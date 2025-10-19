@@ -1,0 +1,374 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Tous les temps - {{ month }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Tous les temps passés</h4>
+                <div class="page-title-right">
+                    <form method="get" class="d-inline-flex">
+                        <select class="form-control me-2" name="project" onchange="this.form.submit()">
+                            <option value="">Tous les projets</option>
+                            {% for project in projects %}
+                                <option value="{{ project.id }}" {{ selectedProject == project.id ? 'selected' : '' }}>
+                                    {{ project.name }} - {{ project.client ?: 'Sans client' }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="month" class="form-control me-2" name="month" value="{{ month }}" onchange="this.form.submit()">
+                        <a href="{{ path('timesheet_index') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Saisir temps
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres et statistiques -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Total heures</p>
+                            <h4 class="mb-2">
+                                {% set totalHours = timesheets|reduce((carry, t) => carry + t.hours, 0) %}
+                                {{ totalHours|number_format(1) }}h
+                            </h4>
+                            <p class="text-muted mb-0">
+                                <span class="text-success fw-bold font-size-12 me-2">
+                                    <i class="ri-arrow-right-up-line me-1 align-middle"></i>
+                                    {{ (totalHours / 8)|round(1) }} jours
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-primary rounded-3">
+                                <i class="ri-time-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Contributeurs actifs</p>
+                            <h4 class="mb-2">
+                                {% set uniqueContributors = [] %}
+                                {% for timesheet in timesheets %}
+                                    {% if timesheet.contributor.id not in uniqueContributors %}
+                                        {% set uniqueContributors = uniqueContributors|merge([timesheet.contributor.id]) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {{ uniqueContributors|length }}
+                            </h4>
+                            <p class="text-muted mb-0">
+                                <span class="text-info fw-bold font-size-12 me-2">
+                                    {{ startDate|date('F Y')|title }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-success rounded-3">
+                                <i class="ri-team-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Projets concernés</p>
+                            <h4 class="mb-2">
+                                {% set uniqueProjects = [] %}
+                                {% for timesheet in timesheets %}
+                                    {% if timesheet.project.id not in uniqueProjects %}
+                                        {% set uniqueProjects = uniqueProjects|merge([timesheet.project.id]) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {{ uniqueProjects|length }}
+                            </h4>
+                            <p class="text-muted mb-0">
+                                <span class="text-warning fw-bold font-size-12 me-2">
+                                    Avec temps saisis
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-warning rounded-3">
+                                <i class="ri-folder-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Moyenne/jour</p>
+                            <h4 class="mb-2">
+                                {% set workingDays = startDate.format('t') %}
+                                {{ (totalHours / workingDays)|number_format(1) }}h
+                            </h4>
+                            <p class="text-muted mb-0">
+                                <span class="text-danger fw-bold font-size-12 me-2">
+                                    Par jour calendaire
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-danger rounded-3">
+                                <i class="ri-bar-chart-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        Temps passés - {{ startDate|date('F Y')|title }}
+                        {% if selectedProject %}
+                            - {{ projects|filter(p => p.id == selectedProject)|first.name }}
+                        {% endif %}
+                    </h4>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary" onclick="exportToCSV()">
+                            <i class="bx bx-download me-1"></i> Export CSV
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="window.print()">
+                            <i class="bx bx-printer me-1"></i> Imprimer
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if timesheets %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="timesheets-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Contributeur</th>
+                                        <th>Projet</th>
+                                        <th>Client</th>
+                                        <th class="text-end">Heures</th>
+                                        <th>Notes</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for timesheet in timesheets|sort((a, b) => b.date <=> a.date) %}
+                                        <tr>
+                                            <td>
+                                                <span class="fw-medium">{{ timesheet.date|date('d/m/Y') }}</span><br>
+                                                <small class="text-muted">{{ timesheet.date|date('l')|trans }}</small>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-xs me-3">
+                                                        <span class="avatar-title rounded-circle bg-primary text-white font-size-12">
+                                                            {{ timesheet.contributor.name|slice(0, 1)|upper }}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">{{ timesheet.contributor.name }}</h6>
+                                                        {% if timesheet.contributor.user %}
+                                                            <small class="text-muted">{{ timesheet.contributor.user.email }}</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0">
+                                                            <a href="{{ path('project_show', {'id': timesheet.project.id}) }}" class="text-dark">
+                                                                {{ timesheet.project.name }}
+                                                            </a>
+                                                        </h6>
+                                                        {% if timesheet.project.isInternal %}
+                                                            <span class="badge bg-info">Interne</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">{{ timesheet.project.client ?: 'Non défini' }}</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="fw-bold text-primary">{{ timesheet.hours|number_format(2) }}h</span>
+                                            </td>
+                                            <td>
+                                                {% if timesheet.notes %}
+                                                    <button type="button" class="btn btn-sm btn-light"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            title="{{ timesheet.notes }}">
+                                                        <i class="bx bx-note text-primary"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{ path('project_show', {'id': timesheet.project.id}) }}"
+                                                       class="btn btn-sm btn-outline-primary" title="Voir le projet">
+                                                        <i class="bx bx-show"></i>
+                                                    </a>
+                                                    <a href="{{ path('contributor_show', {'id': timesheet.contributor.id}) }}"
+                                                       class="btn btn-sm btn-outline-secondary" title="Voir le contributeur">
+                                                        <i class="bx bx-user"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Résumé par contributeur -->
+                        <div class="mt-4">
+                            <h5>Résumé par contributeur</h5>
+                            <div class="row">
+                                {% set contributorTotals = {} %}
+                                {% for timesheet in timesheets %}
+                                    {% set contributorId = timesheet.contributor.id %}
+                                    {% if contributorTotals[contributorId] is not defined %}
+                                        {% set contributorTotals = contributorTotals|merge({(contributorId): {
+                                            'contributor': timesheet.contributor,
+                                            'hours': 0,
+                                            'projects': []
+                                        }}) %}
+                                    {% endif %}
+                                    {% set projectsList = contributorTotals[contributorId].projects %}
+                                    {% if timesheet.project.name not in projectsList %}
+                                        {% set projectsList = projectsList|merge([timesheet.project.name]) %}
+                                    {% endif %}
+                                    {% set contributorTotals = contributorTotals|merge({(contributorId): {
+                                        'contributor': contributorTotals[contributorId].contributor,
+                                        'hours': contributorTotals[contributorId].hours + timesheet.hours,
+                                        'projects': projectsList
+                                    }}) %}
+                                {% endfor %}
+
+                                {% for contributorId, data in contributorTotals %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card border">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-1">{{ data.contributor.name }}</h6>
+                                                        <small class="text-muted">{{ data.projects|length }} projet{{ data.projects|length > 1 ? 's' : '' }}</small>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <h5 class="text-primary mb-0">{{ data.hours|number_format(1) }}h</h5>
+                                                        <small class="text-muted">{{ (data.hours / 8)|round(1) }}j</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="avatar-md mx-auto mb-4">
+                                <div class="avatar-title bg-light text-primary rounded-circle font-size-24">
+                                    <i class="ri-time-line"></i>
+                                </div>
+                            </div>
+                            <h5>Aucun temps saisi</h5>
+                            <p class="text-muted">Aucun temps n'a été saisi pour cette période{% if selectedProject %} sur ce projet{% endif %}.</p>
+                            <a href="{{ path('timesheet_index') }}" class="btn btn-primary">
+                                <i class="bx bx-plus me-1"></i> Commencer la saisie
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Initialiser les tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Fonction d'export CSV
+        function exportToCSV() {
+            const table = document.getElementById('timesheets-table');
+            const rows = table.querySelectorAll('tr');
+            let csvContent = '\uFEFF'; // BOM pour UTF-8
+
+            csvContent += 'Date,Contributeur,Projet,Client,Heures,Notes\n';
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 6) {
+                    const date = cols[0].querySelector('.fw-medium').textContent.trim();
+                    const contributor = cols[1].querySelector('h6').textContent.trim();
+                    const project = cols[2].querySelector('h6 a').textContent.trim();
+                    const client = cols[3].textContent.trim();
+                    const hours = cols[4].querySelector('.fw-bold').textContent.trim().replace('h', '');
+                    const notes = cols[5].querySelector('.btn') ?
+                        cols[5].querySelector('.btn').getAttribute('title') || '' : '';
+
+                    csvContent += `"${date}","${contributor}","${project}","${client}","${hours}","${notes}"\n`;
+                }
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `temps_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Style d'impression
+        const style = document.createElement('style');
+        style.textContent = `
+            @media print {
+                .btn-group, .page-title-right, .card-header .btn-group { display: none !important; }
+                .card { border: 1px solid #dee2e6 !important; }
+                .table { font-size: 12px; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+{% endblock %}

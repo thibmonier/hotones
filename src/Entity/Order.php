@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'orders')]
+class Order
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+
+    #[ORM\Column(type: 'string', length: 180)]
+    private string $name;
+
+    // Numéro unique du devis D[année][mois][numéro incrémental]
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
+    private string $orderNumber;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $notes = null;
+
+    // Contingence (retenue sur la marge)
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
+    private ?string $contingenceAmount = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $contingenceReason = null;
+
+    // Relations
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Project $project = null;
+    // Montant total HT du devis
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
+    private string $totalAmount;
+
+    #[ORM\Column(type: 'date')]
+    private \DateTimeInterface $createdAt;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $validatedAt = null;
+
+    #[ORM\Column(type: 'string', length: 20)]
+    private string $status = 'a_signer'; // a_signer, gagne, signe, perdu, termine, standby, abandonne
+
+    // Relation vers les tâches du devis (ancienne structure)
+    #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderTask::class, cascade: ['persist', 'remove'])]
+    private Collection $tasks;
+
+    // Relation vers les sections du devis (nouvelle structure)
+    #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderSection::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private Collection $sections;
+
+    public function __construct()
+    {
+        $this->tasks = new ArrayCollection();
+        $this->sections = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+    }
+
+    public function getId(): ?int { return $this->id; }
+
+    public function getName(): string { return $this->name; }
+    public function setName(string $name): self { $this->name = $name; return $this; }
+
+    public function getOrderNumber(): string { return $this->orderNumber; }
+    public function setOrderNumber(string $orderNumber): self { $this->orderNumber = $orderNumber; return $this; }
+
+    public function getNotes(): ?string { return $this->notes; }
+    public function setNotes(?string $notes): self { $this->notes = $notes; return $this; }
+
+    public function getContingenceAmount(): ?string { return $this->contingenceAmount; }
+    public function setContingenceAmount(?string $contingenceAmount): self { $this->contingenceAmount = $contingenceAmount; return $this; }
+
+    public function getContingenceReason(): ?string { return $this->contingenceReason; }
+    public function setContingenceReason(?string $contingenceReason): self { $this->contingenceReason = $contingenceReason; return $this; }
+
+    public function getProject(): Project { return $this->project; }
+    public function setProject(Project $project): self { $this->project = $project; return $this; }
+
+    public function getTotalAmount(): string { return $this->totalAmount; }
+    public function setTotalAmount(string $totalAmount): self { $this->totalAmount = $totalAmount; return $this; }
+
+    public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
+    public function setCreatedAt(\DateTimeInterface $createdAt): self { $this->createdAt = $createdAt; return $this; }
+
+    public function getValidatedAt(): ?\DateTimeInterface { return $this->validatedAt; }
+    public function setValidatedAt(?\DateTimeInterface $validatedAt): self { $this->validatedAt = $validatedAt; return $this; }
+
+    public function getStatus(): string { return $this->status; }
+    public function setStatus(string $status): self { $this->status = $status; return $this; }
+
+    public function getTasks(): Collection { return $this->tasks; }
+    public function addTask(OrderTask $task): self 
+    { 
+        if (!$this->tasks->contains($task)) {
+            $this->tasks[] = $task;
+            $task->setOrder($this);
+        }
+        return $this; 
+    }
+    public function removeTask(OrderTask $task): self 
+    { 
+        if ($this->tasks->removeElement($task)) {
+            if ($task->getOrder() === $this) {
+                $task->setOrder(null);
+            }
+        }
+        return $this; 
+    }
+
+    public function getSections(): Collection { return $this->sections; }
+    public function addSection(OrderSection $section): self 
+    { 
+        if (!$this->sections->contains($section)) {
+            $this->sections[] = $section;
+            $section->setOrder($this);
+        }
+        return $this; 
+    }
+    public function removeSection(OrderSection $section): self 
+    { 
+        if ($this->sections->removeElement($section)) {
+            if ($section->getOrder() === $this) {
+                $section->setOrder(null);
+            }
+        }
+        return $this; 
+    }
+
+    /**
+     * Calcule le montant total du devis à partir des sections
+     */
+    public function calculateTotalFromSections(): string
+    {
+        $total = '0';
+        foreach ($this->sections as $section) {
+            $total = bcadd($total, $section->getTotalAmount(), 2);
+        }
+        return $total;
+    }
+
+    /**
+     * Génère un numéro de devis unique
+     */
+    public static function generateOrderNumber(\DateTimeInterface $date): string
+    {
+        $year = $date->format('Y');
+        $month = $date->format('m');
+        
+        // TODO: Implémenter la logique incrémentale en base
+        // Pour l'instant, utilisation d'un timestamp pour l'unicité
+        $increment = $date->format('His'); // Heures/minutes/secondes comme increment temporaire
+        
+        return "D{$year}{$month}{$increment}";
+    }
+}

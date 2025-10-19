@@ -1,0 +1,22 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+{% block title %}Compact Sidebar{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body_tag %}
+<body data-sidebar="dark" data-sidebar-size="small">
+{% endblock %}
+
+{% block content %}
+
+{{ component('breadcrumb', { pagetitle: 'Layouts', title: 'Compact Sidebar' }) }}
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="/assets/js/app.js"></script>
+{% endblock %}

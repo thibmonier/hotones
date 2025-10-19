@@ -1,0 +1,166 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Mon profil</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('profile_edit') }}" class="btn btn-primary">
+                        <i class="bx bx-edit me-1"></i> Modifier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 me-4">
+                            <img src="{{ user.avatar ?: asset('assets/images/users/avatar-1.jpg') }}"
+                                 alt="" class="avatar-md rounded-circle img-thumbnail">
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="text-muted">
+                                <h5 class="mb-1">{{ user.firstName }} {{ user.lastName }}</h5>
+                                <p class="mb-0">{{ user.email }}</p>
+                                {% if user.phone %}
+                                    <p class="mb-0"><i class="bx bx-phone me-1"></i> {{ user.phone }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Sécurité</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="bx bx-shield text-primary font-size-20"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1">Authentification à deux facteurs (2FA)</h6>
+                            {% if user.totpEnabled %}
+                                <span class="badge bg-success">Activée</span>
+                            {% else %}
+                                <span class="badge bg-warning">Désactivée</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ path('profile_2fa_setup') }}" class="btn btn-outline-primary btn-sm">
+                        {% if user.totpEnabled %}
+                            Gérer 2FA
+                        {% else %}
+                            Configurer 2FA
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Informations personnelles</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Prénom</label>
+                                <p class="text-muted mb-0">{{ user.firstName ?: 'Non renseigné' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nom</label>
+                                <p class="text-muted mb-0">{{ user.lastName ?: 'Non renseigné' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <p class="text-muted mb-0">{{ user.email }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Téléphone</label>
+                                <p class="text-muted mb-0">{{ user.phone ?: 'Non renseigné' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Adresse</label>
+                        <p class="text-muted mb-0">{{ user.address ?: 'Non renseignée' }}</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Rôles</label>
+                                <div>
+                                    {% for role in user.roles %}
+                                        {% set roleLabel = '' %}
+                                        {% if role == 'ROLE_USER' %}{% set roleLabel = 'Utilisateur' %}
+                                        {% elseif role == 'ROLE_INTERVENANT' %}{% set roleLabel = 'Intervenant' %}
+                                        {% elseif role == 'ROLE_CHEF_PROJET' %}{% set roleLabel = 'Chef de projet' %}
+                                        {% elseif role == 'ROLE_MANAGER' %}{% set roleLabel = 'Manager' %}
+                                        {% elseif role == 'ROLE_ADMIN' %}{% set roleLabel = 'Administrateur' %}
+                                        {% else %}{% set roleLabel = role %}
+                                        {% endif %}
+                                        <span class="badge bg-primary me-1">{{ roleLabel }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Membre depuis</label>
+                                <p class="text-muted mb-0">{{ user.createdAt ? user.createdAt|date('d/m/Y') : 'Non disponible' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Actions rapides</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="{{ path('timesheet_index') }}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="bx bx-time me-1"></i> Saisir mes temps
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ path('timesheet_my_time') }}" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bx bx-history me-1"></i> Mon historique
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ path('profile_edit') }}" class="btn btn-outline-success w-100 mb-2">
+                                <i class="bx bx-edit me-1"></i> Modifier profil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

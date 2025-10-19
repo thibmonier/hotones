@@ -1,0 +1,300 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}{{ contributor.name }} - Contributeur{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">{{ contributor.name }}</h4>
+                <div class="page-title-right">
+                    <div class="btn-group">
+                        <a href="{{ path('contributor_index') }}" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Liste
+                        </a>
+                        {% if is_granted('ROLE_MANAGER') %}
+                            <a href="{{ path('contributor_edit', {'id': contributor.id}) }}" class="btn btn-primary">
+                                <i class="bx bx-edit me-1"></i> Modifier
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <!-- Informations générales -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-lg mx-auto mb-3">
+                            <div class="avatar-title bg-primary text-white rounded-circle font-size-24">
+                                {{ contributor.name|slice(0, 1)|upper }}
+                            </div>
+                        </div>
+                        <h5 class="mb-1">{{ contributor.name }}</h5>
+                        {% if contributor.active %}
+                            <span class="badge bg-success">Actif</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactif</span>
+                        {% endif %}
+                    </div>
+
+                    {% if contributor.email or contributor.phone %}
+                        <div class="mb-4">
+                            {% if contributor.email %}
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bx bx-envelope text-primary me-2"></i>
+                                    <a href="mailto:{{ contributor.email }}" class="text-muted">{{ contributor.email }}</a>
+                                </div>
+                            {% endif %}
+                            {% if contributor.phone %}
+                                <div class="d-flex align-items-center">
+                                    <i class="bx bx-phone text-primary me-2"></i>
+                                    <a href="tel:{{ contributor.phone }}" class="text-muted">{{ contributor.phone }}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% if contributor.notes %}
+                        <div class="mb-4">
+                            <h6 class="font-size-14 mb-2">Notes</h6>
+                            <p class="text-muted mb-0">{{ contributor.notes }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Compte utilisateur lié -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Compte utilisateur</h5>
+                </div>
+                <div class="card-body">
+                    {% if contributor.user %}
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm me-3">
+                                <div class="avatar-title bg-success text-white rounded-circle">
+                                    <i class="bx bx-user"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">{{ contributor.user.firstName }} {{ contributor.user.lastName }}</h6>
+                                <p class="text-muted mb-0">{{ contributor.user.email }}</p>
+                                <small class="text-success">
+                                    <i class="bx bx-check-circle me-1"></i>
+                                    Compte actif
+                                </small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <div class="avatar-sm mx-auto mb-3">
+                                <div class="avatar-title bg-warning text-white rounded-circle">
+                                    <i class="bx bx-user-x"></i>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0">Aucun compte utilisateur associé</p>
+                            {% if is_granted('ROLE_MANAGER') %}
+                                <small class="text-muted">Modifiez le contributeur pour l'associer à un compte</small>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actions rapides -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('contributor_timesheets', {'id': contributor.id}) }}" class="btn btn-outline-primary">
+                            <i class="bx bx-time me-1"></i> Voir les temps passés
+                        </a>
+                        {% if is_granted('ROLE_MANAGER') %}
+                            <a href="{{ path('contributor_employment_periods', {'id': contributor.id}) }}" class="btn btn-outline-info">
+                                <i class="bx bx-briefcase me-1"></i> Périodes d'emploi
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <!-- Profils et compétences -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Profils et compétences</h5>
+                </div>
+                <div class="card-body">
+                    {% if contributor.profiles|length > 0 %}
+                        <div class="row">
+                            {% for profile in contributor.profiles %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-xs me-3">
+                                            <div class="avatar-title bg-info text-white rounded-circle">
+                                                <i class="bx bx-user-circle"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ profile.name }}</h6>
+                                            {% if profile.description %}
+                                                <small class="text-muted">{{ profile.description }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="avatar-sm mx-auto mb-3">
+                                <div class="avatar-title bg-light text-muted rounded-circle">
+                                    <i class="bx bx-user-circle"></i>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0">Aucun profil défini</p>
+                            {% if is_granted('ROLE_MANAGER') %}
+                                <small class="text-muted">Modifiez le contributeur pour ajouter des profils</small>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Informations financières -->
+            {% if is_granted('ROLE_MANAGER') %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations financières</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Coût Journalier Moyen (CJM)</label>
+                                {% if contributor.cjm %}
+                                    <p class="text-success mb-0 h5">{{ contributor.cjm|number_format(0) }} €</p>
+                                    <small class="text-muted">Par jour de travail</small>
+                                {% else %}
+                                    <p class="text-muted mb-0">Non défini</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tarif Journalier Moyen (TJM)</label>
+                                {% if contributor.tjm %}
+                                    <p class="text-primary mb-0 h5">{{ contributor.tjm|number_format(0) }} €</p>
+                                    <small class="text-muted">Tarif de vente moyen</small>
+                                {% else %}
+                                    <p class="text-muted mb-0">Non défini</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if contributor.cjm and contributor.tjm %}
+                        {% set marginRate = ((contributor.tjm - contributor.cjm) / contributor.tjm * 100)|round(1) %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Marge théorique</label>
+                                    <p class="mb-0 h5 {% if marginRate >= 20 %}text-success{% elseif marginRate >= 10 %}text-warning{% else %}text-danger{% endif %}">
+                                        {{ marginRate }}%
+                                    </p>
+                                    <small class="text-muted">{{ (contributor.tjm - contributor.cjm)|number_format(0) }}€ / jour</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Périodes d'emploi récentes -->
+            {% if is_granted('ROLE_MANAGER') %}
+            {% set hasEmploymentPeriods = false %}
+            {% if contributor.employmentPeriods is defined and contributor.employmentPeriods|length > 0 %}
+                {% set hasEmploymentPeriods = true %}
+            {% endif %}
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Périodes d'emploi</h5>
+                    <a href="{{ path('contributor_employment_periods', {'id': contributor.id}) }}" class="btn btn-sm btn-outline-primary">
+                        Gérer les périodes
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if hasEmploymentPeriods %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Période</th>
+                                        <th>CJM</th>
+                                        <th>Temps</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for period in contributor.employmentPeriods|slice(0, 3) %}
+                                        <tr>
+                                            <td>
+                                                {{ period.startDate|date('d/m/Y') }}
+                                                {% if period.endDate %}
+                                                    - {{ period.endDate|date('d/m/Y') }}
+                                                {% else %}
+                                                    - <span class="text-success">En cours</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if period.cjm %}
+                                                    {{ period.cjm|number_format(0) }}€
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ period.weeklyHours|default(35) }}h/sem
+                                                {% if period.workingTimePercentage and period.workingTimePercentage != 100 %}
+                                                    ({{ period.workingTimePercentage }}%)
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if not period.endDate %}
+                                                    <span class="badge bg-success">Active</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Terminée</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="avatar-sm mx-auto mb-3">
+                                <div class="avatar-title bg-light text-muted rounded-circle">
+                                    <i class="bx bx-briefcase"></i>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0">Aucune période d'emploi définie</p>
+                            <small class="text-muted">Ajoutez des périodes pour un suivi détaillé des coûts</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

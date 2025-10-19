@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activer 2FA{% endblock %}
+
+{% block body %}
+  <h1>Activer 2FA</h1>
+  <p>Scannez ce QR Code dans Google Authenticator puis activez le 2FA.</p>
+  <p><img alt="QR" src="{{ qr_code_data_uri(otpauth_uri) }}" /></p>
+  <p>Ou utilisez ce code secret: <code>{{ secret }}</code></p>
+  <p><a href="{{ path('me_2fa_activate') }}">J'ai configuré mon application, activer 2FA</a></p>
+{% endblock %}

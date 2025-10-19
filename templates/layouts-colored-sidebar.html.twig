@@ -1,0 +1,21 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+{% block title %}Colored Sidebar{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body_tag %}
+<body data-sidebar="colored">
+{% endblock %}
+
+{% block content %}
+
+{{ component('breadcrumb', { pagetitle: 'Layouts', title: 'Colored Sidebar' }) }}
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="/assets/js/app.js"></script>
+{% endblock %}

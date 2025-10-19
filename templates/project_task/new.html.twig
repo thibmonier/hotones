@@ -1,0 +1,306 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Nouvelle tâche - {{ project.name }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouvelle tâche</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('project_index') }}">Projets</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('project_details', {id: project.id}) }}">{{ project.name }}</a></li>
+                        <li class="breadcrumb-item active">Nouvelle tâche</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="bx bx-plus me-2"></i>
+                        Créer une nouvelle tâche
+                    </h4>
+                    <p class="card-title-desc">
+                        Projet : <strong>{{ project.name }}</strong>
+                        {% if project.client %}
+                            - {{ project.client }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <!-- Informations générales -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-info-circle me-2"></i>
+                                Informations générales
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.name) }}
+                                {{ form_widget(form.name) }}
+                                {{ form_help(form.name) }}
+                                {% if form.name.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form_errors(form.name) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.type) }}
+                                {{ form_widget(form.type) }}
+                                {{ form_help(form.type) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.status) }}
+                                {{ form_widget(form.status) }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                {{ form_label(form.description) }}
+                                {{ form_widget(form.description) }}
+                                {{ form_help(form.description) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estimations et avancement -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-time me-2"></i>
+                                Estimations et avancement
+                            </h5>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.estimatedHoursSold) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.estimatedHoursSold) }}
+                                    <span class="input-group-text">h</span>
+                                </div>
+                                {{ form_help(form.estimatedHoursSold) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.estimatedHoursRevised) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.estimatedHoursRevised) }}
+                                    <span class="input-group-text">h</span>
+                                </div>
+                                {{ form_help(form.estimatedHoursRevised) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.progressPercentage) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.progressPercentage) }}
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                {{ form_help(form.progressPercentage) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.dailyRate) }}
+                                {{ form_widget(form.dailyRate) }}
+                                {{ form_help(form.dailyRate) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Affectation -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-user me-2"></i>
+                                Affectation
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.assignedContributor) }}
+                                {{ form_widget(form.assignedContributor) }}
+                                {{ form_help(form.assignedContributor) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.requiredProfile) }}
+                                {{ form_widget(form.requiredProfile) }}
+                                {{ form_help(form.requiredProfile) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Planification -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-calendar me-2"></i>
+                                Planification
+                            </h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form_label(form.startDate) }}
+                                {{ form_widget(form.startDate) }}
+                                {{ form_help(form.startDate) }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form_label(form.endDate) }}
+                                {{ form_widget(form.endDate) }}
+                                {{ form_help(form.endDate) }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form_label(form.position) }}
+                                {{ form_widget(form.position) }}
+                                {{ form_help(form.position) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-cog me-2"></i>
+                                Options
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-3">
+                                {{ form_widget(form.countsForProfitability) }}
+                                {{ form_label(form.countsForProfitability, null, {label_attr: {class: 'form-check-label'}}) }}
+                                <div class="form-text">{{ form_help(form.countsForProfitability) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-3">
+                                {{ form_widget(form.active) }}
+                                {{ form_label(form.active, null, {label_attr: {class: 'form-check-label'}}) }}
+                                <div class="form-text">{{ form_help(form.active) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ path('project_details', {id: project.id}) }}" class="btn btn-secondary">
+                                    <i class="bx bx-arrow-back me-1"></i>
+                                    Retour au projet
+                                </a>
+                                <div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-save me-1"></i>
+                                        Créer la tâche
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar avec informations du projet -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Informations du projet</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Nom :</strong></td>
+                                <td>{{ project.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Client :</strong></td>
+                                <td>{{ project.client ?? 'Non défini' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Type :</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ project.projectType == 'forfait' ? 'primary' : 'info' }}">
+                                        {{ project.projectType|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Statut :</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ project.status == 'active' ? 'success' : 'secondary' }}">
+                                        {{ project.status|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% if project.projectManager %}
+                            <tr>
+                                <td><strong>Chef de projet :</strong></td>
+                                <td>{{ project.projectManager.fullName }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td><strong>Tâches existantes :</strong></td>
+                                <td>{{ project.tasks|length }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{{ path('project_details', {id: project.id}) }}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bx bx-bar-chart-alt-2 me-1"></i>
+                            Voir les détails du projet
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Aide</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Types de tâches</h5>
+                        <p class="mb-2"><strong>Tâche vendue :</strong> Tâche facturée au client</p>
+                        <p class="mb-2"><strong>AVV :</strong> Avant-vente (non facturé)</p>
+                        <p class="mb-0"><strong>Non-vendu :</strong> Travail non facturable</p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">Rentabilité</h5>
+                        <p class="mb-0">Les tâches AVV et Non-vendu ne comptent pas dans les calculs de rentabilité par défaut.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

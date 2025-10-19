@@ -1,0 +1,437 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Modifier {{ task.name }} - {{ project.name }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Modifier la tâche</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('project_index') }}">Projets</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('project_details', {id: project.id}) }}">{{ project.name }}</a></li>
+                        <li class="breadcrumb-item active">{{ task.name }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="bx bx-edit me-2"></i>
+                        Modifier la tâche : {{ task.name }}
+                    </h4>
+                    <p class="card-title-desc">
+                        Projet : <strong>{{ project.name }}</strong>
+                        {% if project.client %}
+                            - {{ project.client }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <!-- Informations générales -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-info-circle me-2"></i>
+                                Informations générales
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.name) }}
+                                {{ form_widget(form.name) }}
+                                {{ form_help(form.name) }}
+                                {% if form.name.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form_errors(form.name) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.type) }}
+                                {{ form_widget(form.type) }}
+                                {{ form_help(form.type) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.status) }}
+                                {{ form_widget(form.status) }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                {{ form_label(form.description) }}
+                                {{ form_widget(form.description) }}
+                                {{ form_help(form.description) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estimations et avancement -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-time me-2"></i>
+                                Estimations et avancement
+                            </h5>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.estimatedHoursSold) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.estimatedHoursSold) }}
+                                    <span class="input-group-text">h</span>
+                                </div>
+                                {{ form_help(form.estimatedHoursSold) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.estimatedHoursRevised) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.estimatedHoursRevised) }}
+                                    <span class="input-group-text">h</span>
+                                </div>
+                                {{ form_help(form.estimatedHoursRevised) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.progressPercentage) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.progressPercentage) }}
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                {{ form_help(form.progressPercentage) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form_label(form.dailyRate) }}
+                                {{ form_widget(form.dailyRate) }}
+                                {{ form_help(form.dailyRate) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Affectation -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-user me-2"></i>
+                                Affectation
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.assignedContributor) }}
+                                {{ form_widget(form.assignedContributor) }}
+                                {{ form_help(form.assignedContributor) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.requiredProfile) }}
+                                {{ form_widget(form.requiredProfile) }}
+                                {{ form_help(form.requiredProfile) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Planification -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-calendar me-2"></i>
+                                Planification
+                            </h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form_label(form.startDate) }}
+                                {{ form_widget(form.startDate) }}
+                                {{ form_help(form.startDate) }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form_label(form.endDate) }}
+                                {{ form_widget(form.endDate) }}
+                                {{ form_help(form.endDate) }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form_label(form.position) }}
+                                {{ form_widget(form.position) }}
+                                {{ form_help(form.position) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="font-size-16 mb-3">
+                                <i class="bx bx-cog me-2"></i>
+                                Options
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-3">
+                                {{ form_widget(form.countsForProfitability) }}
+                                {{ form_label(form.countsForProfitability, null, {label_attr: {class: 'form-check-label'}}) }}
+                                <div class="form-text">{{ form_help(form.countsForProfitability) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-3">
+                                {{ form_widget(form.active) }}
+                                {{ form_label(form.active, null, {label_attr: {class: 'form-check-label'}}) }}
+                                <div class="form-text">{{ form_help(form.active) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ path('project_details', {id: project.id}) }}" class="btn btn-secondary">
+                                    <i class="bx bx-arrow-back me-1"></i>
+                                    Retour au projet
+                                </a>
+                                <div>
+                                    <button type="button" 
+                                            class="btn btn-outline-danger me-2" 
+                                            onclick="confirmDeleteTask()">
+                                        <i class="bx bx-trash me-1"></i>
+                                        Supprimer la tâche
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-save me-1"></i>
+                                        Enregistrer les modifications
+                                    </button>
+                                </div>
+                                
+                                <!-- Formulaire caché pour la suppression -->
+                                <form id="delete-form" 
+                                      action="{{ path('project_task_delete', {id: task.id}) }}" 
+                                      method="post" 
+                                      style="display: none;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ task.id) }}">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar avec informations de la tâche -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Informations de la tâche</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Type :</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ task.type == 'regular' ? 'primary' : 'secondary' }}">
+                                        {{ task.typeLabel }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Statut :</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 
+                                        task.status == 'completed' ? 'success' : 
+                                        (task.status == 'in_progress' ? 'primary' : 
+                                        (task.status == 'on_hold' ? 'warning' : 'secondary'))
+                                    }}">
+                                        {{ task.statusLabel }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Position :</strong></td>
+                                <td>{{ task.position }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Temps passé :</strong></td>
+                                <td>{{ (task.totalHours / 8)|number_format(1) }} jour(s)</td>
+                            </tr>
+                            {% if task.assignedContributor %}
+                            <tr>
+                                <td><strong>Assigné à :</strong></td>
+                                <td>{{ task.assignedContributor.name }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td><strong>Rentable :</strong></td>
+                                <td>
+                                    {% if task.countsForProfitability %}
+                                        <span class="badge bg-success">Oui</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Non</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Active :</strong></td>
+                                <td>
+                                    {% if task.active %}
+                                        <span class="badge bg-success">Oui</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Informations du projet</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Nom :</strong></td>
+                                <td>{{ project.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Client :</strong></td>
+                                <td>{{ project.client ?? 'Non défini' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Type :</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ project.projectType == 'forfait' ? 'primary' : 'info' }}">
+                                        {{ project.projectType|title }}
+                                    </span>
+                                </td>
+            </tr>
+                            <tr>
+                                <td><strong>Statut :</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ project.status == 'active' ? 'success' : 'secondary' }}">
+                                        {{ project.status|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% if project.projectManager %}
+                            <tr>
+                                <td><strong>Chef de projet :</strong></td>
+                                <td>{{ project.projectManager.fullName }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td><strong>Tâches totales :</strong></td>
+                                <td>{{ project.tasks|length }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{{ path('project_details', {id: project.id}) }}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bx bx-bar-chart-alt-2 me-1"></i>
+                            Voir les détails du projet
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Temps passé</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Total :</strong></td>
+                                <td>{{ task.totalHours }}h ({{ (task.totalHours / 8)|number_format(1) }}j)</td>
+                            </tr>
+                            {% if task.estimatedHoursSold %}
+                            <tr>
+                                <td><strong>Vendu :</strong></td>
+                                <td>{{ task.estimatedHoursSold }}h ({{ (task.estimatedHoursSold / 8)|number_format(1) }}j)</td>
+                            </tr>
+                            {% endif %}
+                            {% if task.estimatedHoursRevised %}
+                            <tr>
+                                <td><strong>Estimé :</strong></td>
+                                <td>{{ task.estimatedHoursRevised }}h ({{ (task.estimatedHoursRevised / 8)|number_format(1) }}j)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Restant :</strong></td>
+                                <td>{{ task.remainingHours }}h ({{ (task.remainingHours / 8)|number_format(1) }}j)</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td><strong>Avancement :</strong></td>
+                                <td>
+                                    <div class="progress" style="height: 15px;">
+                                        <div class="progress-bar bg-success" style="width: {{ task.progressPercentage }}%">
+                                            {{ task.progressPercentage }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Aide</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Modification</h5>
+                        <p class="mb-0">Vous pouvez modifier tous les paramètres de la tâche. Les modifications seront immédiatement prises en compte dans les calculs du projet.</p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">Attention</h5>
+                        <p class="mb-0">Modifier le type ou la rentabilité de la tâche peut affecter les métriques globales du projet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function confirmDeleteTask() {
+            if (confirm('Voulez-vous vraiment supprimer la tâche "{{ task.name|e('js') }}" ?\n\nCette action est irréversible et supprimera toutes les données associées.')) {
+                document.getElementById('delete-form').submit();
+            }
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">{{ project.name }}</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('project_index') }}" class="btn btn-secondary me-2">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <a href="{{ path('project_edit', {'id': project.id}) }}" class="btn btn-primary">
+                            <i class="bx bx-edit me-1"></i> Modifier
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Vue d'ensemble</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h5 class="font-size-15 mb-1">{{ project.totalSoldAmount|number_format(2, ',', ' ') }}€</h5>
+                                <p class="text-muted mb-0">CA Total</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h5 class="font-size-15 mb-1">{{ project.totalSoldDays|number_format(1, ',', ' ') }}</h5>
+                                <p class="text-muted mb-0">Jours vendus</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h5 class="font-size-15 mb-1">{{ project.orders|length }}</h5>
+                                <p class="text-muted mb-0">Devis</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <span class="badge bg-{% if project.status == 'active' %}success{% elseif project.status == 'completed' %}primary{% else %}warning{% endif %} font-size-12">
+                                    {{ project.status|title }}
+                                </span>
+                                <p class="text-muted mb-0">Statut</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Informations</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-nowrap mb-0">
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="width: 50%;">Client :</th>
+                                    <td>{{ project.client ?? 'Non défini' }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Type de projet :</th>
+                                    <td>
+                                        <span class="badge bg-{% if project.isInternal %}info{% else %}primary{% endif %}">
+                                            {{ project.isInternal ? 'Interne' : 'Client' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Catégorie :</th>
+                                    <td>
+                                        {% if project.serviceCategory %}
+                                            <span class="badge bg-secondary">{{ project.serviceCategory.name }}</span>
+                                        {% else %}
+                                            Non définie
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Technologies :</th>
+                                    <td>
+                                        {% for tech in project.technologies %}
+                                            <span class="badge bg-light text-dark me-1">{{ tech.name }}</span>
+                                        {% else %}
+                                            Aucune technologie définie
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% if project.startDate %}
+                                <tr>
+                                    <th scope="row">Date de début :</th>
+                                    <td>{{ project.startDate|date('d/m/Y') }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if project.endDate %}
+                                <tr>
+                                    <th scope="row">Date de fin :</th>
+                                    <td>{{ project.endDate|date('d/m/Y') }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if project.description %}
+                                <tr>
+                                    <th scope="row">Description :</th>
+                                    <td>{{ project.description|nl2br }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% if project.purchasesAmount %}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Achats et fournitures</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="text-muted">Montant total des achats</span>
+                        <h5 class="mb-0">{{ project.purchasesAmount|number_format(2, ',', ' ') }}€</h5>
+                    </div>
+                    {% if project.purchasesDescription %}
+                        <p class="text-muted mb-0">{{ project.purchasesDescription|nl2br }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Devis du projet</h4>
+                    <div class="card-header-action">
+                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                            <a href="#" class="btn btn-sm btn-primary">
+                                <i class="bx bx-plus"></i> Nouveau devis
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% for order in project.orders %}
+                        <div class="border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-1">{{ order.name }}</h6>
+                                <span class="badge bg-{% if order.status == 'validated' %}success{% elseif order.status == 'in_progress' %}primary{% else %}secondary{% endif %}">
+                                    {{ order.status|title }}
+                                </span>
+                            </div>
+                            <div class="text-muted small">
+                                <div>CA: {{ order.totalAmount|number_format(2, ',', ' ') }}€</div>
+                                {% if order.contingenceAmount %}
+                                    <div>Contingence: {{ order.contingenceAmount|number_format(2, ',', ' ') }}€</div>
+                                {% endif %}
+                                <div>Créé le {{ order.createdAt|date('d/m/Y') }}</div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bx bx-file font-size-24 mb-2"></i>
+                            <p>Aucun devis pour ce projet</p>
+                            {% if is_granted('ROLE_CHEF_PROJET') %}
+                                <a href="#" class="btn btn-primary btn-sm">Créer le premier devis</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

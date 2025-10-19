@@ -1,0 +1,508 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% set title = 'Détails du projet : ' ~ project.name %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.min.css" rel="stylesheet">
+    <style>
+        .progress-custom {
+            height: 8px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .metric-card.revenue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .metric-card.time {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        .metric-card.margin {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        .task-status {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            height: 400px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête du projet -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('project_index') }}">Projets</a></li>
+                        <li class="breadcrumb-item active">{{ project.name }}</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">{{ title }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations du projet -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-folder-outline"></i>
+                        {{ project.name }}
+                        <span class="badge bg-{{ project.status == 'active' ? 'success' : 'secondary' }} ms-2">
+                            {{ project.status|title }}
+                        </span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Client :</strong> {{ project.client ?? 'Non défini' }}</p>
+                            <p><strong>Type :</strong>
+                                <span class="badge bg-{{ project.projectType == 'forfait' ? 'primary' : 'info' }}">
+                                    {{ project.projectType|title }}
+                                </span>
+                            </p>
+                            <p><strong>Dates :</strong>
+                                {% if project.startDate %}
+                                    {{ project.startDate|date('d/m/Y') }}
+                                {% endif %}
+                                {% if project.startDate and project.endDate %} → {% endif %}
+                                {% if project.endDate %}
+                                    {{ project.endDate|date('d/m/Y') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Chef de projet :</strong>
+                                {{ project.projectManager ? project.projectManager.fullName : 'Non assigné' }}
+                            </p>
+                            <p><strong>Commercial :</strong>
+                                {{ project.keyAccountManager ? project.keyAccountManager.fullName : 'Non assigné' }}
+                            </p>
+                            <p><strong>Avancement global :</strong></p>
+                            <div class="progress progress-custom">
+                                <div class="progress-bar" role="progressbar" style="width: {{ metrics.global_progress }}%"
+                                     aria-valuenow="{{ metrics.global_progress }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ metrics.global_progress }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if project.description %}
+                    <div class="mt-3">
+                        <strong>Description :</strong>
+                        <p class="text-muted">{{ project.description }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Métriques rapides -->
+        <div class="col-md-4">
+            <div class="metric-card revenue">
+                <h6>Chiffre d'Affaires</h6>
+                <h4>{{ metrics.total_sold_amount|number_format(0, ',', ' ') }}€</h4>
+                <small>Devis validés</small>
+            </div>
+
+            <div class="metric-card time">
+                <h6>Temps Projet</h6>
+                <h4>{{ metrics.total_spent_days|number_format(1) }}j / {{ metrics.total_revised_days|number_format(1) }}j</h4>
+                <small>Passé / Estimé</small>
+            </div>
+
+            <div class="metric-card margin">
+                <h6>Marge Cible</h6>
+                <h4>{{ metrics.target_margin_percentage }}%</h4>
+                <small>{{ metrics.target_gross_margin|number_format(0, ',', ' ') }}€</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intervenants du projet -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-account-group"></i>
+                        Intervenants du projet ({{ projectContributors|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if projectContributors|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Contributeur</th>
+                                    <th>Temps passé</th>
+                                    <th>Temps restant</th>
+                                    <th>Total estimé</th>
+                                    <th>Taux d'avancement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contributor in projectContributors %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ contributor.contributor.name }}</strong>
+                                    </td>
+                                    <td>{{ (contributor.spent_hours / 8)|number_format(1) }}j</td>
+                                    <td>{{ (contributor.remaining_hours / 8)|number_format(1) }}j</td>
+                                    <td>{{ (contributor.estimated_hours / 8)|number_format(1) }}j</td>
+                                    <td>
+                                        {% set progress = contributor.estimated_hours > 0 ? (contributor.spent_hours / contributor.estimated_hours * 100) : 0 %}
+                                        <div class="progress progress-custom">
+                                            <div class="progress-bar bg-info" style="width: {{ progress }}%"></div>
+                                        </div>
+                                        <small>{{ progress|number_format(0) }}%</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Aucun intervenant assigné aux tâches du projet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des tâches -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-clipboard-list"></i>
+                        Tâches du projet ({{ tasks|length }})
+                    </h5>
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                    <a href="{{ path('project_task_new', {id: project.id}) }}" class="btn btn-primary btn-sm">
+                        <i class="mdi mdi-plus"></i> Nouvelle tâche
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if tasks|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tâche</th>
+                                    <th>Assigné à</th>
+                                    <th>Statut</th>
+                                    <th>Temps vendu</th>
+                                    <th>Temps révisé</th>
+                                    <th>Temps passé</th>
+                                    <th>Avancement</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ task.name }}</strong>
+                                        {% if task.description %}
+                                            <br><small class="text-muted">{{ task.description|slice(0, 60) }}{{ task.description|length > 60 ? '...' : '' }}</small>
+                                        {% endif %}
+                                        {% if not task.countsForProfitability %}
+                                            <span class="badge bg-warning ms-1">Non-rentable</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ task.assignedContributor is defined and task.assignedContributor ? task.assignedContributor.name : '-' }}
+                                    </td>
+                                    <td>
+                                        <span class="badge task-status bg-{{
+                                            task.status == 'completed' ? 'success' :
+                                            (task.status == 'in_progress' ? 'primary' :
+                                            (task.status == 'on_hold' ? 'warning' : 'secondary'))
+                                        }}">
+                                            {{ task.statusLabel }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if task.estimatedHoursSold is defined and task.estimatedHoursSold %}
+                                            {{ (task.estimatedHoursSold / 8)|number_format(1) }}j
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.estimatedHoursRevised is defined and task.estimatedHoursRevised %}
+                                            {{ (task.estimatedHoursRevised / 8)|number_format(1) }}j
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.totalHours is defined %}
+                                            {{ (task.totalHours / 8)|number_format(1) }}j
+                                        {% else %}
+                                            0j
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% set progress = task.progressPercentage is defined ? task.progressPercentage : 0 %}
+                                        <div class="progress progress-custom">
+                                            <div class="progress-bar bg-success" style="width: {{ progress }}%"></div>
+                                        </div>
+                                        {{ progress }}%
+                                    </td>
+                                    <td>
+                                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ path('project_task_edit', {id: task.id}) }}" 
+                                               class="btn btn-outline-primary btn-sm" title="Éditer">
+                                                <i class="mdi mdi-pencil"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-outline-danger btn-sm" 
+                                                    title="Supprimer"
+                                                    onclick="confirmDeleteTask({{ task.id }}, '{{ task.name|e('js') }}')">
+                                                <i class="mdi mdi-delete"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Formulaire caché pour la suppression -->
+                                        <form id="delete-form-{{ task.id }}" 
+                                              action="{{ path('project_task_delete', {id: task.id}) }}" 
+                                              method="post" 
+                                              style="display: none;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ task.id) }}">
+                                        </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="mdi mdi-clipboard-outline" style="font-size: 48px; color: #ccc;"></i>
+                        <p class="text-muted">Aucune tâche définie pour ce projet.</p>
+                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <a href="{{ path('project_task_new', {id: project.id}) }}" class="btn btn-primary">
+                            <i class="mdi mdi-plus"></i> Créer la première tâche
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue rapide des chiffres -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-calculator"></i>
+                        Synthèse financière
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>CA vendu (devis)</strong></td>
+                            <td class="text-end">{{ metrics.total_sold_amount|number_format(0, ',', ' ') }}€</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CA tâches vendues</strong></td>
+                            <td class="text-end">{{ metrics.total_tasks_sold_amount|number_format(0, ',', ' ') }}€</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coût estimé</strong></td>
+                            <td class="text-end">{{ metrics.estimated_cost|number_format(0, ',', ' ') }}€</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Achats rattachés</strong></td>
+                            <td class="text-end">{{ metrics.purchases_amount|number_format(0, ',', ' ') }}€</td>
+                        </tr>
+                        <tr class="table-success">
+                            <td><strong>Marge brute cible</strong></td>
+                            <td class="text-end"><strong>{{ metrics.target_gross_margin|number_format(0, ',', ' ') }}€</strong></td>
+                        </tr>
+                        <tr class="table-info">
+                            <td><strong>Taux de marge cible</strong></td>
+                            <td class="text-end"><strong>{{ metrics.target_margin_percentage }}%</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-clock-outline"></i>
+                        Synthèse temporelle
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>Jours vendus</strong></td>
+                            <td class="text-end">{{ metrics.total_sold_days|number_format(1) }}j</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jours révisés</strong></td>
+                            <td class="text-end">{{ metrics.total_revised_days|number_format(1) }}j</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jours passés</strong></td>
+                            <td class="text-end">{{ metrics.total_spent_days|number_format(1) }}j</td>
+                        </tr>
+                        <tr class="table-warning">
+                            <td><strong>Jours restants</strong></td>
+                            <td class="text-end"><strong>{{ metrics.total_remaining_days|number_format(1) }}j</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tâches terminées</strong></td>
+                            <td class="text-end">{{ metrics.completed_tasks }} / {{ metrics.total_tasks }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tâches en cours</strong></td>
+                            <td class="text-end">{{ metrics.in_progress_tasks }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    {% if taskProgressData.labels|length > 0 %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h6>Avancement des tâches</h6>
+                <canvas id="taskProgressChart"></canvas>
+            </div>
+        </div>
+        {% if contributorHoursData.labels|length > 0 %}
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h6>Répartition par intervenant</h6>
+                <canvas id="contributorChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        {% if taskProgressData.labels|length > 0 %}
+        // Graphique d'avancement des tâches
+        const taskCtx = document.getElementById('taskProgressChart').getContext('2d');
+        new Chart(taskCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ taskProgressData.labels|json_encode|raw }},
+                datasets: [{
+                    label: 'Avancement (%)',
+                    data: {{ taskProgressData.progress|json_encode|raw }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        {% endif %}
+
+        {% if contributorHoursData.labels|length > 0 %}
+        // Graphique répartition contributeurs
+        const contributorCtx = document.getElementById('contributorChart').getContext('2d');
+        new Chart(contributorCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ contributorHoursData.labels|json_encode|raw }},
+                datasets: [{
+                    label: 'Heures passées',
+                    data: {{ contributorHoursData.spentHours|json_encode|raw }},
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                }, {
+                    label: 'Heures restantes',
+                    data: {{ contributorHoursData.remainingHours|json_encode|raw }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        {% endif %}
+        
+        // Fonction pour confirmer la suppression d'une tâche
+        function confirmDeleteTask(taskId, taskName) {
+            if (confirm('Voulez-vous vraiment supprimer la tâche "' + taskName + '" ?\n\nCette action est irréversible.')) {
+                document.getElementById('delete-form-' + taskId).submit();
+            }
+        }
+    </script>
+{% endblock %}

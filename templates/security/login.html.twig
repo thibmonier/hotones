@@ -1,0 +1,8 @@
+{% extends 'auth-login.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% set form_action = path('app_login') %}
+{% set username_value = last_username|default('') %}
+{% set error_message = error ? error.messageKey|trans(error.messageData, 'security') : null %}
+{% set csrf_token_value = csrf_token('authenticate') %}

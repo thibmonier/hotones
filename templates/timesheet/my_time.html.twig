@@ -1,0 +1,263 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Mes temps - {{ month }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Mes temps passés</h4>
+                <div class="page-title-right">
+                    <form method="get" class="d-inline-flex">
+                        <input type="month" class="form-control me-2" name="month" value="{{ month }}" onchange="this.form.submit()">
+                        <a href="{{ path('timesheet_index') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Saisir des temps
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Résumé mensuel -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Total heures</p>
+                            <h4 class="mb-2">{{ totalHours|number_format(1) }}h</h4>
+                            <p class="text-muted mb-0">
+                                <span class="text-success fw-bold font-size-12 me-2">
+                                    <i class="ri-arrow-right-up-line me-1 align-middle"></i>
+                                    {{ (totalHours / 8)|round(1) }} jours
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-primary rounded-3">
+                                <i class="ri-time-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Projets actifs</p>
+                            <h4 class="mb-2">{{ projectTotals|length }}</h4>
+                            <p class="text-muted mb-0">
+                                <span class="text-info fw-bold font-size-12 me-2">
+                                    Ce mois
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-success rounded-3">
+                                <i class="ri-folder-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Moyenne/jour</p>
+                            <h4 class="mb-2">{{ (totalHours / startDate.format('t'))|number_format(1) }}h</h4>
+                            <p class="text-muted mb-0">
+                                <span class="text-warning fw-bold font-size-12 me-2">
+                                    Par jour ouvré
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-warning rounded-3">
+                                <i class="ri-bar-chart-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Objectif mensuel</p>
+                            {% set monthlyTarget = (35 * 4.33)|round %} {# Approximation #}
+                            <h4 class="mb-2">{{ ((totalHours / monthlyTarget) * 100)|round }}%</h4>
+                            <p class="text-muted mb-0">
+                                <span class="{% if (totalHours / monthlyTarget) >= 1 %}text-success{% else %}text-danger{% endif %} fw-bold font-size-12 me-2">
+                                    {{ totalHours }}/{{ monthlyTarget }}h
+                                </span>
+                            </p>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-danger rounded-3">
+                                <i class="ri-target-line font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Historique détaillé -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Historique détaillé - {{ startDate|date('F Y')|title }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Projet</th>
+                                    <th>Client</th>
+                                    <th class="text-end">Heures</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for timesheet in timesheets|sort((a, b) => b.date <=> a.date) %}
+                                    <tr>
+                                        <td>
+                                            <span class="fw-medium">{{ timesheet.date|date('d/m/Y') }}</span><br>
+                                            <small class="text-muted">{{ timesheet.date|date('l')|trans }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <h6 class="mb-0">{{ timesheet.project.name }}</h6>
+                                                    {% if timesheet.project.isInternal %}
+                                                        <span class="badge bg-info">Interne</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">{{ timesheet.project.client ?: 'Non défini' }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="fw-bold">{{ timesheet.hours|number_format(2) }}h</span>
+                                        </td>
+                                        <td>
+                                            {% if timesheet.notes %}
+                                                <button type="button" class="btn btn-sm btn-light"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="{{ timesheet.notes }}">
+                                                    <i class="bx bx-note text-primary"></i>
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="ri-time-line font-size-48 d-block mb-2"></i>
+                                                Aucun temps saisi pour cette période
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Répartition par projet -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Répartition par projet</h4>
+                </div>
+                <div class="card-body">
+                    {% if projectTotals %}
+                        <div class="list-group list-group-flush">
+                            {% for project, total in projectTotals %}
+                                {% set percentage = (total.hours / totalHours * 100)|round(1) %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <h6 class="mb-0">{{ project.name }}</h6>
+                                            <small class="text-muted">{{ project.client ?: 'Non défini' }}</small>
+                                        </div>
+                                        <span class="text-primary fw-bold">{{ total.hours|number_format(1) }}h</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-primary" role="progressbar"
+                                             style="width: {{ percentage }}%"
+                                             aria-valuenow="{{ percentage }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ percentage }}% du temps total</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="ri-pie-chart-line font-size-48 d-block mb-2"></i>
+                            Aucune donnée à afficher
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actions rapides -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Actions rapides</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('timesheet_index') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Saisir des temps
+                        </a>
+                        <a href="{{ path('timesheet_all') }}" class="btn btn-outline-secondary">
+                            <i class="bx bx-group me-1"></i> Voir tous les temps
+                        </a>
+                        <button class="btn btn-outline-success" onclick="window.print()">
+                            <i class="bx bx-printer me-1"></i> Imprimer le rapport
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Initialiser les tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+{% endblock %}

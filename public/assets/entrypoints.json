@@ -1,0 +1,34 @@
+{
+  "entrypoints": {
+    "app": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/app.js"
+      ],
+      "css": [
+        "/assets/css/app.min.css",
+        "/assets/css/app-rtl.min.css"
+      ]
+    },
+    "bootstrap": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/bootstrap.js"
+      ],
+      "css": [
+        "/assets/css/bootstrap.min.css",
+        "/assets/css/bootstrap-rtl.min.css"
+      ]
+    },
+    "icons": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/icons.js"
+      ],
+      "css": [
+        "/assets/css/icons.min.css",
+        "/assets/css/icons-rtl.min.css"
+      ]
+    }
+  }
+}

@@ -1,0 +1,321 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Saisie des temps - Semaine du {{ startDate|date('d/m/Y') }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Saisie des temps</h4>
+                <div class="page-title-right">
+                    <div class="btn-group">
+                        <a href="?week={{ previousWeek }}" class="btn btn-outline-secondary">
+                            <i class="bx bx-left-arrow-alt me-1"></i> Semaine précédente
+                        </a>
+                        <a href="?week={{ nextWeek }}" class="btn btn-outline-secondary">
+                            Semaine suivante <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not contributor %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">Aucun contributeur associé</h4>
+                    <p>Votre compte utilisateur n'est pas encore associé à un contributeur. Veuillez contacter un administrateur pour créer votre profil contributeur.</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            Semaine du {{ startDate|date('d/m/Y') }} au {{ endDate|date('d/m/Y') }}
+                            <small class="text-muted">- {{ contributor.name }}</small>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="timesheet-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 25%">Projet</th>
+                                        {% for i in 0..6 %}
+                                            {% set current = startDate|date_modify('+' ~ i ~ ' day') %}
+                                            {% set dayName = current|date('l')|trans %}
+                                            {% set dayDate = current|date('d/m') %}
+                                            <th class="text-center" style="width: {{ (75/7)|round(1) }}%">
+                                                {{ dayName }}<br>
+                                                <small class="text-muted">{{ dayDate }}</small>
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for project in projects %}
+                                        <tr data-project-id="{{ project.id }}">
+                                            <td>
+                                                <div class="fw-medium">{{ project.name }}</div>
+                                                <small class="text-muted">{{ project.client ?: 'Client non défini' }}</small>
+                                                {% if project.isInternal %}
+                                                    <span class="badge bg-info ms-2">Interne</span>
+                                                {% endif %}
+                                            </td>
+                                            {% for i in 0..6 %}
+                                                {% set current = startDate|date_modify('+' ~ i ~ ' day') %}
+                                                {% set dateKey = current|date('Y-m-d') %}
+                                                {% set timesheet = timesheetGrid[project.id][dateKey] ?? null %}
+                                                <td class="text-center">
+                                                    <input
+                                                        type="number"
+                                                        class="form-control time-input text-center"
+                                                        step="0.25"
+                                                        min="0"
+                                                        max="12"
+                                                        placeholder="0"
+                                                        data-project-id="{{ project.id }}"
+                                                        data-date="{{ dateKey }}"
+                                                        value="{{ timesheet ? timesheet.hours : '' }}"
+                                                        style="width: 80px; margin: 0 auto;"
+                                                    >
+                                                    {% if timesheet and timesheet.notes %}
+                                                        <button type="button" class="btn btn-sm btn-link p-0 notes-btn"
+                                                                data-bs-toggle="tooltip"
+                                                                title="{{ timesheet.notes }}">
+                                                            <i class="bx bx-note text-primary"></i>
+                                                        </button>
+                                                    {% endif %}
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th>Total par jour</th>
+                                        {% for i in 0..6 %}
+                                            <th class="text-center day-total" data-day="{{ i }}">0h</th>
+                                        {% endfor %}
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading">Instructions :</h6>
+                                    <ul class="mb-0">
+                                        <li>Saisissez vos heures au format décimal (ex: 7.5 pour 7h30)</li>
+                                        <li>Les modifications sont enregistrées automatiquement</li>
+                                        <li>Maximum 12h par jour</li>
+                                        <li>Incrément minimum : 0.25h (15 minutes)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Résumé de la semaine</h6>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Total saisi :</span>
+                                            <span class="fw-bold" id="week-total">0h</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Objectif :</span>
+                                            <span class="text-muted">{{ contributor.weeklyHours ?? 35 }}h</span>
+                                        </div>
+                                        <div class="progress mt-2">
+                                            <div class="progress-bar" role="progressbar" id="week-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour les notes -->
+        <div class="modal fade" id="notesModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ajouter une note</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="notes-form">
+                            <div class="mb-3">
+                                <label for="notes-text" class="form-label">Note (optionnel)</label>
+                                <textarea class="form-control" id="notes-text" rows="3" placeholder="Décrivez brièvement le travail effectué..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        <button type="button" class="btn btn-primary" id="save-notes">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const timeInputs = document.querySelectorAll('.time-input');
+        const dayTotals = document.querySelectorAll('.day-total');
+        const weekTotal = document.getElementById('week-total');
+        const weekProgress = document.getElementById('week-progress');
+        const weeklyTarget = {{ contributor.weeklyHours ?? 35 }};
+
+        // Debounce function pour éviter trop de requêtes
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Fonction pour calculer les totaux
+        function calculateTotals() {
+            const dayTotalsArray = new Array(7).fill(0);
+            let weekTotalHours = 0;
+
+            timeInputs.forEach(input => {
+                const hours = parseFloat(input.value) || 0;
+                const date = new Date(input.dataset.date);
+                const dayIndex = (date.getDay() + 6) % 7; // Lundi = 0
+                dayTotalsArray[dayIndex] += hours;
+                weekTotalHours += hours;
+            });
+
+            // Mettre à jour l'affichage des totaux quotidiens
+            dayTotals.forEach((total, index) => {
+                total.textContent = dayTotalsArray[index].toFixed(1) + 'h';
+
+                // Colorer en rouge si > 8h
+                if (dayTotalsArray[index] > 8) {
+                    total.classList.add('text-danger');
+                } else {
+                    total.classList.remove('text-danger');
+                }
+            });
+
+            // Mettre à jour le total hebdomadaire
+            weekTotal.textContent = weekTotalHours.toFixed(1) + 'h';
+
+            // Mettre à jour la barre de progression
+            const progressPercent = (weekTotalHours / weeklyTarget) * 100;
+            weekProgress.style.width = Math.min(progressPercent, 100) + '%';
+
+            if (progressPercent >= 100) {
+                weekProgress.classList.remove('bg-warning');
+                weekProgress.classList.add('bg-success');
+            } else if (progressPercent >= 80) {
+                weekProgress.classList.remove('bg-success');
+                weekProgress.classList.add('bg-warning');
+            } else {
+                weekProgress.classList.remove('bg-success', 'bg-warning');
+            }
+        }
+
+        // Fonction pour sauvegarder un temps
+        const saveTime = debounce(function(projectId, date, hours, notes = '') {
+            fetch('{{ path('timesheet_save') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'project_id': projectId,
+                    'date': date,
+                    'hours': hours,
+                    'notes': notes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Erreur lors de la sauvegarde: ' + (data.error || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur de connexion');
+            });
+        }, 1000);
+
+        // Event listeners pour les inputs de temps
+        timeInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                calculateTotals();
+                const hours = parseFloat(this.value) || 0;
+                saveTime(this.dataset.projectId, this.dataset.date, hours);
+            });
+
+            // Double-clic pour ajouter une note
+            input.addEventListener('dblclick', function() {
+                const modal = new bootstrap.Modal(document.getElementById('notesModal'));
+                const notesText = document.getElementById('notes-text');
+                const saveBtn = document.getElementById('save-notes');
+
+                // Récupérer la note existante s'il y en a une
+                const notesBtn = this.parentElement.querySelector('.notes-btn');
+                if (notesBtn) {
+                    notesText.value = notesBtn.getAttribute('title') || '';
+                } else {
+                    notesText.value = '';
+                }
+
+                saveBtn.onclick = () => {
+                    const hours = parseFloat(this.value) || 0;
+                    saveTime(this.dataset.projectId, this.dataset.date, hours, notesText.value);
+                    modal.hide();
+
+                    // Mettre à jour l'affichage de la note
+                    let notesButton = this.parentElement.querySelector('.notes-btn');
+                    if (notesText.value.trim()) {
+                        if (!notesButton) {
+                            notesButton = document.createElement('button');
+                            notesButton.className = 'btn btn-sm btn-link p-0 notes-btn';
+                            notesButton.setAttribute('data-bs-toggle', 'tooltip');
+                            notesButton.innerHTML = '<i class="bx bx-note text-primary"></i>';
+                            this.parentElement.appendChild(notesButton);
+                        }
+                        notesButton.setAttribute('title', notesText.value);
+                    } else if (notesButton) {
+                        notesButton.remove();
+                    }
+                };
+
+                modal.show();
+            });
+        });
+
+        // Calculer les totaux au chargement
+        calculateTotals();
+
+        // Initialiser les tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+    </script>
+{% endblock %}

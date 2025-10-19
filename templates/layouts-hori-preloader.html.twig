@@ -1,0 +1,32 @@
+{% extends 'layouts/layouts-horizontal.html.twig' %}
+{% block title %}Horizontal Preloader Layout{% endblock %}
+
+{% block stylesheets %}{% endblock %}
+
+{% block body_tag %}
+<body data-topbar="dark" data-layout="horizontal">
+    <!-- Loader -->
+    <div id="preloader">
+        <div id="status">
+            <div class="spinner-chase">
+                <div class="chase-dot"></div>
+                <div class="chase-dot"></div>
+                <div class="chase-dot"></div>
+                <div class="chase-dot"></div>
+                <div class="chase-dot"></div>
+                <div class="chase-dot"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+{{ component('breadcrumb', { pagetitle: 'Layouts', title: 'Horizontal Preloader Layout' }) }}
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="/assets/js/app.js"></script>
+{% endblock %}

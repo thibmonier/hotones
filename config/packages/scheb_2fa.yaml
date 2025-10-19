@@ -1,0 +1,11 @@
+# See the configuration reference at https://symfony.com/bundles/SchebTwoFactorBundle/7.x/configuration.html
+scheb_two_factor:
+    # Enable TOTP 2FA for the main firewall
+    totp:
+        enabled: true
+        issuer: 'hotones'
+    security_tokens:
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+    # Routes provided by the bundle
+    # The default paths are /2fa and /2fa_check

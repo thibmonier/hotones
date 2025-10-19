@@ -1,0 +1,146 @@
+<!-- ========== Left Sidebar Start ========== -->
+<div class="vertical-menu">
+
+    <div data-simplebar class="h-100">
+
+        <!--- Sidemenu -->
+        <div id="sidebar-menu">
+            <!-- Left Menu Start -->
+            <ul class="metismenu list-unstyled" id="side-menu">
+                <li class="menu-title">Tableau de bord</li>
+
+                <li>
+                    <a href="{{ path('home') }}" class="waves-effect">
+                        <i class="bx bx-home-circle"></i>
+                        <span>Accueil</span>
+                    </a>
+                </li>
+
+                {% if is_granted('ROLE_CHEF_PROJET') %}
+                <li class="menu-title">Gestion de projets</li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-folder"></i>
+                        <span>Projets</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('project_index') }}">Liste des projets</a></li>
+                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <li><a href="{{ path('project_new') }}">Nouveau projet</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-receipt"></i>
+                        <span>Devis</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('order_index') }}">Liste des devis</a></li>
+                        <li><a href="{{ path('order_new') }}">Nouveau devis</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-group"></i>
+                        <span>Contributeurs</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('contributor_index') }}">Liste des contributeurs</a></li>
+                        {% if is_granted('ROLE_MANAGER') %}
+                        <li><a href="{{ path('contributor_new') }}">Nouveau contributeur</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+
+                <li class="menu-title">Suivi des temps</li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-time-five"></i>
+                        <span>Temps de travail</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('timesheet_index') }}">Saisir mes temps</a></li>
+                        <li><a href="{{ path('timesheet_my_time') }}">Mon historique</a></li>
+                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <li><a href="{{ path('timesheet_all') }}">Tous les temps</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+
+                {% if is_granted('ROLE_MANAGER') %}
+                <li class="menu-title">Administration</li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-briefcase"></i>
+                        <span>Ressources humaines</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('employment_period_index') }}">Périodes d'emploi</a></li>
+                        <li><a href="{{ path('employment_period_new') }}">Nouvelle période</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                        <span>Analyses & Rapports</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('analytics_dashboard') }}">📊 Dashboard KPIs</a></li>
+                        <li><a href="#">Rentabilité projets</a></li>
+                        <li><a href="#">Performance équipe</a></li>
+                        <li><a href="#">Évolution temporelle</a></li>
+                        <li><a href="#">Comparaison vendu/réalisé</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-cog"></i>
+                        <span>Configuration</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="#">Technologies</a></li>
+                        <li><a href="#">Catégories de service</a></li>
+                        <li><a href="#">Profils métier</a></li>
+                        <li><a href="#">Paramètres généraux</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+
+                <li class="menu-title">Mon compte</li>
+
+                <li>
+                    <a href="{{ path('profile_me') }}" class="waves-effect">
+                        <i class="bx bx-user"></i>
+                        <span>Mon profil</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ path('profile_2fa_setup') }}" class="waves-effect">
+                        <i class="bx bx-shield"></i>
+                        <span>Authentification 2FA</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ path('app_logout') }}" class="waves-effect">
+                        <i class="bx bx-power-off text-danger"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->

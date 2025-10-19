@@ -1,0 +1,226 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Contributeurs{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Contributeurs</h4>
+                <div class="page-title-right">
+                    {% if is_granted('ROLE_MANAGER') %}
+                        <a href="{{ path('contributor_new') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Nouveau contributeur
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="card-title mb-0">Liste des contributeurs actifs</h4>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-primary">{{ contributors|length }} contributeur{{ contributors|length > 1 ? 's' : '' }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if contributors %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Contact</th>
+                                        <th>Profils</th>
+                                        <th>Coûts</th>
+                                        <th>Compte lié</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for contributor in contributors %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-xs me-3">
+                                                        <span class="avatar-title rounded-circle bg-primary text-white font-size-16">
+                                                            {{ contributor.name|slice(0, 1)|upper }}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">
+                                                            <a href="{{ path('contributor_show', {'id': contributor.id}) }}" class="text-dark">
+                                                                {{ contributor.name }}
+                                                            </a>
+                                                        </h6>
+                                                        {% if contributor.notes %}
+                                                            <small class="text-muted">{{ contributor.notes|slice(0, 50) }}...</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if contributor.email %}
+                                                    <div><i class="bx bx-envelope me-1 text-muted"></i> {{ contributor.email }}</div>
+                                                {% endif %}
+                                                {% if contributor.phone %}
+                                                    <div><i class="bx bx-phone me-1 text-muted"></i> {{ contributor.phone }}</div>
+                                                {% endif %}
+                                                {% if not contributor.email and not contributor.phone %}
+                                                    <span class="text-muted">Non renseigné</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if contributor.profiles|length > 0 %}
+                                                    {% for profile in contributor.profiles %}
+                                                        <span class="badge bg-info me-1">{{ profile.name }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="text-muted">Aucun profil</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if contributor.cjm %}
+                                                    <div class="text-success">CJM: {{ contributor.cjm|number_format(0) }}€</div>
+                                                {% endif %}
+                                                {% if contributor.tjm %}
+                                                    <div class="text-primary">TJM: {{ contributor.tjm|number_format(0) }}€</div>
+                                                {% endif %}
+                                                {% if not contributor.cjm and not contributor.tjm %}
+                                                    <span class="text-muted">Non défini</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if contributor.user %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bx bx-check me-1"></i>
+                                                        {{ contributor.user.firstName }} {{ contributor.user.lastName }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">
+                                                        <i class="bx bx-x me-1"></i>
+                                                        Aucun compte
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{ path('contributor_show', {'id': contributor.id}) }}"
+                                                       class="btn btn-sm btn-outline-primary" title="Voir">
+                                                        <i class="bx bx-show"></i>
+                                                    </a>
+                                                    {% if is_granted('ROLE_MANAGER') %}
+                                                        <a href="{{ path('contributor_edit', {'id': contributor.id}) }}"
+                                                           class="btn btn-sm btn-outline-success" title="Modifier">
+                                                            <i class="bx bx-edit"></i>
+                                                        </a>
+                                                        <a href="{{ path('contributor_employment_periods', {'id': contributor.id}) }}"
+                                                           class="btn btn-sm btn-outline-info" title="Périodes d'emploi">
+                                                            <i class="bx bx-briefcase"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                    <a href="{{ path('contributor_timesheets', {'id': contributor.id}) }}"
+                                                       class="btn btn-sm btn-outline-secondary" title="Temps passés">
+                                                        <i class="bx bx-time"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="avatar-md mx-auto mb-4">
+                                <div class="avatar-title bg-light text-primary rounded-circle font-size-24">
+                                    <i class="bx bx-user"></i>
+                                </div>
+                            </div>
+                            <h5>Aucun contributeur</h5>
+                            <p class="text-muted">Commencez par ajouter votre premier contributeur à l'équipe.</p>
+                            {% if is_granted('ROLE_MANAGER') %}
+                                <a href="{{ path('contributor_new') }}" class="btn btn-primary">
+                                    <i class="bx bx-plus me-1"></i> Ajouter un contributeur
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if contributors|length > 0 %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Total contributeurs</p>
+                            <h4 class="mb-2">{{ contributors|length }}</h4>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-primary rounded-3">
+                                <i class="bx bx-group font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">Avec compte utilisateur</p>
+                            {% set linkedUsers = contributors|filter(c => c.user is not null) %}
+                            <h4 class="mb-2">{{ linkedUsers|length }}</h4>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-success rounded-3">
+                                <i class="bx bx-user-check font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">CJM moyen</p>
+                            {% set contributorsWithCjm = contributors|filter(c => c.cjm is not null) %}
+                            {% if contributorsWithCjm|length > 0 %}
+                                {% set avgCjm = contributorsWithCjm|reduce((carry, c) => carry + c.cjm, 0) / contributorsWithCjm|length %}
+                                <h4 class="mb-2">{{ avgCjm|number_format(0) }}€</h4>
+                            {% else %}
+                                <h4 class="mb-2">-</h4>
+                            {% endif %}
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-warning rounded-3">
+                                <i class="bx bx-euro font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

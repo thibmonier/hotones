@@ -1,0 +1,27 @@
+{% include 'layouts/_main.html.twig' %}
+
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}Welcome{% endblock %} | Skote - Admin & Dashboard Template</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+        <meta content="Themesbrand" name="author" />
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="/assets/images/favicon.ico">
+
+        {% block stylesheets %}{% endblock %}
+        {% include 'layouts/_head-css.html.twig' %}
+    </head>
+
+    {% block body_tag %}{% endblock %}
+    {% block body %}
+
+        {% block content %}{% endblock %}
+
+        {% include 'layouts/_vendor-scripts.html.twig' %}
+
+        {% block javascripts %}{% endblock %}
+
+    {% endblock %}
+    </body>
+</html>

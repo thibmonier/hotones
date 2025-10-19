@@ -1,0 +1,23 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+{% block title %}Scrollable Layout{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body_tag %}
+<body data-sidebar="dark" data-layout-scrollable="true">
+{% endblock %}
+
+{% block content %}
+
+{{ component('breadcrumb', { pagetitle: 'Layouts', title: 'Scrollable Layout' }) }}
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+<!-- App js -->
+<script src="/assets/js/app.js"></script>
+{% endblock %}

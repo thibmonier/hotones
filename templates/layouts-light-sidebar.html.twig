@@ -1,0 +1,22 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+{% block title %}Light Sidebar{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body_tag %}
+<body data-topbar="dark">
+{% endblock %}
+
+{% block content %}
+
+{{ component('breadcrumb', { pagetitle: 'Layouts', title: 'Light Sidebar' }) }}
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="/assets/js/app.js"></script>
+{% endblock %}

@@ -1,0 +1,406 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% set title = 'Dashboard Analytique' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.min.css" rel="stylesheet">
+    <style>
+        .kpi-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .kpi-card.revenue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .kpi-card.margin {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        .kpi-card.projects {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        .kpi-card.orders {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .kpi-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            height: 400px; /* Hauteur fixe */
+        }
+        .chart-container canvas {
+            max-height: 320px !important; /* Hauteur maximum du canvas */
+        }
+        .filter-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item active">Analytics</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">{{ title }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panneau de filtres -->
+    <div class="row">
+        <div class="col-12">
+            <div class="filter-panel">
+                <form id="filter-form" method="GET">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Période</label>
+                            <select name="granularity" class="form-select">
+                                <option value="monthly" {{ filters.granularity == 'monthly' ? 'selected' : '' }}>Mensuel</option>
+                                <option value="quarterly" {{ filters.granularity == 'quarterly' ? 'selected' : '' }}>Trimestriel</option>
+                                <option value="yearly" {{ filters.granularity == 'yearly' ? 'selected' : '' }}>Annuel</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Année</label>
+                            <select name="year" class="form-select">
+                                {% for y in range(2020, date().format('Y') + 1) %}
+                                    <option value="{{ y }}" {{ filters.year == y ? 'selected' : '' }}>{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Mois</label>
+                            <select name="month" class="form-select">
+                                <option value="">Tous</option>
+                                {% for m in 1..12 %}
+                                    {% set monthName = ('2024-' ~ m ~ '-01')|date('F') %}
+                                    <option value="{{ m }}" {{ filters.month == m ? 'selected' : '' }}>{{ monthName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Type projet</label>
+                            <select name="project_type" class="form-select">
+                                <option value="">Tous</option>
+                                {% for type in filterData.projectTypes %}
+                                    <option value="{{ type }}" {{ filters.project_type == type ? 'selected' : '' }}>{{ type|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Chef projet</label>
+                            <select name="project_manager" class="form-select">
+                                <option value="">Tous</option>
+                                {% for pm in filterData.projectManagers %}
+                                    <option value="{{ pm.id }}" {{ filters.project_manager == pm.id ? 'selected' : '' }}>{{ pm.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs principaux -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="kpi-card revenue">
+                <div class="kpi-value">{{ kpis.totalRevenue|number_format(0, ',', ' ') }}€</div>
+                <div class="kpi-label">Chiffre d'Affaires</div>
+                <small>Marge: {{ kpis.grossMargin|number_format(0, ',', ' ') }}€ ({{ kpis.marginPercentage }}%)</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card projects">
+                <div class="kpi-value">{{ kpis.projectCount }}</div>
+                <div class="kpi-label">Projets Total</div>
+                <small>Actifs: {{ kpis.activeProjectCount }} | Terminés: {{ kpis.completedProjectCount }}</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card orders">
+                <div class="kpi-value">{{ kpis.pendingOrderCount }}</div>
+                <div class="kpi-label">Devis en Attente</div>
+                <small>CA Potentiel: {{ kpis.pendingRevenue|number_format(0, ',', ' ') }}€</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card margin">
+                <div class="kpi-value">{{ kpis.averageOrderValue|number_format(0, ',', ' ') }}€</div>
+                <div class="kpi-label">Valeur Moy. Devis</div>
+                <small>Devis gagnés: {{ kpis.wonOrderCount }}</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>Évolution du Chiffre d'Affaires</h5>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>Évolution de la Marge (%)</h5>
+                <canvas id="marginChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>Nombre de Projets</h5>
+                <canvas id="projectChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>Répartition CA par Type de Projet</h5>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table détaillée -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Détail des Métriques</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Période</th>
+                                    <th>Type</th>
+                                    <th>Chef Projet</th>
+                                    <th>CA</th>
+                                    <th>Marge</th>
+                                    <th>Projets</th>
+                                    <th>Devis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for metric in metrics %}
+                                <tr>
+                                    <td>{{ metric.dimTime.monthName }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ metric.dimProjectType.projectType == 'forfait' ? 'primary' : 'success' }}">
+                                            {{ metric.dimProjectType.projectType|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ metric.dimProjectManager ? metric.dimProjectManager.getName() : '-' }}</td>
+                                    <td>{{ metric.totalRevenue|number_format(0, ',', ' ') }}€</td>
+                                    <td>
+                                        <span class="badge bg-{{ metric.marginPercentage|number_format(0) > 20 ? 'success' : 'warning' }}">
+                                            {{ metric.marginPercentage }}%
+                                        </span>
+                                    </td>
+                                    <td>{{ metric.projectCount }}</td>
+                                    <td>
+                                        <small>
+                                            En attente: {{ metric.pendingOrderCount }}<br>
+                                            Gagnés: {{ metric.wonOrderCount }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">Aucune donnée disponible pour cette période</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton de recalcul (admin uniquement) -->
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="row mt-3">
+        <div class="col-12">
+            <button id="recalculate-btn" class="btn btn-warning">
+                <i class="mdi mdi-refresh"></i> Recalculer les métriques
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const chartData = {{ chartData|json_encode|raw }};
+
+        // Configuration commune des graphiques
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2, // Ratio largeur/hauteur fixe
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        };
+
+        // Graphique CA
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Chiffre d\'Affaires (€)',
+                    data: chartData.revenue,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Graphique Marge
+        const marginCtx = document.getElementById('marginChart').getContext('2d');
+        new Chart(marginCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Marge (%)',
+                    data: chartData.margin,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Graphique Projets
+        const projectCtx = document.getElementById('projectChart').getContext('2d');
+        new Chart(projectCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Nombre de Projets',
+                    data: chartData.projectCount,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Graphique en camembert (simulation - à adapter selon vos besoins)
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Forfait', 'Régie'],
+                datasets: [{
+                    data: [60, 40], // À calculer dynamiquement
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1 // Ratio carré pour le camembert
+            }
+        });
+
+        // Filtrage automatique
+        document.getElementById('filter-form').addEventListener('change', function() {
+            this.submit();
+        });
+
+        // Recalcul des métriques
+        {% if is_granted('ROLE_ADMIN') %}
+        document.getElementById('recalculate-btn').addEventListener('click', function() {
+            if (confirm('Recalculer les métriques pour l\'année {{ filters.year }} ? Cette opération peut prendre du temps.')) {
+                fetch('{{ path('analytics_recalculate', {year: filters.year}) }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Métriques recalculées avec succès');
+                        location.reload();
+                    } else {
+                        alert('Erreur: ' + data.message);
+                    }
+                });
+            }
+        });
+        {% endif %}
+    </script>
+{% endblock %}

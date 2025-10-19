@@ -1,0 +1,55 @@
+{% include 'layouts/_main.html.twig' %}
+
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}Welcome{% endblock %} | Skote - Admin & Dashboard Template</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+        <meta content="Themesbrand" name="author" />
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="/assets/images/favicon.ico">
+
+        {% block stylesheets %}{% endblock %}
+        {% include 'layouts/_head-css.html.twig' %}
+    </head>
+
+    {% include 'layouts/_body.html.twig' %}
+        {% block body %}
+
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+
+            {% include 'layouts/_menu.html.twig' %}
+
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+
+                <div class="page-content">
+                    <div class="container-fluid">
+
+                        {% block content %}
+                        {% endblock %}
+
+                    </div>
+                    <!-- container-fluid -->
+                </div>
+                <!-- End Page-content -->
+
+                {% include 'layouts/_footer.html.twig' %}
+            </div>
+            <!-- end main content-->
+
+        </div>
+        <!-- END layout-wrapper -->
+
+        {% include 'layouts/_right-sidebar.html.twig' %}
+
+        {% include 'layouts/_vendor-scripts.html.twig' %}
+
+        {% block javascripts %}{% endblock %}
+
+        {% endblock %}
+    </body>
+</html>

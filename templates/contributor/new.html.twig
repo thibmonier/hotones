@@ -1,0 +1,254 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Nouveau contributeur{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouveau contributeur</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('contributor_index') }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Informations générales</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nom complet *</label>
+                                    <input type="text" class="form-control" id="name" name="name" required
+                                           placeholder="Ex: Jean Dupont">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                           placeholder="jean.dupont@example.com">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Téléphone</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                           placeholder="01 23 45 67 89">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="user_id" class="form-label">Compte utilisateur</label>
+                                    <select class="form-control" id="user_id" name="user_id">
+                                        <option value="">Aucun compte lié</option>
+                                        {% for user in users %}
+                                            <option value="{{ user.id }}">
+                                                {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="form-text text-muted">Associer à un compte utilisateur existant</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"
+                                      placeholder="Notes internes sur le contributeur..."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="active" name="active" value="1" checked>
+                                        <label class="form-check-label" for="active">
+                                            Contributeur actif
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Informations financières</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bx bx-info-circle me-2"></i>
+                            <strong>Information :</strong> Ces données peuvent être surchargées par les périodes d'emploi.
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cjm" class="form-label">Coût Journalier Moyen (CJM)</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="cjm" name="cjm"
+                                               step="1" min="0" placeholder="400">
+                                        <span class="input-group-text">€</span>
+                                    </div>
+                                    <small class="form-text text-muted">Coût pour l'entreprise par jour</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tjm" class="form-label">Tarif Journalier Moyen (TJM)</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="tjm" name="tjm"
+                                               step="1" min="0" placeholder="600">
+                                        <span class="input-group-text">€</span>
+                                    </div>
+                                    <small class="form-text text-muted">Tarif de vente moyen par jour</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="margin-preview" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="alert alert-light border">
+                                    <h6 class="mb-2">Aperçu de la marge</h6>
+                                    <div id="margin-calculation"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Profils métier</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if profiles %}
+                            <div class="mb-3">
+                                <small class="text-muted">Sélectionnez les profils correspondant aux compétences du contributeur</small>
+                            </div>
+                            {% for profile in profiles %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="profile_{{ profile.id }}"
+                                           name="profiles[]" value="{{ profile.id }}">
+                                    <label class="form-check-label" for="profile_{{ profile.id }}">
+                                        <strong>{{ profile.name }}</strong>
+                                        {% if profile.description %}
+                                            <br><small class="text-muted">{{ profile.description }}</small>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-3">
+                                <div class="avatar-sm mx-auto mb-3">
+                                    <div class="avatar-title bg-light text-muted rounded-circle">
+                                        <i class="bx bx-user-circle"></i>
+                                    </div>
+                                </div>
+                                <p class="text-muted mb-0">Aucun profil disponible</p>
+                                <small class="text-muted">Créez d'abord des profils métier</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bx bx-save me-1"></i> Créer le contributeur
+                            </button>
+                            <a href="{{ path('contributor_index') }}" class="btn btn-outline-secondary">
+                                <i class="bx bx-x me-1"></i> Annuler
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Aide</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="font-size-14">Coût Journalier Moyen (CJM)</h6>
+                            <p class="text-muted font-size-13 mb-0">
+                                Coût réel pour l'entreprise incluant salaire, charges sociales,
+                                avantages et coûts indirects.
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="font-size-14">Tarif Journalier Moyen (TJM)</h6>
+                            <p class="text-muted font-size-13 mb-0">
+                                Tarif de vente moyen facturé aux clients pour ce contributeur.
+                            </p>
+                        </div>
+                        <div>
+                            <h6 class="font-size-14">Profils métier</h6>
+                            <p class="text-muted font-size-13 mb-0">
+                                Compétences et rôles que peut tenir le contributeur dans les projets.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cjmInput = document.getElementById('cjm');
+            const tjmInput = document.getElementById('tjm');
+            const marginPreview = document.getElementById('margin-preview');
+            const marginCalculation = document.getElementById('margin-calculation');
+
+            function updateMarginPreview() {
+                const cjm = parseFloat(cjmInput.value) || 0;
+                const tjm = parseFloat(tjmInput.value) || 0;
+
+                if (cjm > 0 && tjm > 0) {
+                    const margin = tjm - cjm;
+                    const marginRate = (margin / tjm * 100).toFixed(1);
+
+                    let colorClass = 'text-success';
+                    if (marginRate < 10) colorClass = 'text-danger';
+                    else if (marginRate < 20) colorClass = 'text-warning';
+
+                    marginCalculation.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <span>Marge :</span>
+                            <span class="${colorClass} fw-bold">${margin}€ (${marginRate}%)</span>
+                        </div>
+                        <small class="text-muted">TJM ${tjm}€ - CJM ${cjm}€</small>
+                    `;
+                    marginPreview.style.display = 'block';
+                } else {
+                    marginPreview.style.display = 'none';
+                }
+            }
+
+            cjmInput.addEventListener('input', updateMarginPreview);
+            tjmInput.addEventListener('input', updateMarginPreview);
+        });
+    </script>
+{% endblock %}
