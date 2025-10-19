@@ -18,6 +18,8 @@ RUN apk add --no-cache \
     libpng-dev \
   && docker-php-ext-configure intl \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && pecl install apcu \
+  && docker-php-ext-enable apcu \
   && docker-php-ext-install \
     pdo \
     pdo_mysql \

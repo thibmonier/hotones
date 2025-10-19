@@ -10,6 +10,16 @@ use Doctrine\Common\Collections\Collection;
 #[ORM\Table(name: 'orders')]
 class Order
 {
+    public const STATUS_OPTIONS = [
+        'a_signer' => 'À signer',
+        'gagne' => 'Gagné',
+        'signe' => 'Signé',
+        'perdu' => 'Perdu',
+        'termine' => 'Terminé',
+        'standby' => 'Standby',
+        'abandonne' => 'Abandonné'
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

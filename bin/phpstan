@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Script pour exécuter PHPStan dans Docker
+docker exec hotones_app ./vendor/bin/phpstan analyse --memory-limit=512M "$@"
