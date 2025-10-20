@@ -1,0 +1,99 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Technologies{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Technologies</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('technology_new') }}" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Nouvelle technologie
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Catégorie</th>
+                                    <th>Couleur</th>
+                                    <th>Projets</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for technology in technologies %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if technology.color %}
+                                                <div class="me-2" style="width: 16px; height: 16px; background-color: {{ technology.color }}; border-radius: 3px;"></div>
+                                            {% endif %}
+                                            <strong>{{ technology.name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ technology.category|title }}</span>
+                                    </td>
+                                    <td>
+                                        {% if technology.color %}
+                                            <span class="badge" style="background-color: {{ technology.color }}; color: white;">{{ technology.color }}</span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ technology.projects|length }}</td>
+                                    <td>
+                                        {% if technology.active %}
+                                            <span class="badge bg-success">Actif</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactif</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ path('technology_show', {'id': technology.id}) }}" class="btn btn-outline-secondary btn-sm" title="Voir">
+                                                <i class="bx bx-show"></i>
+                                            </a>
+                                            <a href="{{ path('technology_edit', {'id': technology.id}) }}" class="btn btn-outline-primary btn-sm" title="Modifier">
+                                                <i class="bx bx-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('technology_delete', {'id': technology.id}) }}" class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ technology.id) }}">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette technologie ?')">
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        <div class="py-4">
+                                            <i class="bx bx-code-alt font-size-24 mb-2"></i>
+                                            <p>Aucune technologie trouvée</p>
+                                            <a href="{{ path('technology_new') }}" class="btn btn-primary">Créer la première technologie</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

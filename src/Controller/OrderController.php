@@ -7,6 +7,7 @@ use App\Entity\Project;
 use App\Entity\OrderSection;
 use App\Entity\OrderLine;
 use App\Entity\Profile;
+use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,21 +25,8 @@ class OrderController extends AbstractController
         $projectId = $request->query->get('project');
         $status = $request->query->get('status');
         
-        $queryBuilder = $em->getRepository(Order::class)->createQueryBuilder('o')
-            ->leftJoin('o.project', 'p')
-            ->orderBy('o.createdAt', 'DESC');
-        
-        if ($projectId) {
-            $queryBuilder->andWhere('o.project = :project')
-                ->setParameter('project', $projectId);
-        }
-        
-        if ($status) {
-            $queryBuilder->andWhere('o.status = :status')
-                ->setParameter('status', $status);
-        }
-        
-        $orders = $queryBuilder->getQuery()->getResult();
+        $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
+        $orders = $em->getRepository(Order::class)->findWithFilters($project, $status);
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
         
         return $this->render('order/index.html.twig', [
@@ -305,13 +293,7 @@ class OrderController extends AbstractController
         
         // Trouver le dernier numéro de devis pour ce mois
         $lastOrder = $em->getRepository(Order::class)
-            ->createQueryBuilder('o')
-            ->where('o.orderNumber LIKE :pattern')
-            ->setParameter('pattern', "D{$year}{$month}%")
-            ->orderBy('o.orderNumber', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->findLastOrderNumberForMonth($year, $month);
         
         $increment = 1;
         if ($lastOrder) {

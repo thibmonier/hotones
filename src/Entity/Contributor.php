@@ -50,12 +50,12 @@ class Contributor
     private Collection $profiles;
 
     // Périodes d'emploi du contributeur
-    #[ORM\OneToMany(mappedBy: 'contributor', targetEntity: EmploymentPeriod::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: EmploymentPeriod::class, mappedBy: 'contributor', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['startDate' => 'DESC'])]
     private Collection $employmentPeriods;
 
     // Temps passés par le contributeur
-    #[ORM\OneToMany(mappedBy: 'contributor', targetEntity: Timesheet::class)]
+    #[ORM\OneToMany(targetEntity: Timesheet::class, mappedBy: 'contributor')]
     private Collection $timesheets;
 
     public function __construct()
@@ -92,17 +92,17 @@ class Contributor
     public function setUser(?User $user): self { $this->user = $user; return $this; }
 
     public function getProfiles(): Collection { return $this->profiles; }
-    public function addProfile(Profile $profile): self 
-    { 
+    public function addProfile(Profile $profile): self
+    {
         if (!$this->profiles->contains($profile)) {
             $this->profiles[] = $profile;
         }
-        return $this; 
+        return $this;
     }
-    public function removeProfile(Profile $profile): self 
-    { 
+    public function removeProfile(Profile $profile): self
+    {
         $this->profiles->removeElement($profile);
-        return $this; 
+        return $this;
     }
 
     public function getEmploymentPeriods(): Collection { return $this->employmentPeriods; }

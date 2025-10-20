@@ -43,9 +43,6 @@
                                         <h5 class="font-size-14 mb-1">
                                             <a href="{{ path('project_show', {'id': project.id}) }}" class="text-dark">{{ project.name }}</a>
                                         </h5>
-                                        {% if project.description %}
-                                            <p class="text-muted mb-0">{{ project.description|slice(0, 50) }}{% if project.description|length > 50 %}...{% endif %}</p>
-                                        {% endif %}
                                     </td>
                                     <td>{{ project.client ?? '-' }}</td>
                                     <td>
@@ -70,7 +67,7 @@
                                             {{ project.status|title }}
                                         </span>
                                     </td>
-                                    <td>{{ project.totalSoldAmount|number_format(2, ',', ' ') }}€</td>
+                                    <td>-</td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ path('project_details', {'id': project.id}) }}" class="btn btn-primary btn-sm" title="Vue détaillée">

@@ -67,7 +67,7 @@ class Project
     private ?User $salesPerson = null; // Commercial ayant identifié le projet
 
     // Relations
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Order::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
     private Collection $orders;
 
     // Technologies utilisées dans le projet
@@ -81,7 +81,7 @@ class Project
     private ?ServiceCategory $serviceCategory = null;
 
     // Tâches du projet
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectTask::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: ProjectTask::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $tasks;
 
@@ -137,36 +137,36 @@ class Project
     public function setSalesPerson(?User $salesPerson): self { $this->salesPerson = $salesPerson; return $this; }
 
     public function getOrders(): Collection { return $this->orders; }
-    public function addOrder(Order $order): self 
-    { 
+    public function addOrder(Order $order): self
+    {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
             $order->setProject($this);
         }
-        return $this; 
+        return $this;
     }
-    public function removeOrder(Order $order): self 
-    { 
+    public function removeOrder(Order $order): self
+    {
         if ($this->orders->removeElement($order)) {
             if ($order->getProject() === $this) {
                 $order->setProject(null);
             }
         }
-        return $this; 
+        return $this;
     }
 
     public function getTechnologies(): Collection { return $this->technologies; }
-    public function addTechnology(Technology $technology): self 
-    { 
+    public function addTechnology(Technology $technology): self
+    {
         if (!$this->technologies->contains($technology)) {
             $this->technologies[] = $technology;
         }
-        return $this; 
+        return $this;
     }
-    public function removeTechnology(Technology $technology): self 
-    { 
+    public function removeTechnology(Technology $technology): self
+    {
         $this->technologies->removeElement($technology);
-        return $this; 
+        return $this;
     }
 
     public function getServiceCategory(): ?ServiceCategory { return $this->serviceCategory; }
@@ -222,7 +222,7 @@ class Project
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getEstimatedHoursSold() && $task->getCountsForProfitability()) {
+            if ($task->getEstimatedHoursSold() && $task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $total = bcadd($total, $task->getEstimatedHoursSold(), 2);
             }
         }
@@ -237,7 +237,7 @@ class Project
         $total = '0';
         foreach ($this->tasks as $task) {
             $hours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
-            if ($task->getCountsForProfitability()) {
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $total = bcadd($total, $hours, 2);
             }
         }
@@ -251,7 +251,9 @@ class Project
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            $total = bcadd($total, $task->getTotalHours(), 2);
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
+                $total = bcadd($total, $task->getTotalHours(), 2);
+            }
         }
         return $total;
     }
@@ -263,7 +265,9 @@ class Project
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            $total = bcadd($total, $task->getRemainingHours(), 2);
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
+                $total = bcadd($total, $task->getRemainingHours(), 2);
+            }
         }
         return $total;
     }
@@ -275,7 +279,7 @@ class Project
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability()) {
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $total = bcadd($total, $task->getSoldAmount(), 2);
             }
         }
@@ -289,7 +293,7 @@ class Project
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability()) {
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $total = bcadd($total, $task->getEstimatedCost(), 2);
             }
         }
@@ -325,13 +329,13 @@ class Project
     public function getProjectContributorsWithHours(): array
     {
         $contributors = [];
-        
+
         // Récupérer les contributeurs des tâches
         foreach ($this->tasks as $task) {
-            if ($task->getAssignedContributor()) {
+            if ($task->getAssignedContributor() && $task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $contributor = $task->getAssignedContributor();
                 $contributorId = $contributor->getId();
-                
+
                 if (!isset($contributors[$contributorId])) {
                     $contributors[$contributorId] = [
                         'contributor' => $contributor,
@@ -341,30 +345,30 @@ class Project
                         'tasks' => []
                     ];
                 }
-                
+
                 $contributors[$contributorId]['spent_hours'] = bcadd(
                     $contributors[$contributorId]['spent_hours'],
                     $task->getTotalHours(),
                     2
                 );
-                
+
                 $contributors[$contributorId]['remaining_hours'] = bcadd(
                     $contributors[$contributorId]['remaining_hours'],
                     $task->getRemainingHours(),
                     2
                 );
-                
+
                 $estimatedHours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
                 $contributors[$contributorId]['estimated_hours'] = bcadd(
                     $contributors[$contributorId]['estimated_hours'],
                     $estimatedHours,
                     2
                 );
-                
+
                 $contributors[$contributorId]['tasks'][] = $task;
             }
         }
-        
+
         return array_values($contributors);
     }
 
@@ -376,25 +380,25 @@ class Project
         if ($this->tasks->isEmpty()) {
             return '0.00';
         }
-        
+
         $totalWeight = '0';
         $weightedProgress = '0';
-        
+
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability()) {
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $hours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '1';
                 $weight = $hours;
                 $progress = $task->getProgressPercentage();
-                
+
                 $totalWeight = bcadd($totalWeight, $weight, 2);
                 $weightedProgress = bcadd($weightedProgress, bcmul($weight, $progress, 4), 2);
             }
         }
-        
+
         if (bccomp($totalWeight, '0', 2) <= 0) {
             return '0.00';
         }
-        
+
         return bcdiv($weightedProgress, $totalWeight, 2);
     }
 }

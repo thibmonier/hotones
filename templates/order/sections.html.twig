@@ -1,0 +1,224 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Sections - {{ order.orderNumber }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Sections du devis {{ order.orderNumber }}</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('order_show', {'id': order.id}) }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour au devis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            {% for section in order.sections %}
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">{{ section.name }}</h5>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#addLine{{ section.id }}">
+                                <i class="bx bx-plus"></i> Ligne
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if section.description %}
+                            <p class="text-muted">{{ section.description }}</p>
+                        {% endif %}
+
+                        {% if section.lines|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Profil</th>
+                                            <th>TJM</th>
+                                            <th>Jours</th>
+                                            <th>Achats</th>
+                                            <th class="text-end">Total</th>
+                                            <th width="80">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for line in section.lines %}
+                                            <tr>
+                                                <td>{{ line.description }}</td>
+                                                <td>
+                                                    {% if line.profile %}
+                                                        <span class="badge bg-light text-dark">{{ line.profile.name }}</span>
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ line.tjm ? (line.tjm|number_format(0, ',', ' ') ~ '€') : '-' }}</td>
+                                                <td>{{ line.days ? line.days|number_format(1, ',', ' ') : '-' }}</td>
+                                                <td>{{ line.purchaseAmount ? (line.purchaseAmount|number_format(2, ',', ' ') ~ '€') : '-' }}</td>
+                                                <td class="text-end"><strong>{{ line.totalAmount|number_format(2, ',', ' ') }}€</strong></td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-outline-primary btn-sm" title="Modifier">
+                                                            <i class="bx bx-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                                            <i class="bx bx-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="bx bx-list-ul font-size-24 mb-2"></i>
+                                <p>Aucune ligne dans cette section</p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Formulaire d'ajout de ligne (collapsible) -->
+                        <div class="collapse mt-3" id="addLine{{ section.id }}">
+                            <div class="card card-body bg-light">
+                                <h6>Ajouter une ligne</h6>
+                                <form method="POST" action="{{ path('order_add_line', {'orderId': order.id, 'sectionId': section.id}) }}">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label for="line_description_{{ section.id }}" class="form-label">Description <span class="text-danger">*</span></label>
+                                            <textarea class="form-control" id="line_description_{{ section.id }}" name="line_description" rows="2" required></textarea>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="profile_id_{{ section.id }}" class="form-label">Profil</label>
+                                            <select class="form-select" id="profile_id_{{ section.id }}" name="profile_id">
+                                                <option value="">Aucun profil</option>
+                                                {# Ici il faudrait passer les profils depuis le contrôleur #}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="tjm_{{ section.id }}" class="form-label">TJM (€)</label>
+                                            <input type="number" class="form-control" id="tjm_{{ section.id }}" name="tjm" min="0" step="10">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="days_{{ section.id }}" class="form-label">Jours</label>
+                                            <input type="number" class="form-control" id="days_{{ section.id }}" name="days" min="0" step="0.5">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="purchase_amount_{{ section.id }}" class="form-label">Achats (€)</label>
+                                            <input type="number" class="form-control" id="purchase_amount_{{ section.id }}" name="purchase_amount" min="0" step="0.01">
+                                        </div>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary btn-sm me-2">
+                                                <i class="bx bx-plus"></i> Ajouter
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#addLine{{ section.id }}">
+                                                Annuler
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bx bx-folder-open font-size-24 mb-2 text-muted"></i>
+                        <p class="text-muted">Aucune section définie pour ce devis</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Formulaire d'ajout de section -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Ajouter une section</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ path('order_add_section', {'id': order.id}) }}">
+                        <div class="mb-3">
+                            <label for="section_name" class="form-label">Nom de la section <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="section_name" name="section_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="section_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="section_description" name="section_description" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bx bx-plus me-1"></i> Ajouter la section
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Résumé financier -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Résumé</h5>
+                </div>
+                <div class="card-body">
+                    {% set totalAmount = 0 %}
+                    {% set totalLines = 0 %}
+                    {% for section in order.sections %}
+                        {% for line in section.lines %}
+                            {% set totalAmount = totalAmount + line.totalAmount %}
+                            {% set totalLines = totalLines + 1 %}
+                        {% endfor %}
+                    {% endfor %}
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Sections :</span>
+                        <strong>{{ order.sections|length }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Lignes :</span>
+                        <strong>{{ totalLines }}</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="h6">Total :</span>
+                        <strong class="h6 text-success">{{ totalAmount|number_format(2, ',', ' ') }}€</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Auto-calcul du total lors de la saisie
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form[action*="add-line"]');
+            forms.forEach(function(form) {
+                const tjmInput = form.querySelector('input[name="tjm"]');
+                const daysInput = form.querySelector('input[name="days"]');
+                const purchaseInput = form.querySelector('input[name="purchase_amount"]');
+                
+                function updateTotal() {
+                    const tjm = parseFloat(tjmInput.value) || 0;
+                    const days = parseFloat(daysInput.value) || 0;
+                    const purchase = parseFloat(purchaseInput.value) || 0;
+                    const total = (tjm * days) + purchase;
+                    
+                    // Afficher le total quelque part si besoin
+                    console.log('Total calculé:', total);
+                }
+                
+                tjmInput?.addEventListener('input', updateTotal);
+                daysInput?.addEventListener('input', updateTotal);
+                purchaseInput?.addEventListener('input', updateTotal);
+            });
+        });
+    </script>
+{% endblock %}

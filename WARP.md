@@ -3,14 +3,14 @@
 ## 🎯 Objectif du projet
 
 **HotOnes** est une application de gestion de projets, du suivi de la rentabilité des projets pour une agence web digitale. Elle permet d'analyser la rentabilité en croisant :
-- Ce qui est vendu aux clients (jours vendus, TJM de vente par tâches par profil)
-- Les temps passés réels par les intervenants (les utilisateurs de l'application avec leur profil d'expertise et leur coût moyen associé)
+- Ce qui est vendu aux clients (jours vendus, TJM de vente par tâches par profil).
+- Les temps passés réels par les intervenants (les utilisateurs de l'application avec leur profil d'expertise et leur coût moyen associé).
 - Leur coût journalier moyen (CJM) et tarif journalier moyen (TJM) défini pour chaque client
 - l'application aura pour but de centraliser les projets au moyen de différents devis qui, additionnés, constituerons le projet dans sa globalité.
-- L'application aura pour objectif de montrer les chiffres consolidés de l'ensemble de l'activité de l'agence pour chaque mois, visible sur une année civile ou glissante (date à date)
+- L'application aura pour objectif de montrer les chiffres consolidés de l'ensemble de l'activité de l'agence pour chaque mois, visible sur une année civile ou glissante (date à date).
 - L'application pourra être accessible pour chaque salarié de l'agence digitale qui pourra se créer un compte et qui pourra saisir le temps passé chaque jour sur l'ensemble des projets sur lesquels il est vendu.
 - l'application sera en mesure de planifier les tâches à venir pour chaque contributeur de projet.
-- l'application devra montrer l'évolution des KPIs dans le temps
+- l'application devra montrer l'évolution des KPIs dans le temps.
 
 ## 📋 Fonctionnalités principales
 
@@ -25,7 +25,7 @@
 - **EmploymentPeriod** : Historique des données RH par période
   - Salaire mensuel brut
   - CJM (Coût Journalier Moyen)
-  - Temps de travail hebdomadaire (défaut: 35h pouvant aller à 39h hebdomadaires). Attention, certains contributeurs travaillent à temps partiel (90%, 80%)
+  - Temps de travail hebdomadaire (défaut : 35h pouvant aller à 39h hebdomadaires). Attention, certains contributeurs travaillent à temps partiel (90%, 80%)
   - Dates de début/fin de période
   - profil (pouvant être multiple. exemple : développeur, lead developer, chef de projet, product owner)
 
@@ -37,13 +37,13 @@
   - Dates de début/fin
   - achats sur le projet (fournitures ou renfort par des ressources externes à l'agence)
   - Chaque interface de projet devra montrer l'ensemble des devis constituant le projet, l'avancement de la consommation dans chaque devis et la rentabilité de chaque devis ainsi qu'une vision consolidée de ces chiffres pour le projet.
-  - Une contingence (retenue d'argent sur le volume de marge générée) doit pouvoir être retenue lors de la vente de chaque devis. Cette retenue fait baisser le pourcentage de rentabilité du projet sans toucher au prix de vente et pourra être utilisée en cas de problème de dépassement de charges durant la vie du projet
+  - Une contingence (retenue d'argent sur le volume de marge générée) doit pouvoir être retenue lors de la vente de chaque devis. Cette retenue fait baisser le pourcentage de rentabilité du projet sans toucher au prix de vente et pourra être utilisée en cas de problème de dépassement de charges durant la vie du projet.
   - Chaque projet peut être un projet interne (et dont la saisie des temps ne rentre pas dans le calcul de marge de l'agence) ou externe.
   - Les projets affichent les données de temps en jours (conversion des temps saisis en heures en jours 1j=8h pour faciliter l'affichage) et dans la devise principale (ici euro).
   - Chaque projet doit avoir 2 tâches par défaut (AVV ou avant-vente et non-vendu), ces temps peuvent être saisis en tant que temps passés sur le projet et ne comptent pas dans les calculs de rentabilité du projet.
   - Chaque projet doit avoir un ensemble d'informations qui le décrivent : 
     - les technologies principales utilisées dans le projet (Symfony, Laravel, VueJS, NuxtJS, Wordpress, Drupal, Ionic, Tailwind, Varnish, CloudFlare, etc.)
-    - L'offre à laquelle on doit le rattacher pour un suivi statistique (Brand, E-commerce, application métier, Maintenance, SEO/SEA, Hébergement, Licences)
+    - L'offre à laquelle on doit le rattacher pour un suivi statistique (Brand, E-commerce, application métier, Maintenance, SEO/SEA, Hébergement, Licences).
   - Chaque projet doit être associé à plusieurs personnes de l'agence :
     - un Key Account Manager (ou commercial) en charge de la signature du projet, des aspects contractuels et du suivi commercial du client
     - un chef de projet en charge du pilotage du projet et de l'équipe associée au projet
@@ -64,7 +64,7 @@
 
 ### ⏱️ Suivi du temps
 - **Timesheet** : Saisie des temps passés
-  - Date et durée en heures (ex: 7.5h)
+  - Date et durée en heures (ex : 7.5h)
   - Lien Contributor ↔ Project
   - Notes optionnelles
 
@@ -77,18 +77,46 @@
 ### Congés
 - **Vacation** : détermine des dates impossibles à utiliser pour un contributeur dans le planning
   - Date et durée
-  - type (congés payés, repos compensateur, absence excepetionnelle, arrêt maladie)
+  - type (congés payés, repos compensateur, absence exceptionnelle, arrêt maladie)
 
 
-## 🏗️ Architecture technique
+## 🏢 Architecture technique
 
 ### Stack
 - **Backend** : Symfony 7.3 + PHP 8.4
 - **Base de données** : MariaDB 11.4
-- **Frontend** : Twig + Bootstrap 5 (thème Skote, les templates de références sont à la racine du répertoire "templates")
+- **Frontend** : Twig + Bootstrap 5 (thème "Skote", les templates de références sont à la racine du répertoire "templates")
 - **Assets** : Webpack Encore + Sass
 - **Conteneurisation** : Docker Compose
 - **Bundles Symfony** : [ajouter ici l'ensemble des bundles symfony utilisés]
+
+### 📚 Architecture des Repositories
+
+L'application suit le pattern Repository pour séparer la logique métier des contrôleurs :
+
+#### Repositories personnalisés implémentés
+
+**`EmploymentPeriodRepository`**
+- `findWithOptionalContributorFilter()` : Filtrage par contributeur
+- `hasOverlappingPeriods()` : Vérification des chevauchements
+- `findActivePeriods()` : Périodes actives
+- `findCurrentPeriodForContributor()` : Période actuelle d'un contributeur
+- `calculatePeriodCost()` : Calcul du coût d'une période
+- `calculateWorkingDays()` : Calcul des jours ouvrés
+- `getStatistics()` : Statistiques des périodes
+
+**`ContributorRepository`**
+- `findActiveContributors()` : Contributeurs actifs
+- `findWithProfiles()` : Contributeurs avec profils
+- `searchByName()` : Recherche par nom
+- `findWithHoursForPeriod()` : Contributeurs avec heures sur période
+
+**Avantages de cette architecture :**
+- ✅ Séparation claire des responsabilités
+- ✅ Réutilisabilité de la logique métier
+- ✅ Testabilité améliorée
+- ✅ Contrôleurs plus légers et focalisés sur HTTP
+- ✅ Optimisation possible des requêtes dans les repositories
 ### 📦 Entités principales
 
 ```php
@@ -100,8 +128,9 @@ User (authentification)
 
 EmploymentPeriod (historique RH)
 ├── contributor_id → Contributor
-├── salary, cjm, weeklyHours, workTimePercentage
-└── startDate, endDate
+├── salary, cjm, tjm, weeklyHours, workTimePercentage
+├── startDate, endDate, notes
+└── profiles[] → Profile (ManyToMany)
 
 Contributor (intervenants)
 ├── name, email, phone, cjm, tjm, active
@@ -207,6 +236,18 @@ FactProjectMetrics (table de faits)
 - [x] QR Code generation (endroid/qr-code-bundle)
 - [x] Command CLI création utilisateur
 - [x] Pages : login, 2fa, tableau de bord, config 2FA
+- [x] **Repositories personnalisés** :
+  - [x] `ContributorRepository` avec méthodes métier
+  - [x] `EmploymentPeriodRepository` avec logique de gestion des périodes
+  - [x] `TimesheetRepository` avec calculs de temps
+  - [x] `ProjectRepository` avec requêtes de rentabilité
+  - [x] `ProjectTaskRepository` avec gestion des tâches
+  - [x] `OrderRepository` avec calculs financiers
+- [x] **CRUD complets** pour entités de configuration :
+  - [x] Technologies (`/admin/technologies`)
+  - [x] Catégories de service (`/admin/service-categories`)
+  - [x] Profils métier (`/admin/job-profiles`)
+- [x] **Refactoring contrôleurs** : logique métier déplacée vers repositories
 
 ### 🔄 En cours / À faire
 - [x] CRUD complet des entités principales (Contributor, Project, Order, Timesheet, EmploymentPeriod)
@@ -214,7 +255,7 @@ FactProjectMetrics (table de faits)
 - [x] Calculs de rentabilité par projet
 - [x] Dashboard analytique avec métriques et graphiques
 - [x] Système de suivi KPIs avec modèle en étoile
-- [ ] Gestion des périodes d'emploi (interface complète)
+- [x] Gestion des périodes d'emploi (interface complète avec relation profils)
 - [ ] Upload et gestion d'avatars
 - [ ] API REST pour intégrations externes
 - [ ] Rapports et exports (PDF/Excel)
@@ -246,6 +287,11 @@ docker compose exec app php bin/console app:user:create email@example.com passwo
 ### URLs
 - **Application** : http://localhost:8080
 - **Base de données** : localhost:3307 (hotones/symfony/symfony)
+- **Administration** :
+  - Technologies : http://localhost:8080/admin/technologies
+  - Catégories de service : http://localhost:8080/admin/service-categories
+  - Profils métier : http://localhost:8080/admin/job-profiles
+  - Périodes d'emploi : http://localhost:8080/employment-periods
 
 ### Compte de test
 - **Email** : thibaut.monier@gmail.com
@@ -274,7 +320,7 @@ Taux de marge = (Marge / CA) × 100
 ### Pages principales à créer
 - Dashboard avec KPIs
 - Liste des projets avec rentabilité
-- Pour chaque projet une page de détail reprenant les principales informations de rentabilité du projet, la liste des temps saisis (dans une page à part), et la possibilité de modifier les informations du projet
+- Pour chaque projet une page de détail reprenant les principales informations de rentabilité du projet, la liste des temps saisis (dans une page à part), et la possibilité de modifier les informations du projet.
 - Formulaire de saisie des temps
 - Gestion des intervenants
 - Rapports et analyses
@@ -282,7 +328,7 @@ Taux de marge = (Marge / CA) × 100
 
 ### UX/UI
 - Design responsive Bootstrap 5
-- Thème Skote (admin dashboard)
+- Thème "Skote" (admin dashboard)
 - Formulaires avec validation
 - Tableaux interactifs
 - Graphiques (Chart.js ou similaire)
@@ -392,6 +438,28 @@ php bin/console app:generate-test-data --force
 - **Support gros volumes** grâce au modèle en étoile
 
 ## 📝 Notes pour la suite
+
+### 🎨 Bonnes pratiques implémentées
+
+#### Architecture et Code
+- **Pattern Repository** : Logique métier séparée des contrôleurs
+- **Injection de dépendances** : Utilisation native de Symfony DI
+- **Entités Doctrine** : Relations bien définies avec annotations
+- **Sécurité** : Contrôle d'accès par rôles (`ROLE_MANAGER`)
+- **Validation** : Token CSRF sur suppressions et formulaires
+
+#### Interface utilisateur
+- **Feedback utilisateur** : Messages flash pour les opérations
+- **Navigation intuitive** : Breadcrumbs et liens cohérents
+- **Filtrage** : Possibilité de filtrer par contributeur
+- **Responsivité** : Bootstrap 5 avec thème Skote
+- **Accessibilité** : Statuts visuels avec couleurs et icônes
+
+#### Gestion des données
+- **Validation métier** : Vérification des chevauchements de périodes
+- **Flexibilité** : Gestion du temps partiel et des différents profils
+- **Tracçabilité** : Historique complet des périodes d'emploi
+- **Calculs automatiques** : Coûts et durées calculés automatiquement
 
 ## Spécifications détaillées
 

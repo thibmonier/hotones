@@ -110,12 +110,6 @@
                         </div>
                     </div>
 
-                    {% if project.description %}
-                    <div class="mt-3">
-                        <strong>Description :</strong>
-                        <p class="text-muted">{{ project.description }}</p>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -230,9 +224,6 @@
                                 <tr>
                                     <td>
                                         <strong>{{ task.name }}</strong>
-                                        {% if task.description %}
-                                            <br><small class="text-muted">{{ task.description|slice(0, 60) }}{{ task.description|length > 60 ? '...' : '' }}</small>
-                                        {% endif %}
                                         {% if not task.countsForProfitability %}
                                             <span class="badge bg-warning ms-1">Non-rentable</span>
                                         {% endif %}

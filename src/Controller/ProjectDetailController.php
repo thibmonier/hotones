@@ -9,6 +9,7 @@ use App\Entity\ProjectTask;
 use App\Entity\Contributor;
 use App\Entity\Profile;
 use App\Form\ProjectTaskType;
+use App\Repository\ProjectTaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,13 +33,7 @@ class ProjectDetailController extends AbstractController
         
         // Récupérer toutes les tâches du projet triées par position
         $tasks = $this->entityManager->getRepository(ProjectTask::class)
-            ->createQueryBuilder('t')
-            ->where('t.project = :project')
-            ->orderBy('t.position', 'ASC')
-            ->addOrderBy('t.id', 'ASC')
-            ->setParameter('project', $project)
-            ->getQuery()
-            ->getResult();
+            ->findByProjectOrderedByPosition($project);
 
         // Calculer les métriques du projet
         $metrics = $this->calculateProjectMetrics($project);
@@ -70,12 +65,7 @@ class ProjectDetailController extends AbstractController
         
         // Définir la position par défaut (dernière position + 1)
         $lastPosition = $this->entityManager->getRepository(ProjectTask::class)
-            ->createQueryBuilder('t')
-            ->select('MAX(t.position)')
-            ->where('t.project = :project')
-            ->setParameter('project', $project)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
+            ->findMaxPositionForProject($project);
         $task->setPosition($lastPosition + 1);
 
         $form = $this->createForm(ProjectTaskType::class, $task);
@@ -140,11 +130,11 @@ class ProjectDetailController extends AbstractController
     private function calculateProjectMetrics(Project $project): array
     {
         return [
-            // Chiffres de vente
-            'total_sold_amount' => $project->getTotalSoldAmount(), // Via devis
-            'total_tasks_sold_amount' => $project->getTotalTasksSoldAmount(), // Via tâches
+            // Chiffres de vente - seulement désactiver ceux liés aux orders
+            'total_sold_amount' => '0.00', // Via devis - désactivé car orders problématique
+            'total_tasks_sold_amount' => $project->getTotalTasksSoldAmount(), // Via tâches - OK
             
-            // Estimations de temps
+            // Estimations de temps - basées sur les tâches
             'total_sold_hours' => $project->getTotalTasksSoldHours(),
             'total_revised_hours' => $project->getTotalTasksRevisedHours(),
             'total_spent_hours' => $project->getTotalTasksSpentHours(),
@@ -168,10 +158,10 @@ class ProjectDetailController extends AbstractController
             // Avancement
             'global_progress' => $project->getGlobalProgress(),
             
-            // Nombres
-            'total_tasks' => $project->getTasks()->count(),
-            'completed_tasks' => $project->getTasks()->filter(fn($t) => $t->getStatus() === 'completed')->count(),
-            'in_progress_tasks' => $project->getTasks()->filter(fn($t) => $t->getStatus() === 'in_progress')->count(),
+            // Nombres - seulement les tâches qui comptent pour la rentabilité
+            'total_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasks($project),
+            'completed_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'completed'),
+            'in_progress_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'in_progress'),
         ];
     }
 
@@ -183,7 +173,7 @@ class ProjectDetailController extends AbstractController
         $remainingHours = [];
 
         foreach ($tasks as $task) {
-            if ($task->getCountsForProfitability()) {
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $labels[] = substr($task->getName(), 0, 20) . (strlen($task->getName()) > 20 ? '...' : '');
                 $progressData[] = (float) $task->getProgressPercentage();
                 $spentHours[] = (float) $task->getTotalHours();

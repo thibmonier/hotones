@@ -1,0 +1,156 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Devis{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Devis</h4>
+                <div class="page-title-right">
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <a href="{{ path('order_new') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Nouveau devis
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Filtres</h4>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="project" class="form-label">Projet</label>
+                            <select name="project" id="project" class="form-select">
+                                <option value="">Tous les projets</option>
+                                {% for project in projects %}
+                                    <option value="{{ project.id }}" {% if selectedProject == project.id %}selected{% endif %}>
+                                        {{ project.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Statut</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">Tous les statuts</option>
+                                {% for key, label in statusOptions %}
+                                    <option value="{{ key }}" {% if selectedStatus == key %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bx bx-search"></i> Filtrer
+                            </button>
+                            <a href="{{ path('order_index') }}" class="btn btn-outline-secondary">
+                                <i class="bx bx-refresh"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Nom</th>
+                                    <th>Projet</th>
+                                    <th>Statut</th>
+                                    <th>Date création</th>
+                                    <th>Montant total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ order.orderNumber }}</strong>
+                                    </td>
+                                    <td>
+                                        <h5 class="font-size-14 mb-1">
+                                            <a href="{{ path('order_show', {'id': order.id}) }}" class="text-dark">{{ order.name ?? 'Devis sans nom' }}</a>
+                                        </h5>
+                                        {% if order.notes %}
+                                            <p class="text-muted mb-0">{{ order.notes|slice(0, 50) }}{% if order.notes|length > 50 %}...{% endif %}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('project_show', {'id': order.project.id}) }}" class="text-primary">
+                                            {{ order.project.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% set statusClass = 'secondary' %}
+                                        {% if order.status == 'gagne' or order.status == 'signe' %}
+                                            {% set statusClass = 'success' %}
+                                        {% elseif order.status == 'termine' %}
+                                            {% set statusClass = 'primary' %}
+                                        {% elseif order.status == 'perdu' or order.status == 'abandonne' %}
+                                            {% set statusClass = 'danger' %}
+                                        {% elseif order.status == 'standby' %}
+                                            {% set statusClass = 'warning' %}
+                                        {% endif %}
+                                        <span class="badge bg-{{ statusClass }}">
+                                            {{ statusOptions[order.status] ?? order.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.createdAt|date('d/m/Y') }}</td>
+                                    <td>{{ order.totalAmount|number_format(2, ',', ' ') }}€</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ path('order_show', {'id': order.id}) }}" class="btn btn-outline-secondary btn-sm" title="Voir">
+                                                <i class="bx bx-show"></i>
+                                            </a>
+                                            {% if is_granted('ROLE_CHEF_PROJET') %}
+                                                <a href="{{ path('order_edit', {'id': order.id}) }}" class="btn btn-outline-primary btn-sm" title="Modifier">
+                                                    <i class="bx bx-edit"></i>
+                                                </a>
+                                                <form method="post" action="{{ path('order_duplicate', {'id': order.id}) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-info btn-sm" title="Dupliquer" onclick="return confirm('Dupliquer ce devis ?')">
+                                                        <i class="bx bx-copy"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">
+                                        <div class="py-4">
+                                            <i class="bx bx-receipt font-size-24 mb-2"></i>
+                                            <p>Aucun devis trouvé</p>
+                                            {% if is_granted('ROLE_CHEF_PROJET') %}
+                                                <a href="{{ path('order_new') }}" class="btn btn-primary">Créer le premier devis</a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

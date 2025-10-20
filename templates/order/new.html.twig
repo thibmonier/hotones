@@ -1,0 +1,93 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Nouveau devis{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouveau devis</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('order_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Informations du devis</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="project_id" class="form-label">Projet <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="project_id" name="project_id" required>
+                                        <option value="">Sélectionner un projet</option>
+                                        {% for project in projects %}
+                                            <option value="{{ project.id }}" {% if order.project and order.project.id == project.id %}selected{% endif %}>
+                                                {{ project.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Statut</label>
+                                    <select class="form-select" id="status" name="status">
+                                        {% for key, label in statusOptions %}
+                                            <option value="{{ key }}" {% if key == 'a_signer' %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ order.description ?? '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ order.notes ?? '' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contingency_percentage" class="form-label">Contingence (%)</label>
+                                    <input type="number" class="form-control" id="contingency_percentage" name="contingency_percentage" 
+                                           min="0" max="100" step="0.1" value="{{ order.contingencyPercentage ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="valid_until" class="form-label">Valide jusqu'au</label>
+                                    <input type="date" class="form-control" id="valid_until" name="valid_until" 
+                                           value="{{ order.validUntil ? order.validUntil|date('Y-m-d') : '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ path('order_index') }}" class="btn btn-outline-secondary me-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-save me-1"></i> Créer le devis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

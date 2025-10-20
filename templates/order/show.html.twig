@@ -1,0 +1,192 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}{{ order.orderNumber }} - Devis{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Devis {{ order.orderNumber }}</h4>
+                <div class="page-title-right">
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <a href="{{ path('order_edit', {'id': order.id}) }}" class="btn btn-primary me-2">
+                            <i class="bx bx-edit me-1"></i> Modifier
+                        </a>
+                        <a href="{{ path('order_sections', {'id': order.id}) }}" class="btn btn-outline-primary me-2">
+                            <i class="bx bx-list-ul me-1"></i> Gérer les sections
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('order_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Informations générales</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Projet</h5>
+                            <p><a href="{{ path('project_show', {'id': order.project.id}) }}" class="text-primary">{{ order.project.name }}</a></p>
+                            
+                            <h5>Statut</h5>
+                            {% set statusClass = 'secondary' %}
+                            {% if order.status == 'gagne' or order.status == 'signe' %}
+                                {% set statusClass = 'success' %}
+                            {% elseif order.status == 'termine' %}
+                                {% set statusClass = 'primary' %}
+                            {% elseif order.status == 'perdu' or order.status == 'abandonne' %}
+                                {% set statusClass = 'danger' %}
+                            {% elseif order.status == 'standby' %}
+                                {% set statusClass = 'warning' %}
+                            {% endif %}
+                            <p><span class="badge bg-{{ statusClass }} fs-6">{{ order.status|upper }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Date de création</h5>
+                            <p>{{ order.createdAt|date('d/m/Y') }}</p>
+                            
+                            {% if order.validatedAt %}
+                                <h5>Date de validation</h5>
+                                <p>{{ order.validatedAt|date('d/m/Y') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if order.notes %}
+                        <div class="mt-3">
+                            <h5>Notes</h5>
+                            <p class="text-muted">{{ order.notes|nl2br }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if order.sections|length > 0 %}
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Sections du devis</h4>
+                    </div>
+                    <div class="card-body">
+                        {% for section in order.sections %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <h5>{{ section.name }}</h5>
+                                {% if section.description %}
+                                    <p class="text-muted">{{ section.description }}</p>
+                                {% endif %}
+
+                                {% if section.lines|length > 0 %}
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Description</th>
+                                                    <th>Profil</th>
+                                                    <th>TJM</th>
+                                                    <th>Jours</th>
+                                                    <th>Achats</th>
+                                                    <th class="text-end">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for line in section.lines %}
+                                                    <tr>
+                                                        <td>{{ line.description }}</td>
+                                                        <td>{{ line.profile ? line.profile.name : '-' }}</td>
+                                                        <td>{{ line.tjm ? (line.tjm|number_format(0, ',', ' ') ~ '€') : '-' }}</td>
+                                                        <td>{{ line.days ? line.days|number_format(1, ',', ' ') : '-' }}</td>
+                                                        <td>{{ line.purchaseAmount ? (line.purchaseAmount|number_format(2, ',', ' ') ~ '€') : '-' }}</td>
+                                                        <td class="text-end">{{ line.totalAmount|number_format(2, ',', ' ') }}€</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">Aucune ligne dans cette section</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bx bx-list-ul font-size-24 mb-2 text-muted"></i>
+                        <p class="text-muted">Aucune section définie pour ce devis</p>
+                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                            <a href="{{ path('order_sections', {'id': order.id}) }}" class="btn btn-primary">
+                                Ajouter des sections
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Résumé financier</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total prestations :</span>
+                        <strong>{{ totalAmount|number_format(2, ',', ' ') }}€</strong>
+                    </div>
+                    
+                    {% if totalPurchases > 0 %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total achats :</span>
+                            <strong>{{ totalPurchases|number_format(2, ',', ' ') }}€</strong>
+                        </div>
+                    {% endif %}
+
+                    {% if contingencyAmount > 0 %}
+                        <div class="d-flex justify-content-between mb-2 text-warning">
+                            <span>Contingence :</span>
+                            <strong>-{{ contingencyAmount|number_format(2, ',', ' ') }}€</strong>
+                        </div>
+                    {% endif %}
+
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="h5">Total final :</span>
+                        <strong class="h5 text-success">{{ finalAmount|number_format(2, ',', ' ') }}€</strong>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_granted('ROLE_CHEF_PROJET') %}
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Actions</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ path('order_duplicate', {'id': order.id}) }}" class="d-grid gap-2">
+                            <button type="submit" class="btn btn-outline-info" onclick="return confirm('Dupliquer ce devis ?')">
+                                <i class="bx bx-copy me-1"></i> Dupliquer
+                            </button>
+                        </form>
+                        
+                        {% if is_granted('ROLE_MANAGER') %}
+                            <form method="post" action="{{ path('order_delete', {'id': order.id}) }}" class="mt-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
+                                <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce devis ?')">
+                                    <i class="bx bx-trash me-1"></i> Supprimer
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

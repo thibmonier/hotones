@@ -28,7 +28,7 @@ class OrderSection
     #[ORM\Column(type: 'integer')]
     private int $position = 0; // Pour ordonner les sections
 
-    #[ORM\OneToMany(mappedBy: 'section', targetEntity: OrderLine::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: OrderLine::class, mappedBy: 'section', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $lines;
 
@@ -52,22 +52,22 @@ class OrderSection
     public function setPosition(int $position): self { $this->position = $position; return $this; }
 
     public function getLines(): Collection { return $this->lines; }
-    public function addLine(OrderLine $line): self 
-    { 
+    public function addLine(OrderLine $line): self
+    {
         if (!$this->lines->contains($line)) {
             $this->lines[] = $line;
             $line->setSection($this);
         }
-        return $this; 
+        return $this;
     }
-    public function removeLine(OrderLine $line): self 
-    { 
+    public function removeLine(OrderLine $line): self
+    {
         if ($this->lines->removeElement($line)) {
             if ($line->getSection() === $this) {
                 $line->setSection(null);
             }
         }
-        return $this; 
+        return $this;
     }
 
     /**

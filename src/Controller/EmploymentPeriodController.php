@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\EmploymentPeriod;
 use App\Entity\Contributor;
 use App\Entity\Profile;
+use App\Repository\EmploymentPeriodRepository;
+use App\Repository\ContributorRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,21 +19,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class EmploymentPeriodController extends AbstractController
 {
     #[Route('', name: 'employment_period_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em): Response
+    public function index(Request $request, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository): Response
     {
         $contributorId = $request->query->get('contributor');
         
-        $queryBuilder = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
-            ->leftJoin('ep.contributor', 'c')
-            ->orderBy('ep.startDate', 'DESC');
-        
-        if ($contributorId) {
-            $queryBuilder->andWhere('ep.contributor = :contributor')
-                ->setParameter('contributor', $contributorId);
-        }
-        
-        $periods = $queryBuilder->getQuery()->getResult();
-        $contributors = $em->getRepository(Contributor::class)->findBy(['active' => true], ['name' => 'ASC']);
+        $periods = $employmentPeriodRepository->findWithOptionalContributorFilter($contributorId);
+        $contributors = $contributorRepository->findActiveContributors();
         
         return $this->render('employment_period/index.html.twig', [
             'periods' => $periods,
@@ -41,7 +34,7 @@ class EmploymentPeriodController extends AbstractController
     }
 
     #[Route('/new', name: 'employment_period_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository): Response
     {
         $period = new EmploymentPeriod();
         
@@ -100,10 +93,10 @@ class EmploymentPeriodController extends AbstractController
             $period->setNotes($request->request->get('notes'));
             
             // Vérifier les chevauchements de périodes
-            if ($this->hasOverlappingPeriods($period, $em)) {
+            if ($employmentPeriodRepository->hasOverlappingPeriods($period)) {
                 $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce contributeur.');
                 
-                $contributors = $em->getRepository(Contributor::class)->findBy(['active' => true], ['name' => 'ASC']);
+                $contributors = $contributorRepository->findActiveContributors();
                 $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
                 
                 return $this->render('employment_period/new.html.twig', [
@@ -120,7 +113,7 @@ class EmploymentPeriodController extends AbstractController
             return $this->redirectToRoute('employment_period_show', ['id' => $period->getId()]);
         }
         
-        $contributors = $em->getRepository(Contributor::class)->findBy(['active' => true], ['name' => 'ASC']);
+        $contributors = $contributorRepository->findActiveContributors();
         $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
         
         return $this->render('employment_period/new.html.twig', [
@@ -131,7 +124,7 @@ class EmploymentPeriodController extends AbstractController
     }
 
     #[Route('/{id}', name: 'employment_period_show', methods: ['GET'])]
-    public function show(EmploymentPeriod $period): Response
+    public function show(EmploymentPeriod $period, EmploymentPeriodRepository $employmentPeriodRepository): Response
     {
         // Calculer la durée en jours
         $duration = null;
@@ -141,12 +134,7 @@ class EmploymentPeriodController extends AbstractController
         }
         
         // Calculer le coût total sur la période
-        $totalCost = null;
-        if ($period->getCjm() && $duration) {
-            $workingDays = $this->calculateWorkingDays($period->getStartDate(), $period->getEndDate() ?? new \DateTime());
-            $adjustedWorkingDays = $workingDays * ($period->getWorkTimePercentage() / 100);
-            $totalCost = $adjustedWorkingDays * $period->getCjm();
-        }
+        $totalCost = $employmentPeriodRepository->calculatePeriodCost($period);
         
         return $this->render('employment_period/show.html.twig', [
             'period' => $period,
@@ -156,7 +144,7 @@ class EmploymentPeriodController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'employment_period_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EmploymentPeriod $period, EntityManagerInterface $em): Response
+    public function edit(Request $request, EmploymentPeriod $period, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository): Response
     {
         if ($request->isMethod('POST')) {
             // Contributeur
@@ -206,10 +194,10 @@ class EmploymentPeriodController extends AbstractController
             $period->setNotes($request->request->get('notes'));
             
             // Vérifier les chevauchements de périodes (en excluant la période actuelle)
-            if ($this->hasOverlappingPeriods($period, $em, $period->getId())) {
+            if ($employmentPeriodRepository->hasOverlappingPeriods($period, $period->getId())) {
                 $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce contributeur.');
                 
-                $contributors = $em->getRepository(Contributor::class)->findBy(['active' => true], ['name' => 'ASC']);
+                $contributors = $contributorRepository->findActiveContributors();
                 $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
                 
                 return $this->render('employment_period/edit.html.twig', [
@@ -225,7 +213,7 @@ class EmploymentPeriodController extends AbstractController
             return $this->redirectToRoute('employment_period_show', ['id' => $period->getId()]);
         }
         
-        $contributors = $em->getRepository(Contributor::class)->findBy(['active' => true], ['name' => 'ASC']);
+        $contributors = $contributorRepository->findActiveContributors();
         $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
         
         return $this->render('employment_period/edit.html.twig', [
@@ -247,54 +235,4 @@ class EmploymentPeriodController extends AbstractController
         return $this->redirectToRoute('employment_period_index');
     }
 
-    private function hasOverlappingPeriods(EmploymentPeriod $period, EntityManagerInterface $em, int $excludeId = null): bool
-    {
-        if (!$period->getContributor() || !$period->getStartDate()) {
-            return false;
-        }
-        
-        $queryBuilder = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
-            ->setParameter('contributor', $period->getContributor());
-        
-        if ($excludeId) {
-            $queryBuilder->andWhere('ep.id != :excludeId')
-                ->setParameter('excludeId', $excludeId);
-        }
-        
-        // Vérifier les chevauchements
-        $endDate = $period->getEndDate();
-        if ($endDate) {
-            // Période avec date de fin
-            $queryBuilder->andWhere(
-                '(ep.startDate <= :endDate AND (ep.endDate IS NULL OR ep.endDate >= :startDate))'
-            )
-            ->setParameter('startDate', $period->getStartDate())
-            ->setParameter('endDate', $endDate);
-        } else {
-            // Période ouverte (sans date de fin)
-            $queryBuilder->andWhere(
-                '(ep.endDate IS NULL OR ep.endDate >= :startDate)'
-            )
-            ->setParameter('startDate', $period->getStartDate());
-        }
-        
-        return $queryBuilder->getQuery()->getOneOrNullResult() !== null;
-    }
-
-    private function calculateWorkingDays(\DateTime $startDate, \DateTime $endDate): int
-    {
-        $workingDays = 0;
-        $current = clone $startDate;
-        
-        while ($current <= $endDate) {
-            // Exclure les weekends (samedi = 6, dimanche = 0)
-            if ($current->format('w') != 0 && $current->format('w') != 6) {
-                $workingDays++;
-            }
-            $current->modify('+1 day');
-        }
-        
-        return $workingDays;
-    }
 }
