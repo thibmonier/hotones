@@ -20,10 +20,10 @@ class ContributorController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $contributors = $em->getRepository(Contributor::class)->findBy(
-            ['active' => true], 
+            ['active' => true],
             ['name' => 'ASC']
         );
-        
+
         return $this->render('contributor/index.html.twig', [
             'contributors' => $contributors,
         ]);
@@ -34,22 +34,22 @@ class ContributorController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $contributor = new Contributor();
-        
+
         if ($request->isMethod('POST')) {
             $contributor->setName($request->request->get('name'));
             $contributor->setEmail($request->request->get('email'));
             $contributor->setPhone($request->request->get('phone'));
-            
+
             // Gestion des montants (éviter les chaînes vides)
             $cjm = $request->request->get('cjm');
             $contributor->setCjm($cjm !== '' ? (float)$cjm : null);
-            
+
             $tjm = $request->request->get('tjm');
             $contributor->setTjm($tjm !== '' ? (float)$tjm : null);
-            
+
             $contributor->setActive((bool)$request->request->get('active', true));
             $contributor->setNotes($request->request->get('notes'));
-            
+
             // Association avec un utilisateur si sélectionné
             if ($userId = $request->request->get('user_id')) {
                 $user = $em->getRepository(User::class)->find($userId);
@@ -57,7 +57,7 @@ class ContributorController extends AbstractController
                     $contributor->setUser($user);
                 }
             }
-            
+
             // Gestion des profils
             $profileIds = $request->request->all('profiles');
             if (!empty($profileIds)) {
@@ -68,17 +68,17 @@ class ContributorController extends AbstractController
                     }
                 }
             }
-            
+
             $em->persist($contributor);
             $em->flush();
-            
+
             $this->addFlash('success', 'Contributeur créé avec succès');
             return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
         }
-        
+
         $users = $em->getRepository(User::class)->findBy(['totpEnabled' => true], ['firstName' => 'ASC']);
         $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
-        
+
         return $this->render('contributor/new.html.twig', [
             'contributor' => $contributor,
             'users' => $users,
@@ -102,17 +102,17 @@ class ContributorController extends AbstractController
             $contributor->setName($request->request->get('name'));
             $contributor->setEmail($request->request->get('email'));
             $contributor->setPhone($request->request->get('phone'));
-            
+
             // Gestion des montants (éviter les chaînes vides)
             $cjm = $request->request->get('cjm');
             $contributor->setCjm($cjm !== '' ? (float)$cjm : null);
-            
+
             $tjm = $request->request->get('tjm');
             $contributor->setTjm($tjm !== '' ? (float)$tjm : null);
-            
+
             $contributor->setActive((bool)$request->request->get('active'));
             $contributor->setNotes($request->request->get('notes'));
-            
+
             // Association avec un utilisateur
             if ($userId = $request->request->get('user_id')) {
                 $user = $em->getRepository(User::class)->find($userId);
@@ -120,7 +120,7 @@ class ContributorController extends AbstractController
             } else {
                 $contributor->setUser(null);
             }
-            
+
             // Gestion des profils
             $contributor->getProfiles()->clear();
             $profileIds = $request->request->all('profiles');
@@ -132,16 +132,16 @@ class ContributorController extends AbstractController
                     }
                 }
             }
-            
+
             $em->flush();
-            
+
             $this->addFlash('success', 'Contributeur modifié avec succès');
             return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
         }
-        
+
         $users = $em->getRepository(User::class)->findBy(['totpEnabled' => true], ['firstName' => 'ASC']);
         $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
-        
+
         return $this->render('contributor/edit.html.twig', [
             'contributor' => $contributor,
             'users' => $users,
@@ -155,7 +155,7 @@ class ContributorController extends AbstractController
     {
         $periods = $em->getRepository(\App\Entity\EmploymentPeriod::class)
             ->findBy(['contributor' => $contributor], ['startDate' => 'DESC']);
-        
+
         return $this->render('contributor/employment_periods.html.twig', [
             'contributor' => $contributor,
             'periods' => $periods,
@@ -169,12 +169,12 @@ class ContributorController extends AbstractController
         $startDate = new \DateTime($month . '-01');
         $endDate = clone $startDate;
         $endDate->modify('last day of this month');
-        
+
         $timesheetRepo = $em->getRepository(\App\Entity\Timesheet::class);
         $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
         $projectTotals = $timesheetRepo->getHoursGroupedByProjectForContributor($contributor, $startDate, $endDate);
-        $totalHours = array_sum(array_map(fn($t) => $t->getHours(), $timesheets));
-        
+        $totalHours = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
+
         return $this->render('contributor/timesheets.html.twig', [
             'contributor' => $contributor,
             'timesheets' => $timesheets,
@@ -196,7 +196,7 @@ class ContributorController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Contributeur désactivé avec succès');
         }
-        
+
         return $this->redirectToRoute('contributor_index');
     }
 }

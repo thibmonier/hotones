@@ -37,21 +37,55 @@ class OrderSection
         $this->lines = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getOrder(): Order { return $this->order; }
-    public function setOrder(Order $order): self { $this->order = $order; return $this; }
+    public function getOrder(): Order
+    {
+        return $this->order;
+    }
+    public function setOrder(Order $order): self
+    {
+        $this->order = $order;
+        return $this;
+    }
 
-    public function getTitle(): string { return $this->title; }
-    public function setTitle(string $title): self { $this->title = $title; return $this; }
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): self { $this->description = $description; return $this; }
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
 
-    public function getPosition(): int { return $this->position; }
-    public function setPosition(int $position): self { $this->position = $position; return $this; }
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
+        return $this;
+    }
 
-    public function getLines(): Collection { return $this->lines; }
+    public function getLines(): Collection
+    {
+        return $this->lines;
+    }
     public function addLine(OrderLine $line): self
     {
         if (!$this->lines->contains($line)) {

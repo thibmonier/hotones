@@ -18,7 +18,7 @@ class ServiceCategoryController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $serviceCategories = $em->getRepository(ServiceCategory::class)->findBy([], ['name' => 'ASC']);
-        
+
         return $this->render('service_category/index.html.twig', [
             'serviceCategories' => $serviceCategories,
         ]);
@@ -28,20 +28,20 @@ class ServiceCategoryController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $serviceCategory = new ServiceCategory();
-        
+
         if ($request->isMethod('POST')) {
             $serviceCategory->setName($request->request->get('name'));
             $serviceCategory->setDescription($request->request->get('description'));
             $serviceCategory->setColor($request->request->get('color'));
             $serviceCategory->setActive($request->request->get('active', false));
-            
+
             $em->persist($serviceCategory);
             $em->flush();
-            
+
             $this->addFlash('success', 'Catégorie de service créée avec succès');
             return $this->redirectToRoute('service_category_index');
         }
-        
+
         return $this->render('service_category/new.html.twig', [
             'serviceCategory' => $serviceCategory,
         ]);
@@ -63,13 +63,13 @@ class ServiceCategoryController extends AbstractController
             $serviceCategory->setDescription($request->request->get('description'));
             $serviceCategory->setColor($request->request->get('color'));
             $serviceCategory->setActive($request->request->get('active', false));
-            
+
             $em->flush();
-            
+
             $this->addFlash('success', 'Catégorie de service modifiée avec succès');
             return $this->redirectToRoute('service_category_index');
         }
-        
+
         return $this->render('service_category/edit.html.twig', [
             'serviceCategory' => $serviceCategory,
         ]);
@@ -83,7 +83,7 @@ class ServiceCategoryController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Catégorie de service supprimée avec succès');
         }
-        
+
         return $this->redirectToRoute('service_category_index');
     }
 }

@@ -23,28 +23,28 @@ class TimesheetController extends AbstractController
         $currentWeek = $request->query->get('week', date('Y-W'));
         $year = (int)substr($currentWeek, 0, 4);
         $week = (int)substr($currentWeek, -2);
-        
+
         // Calculer les dates de début et fin de semaine
         $startDate = new \DateTime();
         $startDate->setISODate($year, $week, 1);
         $endDate = clone $startDate;
         $endDate->modify('+6 days');
-        
+
         $projectRepo = $em->getRepository(Project::class);
         $contributorRepo = $em->getRepository(Contributor::class);
         $timesheetRepo = $em->getRepository(Timesheet::class);
-        
+
         // Récupérer les projets actifs via repository
         $projects = $projectRepo->findActiveOrderedByName();
-        
+
         // Récupérer les temps de la semaine pour l'utilisateur connecté via repository
         $contributor = $contributorRepo->findByUser($this->getUser());
         $timesheets = [];
-        
+
         if ($contributor) {
             $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
         }
-        
+
         // Organiser les temps par projet et date
         $timesheetGrid = [];
         foreach ($timesheets as $timesheet) {
@@ -52,7 +52,7 @@ class TimesheetController extends AbstractController
             $date = $timesheet->getDate()->format('Y-m-d');
             $timesheetGrid[$projectId][$date] = $timesheet;
         }
-        
+
         return $this->render('timesheet/index.html.twig', [
             'projects' => $projects,
             'contributor' => $contributor,
@@ -70,32 +70,32 @@ class TimesheetController extends AbstractController
     {
         $contributorRepo = $em->getRepository(Contributor::class);
         $timesheetRepo = $em->getRepository(Timesheet::class);
-        
+
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
             return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
         }
-        
+
         $projectId = $request->request->get('project_id');
         $date = new \DateTime($request->request->get('date'));
         $hours = (float)$request->request->get('hours');
         $notes = $request->request->get('notes', '');
-        
+
         $project = $em->getRepository(Project::class)->find($projectId);
         if (!$project) {
             return new JsonResponse(['error' => 'Projet non trouvé'], 400);
         }
-        
+
         // Chercher un timesheet existant via repository
         $timesheet = $timesheetRepo->findExistingTimesheet($contributor, $project, $date);
-        
+
         if (!$timesheet) {
             $timesheet = new Timesheet();
             $timesheet->setContributor($contributor);
             $timesheet->setProject($project);
             $timesheet->setDate($date);
         }
-        
+
         if ($hours > 0) {
             $timesheet->setHours($hours);
             $timesheet->setNotes($notes);
@@ -106,9 +106,9 @@ class TimesheetController extends AbstractController
                 $em->remove($timesheet);
             }
         }
-        
+
         $em->flush();
-        
+
         return new JsonResponse(['success' => true]);
     }
 
@@ -117,25 +117,25 @@ class TimesheetController extends AbstractController
     {
         $contributorRepo = $em->getRepository(Contributor::class);
         $timesheetRepo = $em->getRepository(Timesheet::class);
-        
+
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
             $this->addFlash('error', 'Aucun contributeur associé à votre compte.');
             return $this->redirectToRoute('home');
         }
-        
+
         $month = $request->query->get('month', date('Y-m'));
         $startDate = new \DateTime($month . '-01');
         $endDate = clone $startDate;
         $endDate->modify('last day of this month');
-        
+
         // Utiliser le repository pour récupérer les temps
         $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
-        
+
         // Calculer les totaux via repository
         $projectTotals = $timesheetRepo->getHoursGroupedByProjectForContributor($contributor, $startDate, $endDate);
-        $totalHours = array_sum(array_map(fn($t) => $t->getHours(), $timesheets));
-        
+        $totalHours = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
+
         return $this->render('timesheet/my_time.html.twig', [
             'timesheets' => $timesheets,
             'totalHours' => $totalHours,
@@ -152,19 +152,19 @@ class TimesheetController extends AbstractController
     {
         $month = $request->query->get('month', date('Y-m'));
         $projectId = $request->query->get('project');
-        
+
         $startDate = new \DateTime($month . '-01');
         $endDate = clone $startDate;
         $endDate->modify('last day of this month');
-        
+
         $projectRepo = $em->getRepository(Project::class);
         $timesheetRepo = $em->getRepository(Timesheet::class);
-        
+
         // Utiliser le repository avec filtrage optionnel par projet
         $selectedProject = $projectId ? $projectRepo->find($projectId) : null;
         $timesheets = $timesheetRepo->findForPeriodWithProject($startDate, $endDate, $selectedProject);
         $projects = $projectRepo->findActiveOrderedByName();
-        
+
         return $this->render('timesheet/all.html.twig', [
             'timesheets' => $timesheets,
             'projects' => $projects,

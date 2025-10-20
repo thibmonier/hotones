@@ -197,59 +197,185 @@ class FactProjectMetrics
     }
 
     // Getters/Setters pour les KPIs
-    public function getProjectCount(): int { return $this->projectCount; }
-    public function setProjectCount(int $projectCount): self { $this->projectCount = $projectCount; return $this; }
+    public function getProjectCount(): int
+    {
+        return $this->projectCount;
+    }
+    public function setProjectCount(int $projectCount): self
+    {
+        $this->projectCount = $projectCount;
+        return $this;
+    }
 
-    public function getActiveProjectCount(): int { return $this->activeProjectCount; }
-    public function setActiveProjectCount(int $activeProjectCount): self { $this->activeProjectCount = $activeProjectCount; return $this; }
+    public function getActiveProjectCount(): int
+    {
+        return $this->activeProjectCount;
+    }
+    public function setActiveProjectCount(int $activeProjectCount): self
+    {
+        $this->activeProjectCount = $activeProjectCount;
+        return $this;
+    }
 
-    public function getCompletedProjectCount(): int { return $this->completedProjectCount; }
-    public function setCompletedProjectCount(int $completedProjectCount): self { $this->completedProjectCount = $completedProjectCount; return $this; }
+    public function getCompletedProjectCount(): int
+    {
+        return $this->completedProjectCount;
+    }
+    public function setCompletedProjectCount(int $completedProjectCount): self
+    {
+        $this->completedProjectCount = $completedProjectCount;
+        return $this;
+    }
 
-    public function getOrderCount(): int { return $this->orderCount; }
-    public function setOrderCount(int $orderCount): self { $this->orderCount = $orderCount; return $this; }
+    public function getOrderCount(): int
+    {
+        return $this->orderCount;
+    }
+    public function setOrderCount(int $orderCount): self
+    {
+        $this->orderCount = $orderCount;
+        return $this;
+    }
 
-    public function getPendingOrderCount(): int { return $this->pendingOrderCount; }
-    public function setPendingOrderCount(int $pendingOrderCount): self { $this->pendingOrderCount = $pendingOrderCount; return $this; }
+    public function getPendingOrderCount(): int
+    {
+        return $this->pendingOrderCount;
+    }
+    public function setPendingOrderCount(int $pendingOrderCount): self
+    {
+        $this->pendingOrderCount = $pendingOrderCount;
+        return $this;
+    }
 
-    public function getWonOrderCount(): int { return $this->wonOrderCount; }
-    public function setWonOrderCount(int $wonOrderCount): self { $this->wonOrderCount = $wonOrderCount; return $this; }
+    public function getWonOrderCount(): int
+    {
+        return $this->wonOrderCount;
+    }
+    public function setWonOrderCount(int $wonOrderCount): self
+    {
+        $this->wonOrderCount = $wonOrderCount;
+        return $this;
+    }
 
-    public function getContributorCount(): int { return $this->contributorCount; }
-    public function setContributorCount(int $contributorCount): self { $this->contributorCount = $contributorCount; return $this; }
+    public function getContributorCount(): int
+    {
+        return $this->contributorCount;
+    }
+    public function setContributorCount(int $contributorCount): self
+    {
+        $this->contributorCount = $contributorCount;
+        return $this;
+    }
 
-    public function getTotalRevenue(): string { return $this->totalRevenue; }
-    public function setTotalRevenue(string $totalRevenue): self { $this->totalRevenue = $totalRevenue; return $this; }
+    public function getTotalRevenue(): string
+    {
+        return $this->totalRevenue;
+    }
+    public function setTotalRevenue(string $totalRevenue): self
+    {
+        $this->totalRevenue = $totalRevenue;
+        return $this;
+    }
 
-    public function getTotalCosts(): string { return $this->totalCosts; }
-    public function setTotalCosts(string $totalCosts): self { $this->totalCosts = $totalCosts; return $this; }
+    public function getTotalCosts(): string
+    {
+        return $this->totalCosts;
+    }
+    public function setTotalCosts(string $totalCosts): self
+    {
+        $this->totalCosts = $totalCosts;
+        return $this;
+    }
 
-    public function getGrossMargin(): string { return $this->grossMargin; }
-    public function setGrossMargin(string $grossMargin): self { $this->grossMargin = $grossMargin; return $this; }
+    public function getGrossMargin(): string
+    {
+        return $this->grossMargin;
+    }
+    public function setGrossMargin(string $grossMargin): self
+    {
+        $this->grossMargin = $grossMargin;
+        return $this;
+    }
 
-    public function getMarginPercentage(): string { return $this->marginPercentage; }
-    public function setMarginPercentage(string $marginPercentage): self { $this->marginPercentage = $marginPercentage; return $this; }
+    public function getMarginPercentage(): string
+    {
+        return $this->marginPercentage;
+    }
+    public function setMarginPercentage(string $marginPercentage): self
+    {
+        $this->marginPercentage = $marginPercentage;
+        return $this;
+    }
 
-    public function getPendingRevenue(): string { return $this->pendingRevenue; }
-    public function setPendingRevenue(string $pendingRevenue): self { $this->pendingRevenue = $pendingRevenue; return $this; }
+    public function getPendingRevenue(): string
+    {
+        return $this->pendingRevenue;
+    }
+    public function setPendingRevenue(string $pendingRevenue): self
+    {
+        $this->pendingRevenue = $pendingRevenue;
+        return $this;
+    }
 
-    public function getAverageOrderValue(): string { return $this->averageOrderValue; }
-    public function setAverageOrderValue(string $averageOrderValue): self { $this->averageOrderValue = $averageOrderValue; return $this; }
+    public function getAverageOrderValue(): string
+    {
+        return $this->averageOrderValue;
+    }
+    public function setAverageOrderValue(string $averageOrderValue): self
+    {
+        $this->averageOrderValue = $averageOrderValue;
+        return $this;
+    }
 
-    public function getTotalSoldDays(): string { return $this->totalSoldDays; }
-    public function setTotalSoldDays(string $totalSoldDays): self { $this->totalSoldDays = $totalSoldDays; return $this; }
+    public function getTotalSoldDays(): string
+    {
+        return $this->totalSoldDays;
+    }
+    public function setTotalSoldDays(string $totalSoldDays): self
+    {
+        $this->totalSoldDays = $totalSoldDays;
+        return $this;
+    }
 
-    public function getTotalWorkedDays(): string { return $this->totalWorkedDays; }
-    public function setTotalWorkedDays(string $totalWorkedDays): self { $this->totalWorkedDays = $totalWorkedDays; return $this; }
+    public function getTotalWorkedDays(): string
+    {
+        return $this->totalWorkedDays;
+    }
+    public function setTotalWorkedDays(string $totalWorkedDays): self
+    {
+        $this->totalWorkedDays = $totalWorkedDays;
+        return $this;
+    }
 
-    public function getUtilizationRate(): string { return $this->utilizationRate; }
-    public function setUtilizationRate(string $utilizationRate): self { $this->utilizationRate = $utilizationRate; return $this; }
+    public function getUtilizationRate(): string
+    {
+        return $this->utilizationRate;
+    }
+    public function setUtilizationRate(string $utilizationRate): self
+    {
+        $this->utilizationRate = $utilizationRate;
+        return $this;
+    }
 
-    public function getCalculatedAt(): \DateTimeInterface { return $this->calculatedAt; }
-    public function setCalculatedAt(\DateTimeInterface $calculatedAt): self { $this->calculatedAt = $calculatedAt; return $this; }
+    public function getCalculatedAt(): \DateTimeInterface
+    {
+        return $this->calculatedAt;
+    }
+    public function setCalculatedAt(\DateTimeInterface $calculatedAt): self
+    {
+        $this->calculatedAt = $calculatedAt;
+        return $this;
+    }
 
-    public function getGranularity(): string { return $this->granularity; }
-    public function setGranularity(string $granularity): self { $this->granularity = $granularity; return $this; }
+    public function getGranularity(): string
+    {
+        return $this->granularity;
+    }
+    public function setGranularity(string $granularity): self
+    {
+        $this->granularity = $granularity;
+        return $this;
+    }
 
     /**
      * Calcule automatiquement la marge et le pourcentage
@@ -257,7 +383,7 @@ class FactProjectMetrics
     public function calculateMargins(): self
     {
         $this->grossMargin = bcsub($this->totalRevenue, $this->totalCosts, 2);
-        
+
         if (bccomp($this->totalRevenue, '0', 2) > 0) {
             $this->marginPercentage = bcmul(
                 bcdiv($this->grossMargin, $this->totalRevenue, 4),
@@ -267,7 +393,7 @@ class FactProjectMetrics
         } else {
             $this->marginPercentage = '0.00';
         }
-        
+
         return $this;
     }
 }

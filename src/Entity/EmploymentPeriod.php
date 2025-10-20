@@ -58,34 +58,100 @@ class EmploymentPeriod
         $this->profiles = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getContributor(): Contributor { return $this->contributor; }
-    public function setContributor(Contributor $contributor): self { $this->contributor = $contributor; return $this; }
+    public function getContributor(): Contributor
+    {
+        return $this->contributor;
+    }
+    public function setContributor(Contributor $contributor): self
+    {
+        $this->contributor = $contributor;
+        return $this;
+    }
 
-    public function getSalary(): ?string { return $this->salary; }
-    public function setSalary(?float $salary): self { $this->salary = $salary !== null ? (string)$salary : null; return $this; }
+    public function getSalary(): ?string
+    {
+        return $this->salary;
+    }
+    public function setSalary(?float $salary): self
+    {
+        $this->salary = $salary !== null ? (string)$salary : null;
+        return $this;
+    }
 
-    public function getCjm(): ?string { return $this->cjm; }
-    public function setCjm(?float $cjm): self { $this->cjm = $cjm !== null ? (string)$cjm : null; return $this; }
+    public function getCjm(): ?string
+    {
+        return $this->cjm;
+    }
+    public function setCjm(?float $cjm): self
+    {
+        $this->cjm = $cjm !== null ? (string)$cjm : null;
+        return $this;
+    }
 
-    public function getTjm(): ?string { return $this->tjm; }
-    public function setTjm(?float $tjm): self { $this->tjm = $tjm !== null ? (string)$tjm : null; return $this; }
+    public function getTjm(): ?string
+    {
+        return $this->tjm;
+    }
+    public function setTjm(?float $tjm): self
+    {
+        $this->tjm = $tjm !== null ? (string)$tjm : null;
+        return $this;
+    }
 
-    public function getWeeklyHours(): string { return $this->weeklyHours; }
-    public function setWeeklyHours(?float $weeklyHours): self { $this->weeklyHours = $weeklyHours !== null ? (string)$weeklyHours : '35.00'; return $this; }
+    public function getWeeklyHours(): string
+    {
+        return $this->weeklyHours;
+    }
+    public function setWeeklyHours(?float $weeklyHours): self
+    {
+        $this->weeklyHours = $weeklyHours !== null ? (string)$weeklyHours : '35.00';
+        return $this;
+    }
 
-    public function getStartDate(): \DateTimeInterface { return $this->startDate; }
-    public function setStartDate(\DateTimeInterface $startDate): self { $this->startDate = $startDate; return $this; }
+    public function getStartDate(): \DateTimeInterface
+    {
+        return $this->startDate;
+    }
+    public function setStartDate(\DateTimeInterface $startDate): self
+    {
+        $this->startDate = $startDate;
+        return $this;
+    }
 
-    public function getEndDate(): ?\DateTimeInterface { return $this->endDate; }
-    public function setEndDate(?\DateTimeInterface $endDate): self { $this->endDate = $endDate; return $this; }
+    public function getEndDate(): ?\DateTimeInterface
+    {
+        return $this->endDate;
+    }
+    public function setEndDate(?\DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
+        return $this;
+    }
 
-    public function getWorkTimePercentage(): string { return $this->workTimePercentage; }
-    public function setWorkTimePercentage(?float $workTimePercentage): self { $this->workTimePercentage = $workTimePercentage !== null ? (string)$workTimePercentage : '100.00'; return $this; }
+    public function getWorkTimePercentage(): string
+    {
+        return $this->workTimePercentage;
+    }
+    public function setWorkTimePercentage(?float $workTimePercentage): self
+    {
+        $this->workTimePercentage = $workTimePercentage !== null ? (string)$workTimePercentage : '100.00';
+        return $this;
+    }
 
-    public function getNotes(): ?string { return $this->notes; }
-    public function setNotes(?string $notes): self { $this->notes = $notes; return $this; }
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+    public function setNotes(?string $notes): self
+    {
+        $this->notes = $notes;
+        return $this;
+    }
 
     /**
      * @return Collection<int, Profile>
@@ -129,7 +195,7 @@ class EmploymentPeriod
         $standardHourPerDay = 7; // 7h par jour standard
         $actualHours = floatval($this->weeklyHours);
         $workingRatio = floatval($this->workingTimePercentage) / 100;
-        
+
         return ($actualHours * $workingRatio) / $standardHourPerDay;
     }
 
@@ -141,7 +207,7 @@ class EmploymentPeriod
         if ($date < $this->startDate) {
             return false;
         }
-        
+
         return $this->endDate === null || $date <= $this->endDate;
     }
 }

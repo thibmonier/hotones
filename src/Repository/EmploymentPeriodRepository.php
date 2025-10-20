@@ -30,12 +30,12 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->orderBy('ep.startDate', 'DESC');
-        
+
         if ($contributorId) {
             $queryBuilder->andWhere('ep.contributor = :contributor')
                 ->setParameter('contributor', $contributorId);
         }
-        
+
         return $queryBuilder->getQuery()->getResult();
     }
 
@@ -47,16 +47,16 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
         if (!$period->getContributor() || !$period->getStartDate()) {
             return false;
         }
-        
+
         $queryBuilder = $this->createQueryBuilder('ep')
             ->where('ep.contributor = :contributor')
             ->setParameter('contributor', $period->getContributor());
-        
+
         if ($excludeId) {
             $queryBuilder->andWhere('ep.id != :excludeId')
                 ->setParameter('excludeId', $excludeId);
         }
-        
+
         // Vérifier les chevauchements
         $endDate = $period->getEndDate();
         if ($endDate) {
@@ -73,7 +73,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             )
             ->setParameter('startDate', $period->getStartDate());
         }
-        
+
         return $queryBuilder->getQuery()->getOneOrNullResult() !== null;
     }
 
@@ -83,7 +83,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     public function findActivePeriods(): array
     {
         $now = new \DateTime();
-        
+
         return $this->createQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->addSelect('c')
@@ -113,7 +113,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     public function findCurrentPeriodForContributor(Contributor $contributor): ?EmploymentPeriod
     {
         $now = new \DateTime();
-        
+
         return $this->createQueryBuilder('ep')
             ->where('ep.contributor = :contributor')
             ->andWhere('ep.startDate <= :now')
@@ -152,7 +152,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
         $endDate = $period->getEndDate() ?? new \DateTime();
         $workingDays = $this->calculateWorkingDays($period->getStartDate(), $endDate);
         $adjustedWorkingDays = $workingDays * (floatval($period->getWorkTimePercentage()) / 100);
-        
+
         return $adjustedWorkingDays * floatval($period->getCjm());
     }
 
@@ -163,7 +163,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     {
         $workingDays = 0;
         $current = clone $startDate;
-        
+
         while ($current <= $endDate) {
             // Exclure les weekends (samedi = 6, dimanche = 0)
             if ($current->format('w') != 0 && $current->format('w') != 6) {
@@ -171,7 +171,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             }
             $current->modify('+1 day');
         }
-        
+
         return $workingDays;
     }
 
@@ -181,12 +181,12 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     public function getStatistics(): array
     {
         $qb = $this->createQueryBuilder('ep');
-        
+
         // Total des périodes
         $totalPeriods = $qb->select('COUNT(ep.id)')
             ->getQuery()
             ->getSingleScalarResult();
-        
+
         // Périodes actives
         $now = new \DateTime();
         $activePeriods = $this->createQueryBuilder('ep')
@@ -195,14 +195,14 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             ->setParameter('now', $now)
             ->getQuery()
             ->getSingleScalarResult();
-        
+
         // Coût moyen des CJM
         $avgCjm = $this->createQueryBuilder('ep')
             ->select('AVG(ep.cjm)')
             ->where('ep.cjm IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
-        
+
         return [
             'total_periods' => $totalPeriods,
             'active_periods' => $activePeriods,

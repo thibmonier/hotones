@@ -42,25 +42,25 @@ class CreateTestDataCommand extends Command
         try {
             // 1. Créer des profils
             $profiles = $this->createProfiles($io);
-            
+
             // 2. Créer des utilisateurs
             $users = $this->createUsers($io);
-            
+
             // 3. Créer des contributeurs
             $contributors = $this->createContributors($io, $profiles);
-            
+
             // 4. Créer des catégories de service
             $categories = $this->createServiceCategories($io);
-            
+
             // 5. Créer des technologies
             $technologies = $this->createTechnologies($io);
-            
+
             // 6. Créer des projets
             $projects = $this->createProjects($io, $users, $categories, $technologies);
-            
+
             // 7. Créer des tâches de projet
             $this->createProjectTasks($io, $projects, $contributors, $profiles);
-            
+
             // 8. Créer des feuilles de temps
             $this->createTimesheets($io, $projects, $contributors);
 
@@ -70,12 +70,12 @@ class CreateTestDataCommand extends Command
             } catch (\Exception $flushError) {
                 $io->warning('Erreur lors du flush final : ' . $flushError->getMessage());
                 $io->note('Tentative de sauvegarde partielle...');
-                
+
                 // Essayer de sauvegarder par blocs
                 $this->entityManager->clear();
                 return Command::SUCCESS;
             }
-            
+
             return Command::SUCCESS;
         } catch (\Exception $e) {
             $io->error('Erreur lors de la création des données : ' . $e->getMessage());
@@ -86,7 +86,7 @@ class CreateTestDataCommand extends Command
     private function createProfiles(SymfonyStyle $io): array
     {
         $io->section('Création des profils');
-        
+
         $profilesData = [
             ['name' => 'Développeur Frontend', 'description' => 'Spécialisé React, Vue, Angular'],
             ['name' => 'Développeur Backend', 'description' => 'API REST, bases de données'],
@@ -111,7 +111,7 @@ class CreateTestDataCommand extends Command
     private function createUsers(SymfonyStyle $io): array
     {
         $io->section('Création des utilisateurs');
-        
+
         $usersData = [
             ['email' => 'chef.projet@test.com', 'firstName' => 'Alice', 'lastName' => 'Martin', 'roles' => ['ROLE_CHEF_PROJET']],
             ['email' => 'commercial@test.com', 'firstName' => 'Bob', 'lastName' => 'Durand', 'roles' => ['ROLE_COMMERCIAL']],
@@ -138,7 +138,7 @@ class CreateTestDataCommand extends Command
     private function createContributors(SymfonyStyle $io, array $profiles): array
     {
         $io->section('Création des contributeurs');
-        
+
         $contributorsData = [
             ['name' => 'Emma Développeuse', 'profile' => 0, 'cjm' => '450.00', 'active' => true],
             ['name' => 'Lucas Backend', 'profile' => 1, 'cjm' => '500.00', 'active' => true],
@@ -153,12 +153,12 @@ class CreateTestDataCommand extends Command
             $contributor->setName($data['name']);
             $contributor->setCjm($data['cjm']);
             $contributor->setActive($data['active']);
-            
+
             // Ajouter le profil
             if (isset($profiles[$data['profile']])) {
                 $contributor->addProfile($profiles[$data['profile']]);
             }
-            
+
             $this->entityManager->persist($contributor);
             $contributors[] = $contributor;
             $io->writeln("✓ Contributeur créé : {$data['name']}");
@@ -170,7 +170,7 @@ class CreateTestDataCommand extends Command
     private function createServiceCategories(SymfonyStyle $io): array
     {
         $io->section('Création des catégories de service');
-        
+
         $categoriesData = [
             ['name' => 'E-commerce', 'description' => 'Sites marchands et places de marché'],
             ['name' => 'Corporate', 'description' => 'Sites vitrine et institutionnels'],
@@ -194,9 +194,9 @@ class CreateTestDataCommand extends Command
     private function createTechnologies(SymfonyStyle $io): array
     {
         $io->section('Création des technologies');
-        
+
         $technologiesData = [
-            'Symfony', 'React', 'Vue.js', 'Angular', 'Laravel', 'Node.js', 
+            'Symfony', 'React', 'Vue.js', 'Angular', 'Laravel', 'Node.js',
             'Python', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis'
         ];
 
@@ -215,7 +215,7 @@ class CreateTestDataCommand extends Command
     private function createProjects(SymfonyStyle $io, array $users, array $categories, array $technologies): array
     {
         $io->section('Création des projets');
-        
+
         $projectsData = [
             [
                 'name' => 'E-shop Mode Parisienne',
@@ -273,23 +273,23 @@ class CreateTestDataCommand extends Command
             $project->setStatus($data['status']);
             $project->setStartDate(new \DateTime($data['startDate']));
             $project->setEndDate(new \DateTime($data['endDate']));
-            
+
             // Assigner des rôles aléatoirement
             $project->setProjectManager($users[0]); // Alice Martin
             $project->setKeyAccountManager($users[1]); // Bob Durand
             $project->setProjectDirector($users[2]); // Claire Moreau
-            
+
             // Assigner catégorie et technologies
             if (isset($categories[$data['categoryIndex']])) {
                 $project->setServiceCategory($categories[$data['categoryIndex']]);
             }
-            
+
             foreach ($data['techIndices'] as $index) {
                 if (isset($technologies[$index])) {
                     $project->addTechnology($technologies[$index]);
                 }
             }
-            
+
             $this->entityManager->persist($project);
             $projects[] = $project;
             $io->writeln("✓ Projet créé : {$data['name']}");
@@ -301,7 +301,7 @@ class CreateTestDataCommand extends Command
     private function createProjectTasks(SymfonyStyle $io, array $projects, array $contributors, array $profiles): void
     {
         $io->section('Création des tâches de projet');
-        
+
         $taskTemplates = [
             ['name' => 'Analyse et spécifications', 'type' => 'regular', 'hours_sold' => 40, 'hours_revised' => 35, 'progress' => 100],
             ['name' => 'Maquettage et design', 'type' => 'regular', 'hours_sold' => 80, 'hours_revised' => 75, 'progress' => 90],
@@ -322,11 +322,11 @@ class CreateTestDataCommand extends Command
 
         foreach ($projects as $projectIndex => $project) {
             $position = 1;
-            
+
             // Prendre un sous-ensemble de tâches selon le projet
             $numTasks = min(6, count($taskTemplates));
             $selectedTasks = array_slice($taskTemplates, 0, $numTasks);
-            
+
             foreach ($selectedTasks as $taskData) {
                 $task = new ProjectTask();
                 $task->setProject($project);
@@ -339,16 +339,16 @@ class CreateTestDataCommand extends Command
                 $task->setStatus($taskData['progress'] == 100 ? 'completed' : ($taskData['progress'] > 0 ? 'in_progress' : 'not_started'));
                 $task->setCountsForProfitability($taskData['type'] === 'regular');
                 $task->setActive(true);
-                
+
                 // Assigner un contributeur approprié
                 $assignedContributor = $this->assignContributorToTask($taskData['name'], $contributors, $contributorsByProfile);
                 if ($assignedContributor) {
                     $task->setAssignedContributor($assignedContributor);
                 }
-                
+
                 // Tarif journalier aléatoire
                 $task->setDailyRate((string)(400 + rand(0, 200)) . '.00');
-                
+
                 $this->entityManager->persist($task);
                 $io->writeln("  ✓ Tâche créée : {$project->getName()} -> {$taskData['name']}");
             }
@@ -361,19 +361,19 @@ class CreateTestDataCommand extends Command
         if (str_contains($taskName, 'Frontend') || str_contains($taskName, 'design')) {
             return $contributorsByProfile['Développeur Frontend'][0] ?? $contributors[0];
         }
-        
+
         if (str_contains($taskName, 'Backend')) {
             return $contributorsByProfile['Développeur Backend'][0] ?? $contributors[1];
         }
-        
+
         if (str_contains($taskName, 'Design') || str_contains($taskName, 'Maquettage')) {
             return $contributorsByProfile['Designer UX/UI'][0] ?? $contributors[2];
         }
-        
+
         if (str_contains($taskName, 'Déploiement')) {
             return $contributorsByProfile['DevOps'][0] ?? $contributors[3];
         }
-        
+
         // Par défaut, assigner aléatoirement
         return $contributors[array_rand($contributors)];
     }
@@ -381,43 +381,43 @@ class CreateTestDataCommand extends Command
     private function createTimesheets(SymfonyStyle $io, array $projects, array $contributors): void
     {
         $io->section('Création des feuilles de temps');
-        
+
         $startDate = new \DateTime('2024-09-01');
         $endDate = new \DateTime('2024-10-19');
-        
+
         $interval = new \DateInterval('P1D');
         $period = new \DatePeriod($startDate, $interval, $endDate);
-        
+
         $timesheetsCreated = 0;
-        
+
         foreach ($period as $date) {
             // Skip weekends
             if ((int)$date->format('N') > 5) {
                 continue;
             }
-            
+
             // Chaque contributeur a 70% de chance de travailler un jour donné
             foreach ($contributors as $contributor) {
                 if (rand(1, 100) <= 70) {
                     // Sélectionner un projet aléatoire
                     $project = $projects[array_rand($projects)];
-                    
+
                     // Heures travaillées entre 4 et 8
                     $hours = (string)(4 + (rand(0, 40) / 10)); // 4.0 à 8.0
-                    
+
                     $timesheet = new Timesheet();
                     $timesheet->setContributor($contributor);
                     $timesheet->setProject($project);
                     $timesheet->setDate($date);
                     $timesheet->setHours($hours);
                     $timesheet->setNotes("Travail sur le projet {$project->getName()}");
-                    
+
                     $this->entityManager->persist($timesheet);
                     $timesheetsCreated++;
                 }
             }
         }
-        
+
         $io->writeln("✓ {$timesheetsCreated} feuilles de temps créées");
     }
 }

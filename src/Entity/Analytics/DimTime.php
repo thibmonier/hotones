@@ -56,23 +56,23 @@ class DimTime
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
-        
+
         // Auto-calcul des autres champs
         $this->year = (int) $date->format('Y');
         $this->month = (int) $date->format('n');
         $this->quarter = (int) ceil($this->month / 3);
         $this->yearMonth = $date->format('Y-m');
         $this->yearQuarter = $this->year . '-Q' . $this->quarter;
-        
+
         $monthNames = [
             1 => 'Janvier', 2 => 'Février', 3 => 'Mars', 4 => 'Avril',
             5 => 'Mai', 6 => 'Juin', 7 => 'Juillet', 8 => 'Août',
             9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre'
         ];
-        
+
         $this->monthName = $monthNames[$this->month] . ' ' . $this->year;
         $this->quarterName = 'Q' . $this->quarter . ' ' . $this->year;
-        
+
         return $this;
     }
 

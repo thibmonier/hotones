@@ -18,7 +18,7 @@ class TechnologyController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $technologies = $em->getRepository(Technology::class)->findBy([], ['name' => 'ASC']);
-        
+
         return $this->render('technology/index.html.twig', [
             'technologies' => $technologies,
         ]);
@@ -28,20 +28,20 @@ class TechnologyController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $technology = new Technology();
-        
+
         if ($request->isMethod('POST')) {
             $technology->setName($request->request->get('name'));
             $technology->setCategory($request->request->get('category'));
             $technology->setColor($request->request->get('color'));
             $technology->setActive($request->request->get('active', false));
-            
+
             $em->persist($technology);
             $em->flush();
-            
+
             $this->addFlash('success', 'Technologie créée avec succès');
             return $this->redirectToRoute('technology_index');
         }
-        
+
         return $this->render('technology/new.html.twig', [
             'technology' => $technology,
             'categories' => $this->getTechnologyCategories(),
@@ -64,13 +64,13 @@ class TechnologyController extends AbstractController
             $technology->setCategory($request->request->get('category'));
             $technology->setColor($request->request->get('color'));
             $technology->setActive($request->request->get('active', false));
-            
+
             $em->flush();
-            
+
             $this->addFlash('success', 'Technologie modifiée avec succès');
             return $this->redirectToRoute('technology_index');
         }
-        
+
         return $this->render('technology/edit.html.twig', [
             'technology' => $technology,
             'categories' => $this->getTechnologyCategories(),
@@ -85,7 +85,7 @@ class TechnologyController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Technologie supprimée avec succès');
         }
-        
+
         return $this->redirectToRoute('technology_index');
     }
 

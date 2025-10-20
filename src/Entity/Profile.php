@@ -46,56 +46,100 @@ class Profile
         $this->orderTasks = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getName(): string { return $this->name; }
-    public function setName(string $name): self { $this->name = $name; return $this; }
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): self { $this->description = $description; return $this; }
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
 
-    public function getDefaultDailyRate(): ?string { return $this->defaultDailyRate; }
-    public function setDefaultDailyRate(?string $defaultDailyRate): self { $this->defaultDailyRate = $defaultDailyRate; return $this; }
+    public function getDefaultDailyRate(): ?string
+    {
+        return $this->defaultDailyRate;
+    }
+    public function setDefaultDailyRate(?string $defaultDailyRate): self
+    {
+        $this->defaultDailyRate = $defaultDailyRate;
+        return $this;
+    }
 
-    public function getColor(): ?string { return $this->color; }
-    public function setColor(?string $color): self { $this->color = $color; return $this; }
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
+        return $this;
+    }
 
-    public function isActive(): bool { return $this->active; }
-    public function setActive(bool $active): self { $this->active = $active; return $this; }
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+        return $this;
+    }
 
-    public function getContributors(): Collection { return $this->contributors; }
-    public function addContributor(Contributor $contributor): self 
-    { 
+    public function getContributors(): Collection
+    {
+        return $this->contributors;
+    }
+    public function addContributor(Contributor $contributor): self
+    {
         if (!$this->contributors->contains($contributor)) {
             $this->contributors[] = $contributor;
             $contributor->addProfile($this);
         }
-        return $this; 
+        return $this;
     }
-    public function removeContributor(Contributor $contributor): self 
-    { 
+    public function removeContributor(Contributor $contributor): self
+    {
         if ($this->contributors->removeElement($contributor)) {
             $contributor->removeProfile($this);
         }
-        return $this; 
+        return $this;
     }
 
-    public function getOrderTasks(): Collection { return $this->orderTasks; }
-    public function addOrderTask(OrderTask $orderTask): self 
-    { 
+    public function getOrderTasks(): Collection
+    {
+        return $this->orderTasks;
+    }
+    public function addOrderTask(OrderTask $orderTask): self
+    {
         if (!$this->orderTasks->contains($orderTask)) {
             $this->orderTasks[] = $orderTask;
             $orderTask->setProfile($this);
         }
-        return $this; 
+        return $this;
     }
-    public function removeOrderTask(OrderTask $orderTask): self 
-    { 
+    public function removeOrderTask(OrderTask $orderTask): self
+    {
         if ($this->orderTasks->removeElement($orderTask)) {
             if ($orderTask->getProfile() === $this) {
                 $orderTask->setProfile(null);
             }
         }
-        return $this; 
+        return $this;
     }
 }

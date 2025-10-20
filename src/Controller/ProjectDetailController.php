@@ -23,14 +23,15 @@ class ProjectDetailController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     #[Route('/{id}/details', name: 'project_details', methods: ['GET'])]
     public function details(Project $project): Response
     {
         // Récupérer les intervenants avec leurs heures
         $projectContributors = $project->getProjectContributorsWithHours();
-        
+
         // Récupérer toutes les tâches du projet triées par position
         $tasks = $this->entityManager->getRepository(ProjectTask::class)
             ->findByProjectOrderedByPosition($project);
@@ -62,7 +63,7 @@ class ProjectDetailController extends AbstractController
         $task->setCountsForProfitability(true);
         $task->setStatus('not_started');
         $task->setActive(true);
-        
+
         // Définir la position par défaut (dernière position + 1)
         $lastPosition = $this->entityManager->getRepository(ProjectTask::class)
             ->findMaxPositionForProject($project);
@@ -112,13 +113,13 @@ class ProjectDetailController extends AbstractController
     public function deleteTask(ProjectTask $task, Request $request): Response
     {
         $project = $task->getProject();
-        
+
         // Vérification du token CSRF pour la sécurité
         if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {
             $taskName = $task->getName();
             $this->entityManager->remove($task);
             $this->entityManager->flush();
-            
+
             $this->addFlash('success', sprintf('La tâche « %s » a été supprimée avec succès.', $taskName));
         } else {
             $this->addFlash('error', 'Token de sécurité invalide. La suppression a été annulée.');
@@ -133,31 +134,31 @@ class ProjectDetailController extends AbstractController
             // Chiffres de vente - seulement désactiver ceux liés aux orders
             'total_sold_amount' => '0.00', // Via devis - désactivé car orders problématique
             'total_tasks_sold_amount' => $project->getTotalTasksSoldAmount(), // Via tâches - OK
-            
+
             // Estimations de temps - basées sur les tâches
             'total_sold_hours' => $project->getTotalTasksSoldHours(),
             'total_revised_hours' => $project->getTotalTasksRevisedHours(),
             'total_spent_hours' => $project->getTotalTasksSpentHours(),
             'total_remaining_hours' => $project->getTotalRemainingHours(),
-            
+
             // Conversion en jours (1j = 8h)
             'total_sold_days' => bcdiv($project->getTotalTasksSoldHours(), '8', 2),
             'total_revised_days' => bcdiv($project->getTotalTasksRevisedHours(), '8', 2),
             'total_spent_days' => bcdiv($project->getTotalTasksSpentHours(), '8', 2),
             'total_remaining_days' => bcdiv($project->getTotalRemainingHours(), '8', 2),
-            
+
             // Coûts et marges
             'estimated_cost' => $project->getTotalTasksEstimatedCost(),
             'target_gross_margin' => $project->getTargetGrossMargin(),
             'target_margin_percentage' => $project->getTargetMarginPercentage(),
-            
+
             // Achats
             'purchases_amount' => $project->getPurchasesAmount() ?? '0.00',
             'purchases_description' => $project->getPurchasesDescription(),
-            
+
             // Avancement
             'global_progress' => $project->getGlobalProgress(),
-            
+
             // Nombres - seulement les tâches qui comptent pour la rentabilité
             'total_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasks($project),
             'completed_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'completed'),

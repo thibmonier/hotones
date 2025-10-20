@@ -22,7 +22,7 @@ class ProjectController extends AbstractController
     {
         $projectRepo = $em->getRepository(Project::class);
         $projects = $projectRepo->findAllOrderedByName();
-        
+
         return $this->render('project/index.html.twig', [
             'projects' => $projects,
         ]);
@@ -33,25 +33,25 @@ class ProjectController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $project = new Project();
-        
+
         if ($request->isMethod('POST')) {
             $project->setName($request->request->get('name'));
             $project->setClient($request->request->get('client'));
             $project->setDescription($request->request->get('description'));
             $project->setIsInternal((bool)$request->request->get('is_internal'));
-            
+
             // Gestion des montants (éviter les chaînes vides)
             $purchasesAmount = $request->request->get('purchases_amount');
             $project->setPurchasesAmount($purchasesAmount !== '' ? $purchasesAmount : null);
             $project->setPurchasesDescription($request->request->get('purchases_description'));
-            
+
             if ($request->request->get('start_date')) {
                 $project->setStartDate(new \DateTime($request->request->get('start_date')));
             }
             if ($request->request->get('end_date')) {
                 $project->setEndDate(new \DateTime($request->request->get('end_date')));
             }
-            
+
             // Service Category
             if ($serviceCategoryId = $request->request->get('service_category')) {
                 $serviceCategory = $em->getRepository(ServiceCategory::class)->find($serviceCategoryId);
@@ -59,7 +59,7 @@ class ProjectController extends AbstractController
                     $project->setServiceCategory($serviceCategory);
                 }
             }
-            
+
             // Technologies
             $technologyIds = $request->request->all('technologies');
             if (!empty($technologyIds)) {
@@ -70,17 +70,17 @@ class ProjectController extends AbstractController
                     }
                 }
             }
-            
+
             $em->persist($project);
             $em->flush();
-            
+
             $this->addFlash('success', 'Projet créé avec succès');
             return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
-        
+
         $technologies = $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']);
         $serviceCategories = $em->getRepository(ServiceCategory::class)->findBy(['active' => true], ['name' => 'ASC']);
-        
+
         return $this->render('project/new.html.twig', [
             'project' => $project,
             'technologies' => $technologies,
@@ -105,20 +105,20 @@ class ProjectController extends AbstractController
             $project->setClient($request->request->get('client'));
             $project->setDescription($request->request->get('description'));
             $project->setIsInternal((bool)$request->request->get('is_internal'));
-            
+
             // Gestion des montants (éviter les chaînes vides)
             $purchasesAmount = $request->request->get('purchases_amount');
             $project->setPurchasesAmount($purchasesAmount !== '' ? $purchasesAmount : null);
             $project->setPurchasesDescription($request->request->get('purchases_description'));
             $project->setStatus($request->request->get('status'));
-            
+
             if ($request->request->get('start_date')) {
                 $project->setStartDate(new \DateTime($request->request->get('start_date')));
             }
             if ($request->request->get('end_date')) {
                 $project->setEndDate(new \DateTime($request->request->get('end_date')));
             }
-            
+
             // Service Category
             if ($serviceCategoryId = $request->request->get('service_category')) {
                 $serviceCategory = $em->getRepository(ServiceCategory::class)->find($serviceCategoryId);
@@ -126,7 +126,7 @@ class ProjectController extends AbstractController
             } else {
                 $project->setServiceCategory(null);
             }
-            
+
             // Technologies
             $project->getTechnologies()->clear();
             $technologyIds = $request->request->all('technologies');
@@ -138,16 +138,16 @@ class ProjectController extends AbstractController
                     }
                 }
             }
-            
+
             $em->flush();
-            
+
             $this->addFlash('success', 'Projet modifié avec succès');
             return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
-        
+
         $technologies = $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']);
         $serviceCategories = $em->getRepository(ServiceCategory::class)->findBy(['active' => true], ['name' => 'ASC']);
-        
+
         return $this->render('project/edit.html.twig', [
             'project' => $project,
             'technologies' => $technologies,
@@ -172,7 +172,7 @@ class ProjectController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Projet supprimé avec succès');
         }
-        
+
         return $this->redirectToRoute('project_index');
     }
 }

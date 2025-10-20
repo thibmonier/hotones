@@ -19,8 +19,8 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) { 
-            return $this->redirectToRoute('app_login'); 
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('profile/profile.html.twig', [
@@ -34,8 +34,8 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) { 
-            return $this->redirectToRoute('app_login'); 
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
         }
 
         if ($request->isMethod('POST')) {
@@ -43,9 +43,9 @@ class ProfileController extends AbstractController
             $user->setLastName($request->request->get('last_name'));
             $user->setPhone($request->request->get('phone'));
             $user->setAddress($request->request->get('address'));
-            
+
             $em->flush();
-            
+
             $this->addFlash('success', 'Profil mis à jour avec succès');
             return $this->redirectToRoute('profile_me');
         }
@@ -60,7 +60,9 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) { return $this->redirectToRoute('app_login'); }
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
 
         if (!$user->getTotpSecret()) {
             $totp = TOTP::create();

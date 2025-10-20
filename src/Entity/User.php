@@ -64,34 +64,100 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[ORM\Column(type: 'boolean')]
     private bool $totpEnabled = false;
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getUserIdentifier(): string { return $this->email; }
-    public function getEmail(): string { return $this->email; }
-    public function setEmail(string $email): self { $this->email = $email; return $this; }
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
 
-    public function getRoles(): array { $roles = $this->roles; $roles[] = 'ROLE_USER'; return array_unique($roles); }
-    public function setRoles(array $roles): self { $this->roles = $roles; return $this; }
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+    }
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+        return $this;
+    }
 
-    public function getPassword(): string { return $this->password; }
-    public function setPassword(string $password): self { $this->password = $password; return $this; }
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
+    }
 
-    public function eraseCredentials(): void {}
+    public function eraseCredentials(): void
+    {
+    }
 
-    public function getFirstName(): string { return $this->firstName; }
-    public function setFirstName(string $firstName): self { $this->firstName = $firstName; return $this; }
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+    public function setFirstName(string $firstName): self
+    {
+        $this->firstName = $firstName;
+        return $this;
+    }
 
-    public function getLastName(): string { return $this->lastName; }
-    public function setLastName(string $lastName): self { $this->lastName = $lastName; return $this; }
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+    public function setLastName(string $lastName): self
+    {
+        $this->lastName = $lastName;
+        return $this;
+    }
 
-    public function getPhone(): ?string { return $this->phone; }
-    public function setPhone(?string $phone): self { $this->phone = $phone; return $this; }
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+        return $this;
+    }
 
-    public function getAddress(): ?string { return $this->address; }
-    public function setAddress(?string $address): self { $this->address = $address; return $this; }
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+        return $this;
+    }
 
-    public function getAvatar(): ?string { return $this->avatar; }
-    public function setAvatar(?string $avatar): self { $this->avatar = $avatar; return $this; }
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+    public function setAvatar(?string $avatar): self
+    {
+        $this->avatar = $avatar;
+        return $this;
+    }
 
     // 2FA implementation
     public function isTotpAuthenticationEnabled(): bool
@@ -106,12 +172,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     public function setTotpSecret(?string $secret): self
     {
-        $this->totpSecret = $secret; return $this;
+        $this->totpSecret = $secret;
+        return $this;
     }
 
     public function setTotpEnabled(bool $enabled): self
     {
-        $this->totpEnabled = $enabled; return $this;
+        $this->totpEnabled = $enabled;
+        return $this;
     }
 
     // Scheb 2FA v7 methods
@@ -134,10 +202,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return in_array($role, $this->getRoles());
     }
 
-    public function isIntervenant(): bool { return $this->hasRole(self::ROLE_INTERVENANT); }
-    public function isChefProjet(): bool { return $this->hasRole(self::ROLE_CHEF_PROJET); }
-    public function isManager(): bool { return $this->hasRole(self::ROLE_MANAGER); }
-    public function isSuperAdmin(): bool { return $this->hasRole(self::ROLE_SUPERADMIN); }
+    public function isIntervenant(): bool
+    {
+        return $this->hasRole(self::ROLE_INTERVENANT);
+    }
+    public function isChefProjet(): bool
+    {
+        return $this->hasRole(self::ROLE_CHEF_PROJET);
+    }
+    public function isManager(): bool
+    {
+        return $this->hasRole(self::ROLE_MANAGER);
+    }
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole(self::ROLE_SUPERADMIN);
+    }
 
     public function getFullName(): string
     {

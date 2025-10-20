@@ -58,37 +58,110 @@ class Vacation
         $this->createdAt = new \DateTime();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getContributor(): Contributor { return $this->contributor; }
-    public function setContributor(Contributor $contributor): self { $this->contributor = $contributor; return $this; }
+    public function getContributor(): Contributor
+    {
+        return $this->contributor;
+    }
+    public function setContributor(Contributor $contributor): self
+    {
+        $this->contributor = $contributor;
+        return $this;
+    }
 
-    public function getStartDate(): \DateTimeInterface { return $this->startDate; }
-    public function setStartDate(\DateTimeInterface $startDate): self { $this->startDate = $startDate; return $this; }
+    public function getStartDate(): \DateTimeInterface
+    {
+        return $this->startDate;
+    }
+    public function setStartDate(\DateTimeInterface $startDate): self
+    {
+        $this->startDate = $startDate;
+        return $this;
+    }
 
-    public function getEndDate(): \DateTimeInterface { return $this->endDate; }
-    public function setEndDate(\DateTimeInterface $endDate): self { $this->endDate = $endDate; return $this; }
+    public function getEndDate(): \DateTimeInterface
+    {
+        return $this->endDate;
+    }
+    public function setEndDate(\DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
+        return $this;
+    }
 
-    public function getType(): string { return $this->type; }
-    public function setType(string $type): self { $this->type = $type; return $this; }
+    public function getType(): string
+    {
+        return $this->type;
+    }
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
 
-    public function getReason(): ?string { return $this->reason; }
-    public function setReason(?string $reason): self { $this->reason = $reason; return $this; }
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+    public function setReason(?string $reason): self
+    {
+        $this->reason = $reason;
+        return $this;
+    }
 
-    public function getStatus(): string { return $this->status; }
-    public function setStatus(string $status): self { $this->status = $status; return $this; }
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
 
-    public function getDailyHours(): string { return $this->dailyHours; }
-    public function setDailyHours(string $dailyHours): self { $this->dailyHours = $dailyHours; return $this; }
+    public function getDailyHours(): string
+    {
+        return $this->dailyHours;
+    }
+    public function setDailyHours(string $dailyHours): self
+    {
+        $this->dailyHours = $dailyHours;
+        return $this;
+    }
 
-    public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
-    public function setCreatedAt(\DateTimeInterface $createdAt): self { $this->createdAt = $createdAt; return $this; }
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
 
-    public function getApprovedAt(): ?\DateTimeInterface { return $this->approvedAt; }
-    public function setApprovedAt(?\DateTimeInterface $approvedAt): self { $this->approvedAt = $approvedAt; return $this; }
+    public function getApprovedAt(): ?\DateTimeInterface
+    {
+        return $this->approvedAt;
+    }
+    public function setApprovedAt(?\DateTimeInterface $approvedAt): self
+    {
+        $this->approvedAt = $approvedAt;
+        return $this;
+    }
 
-    public function getApprovedBy(): ?User { return $this->approvedBy; }
-    public function setApprovedBy(?User $approvedBy): self { $this->approvedBy = $approvedBy; return $this; }
+    public function getApprovedBy(): ?User
+    {
+        return $this->approvedBy;
+    }
+    public function setApprovedBy(?User $approvedBy): self
+    {
+        $this->approvedBy = $approvedBy;
+        return $this;
+    }
 
     /**
      * Calcule le nombre total d'heures d'absence
@@ -107,7 +180,7 @@ class Vacation
         $start = clone $this->startDate;
         $end = clone $this->endDate;
         $interval = $start->diff($end);
-        
+
         return $interval->days + 1; // +1 pour inclure le dernier jour
     }
 

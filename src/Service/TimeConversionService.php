@@ -28,19 +28,19 @@ class TimeConversionService
     public static function formatHoursForDisplay(string $hours): string
     {
         $hoursFloat = floatval($hours);
-        
+
         if ($hoursFloat >= self::HOURS_PER_DAY) {
             $days = self::hoursToDays($hours);
             $remainingHours = bcmod($hours, (string)self::HOURS_PER_DAY, 2);
-            
+
             if ($remainingHours === '0.00') {
                 return number_format(floatval($days), 1, ',', ' ') . 'j';
             } else {
-                return number_format(floatval($days), 1, ',', ' ') . 'j ' . 
+                return number_format(floatval($days), 1, ',', ' ') . 'j ' .
                        number_format(floatval($remainingHours), 1, ',', ' ') . 'h';
             }
         }
-        
+
         return number_format($hoursFloat, 1, ',', ' ') . 'h';
     }
 
@@ -59,7 +59,7 @@ class TimeConversionService
     public static function parseUserInput(string $input): array
     {
         $input = trim(strtolower($input));
-        
+
         if (str_ends_with($input, 'j')) {
             $days = rtrim($input, 'j');
             return [

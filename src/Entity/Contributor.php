@@ -65,33 +65,95 @@ class Contributor
         $this->timesheets = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getName(): string { return $this->name; }
-    public function setName(string $name): self { $this->name = $name; return $this; }
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-    public function getEmail(): ?string { return $this->email; }
-    public function setEmail(?string $email): self { $this->email = $email; return $this; }
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
 
-    public function getPhone(): ?string { return $this->phone; }
-    public function setPhone(?string $phone): self { $this->phone = $phone; return $this; }
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+        return $this;
+    }
 
-    public function getNotes(): ?string { return $this->notes; }
-    public function setNotes(?string $notes): self { $this->notes = $notes; return $this; }
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+    public function setNotes(?string $notes): self
+    {
+        $this->notes = $notes;
+        return $this;
+    }
 
-    public function getCjm(): ?string { return $this->cjm; }
-    public function setCjm(?string $cjm): self { $this->cjm = $cjm; return $this; }
+    public function getCjm(): ?string
+    {
+        return $this->cjm;
+    }
+    public function setCjm(?string $cjm): self
+    {
+        $this->cjm = $cjm;
+        return $this;
+    }
 
-    public function getTjm(): ?string { return $this->tjm; }
-    public function setTjm(?string $tjm): self { $this->tjm = $tjm; return $this; }
+    public function getTjm(): ?string
+    {
+        return $this->tjm;
+    }
+    public function setTjm(?string $tjm): self
+    {
+        $this->tjm = $tjm;
+        return $this;
+    }
 
-    public function isActive(): bool { return $this->active; }
-    public function setActive(bool $active): self { $this->active = $active; return $this; }
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+        return $this;
+    }
 
-    public function getUser(): ?User { return $this->user; }
-    public function setUser(?User $user): self { $this->user = $user; return $this; }
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
 
-    public function getProfiles(): Collection { return $this->profiles; }
+    public function getProfiles(): Collection
+    {
+        return $this->profiles;
+    }
     public function addProfile(Profile $profile): self
     {
         if (!$this->profiles->contains($profile)) {
@@ -105,7 +167,10 @@ class Contributor
         return $this;
     }
 
-    public function getEmploymentPeriods(): Collection { return $this->employmentPeriods; }
+    public function getEmploymentPeriods(): Collection
+    {
+        return $this->employmentPeriods;
+    }
     public function addEmploymentPeriod(EmploymentPeriod $employmentPeriod): self
     {
         if (!$this->employmentPeriods->contains($employmentPeriod)) {
@@ -125,7 +190,10 @@ class Contributor
         return $this;
     }
 
-    public function getTimesheets(): Collection { return $this->timesheets; }
+    public function getTimesheets(): Collection
+    {
+        return $this->timesheets;
+    }
     public function addTimesheet(Timesheet $timesheet): self
     {
         if (!$this->timesheets->contains($timesheet)) {
@@ -148,6 +216,6 @@ class Contributor
     // Méthode utilitaire pour obtenir les noms des profils
     public function getProfileNames(): array
     {
-        return $this->profiles->map(fn(Profile $profile) => $profile->getName())->toArray();
+        return $this->profiles->map(fn (Profile $profile) => $profile->getName())->toArray();
     }
 }

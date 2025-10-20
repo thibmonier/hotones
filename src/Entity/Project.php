@@ -92,51 +92,155 @@ class Project
         $this->tasks = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getName(): string { return $this->name; }
-    public function setName(string $name): self { $this->name = $name; return $this; }
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-    public function getClient(): ?string { return $this->client; }
-    public function setClient(?string $client): self { $this->client = $client; return $this; }
+    public function getClient(): ?string
+    {
+        return $this->client;
+    }
+    public function setClient(?string $client): self
+    {
+        $this->client = $client;
+        return $this;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): self { $this->description = $description; return $this; }
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
 
-    public function getPurchasesAmount(): ?string { return $this->purchasesAmount; }
-    public function setPurchasesAmount(?string $purchasesAmount): self { $this->purchasesAmount = $purchasesAmount; return $this; }
+    public function getPurchasesAmount(): ?string
+    {
+        return $this->purchasesAmount;
+    }
+    public function setPurchasesAmount(?string $purchasesAmount): self
+    {
+        $this->purchasesAmount = $purchasesAmount;
+        return $this;
+    }
 
-    public function getPurchasesDescription(): ?string { return $this->purchasesDescription; }
-    public function setPurchasesDescription(?string $purchasesDescription): self { $this->purchasesDescription = $purchasesDescription; return $this; }
+    public function getPurchasesDescription(): ?string
+    {
+        return $this->purchasesDescription;
+    }
+    public function setPurchasesDescription(?string $purchasesDescription): self
+    {
+        $this->purchasesDescription = $purchasesDescription;
+        return $this;
+    }
 
-    public function getStartDate(): ?\DateTimeInterface { return $this->startDate; }
-    public function setStartDate(?\DateTimeInterface $startDate): self { $this->startDate = $startDate; return $this; }
+    public function getStartDate(): ?\DateTimeInterface
+    {
+        return $this->startDate;
+    }
+    public function setStartDate(?\DateTimeInterface $startDate): self
+    {
+        $this->startDate = $startDate;
+        return $this;
+    }
 
-    public function getEndDate(): ?\DateTimeInterface { return $this->endDate; }
-    public function setEndDate(?\DateTimeInterface $endDate): self { $this->endDate = $endDate; return $this; }
+    public function getEndDate(): ?\DateTimeInterface
+    {
+        return $this->endDate;
+    }
+    public function setEndDate(?\DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
+        return $this;
+    }
 
-    public function getStatus(): string { return $this->status; }
-    public function setStatus(string $status): self { $this->status = $status; return $this; }
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
 
-    public function getIsInternal(): bool { return $this->isInternal; }
-    public function setIsInternal(bool $isInternal): self { $this->isInternal = $isInternal; return $this; }
+    public function getIsInternal(): bool
+    {
+        return $this->isInternal;
+    }
+    public function setIsInternal(bool $isInternal): self
+    {
+        $this->isInternal = $isInternal;
+        return $this;
+    }
 
-    public function getProjectType(): string { return $this->projectType; }
-    public function setProjectType(string $projectType): self { $this->projectType = $projectType; return $this; }
+    public function getProjectType(): string
+    {
+        return $this->projectType;
+    }
+    public function setProjectType(string $projectType): self
+    {
+        $this->projectType = $projectType;
+        return $this;
+    }
 
-    public function getKeyAccountManager(): ?User { return $this->keyAccountManager; }
-    public function setKeyAccountManager(?User $keyAccountManager): self { $this->keyAccountManager = $keyAccountManager; return $this; }
+    public function getKeyAccountManager(): ?User
+    {
+        return $this->keyAccountManager;
+    }
+    public function setKeyAccountManager(?User $keyAccountManager): self
+    {
+        $this->keyAccountManager = $keyAccountManager;
+        return $this;
+    }
 
-    public function getProjectManager(): ?User { return $this->projectManager; }
-    public function setProjectManager(?User $projectManager): self { $this->projectManager = $projectManager; return $this; }
+    public function getProjectManager(): ?User
+    {
+        return $this->projectManager;
+    }
+    public function setProjectManager(?User $projectManager): self
+    {
+        $this->projectManager = $projectManager;
+        return $this;
+    }
 
-    public function getProjectDirector(): ?User { return $this->projectDirector; }
-    public function setProjectDirector(?User $projectDirector): self { $this->projectDirector = $projectDirector; return $this; }
+    public function getProjectDirector(): ?User
+    {
+        return $this->projectDirector;
+    }
+    public function setProjectDirector(?User $projectDirector): self
+    {
+        $this->projectDirector = $projectDirector;
+        return $this;
+    }
 
-    public function getSalesPerson(): ?User { return $this->salesPerson; }
-    public function setSalesPerson(?User $salesPerson): self { $this->salesPerson = $salesPerson; return $this; }
+    public function getSalesPerson(): ?User
+    {
+        return $this->salesPerson;
+    }
+    public function setSalesPerson(?User $salesPerson): self
+    {
+        $this->salesPerson = $salesPerson;
+        return $this;
+    }
 
-    public function getOrders(): Collection { return $this->orders; }
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
     public function addOrder(Order $order): self
     {
         if (!$this->orders->contains($order)) {
@@ -155,7 +259,10 @@ class Project
         return $this;
     }
 
-    public function getTechnologies(): Collection { return $this->technologies; }
+    public function getTechnologies(): Collection
+    {
+        return $this->technologies;
+    }
     public function addTechnology(Technology $technology): self
     {
         if (!$this->technologies->contains($technology)) {
@@ -169,11 +276,21 @@ class Project
         return $this;
     }
 
-    public function getServiceCategory(): ?ServiceCategory { return $this->serviceCategory; }
-    public function setServiceCategory(?ServiceCategory $serviceCategory): self { $this->serviceCategory = $serviceCategory; return $this; }
+    public function getServiceCategory(): ?ServiceCategory
+    {
+        return $this->serviceCategory;
+    }
+    public function setServiceCategory(?ServiceCategory $serviceCategory): self
+    {
+        $this->serviceCategory = $serviceCategory;
+        return $this;
+    }
 
     // Gestion des tâches
-    public function getTasks(): Collection { return $this->tasks; }
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
     public function addTask(ProjectTask $task): self
     {
         if (!$this->tasks->contains($task)) {

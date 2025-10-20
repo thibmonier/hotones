@@ -45,7 +45,7 @@ Exemples :
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         $period = $input->getArgument('period');
         $granularity = $input->getOption('granularity');
         $forceRecalculate = $input->getOption('force-recalculate');
@@ -61,13 +61,13 @@ Exemples :
             if (preg_match('/^(\d{4})$/', $period, $matches)) {
                 // Année complète
                 $year = (int) $matches[1];
-                
+
                 if ($forceRecalculate) {
                     $io->info("Recalcul complet de l'année $year...");
                     $this->metricsService->recalculateMetricsForYear($year);
                 } else {
                     $io->info("Calcul des métriques pour l'année $year ($granularity)...");
-                    
+
                     switch ($granularity) {
                         case 'monthly':
                             for ($month = 1; $month <= 12; $month++) {
@@ -76,7 +76,7 @@ Exemples :
                                 $io->writeln("  ✓ " . $date->format('F Y'));
                             }
                             break;
-                            
+
                         case 'quarterly':
                             for ($quarter = 1; $quarter <= 4; $quarter++) {
                                 $month = ($quarter - 1) * 3 + 1;
@@ -85,7 +85,7 @@ Exemples :
                                 $io->writeln("  ✓ Q$quarter $year");
                             }
                             break;
-                            
+
                         case 'yearly':
                             $date = new \DateTime("$year-01-01");
                             $this->metricsService->calculateMetricsForPeriod($date, 'yearly');
@@ -93,30 +93,30 @@ Exemples :
                             break;
                     }
                 }
-                
+
             } elseif (preg_match('/^(\d{4})-(\d{1,2})$/', $period, $matches)) {
                 // Mois spécifique
                 $year = (int) $matches[1];
                 $month = (int) $matches[2];
-                
+
                 if ($month < 1 || $month > 12) {
                     $io->error('Mois invalide. Doit être entre 1 et 12.');
                     return Command::FAILURE;
                 }
-                
+
                 $date = new \DateTime("$year-$month-01");
                 $io->info("Calcul des métriques pour " . $date->format('F Y') . "...");
-                
+
                 $this->metricsService->calculateMetricsForPeriod($date, $granularity);
                 $io->writeln("  ✓ " . $date->format('F Y'));
-                
+
             } else {
                 $io->error('Format de période invalide. Utilisez YYYY ou YYYY-MM');
                 return Command::FAILURE;
             }
 
             $io->success('Calcul des métriques terminé avec succès !');
-            
+
             // Statistiques
             $io->section('Prochaines étapes');
             $io->writeln('• Consultez le dashboard : /analytics/dashboard');
@@ -124,15 +124,15 @@ Exemples :
             $io->writeln('  0 6 * * * cd /path/to/project && php bin/console app:calculate-metrics');
 
             return Command::SUCCESS;
-            
+
         } catch (\Exception $e) {
             $io->error('Erreur lors du calcul des métriques : ' . $e->getMessage());
-            
+
             if ($output->isVerbose()) {
                 $io->writeln('Stack trace:');
                 $io->writeln($e->getTraceAsString());
             }
-            
+
             return Command::FAILURE;
         }
     }

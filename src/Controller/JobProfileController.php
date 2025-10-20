@@ -18,7 +18,7 @@ class JobProfileController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $profiles = $em->getRepository(Profile::class)->findBy([], ['name' => 'ASC']);
-        
+
         return $this->render('job_profile/index.html.twig', [
             'profiles' => $profiles,
         ]);
@@ -28,21 +28,21 @@ class JobProfileController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $profile = new Profile();
-        
+
         if ($request->isMethod('POST')) {
             $profile->setName($request->request->get('name'));
             $profile->setDescription($request->request->get('description'));
             $profile->setDefaultDailyRate($request->request->get('default_daily_rate'));
             $profile->setColor($request->request->get('color'));
             $profile->setActive($request->request->get('active', false));
-            
+
             $em->persist($profile);
             $em->flush();
-            
+
             $this->addFlash('success', 'Profil métier créé avec succès');
             return $this->redirectToRoute('job_profile_index');
         }
-        
+
         return $this->render('job_profile/new.html.twig', [
             'profile' => $profile,
         ]);
@@ -65,13 +65,13 @@ class JobProfileController extends AbstractController
             $profile->setDefaultDailyRate($request->request->get('default_daily_rate'));
             $profile->setColor($request->request->get('color'));
             $profile->setActive($request->request->get('active', false));
-            
+
             $em->flush();
-            
+
             $this->addFlash('success', 'Profil métier modifié avec succès');
             return $this->redirectToRoute('job_profile_index');
         }
-        
+
         return $this->render('job_profile/edit.html.twig', [
             'profile' => $profile,
         ]);
@@ -85,7 +85,7 @@ class JobProfileController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Profil métier supprimé avec succès');
         }
-        
+
         return $this->redirectToRoute('job_profile_index');
     }
 }

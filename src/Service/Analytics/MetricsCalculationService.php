@@ -24,7 +24,8 @@ class MetricsCalculationService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger
-    ) {}
+    ) {
+    }
 
     /**
      * Calcule et met à jour toutes les métriques pour une période donnée
@@ -39,18 +40,18 @@ class MetricsCalculationService
         try {
             // 1. Préparer les dimensions temporelles
             $dimTime = $this->getOrCreateDimTime($date);
-            
+
             // 2. Récupérer tous les projets pour la période
             $projects = $this->getProjectsForPeriod($date, $granularity);
-            
+
             // 3. Calculer les métriques par dimension
             foreach ($projects as $project) {
                 $this->calculateProjectMetrics($project, $dimTime, $granularity);
             }
-            
+
             $this->entityManager->flush();
             $this->logger->info('Calcul des métriques terminé avec succès');
-            
+
         } catch (\Exception $e) {
             $this->logger->error('Erreur lors du calcul des métriques', [
                 'error' => $e->getMessage(),
@@ -74,10 +75,10 @@ class MetricsCalculationService
         // Calculer les métriques pour chaque devis du projet
         foreach ($project->getOrders() as $order) {
             $metrics = $this->getOrCreateFactMetrics(
-                $dimTime, 
-                $dimProjectType, 
-                $dimProjectManager, 
-                $dimSalesPerson, 
+                $dimTime,
+                $dimProjectType,
+                $dimProjectManager,
+                $dimSalesPerson,
                 $dimProjectDirector,
                 $granularity
             );
@@ -88,10 +89,10 @@ class MetricsCalculationService
         // Si le projet n'a pas de devis, créer quand même une métrique
         if ($project->getOrders()->isEmpty()) {
             $metrics = $this->getOrCreateFactMetrics(
-                $dimTime, 
-                $dimProjectType, 
-                $dimProjectManager, 
-                $dimSalesPerson, 
+                $dimTime,
+                $dimProjectType,
+                $dimProjectManager,
+                $dimSalesPerson,
                 $dimProjectDirector,
                 $granularity
             );
@@ -106,7 +107,7 @@ class MetricsCalculationService
     {
         // Métriques de base
         $metrics->setProjectCount($metrics->getProjectCount() + 1);
-        
+
         if ($project->getStatus() === 'active') {
             $metrics->setActiveProjectCount($metrics->getActiveProjectCount() + 1);
         } elseif ($project->getStatus() === 'completed') {
@@ -116,7 +117,7 @@ class MetricsCalculationService
         if ($order) {
             // Métriques de devis
             $metrics->setOrderCount($metrics->getOrderCount() + 1);
-            
+
             switch ($order->getStatus()) {
                 case 'a_signer':
                     $metrics->setPendingOrderCount($metrics->getPendingOrderCount() + 1);
@@ -145,16 +146,16 @@ class MetricsCalculationService
         // Calcul des coûts et marges
         $this->calculateProjectCosts($metrics, $project);
         $metrics->calculateMargins();
-        
+
         // Calcul des temps et taux d'occupation
         $this->calculateTimeMetrics($metrics, $project);
-        
+
         // Mise à jour de la référence vers les entités sources
         $metrics->setProject($project);
         if ($order) {
             $metrics->setOrder($order);
         }
-        
+
         $metrics->setCalculatedAt(new \DateTime());
     }
 
@@ -251,7 +252,7 @@ class MetricsCalculationService
     private function getOrCreateDimProjectType(Project $project): DimProjectType
     {
         $serviceCategory = $project->getServiceCategory()?->getName();
-        
+
         $compositeKey = sprintf(
             '%s_%s_%s_%s',
             $project->getProjectType(),
@@ -318,7 +319,7 @@ class MetricsCalculationService
         string $granularity
     ): FactProjectMetrics {
         $repo = $this->entityManager->getRepository(FactProjectMetrics::class);
-        
+
         $qb = $repo->createQueryBuilder('f')
             ->where('f.dimTime = :dimTime')
             ->andWhere('f.dimProjectType = :dimProjectType')

@@ -115,7 +115,7 @@ class DimProjectType
         if ($this->isInternal) {
             $parts[] = 'Interne';
         }
-        
+
         return implode(' - ', $parts);
     }
 }

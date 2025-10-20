@@ -32,20 +32,58 @@ class Timesheet
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $notes = null;
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getContributor(): Contributor { return $this->contributor; }
-    public function setContributor(Contributor $contributor): self { $this->contributor = $contributor; return $this; }
+    public function getContributor(): Contributor
+    {
+        return $this->contributor;
+    }
+    public function setContributor(Contributor $contributor): self
+    {
+        $this->contributor = $contributor;
+        return $this;
+    }
 
-    public function getProject(): Project { return $this->project; }
-    public function setProject(Project $project): self { $this->project = $project; return $this; }
+    public function getProject(): Project
+    {
+        return $this->project;
+    }
+    public function setProject(Project $project): self
+    {
+        $this->project = $project;
+        return $this;
+    }
 
-    public function getDate(): \DateTimeInterface { return $this->date; }
-    public function setDate(\DateTimeInterface $date): self { $this->date = $date; return $this; }
+    public function getDate(): \DateTimeInterface
+    {
+        return $this->date;
+    }
+    public function setDate(\DateTimeInterface $date): self
+    {
+        $this->date = $date;
+        return $this;
+    }
 
-    public function getHours(): string { return $this->hours; }
-    public function setHours(string $hours): self { $this->hours = $hours; return $this; }
+    public function getHours(): string
+    {
+        return $this->hours;
+    }
+    public function setHours(string $hours): self
+    {
+        $this->hours = $hours;
+        return $this;
+    }
 
-    public function getNotes(): ?string { return $this->notes; }
-    public function setNotes(?string $notes): self { $this->notes = $notes; return $this; }
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+    public function setNotes(?string $notes): self
+    {
+        $this->notes = $notes;
+        return $this;
+    }
 }

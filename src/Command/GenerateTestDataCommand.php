@@ -118,13 +118,13 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function createTimeDimensions(int $year): array
     {
         $dimTimes = [];
-        
+
         for ($month = 1; $month <= 12; $month++) {
             $date = new \DateTime("$year-$month-01");
-            
+
             $dimTime = new DimTime();
             $dimTime->setDate($date);
-            
+
             $this->entityManager->persist($dimTime);
             $dimTimes[] = $dimTime;
         }
@@ -144,14 +144,14 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         ];
 
         $projectTypes = [];
-        
+
         foreach ($types as [$projectType, $serviceCategory, $status, $isInternal]) {
             $dimProjectType = new DimProjectType();
             $dimProjectType->setProjectType($projectType)
                 ->setServiceCategory($serviceCategory)
                 ->setStatus($status)
                 ->setIsInternal($isInternal);
-            
+
             $this->entityManager->persist($dimProjectType);
             $projectTypes[] = $dimProjectType;
         }
@@ -171,13 +171,13 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         ];
 
         $contributors = [];
-        
+
         foreach ($contributors_data as [$name, $role]) {
             $contributor = new DimContributor();
             $contributor->setName($name)
                 ->setRole($role)
                 ->setIsActive(true);
-            
+
             $this->entityManager->persist($contributor);
             $contributors[] = $contributor;
         }
@@ -188,8 +188,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function generateMetrics(array $dimTimes, array $projectTypes, array $contributors): array
     {
         $metrics = [];
-        $projectManagers = array_filter($contributors, fn($c) => $c->getRole() === 'project_manager');
-        $salesPersons = array_filter($contributors, fn($c) => $c->getRole() === 'sales_person');
+        $projectManagers = array_filter($contributors, fn ($c) => $c->getRole() === 'project_manager');
+        $salesPersons = array_filter($contributors, fn ($c) => $c->getRole() === 'sales_person');
 
         foreach ($dimTimes as $dimTime) {
             foreach ($projectTypes as $projectType) {
@@ -226,7 +226,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
 
         $baseRevenue = rand(10000, 50000) * $seasonalFactor;
         $baseCosts = $baseRevenue * (0.6 + (rand(0, 20) / 100)); // 60-80% du CA
-        
+
         $metric->setProjectCount(rand(1, 5))
             ->setActiveProjectCount(rand(1, 3))
             ->setCompletedProjectCount(rand(0, 2))
@@ -265,7 +265,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function displayStatistics(SymfonyStyle $io, int $year): void
     {
         $io->section('Statistiques générées');
-        
+
         // Total CA sur l'année
         $totalRevenue = $this->entityManager->createQuery('
             SELECT SUM(f.totalRevenue) as total 

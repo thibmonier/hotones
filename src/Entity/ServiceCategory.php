@@ -36,36 +36,70 @@ class ServiceCategory
         $this->projects = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getName(): string { return $this->name; }
-    public function setName(string $name): self { $this->name = $name; return $this; }
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): self { $this->description = $description; return $this; }
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
 
-    public function getColor(): ?string { return $this->color; }
-    public function setColor(?string $color): self { $this->color = $color; return $this; }
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
+        return $this;
+    }
 
-    public function getActive(): bool { return $this->active; }
-    public function setActive(bool $active): self { $this->active = $active; return $this; }
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+        return $this;
+    }
 
-    public function getProjects(): Collection { return $this->projects; }
-    public function addProject(Project $project): self 
-    { 
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+    public function addProject(Project $project): self
+    {
         if (!$this->projects->contains($project)) {
             $this->projects[] = $project;
             $project->setServiceCategory($this);
         }
-        return $this; 
+        return $this;
     }
-    public function removeProject(Project $project): self 
-    { 
+    public function removeProject(Project $project): self
+    {
         if ($this->projects->removeElement($project)) {
             if ($project->getServiceCategory() === $this) {
                 $project->setServiceCategory(null);
             }
         }
-        return $this; 
+        return $this;
     }
 }

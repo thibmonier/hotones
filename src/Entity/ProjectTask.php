@@ -90,31 +90,90 @@ class ProjectTask
         // Pas de collection timesheets pour l'instant
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getProject(): Project { return $this->project; }
-    public function setProject(Project $project): self { $this->project = $project; return $this; }
+    public function getProject(): Project
+    {
+        return $this->project;
+    }
+    public function setProject(Project $project): self
+    {
+        $this->project = $project;
+        return $this;
+    }
 
-    public function getName(): string { return $this->name; }
-    public function setName(string $name): self { $this->name = $name; return $this; }
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): self { $this->description = $description; return $this; }
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
 
-    public function getType(): string { return $this->type; }
-    public function setType(string $type): self { $this->type = $type; return $this; }
+    public function getType(): string
+    {
+        return $this->type ?? self::TYPE_REGULAR;
+    }
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
 
-    public function getIsDefault(): bool { return $this->isDefault; }
-    public function setIsDefault(bool $isDefault): self { $this->isDefault = $isDefault; return $this; }
+    public function getIsDefault(): bool
+    {
+        return $this->isDefault;
+    }
+    public function setIsDefault(bool $isDefault): self
+    {
+        $this->isDefault = $isDefault;
+        return $this;
+    }
 
-    public function getCountsForProfitability(): bool { return $this->countsForProfitability; }
-    public function setCountsForProfitability(bool $countsForProfitability): self { $this->countsForProfitability = $countsForProfitability; return $this; }
+    public function getCountsForProfitability(): bool
+    {
+        return $this->countsForProfitability;
+    }
+    public function setCountsForProfitability(bool $countsForProfitability): self
+    {
+        $this->countsForProfitability = $countsForProfitability;
+        return $this;
+    }
 
-    public function getPosition(): int { return $this->position; }
-    public function setPosition(int $position): self { $this->position = $position; return $this; }
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
+        return $this;
+    }
 
-    public function getActive(): bool { return $this->active; }
-    public function setActive(bool $active): self { $this->active = $active; return $this; }
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+        return $this;
+    }
 
     /**
      * Calcule le total des heures passées sur cette tâche
@@ -140,7 +199,7 @@ class ProjectTask
      */
     public function getTypeLabel(): string
     {
-        return match($this->type) {
+        return match($this->getType()) {
             self::TYPE_AVV => 'Avant-vente (AVV)',
             self::TYPE_NON_VENDU => 'Non-vendu',
             self::TYPE_REGULAR => 'Tâche vendue',
@@ -181,39 +240,102 @@ class ProjectTask
     }
 
     // Getters et setters pour les nouvelles propriétés
-    public function getEstimatedHoursSold(): ?int { return $this->estimatedHoursSold; }
-    public function setEstimatedHoursSold(?int $estimatedHoursSold): self { $this->estimatedHoursSold = $estimatedHoursSold; return $this; }
+    public function getEstimatedHoursSold(): ?int
+    {
+        return $this->estimatedHoursSold;
+    }
+    public function setEstimatedHoursSold(?int $estimatedHoursSold): self
+    {
+        $this->estimatedHoursSold = $estimatedHoursSold;
+        return $this;
+    }
 
-    public function getEstimatedHoursRevised(): ?int { return $this->estimatedHoursRevised; }
-    public function setEstimatedHoursRevised(?int $estimatedHoursRevised): self { $this->estimatedHoursRevised = $estimatedHoursRevised; return $this; }
+    public function getEstimatedHoursRevised(): ?int
+    {
+        return $this->estimatedHoursRevised;
+    }
+    public function setEstimatedHoursRevised(?int $estimatedHoursRevised): self
+    {
+        $this->estimatedHoursRevised = $estimatedHoursRevised;
+        return $this;
+    }
 
-    public function getProgressPercentage(): int { return $this->progressPercentage ?? 0; }
-    public function setProgressPercentage(int $progressPercentage): self { $this->progressPercentage = $progressPercentage; return $this; }
+    public function getProgressPercentage(): int
+    {
+        return $this->progressPercentage ?? 0;
+    }
+    public function setProgressPercentage(int $progressPercentage): self
+    {
+        $this->progressPercentage = $progressPercentage;
+        return $this;
+    }
 
-    public function getAssignedContributor(): ?Contributor { return $this->assignedContributor; }
-    public function setAssignedContributor(?Contributor $assignedContributor): self { $this->assignedContributor = $assignedContributor; return $this; }
+    public function getAssignedContributor(): ?Contributor
+    {
+        return $this->assignedContributor;
+    }
+    public function setAssignedContributor(?Contributor $assignedContributor): self
+    {
+        $this->assignedContributor = $assignedContributor;
+        return $this;
+    }
 
-    public function getRequiredProfile(): ?Profile { return $this->requiredProfile; }
-    public function setRequiredProfile(?Profile $requiredProfile): self { $this->requiredProfile = $requiredProfile; return $this; }
+    public function getRequiredProfile(): ?Profile
+    {
+        return $this->requiredProfile;
+    }
+    public function setRequiredProfile(?Profile $requiredProfile): self
+    {
+        $this->requiredProfile = $requiredProfile;
+        return $this;
+    }
 
-    public function getDailyRate(): ?string { return $this->dailyRate; }
-    public function setDailyRate(?string $dailyRate): self { $this->dailyRate = $dailyRate; return $this; }
+    public function getDailyRate(): ?string
+    {
+        return $this->dailyRate;
+    }
+    public function setDailyRate(?string $dailyRate): self
+    {
+        $this->dailyRate = $dailyRate;
+        return $this;
+    }
 
-    public function getStartDate(): ?\DateTimeInterface { return $this->startDate; }
-    public function setStartDate(?\DateTimeInterface $startDate): self { $this->startDate = $startDate; return $this; }
+    public function getStartDate(): ?\DateTimeInterface
+    {
+        return $this->startDate;
+    }
+    public function setStartDate(?\DateTimeInterface $startDate): self
+    {
+        $this->startDate = $startDate;
+        return $this;
+    }
 
-    public function getEndDate(): ?\DateTimeInterface { return $this->endDate; }
-    public function setEndDate(?\DateTimeInterface $endDate): self { $this->endDate = $endDate; return $this; }
+    public function getEndDate(): ?\DateTimeInterface
+    {
+        return $this->endDate;
+    }
+    public function setEndDate(?\DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
+        return $this;
+    }
 
-    public function getStatus(): string { return $this->status; }
-    public function setStatus(string $status): self { $this->status = $status; return $this; }
+    public function getStatus(): string
+    {
+        return $this->status ?? 'not_started';
+    }
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
 
     /**
      * Retourne le libellé du statut
      */
     public function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match($this->getStatus()) {
             'not_started' => 'Non démarrée',
             'in_progress' => 'En cours',
             'completed' => 'Terminée',

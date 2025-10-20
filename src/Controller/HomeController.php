@@ -20,36 +20,36 @@ class HomeController extends AbstractController
     {
         $currentMonth = new \DateTime('first day of this month');
         $endMonth = new \DateTime('last day of this month');
-        
+
         $projectRepo = $em->getRepository(Project::class);
         $contributorRepo = $em->getRepository(Contributor::class);
         $timesheetRepo = $em->getRepository(Timesheet::class);
-        
+
         // KPIs globaux via repositories
         $totalProjects = $projectRepo->count([]);
         $activeProjects = $projectRepo->countActiveProjects();
         $totalContributors = $contributorRepo->countActiveContributors();
-        
+
         // CA total de tous les projets
         $projects = $projectRepo->findAll();
         $totalRevenue = '0';
         foreach ($projects as $project) {
             $totalRevenue = bcadd($totalRevenue, $project->getTotalSoldAmount(), 2);
         }
-        
+
         // Temps saisies ce mois-ci via repository
         $monthlyHours = $timesheetRepo->getTotalHoursForMonth($currentMonth, $endMonth);
-        
+
         // Projets récents via repository
         $recentProjects = $projectRepo->findRecentProjects(5);
-        
+
         // Mes temps récents (si contributeur) via repository
         $contributor = $contributorRepo->findByUser($this->getUser());
         $myRecentTimesheets = [];
         if ($contributor) {
             $myRecentTimesheets = $timesheetRepo->findRecentByContributor($contributor, 5);
         }
-        
+
         // Projets par statut via repository
         $projectsByStatus = $projectRepo->getProjectsByStatus();
 

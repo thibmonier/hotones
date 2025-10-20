@@ -24,11 +24,11 @@ class OrderController extends AbstractController
     {
         $projectId = $request->query->get('project');
         $status = $request->query->get('status');
-        
+
         $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
         $orders = $em->getRepository(Order::class)->findWithFilters($project, $status);
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
-        
+
         return $this->render('order/index.html.twig', [
             'orders' => $orders,
             'projects' => $projects,
@@ -43,7 +43,7 @@ class OrderController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $order = new Order();
-        
+
         // Pré-sélectionner le projet si fourni dans l'URL
         if ($projectId = $request->query->get('project')) {
             $project = $em->getRepository(Project::class)->find($projectId);
@@ -51,10 +51,10 @@ class OrderController extends AbstractController
                 $order->setProject($project);
             }
         }
-        
+
         if ($request->isMethod('POST')) {
             $order->setOrderNumber($this->generateOrderNumber($em));
-            
+
             // Projet
             if ($projectId = $request->request->get('project_id')) {
                 $project = $em->getRepository(Project::class)->find($projectId);
@@ -62,28 +62,28 @@ class OrderController extends AbstractController
                     $order->setProject($project);
                 }
             }
-            
+
             $order->setStatus($request->request->get('status', 'draft'));
             $order->setDescription($request->request->get('description'));
             $order->setNotes($request->request->get('notes'));
-            
+
             // Contingence
             $contingency = $request->request->get('contingency_percentage');
             $order->setContingencyPercentage($contingency !== '' ? (float)$contingency : null);
-            
+
             if ($request->request->get('valid_until')) {
                 $order->setValidUntil(new \DateTime($request->request->get('valid_until')));
             }
-            
+
             $em->persist($order);
             $em->flush();
-            
+
             $this->addFlash('success', 'Devis créé avec succès');
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
-        
+
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
-        
+
         return $this->render('order/new.html.twig', [
             'order' => $order,
             'projects' => $projects,
@@ -97,7 +97,7 @@ class OrderController extends AbstractController
         // Calculer les totaux
         $totalAmount = 0;
         $totalPurchases = 0;
-        
+
         foreach ($order->getSections() as $section) {
             foreach ($section->getLines() as $line) {
                 $totalAmount += $line->getTotalAmount();
@@ -106,15 +106,15 @@ class OrderController extends AbstractController
                 }
             }
         }
-        
+
         // Calcul avec contingence
         $contingencyAmount = 0;
         if ($order->getContingencyPercentage()) {
             $contingencyAmount = $totalAmount * ($order->getContingencyPercentage() / 100);
         }
-        
+
         $finalAmount = $totalAmount - $contingencyAmount;
-        
+
         return $this->render('order/show.html.twig', [
             'order' => $order,
             'totalAmount' => $totalAmount,
@@ -134,29 +134,29 @@ class OrderController extends AbstractController
                 $project = $em->getRepository(Project::class)->find($projectId);
                 $order->setProject($project);
             }
-            
+
             $order->setStatus($request->request->get('status'));
             $order->setDescription($request->request->get('description'));
             $order->setNotes($request->request->get('notes'));
-            
+
             // Contingence
             $contingency = $request->request->get('contingency_percentage');
             $order->setContingencyPercentage($contingency !== '' ? (float)$contingency : null);
-            
+
             if ($request->request->get('valid_until')) {
                 $order->setValidUntil(new \DateTime($request->request->get('valid_until')));
             } else {
                 $order->setValidUntil(null);
             }
-            
+
             $em->flush();
-            
+
             $this->addFlash('success', 'Devis modifié avec succès');
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
-        
+
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
-        
+
         return $this->render('order/edit.html.twig', [
             'order' => $order,
             'projects' => $projects,
@@ -181,10 +181,10 @@ class OrderController extends AbstractController
         $section->setName($request->request->get('section_name'));
         $section->setDescription($request->request->get('section_description'));
         $section->setSortOrder($order->getSections()->count() + 1);
-        
+
         $em->persist($section);
         $em->flush();
-        
+
         $this->addFlash('success', 'Section ajoutée avec succès');
         return $this->redirectToRoute('order_sections', ['id' => $order->getId()]);
     }
@@ -195,36 +195,36 @@ class OrderController extends AbstractController
     {
         $order = $em->getRepository(Order::class)->find($orderId);
         $section = $em->getRepository(OrderSection::class)->find($sectionId);
-        
+
         if (!$order || !$section || $section->getOrder() !== $order) {
             throw $this->createNotFoundException();
         }
-        
+
         $line = new OrderLine();
         $line->setSection($section);
         $line->setDescription($request->request->get('line_description'));
-        
+
         if ($profileId = $request->request->get('profile_id')) {
             $profile = $em->getRepository(Profile::class)->find($profileId);
             if ($profile) {
                 $line->setProfile($profile);
             }
         }
-        
+
         $tjm = $request->request->get('tjm');
         $line->setTjm($tjm !== '' ? (float)$tjm : null);
-        
+
         $days = $request->request->get('days');
         $line->setDays($days !== '' ? (float)$days : 0);
-        
+
         $purchaseAmount = $request->request->get('purchase_amount');
         $line->setPurchaseAmount($purchaseAmount !== '' ? (float)$purchaseAmount : null);
-        
+
         $line->setSortOrder($section->getLines()->count() + 1);
-        
+
         $em->persist($line);
         $em->flush();
-        
+
         $this->addFlash('success', 'Ligne ajoutée avec succès');
         return $this->redirectToRoute('order_sections', ['id' => $orderId]);
     }
@@ -240,9 +240,9 @@ class OrderController extends AbstractController
         $newOrder->setDescription($originalOrder->getDescription() . ' (Copie)');
         $newOrder->setNotes($originalOrder->getNotes());
         $newOrder->setContingencyPercentage($originalOrder->getContingencyPercentage());
-        
+
         $em->persist($newOrder);
-        
+
         // Copier les sections et lignes
         foreach ($originalOrder->getSections() as $originalSection) {
             $newSection = new OrderSection();
@@ -250,9 +250,9 @@ class OrderController extends AbstractController
             $newSection->setName($originalSection->getName());
             $newSection->setDescription($originalSection->getDescription());
             $newSection->setSortOrder($originalSection->getSortOrder());
-            
+
             $em->persist($newSection);
-            
+
             foreach ($originalSection->getLines() as $originalLine) {
                 $newLine = new OrderLine();
                 $newLine->setSection($newSection);
@@ -262,13 +262,13 @@ class OrderController extends AbstractController
                 $newLine->setDays($originalLine->getDays());
                 $newLine->setPurchaseAmount($originalLine->getPurchaseAmount());
                 $newLine->setSortOrder($originalLine->getSortOrder());
-                
+
                 $em->persist($newLine);
             }
         }
-        
+
         $em->flush();
-        
+
         $this->addFlash('success', 'Devis dupliqué avec succès');
         return $this->redirectToRoute('order_show', ['id' => $newOrder->getId()]);
     }
@@ -282,7 +282,7 @@ class OrderController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Devis supprimé avec succès');
         }
-        
+
         return $this->redirectToRoute('order_index');
     }
 
@@ -290,17 +290,17 @@ class OrderController extends AbstractController
     {
         $year = date('Y');
         $month = date('m');
-        
+
         // Trouver le dernier numéro de devis pour ce mois
         $lastOrder = $em->getRepository(Order::class)
             ->findLastOrderNumberForMonth($year, $month);
-        
+
         $increment = 1;
         if ($lastOrder) {
             $lastNumber = $lastOrder->getOrderNumber();
             $increment = (int)substr($lastNumber, -3) + 1;
         }
-        
+
         return sprintf('D%s%s%03d', $year, $month, $increment);
     }
 }

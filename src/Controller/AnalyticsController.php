@@ -24,7 +24,8 @@ class AnalyticsController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private MetricsCalculationService $metricsService
-    ) {}
+    ) {
+    }
 
     #[Route('/dashboard', name: 'analytics_dashboard')]
     public function dashboard(Request $request): Response
@@ -32,7 +33,7 @@ class AnalyticsController extends AbstractController
         $granularity = $request->query->get('granularity', 'monthly');
         $year = (int) $request->query->get('year', date('Y'));
         $month = $request->query->get('month') ? (int) $request->query->get('month') : null;
-        
+
         // Filtres optionnels
         $projectType = $request->query->get('project_type') ?: null;
         $projectManager = $request->query->get('project_manager') ? (int) $request->query->get('project_manager') : null;
@@ -40,13 +41,13 @@ class AnalyticsController extends AbstractController
 
         // Récupérer les métriques selon les filtres
         $metrics = $this->getMetrics($granularity, $year, $month, $projectType, $projectManager, $salesPerson);
-        
+
         // Calculer les KPIs principaux
         $kpis = $this->calculateKPIs($metrics);
-        
+
         // Données pour les graphiques
         $chartData = $this->prepareChartData($metrics, $granularity);
-        
+
         // Listes pour les filtres
         $filterData = $this->getFilterData();
 
@@ -72,7 +73,7 @@ class AnalyticsController extends AbstractController
         $granularity = $request->query->get('granularity', 'monthly');
         $year = (int) $request->query->get('year', date('Y'));
         $month = $request->query->get('month') ? (int) $request->query->get('month') : null;
-        
+
         $projectType = $request->query->get('project_type') ?: null;
         $projectManager = $request->query->get('project_manager') ? (int) $request->query->get('project_manager') : null;
         $salesPerson = $request->query->get('sales_person') ? (int) $request->query->get('sales_person') : null;
@@ -169,7 +170,7 @@ class AnalyticsController extends AbstractController
 
         // Calcul de la marge globale
         $totals['grossMargin'] = bcsub($totals['totalRevenue'], $totals['totalCosts'], 2);
-        
+
         if (bccomp($totals['totalRevenue'], '0', 2) > 0) {
             $totals['marginPercentage'] = bcmul(
                 bcdiv($totals['grossMargin'], $totals['totalRevenue'], 4),
@@ -197,7 +198,7 @@ class AnalyticsController extends AbstractController
 
         foreach ($metrics as $metric) {
             $dimTime = $metric->getDimTime();
-            
+
             $label = match ($granularity) {
                 'monthly' => $dimTime->getMonthName(),
                 'quarterly' => $dimTime->getQuarterName(),
