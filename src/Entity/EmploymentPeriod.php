@@ -37,7 +37,7 @@ class EmploymentPeriod
     private string $weeklyHours = '35.00';
 
     // Pourcentage temps de travail (100%, 90%, 80% pour temps partiel)
-    #[ORM\Column(type: 'decimal', precision: 5, scale: 2, options: ['default' => 100.00])]
+    #[ORM\Column(name: 'work_time_percentage', type: 'decimal', precision: 5, scale: 2, options: ['default' => 100.00])]
     private string $workTimePercentage = '100.00';
 
     #[ORM\Column(type: 'date')]
@@ -183,7 +183,7 @@ class EmploymentPeriod
     public function getEffectiveDailyCost(): string
     {
         $baseCost = floatval($this->cjm);
-        $workingRatio = floatval($this->workingTimePercentage) / 100;
+        $workingRatio = floatval($this->workTimePercentage) / 100;
         return number_format($baseCost * $workingRatio, 2, '.', '');
     }
 
@@ -194,7 +194,7 @@ class EmploymentPeriod
     {
         $standardHourPerDay = 7; // 7h par jour standard
         $actualHours = floatval($this->weeklyHours);
-        $workingRatio = floatval($this->workingTimePercentage) / 100;
+        $workingRatio = floatval($this->workTimePercentage) / 100;
 
         return ($actualHours * $workingRatio) / $standardHourPerDay;
     }

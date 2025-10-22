@@ -97,8 +97,8 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function getHoursGroupedByProjectForContributor(Contributor $contributor, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
-        return $this->createQueryBuilder('t')
-            ->select('p.name as projectName, SUM(t.hours) as totalHours')
+        $results = $this->createQueryBuilder('t')
+            ->select('p as project, SUM(t.hours) as totalHours')
             ->leftJoin('t.project', 'p')
             ->where('t.contributor = :contributor')
             ->andWhere('t.date BETWEEN :start AND :end')
@@ -109,6 +109,17 @@ class TimesheetRepository extends ServiceEntityRepository
             ->orderBy('totalHours', 'DESC')
             ->getQuery()
             ->getResult();
+            
+        // Reformater les résultats pour avoir project et totalHours clairement séparés
+        $formatted = [];
+        foreach ($results as $result) {
+            $formatted[] = [
+                'project' => $result['project'],
+                'totalHours' => (float) $result['totalHours']
+            ];
+        }
+        
+        return $formatted;
     }
 
     /**

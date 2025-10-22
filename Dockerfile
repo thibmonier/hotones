@@ -1,5 +1,15 @@
 # syntax=docker/dockerfile:1
 
+# Stage 1: Build assets
+FROM node:18-alpine AS assets
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+COPY assets/ assets/
+COPY webpack.config.js ./
+RUN yarn build
+
+# Stage 2: PHP application
 FROM php:8.4-fpm-alpine
 
 # Install system dependencies
@@ -36,6 +46,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
 
 WORKDIR /var/www/html
+
+# Copy built assets from assets stage
+COPY --from=assets /app/public/assets/ public/assets/
 
 # Optimize permissions for local dev
 RUN usermod -u 1000 www-data && groupmod -g 1000 www-data || true

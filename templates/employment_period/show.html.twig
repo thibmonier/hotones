@@ -1,0 +1,230 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}{{ period.contributor.name }} - Période du {{ period.startDate|date('d/m/Y') }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Période d'emploi - {{ period.contributor.name }}</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('employment_period_index') }}">Périodes d'emploi</a></li>
+                        <li class="breadcrumb-item active">{{ period.contributor.name }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">
+                            <i class="bx bx-briefcase me-2"></i>
+                            Détails de la période
+                        </h4>
+                        <div>
+                            <a href="{{ path('employment_period_edit', {id: period.id}) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bx bx-edit-alt me-1"></i> Modifier
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Contributeur</h6>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm me-3">
+                                    <span class="avatar-title bg-soft-primary text-primary rounded-circle">
+                                        {{ period.contributor.name|first|upper }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0">{{ period.contributor.name }}</h5>
+                                    <small class="text-muted">{{ period.contributor.email ?: 'Email non renseigné' }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Période d'activité</h6>
+                            <p class="mb-0">
+                                <strong>{{ period.startDate|date('d F Y') }}</strong>
+                                {% if period.endDate %}
+                                    → {{ period.endDate|date('d F Y') }}
+                                    <br><small class="text-muted">{{ period.startDate.diff(period.endDate).days }} jours</small>
+                                {% else %}
+                                    → <span class="badge bg-success">En cours</span>
+                                    <br><small class="text-muted">{{ period.startDate.diff(date()) |abs.days }} jours</small>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="fw-bold text-muted">Profils associés</h6>
+                            {% if period.profiles|length > 0 %}
+                                {% for profile in period.profiles %}
+                                    <span class="badge bg-soft-info text-info me-2 mb-2">
+                                        {{ profile.name }}
+                                    </span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">Aucun profil associé</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if period.notes %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold text-muted">Notes</h6>
+                                <div class="alert alert-light">
+                                    {{ period.notes|nl2br }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Données financières</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3 text-center">
+                                <h5 class="text-primary mb-1">
+                                    {% if period.salary %}
+                                        {{ period.salary|number_format(0, ',', ' ') }} €
+                                    {% else %}
+                                        Non renseigné
+                                    {% endif %}
+                                </h5>
+                                <p class="text-muted mb-0">Salaire mensuel</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3 text-center">
+                                <h5 class="text-success mb-1">
+                                    {% if period.cjm %}
+                                        {{ period.cjm|number_format(0, ',', ' ') }} €
+                                    {% else %}
+                                        Non renseigné
+                                    {% endif %}
+                                </h5>
+                                <p class="text-muted mb-0">CJM - Coût journalier</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3 text-center">
+                                <h5 class="text-warning mb-1">
+                                    {% if period.tjm %}
+                                        {{ period.tjm|number_format(0, ',', ' ') }} €
+                                    {% else %}
+                                        Non renseigné
+                                    {% endif %}
+                                </h5>
+                                <p class="text-muted mb-0">TJM - Taux journalier</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Informations complémentaires</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-sm">
+                            <tr>
+                                <td class="fw-bold">Heures hebdomadaires :</td>
+                                <td>{{ period.weeklyHours }}h</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Temps de travail :</td>
+                                <td>
+                                    {{ period.workTimePercentage }}%
+                                    {% if period.workTimePercentage != '100.00' %}
+                                        <span class="badge bg-warning ms-2">Temps partiel</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if duration %}
+                                <tr>
+                                    <td class="fw-bold">Durée totale :</td>
+                                    <td>{{ duration }} jour(s)</td>
+                                </tr>
+                            {% endif %}
+                            {% if totalCost %}
+                                <tr>
+                                    <td class="fw-bold">Coût estimé :</td>
+                                    <td><strong class="text-primary">{{ totalCost|number_format(2, ',', ' ') }} €</strong></td>
+                                </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('employment_period_edit', {id: period.id}) }}" class="btn btn-primary">
+                            <i class="bx bx-edit-alt me-1"></i> Modifier cette période
+                        </a>
+                        <a href="{{ path('employment_period_new', {contributor: period.contributor.id}) }}" class="btn btn-outline-success">
+                            <i class="bx bx-plus me-1"></i> Nouvelle période pour ce contributeur
+                        </a>
+                        <hr>
+                        <button class="btn btn-outline-danger" onclick="confirmDelete()">
+                            <i class="bx bx-trash me-1"></i> Supprimer la période
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('employment_period_index') }}" class="btn btn-secondary">
+                    <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire caché pour la suppression -->
+    <form id="delete-form" method="post" action="{{ path('employment_period_delete', {id: period.id}) }}" style="display: none;">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ period.id) }}">
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function confirmDelete() {
+            const message = `Voulez-vous vraiment supprimer la période d'emploi de {{ period.contributor.name|e('js') }} commencée le {{ period.startDate|date('d/m/Y')|e('js') }} ?\n\nCette action est irréversible.`;
+            
+            if (confirm(message)) {
+                document.getElementById('delete-form').submit();
+            }
+        }
+    </script>
+{% endblock %}

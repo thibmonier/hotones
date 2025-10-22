@@ -1,0 +1,236 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Modifier - {{ period.contributor.name }} - Période du {{ period.startDate|date('d/m/Y') }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Modifier la période d'emploi</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('employment_period_index') }}">Périodes d'emploi</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('employment_period_show', {id: period.id}) }}">{{ period.contributor.name }}</a></li>
+                        <li class="breadcrumb-item active">Modifier</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" autocomplete="off">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Informations générales</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="contributor_id" class="form-label">Contributeur <span class="text-danger">*</span></label>
+                                <select name="contributor_id" id="contributor_id" class="form-select" required>
+                                    <option value="">Sélectionner un contributeur</option>
+                                    {% for contributor in contributors %}
+                                        <option value="{{ contributor.id }}" {% if period.contributor and period.contributor.id == contributor.id %}selected{% endif %}>
+                                            {{ contributor.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label">Date de début <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" 
+                                       value="{{ period.startDate ? period.startDate|date('Y-m-d') : '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label">Date de fin</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" 
+                                       value="{{ period.endDate ? period.endDate|date('Y-m-d') : '' }}">
+                                <div class="form-text">Laisser vide pour une période en cours</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="notes" class="form-label">Notes</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                          placeholder="Notes et commentaires sur cette période d'emploi">{{ period.notes }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Données financières</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="salary" class="form-label">Salaire mensuel (€)</label>
+                                <input type="number" class="form-control" id="salary" name="salary" 
+                                       step="0.01" min="0" value="{{ period.salary }}" 
+                                       placeholder="3500.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="cjm" class="form-label">CJM - Coût Journalier Moyen (€)</label>
+                                <input type="number" class="form-control" id="cjm" name="cjm" 
+                                       step="0.01" min="0" value="{{ period.cjm }}" 
+                                       placeholder="450.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="tjm" class="form-label">TJM - Taux Journalier Moyen (€)</label>
+                                <input type="number" class="form-control" id="tjm" name="tjm" 
+                                       step="0.01" min="0" value="{{ period.tjm }}" 
+                                       placeholder="550.00">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="weekly_hours" class="form-label">Heures hebdomadaires</label>
+                                <input type="number" class="form-control" id="weekly_hours" name="weekly_hours" 
+                                       step="0.5" min="1" max="60" value="{{ period.weeklyHours }}" 
+                                       placeholder="35.0">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="work_time_percentage" class="form-label">Pourcentage temps de travail (%)</label>
+                                <input type="number" class="form-control" id="work_time_percentage" name="work_time_percentage" 
+                                       step="0.1" min="1" max="100" value="{{ period.workTimePercentage }}" 
+                                       placeholder="100.0">
+                                <div class="form-text">Pour le temps partiel (ex: 80%)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Profils associés</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if profiles %}
+                            {% for profile in profiles %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="profiles[]" 
+                                           value="{{ profile.id }}" id="profile_{{ profile.id }}"
+                                           {% if period.profiles and profile in period.profiles %}checked{% endif %}>
+                                    <label class="form-check-label" for="profile_{{ profile.id }}">
+                                        <strong>{{ profile.name }}</strong>
+                                        {% if profile.description %}
+                                            <br><small class="text-muted">{{ profile.description }}</small>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">Aucun profil métier disponible.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Informations actuelles</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-sm">
+                                <tr>
+                                    <td class="fw-bold">Contributeur :</td>
+                                    <td>{{ period.contributor.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Période :</td>
+                                    <td>
+                                        {{ period.startDate|date('d/m/Y') }}
+                                        {% if period.endDate %}
+                                            → {{ period.endDate|date('d/m/Y') }}
+                                        {% else %}
+                                            → En cours
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Créé le :</td>
+                                    <td>{{ period.startDate|date('d/m/Y') }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Aide</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">Attention</h6>
+                            <ul class="mb-0 small">
+                                <li>La modification de ces données peut affecter les calculs de rentabilité</li>
+                                <li>Vérifiez que les dates ne chevauchent pas avec d'autres périodes</li>
+                                <li>Les profils définissent les compétences du contributeur pour cette période</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('employment_period_show', {id: period.id}) }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Annuler
+                    </a>
+                    <div>
+                        <button type="button" class="btn btn-outline-danger me-2" onclick="confirmDelete()">
+                            <i class="bx bx-trash me-1"></i> Supprimer
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i> Enregistrer les modifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Formulaire caché pour la suppression -->
+    <form id="delete-form" method="post" action="{{ path('employment_period_delete', {id: period.id}) }}" style="display: none;">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ period.id) }}">
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Validation côté client
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            
+            if (endDate && endDate < startDate) {
+                e.preventDefault();
+                alert('La date de fin ne peut pas être antérieure à la date de début.');
+                return false;
+            }
+        });
+
+        function confirmDelete() {
+            const message = `Voulez-vous vraiment supprimer la période d'emploi de {{ period.contributor.name|e('js') }} commencée le {{ period.startDate|date('d/m/Y')|e('js') }} ?\n\nCette action est irréversible.`;
+            
+            if (confirm(message)) {
+                document.getElementById('delete-form').submit();
+            }
+        }
+    </script>
+{% endblock %}

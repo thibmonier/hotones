@@ -276,13 +276,58 @@ FactProjectMetrics (table de faits)
 # Clone et démarrage
 docker compose up -d --build
 
-# Installation assets
-npm install
-npm run dev
-
 # Création d'un utilisateur
 docker compose exec app php bin/console app:user:create email@example.com password Prénom Nom
 ```
+
+### 🎨 Gestion des Assets
+
+#### Méthodes disponibles pour builder les assets :
+
+**1. En local (recommandé pour le développement)**
+```bash
+# Installation des dépendances
+yarn install
+
+# Build développement
+yarn dev
+
+# Build production  
+yarn build
+
+# Watch mode (rebuild automatique)
+yarn watch
+
+# Ou utiliser le script pratique
+./build-assets.sh dev     # Mode développement
+./build-assets.sh prod    # Mode production
+./build-assets.sh watch   # Mode watch
+```
+
+**2. Dans Docker**
+```bash
+# Avec le script Docker
+./docker-build-assets.sh dev
+./docker-build-assets.sh prod
+./docker-build-assets.sh watch
+
+# Ou manuellement
+docker compose exec app apk add --no-cache nodejs npm yarn
+docker compose exec app yarn install
+docker compose exec app yarn dev
+```
+
+**3. Multi-stage build Docker (production)**
+```bash
+# Le Dockerfile inclut un stage de build des assets
+docker compose build --no-cache app
+```
+
+#### Configuration Webpack Encore
+- **Output** : `public/assets/`
+- **Entrypoints** : `app.scss`, `bootstrap.scss`, `icons.scss`
+- **Features** : Support RTL, copie des fonts/images/libs
+- **Problème résolu** : Exclusion du fichier `pdfmake/build-vfs.js` (renommé en `.backup`)
 
 ### URLs
 - **Application** : http://localhost:8080
@@ -292,6 +337,38 @@ docker compose exec app php bin/console app:user:create email@example.com passwo
   - Catégories de service : http://localhost:8080/admin/service-categories
   - Profils métier : http://localhost:8080/admin/job-profiles
   - Périodes d'emploi : http://localhost:8080/employment-periods
+
+### 📊 Connexion à la base de données (clients externes)
+
+**Paramètres pour PhpStorm, DBeaver, MySQL Workbench, etc. :**
+```
+Host: localhost (ou 127.0.0.1)
+Port: 3307 ⚠️ (pas 3306 !)
+Database: hotones
+Username: symfony
+Password: symfony
+Type: MySQL/MariaDB 11.4
+```
+
+**Utilisateur root :**
+```
+Username: root
+Password: root
+```
+
+**Commandes de vérification :**
+```bash
+# Vérifier les containers
+docker compose ps
+
+# Tester le port
+nc -z localhost 3307
+
+# Connexion depuis l'intérieur du container
+docker compose exec db mariadb -u symfony -psymfony hotones
+```
+
+📝 **Guide complet** : Voir `DATABASE-CONNECTION.md` pour plus de détails
 
 ### Compte de test
 - **Email** : thibaut.monier@gmail.com
