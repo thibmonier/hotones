@@ -32,7 +32,7 @@ class Order
     private ?string $description = null;
 
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)]
-    private ?float $contingencyPercentage = null;
+    private ?string $contingencyPercentage = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $validUntil = null;
@@ -109,11 +109,11 @@ class Order
         return $this;
     }
 
-    public function getContingencyPercentage(): ?float
+    public function getContingencyPercentage(): ?string
     {
         return $this->contingencyPercentage;
     }
-    public function setContingencyPercentage(?float $contingencyPercentage): self
+    public function setContingencyPercentage(?string $contingencyPercentage): self
     {
         $this->contingencyPercentage = $contingencyPercentage;
         return $this;

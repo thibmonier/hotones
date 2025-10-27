@@ -1,0 +1,242 @@
+{% extends 'layouts/layouts-vertical.html.twig' %}
+
+{% block title %}Planning{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .planning-wrapper { display: grid; grid-template-columns: 320px 1fr; }
+  .planning-left { position: sticky; left: 0; z-index: 3; background: var(--bs-body-bg); border-right: 1px solid #eee; }
+  .planning-right { overflow-x: auto; }
+  .planning-grid { min-width: calc(var(--cell-width) * {{ timeline_dates|length }}); position: relative; }
+:root { --cell-width: 40px; --row-height: 56px; }
+  .totals-row { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: var(--cell-width); height: var(--row-height); align-items: center; }
+  .day-total { text-align: center; font-size: 11px; line-height: 1.1; }
+  .day-total .actual { font-weight: 700; color: #0d6efd; }
+  .day-total .planned { font-weight: 700; color: #16a34a; }
+  .header-row, .planning-row { display: grid; grid-auto-flow: column; grid-auto-columns: var(--cell-width); }
+  .header-cell { text-align: center; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #e9ecef; border-right: 1px solid #f1f1f1; }
+  .header-week { font-weight: 600; padding: 8px 6px; border-bottom: 1px solid #dee2e6; background: #fafbfc; position: sticky; top: 0; z-index: 2; }
+  .day-weekend { background: #fafafa; }
+  .contributor-cell { height: var(--row-height); display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f1f1f1; }
+  .contributor-name { font-weight: 600; }
+  .row-canvas { position: relative; height: var(--row-height); border-bottom: 1px solid #f1f1f1; }
+  .plan-block { position: absolute; top: 8px; height: calc(var(--row-height) - 16px); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 12px; cursor: grab; display: flex; align-items: center; gap: 8px; }
+  .plan-block:active { cursor: grabbing; }
+  .plan-block[data-status="planned"] { background: #3b82f6; }
+  .plan-block[data-status="confirmed"] { background: #22c55e; }
+  .plan-block[data-status="cancelled"] { background: #9CA3AF; text-decoration: line-through; }
+  .plan-block .badge { background: rgba(255,255,255,0.2); }
+  .week-divider { position: absolute; top: 0; bottom: 0; width: 1px; background: #e5e7eb; z-index: 1; }
+  .grid-bg { position: absolute; inset: 0; display: grid; grid-auto-flow: column; grid-auto-columns: var(--cell-width); }
+  .grid-bg > div { border-right: 1px dashed #f0f0f0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-title-box d-flex align-items-center justify-content-between">
+  <h4 class="mb-0">Planning</h4>
+  <div class="w-100">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label class="form-label">Début</label>
+        <input type="date" name="start" value="{{ timeline_start|date('Y-m-d') }}" class="form-control" style="width: 180px;">
+      </div>
+      <div class="col-auto">
+        <label class="form-label">Semaines</label>
+        <select name="weeks" class="form-select" style="width: 120px;">
+          {% for w in [4,8,12,16] %}
+            <option value="{{ w }}" {% if w == app.request.get('weeks')|default(8) %}selected{% endif %}>{{ w }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label">Contributeurs</label>
+        <select name="contributors[]" class="form-select" multiple size="3" style="min-width: 220px;">
+          {% for c in all_contributors %}
+            <option value="{{ c.id }}" {% if (c.id ~ '') in selected_contributors %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label">Chefs de projet</label>
+        <select name="project_managers[]" class="form-select" multiple size="3" style="min-width: 220px;">
+          {% for u in all_project_managers %}
+            <option value="{{ u.id }}" {% if (u.id ~ '') in selected_project_managers %}selected{% endif %}>{{ u.fullName ?? (u.firstName ~ ' ' ~ u.lastName) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label">Projets</label>
+        <select name="projects[]" class="form-select" multiple size="3" style="min-width: 240px;">
+          {% for p in all_projects %}
+            <option value="{{ p.id }}" {% if (p.id ~ '') in selected_projects %}selected{% endif %}>{{ p.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label">Type de projet</label>
+        <select name="project_types[]" class="form-select" multiple size="2" style="min-width: 160px;">
+          {% for key,label in project_types %}
+            <option value="{{ key }}" {% if key in selected_project_types %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary">Filtrer</button>
+        <a class="btn btn-light" href="{{ path('planning_index') }}">Réinitialiser</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body planning-wrapper">
+    <!-- Left fixed column: contributor project rows -->
+    <div class="planning-left">
+      <div class="header-week">Contributeur · Projet</div>
+      {% for g in groups %}
+        {% set c = g.contributor %}
+        <!-- Summary row label -->
+        <div class="contributor-cell">
+          <div class="avatar-xs me-2"><span class="avatar-title rounded-circle bg-primary bg-soft text-primary">{{ c.name|first|upper }}</span></div>
+          <div>
+            <div class="contributor-name">{{ c.name }}</div>
+            <div class="text-muted small">Passées vs Prévisionnelles (h/j)</div>
+          </div>
+        </div>
+        {% for prj in g.projectRows %}
+          <div class="contributor-cell">
+            <div class="avatar-xs me-2"><span class="avatar-title rounded-circle bg-primary bg-soft text-primary">{{ c.name|first|upper }}</span></div>
+            <div>
+              <div class="contributor-name">{{ c.name }}</div>
+              <div class="text-muted small">{{ prj.project.name }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+
+    <!-- Right scrollable timeline -->
+    <div class="planning-right">
+      <div style="position: sticky; left: 0;">
+        <!-- Header with days -->
+        <div class="header-week">{{ timeline_start|date('d M Y') }} → {{ timeline_end|date('d M Y') }}</div>
+        <div class="header-row">
+          {% for d in timeline_dates %}
+            {% set isWeekend = d|date('w') in ['0','6'] %}
+            <div class="header-cell {% if isWeekend %}day-weekend{% endif %}">
+              <div>{{ d|date('D') }}</div>
+              <div><strong>{{ d|date('d') }}</strong></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Rows canvas -->
+      {% for g in groups %}
+        {# Summary totals row #}
+        <div class="row-canvas position-relative" data-contributor-id="{{ g.contributor.id }}" data-summary="true">
+          <div class="grid-bg">
+            {% for d in timeline_dates %}<div data-date="{{ d|date('Y-m-d') }}"></div>{% endfor %}
+          </div>
+          <div class="totals-row">
+            {% for d in timeline_dates %}
+              {% set key = d|date('Y-m-d') %}
+              <div class="day-total">
+                <div class="actual">{% if g.totals[key] is defined and g.totals[key] > 0 %}{{ g.totals[key]|number_format(1, ',', ' ') }}h{% else %}&nbsp;{% endif %}</div>
+                {% set planned = planned_totals_by_contributor[g.contributor.id][key] ?? 0 %}
+                <div class="planned">{% if planned > 0 %}{{ planned|number_format(1, ',', ' ') }}h{% else %}&nbsp;{% endif %}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        {# Project rows #}
+        {% for prj in g.projectRows %}
+          {% set items = prj.items %}
+          <div class="row-canvas position-relative" data-contributor-id="{{ g.contributor.id }}" data-project-id="{{ prj.project.id }}">
+            <div class="grid-bg">
+              {% for d in timeline_dates %}<div data-date="{{ d|date('Y-m-d') }}" class="drop-target"></div>{% endfor %}
+            </div>
+
+            {# Render blocks for this contributor+project #}
+            {% for p in items %}
+              {% set blockStart = p.startDate < timeline_start ? timeline_start : p.startDate %}
+              {% set blockEnd = p.endDate > timeline_end ? timeline_end : p.endDate %}
+              {% set leftDays = (blockStart|date('U') - timeline_start|date('U')) / 86400 %}
+              {% set totalDays = ((blockEnd|date('U') - blockStart|date('U')) / 86400) + 1 %}
+              {% set left = leftDays * 40 %}
+              {% set width = totalDays * 40 %}
+              <div class="plan-block"
+                   draggable="true"
+                   data-id="{{ p.id }}"
+                   data-status="{{ p.status }}"
+                   data-start="{{ p.startDate|date('Y-m-d') }}"
+                   data-end="{{ p.endDate|date('Y-m-d') }}"
+                   data-token-move="{{ csrf_token('move_planning_' ~ p.id) }}"
+                   data-token-edit="{{ csrf_token('edit_planning_' ~ p.id) }}"
+                   style="left: {{ left }}px; width: {{ width }}px;">
+                <span class="badge">{{ prj.project.name }}</span>
+                <span>{{ p.dailyHours }}h/j</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal fade" id="planEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier la planification</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="planEditForm">
+          <div class="mb-3">
+            <label class="form-label">Début</label>
+            <input type="date" name="startDate" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Fin</label>
+            <input type="date" name="endDate" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Heures par jour</label>
+            <input type="number" step="0.25" min="0" max="12" name="dailyHours" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Statut</label>
+            <select name="status" class="form-select">
+              <option value="planned">Planifié</option>
+              <option value="confirmed">Confirmé</option>
+              <option value="cancelled">Annulé</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea name="notes" class="form-control" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" id="planEditSave">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/js/planning.js') }}"></script>
+<script>
+  window.PLANNING_CONFIG = {
+    moveUrl: '{{ path('planning_move', {id: 0})|replace({'/0/move':'/{id}/move'}) }}',
+    updateUrl: '{{ path('planning_update', {id: 0})|replace({'/0/update':'/{id}/update'}) }}'
+  };
+</script>
+{% endblock %}

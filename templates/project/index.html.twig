@@ -18,6 +18,60 @@
         </div>
     </div>
 
+    {% if projects_with_metrics|length > 0 %}
+        <!-- Résumé global -->
+        <div class="row mb-4">
+            {% set global_revenue = 0 %}
+            {% set global_margin = 0 %}
+            {% set global_cost = 0 %}
+            {% set total_orders = 0 %}
+            {% set signed_orders = 0 %}
+            {% for item in projects_with_metrics %}
+                {% set global_revenue = global_revenue + item.metrics.total_revenue %}
+                {% set global_margin = global_margin + item.metrics.total_margin %}
+                {% set global_cost = global_cost + item.metrics.total_cost %}
+                {% set total_orders = total_orders + item.metrics.orders_count %}
+                {% set signed_orders = signed_orders + item.metrics.signed_orders_count %}
+            {% endfor %}
+            {% set global_margin_rate = global_revenue > 0 ? (global_margin / global_revenue * 100) : 0 %}
+            
+            <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body text-center">
+                        <h4 class="text-success mb-1">{{ global_revenue|number_format(0, ',', ' ') }}€</h4>
+                        <p class="text-muted mb-0">CA Total Signé</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body text-center">
+                        <h4 class="text-{% if global_margin_rate >= 20 %}success{% elseif global_margin_rate >= 10 %}warning{% else %}danger{% endif %} mb-1">
+                            {{ global_margin|number_format(0, ',', ' ') }}€
+                        </h4>
+                        <p class="text-muted mb-0">Marge Totale ({{ global_margin_rate|number_format(1, ',', ' ') }}%)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body text-center">
+                        <h4 class="text-warning mb-1">{{ global_cost|number_format(0, ',', ' ') }}€</h4>
+                        <p class="text-muted mb-0">Coût Estimé</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body text-center">
+                        <h4 class="text-info mb-1">{{ signed_orders }}/{{ total_orders }}</h4>
+                        <p class="text-muted mb-0">Devis Signés</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -32,17 +86,25 @@
                                     <th>Catégorie</th>
                                     <th>Technologies</th>
                                     <th>Statut</th>
-                                    <th>CA Total</th>
+                                    <th class="text-end">CA Signé</th>
+                                    <th class="text-end">Marge Brute</th>
+                                    <th class="text-end">Achats</th>
+                                    <th class="text-center">Devis</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for project in projects %}
+                                {% for item in projects_with_metrics %}
+                                {% set project = item.project %}
+                                {% set metrics = item.metrics %}
                                 <tr>
                                     <td>
                                         <h5 class="font-size-14 mb-1">
                                             <a href="{{ path('project_show', {'id': project.id}) }}" class="text-dark">{{ project.name }}</a>
                                         </h5>
+                                        {% if project.description %}
+                                            <small class="text-muted">{{ project.description|length > 50 ? project.description|slice(0, 50) ~ '...' : project.description }}</small>
+                                        {% endif %}
                                     </td>
                                     <td>{{ project.client ?? '-' }}</td>
                                     <td>
@@ -54,20 +116,64 @@
                                         {% if project.serviceCategory %}
                                             <span class="badge bg-secondary">{{ project.serviceCategory.name }}</span>
                                         {% else %}
-                                            -
+                                            <small class="text-muted">-</small>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% for tech in project.technologies %}
-                                            <span class="badge bg-light text-dark me-1">{{ tech.name }}</span>
-                                        {% endfor %}
+                                        {% if project.technologies|length > 0 %}
+                                            {% for tech in project.technologies|slice(0, 2) %}
+                                                <span class="badge bg-light text-dark me-1">{{ tech.name }}</span>
+                                            {% endfor %}
+                                            {% if project.technologies|length > 2 %}
+                                                <small class="text-muted">+{{ project.technologies|length - 2 }}</small>
+                                            {% endif %}
+                                        {% else %}
+                                            <small class="text-muted">-</small>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <span class="badge bg-{% if project.status == 'active' %}success{% elseif project.status == 'completed' %}primary{% else %}warning{% endif %}">
                                             {{ project.status|title }}
                                         </span>
                                     </td>
-                                    <td>-</td>
+                                    <td class="text-end">
+                                        {% if metrics.total_revenue > 0 %}
+                                            <strong class="text-success">{{ metrics.total_revenue|number_format(0, ',', ' ') }}€</strong>
+                                        {% else %}
+                                            <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if metrics.total_margin > 0 %}
+                                            <div class="d-flex flex-column align-items-end">
+                                                <strong class="text-{% if metrics.margin_rate >= 20 %}success{% elseif metrics.margin_rate >= 10 %}warning{% else %}danger{% endif %}">
+                                                    {{ metrics.total_margin|number_format(0, ',', ' ') }}€
+                                                </strong>
+                                                <small class="text-muted">{{ metrics.margin_rate|number_format(1, ',', ' ') }}%</small>
+                                            </div>
+                                        {% else %}
+                                            <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if metrics.total_purchases > 0 %}
+                                            <strong class="text-warning">{{ metrics.total_purchases|number_format(0, ',', ' ') }}€</strong>
+                                        {% else %}
+                                            <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if metrics.orders_count > 0 %}
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="badge bg-light text-dark">{{ metrics.orders_count }}</span>
+                                                {% if metrics.signed_orders_count > 0 %}
+                                                    <small class="text-success">{{ metrics.signed_orders_count }} signé{{ metrics.signed_orders_count > 1 ? 's' : '' }}</small>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ path('project_details', {'id': project.id}) }}" class="btn btn-primary btn-sm" title="Vue détaillée">
@@ -86,7 +192,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted">
+                                    <td colspan="11" class="text-center text-muted">
                                         <div class="py-4">
                                             <i class="bx bx-folder-open font-size-24 mb-2"></i>
                                             <p>Aucun projet trouvé</p>

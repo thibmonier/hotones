@@ -85,11 +85,16 @@ class Project
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $tasks;
 
+    // Temps passés sur le projet
+    #[ORM\OneToMany(targetEntity: Timesheet::class, mappedBy: 'project', cascade: ['remove'])]
+    private Collection $timesheets;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->technologies = new ArrayCollection();
         $this->tasks = new ArrayCollection();
+        $this->timesheets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -517,5 +522,127 @@ class Project
         }
 
         return bcdiv($weightedProgress, $totalWeight, 2);
+    }
+
+    /**
+     * Calcule le total des heures réellement passées sur le projet
+     */
+    public function getTotalRealHours(): string
+    {
+        $total = '0';
+        foreach ($this->tasks as $task) {
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
+                $total = bcadd($total, $task->getTotalHours(), 2);
+            }
+        }
+        return $total;
+    }
+
+    /**
+     * Calcule le coût réel total du projet
+     */
+    public function getTotalRealCost(): string
+    {
+        $total = '0';
+        foreach ($this->tasks as $task) {
+            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
+                $total = bcadd($total, $task->getRealCost(), 2);
+            }
+        }
+        return $total;
+    }
+
+    /**
+     * Calcule la marge réelle totale du projet
+     */
+    public function getTotalRealMargin(): string
+    {
+        $soldAmount = $this->getTotalTasksSoldAmount();
+        $realCost = $this->getTotalRealCost();
+        
+        return bcsub($soldAmount, $realCost, 2);
+    }
+
+    /**
+     * Calcule le taux de marge réel du projet
+     */
+    public function getRealMarginPercentage(): string
+    {
+        $soldAmount = $this->getTotalTasksSoldAmount();
+        
+        if (bccomp($soldAmount, '0', 2) <= 0) {
+            return '0.00';
+        }
+        
+        $realMargin = $this->getTotalRealMargin();
+        return bcmul(bcdiv($realMargin, $soldAmount, 4), '100', 2);
+    }
+
+    /**
+     * Compare les performances prévisionnelles vs réelles
+     */
+    public function getPerformanceComparison(): array
+    {
+        $targetHours = $this->getTotalTasksRevisedHours();
+        $realHours = $this->getTotalRealHours();
+        $targetCost = $this->getTotalTasksEstimatedCost();
+        $realCost = $this->getTotalRealCost();
+        $targetMargin = $this->getTargetGrossMargin();
+        $realMargin = $this->getTotalRealMargin();
+        
+        // Calcul des écarts
+        $hoursVariance = bcsub($realHours, $targetHours, 2);
+        $costVariance = bcsub($realCost, $targetCost, 2);
+        $marginVariance = bcsub($realMargin, $targetMargin, 2);
+        
+        // Calcul des pourcentages d'écart
+        $hoursVariancePercent = bccomp($targetHours, '0', 2) > 0 ? 
+            bcmul(bcdiv($hoursVariance, $targetHours, 4), '100', 2) : '0.00';
+        $costVariancePercent = bccomp($targetCost, '0', 2) > 0 ? 
+            bcmul(bcdiv($costVariance, $targetCost, 4), '100', 2) : '0.00';
+        $marginVariancePercent = bccomp($targetMargin, '0', 2) > 0 ? 
+            bcmul(bcdiv($marginVariance, $targetMargin, 4), '100', 2) : '0.00';
+        
+        return [
+            'target_hours' => $targetHours,
+            'real_hours' => $realHours,
+            'hours_variance' => $hoursVariance,
+            'hours_variance_percent' => $hoursVariancePercent,
+            
+            'target_cost' => $targetCost,
+            'real_cost' => $realCost,
+            'cost_variance' => $costVariance,
+            'cost_variance_percent' => $costVariancePercent,
+            
+            'target_margin' => $targetMargin,
+            'real_margin' => $realMargin,
+            'margin_variance' => $marginVariance,
+            'margin_variance_percent' => $marginVariancePercent,
+        ];
+    }
+
+    // Gestion des temps passés (timesheets)
+    public function getTimesheets(): Collection
+    {
+        return $this->timesheets;
+    }
+
+    public function addTimesheet(Timesheet $timesheet): self
+    {
+        if (!$this->timesheets->contains($timesheet)) {
+            $this->timesheets[] = $timesheet;
+            $timesheet->setProject($this);
+        }
+        return $this;
+    }
+
+    public function removeTimesheet(Timesheet $timesheet): self
+    {
+        if ($this->timesheets->removeElement($timesheet)) {
+            if ($timesheet->getProject() === $this) {
+                $timesheet->setProject(null);
+            }
+        }
+        return $this;
     }
 }

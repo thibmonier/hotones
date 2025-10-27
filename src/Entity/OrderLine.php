@@ -197,4 +197,85 @@ class OrderLine
         // Les achats directs ne comptent pas dans la rentabilité
         return $this->type !== 'purchase';
     }
+
+    // Méthodes alias pour compatibilité avec le contrôleur
+    public function getTjm(): ?string
+    {
+        return $this->getDailyRate();
+    }
+
+    public function setTjm(?string $tjm): self
+    {
+        return $this->setDailyRate($tjm);
+    }
+
+    public function getPurchaseAmount(): ?string
+    {
+        return $this->getAttachedPurchaseAmount();
+    }
+
+    public function setPurchaseAmount(?string $purchaseAmount): self
+    {
+        return $this->setAttachedPurchaseAmount($purchaseAmount);
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->getPosition();
+    }
+
+    public function setSortOrder(int $sortOrder): self
+    {
+        return $this->setPosition($sortOrder);
+    }
+
+    /**
+     * Calcule la marge brute de cette ligne (CA - coût estimé)
+     */
+    public function getGrossMargin(): string
+    {
+        if ($this->type !== 'service' || !$this->profile || !$this->days) {
+            return '0';
+        }
+
+        $revenue = $this->getServiceAmount(); // CA sans achats
+        $cost = $this->getEstimatedCost();
+        
+        return bcsub($revenue, $cost, 2);
+    }
+
+    /**
+     * Calcule le coût estimé de cette ligne (jours * CJM du profil)
+     */
+    public function getEstimatedCost(): string
+    {
+        if ($this->type !== 'service' || !$this->profile || !$this->days) {
+            return '0';
+        }
+
+        // Utiliser le TJM par défaut du profil comme base de coût
+        // TODO: Améliorer en utilisant les périodes d'emploi des contributeurs
+        $defaultRate = $this->profile->getDefaultDailyRate();
+        if (!$defaultRate) {
+            return '0';
+        }
+
+        // Estimation : coût = 70% du TJM par défaut (marge standard)
+        $estimatedCostRate = bcmul($defaultRate, '0.7', 2);
+        return bcmul($this->days, $estimatedCostRate, 2);
+    }
+
+    /**
+     * Calcule le taux de marge de cette ligne
+     */
+    public function getMarginRate(): string
+    {
+        $revenue = $this->getServiceAmount();
+        if (bccomp($revenue, '0', 2) <= 0) {
+            return '0';
+        }
+
+        $margin = $this->getGrossMargin();
+        return bcmul(bcdiv($margin, $revenue, 4), '100', 2);
+    }
 }

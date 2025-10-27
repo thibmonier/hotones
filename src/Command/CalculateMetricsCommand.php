@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CalculateMetricsCommand extends Command
 {
     public function __construct(
-        private MetricsCalculationService $metricsService
+        private readonly MetricsCalculationService $metricsService
     ) {
         parent::__construct();
     }
@@ -30,7 +30,7 @@ class CalculateMetricsCommand extends Command
         $this
             ->addArgument('period', InputArgument::OPTIONAL, 'Période à calculer (YYYY ou YYYY-MM)', date('Y'))
             ->addOption('granularity', 'g', InputOption::VALUE_OPTIONAL, 'Granularité (monthly, quarterly, yearly)', 'monthly')
-            ->addOption('force-recalculate', 'f', InputOption::VALUE_NONE, 'Force le recalcul complet de l\'année')
+            ->addOption('force-recalculate', 'f', InputOption::VALUE_NONE, 'Force le re-calcul complet de l\'année')
             ->setHelp('
 Cette commande calcule les métriques analytics pour une période donnée.
 
@@ -63,7 +63,7 @@ Exemples :
                 $year = (int) $matches[1];
 
                 if ($forceRecalculate) {
-                    $io->info("Recalcul complet de l'année $year...");
+                    $io->info("Re-calcul complet de l'année $year...");
                     $this->metricsService->recalculateMetricsForYear($year);
                 } else {
                     $io->info("Calcul des métriques pour l'année $year ($granularity)...");

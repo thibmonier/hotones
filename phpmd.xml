@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<ruleset name="HotOnes PHP Mess Detector">
+    <description>PMD rules for HotOnes codebase.</description>
+
+    <file>src</file>
+
+    <exclude-pattern>*/var/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/migrations/*</exclude-pattern>
+    <exclude-pattern>*/public/*</exclude-pattern>
+    <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>*/bin/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+
+    <rule ref="vendor/phpmd/phpmd/src/main/resources/rulesets/cleancode.xml" />
+    <rule ref="vendor/phpmd/phpmd/src/main/resources/rulesets/codesize.xml">
+        <exclude name="TooManyPublicMethods"/>
+    </rule>
+    <rule ref="vendor/phpmd/phpmd/src/main/resources/rulesets/controversial.xml"/>
+    <rule ref="vendor/phpmd/phpmd/src/main/resources/rulesets/design.xml"/>
+    <rule ref="vendor/phpmd/phpmd/src/main/resources/rulesets/naming.xml"/>
+    <rule ref="vendor/phpmd/phpmd/src/main/resources/rulesets/unusedcode.xml"/>
+</ruleset>

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TimesheetRepository;
 use Doctrine\ORM\Mapping as ORM;
+use DateTimeInterface;
 
 #[ORM\Entity(repositoryClass: TimesheetRepository::class)]
 #[ORM\Table(name: 'timesheets')]
@@ -14,16 +15,21 @@ class Timesheet
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Contributor::class)]
+    #[ORM\ManyToOne(targetEntity: Contributor::class, inversedBy: 'timesheets')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Contributor $contributor;
 
-    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'timesheets')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Project $project;
 
+    // Lien optionnel vers une tâche du projet
+    #[ORM\ManyToOne(targetEntity: ProjectTask::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?ProjectTask $task = null;
+
     #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $date;
+    private DateTimeInterface $date;
 
     // Durée en heures (ex: 7.5)
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
@@ -57,11 +63,21 @@ class Timesheet
         return $this;
     }
 
-    public function getDate(): \DateTimeInterface
+    public function getTask(): ?ProjectTask
+    {
+        return $this->task;
+    }
+    public function setTask(?ProjectTask $task): self
+    {
+        $this->task = $task;
+        return $this;
+    }
+
+    public function getDate(): DateTimeInterface
     {
         return $this->date;
     }
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(DateTimeInterface $date): self
     {
         $this->date = $date;
         return $this;

@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Service de calcul et mise à jour des métriques dans le modèle en étoile
  */
-class MetricsCalculationService
+readonly class MetricsCalculationService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -29,6 +29,8 @@ class MetricsCalculationService
 
     /**
      * Calcule et met à jour toutes les métriques pour une période donnée
+     *
+     * @throws \Exception
      */
     public function calculateMetricsForPeriod(\DateTimeInterface $date, string $granularity = 'monthly'): void
     {
@@ -241,6 +243,8 @@ class MetricsCalculationService
             $dimTime = new DimTime();
             $dimTime->setDate($date);
             $this->entityManager->persist($dimTime);
+            // Flush to ensure identifier is generated before usage in queries
+            $this->entityManager->flush();
         }
 
         return $dimTime;
@@ -271,6 +275,7 @@ class MetricsCalculationService
                 ->setStatus($project->getStatus())
                 ->setIsInternal($project->getIsInternal());
             $this->entityManager->persist($dimProjectType);
+            $this->entityManager->flush();
         }
 
         return $dimProjectType;
@@ -285,15 +290,8 @@ class MetricsCalculationService
             return null;
         }
 
-        $compositeKey = sprintf(
-            '%s_%s_%s',
-            $user->getId(),
-            $role,
-            'active' // Assume active pour les utilisateurs existants
-        );
-
         $repo = $this->entityManager->getRepository(DimContributor::class);
-        $dimContributor = $repo->findOneBy(['compositeKey' => $compositeKey]);
+        $dimContributor = $repo->findOneBy(['user' => $user, 'role' => $role, 'isActive' => true]);
 
         if (!$dimContributor) {
             $dimContributor = new DimContributor();
@@ -302,6 +300,7 @@ class MetricsCalculationService
                 ->setRole($role)
                 ->setIsActive(true);
             $this->entityManager->persist($dimContributor);
+            $this->entityManager->flush();
         }
 
         return $dimContributor;
@@ -402,6 +401,8 @@ class MetricsCalculationService
 
     /**
      * Recalcule toutes les métriques pour une année donnée
+     *
+     * @throws \Exception
      */
     public function recalculateMetricsForYear(int $year): void
     {
@@ -409,9 +410,9 @@ class MetricsCalculationService
 
         // Supprimer les métriques existantes pour cette année
         $this->entityManager->createQuery('
-            DELETE FROM App\Entity\Analytics\FactProjectMetrics f 
+            DELETE FROM App\Entity\Analytics\FactProjectMetrics f
             WHERE f.dimTime IN (
-                SELECT t.id FROM App\Entity\Analytics\DimTime t 
+                SELECT t.id FROM App\Entity\Analytics\DimTime t
                 WHERE t.year = :year
             )
         ')->setParameter('year', $year)->execute();

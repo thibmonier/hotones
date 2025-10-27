@@ -24,8 +24,9 @@ class OrderTask
     private ?string $description = null;
 
     // Profil requis pour cette tâche (développeur, lead developer, chef de projet, product owner)
-    #[ORM\Column(type: 'string', length: 50)]
-    private string $profile;
+    #[ORM\ManyToOne(targetEntity: Profile::class, inversedBy: 'orderTasks')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Profile $profile;
 
     // Nombre de jours vendus pour cette tâche
     #[ORM\Column(type: 'decimal', precision: 8, scale: 2)]
@@ -74,11 +75,11 @@ class OrderTask
         return $this;
     }
 
-    public function getProfile(): string
+    public function getProfile(): Profile
     {
         return $this->profile;
     }
-    public function setProfile(string $profile): self
+    public function setProfile(Profile $profile): self
     {
         $this->profile = $profile;
         return $this;

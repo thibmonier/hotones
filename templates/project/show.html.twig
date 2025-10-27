@@ -31,20 +31,26 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="text-center">
-                                <h5 class="font-size-15 mb-1">-</h5>
-                                <p class="text-muted mb-0">CA Total</p>
+                                <h5 class="font-size-15 mb-1 text-{% if metrics.total_revenue > 0 %}success{% else %}muted{% endif %}">
+                                    {{ metrics.total_revenue|number_format(0, ',', ' ') }}€
+                                </h5>
+                                <p class="text-muted mb-0">CA Signé</p>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="text-center">
-                                <h5 class="font-size-15 mb-1">-</h5>
+                                <h5 class="font-size-15 mb-1 text-{% if metrics.total_days > 0 %}info{% else %}muted{% endif %}">
+                                    {{ metrics.total_days|number_format(1, ',', ' ') }}j
+                                </h5>
                                 <p class="text-muted mb-0">Jours vendus</p>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="text-center">
-                                <h5 class="font-size-15 mb-1">{{ project.orders|length }}</h5>
-                                <p class="text-muted mb-0">Devis</p>
+                                <h5 class="font-size-15 mb-1">
+                                    {{ metrics.signed_orders_count }}/{{ metrics.orders_count }}
+                                </h5>
+                                <p class="text-muted mb-0">Devis signés</p>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -133,6 +139,49 @@
                 </div>
             </div>
             {% endif %}
+            
+            {% if metrics.total_revenue > 0 %}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Rentabilité prévisionnelle</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center mb-3">
+                                <h5 class="text-success mb-1">{{ metrics.total_revenue|number_format(0, ',', ' ') }}€</h5>
+                                <p class="text-muted mb-0">CA Signé</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center mb-3">
+                                <h5 class="text-warning mb-1">{{ metrics.total_cost|number_format(0, ',', ' ') }}€</h5>
+                                <p class="text-muted mb-0">Coût Estimé</p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h5 class="text-{% if metrics.margin_rate >= 20 %}success{% elseif metrics.margin_rate >= 10 %}warning{% else %}danger{% endif %} mb-1">
+                                    {{ metrics.total_margin|number_format(0, ',', ' ') }}€
+                                </h5>
+                                <p class="text-muted mb-0">Marge Brute</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h5 class="text-{% if metrics.margin_rate >= 20 %}success{% elseif metrics.margin_rate >= 10 %}warning{% else %}danger{% endif %} mb-1">
+                                    {{ metrics.margin_rate|number_format(1, ',', ' ') }}%
+                                </h5>
+                                <p class="text-muted mb-0">Taux de Marge</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <div class="col-lg-4">
@@ -141,7 +190,7 @@
                     <h4 class="card-title">Devis du projet</h4>
                     <div class="card-header-action">
                         {% if is_granted('ROLE_CHEF_PROJET') %}
-                            <a href="#" class="btn btn-sm btn-primary">
+                            <a href="{{ path('order_new', {'project': project.id}) }}" class="btn btn-sm btn-primary">
                                 <i class="bx bx-plus"></i> Nouveau devis
                             </a>
                         {% endif %}
@@ -151,17 +200,42 @@
                     {% for order in project.orders %}
                         <div class="border rounded p-3 mb-3">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="mb-1">{{ order.name ?? 'Devis sans nom' }}</h6>
-                                <span class="badge bg-{% if order.status == 'validated' %}success{% elseif order.status == 'in_progress' %}primary{% else %}secondary{% endif %}">
-                                    {{ order.status|title }}
+                                <h6 class="mb-1">
+                                    <a href="{{ path('order_show', {'id': order.id}) }}" class="text-decoration-none">
+                                        {{ order.orderNumber }}
+                                    </a>
+                                </h6>
+                                <span class="badge bg-{% if order.status == 'signe' or order.status == 'gagne' or order.status == 'termine' %}success{% elseif order.status == 'a_signer' %}primary{% else %}secondary{% endif %}">
+                                    {% if order.status in constant('App\\Entity\\Order::STATUS_OPTIONS') %}
+                                        {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] }}
+                                    {% else %}
+                                        {{ order.status|title }}
+                                    {% endif %}
                                 </span>
                             </div>
+                            {% if order.name %}
+                                <div class="mb-2"><small class="text-muted">{{ order.name }}</small></div>
+                            {% endif %}
                             <div class="text-muted small">
-                                <div>CA: {{ order.totalAmount|number_format(2, ',', ' ') }}€</div>
+                                {% set orderTotal = order.calculateTotalFromSections() %}
+                                <div class="d-flex justify-content-between">
+                                    <span>CA:</span>
+                                    <strong class="text-{% if orderTotal > 0 %}success{% else %}muted{% endif %}">{{ orderTotal|number_format(0, ',', ' ') }}€</strong>
+                                </div>
                                 {% if order.contingenceAmount %}
-                                    <div>Contingence: {{ order.contingenceAmount|number_format(2, ',', ' ') }}€</div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Contingence:</span>
+                                        <span class="text-warning">{{ order.contingenceAmount|number_format(2, ',', ' ') }}€</span>
+                                    </div>
                                 {% endif %}
-                                <div>Créé le {{ order.createdAt|date('d/m/Y') }}</div>
+                                <div class="d-flex justify-content-between mt-1 pt-1 border-top">
+                                    <span>Sections:</span>
+                                    <span>{{ order.sections|length }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Créé le:</span>
+                                    <span>{{ order.createdAt|date('d/m/Y') }}</span>
+                                </div>
                             </div>
                         </div>
                     {% else %}
@@ -169,7 +243,7 @@
                             <i class="bx bx-file font-size-24 mb-2"></i>
                             <p>Aucun devis pour ce projet</p>
                             {% if is_granted('ROLE_CHEF_PROJET') %}
-                                <a href="#" class="btn btn-primary btn-sm">Créer le premier devis</a>
+                                <a href="{{ path('order_new', {'project': project.id}) }}" class="btn btn-primary btn-sm">Créer le premier devis</a>
                             {% endif %}
                         </div>
                     {% endfor %}

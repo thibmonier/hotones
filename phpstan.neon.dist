@@ -1,0 +1,14 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    tmpDir: var/phpstan
+    treatPhpDocTypesAsCertain: false
+    
+    ignoreErrors:
+        # You can add specific error patterns to ignore here if needed
+    
+    excludePaths:
+        - var/
+        - vendor/
+        - migrations/

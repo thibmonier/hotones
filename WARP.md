@@ -69,6 +69,18 @@
   - Notes optionnelles
 
 ### Planification
+- **Écran Planning (nouveau)** : Vue timeline par contributeur avec drag & drop et édition in-place
+  - URL: `/planning` (menu Planification → Planning)
+  - Accès: `ROLE_CHEF_PROJET` et au-dessus
+  - Colonnes: jours consécutifs (scroll horizontal), en-tête collant; lignes: contributeurs (colonne gauche figée)
+  - Blocs: une planification par période (couleur selon statut: planned/confirmed/cancelled), taille proportionnelle au nombre de jours
+  - Actions: déplacer un bloc (drag&drop) pour changer sa date de début; clic pour éditer début/fin, heures/jour, statut, notes via modal
+  - Sécurité: endpoints protégés par CSRF et rôles; mise à jour en AJAX
+
+- **Planning** : positionnement de taches ou temps de travail du projet dans le futur : donne la projection d'utilisation du budget dans le futur (différent du temps passé qui lui est le temps réellement passé par le contributeur)
+    - Date et durée en heure (peut être positionné sur plusieurs jours, semaines, mois)
+    - Lien Contributeur ↔ Project
+    - Notes optionnelles
 - **Planning** : positionnement de taches ou temps de travail du projet dans le futur : donne la projection d'utilisation du budget dans le futur (différent du temps passé qui lui est le temps réellement passé par le contributeur)
     - Date et durée en heure (peut être positionné sur plusieurs jours, semaines, mois)
     - Lien Contributeur ↔ Project
@@ -88,7 +100,20 @@
 - **Frontend** : Twig + Bootstrap 5 (thème "Skote", les templates de références sont à la racine du répertoire "templates")
 - **Assets** : Webpack Encore + Sass
 - **Conteneurisation** : Docker Compose
-- **Bundles Symfony** : [ajouter ici l'ensemble des bundles symfony utilisés]
+- **Bundles Symfony** :
+  - symfony/framework-bundle
+  - symfony/security-bundle
+  - symfony/twig-bundle
+  - symfony/webpack-encore-bundle
+  - symfony/ux-turbo
+  - symfony/stimulus-bundle
+  - symfony/monolog-bundle
+  - doctrine/doctrine-bundle
+  - doctrine/doctrine-migrations-bundle
+  - scheb/2fa-bundle, scheb/2fa-totp
+  - endroid/qr-code-bundle
+  - symfony/web-profiler-bundle (dev)
+  - symfony/maker-bundle (dev)
 
 ### 📚 Architecture des Repositories
 
@@ -256,6 +281,11 @@ FactProjectMetrics (table de faits)
 - [x] Dashboard analytique avec métriques et graphiques
 - [x] Système de suivi KPIs avec modèle en étoile
 - [x] Gestion des périodes d'emploi (interface complète avec relation profils)
+- [x] Création automatique des tâches par défaut (AVV, Non-vendu) à la création d'un projet
+- [x] Ajout du type et du statut de projet lors de la création/édition
+- [x] Relation optionnelle Timesheet → ProjectTask (modèle)
+- [ ] Sélection de la tâche dans l'UI de saisie des temps (Timesheet)
+- [ ] Alimenter les listes des rôles projet (KAM, Chef de projet, Directeur, Commercial) dans le formulaire
 - [ ] Upload et gestion d'avatars
 - [ ] API REST pour intégrations externes
 - [ ] Rapports et exports (PDF/Excel)
@@ -264,6 +294,7 @@ FactProjectMetrics (table de faits)
 - [x] Mettre à jour project/new.html.twig avec les champs manquants
 - [ ] Tests automatisés
 - [ ] Filtres avancés dans le listing des projets
+- [ ] Générer et exécuter la migration Doctrine pour Timesheet.task
 
 ## 🔧 Installation & Usage
 
@@ -396,12 +427,13 @@ Taux de marge = (Marge / CA) × 100
 
 ### Pages principales à créer
 - Dashboard avec KPIs
-- Liste des projets avec rentabilité
+- Liste des projets avec rentabilité, cette page doit montrer le CA de vente, la marge brute vendue, la marge brute cible, la rentabilité constatée en fonction des imputations sur le projet, le commercial en charge du projet, le chef de projet 
 - Pour chaque projet une page de détail reprenant les principales informations de rentabilité du projet, la liste des temps saisis (dans une page à part), et la possibilité de modifier les informations du projet.
-- Formulaire de saisie des temps
-- Gestion des intervenants
-- Rapports et analyses
+- Formulaire de saisie des temps (en se basant sur une vue en liste et une vue en agenda par semaine de travail : du lundi au vendredi sur les heures ouvrées : 8h -> 20h)
+- Gestion des intervenants (chaque intervenant est un employé de l'agence ou un freelance intervenant pour l'agence avec un prix d'achat)
+- Rapports et analyses (dashboard montrant la performance globale en marge brute sur les chiffres consolidés des projets)
 - Administration (users, périodes)
+- un planning détaillé par intervenant montrant son staffing prévisionnel (futur)
 
 ### UX/UI
 - Design responsive Bootstrap 5
@@ -557,3 +589,8 @@ php bin/console app:generate-test-data --force
 
 ### En tant que superadministrateur (administrateur global), je peux :
 - tout faire, sans limitation de droits d'accès
+
+### En tant que commercial, je dois pouvoir :
+- créer des projets
+- créer des devis pour définir le CA du devis, l'offre auquel chaque section du devis est attachée, pour chaque section, avoir un ensemble de ligne de prix déterminées par un profil d'intervention, son TJM de vente, son CJM, le nombre de jours d'intervention, le total du coût de la ligne (TJMxnombre de jours), la valeur d'achats applicables à la ligne (en euros)
+- voir la performance commerciale des projets

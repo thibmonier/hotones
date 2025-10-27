@@ -130,27 +130,47 @@ class ProjectDetailController extends AbstractController
 
     private function calculateProjectMetrics(Project $project): array
     {
+        // Récupérer les comparaisons prévisionnel vs réel
+        $performanceComparison = $project->getPerformanceComparison();
+        
         return [
-            // Chiffres de vente - seulement désactiver ceux liés aux orders
-            'total_sold_amount' => '0.00', // Via devis - désactivé car orders problématique
-            'total_tasks_sold_amount' => $project->getTotalTasksSoldAmount(), // Via tâches - OK
+            // Chiffres de vente - Via tâches
+            'total_sold_amount' => $project->getTotalTasksSoldAmount(),
 
-            // Estimations de temps - basées sur les tâches
+            // Temps prévisionnels (basés sur les tâches)
             'total_sold_hours' => $project->getTotalTasksSoldHours(),
             'total_revised_hours' => $project->getTotalTasksRevisedHours(),
-            'total_spent_hours' => $project->getTotalTasksSpentHours(),
             'total_remaining_hours' => $project->getTotalRemainingHours(),
+            
+            // Temps réels (basés sur les timesheets)
+            'total_real_hours' => $project->getTotalRealHours(),
 
             // Conversion en jours (1j = 8h)
             'total_sold_days' => bcdiv($project->getTotalTasksSoldHours(), '8', 2),
             'total_revised_days' => bcdiv($project->getTotalTasksRevisedHours(), '8', 2),
-            'total_spent_days' => bcdiv($project->getTotalTasksSpentHours(), '8', 2),
+            'total_real_days' => bcdiv($project->getTotalRealHours(), '8', 2),
             'total_remaining_days' => bcdiv($project->getTotalRemainingHours(), '8', 2),
 
-            // Coûts et marges
+            // Coûts et marges prévisionnels
             'estimated_cost' => $project->getTotalTasksEstimatedCost(),
             'target_gross_margin' => $project->getTargetGrossMargin(),
             'target_margin_percentage' => $project->getTargetMarginPercentage(),
+            
+            // Coûts et marges réels
+            'real_cost' => $project->getTotalRealCost(),
+            'real_gross_margin' => $project->getTotalRealMargin(),
+            'real_margin_percentage' => $project->getRealMarginPercentage(),
+
+            // Comparaisons prévisionnel vs réel
+            'performance_comparison' => $performanceComparison,
+            
+            // Indicateurs de variance
+            'hours_variance' => $performanceComparison['hours_variance'],
+            'cost_variance' => $performanceComparison['cost_variance'],
+            'margin_variance' => $performanceComparison['margin_variance'],
+            'hours_variance_percent' => $performanceComparison['hours_variance_percent'],
+            'cost_variance_percent' => $performanceComparison['cost_variance_percent'],
+            'margin_variance_percent' => $performanceComparison['margin_variance_percent'],
 
             // Achats
             'purchases_amount' => $project->getPurchasesAmount() ?? '0.00',

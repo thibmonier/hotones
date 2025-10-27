@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use DateTimeInterface;
+
 class TimeConversionService
 {
     public const HOURS_PER_DAY = 8;
@@ -84,7 +86,7 @@ class TimeConversionService
     /**
      * Calcule les jours ouvrés entre deux dates
      */
-    public static function getWorkingDaysBetween(\DateTimeInterface $start, \DateTimeInterface $end): int
+    public static function getWorkingDaysBetween(DateTimeInterface $start, DateTimeInterface $end): int
     {
         $start = clone $start;
         $end = clone $end;
@@ -104,7 +106,7 @@ class TimeConversionService
     /**
      * Calcule les heures théoriques d'une période
      */
-    public static function getTheoreticalHours(\DateTimeInterface $start, \DateTimeInterface $end, float $dailyHours = self::HOURS_PER_DAY): string
+    public static function getTheoreticalHours(DateTimeInterface $start, DateTimeInterface $end, float $dailyHours = self::HOURS_PER_DAY): string
     {
         $workingDays = self::getWorkingDaysBetween($start, $end);
         return bcmul((string)$workingDays, (string)$dailyHours, 2);

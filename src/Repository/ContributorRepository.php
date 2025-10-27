@@ -103,4 +103,61 @@ class ContributorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Récupère les projets où un contributeur a des tâches assignées
+     */
+    public function findProjectsWithAssignedTasks(Contributor $contributor): array
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('DISTINCT p')
+            ->from('App\Entity\Project', 'p')
+            ->innerJoin('p.tasks', 't')
+            ->where('t.assignedContributor = :contributor')
+            ->andWhere('p.status != :archived')
+            ->andWhere('t.active = :active')
+            ->setParameter('contributor', $contributor)
+            ->setParameter('archived', 'archived')
+            ->setParameter('active', true)
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupère les projets avec leurs tâches assignées pour un contributeur
+     */
+    public function findProjectsWithTasksForContributor(Contributor $contributor): array
+    {
+        // Récupérer les projets
+        $projects = $this->findProjectsWithAssignedTasks($contributor);
+        
+        // Pour chaque projet, récupérer les tâches assignées au contributeur
+        $result = [];
+        foreach ($projects as $project) {
+            $assignedTasks = $this->getEntityManager()
+                ->createQueryBuilder()
+                ->select('t')
+                ->from('App\Entity\ProjectTask', 't')
+                ->where('t.project = :project')
+                ->andWhere('t.assignedContributor = :contributor')
+                ->andWhere('t.active = :active')
+                ->setParameter('project', $project)
+                ->setParameter('contributor', $contributor)
+                ->setParameter('active', true)
+                ->orderBy('t.position', 'ASC')
+                ->getQuery()
+                ->getResult();
+                
+            if (!empty($assignedTasks)) {
+                $result[] = [
+                    'project' => $project,
+                    'tasks' => $assignedTasks
+                ];
+            }
+        }
+        
+        return $result;
+    }
 }

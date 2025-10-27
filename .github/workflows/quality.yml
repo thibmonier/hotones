@@ -1,0 +1,34 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer
+          extensions: mbstring, intl, pdo_mysql
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: PHP-CS-Fixer (dry-run)
+        run: composer phpcsfixer
+
+      - name: PHPStan
+        run: composer phpstan
+
+      - name: PHPMD
+        run: composer phpmd

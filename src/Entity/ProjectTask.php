@@ -176,13 +176,21 @@ class ProjectTask
     }
 
     /**
-     * Calcule le total des heures passées sur cette tâche
-     * Pour l'instant, retourne 0 car les temps ne sont pas liés aux tâches spécifiques
+     * Calcule le total des heures passées sur cette tâche via les timesheets
      */
     public function getTotalHours(): string
     {
-        // TODO: Implémenter le lien timesheet->task dans une version future
-        return '0.00';
+        // Récupérer tous les timesheets liés à cette tâche
+        $totalHours = '0.00';
+        
+        // Les timesheets sont liés au projet, on filtre ceux qui ont cette tâche
+        foreach ($this->project->getTimesheets() as $timesheet) {
+            if ($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId()) {
+                $totalHours = bcadd($totalHours, $timesheet->getHours(), 2);
+            }
+        }
+        
+        return $totalHours;
     }
 
     /**
@@ -381,6 +389,61 @@ class ProjectTask
         }
         $hourlyRate = bcdiv($cjm, '8', 4);
         return bcmul((string)$this->estimatedHoursRevised, $hourlyRate, 2);
+    }
+
+    /**
+     * Calcule le coût réel pour cette tâche basé sur les temps passés
+     */
+    public function getRealCost(): string
+    {
+        $totalCost = '0.00';
+        $realHours = $this->getTotalHours();
+        
+        if (bccomp($realHours, '0', 2) <= 0) {
+            return $totalCost;
+        }
+        
+        // Calculer le coût basé sur les timesheets et les CJM des contributeurs
+        foreach ($this->project->getTimesheets() as $timesheet) {
+            if ($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId()) {
+                $contributor = $timesheet->getContributor();
+                $cjm = $contributor->getCjm();
+                
+                if ($cjm) {
+                    $hourlyRate = bcdiv($cjm, '8', 4); // CJM / 8h
+                    $timeCost = bcmul($timesheet->getHours(), $hourlyRate, 2);
+                    $totalCost = bcadd($totalCost, $timeCost, 2);
+                }
+            }
+        }
+        
+        return $totalCost;
+    }
+
+    /**
+     * Calcule la marge réelle de la tâche (CA vendu - coût réel)
+     */
+    public function getRealMargin(): string
+    {
+        $soldAmount = $this->getSoldAmount();
+        $realCost = $this->getRealCost();
+        
+        return bcsub($soldAmount, $realCost, 2);
+    }
+
+    /**
+     * Calcule le taux de marge réel
+     */
+    public function getRealMarginRate(): string
+    {
+        $soldAmount = $this->getSoldAmount();
+        
+        if (bccomp($soldAmount, '0', 2) <= 0) {
+            return '0.00';
+        }
+        
+        $realMargin = $this->getRealMargin();
+        return bcmul(bcdiv($realMargin, $soldAmount, 4), '100', 2);
     }
 
     /**

@@ -133,6 +133,38 @@ class TimesheetRepository extends ServiceEntityRepository
             'date' => $date
         ]);
     }
+    
+    /**
+     * Trouve un timesheet existant avec tâche spécifique pour éviter les doublons
+     */
+    public function findExistingTimesheetWithTask(Contributor $contributor, Project $project, \DateTimeInterface $date, ?\App\Entity\ProjectTask $task = null): ?Timesheet
+    {
+        $criteria = [
+            'contributor' => $contributor,
+            'project' => $project,
+            'date' => $date
+        ];
+        
+        // Si une tâche est spécifiée, l'ajouter aux critères
+        if ($task) {
+            $criteria['task'] = $task;
+        } else {
+            // Si pas de tâche spécifiée, chercher les timesheets sans tâche
+            return $this->createQueryBuilder('t')
+                ->where('t.contributor = :contributor')
+                ->andWhere('t.project = :project')
+                ->andWhere('t.date = :date')
+                ->andWhere('t.task IS NULL')
+                ->setParameter('contributor', $contributor)
+                ->setParameter('project', $project)
+                ->setParameter('date', $date)
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+        }
+        
+        return $this->findOneBy($criteria);
+    }
 
     /**
      * Récupère les statistiques de temps par contributeur pour une période

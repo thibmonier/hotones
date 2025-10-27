@@ -34,27 +34,28 @@ class TimesheetController extends AbstractController
         $contributorRepo = $em->getRepository(Contributor::class);
         $timesheetRepo = $em->getRepository(Timesheet::class);
 
-        // Récupérer les projets actifs via repository
-        $projects = $projectRepo->findActiveOrderedByName();
-
         // Récupérer les temps de la semaine pour l'utilisateur connecté via repository
         $contributor = $contributorRepo->findByUser($this->getUser());
         $timesheets = [];
+        $projectsWithTasks = [];
 
         if ($contributor) {
+            // Récupérer les projets avec tâches assignées au contributeur
+            $projectsWithTasks = $contributorRepo->findProjectsWithTasksForContributor($contributor);
             $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
         }
 
-        // Organiser les temps par projet et date
+        // Organiser les temps par projet, tâche et date
         $timesheetGrid = [];
         foreach ($timesheets as $timesheet) {
             $projectId = $timesheet->getProject()->getId();
+            $taskId = $timesheet->getTask() ? $timesheet->getTask()->getId() : 'no_task';
             $date = $timesheet->getDate()->format('Y-m-d');
-            $timesheetGrid[$projectId][$date] = $timesheet;
+            $timesheetGrid[$projectId][$taskId][$date] = $timesheet;
         }
 
         return $this->render('timesheet/index.html.twig', [
-            'projects' => $projects,
+            'projectsWithTasks' => $projectsWithTasks,
             'contributor' => $contributor,
             'timesheetGrid' => $timesheetGrid,
             'startDate' => $startDate,
@@ -77,6 +78,7 @@ class TimesheetController extends AbstractController
         }
 
         $projectId = $request->request->get('project_id');
+        $taskId = $request->request->get('task_id');
         $date = new \DateTime($request->request->get('date'));
         $hours = (float)$request->request->get('hours');
         $notes = $request->request->get('notes', '');
@@ -85,15 +87,30 @@ class TimesheetController extends AbstractController
         if (!$project) {
             return new JsonResponse(['error' => 'Projet non trouvé'], 400);
         }
+        
+        $task = null;
+        if ($taskId) {
+            $task = $em->getRepository(\App\Entity\ProjectTask::class)->find($taskId);
+            if (!$task) {
+                return new JsonResponse(['error' => 'Tâche non trouvée'], 400);
+            }
+            // Vérifier que la tâche appartient au projet
+            if ($task->getProject()->getId() !== $project->getId()) {
+                return new JsonResponse(['error' => 'La tâche ne correspond pas au projet'], 400);
+            }
+        }
 
-        // Chercher un timesheet existant via repository
-        $timesheet = $timesheetRepo->findExistingTimesheet($contributor, $project, $date);
+        // Chercher un timesheet existant via repository (avec tâche si spécifiée)
+        $timesheet = $timesheetRepo->findExistingTimesheetWithTask($contributor, $project, $date, $task);
 
         if (!$timesheet) {
             $timesheet = new Timesheet();
             $timesheet->setContributor($contributor);
             $timesheet->setProject($project);
             $timesheet->setDate($date);
+            if ($task) {
+                $timesheet->setTask($task);
+            }
         }
 
         if ($hours > 0) {

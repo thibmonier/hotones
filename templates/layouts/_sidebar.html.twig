@@ -57,6 +57,16 @@
                 </li>
                 {% endif %}
 
+                {% if is_granted('ROLE_CHEF_PROJET') %}
+                <li class="menu-title">Planification</li>
+                <li>
+                    <a href="{{ path('planning_index') }}" class="waves-effect">
+                        <i class="bx bx-calendar"></i>
+                        <span>Planning</span>
+                    </a>
+                </li>
+                {% endif %}
+
                 <li class="menu-title">Suivi des temps</li>
 
                 <li>

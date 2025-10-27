@@ -50,7 +50,7 @@ class DimContributor
     public function setUser(?User $user): self
     {
         $this->user = $user;
-        if ($user && !$this->name) {
+        if ($user && (!isset($this->name) || $this->name === '')) {
             $this->name = $user->getFullName() ?? $user->getEmail();
         }
         $this->updateCompositeKey();

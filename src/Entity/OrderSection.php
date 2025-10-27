@@ -129,4 +129,67 @@ class OrderSection
         }
         return $total;
     }
+
+    // Méthodes alias pour compatibilité
+    public function getName(): string
+    {
+        return $this->getTitle();
+    }
+
+    public function setName(string $name): self
+    {
+        return $this->setTitle($name);
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->getPosition();
+    }
+
+    public function setSortOrder(int $sortOrder): self
+    {
+        return $this->setPosition($sortOrder);
+    }
+
+    /**
+     * Calcule la marge brute totale de la section
+     */
+    public function getTotalGrossMargin(): string
+    {
+        $total = '0';
+        foreach ($this->lines as $line) {
+            $total = bcadd($total, $line->getGrossMargin(), 2);
+        }
+        return $total;
+    }
+
+    /**
+     * Calcule le coût estimé total de la section
+     */
+    public function getTotalEstimatedCost(): string
+    {
+        $total = '0';
+        foreach ($this->lines as $line) {
+            $total = bcadd($total, $line->getEstimatedCost(), 2);
+        }
+        return $total;
+    }
+
+    /**
+     * Calcule le taux de marge moyen de la section
+     */
+    public function getMarginRate(): string
+    {
+        $totalRevenue = '0';
+        foreach ($this->lines as $line) {
+            $totalRevenue = bcadd($totalRevenue, $line->getServiceAmount(), 2);
+        }
+        
+        if (bccomp($totalRevenue, '0', 2) <= 0) {
+            return '0';
+        }
+
+        $totalMargin = $this->getTotalGrossMargin();
+        return bcmul(bcdiv($totalMargin, $totalRevenue, 4), '100', 2);
+    }
 }

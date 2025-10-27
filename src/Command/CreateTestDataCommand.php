@@ -12,6 +12,7 @@ use App\Entity\ProjectTask;
 use App\Entity\ServiceCategory;
 use App\Entity\Technology;
 use App\Entity\Timesheet;
+use App\Entity\Planning;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -27,8 +28,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class CreateTestDataCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private UserPasswordHasherInterface $passwordHasher
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserPasswordHasherInterface $passwordHasher
     ) {
         parent::__construct();
     }
@@ -59,22 +60,16 @@ class CreateTestDataCommand extends Command
             $projects = $this->createProjects($io, $users, $categories, $technologies);
 
             // 7. Créer des tâches de projet
-            $this->createProjectTasks($io, $projects, $contributors, $profiles);
+            $this->createProjectTasks($io, $projects, $contributors);
 
             // 8. Créer des feuilles de temps
             $this->createTimesheets($io, $projects, $contributors);
 
-            try {
-                $this->entityManager->flush();
-                $io->success('Données de test créées avec succès !');
-            } catch (\Exception $flushError) {
-                $io->warning('Erreur lors du flush final : ' . $flushError->getMessage());
-                $io->note('Tentative de sauvegarde partielle...');
+            // 9. Créer du planning prévisionnel
+            $this->createPlannings($io, $projects, $contributors);
 
-                // Essayer de sauvegarder par blocs
-                $this->entityManager->clear();
-                return Command::SUCCESS;
-            }
+            $this->entityManager->flush();
+            $io->success('Données de test créées avec succès !');
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
@@ -96,13 +91,19 @@ class CreateTestDataCommand extends Command
         ];
 
         $profiles = [];
+        $repo = $this->entityManager->getRepository(Profile::class);
         foreach ($profilesData as $data) {
-            $profile = new Profile();
-            $profile->setName($data['name']);
-            $profile->setDescription($data['description']);
-            $this->entityManager->persist($profile);
+            $profile = $repo->findOneBy(['name' => $data['name']]);
+            if (!$profile) {
+                $profile = new Profile();
+                $profile->setName($data['name']);
+                $profile->setDescription($data['description']);
+                $this->entityManager->persist($profile);
+                $io->writeln("✓ Profil créé : {$data['name']}");
+            } else {
+                $io->writeln("• Profil existant : {$data['name']}");
+            }
             $profiles[] = $profile;
-            $io->writeln("✓ Profil créé : {$data['name']}");
         }
 
         return $profiles;
@@ -120,16 +121,23 @@ class CreateTestDataCommand extends Command
         ];
 
         $users = [];
+        $repo = $this->entityManager->getRepository(User::class);
         foreach ($usersData as $data) {
-            $user = new User();
-            $user->setEmail($data['email']);
+            $user = $repo->findOneBy(['email' => $data['email']]);
+            if (!$user) {
+                $user = new User();
+                $user->setEmail($data['email']);
+                $io->writeln("✓ Utilisateur créé : {$data['firstName']} {$data['lastName']} ({$data['email']})");
+            } else {
+                $io->writeln("• Utilisateur existant : {$data['email']}");
+            }
             $user->setFirstName($data['firstName']);
             $user->setLastName($data['lastName']);
             $user->setRoles($data['roles']);
+            // reset test password
             $user->setPassword($this->passwordHasher->hashPassword($user, 'test123'));
             $this->entityManager->persist($user);
             $users[] = $user;
-            $io->writeln("✓ Utilisateur créé : {$user->getFullName()} ({$data['email']})");
         }
 
         return $users;
@@ -148,20 +156,28 @@ class CreateTestDataCommand extends Command
         ];
 
         $contributors = [];
+        $repo = $this->entityManager->getRepository(Contributor::class);
         foreach ($contributorsData as $data) {
-            $contributor = new Contributor();
-            $contributor->setName($data['name']);
+            $contributor = $repo->findOneBy(['name' => $data['name']]);
+            if (!$contributor) {
+                $contributor = new Contributor();
+                $contributor->setName($data['name']);
+                $io->writeln("✓ Contributeur créé : {$data['name']}");
+            } else {
+                $io->writeln("• Contributeur existant : {$data['name']}");
+            }
             $contributor->setCjm($data['cjm']);
             $contributor->setActive($data['active']);
 
             // Ajouter le profil
             if (isset($profiles[$data['profile']])) {
-                $contributor->addProfile($profiles[$data['profile']]);
+                if (!$contributor->getProfiles()->contains($profiles[$data['profile']])) {
+                    $contributor->addProfile($profiles[$data['profile']]);
+                }
             }
 
             $this->entityManager->persist($contributor);
             $contributors[] = $contributor;
-            $io->writeln("✓ Contributeur créé : {$data['name']}");
         }
 
         return $contributors;
@@ -179,13 +195,19 @@ class CreateTestDataCommand extends Command
         ];
 
         $categories = [];
+        $repo = $this->entityManager->getRepository(ServiceCategory::class);
         foreach ($categoriesData as $data) {
-            $category = new ServiceCategory();
-            $category->setName($data['name']);
+            $category = $repo->findOneBy(['name' => $data['name']]);
+            if (!$category) {
+                $category = new ServiceCategory();
+                $category->setName($data['name']);
+                $io->writeln("✓ Catégorie créée : {$data['name']}");
+            } else {
+                $io->writeln("• Catégorie existante : {$data['name']}");
+            }
             $category->setDescription($data['description']);
             $this->entityManager->persist($category);
             $categories[] = $category;
-            $io->writeln("✓ Catégorie créée : {$data['name']}");
         }
 
         return $categories;
@@ -201,12 +223,40 @@ class CreateTestDataCommand extends Command
         ];
 
         $technologies = [];
+        $repo = $this->entityManager->getRepository(Technology::class);
+        $categoriesByTech = [
+            'Symfony' => ['framework', '#6f42c1'],
+            'Laravel' => ['framework', '#ff2d20'],
+            'React' => ['framework', '#61dafb'],
+            'Vue.js' => ['framework', '#42b883'],
+            'Angular' => ['framework', '#dd0031'],
+            'Node.js' => ['runtime', '#3c873a'],
+            'Python' => ['language', '#3776ab'],
+            'Docker' => ['infra', '#2496ed'],
+            'AWS' => ['hosting', '#ff9900'],
+            'MySQL' => ['database', '#00758f'],
+            'PostgreSQL' => ['database', '#336791'],
+            'Redis' => ['cache', '#dc382d'],
+        ];
+
         foreach ($technologiesData as $name) {
-            $technology = new Technology();
-            $technology->setName($name);
+            $technology = $repo->findOneBy(['name' => $name]);
+            if (!$technology) {
+                $technology = new Technology();
+                $technology->setName($name);
+                $io->writeln("✓ Technologie créée : $name");
+            } else {
+                $io->writeln("• Technologie existante : $name");
+            }
+            // Set required fields
+            $category = $categoriesByTech[$name][0] ?? 'tool';
+            $color = $categoriesByTech[$name][1] ?? null;
+            $technology->setCategory($category);
+            $technology->setColor($color);
+            $technology->setActive(true);
+
             $this->entityManager->persist($technology);
             $technologies[] = $technology;
-            $io->writeln("✓ Technologie créée : {$name}");
         }
 
         return $technologies;
@@ -264,9 +314,16 @@ class CreateTestDataCommand extends Command
         ];
 
         $projects = [];
+        $repo = $this->entityManager->getRepository(Project::class);
         foreach ($projectsData as $data) {
-            $project = new Project();
-            $project->setName($data['name']);
+            $project = $repo->findOneBy(['name' => $data['name']]);
+            if (!$project) {
+                $project = new Project();
+                $project->setName($data['name']);
+                $io->writeln("✓ Projet créé : {$data['name']}");
+            } else {
+                $io->writeln("• Projet existant : {$data['name']}");
+            }
             $project->setClient($data['client']);
             $project->setDescription($data['description']);
             $project->setProjectType($data['type']);
@@ -274,16 +331,18 @@ class CreateTestDataCommand extends Command
             $project->setStartDate(new \DateTime($data['startDate']));
             $project->setEndDate(new \DateTime($data['endDate']));
 
-            // Assigner des rôles aléatoirement
-            $project->setProjectManager($users[0]); // Alice Martin
-            $project->setKeyAccountManager($users[1]); // Bob Durand
-            $project->setProjectDirector($users[2]); // Claire Moreau
+            // Assigner des rôles
+            $project->setProjectManager($users[0]);
+            $project->setKeyAccountManager($users[1]);
+            $project->setProjectDirector($users[2]);
 
             // Assigner catégorie et technologies
             if (isset($categories[$data['categoryIndex']])) {
                 $project->setServiceCategory($categories[$data['categoryIndex']]);
             }
 
+            // reset techs
+            foreach ($project->getTechnologies() as $t) { $project->removeTechnology($t); }
             foreach ($data['techIndices'] as $index) {
                 if (isset($technologies[$index])) {
                     $project->addTechnology($technologies[$index]);
@@ -292,13 +351,12 @@ class CreateTestDataCommand extends Command
 
             $this->entityManager->persist($project);
             $projects[] = $project;
-            $io->writeln("✓ Projet créé : {$data['name']}");
         }
 
         return $projects;
     }
 
-    private function createProjectTasks(SymfonyStyle $io, array $projects, array $contributors, array $profiles): void
+    private function createProjectTasks(SymfonyStyle $io, array $projects, array $contributors): void
     {
         $io->section('Création des tâches de projet');
 
@@ -320,17 +378,24 @@ class CreateTestDataCommand extends Command
             }
         }
 
-        foreach ($projects as $projectIndex => $project) {
+        foreach ($projects as $project) {
             $position = 1;
 
             // Prendre un sous-ensemble de tâches selon le projet
             $numTasks = min(6, count($taskTemplates));
             $selectedTasks = array_slice($taskTemplates, 0, $numTasks);
 
+            $taskRepo = $this->entityManager->getRepository(ProjectTask::class);
             foreach ($selectedTasks as $taskData) {
-                $task = new ProjectTask();
-                $task->setProject($project);
-                $task->setName($taskData['name']);
+                $task = $taskRepo->findOneBy(['project' => $project, 'name' => $taskData['name']]);
+                if (!$task) {
+                    $task = new ProjectTask();
+                    $task->setProject($project);
+                    $task->setName($taskData['name']);
+                    $io->writeln("  ✓ Tâche créée : {$project->getName()} -> {$taskData['name']}");
+                } else {
+                    $io->writeln("  • Tâche existante : {$project->getName()} -> {$taskData['name']}");
+                }
                 $task->setType($taskData['type']);
                 $task->setEstimatedHoursSold($taskData['hours_sold']);
                 $task->setEstimatedHoursRevised($taskData['hours_revised']);
@@ -347,10 +412,9 @@ class CreateTestDataCommand extends Command
                 }
 
                 // Tarif journalier aléatoire
-                $task->setDailyRate((string)(400 + rand(0, 200)) . '.00');
+                $task->setDailyRate(400 + rand(0, 200). '.00');
 
                 $this->entityManager->persist($task);
-                $io->writeln("  ✓ Tâche créée : {$project->getName()} -> {$taskData['name']}");
             }
         }
     }
@@ -418,6 +482,52 @@ class CreateTestDataCommand extends Command
             }
         }
 
-        $io->writeln("✓ {$timesheetsCreated} feuilles de temps créées");
+        $io->writeln("✓ $timesheetsCreated feuilles de temps créées");
+    }
+    private function createPlannings(SymfonyStyle $io, array $projects, array $contributors): void
+    {
+        $io->section('Création des plannings prévisionnels');
+
+        $startWindow = new \DateTime('monday this week');
+        $endWindow = (clone $startWindow)->modify('+8 weeks');
+
+        $planningCreated = 0;
+
+        foreach ($contributors as $contributor) {
+            // Chaque contributeur: 1 à 3 projets planifiés
+            $num = rand(1, 3);
+            $selectedProjects = array_rand($projects, min($num, count($projects)));
+            if (!is_array($selectedProjects)) { $selectedProjects = [$selectedProjects]; }
+
+            foreach ($selectedProjects as $idx) {
+                $project = $projects[$idx];
+
+                // Générer 1 à 2 blocs de planification de 2-10 jours ouvrés
+                $blocks = rand(1, 2);
+                $cursor = (clone $startWindow)->modify('+' . rand(0, 14) . ' days');
+                for ($b = 0; $b < $blocks; $b++) {
+                    $days = rand(3, 10);
+                    $start = clone $cursor;
+                    $end = (clone $start)->modify('+' . max(0, $days - 1) . ' days');
+
+                    $planning = new Planning();
+                    $planning->setContributor($contributor);
+                    $planning->setProject($project);
+                    $planning->setStartDate($start);
+                    $planning->setEndDate($end);
+                    $planning->setDailyHours((string)(rand(6, 8)));
+                    $planning->setStatus(rand(0,1) ? 'planned' : 'confirmed');
+                    $planning->setNotes('Bloc prévisionnel');
+
+                    $this->entityManager->persist($planning);
+                    $planningCreated++;
+
+                    // avancer le curseur de 1 à 3 jours après ce bloc
+                    $cursor = (clone $end)->modify('+' . rand(1, 3) . ' days');
+                }
+            }
+        }
+
+        $io->writeln("✓ $planningCreated blocs de planning créés");
     }
 }

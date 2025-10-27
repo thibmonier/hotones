@@ -69,7 +69,7 @@ class OrderController extends AbstractController
 
             // Contingence
             $contingency = $request->request->get('contingency_percentage');
-            $order->setContingencyPercentage($contingency !== '' ? (float)$contingency : null);
+            $order->setContingencyPercentage($contingency !== '' ? (string)$contingency : null);
 
             if ($request->request->get('valid_until')) {
                 $order->setValidUntil(new \DateTime($request->request->get('valid_until')));
@@ -141,7 +141,7 @@ class OrderController extends AbstractController
 
             // Contingence
             $contingency = $request->request->get('contingency_percentage');
-            $order->setContingencyPercentage($contingency !== '' ? (float)$contingency : null);
+            $order->setContingencyPercentage($contingency !== '' ? (string)$contingency : null);
 
             if ($request->request->get('valid_until')) {
                 $order->setValidUntil(new \DateTime($request->request->get('valid_until')));
@@ -165,10 +165,16 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}/sections', name: 'order_sections', methods: ['GET'])]
-    public function sections(Order $order): Response
+    public function sections(Order $order, EntityManagerInterface $em): Response
     {
+        $profiles = $em->getRepository(Profile::class)->findBy(
+            ['active' => true], 
+            ['name' => 'ASC']
+        );
+        
         return $this->render('order/sections.html.twig', [
             'order' => $order,
+            'profiles' => $profiles,
         ]);
     }
 
@@ -212,20 +218,35 @@ class OrderController extends AbstractController
         }
 
         $tjm = $request->request->get('tjm');
-        $line->setTjm($tjm !== '' ? (float)$tjm : null);
+        $line->setTjm($tjm !== '' ? (string)$tjm : null);
 
         $days = $request->request->get('days');
-        $line->setDays($days !== '' ? (float)$days : 0);
+        $line->setDays($days !== '' ? (string)$days : '0');
 
         $purchaseAmount = $request->request->get('purchase_amount');
-        $line->setPurchaseAmount($purchaseAmount !== '' ? (float)$purchaseAmount : null);
+        $line->setPurchaseAmount($purchaseAmount !== '' ? (string)$purchaseAmount : null);
 
         $line->setSortOrder($section->getLines()->count() + 1);
 
         $em->persist($line);
+        
+        // Recalculer le total du devis
+        $this->updateOrderTotals($order, $em);
+        
         $em->flush();
 
-        $this->addFlash('success', 'Ligne ajoutée avec succès');
+        // Ajouter des informations sur la marge dans le message flash
+        $marginInfo = '';
+        if ($line->getProfile() && $line->getDays()) {
+            $margin = $line->getGrossMargin();
+            $marginRate = $line->getMarginRate();
+            $marginInfo = sprintf(' (Marge: %s€ - %s%%)', 
+                number_format(floatval($margin), 0, ',', ' '),
+                number_format(floatval($marginRate), 1, ',', ' ')
+            );
+        }
+        
+        $this->addFlash('success', 'Ligne ajoutée avec succès' . $marginInfo);
         return $this->redirectToRoute('order_sections', ['id' => $orderId]);
     }
 
@@ -286,6 +307,18 @@ class OrderController extends AbstractController
         return $this->redirectToRoute('order_index');
     }
 
+    #[Route('/api/profile/{id}', name: 'api_profile_info', methods: ['GET'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function getProfileInfo(Profile $profile): Response
+    {
+        return $this->json([
+            'id' => $profile->getId(),
+            'name' => $profile->getName(),
+            'defaultDailyRate' => $profile->getDefaultDailyRate(),
+            'color' => $profile->getColor(),
+        ]);
+    }
+
     private function generateOrderNumber(EntityManagerInterface $em): string
     {
         $year = date('Y');
@@ -302,5 +335,19 @@ class OrderController extends AbstractController
         }
 
         return sprintf('D%s%s%03d', $year, $month, $increment);
+    }
+
+    /**
+     * Met à jour automatiquement le montant total du devis
+     */
+    private function updateOrderTotals(Order $order, EntityManagerInterface $em): void
+    {
+        $totalAmount = '0';
+        
+        foreach ($order->getSections() as $section) {
+            $totalAmount = bcadd($totalAmount, $section->getTotalAmount(), 2);
+        }
+        
+        $order->setTotalAmount($totalAmount);
     }
 }

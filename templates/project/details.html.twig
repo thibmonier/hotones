@@ -119,19 +119,42 @@
             <div class="metric-card revenue">
                 <h6>Chiffre d'Affaires</h6>
                 <h4>{{ metrics.total_sold_amount|number_format(0, ',', ' ') }}€</h4>
-                <small>Devis validés</small>
+                <small>Tâches vendues</small>
             </div>
 
             <div class="metric-card time">
                 <h6>Temps Projet</h6>
-                <h4>{{ metrics.total_spent_days|number_format(1) }}j / {{ metrics.total_revised_days|number_format(1) }}j</h4>
-                <small>Passé / Estimé</small>
+                <h4>{{ metrics.total_real_days|number_format(1) }}j / {{ metrics.total_revised_days|number_format(1) }}j</h4>
+                <small>Réel / Prévisionnel</small>
+                {% if metrics.hours_variance_percent != '0.00' %}
+                    <div class="mt-1">
+                        <small class="badge bg-{% if metrics.hours_variance_percent|number_format(1) > 0 %}danger{% else %}success{% endif %}">
+                            {{ metrics.hours_variance_percent > 0 ? '+' : '' }}{{ metrics.hours_variance_percent|number_format(1) }}%
+                        </small>
+                    </div>
+                {% endif %}
             </div>
 
             <div class="metric-card margin">
-                <h6>Marge Cible</h6>
-                <h4>{{ metrics.target_margin_percentage }}%</h4>
-                <small>{{ metrics.target_gross_margin|number_format(0, ',', ' ') }}€</small>
+                <h6>Marge Réelle vs Cible</h6>
+                <h4 class="d-flex justify-content-between">
+                    <span class="text-{% if metrics.real_margin_percentage >= metrics.target_margin_percentage %}success{% else %}warning{% endif %}">
+                        {{ metrics.real_margin_percentage|number_format(1) }}%
+                    </span>
+                    <span class="text-muted" style="font-size: 0.8em;">
+                        {{ metrics.target_margin_percentage|number_format(1) }}%
+                    </span>
+                </h4>
+                <small>
+                    {{ metrics.real_gross_margin|number_format(0, ',', ' ') }}€ / {{ metrics.target_gross_margin|number_format(0, ',', ' ') }}€
+                </small>
+                {% if metrics.margin_variance_percent != '0.00' %}
+                    <div class="mt-1">
+                        <small class="badge bg-{% if metrics.margin_variance_percent|number_format(1) > 0 %}success{% else %}danger{% endif %}">
+                            {{ metrics.margin_variance_percent > 0 ? '+' : '' }}{{ metrics.margin_variance_percent|number_format(1) }}%
+                        </small>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -214,7 +237,9 @@
                                     <th>Statut</th>
                                     <th>Temps vendu</th>
                                     <th>Temps révisé</th>
-                                    <th>Temps passé</th>
+                                    <th>Temps réel</th>
+                                    <th>Coût réel</th>
+                                    <th>Marge réelle</th>
                                     <th>Avancement</th>
                                     <th>Actions</th>
                                 </tr>
@@ -256,9 +281,32 @@
                                     </td>
                                     <td>
                                         {% if task.totalHours is defined %}
-                                            {{ (task.totalHours / 8)|number_format(1) }}j
+                                            <span class="text-{% if task.totalHours > 0 %}info{% else %}muted{% endif %}">
+                                                {{ (task.totalHours / 8)|number_format(1) }}j
+                                            </span>
                                         {% else %}
-                                            0j
+                                            <span class="text-muted">0j</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.countsForProfitability and task.totalHours > 0 %}
+                                            <span class="text-{% if task.realCost <= task.estimatedCost %}success{% else %}danger{% endif %}">
+                                                {{ task.realCost|number_format(0, ',', ' ') }}€
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.countsForProfitability and task.totalHours > 0 %}
+                                            <div class="d-flex flex-column align-items-end">
+                                                <span class="text-{% if task.realMarginRate >= 20 %}success{% elseif task.realMarginRate >= 10 %}warning{% else %}danger{% endif %}">
+                                                    {{ task.realMargin|number_format(0, ',', ' ') }}€
+                                                </span>
+                                                <small class="text-muted">{{ task.realMarginRate|number_format(1) }}%</small>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -331,7 +379,7 @@
                         </tr>
                         <tr>
                             <td><strong>CA tâches vendues</strong></td>
-                            <td class="text-end">{{ metrics.total_tasks_sold_amount|number_format(0, ',', ' ') }}€</td>
+                            <td class="text-end">{{ metrics.total_sold_amount|number_format(0, ',', ' ') }}€</td>
                         </tr>
                         <tr>
                             <td><strong>Coût estimé</strong></td>
@@ -373,9 +421,9 @@
                             <td class="text-end">{{ metrics.total_revised_days|number_format(1) }}j</td>
                         </tr>
                         <tr>
-                            <td><strong>Jours passés</strong></td>
-                            <td class="text-end">{{ metrics.total_spent_days|number_format(1) }}j</td>
-                        </tr>
+                                    <td><strong>Jours passés (réel)</strong></td>
+                                    <td class="text-end">{{ metrics.total_real_days|number_format(1) }}j</td>
+                                </tr>
                         <tr class="table-warning">
                             <td><strong>Jours restants</strong></td>
                             <td class="text-end"><strong>{{ metrics.total_remaining_days|number_format(1) }}j</strong></td>
@@ -393,6 +441,122 @@
             </div>
         </div>
     </div>
+    
+    <!-- Comparaison Prévisionnel vs Réel -->
+    {% if metrics.total_real_hours > 0 %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-compare"></i>
+                        Analyse de Performance : Prévisionnel vs Réel
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Temps</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Prévisionnel:</span>
+                                        <strong>{{ metrics.total_revised_days|number_format(1) }}j</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Réel:</span>
+                                        <strong class="text-{% if metrics.total_real_days <= metrics.total_revised_days %}success{% else %}danger{% endif %}">
+                                            {{ metrics.total_real_days|number_format(1) }}j
+                                        </strong>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Écart:</span>
+                                        <strong class="text-{% if metrics.hours_variance_percent|number_format(1) <= 0 %}success{% else %}danger{% endif %}">
+                                            {{ metrics.hours_variance > 0 ? '+' : '' }}{{ metrics.hours_variance|number_format(1) }}j
+                                            ({{ metrics.hours_variance_percent > 0 ? '+' : '' }}{{ metrics.hours_variance_percent|number_format(1) }}%)
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Coût</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Prévisionnel:</span>
+                                        <strong>{{ metrics.estimated_cost|number_format(0, ',', ' ') }}€</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Réel:</span>
+                                        <strong class="text-{% if metrics.real_cost <= metrics.estimated_cost %}success{% else %}danger{% endif %}">
+                                            {{ metrics.real_cost|number_format(0, ',', ' ') }}€
+                                        </strong>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Écart:</span>
+                                        <strong class="text-{% if metrics.cost_variance_percent|number_format(1) <= 0 %}success{% else %}danger{% endif %}">
+                                            {{ metrics.cost_variance > 0 ? '+' : '' }}{{ metrics.cost_variance|number_format(0, ',', ' ') }}€
+                                            ({{ metrics.cost_variance_percent > 0 ? '+' : '' }}{{ metrics.cost_variance_percent|number_format(1) }}%)
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Marge</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Prévisionnel:</span>
+                                        <strong>{{ metrics.target_gross_margin|number_format(0, ',', ' ') }}€</strong>
+                                        <small>({{ metrics.target_margin_percentage|number_format(1) }}%)</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Réel:</span>
+                                        <strong class="text-{% if metrics.real_margin_percentage >= metrics.target_margin_percentage %}success{% else %}danger{% endif %}">
+                                            {{ metrics.real_gross_margin|number_format(0, ',', ' ') }}€
+                                        </strong>
+                                        <small>({{ metrics.real_margin_percentage|number_format(1) }}%)</small>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Écart:</span>
+                                        <strong class="text-{% if metrics.margin_variance_percent|number_format(1) >= 0 %}success{% else %}danger{% endif %}">
+                                            {{ metrics.margin_variance > 0 ? '+' : '' }}{{ metrics.margin_variance|number_format(0, ',', ' ') }}€
+                                            ({{ metrics.margin_variance_percent > 0 ? '+' : '' }}{{ metrics.margin_variance_percent|number_format(1) }}%)
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Résumé de la performance -->
+                    <div class="mt-4">
+                        <div class="alert alert-{% if metrics.margin_variance_percent|number_format(1) >= 0 and metrics.hours_variance_percent|number_format(1) <= 10 %}success{% elseif metrics.margin_variance_percent|number_format(1) >= -10 %}warning{% else %}danger{% endif %}" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="mdi mdi-information"></i>
+                                Évaluation de la performance
+                            </h6>
+                            <p class="mb-0">
+                                {% if metrics.margin_variance_percent|number_format(1) >= 0 and metrics.hours_variance_percent|number_format(1) <= 10 %}
+                                    <strong>Excellente performance !</strong> Le projet respecte les prévisions de temps et de rentabilité.
+                                {% elseif metrics.margin_variance_percent|number_format(1) >= -10 %}
+                                    <strong>Performance acceptable.</strong> Leégers écarts par rapport aux prévisions, à surveiller.
+                                {% else %}
+                                    <strong>Performance dégradée.</strong> Écarts importants par rapport aux prévisions, action corrective recommandée.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Graphiques -->
     {% if taskProgressData.labels|length > 0 %}
