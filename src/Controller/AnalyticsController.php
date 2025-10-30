@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Analytics\FactProjectMetrics;
-use App\Entity\Analytics\DimTime;
-use App\Entity\Analytics\DimProjectType;
 use App\Entity\Analytics\DimContributor;
+use App\Entity\Analytics\DimProjectType;
+use App\Entity\Analytics\FactProjectMetrics;
 use App\Service\Analytics\MetricsCalculationService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -31,13 +31,13 @@ class AnalyticsController extends AbstractController
     public function dashboard(Request $request): Response
     {
         $granularity = $request->query->get('granularity', 'monthly');
-        $year = (int) $request->query->get('year', date('Y'));
-        $month = $request->query->get('month') ? (int) $request->query->get('month') : null;
+        $year        = (int) $request->query->get('year', date('Y'));
+        $month       = $request->query->get('month') ? (int) $request->query->get('month') : null;
 
         // Filtres optionnels
-        $projectType = $request->query->get('project_type') ?: null;
+        $projectType    = $request->query->get('project_type') ?: null;
         $projectManager = $request->query->get('project_manager') ? (int) $request->query->get('project_manager') : null;
-        $salesPerson = $request->query->get('sales_person') ? (int) $request->query->get('sales_person') : null;
+        $salesPerson    = $request->query->get('sales_person') ? (int) $request->query->get('sales_person') : null;
 
         // Récupérer les métriques selon les filtres
         $metrics = $this->getMetrics($granularity, $year, $month, $projectType, $projectManager, $salesPerson);
@@ -52,16 +52,16 @@ class AnalyticsController extends AbstractController
         $filterData = $this->getFilterData();
 
         return $this->render('analytics/dashboard.html.twig', [
-            'kpis' => $kpis,
+            'kpis'      => $kpis,
             'chartData' => $chartData,
-            'metrics' => $metrics,
-            'filters' => [
-                'granularity' => $granularity,
-                'year' => $year,
-                'month' => $month,
-                'project_type' => $projectType,
+            'metrics'   => $metrics,
+            'filters'   => [
+                'granularity'     => $granularity,
+                'year'            => $year,
+                'month'           => $month,
+                'project_type'    => $projectType,
                 'project_manager' => $projectManager,
-                'sales_person' => $salesPerson,
+                'sales_person'    => $salesPerson,
             ],
             'filterData' => $filterData,
         ]);
@@ -71,21 +71,21 @@ class AnalyticsController extends AbstractController
     public function getData(Request $request): JsonResponse
     {
         $granularity = $request->query->get('granularity', 'monthly');
-        $year = (int) $request->query->get('year', date('Y'));
-        $month = $request->query->get('month') ? (int) $request->query->get('month') : null;
+        $year        = (int) $request->query->get('year', date('Y'));
+        $month       = $request->query->get('month') ? (int) $request->query->get('month') : null;
 
-        $projectType = $request->query->get('project_type') ?: null;
+        $projectType    = $request->query->get('project_type') ?: null;
         $projectManager = $request->query->get('project_manager') ? (int) $request->query->get('project_manager') : null;
-        $salesPerson = $request->query->get('sales_person') ? (int) $request->query->get('sales_person') : null;
+        $salesPerson    = $request->query->get('sales_person') ? (int) $request->query->get('sales_person') : null;
 
-        $metrics = $this->getMetrics($granularity, $year, $month, $projectType, $projectManager, $salesPerson);
-        $kpis = $this->calculateKPIs($metrics);
+        $metrics   = $this->getMetrics($granularity, $year, $month, $projectType, $projectManager, $salesPerson);
+        $kpis      = $this->calculateKPIs($metrics);
         $chartData = $this->prepareChartData($metrics, $granularity);
 
         return new JsonResponse([
-            'kpis' => $kpis,
+            'kpis'      => $kpis,
             'chartData' => $chartData,
-            'success' => true
+            'success'   => true,
         ]);
     }
 
@@ -95,8 +95,9 @@ class AnalyticsController extends AbstractController
     {
         try {
             $this->metricsService->recalculateMetricsForYear($year);
+
             return new JsonResponse(['success' => true, 'message' => 'Métriques recalculées avec succès']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -143,29 +144,29 @@ class AnalyticsController extends AbstractController
     private function calculateKPIs(array $metrics): array
     {
         $totals = [
-            'totalRevenue' => '0.00',
-            'totalCosts' => '0.00',
-            'grossMargin' => '0.00',
-            'marginPercentage' => '0.00',
-            'pendingRevenue' => '0.00',
-            'projectCount' => 0,
-            'activeProjectCount' => 0,
+            'totalRevenue'          => '0.00',
+            'totalCosts'            => '0.00',
+            'grossMargin'           => '0.00',
+            'marginPercentage'      => '0.00',
+            'pendingRevenue'        => '0.00',
+            'projectCount'          => 0,
+            'activeProjectCount'    => 0,
             'completedProjectCount' => 0,
-            'pendingOrderCount' => 0,
-            'wonOrderCount' => 0,
-            'averageOrderValue' => '0.00',
-            'utilizationRate' => '0.00',
+            'pendingOrderCount'     => 0,
+            'wonOrderCount'         => 0,
+            'averageOrderValue'     => '0.00',
+            'utilizationRate'       => '0.00',
         ];
 
         foreach ($metrics as $metric) {
-            $totals['totalRevenue'] = bcadd($totals['totalRevenue'], $metric->getTotalRevenue(), 2);
-            $totals['totalCosts'] = bcadd($totals['totalCosts'], $metric->getTotalCosts(), 2);
+            $totals['totalRevenue']   = bcadd($totals['totalRevenue'], $metric->getTotalRevenue(), 2);
+            $totals['totalCosts']     = bcadd($totals['totalCosts'], $metric->getTotalCosts(), 2);
             $totals['pendingRevenue'] = bcadd($totals['pendingRevenue'], $metric->getPendingRevenue(), 2);
-            $totals['projectCount'] += $metric->getProjectCount();
-            $totals['activeProjectCount'] += $metric->getActiveProjectCount();
+            $totals['projectCount']          += $metric->getProjectCount();
+            $totals['activeProjectCount']    += $metric->getActiveProjectCount();
             $totals['completedProjectCount'] += $metric->getCompletedProjectCount();
-            $totals['pendingOrderCount'] += $metric->getPendingOrderCount();
-            $totals['wonOrderCount'] += $metric->getWonOrderCount();
+            $totals['pendingOrderCount']     += $metric->getPendingOrderCount();
+            $totals['wonOrderCount']         += $metric->getWonOrderCount();
         }
 
         // Calcul de la marge globale
@@ -175,14 +176,14 @@ class AnalyticsController extends AbstractController
             $totals['marginPercentage'] = bcmul(
                 bcdiv($totals['grossMargin'], $totals['totalRevenue'], 4),
                 '100',
-                2
+                2,
             );
         }
 
         // Calcul de la valeur moyenne des devis
         $totalOrders = $totals['pendingOrderCount'] + $totals['wonOrderCount'];
         if ($totalOrders > 0) {
-            $totalOrderValue = bcadd($totals['totalRevenue'], $totals['pendingRevenue'], 2);
+            $totalOrderValue             = bcadd($totals['totalRevenue'], $totals['pendingRevenue'], 2);
             $totals['averageOrderValue'] = bcdiv($totalOrderValue, (string) $totalOrders, 2);
         }
 
@@ -191,31 +192,31 @@ class AnalyticsController extends AbstractController
 
     private function prepareChartData(array $metrics, string $granularity): array
     {
-        $revenueData = [];
-        $marginData = [];
+        $revenueData      = [];
+        $marginData       = [];
         $projectCountData = [];
-        $labels = [];
+        $labels           = [];
 
         foreach ($metrics as $metric) {
             $dimTime = $metric->getDimTime();
 
             $label = match ($granularity) {
-                'monthly' => $dimTime->getMonthName(),
+                'monthly'   => $dimTime->getMonthName(),
                 'quarterly' => $dimTime->getQuarterName(),
-                'yearly' => (string) $dimTime->getYear(),
-                default => $dimTime->getMonthName()
+                'yearly'    => (string) $dimTime->getYear(),
+                default     => $dimTime->getMonthName()
             };
 
-            $labels[] = $label;
-            $revenueData[] = (float) $metric->getTotalRevenue();
-            $marginData[] = (float) $metric->getMarginPercentage();
+            $labels[]           = $label;
+            $revenueData[]      = (float) $metric->getTotalRevenue();
+            $marginData[]       = (float) $metric->getMarginPercentage();
             $projectCountData[] = $metric->getProjectCount();
         }
 
         return [
-            'labels' => $labels,
-            'revenue' => $revenueData,
-            'margin' => $marginData,
+            'labels'       => $labels,
+            'revenue'      => $revenueData,
+            'margin'       => $marginData,
             'projectCount' => $projectCountData,
         ];
     }
@@ -246,9 +247,9 @@ class AnalyticsController extends AbstractController
             ->getResult();
 
         return [
-            'projectTypes' => array_column($projectTypes, 'projectType'),
+            'projectTypes'    => array_column($projectTypes, 'projectType'),
             'projectManagers' => $projectManagers,
-            'salesPersons' => $salesPersons,
+            'salesPersons'    => $salesPersons,
         ];
     }
 }

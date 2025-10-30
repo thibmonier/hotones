@@ -12,29 +12,29 @@ use Doctrine\ORM\Mapping as ORM;
  * Permet l'analyse par chef de projet, commercial, directeur de projet, etc.
  */
 #[ORM\Entity]
-#[ORM\Table(name: "dim_contributor")]
+#[ORM\Table(name: 'dim_contributor')]
 class DimContributor
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
-    #[ORM\Column(name: "name_value", type: "string", length: 180)]
+    #[ORM\Column(name: 'name_value', type: 'string', length: 180)]
     private string $name;
 
-    #[ORM\Column(name: "role_value", type: "string", length: 50)]
+    #[ORM\Column(name: 'role_value', type: 'string', length: 50)]
     private string $role; // key_account_manager, project_manager, project_director, sales_person
 
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column(type: 'boolean')]
     private bool $isActive = true;
 
     // Clé composite pour éviter les doublons
-    #[ORM\Column(type: "string", length: 250, unique: true)]
+    #[ORM\Column(type: 'string', length: 250, unique: true)]
     private string $compositeKey;
 
     public function getId(): ?int
@@ -54,6 +54,7 @@ class DimContributor
             $this->name = $user->getFullName() ?? $user->getEmail();
         }
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -66,6 +67,7 @@ class DimContributor
     {
         $this->name = $name;
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -78,6 +80,7 @@ class DimContributor
     {
         $this->role = $role;
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -90,6 +93,7 @@ class DimContributor
     {
         $this->isActive = $isActive;
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -100,14 +104,14 @@ class DimContributor
 
     private function updateCompositeKey(): void
     {
-        $userId = $this->user ? $this->user->getId() : 'null';
-        $name = $this->name ?? 'unknown';
+        $userId             = $this->user ? $this->user->getId() : 'null';
+        $name               = $this->name ?? 'unknown';
         $this->compositeKey = sprintf(
             '%s_%s_%s_%s',
             $userId,
             $this->role ?? 'null',
             $this->isActive ? 'active' : 'inactive',
-            md5($name) // Ajout d'un hash du nom pour l'unicité
+            md5($name), // Ajout d'un hash du nom pour l'unicité
         );
     }
 
@@ -115,15 +119,15 @@ class DimContributor
     {
         return match ($this->role) {
             'key_account_manager' => 'Key Account Manager',
-            'project_manager' => 'Chef de Projet',
-            'project_director' => 'Directeur de Projet',
-            'sales_person' => 'Commercial',
-            default => ucfirst(str_replace('_', ' ', $this->role))
+            'project_manager'     => 'Chef de Projet',
+            'project_director'    => 'Directeur de Projet',
+            'sales_person'        => 'Commercial',
+            default               => ucfirst(str_replace('_', ' ', $this->role))
         };
     }
 
     public function getDisplayName(): string
     {
-        return $this->name . ' (' . $this->getRoleDisplayName() . ')';
+        return $this->name.' ('.$this->getRoleDisplayName().')';
     }
 }

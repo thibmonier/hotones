@@ -3,9 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ProjectRepository;
-use Doctrine\ORM\Mapping as ORM;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: 'projects')]
@@ -33,10 +34,10 @@ class Project
     private ?string $purchasesDescription = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $startDate = null;
+    private ?DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $endDate = null;
+    private ?DateTimeInterface $endDate = null;
 
     #[ORM\Column(type: 'string', length: 20)]
     private string $status = 'active'; // active, completed, cancelled
@@ -91,10 +92,10 @@ class Project
 
     public function __construct()
     {
-        $this->orders = new ArrayCollection();
+        $this->orders       = new ArrayCollection();
         $this->technologies = new ArrayCollection();
-        $this->tasks = new ArrayCollection();
-        $this->timesheets = new ArrayCollection();
+        $this->tasks        = new ArrayCollection();
+        $this->timesheets   = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -106,9 +107,11 @@ class Project
     {
         return $this->name;
     }
+
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -116,9 +119,11 @@ class Project
     {
         return $this->client;
     }
+
     public function setClient(?string $client): self
     {
         $this->client = $client;
+
         return $this;
     }
 
@@ -126,9 +131,11 @@ class Project
     {
         return $this->description;
     }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -136,9 +143,11 @@ class Project
     {
         return $this->purchasesAmount;
     }
+
     public function setPurchasesAmount(?string $purchasesAmount): self
     {
         $this->purchasesAmount = $purchasesAmount;
+
         return $this;
     }
 
@@ -146,29 +155,35 @@ class Project
     {
         return $this->purchasesDescription;
     }
+
     public function setPurchasesDescription(?string $purchasesDescription): self
     {
         $this->purchasesDescription = $purchasesDescription;
+
         return $this;
     }
 
-    public function getStartDate(): ?\DateTimeInterface
+    public function getStartDate(): ?DateTimeInterface
     {
         return $this->startDate;
     }
-    public function setStartDate(?\DateTimeInterface $startDate): self
+
+    public function setStartDate(?DateTimeInterface $startDate): self
     {
         $this->startDate = $startDate;
+
         return $this;
     }
 
-    public function getEndDate(): ?\DateTimeInterface
+    public function getEndDate(): ?DateTimeInterface
     {
         return $this->endDate;
     }
-    public function setEndDate(?\DateTimeInterface $endDate): self
+
+    public function setEndDate(?DateTimeInterface $endDate): self
     {
         $this->endDate = $endDate;
+
         return $this;
     }
 
@@ -176,9 +191,11 @@ class Project
     {
         return $this->status;
     }
+
     public function setStatus(string $status): self
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -186,9 +203,11 @@ class Project
     {
         return $this->isInternal;
     }
+
     public function setIsInternal(bool $isInternal): self
     {
         $this->isInternal = $isInternal;
+
         return $this;
     }
 
@@ -196,9 +215,11 @@ class Project
     {
         return $this->projectType;
     }
+
     public function setProjectType(string $projectType): self
     {
         $this->projectType = $projectType;
+
         return $this;
     }
 
@@ -206,9 +227,11 @@ class Project
     {
         return $this->keyAccountManager;
     }
+
     public function setKeyAccountManager(?User $keyAccountManager): self
     {
         $this->keyAccountManager = $keyAccountManager;
+
         return $this;
     }
 
@@ -216,9 +239,11 @@ class Project
     {
         return $this->projectManager;
     }
+
     public function setProjectManager(?User $projectManager): self
     {
         $this->projectManager = $projectManager;
+
         return $this;
     }
 
@@ -226,9 +251,11 @@ class Project
     {
         return $this->projectDirector;
     }
+
     public function setProjectDirector(?User $projectDirector): self
     {
         $this->projectDirector = $projectDirector;
+
         return $this;
     }
 
@@ -236,9 +263,11 @@ class Project
     {
         return $this->salesPerson;
     }
+
     public function setSalesPerson(?User $salesPerson): self
     {
         $this->salesPerson = $salesPerson;
+
         return $this;
     }
 
@@ -246,14 +275,17 @@ class Project
     {
         return $this->orders;
     }
+
     public function addOrder(Order $order): self
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
             $order->setProject($this);
         }
+
         return $this;
     }
+
     public function removeOrder(Order $order): self
     {
         if ($this->orders->removeElement($order)) {
@@ -261,6 +293,7 @@ class Project
                 $order->setProject(null);
             }
         }
+
         return $this;
     }
 
@@ -268,16 +301,20 @@ class Project
     {
         return $this->technologies;
     }
+
     public function addTechnology(Technology $technology): self
     {
         if (!$this->technologies->contains($technology)) {
             $this->technologies[] = $technology;
         }
+
         return $this;
     }
+
     public function removeTechnology(Technology $technology): self
     {
         $this->technologies->removeElement($technology);
+
         return $this;
     }
 
@@ -285,9 +322,11 @@ class Project
     {
         return $this->serviceCategory;
     }
+
     public function setServiceCategory(?ServiceCategory $serviceCategory): self
     {
         $this->serviceCategory = $serviceCategory;
+
         return $this;
     }
 
@@ -296,14 +335,17 @@ class Project
     {
         return $this->tasks;
     }
+
     public function addTask(ProjectTask $task): self
     {
         if (!$this->tasks->contains($task)) {
             $this->tasks[] = $task;
             $task->setProject($this);
         }
+
         return $this;
     }
+
     public function removeTask(ProjectTask $task): self
     {
         if ($this->tasks->removeElement($task)) {
@@ -311,6 +353,7 @@ class Project
                 $task->setProject(null);
             }
         }
+
         return $this;
     }
 
@@ -321,6 +364,7 @@ class Project
         foreach ($this->orders as $order) {
             $total = bcadd($total, $order->getTotalAmount(), 2);
         }
+
         return $total;
     }
 
@@ -332,13 +376,14 @@ class Project
                 $total = bcadd($total, $task->getSoldDays(), 2);
             }
         }
+
         return $total;
     }
 
     // === Métriques basées sur les tâches ===
 
     /**
-     * Calcule le total des heures vendues sur les tâches
+     * Calcule le total des heures vendues sur les tâches.
      */
     public function getTotalTasksSoldHours(): string
     {
@@ -348,11 +393,12 @@ class Project
                 $total = bcadd($total, $task->getEstimatedHoursSold(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule le total des heures estimées révisées
+     * Calcule le total des heures estimées révisées.
      */
     public function getTotalTasksRevisedHours(): string
     {
@@ -363,11 +409,12 @@ class Project
                 $total = bcadd($total, $hours, 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule le total des heures passées sur les tâches
+     * Calcule le total des heures passées sur les tâches.
      */
     public function getTotalTasksSpentHours(): string
     {
@@ -377,11 +424,12 @@ class Project
                 $total = bcadd($total, $task->getTotalHours(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule le total des heures restantes à passer
+     * Calcule le total des heures restantes à passer.
      */
     public function getTotalRemainingHours(): string
     {
@@ -391,11 +439,12 @@ class Project
                 $total = bcadd($total, $task->getRemainingHours(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule le montant total vendu via les tâches
+     * Calcule le montant total vendu via les tâches.
      */
     public function getTotalTasksSoldAmount(): string
     {
@@ -405,11 +454,12 @@ class Project
                 $total = bcadd($total, $task->getSoldAmount(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule le coût estimé total des tâches
+     * Calcule le coût estimé total des tâches.
      */
     public function getTotalTasksEstimatedCost(): string
     {
@@ -419,21 +469,23 @@ class Project
                 $total = bcadd($total, $task->getEstimatedCost(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule la marge brute cible (basée sur les tâches vendues)
+     * Calcule la marge brute cible (basée sur les tâches vendues).
      */
     public function getTargetGrossMargin(): string
     {
-        $soldAmount = $this->getTotalTasksSoldAmount();
+        $soldAmount    = $this->getTotalTasksSoldAmount();
         $estimatedCost = $this->getTotalTasksEstimatedCost();
+
         return bcsub($soldAmount, $estimatedCost, 2);
     }
 
     /**
-     * Calcule le pourcentage de marge cible
+     * Calcule le pourcentage de marge cible.
      */
     public function getTargetMarginPercentage(): string
     {
@@ -442,11 +494,12 @@ class Project
             return '0.00';
         }
         $margin = $this->getTargetGrossMargin();
+
         return bcmul(bcdiv($margin, $soldAmount, 4), '100', 2);
     }
 
     /**
-     * Retourne les intervenants du projet avec leurs heures
+     * Retourne les intervenants du projet avec leurs heures.
      */
     public function getProjectContributorsWithHours(): array
     {
@@ -455,36 +508,36 @@ class Project
         // Récupérer les contributeurs des tâches
         foreach ($this->tasks as $task) {
             if ($task->getAssignedContributor() && $task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $contributor = $task->getAssignedContributor();
+                $contributor   = $task->getAssignedContributor();
                 $contributorId = $contributor->getId();
 
                 if (!isset($contributors[$contributorId])) {
                     $contributors[$contributorId] = [
-                        'contributor' => $contributor,
-                        'spent_hours' => '0',
+                        'contributor'     => $contributor,
+                        'spent_hours'     => '0',
                         'remaining_hours' => '0',
                         'estimated_hours' => '0',
-                        'tasks' => []
+                        'tasks'           => [],
                     ];
                 }
 
                 $contributors[$contributorId]['spent_hours'] = bcadd(
                     $contributors[$contributorId]['spent_hours'],
                     $task->getTotalHours(),
-                    2
+                    2,
                 );
 
                 $contributors[$contributorId]['remaining_hours'] = bcadd(
                     $contributors[$contributorId]['remaining_hours'],
                     $task->getRemainingHours(),
-                    2
+                    2,
                 );
 
-                $estimatedHours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
+                $estimatedHours                                  = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
                 $contributors[$contributorId]['estimated_hours'] = bcadd(
                     $contributors[$contributorId]['estimated_hours'],
                     $estimatedHours,
-                    2
+                    2,
                 );
 
                 $contributors[$contributorId]['tasks'][] = $task;
@@ -495,7 +548,7 @@ class Project
     }
 
     /**
-     * Calcule le pourcentage d'avancement global du projet
+     * Calcule le pourcentage d'avancement global du projet.
      */
     public function getGlobalProgress(): string
     {
@@ -503,16 +556,16 @@ class Project
             return '0.00';
         }
 
-        $totalWeight = '0';
+        $totalWeight      = '0';
         $weightedProgress = '0';
 
         foreach ($this->tasks as $task) {
             if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $hours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '1';
-                $weight = $hours;
+                $hours    = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '1';
+                $weight   = $hours;
                 $progress = $task->getProgressPercentage();
 
-                $totalWeight = bcadd($totalWeight, $weight, 2);
+                $totalWeight      = bcadd($totalWeight, $weight, 2);
                 $weightedProgress = bcadd($weightedProgress, bcmul($weight, $progress, 4), 2);
             }
         }
@@ -525,7 +578,7 @@ class Project
     }
 
     /**
-     * Calcule le total des heures réellement passées sur le projet
+     * Calcule le total des heures réellement passées sur le projet.
      */
     public function getTotalRealHours(): string
     {
@@ -535,11 +588,12 @@ class Project
                 $total = bcadd($total, $task->getTotalHours(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule le coût réel total du projet
+     * Calcule le coût réel total du projet.
      */
     public function getTotalRealCost(): string
     {
@@ -549,74 +603,76 @@ class Project
                 $total = bcadd($total, $task->getRealCost(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Calcule la marge réelle totale du projet
+     * Calcule la marge réelle totale du projet.
      */
     public function getTotalRealMargin(): string
     {
         $soldAmount = $this->getTotalTasksSoldAmount();
-        $realCost = $this->getTotalRealCost();
-        
+        $realCost   = $this->getTotalRealCost();
+
         return bcsub($soldAmount, $realCost, 2);
     }
 
     /**
-     * Calcule le taux de marge réel du projet
+     * Calcule le taux de marge réel du projet.
      */
     public function getRealMarginPercentage(): string
     {
         $soldAmount = $this->getTotalTasksSoldAmount();
-        
+
         if (bccomp($soldAmount, '0', 2) <= 0) {
             return '0.00';
         }
-        
+
         $realMargin = $this->getTotalRealMargin();
+
         return bcmul(bcdiv($realMargin, $soldAmount, 4), '100', 2);
     }
 
     /**
-     * Compare les performances prévisionnelles vs réelles
+     * Compare les performances prévisionnelles vs réelles.
      */
     public function getPerformanceComparison(): array
     {
-        $targetHours = $this->getTotalTasksRevisedHours();
-        $realHours = $this->getTotalRealHours();
-        $targetCost = $this->getTotalTasksEstimatedCost();
-        $realCost = $this->getTotalRealCost();
+        $targetHours  = $this->getTotalTasksRevisedHours();
+        $realHours    = $this->getTotalRealHours();
+        $targetCost   = $this->getTotalTasksEstimatedCost();
+        $realCost     = $this->getTotalRealCost();
         $targetMargin = $this->getTargetGrossMargin();
-        $realMargin = $this->getTotalRealMargin();
-        
+        $realMargin   = $this->getTotalRealMargin();
+
         // Calcul des écarts
-        $hoursVariance = bcsub($realHours, $targetHours, 2);
-        $costVariance = bcsub($realCost, $targetCost, 2);
+        $hoursVariance  = bcsub($realHours, $targetHours, 2);
+        $costVariance   = bcsub($realCost, $targetCost, 2);
         $marginVariance = bcsub($realMargin, $targetMargin, 2);
-        
+
         // Calcul des pourcentages d'écart
-        $hoursVariancePercent = bccomp($targetHours, '0', 2) > 0 ? 
+        $hoursVariancePercent = bccomp($targetHours, '0', 2) > 0 ?
             bcmul(bcdiv($hoursVariance, $targetHours, 4), '100', 2) : '0.00';
-        $costVariancePercent = bccomp($targetCost, '0', 2) > 0 ? 
+        $costVariancePercent = bccomp($targetCost, '0', 2) > 0 ?
             bcmul(bcdiv($costVariance, $targetCost, 4), '100', 2) : '0.00';
-        $marginVariancePercent = bccomp($targetMargin, '0', 2) > 0 ? 
+        $marginVariancePercent = bccomp($targetMargin, '0', 2) > 0 ?
             bcmul(bcdiv($marginVariance, $targetMargin, 4), '100', 2) : '0.00';
-        
+
         return [
-            'target_hours' => $targetHours,
-            'real_hours' => $realHours,
-            'hours_variance' => $hoursVariance,
+            'target_hours'           => $targetHours,
+            'real_hours'             => $realHours,
+            'hours_variance'         => $hoursVariance,
             'hours_variance_percent' => $hoursVariancePercent,
-            
-            'target_cost' => $targetCost,
-            'real_cost' => $realCost,
-            'cost_variance' => $costVariance,
+
+            'target_cost'           => $targetCost,
+            'real_cost'             => $realCost,
+            'cost_variance'         => $costVariance,
             'cost_variance_percent' => $costVariancePercent,
-            
-            'target_margin' => $targetMargin,
-            'real_margin' => $realMargin,
-            'margin_variance' => $marginVariance,
+
+            'target_margin'           => $targetMargin,
+            'real_margin'             => $realMargin,
+            'margin_variance'         => $marginVariance,
             'margin_variance_percent' => $marginVariancePercent,
         ];
     }
@@ -633,6 +689,7 @@ class Project
             $this->timesheets[] = $timesheet;
             $timesheet->setProject($this);
         }
+
         return $this;
     }
 
@@ -643,6 +700,7 @@ class Project
                 $timesheet->setProject(null);
             }
         }
+
         return $this;
     }
 }

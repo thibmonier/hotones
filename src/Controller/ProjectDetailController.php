@@ -6,10 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Entity\ProjectTask;
-use App\Entity\Contributor;
-use App\Entity\Profile;
 use App\Form\ProjectTaskType;
-use App\Repository\ProjectTaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,15 +37,15 @@ class ProjectDetailController extends AbstractController
         $metrics = $this->calculateProjectMetrics($project);
 
         // Récupérer les données pour les graphiques
-        $taskProgressData = $this->getTaskProgressData($tasks);
+        $taskProgressData     = $this->getTaskProgressData($tasks);
         $contributorHoursData = $this->getContributorHoursData($projectContributors);
 
         return $this->render('project/details.html.twig', [
-            'project' => $project,
-            'tasks' => $tasks,
-            'projectContributors' => $projectContributors,
-            'metrics' => $metrics,
-            'taskProgressData' => $taskProgressData,
+            'project'              => $project,
+            'tasks'                => $tasks,
+            'projectContributors'  => $projectContributors,
+            'metrics'              => $metrics,
+            'taskProgressData'     => $taskProgressData,
             'contributorHoursData' => $contributorHoursData,
         ]);
     }
@@ -77,13 +74,14 @@ class ProjectDetailController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', sprintf('La tâche « %s » a été créée avec succès.', $task->getName()));
+
             return $this->redirectToRoute('project_details', ['id' => $project->getId()]);
         }
 
         return $this->render('project_task/new.html.twig', [
             'project' => $project,
-            'task' => $task,
-            'form' => $form->createView(),
+            'task'    => $task,
+            'form'    => $form->createView(),
         ]);
     }
 
@@ -98,13 +96,14 @@ class ProjectDetailController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', sprintf('La tâche « %s » a été modifiée avec succès.', $task->getName()));
+
             return $this->redirectToRoute('project_details', ['id' => $task->getProject()->getId()]);
         }
 
         return $this->render('project_task/edit.html.twig', [
             'project' => $task->getProject(),
-            'task' => $task,
-            'form' => $form->createView(),
+            'task'    => $task,
+            'form'    => $form->createView(),
         ]);
     }
 
@@ -115,7 +114,7 @@ class ProjectDetailController extends AbstractController
         $project = $task->getProject();
 
         // Vérification du token CSRF pour la sécurité
-        if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
             $taskName = $task->getName();
             $this->entityManager->remove($task);
             $this->entityManager->flush();
@@ -132,102 +131,102 @@ class ProjectDetailController extends AbstractController
     {
         // Récupérer les comparaisons prévisionnel vs réel
         $performanceComparison = $project->getPerformanceComparison();
-        
+
         return [
             // Chiffres de vente - Via tâches
             'total_sold_amount' => $project->getTotalTasksSoldAmount(),
 
             // Temps prévisionnels (basés sur les tâches)
-            'total_sold_hours' => $project->getTotalTasksSoldHours(),
-            'total_revised_hours' => $project->getTotalTasksRevisedHours(),
+            'total_sold_hours'      => $project->getTotalTasksSoldHours(),
+            'total_revised_hours'   => $project->getTotalTasksRevisedHours(),
             'total_remaining_hours' => $project->getTotalRemainingHours(),
-            
+
             // Temps réels (basés sur les timesheets)
             'total_real_hours' => $project->getTotalRealHours(),
 
             // Conversion en jours (1j = 8h)
-            'total_sold_days' => bcdiv($project->getTotalTasksSoldHours(), '8', 2),
-            'total_revised_days' => bcdiv($project->getTotalTasksRevisedHours(), '8', 2),
-            'total_real_days' => bcdiv($project->getTotalRealHours(), '8', 2),
+            'total_sold_days'      => bcdiv($project->getTotalTasksSoldHours(), '8', 2),
+            'total_revised_days'   => bcdiv($project->getTotalTasksRevisedHours(), '8', 2),
+            'total_real_days'      => bcdiv($project->getTotalRealHours(), '8', 2),
             'total_remaining_days' => bcdiv($project->getTotalRemainingHours(), '8', 2),
 
             // Coûts et marges prévisionnels
-            'estimated_cost' => $project->getTotalTasksEstimatedCost(),
-            'target_gross_margin' => $project->getTargetGrossMargin(),
+            'estimated_cost'           => $project->getTotalTasksEstimatedCost(),
+            'target_gross_margin'      => $project->getTargetGrossMargin(),
             'target_margin_percentage' => $project->getTargetMarginPercentage(),
-            
+
             // Coûts et marges réels
-            'real_cost' => $project->getTotalRealCost(),
-            'real_gross_margin' => $project->getTotalRealMargin(),
+            'real_cost'              => $project->getTotalRealCost(),
+            'real_gross_margin'      => $project->getTotalRealMargin(),
             'real_margin_percentage' => $project->getRealMarginPercentage(),
 
             // Comparaisons prévisionnel vs réel
             'performance_comparison' => $performanceComparison,
-            
+
             // Indicateurs de variance
-            'hours_variance' => $performanceComparison['hours_variance'],
-            'cost_variance' => $performanceComparison['cost_variance'],
-            'margin_variance' => $performanceComparison['margin_variance'],
-            'hours_variance_percent' => $performanceComparison['hours_variance_percent'],
-            'cost_variance_percent' => $performanceComparison['cost_variance_percent'],
+            'hours_variance'          => $performanceComparison['hours_variance'],
+            'cost_variance'           => $performanceComparison['cost_variance'],
+            'margin_variance'         => $performanceComparison['margin_variance'],
+            'hours_variance_percent'  => $performanceComparison['hours_variance_percent'],
+            'cost_variance_percent'   => $performanceComparison['cost_variance_percent'],
             'margin_variance_percent' => $performanceComparison['margin_variance_percent'],
 
             // Achats
-            'purchases_amount' => $project->getPurchasesAmount() ?? '0.00',
+            'purchases_amount'      => $project->getPurchasesAmount() ?? '0.00',
             'purchases_description' => $project->getPurchasesDescription(),
 
             // Avancement
             'global_progress' => $project->getGlobalProgress(),
 
             // Nombres - seulement les tâches qui comptent pour la rentabilité
-            'total_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasks($project),
-            'completed_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'completed'),
+            'total_tasks'       => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasks($project),
+            'completed_tasks'   => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'completed'),
             'in_progress_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'in_progress'),
         ];
     }
 
     private function getTaskProgressData(array $tasks): array
     {
-        $labels = [];
-        $progressData = [];
-        $spentHours = [];
+        $labels         = [];
+        $progressData   = [];
+        $spentHours     = [];
         $remainingHours = [];
 
         foreach ($tasks as $task) {
             if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $labels[] = substr($task->getName(), 0, 20) . (strlen($task->getName()) > 20 ? '...' : '');
-                $progressData[] = (float) $task->getProgressPercentage();
-                $spentHours[] = (float) $task->getTotalHours();
+                $labels[]         = substr($task->getName(), 0, 20).(strlen($task->getName()) > 20 ? '...' : '');
+                $progressData[]   = (float) $task->getProgressPercentage();
+                $spentHours[]     = (float) $task->getTotalHours();
                 $remainingHours[] = (float) $task->getRemainingHours();
             }
         }
 
         return [
-            'labels' => $labels,
-            'progress' => $progressData,
-            'spentHours' => $spentHours,
+            'labels'         => $labels,
+            'progress'       => $progressData,
+            'spentHours'     => $spentHours,
             'remainingHours' => $remainingHours,
         ];
     }
 
     private function getContributorHoursData(array $contributors): array
     {
-        $labels = [];
-        $spentHours = [];
+        $labels         = [];
+        $spentHours     = [];
         $remainingHours = [];
         $estimatedHours = [];
 
         foreach ($contributors as $contributorData) {
-            $contributor = $contributorData['contributor'];
-            $labels[] = $contributor->getName();
-            $spentHours[] = (float) $contributorData['spent_hours'];
+            $contributor      = $contributorData['contributor'];
+            $labels[]         = $contributor->getName();
+            $spentHours[]     = (float) $contributorData['spent_hours'];
             $remainingHours[] = (float) $contributorData['remaining_hours'];
             $estimatedHours[] = (float) $contributorData['estimated_hours'];
         }
 
         return [
-            'labels' => $labels,
-            'spentHours' => $spentHours,
+            'labels'         => $labels,
+            'spentHours'     => $spentHours,
             'remainingHours' => $remainingHours,
             'estimatedHours' => $estimatedHours,
         ];

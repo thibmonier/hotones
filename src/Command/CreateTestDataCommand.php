@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\User;
 use App\Entity\Contributor;
+use App\Entity\Planning;
 use App\Entity\Profile;
 use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\ServiceCategory;
 use App\Entity\Technology;
 use App\Entity\Timesheet;
-use App\Entity\Planning;
+use App\Entity\User;
+use DateInterval;
+use DatePeriod;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,7 +27,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
     name: 'app:create-test-data',
-    description: 'Crée des données de test pour les projets, tâches et contributeurs'
+    description: 'Crée des données de test pour les projets, tâches et contributeurs',
 )]
 class CreateTestDataCommand extends Command
 {
@@ -72,8 +76,9 @@ class CreateTestDataCommand extends Command
             $io->success('Données de test créées avec succès !');
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
-            $io->error('Erreur lors de la création des données : ' . $e->getMessage());
+        } catch (Exception $e) {
+            $io->error('Erreur lors de la création des données : '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -91,7 +96,7 @@ class CreateTestDataCommand extends Command
         ];
 
         $profiles = [];
-        $repo = $this->entityManager->getRepository(Profile::class);
+        $repo     = $this->entityManager->getRepository(Profile::class);
         foreach ($profilesData as $data) {
             $profile = $repo->findOneBy(['name' => $data['name']]);
             if (!$profile) {
@@ -121,7 +126,7 @@ class CreateTestDataCommand extends Command
         ];
 
         $users = [];
-        $repo = $this->entityManager->getRepository(User::class);
+        $repo  = $this->entityManager->getRepository(User::class);
         foreach ($usersData as $data) {
             $user = $repo->findOneBy(['email' => $data['email']]);
             if (!$user) {
@@ -156,7 +161,7 @@ class CreateTestDataCommand extends Command
         ];
 
         $contributors = [];
-        $repo = $this->entityManager->getRepository(Contributor::class);
+        $repo         = $this->entityManager->getRepository(Contributor::class);
         foreach ($contributorsData as $data) {
             $contributor = $repo->findOneBy(['name' => $data['name']]);
             if (!$contributor) {
@@ -195,7 +200,7 @@ class CreateTestDataCommand extends Command
         ];
 
         $categories = [];
-        $repo = $this->entityManager->getRepository(ServiceCategory::class);
+        $repo       = $this->entityManager->getRepository(ServiceCategory::class);
         foreach ($categoriesData as $data) {
             $category = $repo->findOneBy(['name' => $data['name']]);
             if (!$category) {
@@ -219,24 +224,24 @@ class CreateTestDataCommand extends Command
 
         $technologiesData = [
             'Symfony', 'React', 'Vue.js', 'Angular', 'Laravel', 'Node.js',
-            'Python', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis'
+            'Python', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis',
         ];
 
-        $technologies = [];
-        $repo = $this->entityManager->getRepository(Technology::class);
+        $technologies     = [];
+        $repo             = $this->entityManager->getRepository(Technology::class);
         $categoriesByTech = [
-            'Symfony' => ['framework', '#6f42c1'],
-            'Laravel' => ['framework', '#ff2d20'],
-            'React' => ['framework', '#61dafb'],
-            'Vue.js' => ['framework', '#42b883'],
-            'Angular' => ['framework', '#dd0031'],
-            'Node.js' => ['runtime', '#3c873a'],
-            'Python' => ['language', '#3776ab'],
-            'Docker' => ['infra', '#2496ed'],
-            'AWS' => ['hosting', '#ff9900'],
-            'MySQL' => ['database', '#00758f'],
+            'Symfony'    => ['framework', '#6f42c1'],
+            'Laravel'    => ['framework', '#ff2d20'],
+            'React'      => ['framework', '#61dafb'],
+            'Vue.js'     => ['framework', '#42b883'],
+            'Angular'    => ['framework', '#dd0031'],
+            'Node.js'    => ['runtime', '#3c873a'],
+            'Python'     => ['language', '#3776ab'],
+            'Docker'     => ['infra', '#2496ed'],
+            'AWS'        => ['hosting', '#ff9900'],
+            'MySQL'      => ['database', '#00758f'],
             'PostgreSQL' => ['database', '#336791'],
-            'Redis' => ['cache', '#dc382d'],
+            'Redis'      => ['cache', '#dc382d'],
         ];
 
         foreach ($technologiesData as $name) {
@@ -250,7 +255,7 @@ class CreateTestDataCommand extends Command
             }
             // Set required fields
             $category = $categoriesByTech[$name][0] ?? 'tool';
-            $color = $categoriesByTech[$name][1] ?? null;
+            $color    = $categoriesByTech[$name][1] ?? null;
             $technology->setCategory($category);
             $technology->setColor($color);
             $technology->setActive(true);
@@ -262,59 +267,62 @@ class CreateTestDataCommand extends Command
         return $technologies;
     }
 
+    /**
+     * @throws Exception
+     */
     private function createProjects(SymfonyStyle $io, array $users, array $categories, array $technologies): array
     {
         $io->section('Création des projets');
 
         $projectsData = [
             [
-                'name' => 'E-shop Mode Parisienne',
-                'client' => 'Fashion Store Paris',
-                'description' => 'Refonte complète de la boutique en ligne avec système de recommandation',
-                'type' => 'forfait',
-                'status' => 'active',
+                'name'          => 'E-shop Mode Parisienne',
+                'client'        => 'Fashion Store Paris',
+                'description'   => 'Refonte complète de la boutique en ligne avec système de recommandation',
+                'type'          => 'forfait',
+                'status'        => 'active',
                 'categoryIndex' => 0,
-                'techIndices' => [0, 1, 9], // Symfony, React, MySQL
-                'startDate' => '2024-09-01',
-                'endDate' => '2024-12-15'
+                'techIndices'   => [0, 1, 9], // Symfony, React, MySQL
+                'startDate'     => '2024-09-01',
+                'endDate'       => '2024-12-15',
             ],
             [
-                'name' => 'App Mobile Banking',
-                'client' => 'CreditCorp',
-                'description' => 'Application mobile pour la gestion des comptes bancaires',
-                'type' => 'regie',
-                'status' => 'active',
+                'name'          => 'App Mobile Banking',
+                'client'        => 'CreditCorp',
+                'description'   => 'Application mobile pour la gestion des comptes bancaires',
+                'type'          => 'regie',
+                'status'        => 'active',
                 'categoryIndex' => 3,
-                'techIndices' => [5, 10, 11], // Node.js, PostgreSQL, Redis
-                'startDate' => '2024-10-01',
-                'endDate' => '2025-03-30'
+                'techIndices'   => [5, 10, 11], // Node.js, PostgreSQL, Redis
+                'startDate'     => '2024-10-01',
+                'endDate'       => '2025-03-30',
             ],
             [
-                'name' => 'Site Vitrine Avocat',
-                'client' => 'Cabinet Juridique Associés',
-                'description' => 'Site vitrine moderne avec système de prise de rendez-vous',
-                'type' => 'forfait',
-                'status' => 'active',
+                'name'          => 'Site Vitrine Avocat',
+                'client'        => 'Cabinet Juridique Associés',
+                'description'   => 'Site vitrine moderne avec système de prise de rendez-vous',
+                'type'          => 'forfait',
+                'status'        => 'active',
                 'categoryIndex' => 1,
-                'techIndices' => [4, 2], // Laravel, Vue.js
-                'startDate' => '2024-08-15',
-                'endDate' => '2024-11-30'
+                'techIndices'   => [4, 2], // Laravel, Vue.js
+                'startDate'     => '2024-08-15',
+                'endDate'       => '2024-11-30',
             ],
             [
-                'name' => 'Plateforme SaaS RH',
-                'client' => 'HRTech Solutions',
-                'description' => 'Plateforme de gestion des ressources humaines en mode SaaS',
-                'type' => 'forfait',
-                'status' => 'completed',
+                'name'          => 'Plateforme SaaS RH',
+                'client'        => 'HRTech Solutions',
+                'description'   => 'Plateforme de gestion des ressources humaines en mode SaaS',
+                'type'          => 'forfait',
+                'status'        => 'completed',
                 'categoryIndex' => 2,
-                'techIndices' => [0, 3, 10], // Symfony, Angular, PostgreSQL
-                'startDate' => '2024-06-01',
-                'endDate' => '2024-09-30'
-            ]
+                'techIndices'   => [0, 3, 10], // Symfony, Angular, PostgreSQL
+                'startDate'     => '2024-06-01',
+                'endDate'       => '2024-09-30',
+            ],
         ];
 
         $projects = [];
-        $repo = $this->entityManager->getRepository(Project::class);
+        $repo     = $this->entityManager->getRepository(Project::class);
         foreach ($projectsData as $data) {
             $project = $repo->findOneBy(['name' => $data['name']]);
             if (!$project) {
@@ -328,8 +336,8 @@ class CreateTestDataCommand extends Command
             $project->setDescription($data['description']);
             $project->setProjectType($data['type']);
             $project->setStatus($data['status']);
-            $project->setStartDate(new \DateTime($data['startDate']));
-            $project->setEndDate(new \DateTime($data['endDate']));
+            $project->setStartDate(new DateTime($data['startDate']));
+            $project->setEndDate(new DateTime($data['endDate']));
 
             // Assigner des rôles
             $project->setProjectManager($users[0]);
@@ -342,7 +350,9 @@ class CreateTestDataCommand extends Command
             }
 
             // reset techs
-            foreach ($project->getTechnologies() as $t) { $project->removeTechnology($t); }
+            foreach ($project->getTechnologies() as $t) {
+                $project->removeTechnology($t);
+            }
             foreach ($data['techIndices'] as $index) {
                 if (isset($technologies[$index])) {
                     $project->addTechnology($technologies[$index]);
@@ -382,7 +392,7 @@ class CreateTestDataCommand extends Command
             $position = 1;
 
             // Prendre un sous-ensemble de tâches selon le projet
-            $numTasks = min(6, count($taskTemplates));
+            $numTasks      = min(6, count($taskTemplates));
             $selectedTasks = array_slice($taskTemplates, 0, $numTasks);
 
             $taskRepo = $this->entityManager->getRepository(ProjectTask::class);
@@ -412,7 +422,7 @@ class CreateTestDataCommand extends Command
                 }
 
                 // Tarif journalier aléatoire
-                $task->setDailyRate(400 + rand(0, 200). '.00');
+                $task->setDailyRate(400 + rand(0, 200).'.00');
 
                 $this->entityManager->persist($task);
             }
@@ -442,21 +452,24 @@ class CreateTestDataCommand extends Command
         return $contributors[array_rand($contributors)];
     }
 
+    /**
+     * @throws DateMalformedPeriodStringException
+     */
     private function createTimesheets(SymfonyStyle $io, array $projects, array $contributors): void
     {
         $io->section('Création des feuilles de temps');
 
-        $startDate = new \DateTime('2024-09-01');
-        $endDate = new \DateTime('2024-10-19');
+        $startDate = new DateTime('2024-09-01');
+        $endDate   = new DateTime('2024-10-19');
 
-        $interval = new \DateInterval('P1D');
-        $period = new \DatePeriod($startDate, $interval, $endDate);
+        $interval = new DateInterval('P1D');
+        $period   = new DatePeriod($startDate, $interval, $endDate);
 
         $timesheetsCreated = 0;
 
         foreach ($period as $date) {
             // Skip weekends
-            if ((int)$date->format('N') > 5) {
+            if ((int) $date->format('N') > 5) {
                 continue;
             }
 
@@ -467,7 +480,7 @@ class CreateTestDataCommand extends Command
                     $project = $projects[array_rand($projects)];
 
                     // Heures travaillées entre 4 et 8
-                    $hours = (string)(4 + (rand(0, 40) / 10)); // 4.0 à 8.0
+                    $hours = (string) (4 + (rand(0, 40) / 10)); // 4.0 à 8.0
 
                     $timesheet = new Timesheet();
                     $timesheet->setContributor($contributor);
@@ -477,53 +490,56 @@ class CreateTestDataCommand extends Command
                     $timesheet->setNotes("Travail sur le projet {$project->getName()}");
 
                     $this->entityManager->persist($timesheet);
-                    $timesheetsCreated++;
+                    ++$timesheetsCreated;
                 }
             }
         }
 
         $io->writeln("✓ $timesheetsCreated feuilles de temps créées");
     }
+
     private function createPlannings(SymfonyStyle $io, array $projects, array $contributors): void
     {
         $io->section('Création des plannings prévisionnels');
 
-        $startWindow = new \DateTime('monday this week');
-        $endWindow = (clone $startWindow)->modify('+8 weeks');
+        $startWindow = new DateTime('monday this week');
+        $endWindow   = (clone $startWindow)->modify('+8 weeks');
 
         $planningCreated = 0;
 
         foreach ($contributors as $contributor) {
             // Chaque contributeur: 1 à 3 projets planifiés
-            $num = rand(1, 3);
+            $num              = rand(1, 3);
             $selectedProjects = array_rand($projects, min($num, count($projects)));
-            if (!is_array($selectedProjects)) { $selectedProjects = [$selectedProjects]; }
+            if (!is_array($selectedProjects)) {
+                $selectedProjects = [$selectedProjects];
+            }
 
             foreach ($selectedProjects as $idx) {
                 $project = $projects[$idx];
 
                 // Générer 1 à 2 blocs de planification de 2-10 jours ouvrés
                 $blocks = rand(1, 2);
-                $cursor = (clone $startWindow)->modify('+' . rand(0, 14) . ' days');
-                for ($b = 0; $b < $blocks; $b++) {
-                    $days = rand(3, 10);
+                $cursor = (clone $startWindow)->modify('+'.rand(0, 14).' days');
+                for ($b = 0; $b < $blocks; ++$b) {
+                    $days  = rand(3, 10);
                     $start = clone $cursor;
-                    $end = (clone $start)->modify('+' . max(0, $days - 1) . ' days');
+                    $end   = (clone $start)->modify('+'.max(0, $days - 1).' days');
 
                     $planning = new Planning();
                     $planning->setContributor($contributor);
                     $planning->setProject($project);
                     $planning->setStartDate($start);
                     $planning->setEndDate($end);
-                    $planning->setDailyHours((string)(rand(6, 8)));
-                    $planning->setStatus(rand(0,1) ? 'planned' : 'confirmed');
+                    $planning->setDailyHours((string) rand(6, 8));
+                    $planning->setStatus(rand(0, 1) ? 'planned' : 'confirmed');
                     $planning->setNotes('Bloc prévisionnel');
 
                     $this->entityManager->persist($planning);
-                    $planningCreated++;
+                    ++$planningCreated;
 
                     // avancer le curseur de 1 à 3 jours après ce bloc
-                    $cursor = (clone $end)->modify('+' . rand(1, 3) . ' days');
+                    $cursor = (clone $end)->modify('+'.rand(1, 3).' days');
                 }
             }
         }

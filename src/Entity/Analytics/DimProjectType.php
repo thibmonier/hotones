@@ -8,31 +8,31 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Table de dimension pour les types de projets
- * Permet l'analyse par type (forfait/régie), catégorie de service, statut
+ * Permet l'analyse par type (forfait/régie), catégorie de service, statut.
  */
 #[ORM\Entity]
-#[ORM\Table(name: "dim_project_type")]
+#[ORM\Table(name: 'dim_project_type')]
 class DimProjectType
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 20)]
+    #[ORM\Column(type: 'string', length: 20)]
     private string $projectType; // forfait, regie
 
-    #[ORM\Column(type: "string", length: 50, nullable: true)]
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private ?string $serviceCategory = null; // Brand, E-commerce, etc.
 
-    #[ORM\Column(name: "status_value", type: "string", length: 20)]
+    #[ORM\Column(name: 'status_value', type: 'string', length: 20)]
     private string $status; // active, completed, cancelled
 
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column(type: 'boolean')]
     private bool $isInternal = false;
 
     // Clé composite pour l'unicité
-    #[ORM\Column(type: "string", length: 150, unique: true)]
+    #[ORM\Column(type: 'string', length: 150, unique: true)]
     private string $compositeKey;
 
     public function getId(): ?int
@@ -49,6 +49,7 @@ class DimProjectType
     {
         $this->projectType = $projectType;
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -61,6 +62,7 @@ class DimProjectType
     {
         $this->serviceCategory = $serviceCategory;
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -73,6 +75,7 @@ class DimProjectType
     {
         $this->status = $status;
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -85,6 +88,7 @@ class DimProjectType
     {
         $this->isInternal = $isInternal;
         $this->updateCompositeKey();
+
         return $this;
     }
 
@@ -97,16 +101,16 @@ class DimProjectType
     {
         $this->compositeKey = sprintf(
             '%s_%s_%s_%s',
-            $this->projectType ?? 'null',
+            $this->projectType     ?? 'null',
             $this->serviceCategory ?? 'null',
-            $this->status ?? 'null',
-            $this->isInternal ? 'internal' : 'external'
+            $this->status          ?? 'null',
+            $this->isInternal ? 'internal' : 'external',
         );
     }
 
     public function getDisplayName(): string
     {
-        $parts = [];
+        $parts   = [];
         $parts[] = ucfirst($this->projectType);
         if ($this->serviceCategory) {
             $parts[] = $this->serviceCategory;

@@ -2,18 +2,20 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'vacations')]
 class Vacation
 {
-    public const TYPE_PAID_LEAVE = 'conges_payes';
-    public const TYPE_COMPENSATORY_REST = 'repos_compensateur';
+    public const TYPE_PAID_LEAVE          = 'conges_payes';
+    public const TYPE_COMPENSATORY_REST   = 'repos_compensateur';
     public const TYPE_EXCEPTIONAL_ABSENCE = 'absence_exceptionnelle';
-    public const TYPE_SICK_LEAVE = 'arret_maladie';
-    public const TYPE_TRAINING = 'formation';
-    public const TYPE_OTHER = 'autre';
+    public const TYPE_SICK_LEAVE          = 'arret_maladie';
+    public const TYPE_TRAINING            = 'formation';
+    public const TYPE_OTHER               = 'autre';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,10 +27,10 @@ class Vacation
     private Contributor $contributor;
 
     #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $startDate;
+    private DateTimeInterface $startDate;
 
     #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $endDate;
+    private DateTimeInterface $endDate;
 
     #[ORM\Column(type: 'string', length: 50)]
     private string $type = self::TYPE_PAID_LEAVE;
@@ -44,10 +46,10 @@ class Vacation
     private string $dailyHours = '8.00';
 
     #[ORM\Column(type: 'datetime')]
-    private \DateTimeInterface $createdAt;
+    private DateTimeInterface $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $approvedAt = null;
+    private ?DateTimeInterface $approvedAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -55,7 +57,7 @@ class Vacation
 
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new DateTime();
     }
 
     public function getId(): ?int
@@ -67,29 +69,35 @@ class Vacation
     {
         return $this->contributor;
     }
+
     public function setContributor(Contributor $contributor): self
     {
         $this->contributor = $contributor;
+
         return $this;
     }
 
-    public function getStartDate(): \DateTimeInterface
+    public function getStartDate(): DateTimeInterface
     {
         return $this->startDate;
     }
-    public function setStartDate(\DateTimeInterface $startDate): self
+
+    public function setStartDate(DateTimeInterface $startDate): self
     {
         $this->startDate = $startDate;
+
         return $this;
     }
 
-    public function getEndDate(): \DateTimeInterface
+    public function getEndDate(): DateTimeInterface
     {
         return $this->endDate;
     }
-    public function setEndDate(\DateTimeInterface $endDate): self
+
+    public function setEndDate(DateTimeInterface $endDate): self
     {
         $this->endDate = $endDate;
+
         return $this;
     }
 
@@ -97,9 +105,11 @@ class Vacation
     {
         return $this->type;
     }
+
     public function setType(string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -107,9 +117,11 @@ class Vacation
     {
         return $this->reason;
     }
+
     public function setReason(?string $reason): self
     {
         $this->reason = $reason;
+
         return $this;
     }
 
@@ -117,9 +129,11 @@ class Vacation
     {
         return $this->status;
     }
+
     public function setStatus(string $status): self
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -127,29 +141,35 @@ class Vacation
     {
         return $this->dailyHours;
     }
+
     public function setDailyHours(string $dailyHours): self
     {
         $this->dailyHours = $dailyHours;
+
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeInterface
+    public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
     }
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+
+    public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getApprovedAt(): ?\DateTimeInterface
+    public function getApprovedAt(): ?DateTimeInterface
     {
         return $this->approvedAt;
     }
-    public function setApprovedAt(?\DateTimeInterface $approvedAt): self
+
+    public function setApprovedAt(?DateTimeInterface $approvedAt): self
     {
         $this->approvedAt = $approvedAt;
+
         return $this;
     }
 
@@ -157,46 +177,49 @@ class Vacation
     {
         return $this->approvedBy;
     }
+
     public function setApprovedBy(?User $approvedBy): self
     {
         $this->approvedBy = $approvedBy;
+
         return $this;
     }
 
     /**
-     * Calcule le nombre total d'heures d'absence
+     * Calcule le nombre total d'heures d'absence.
      */
     public function getTotalHours(): string
     {
         $days = $this->getNumberOfDays();
-        return bcmul((string)$days, $this->dailyHours, 2);
+
+        return bcmul((string) $days, $this->dailyHours, 2);
     }
 
     /**
-     * Calcule le nombre de jours d'absence (incluant weekends)
+     * Calcule le nombre de jours d'absence (incluant weekends).
      */
     public function getNumberOfDays(): int
     {
-        $start = clone $this->startDate;
-        $end = clone $this->endDate;
+        $start    = clone $this->startDate;
+        $end      = clone $this->endDate;
         $interval = $start->diff($end);
 
         return $interval->days + 1; // +1 pour inclure le dernier jour
     }
 
     /**
-     * Calcule le nombre de jours ouvrés d'absence
+     * Calcule le nombre de jours ouvrés d'absence.
      */
     public function getNumberOfWorkingDays(): int
     {
         $start = clone $this->startDate;
-        $end = clone $this->endDate;
-        $days = 0;
+        $end   = clone $this->endDate;
+        $days  = 0;
 
         while ($start <= $end) {
             // Exclure les weekends (samedi=6, dimanche=0)
             if (!in_array($start->format('w'), ['0', '6'])) {
-                $days++;
+                ++$days;
             }
             $start->modify('+1 day');
         }
@@ -205,41 +228,41 @@ class Vacation
     }
 
     /**
-     * Vérifie si une date donnée est en conflit avec cette absence
+     * Vérifie si une date donnée est en conflit avec cette absence.
      */
-    public function isConflictWith(\DateTimeInterface $date): bool
+    public function isConflictWith(DateTimeInterface $date): bool
     {
         return $date >= $this->startDate && $date <= $this->endDate;
     }
 
     /**
-     * Retourne le libellé du type d'absence
+     * Retourne le libellé du type d'absence.
      */
     public function getTypeLabel(): string
     {
-        return match($this->type) {
-            self::TYPE_PAID_LEAVE => 'Congés payés',
-            self::TYPE_COMPENSATORY_REST => 'Repos compensateur',
+        return match ($this->type) {
+            self::TYPE_PAID_LEAVE          => 'Congés payés',
+            self::TYPE_COMPENSATORY_REST   => 'Repos compensateur',
             self::TYPE_EXCEPTIONAL_ABSENCE => 'Absence exceptionnelle',
-            self::TYPE_SICK_LEAVE => 'Arrêt maladie',
-            self::TYPE_TRAINING => 'Formation',
-            self::TYPE_OTHER => 'Autre',
-            default => 'Non défini'
+            self::TYPE_SICK_LEAVE          => 'Arrêt maladie',
+            self::TYPE_TRAINING            => 'Formation',
+            self::TYPE_OTHER               => 'Autre',
+            default                        => 'Non défini'
         };
     }
 
     /**
-     * Retourne tous les types d'absence disponibles
+     * Retourne tous les types d'absence disponibles.
      */
     public static function getAvailableTypes(): array
     {
         return [
-            self::TYPE_PAID_LEAVE => 'Congés payés',
-            self::TYPE_COMPENSATORY_REST => 'Repos compensateur',
+            self::TYPE_PAID_LEAVE          => 'Congés payés',
+            self::TYPE_COMPENSATORY_REST   => 'Repos compensateur',
             self::TYPE_EXCEPTIONAL_ABSENCE => 'Absence exceptionnelle',
-            self::TYPE_SICK_LEAVE => 'Arrêt maladie',
-            self::TYPE_TRAINING => 'Formation',
-            self::TYPE_OTHER => 'Autre',
+            self::TYPE_SICK_LEAVE          => 'Arrêt maladie',
+            self::TYPE_TRAINING            => 'Formation',
+            self::TYPE_OTHER               => 'Autre',
         ];
     }
 }

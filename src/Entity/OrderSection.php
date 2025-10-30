@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'order_sections')]
@@ -46,9 +46,11 @@ class OrderSection
     {
         return $this->order;
     }
+
     public function setOrder(Order $order): self
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -56,9 +58,11 @@ class OrderSection
     {
         return $this->title;
     }
+
     public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -66,9 +70,11 @@ class OrderSection
     {
         return $this->description;
     }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -76,9 +82,11 @@ class OrderSection
     {
         return $this->position;
     }
+
     public function setPosition(int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -86,14 +94,17 @@ class OrderSection
     {
         return $this->lines;
     }
+
     public function addLine(OrderLine $line): self
     {
         if (!$this->lines->contains($line)) {
             $this->lines[] = $line;
             $line->setSection($this);
         }
+
         return $this;
     }
+
     public function removeLine(OrderLine $line): self
     {
         if ($this->lines->removeElement($line)) {
@@ -101,11 +112,12 @@ class OrderSection
                 $line->setSection(null);
             }
         }
+
         return $this;
     }
 
     /**
-     * Calcule le total de la section (somme des lignes)
+     * Calcule le total de la section (somme des lignes).
      */
     public function getTotalAmount(): string
     {
@@ -113,11 +125,12 @@ class OrderSection
         foreach ($this->lines as $line) {
             $total = bcadd($total, $line->getTotalAmount(), 2);
         }
+
         return $total;
     }
 
     /**
-     * Calcule le total des jours vendus dans cette section
+     * Calcule le total des jours vendus dans cette section.
      */
     public function getTotalDays(): string
     {
@@ -127,6 +140,7 @@ class OrderSection
                 $total = bcadd($total, $line->getDays(), 2);
             }
         }
+
         return $total;
     }
 
@@ -152,7 +166,7 @@ class OrderSection
     }
 
     /**
-     * Calcule la marge brute totale de la section
+     * Calcule la marge brute totale de la section.
      */
     public function getTotalGrossMargin(): string
     {
@@ -160,11 +174,12 @@ class OrderSection
         foreach ($this->lines as $line) {
             $total = bcadd($total, $line->getGrossMargin(), 2);
         }
+
         return $total;
     }
 
     /**
-     * Calcule le coût estimé total de la section
+     * Calcule le coût estimé total de la section.
      */
     public function getTotalEstimatedCost(): string
     {
@@ -172,11 +187,12 @@ class OrderSection
         foreach ($this->lines as $line) {
             $total = bcadd($total, $line->getEstimatedCost(), 2);
         }
+
         return $total;
     }
 
     /**
-     * Calcule le taux de marge moyen de la section
+     * Calcule le taux de marge moyen de la section.
      */
     public function getMarginRate(): string
     {
@@ -184,12 +200,13 @@ class OrderSection
         foreach ($this->lines as $line) {
             $totalRevenue = bcadd($totalRevenue, $line->getServiceAmount(), 2);
         }
-        
+
         if (bccomp($totalRevenue, '0', 2) <= 0) {
             return '0';
         }
 
         $totalMargin = $this->getTotalGrossMargin();
+
         return bcmul(bcdiv($totalMargin, $totalRevenue, 4), '100', 2);
     }
 }

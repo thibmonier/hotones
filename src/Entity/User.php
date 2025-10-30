@@ -3,12 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
-use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
-use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
@@ -17,14 +17,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     // Rôles métier
     public const ROLE_INTERVENANT = 'ROLE_INTERVENANT';
     public const ROLE_CHEF_PROJET = 'ROLE_CHEF_PROJET';
-    public const ROLE_MANAGER = 'ROLE_MANAGER';
-    public const ROLE_SUPERADMIN = 'ROLE_SUPERADMIN';
+    public const ROLE_MANAGER     = 'ROLE_MANAGER';
+    public const ROLE_SUPERADMIN  = 'ROLE_SUPERADMIN';
 
     public const ROLE_HIERARCHY = [
         self::ROLE_INTERVENANT => ['ROLE_USER'],
         self::ROLE_CHEF_PROJET => [self::ROLE_INTERVENANT],
-        self::ROLE_MANAGER => [self::ROLE_CHEF_PROJET],
-        self::ROLE_SUPERADMIN => [self::ROLE_MANAGER],
+        self::ROLE_MANAGER     => [self::ROLE_CHEF_PROJET],
+        self::ROLE_SUPERADMIN  => [self::ROLE_MANAGER],
     ];
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -73,25 +73,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->email;
     }
+
     public function getEmail(): string
     {
         return $this->email;
     }
+
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        $roles   = $this->roles;
         $roles[] = 'ROLE_USER';
+
         return array_unique($roles);
     }
+
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
+
         return $this;
     }
 
@@ -99,9 +105,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->password;
     }
+
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -113,9 +121,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->firstName;
     }
+
     public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
+
         return $this;
     }
 
@@ -123,9 +133,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->lastName;
     }
+
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
+
         return $this;
     }
 
@@ -133,9 +145,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->phone;
     }
+
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
@@ -143,9 +157,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->address;
     }
+
     public function setAddress(?string $address): self
     {
         $this->address = $address;
+
         return $this;
     }
 
@@ -153,9 +169,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->avatar;
     }
+
     public function setAvatar(?string $avatar): self
     {
         $this->avatar = $avatar;
+
         return $this;
     }
 
@@ -173,12 +191,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     public function setTotpSecret(?string $secret): self
     {
         $this->totpSecret = $secret;
+
         return $this;
     }
 
     public function setTotpEnabled(bool $enabled): self
     {
         $this->totpEnabled = $enabled;
+
         return $this;
     }
 
@@ -193,6 +213,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         if (!$this->isTotpAuthenticationEnabled()) {
             return null;
         }
+
         return new TotpConfiguration($this->totpSecret ?? '', 'sha1', 30, 6);
     }
 
@@ -206,14 +227,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     {
         return $this->hasRole(self::ROLE_INTERVENANT);
     }
+
     public function isChefProjet(): bool
     {
         return $this->hasRole(self::ROLE_CHEF_PROJET);
     }
+
     public function isManager(): bool
     {
         return $this->hasRole(self::ROLE_MANAGER);
     }
+
     public function isSuperAdmin(): bool
     {
         return $this->hasRole(self::ROLE_SUPERADMIN);
@@ -221,6 +245,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     public function getFullName(): string
     {
-        return $this->firstName . ' ' . $this->lastName;
+        return $this->firstName.' '.$this->lastName;
     }
 }

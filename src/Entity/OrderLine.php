@@ -59,9 +59,11 @@ class OrderLine
     {
         return $this->section;
     }
+
     public function setSection(OrderSection $section): self
     {
         $this->section = $section;
+
         return $this;
     }
 
@@ -69,9 +71,11 @@ class OrderLine
     {
         return $this->description;
     }
+
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -79,9 +83,11 @@ class OrderLine
     {
         return $this->position;
     }
+
     public function setPosition(int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -89,9 +95,11 @@ class OrderLine
     {
         return $this->profile;
     }
+
     public function setProfile(?Profile $profile): self
     {
         $this->profile = $profile;
+
         return $this;
     }
 
@@ -99,9 +107,11 @@ class OrderLine
     {
         return $this->dailyRate;
     }
+
     public function setDailyRate(?string $dailyRate): self
     {
         $this->dailyRate = $dailyRate;
+
         return $this;
     }
 
@@ -109,9 +119,11 @@ class OrderLine
     {
         return $this->days;
     }
+
     public function setDays(?string $days): self
     {
         $this->days = $days;
+
         return $this;
     }
 
@@ -119,9 +131,11 @@ class OrderLine
     {
         return $this->directAmount;
     }
+
     public function setDirectAmount(?string $directAmount): self
     {
         $this->directAmount = $directAmount;
+
         return $this;
     }
 
@@ -129,9 +143,11 @@ class OrderLine
     {
         return $this->attachedPurchaseAmount;
     }
+
     public function setAttachedPurchaseAmount(?string $attachedPurchaseAmount): self
     {
         $this->attachedPurchaseAmount = $attachedPurchaseAmount;
+
         return $this;
     }
 
@@ -139,9 +155,11 @@ class OrderLine
     {
         return $this->type;
     }
+
     public function setType(string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -149,24 +167,28 @@ class OrderLine
     {
         return $this->notes;
     }
+
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
         return $this;
     }
 
     /**
-     * Calcule le montant total de cette ligne
+     * Calcule le montant total de cette ligne.
      */
     public function getTotalAmount(): string
     {
         switch ($this->type) {
             case 'service':
                 if ($this->profile && $this->dailyRate && $this->days) {
-                    $serviceAmount = bcmul($this->dailyRate, $this->days, 2);
+                    $serviceAmount  = bcmul($this->dailyRate, $this->days, 2);
                     $purchaseAmount = $this->attachedPurchaseAmount ?? '0';
+
                     return bcadd($serviceAmount, $purchaseAmount, 2);
                 }
+
                 return '0';
 
             case 'purchase':
@@ -179,18 +201,19 @@ class OrderLine
     }
 
     /**
-     * Calcule le montant de service uniquement (sans achat attaché)
+     * Calcule le montant de service uniquement (sans achat attaché).
      */
     public function getServiceAmount(): string
     {
         if ($this->type === 'service' && $this->profile && $this->dailyRate && $this->days) {
             return bcmul($this->dailyRate, $this->days, 2);
         }
+
         return '0';
     }
 
     /**
-     * Vérifie si cette ligne compte dans les calculs de rentabilité
+     * Vérifie si cette ligne compte dans les calculs de rentabilité.
      */
     public function isCountableForProfitability(): bool
     {
@@ -230,7 +253,7 @@ class OrderLine
     }
 
     /**
-     * Calcule la marge brute de cette ligne (CA - coût estimé)
+     * Calcule la marge brute de cette ligne (CA - coût estimé).
      */
     public function getGrossMargin(): string
     {
@@ -239,13 +262,13 @@ class OrderLine
         }
 
         $revenue = $this->getServiceAmount(); // CA sans achats
-        $cost = $this->getEstimatedCost();
-        
+        $cost    = $this->getEstimatedCost();
+
         return bcsub($revenue, $cost, 2);
     }
 
     /**
-     * Calcule le coût estimé de cette ligne (jours * CJM du profil)
+     * Calcule le coût estimé de cette ligne (jours * CJM du profil).
      */
     public function getEstimatedCost(): string
     {
@@ -262,11 +285,12 @@ class OrderLine
 
         // Estimation : coût = 70% du TJM par défaut (marge standard)
         $estimatedCostRate = bcmul($defaultRate, '0.7', 2);
+
         return bcmul($this->days, $estimatedCostRate, 2);
     }
 
     /**
-     * Calcule le taux de marge de cette ligne
+     * Calcule le taux de marge de cette ligne.
      */
     public function getMarginRate(): string
     {
@@ -276,6 +300,7 @@ class OrderLine
         }
 
         $margin = $this->getGrossMargin();
+
         return bcmul(bcdiv($margin, $revenue, 4), '100', 2);
     }
 }

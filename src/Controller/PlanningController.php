@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Contributor;
 use App\Entity\Planning;
-use App\Repository\ContributorRepository;
 use App\Entity\Timesheet;
+use App\Repository\ContributorRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -24,28 +24,28 @@ class PlanningController extends AbstractController
     #[Route('', name: 'planning_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, ContributorRepository $contributorRepo): Response
     {
-        $weeks = max(1, (int) $request->query->get('weeks', 8));
+        $weeks      = max(1, (int) $request->query->get('weeks', 8));
         $startParam = $request->query->get('start');
 
         // Filters (arrays)
         $selectedContributors = array_filter((array) $request->query->all('contributors'));
-        $selectedManagers = array_filter((array) $request->query->all('project_managers'));
-        $selectedProjects = array_filter((array) $request->query->all('projects'));
+        $selectedManagers     = array_filter((array) $request->query->all('project_managers'));
+        $selectedProjects     = array_filter((array) $request->query->all('projects'));
         $selectedProjectTypes = array_filter((array) $request->query->all('project_types'));
 
         $today = new DateTime('today');
         // Start at Monday of the current week by default
         $start = $startParam ? new DateTime($startParam) : (clone $today)->modify('monday this week');
-        $end = (clone $start)->modify('+' . ($weeks * 7 - 1) . ' days');
+        $end   = (clone $start)->modify('+'.($weeks * 7 - 1).' days');
 
         // Build timeline dates (inclusive)
-        $period = new DatePeriod($start, new DateInterval('P1D'), (clone $end)->modify('+1 day'));
+        $period        = new DatePeriod($start, new DateInterval('P1D'), (clone $end)->modify('+1 day'));
         $timelineDates = iterator_to_array($period);
 
         // Base contributors list (optionally filtered)
         $contributors = $contributorRepo->findActiveContributors();
         if (!empty($selectedContributors)) {
-            $contributors = array_values(array_filter($contributors, fn($c) => in_array((string)$c->getId(), $selectedContributors, true)));
+            $contributors = array_values(array_filter($contributors, fn ($c) => in_array((string) $c->getId(), $selectedContributors, true)));
         }
 
         // Build query with filters
@@ -83,11 +83,11 @@ class PlanningController extends AbstractController
         $planningsByContributor = [];
         foreach ($plannings as $planning) {
             /** @var Planning $planning */
-            $cid = $planning->getContributor()->getId();
-            $project = $planning->getProject();
-            $pid = $project->getId();
+            $cid                                  = $planning->getContributor()->getId();
+            $project                              = $planning->getProject();
+            $pid                                  = $project->getId();
             $planningsByContributor[$cid][$pid][] = $planning;
-            $availableProjects[$pid] = $project; // deduplicate by id
+            $availableProjects[$pid]              = $project; // deduplicate by id
             if ($project->getProjectManager()) {
                 $availableManagers[$project->getProjectManager()->getId()] = $project->getProjectManager();
             }
@@ -97,17 +97,19 @@ class PlanningController extends AbstractController
         $plannedByContributor = [];
         foreach ($plannings as $planning) {
             /** @var Planning $planning */
-            if ($planning->getStatus() === 'cancelled') { continue; }
-            $cid = $planning->getContributor()->getId();
-            $ps = $planning->getStartDate() < $start ? clone $start : clone $planning->getStartDate();
-            $pe = $planning->getEndDate() > $end ? clone $end : clone $planning->getEndDate();
+            if ($planning->getStatus() === 'cancelled') {
+                continue;
+            }
+            $cid    = $planning->getContributor()->getId();
+            $ps     = $planning->getStartDate() < $start ? clone $start : clone $planning->getStartDate();
+            $pe     = $planning->getEndDate() > $end ? clone $end : clone $planning->getEndDate();
             $cursor = $ps;
             while ($cursor <= $pe) {
                 // weekdays only (Mon-Fri); 'w' Sunday=0, Saturday=6
-                $w = (int)$cursor->format('w');
+                $w = (int) $cursor->format('w');
                 if ($w !== 0 && $w !== 6) {
-                    $key = $cursor->format('Y-m-d');
-                    $plannedByContributor[$cid][$key] = ($plannedByContributor[$cid][$key] ?? 0) + (float)$planning->getDailyHours();
+                    $key                              = $cursor->format('Y-m-d');
+                    $plannedByContributor[$cid][$key] = ($plannedByContributor[$cid][$key] ?? 0) + (float) $planning->getDailyHours();
                 }
                 $cursor = (clone $cursor)->modify('+1 day');
             }
@@ -133,24 +135,24 @@ class PlanningController extends AbstractController
         if (!empty($selectedManagers)) {
             $tsQb->leftJoin('tp.projectManager', 'tpm')->andWhere('tpm.id IN (:mids)')->setParameter('mids', $selectedManagers);
         }
-        $tsRows = $tsQb->getQuery()->getResult();
+        $tsRows              = $tsQb->getQuery()->getResult();
         $totalsByContributor = [];
         foreach ($tsRows as $r) {
-            $cid = (int) $r['cid'];
-            $dateKey = $r['d']->format('Y-m-d');
+            $cid                                 = (int) $r['cid'];
+            $dateKey                             = $r['d']->format('Y-m-d');
             $totalsByContributor[$cid][$dateKey] = (float) $r['hours'];
         }
 
         // Build grouped structure: one summary row per contributor + project rows
         $groups = [];
         foreach ($contributors as $contributor) {
-            $cid = $contributor->getId();
+            $cid         = $contributor->getId();
             $projectRows = [];
             if (isset($planningsByContributor[$cid])) {
                 foreach ($planningsByContributor[$cid] as $pid => $items) {
                     $projectRows[] = [
                         'project' => $items[0]->getProject(),
-                        'items' => $items,
+                        'items'   => $items,
                     ];
                 }
             }
@@ -159,37 +161,37 @@ class PlanningController extends AbstractController
             if ($hasAny) {
                 $groups[] = [
                     'contributor' => $contributor,
-                    'totals' => $totalsByContributor[$cid] ?? [],
+                    'totals'      => $totalsByContributor[$cid] ?? [],
                     'projectRows' => $projectRows,
                 ];
             }
         }
 
         return $this->render('planning/index.html.twig', [
-            'contributors' => $contributors,
-            'timeline_start' => $start,
-            'timeline_end' => $end,
-            'timeline_dates' => $timelineDates,
-'groups' => $groups,
+            'contributors'                  => $contributors,
+            'timeline_start'                => $start,
+            'timeline_end'                  => $end,
+            'timeline_dates'                => $timelineDates,
+            'groups'                        => $groups,
             'planned_totals_by_contributor' => $plannedByContributor,
             // filter UI data
-            'all_contributors' => $contributorRepo->findActiveContributors(),
-            'all_projects' => array_values($availableProjects),
-            'all_project_managers' => array_values($availableManagers),
-            'project_types' => ['forfait' => 'Forfait', 'regie' => 'Régie'],
-            'selected_contributors' => $selectedContributors,
+            'all_contributors'          => $contributorRepo->findActiveContributors(),
+            'all_projects'              => array_values($availableProjects),
+            'all_project_managers'      => array_values($availableManagers),
+            'project_types'             => ['forfait' => 'Forfait', 'regie' => 'Régie'],
+            'selected_contributors'     => $selectedContributors,
             'selected_project_managers' => $selectedManagers,
-            'selected_projects' => $selectedProjects,
-            'selected_project_types' => $selectedProjectTypes,
+            'selected_projects'         => $selectedProjects,
+            'selected_project_types'    => $selectedProjectTypes,
         ]);
     }
 
     #[Route('/{id}/move', name: 'planning_move', methods: ['POST'])]
     public function move(Request $request, Planning $planning, EntityManagerInterface $em): JsonResponse
     {
-        $data = json_decode($request->getContent(), true) ?? [];
-        $token = $data['_token'] ?? null;
-        if (!$this->isCsrfTokenValid('move_planning_' . $planning->getId(), $token)) {
+        $data  = json_decode($request->getContent(), true) ?? [];
+        $token = $data['_token']                           ?? null;
+        if (!$this->isCsrfTokenValid('move_planning_'.$planning->getId(), $token)) {
             return new JsonResponse(['error' => 'Invalid CSRF token'], 400);
         }
 
@@ -199,29 +201,29 @@ class PlanningController extends AbstractController
         }
         $targetDate = new DateTime($targetDateStr);
 
-        $oldStart = clone $planning->getStartDate();
-        $oldEnd = clone $planning->getEndDate();
+        $oldStart     = clone $planning->getStartDate();
+        $oldEnd       = clone $planning->getEndDate();
         $durationDays = (int) $oldStart->diff($oldEnd)->format('%a');
 
         $planning->setStartDate($targetDate);
-        $newEnd = (clone $targetDate)->modify('+' . $durationDays . ' days');
+        $newEnd = (clone $targetDate)->modify('+'.$durationDays.' days');
         $planning->setEndDate($newEnd);
         $planning->setUpdatedAt(new DateTime());
         $em->flush();
 
         return new JsonResponse([
-            'ok' => true,
+            'ok'        => true,
             'startDate' => $planning->getStartDate()->format('Y-m-d'),
-            'endDate' => $planning->getEndDate()->format('Y-m-d'),
+            'endDate'   => $planning->getEndDate()->format('Y-m-d'),
         ]);
     }
 
     #[Route('/{id}/update', name: 'planning_update', methods: ['POST'])]
     public function update(Request $request, Planning $planning, EntityManagerInterface $em): JsonResponse
     {
-        $data = json_decode($request->getContent(), true) ?? [];
-        $token = $data['_token'] ?? null;
-        if (!$this->isCsrfTokenValid('edit_planning_' . $planning->getId(), $token)) {
+        $data  = json_decode($request->getContent(), true) ?? [];
+        $token = $data['_token']                           ?? null;
+        if (!$this->isCsrfTokenValid('edit_planning_'.$planning->getId(), $token)) {
             return new JsonResponse(['error' => 'Invalid CSRF token'], 400);
         }
 

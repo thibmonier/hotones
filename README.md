@@ -1,6 +1,12 @@
 # HotOnes
 
+[![WARP Index](https://img.shields.io/badge/WARP-Index-0A84FF?style=for-the-badge)](WARP.md) [![Agents Guide](https://img.shields.io/badge/Agents-Guide-2EA043?style=for-the-badge)](AGENTS.md)
 Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en croisant ventes (jours/TJM), temps passés, coûts (CJM), achats et KPIs consolidés.
+
+## 🚀 Guide Warp/Agents
+- WARP index: WARP.md
+- Guide agents: AGENTS.md
+- Performance: docs/performance.md
 
 ## Stack
 - Backend: Symfony 7.3, PHP 8.4

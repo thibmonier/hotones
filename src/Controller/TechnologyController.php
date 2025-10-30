@@ -39,6 +39,7 @@ class TechnologyController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Technologie créée avec succès');
+
             return $this->redirectToRoute('technology_index');
         }
 
@@ -68,6 +69,7 @@ class TechnologyController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Technologie modifiée avec succès');
+
             return $this->redirectToRoute('technology_index');
         }
 
@@ -93,13 +95,13 @@ class TechnologyController extends AbstractController
     {
         return [
             'framework' => 'Framework',
-            'cms' => 'CMS',
-            'library' => 'Bibliothèque',
-            'tool' => 'Outil',
-            'hosting' => 'Hébergement',
-            'database' => 'Base de données',
-            'language' => 'Langage',
-            'other' => 'Autre'
+            'cms'       => 'CMS',
+            'library'   => 'Bibliothèque',
+            'tool'      => 'Outil',
+            'hosting'   => 'Hébergement',
+            'database'  => 'Base de données',
+            'language'  => 'Langage',
+            'other'     => 'Autre',
         ];
     }
 }

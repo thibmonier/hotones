@@ -40,6 +40,7 @@ class JobProfileController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Profil métier créé avec succès');
+
             return $this->redirectToRoute('job_profile_index');
         }
 
@@ -69,6 +70,7 @@ class JobProfileController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Profil métier modifié avec succès');
+
             return $this->redirectToRoute('job_profile_index');
         }
 

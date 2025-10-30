@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\User;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,7 +24,7 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère tous les contributeurs actifs
+     * Récupère tous les contributeurs actifs.
      */
     public function findActiveContributors(): array
     {
@@ -36,7 +37,7 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Compte les contributeurs actifs
+     * Compte les contributeurs actifs.
      */
     public function countActiveContributors(): int
     {
@@ -49,7 +50,7 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve un contributeur par utilisateur associé
+     * Trouve un contributeur par utilisateur associé.
      */
     public function findByUser(User $user): ?Contributor
     {
@@ -57,7 +58,7 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les contributeurs avec leurs profils
+     * Récupère les contributeurs avec leurs profils.
      */
     public function findWithProfiles(): array
     {
@@ -72,13 +73,13 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Recherche de contributeurs par nom
+     * Recherche de contributeurs par nom.
      */
     public function searchByName(string $query): array
     {
         return $this->createQueryBuilder('c')
             ->where('c.name LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
+            ->setParameter('query', '%'.$query.'%')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->orderBy('c.name', 'ASC')
@@ -87,9 +88,9 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les contributeurs avec leur nombre d'heures sur une période
+     * Récupère les contributeurs avec leur nombre d'heures sur une période.
      */
-    public function findWithHoursForPeriod(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    public function findWithHoursForPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('c')
             ->leftJoin('c.timesheets', 't', 'WITH', 't.date BETWEEN :start AND :end')
@@ -105,7 +106,7 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les projets où un contributeur a des tâches assignées
+     * Récupère les projets où un contributeur a des tâches assignées.
      */
     public function findProjectsWithAssignedTasks(Contributor $contributor): array
     {
@@ -126,13 +127,13 @@ class ContributorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les projets avec leurs tâches assignées pour un contributeur
+     * Récupère les projets avec leurs tâches assignées pour un contributeur.
      */
     public function findProjectsWithTasksForContributor(Contributor $contributor): array
     {
         // Récupérer les projets
         $projects = $this->findProjectsWithAssignedTasks($contributor);
-        
+
         // Pour chaque projet, récupérer les tâches assignées au contributeur
         $result = [];
         foreach ($projects as $project) {
@@ -149,15 +150,15 @@ class ContributorRepository extends ServiceEntityRepository
                 ->orderBy('t.position', 'ASC')
                 ->getQuery()
                 ->getResult();
-                
+
             if (!empty($assignedTasks)) {
                 $result[] = [
                     'project' => $project,
-                    'tasks' => $assignedTasks
+                    'tasks'   => $assignedTasks,
                 ];
             }
         }
-        
+
         return $result;
     }
 }

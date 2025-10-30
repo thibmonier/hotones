@@ -2,22 +2,24 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: \App\Repository\OrderRepository::class)]
 #[ORM\Table(name: 'orders')]
 class Order
 {
     public const STATUS_OPTIONS = [
-        'a_signer' => 'À signer',
-        'gagne' => 'Gagné',
-        'signe' => 'Signé',
-        'perdu' => 'Perdu',
-        'termine' => 'Terminé',
-        'standby' => 'Standby',
-        'abandonne' => 'Abandonné'
+        'a_signer'  => 'À signer',
+        'gagne'     => 'Gagné',
+        'signe'     => 'Signé',
+        'perdu'     => 'Perdu',
+        'termine'   => 'Terminé',
+        'standby'   => 'Standby',
+        'abandonne' => 'Abandonné',
     ];
 
     #[ORM\Id]
@@ -35,7 +37,7 @@ class Order
     private ?string $contingencyPercentage = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $validUntil = null;
+    private ?DateTimeInterface $validUntil = null;
 
     // Numéro unique du devis D[année][mois][numéro incrémental]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
@@ -60,10 +62,10 @@ class Order
     private ?string $totalAmount = '0.00';
 
     #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $createdAt;
+    private DateTimeInterface $createdAt;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $validatedAt = null;
+    private ?DateTimeInterface $validatedAt = null;
 
     #[ORM\Column(type: 'string', length: 20)]
     private string $status = 'a_signer'; // a_signer, gagne, signe, perdu, termine, standby, abandonne
@@ -79,9 +81,9 @@ class Order
 
     public function __construct()
     {
-        $this->tasks = new ArrayCollection();
-        $this->sections = new ArrayCollection();
-        $this->createdAt = new \DateTime();
+        $this->tasks     = new ArrayCollection();
+        $this->sections  = new ArrayCollection();
+        $this->createdAt = new DateTime();
     }
 
     public function getId(): ?int
@@ -93,9 +95,11 @@ class Order
     {
         return $this->name;
     }
+
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -103,9 +107,11 @@ class Order
     {
         return $this->description;
     }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -113,19 +119,23 @@ class Order
     {
         return $this->contingencyPercentage;
     }
+
     public function setContingencyPercentage(?string $contingencyPercentage): self
     {
         $this->contingencyPercentage = $contingencyPercentage;
+
         return $this;
     }
 
-    public function getValidUntil(): ?\DateTimeInterface
+    public function getValidUntil(): ?DateTimeInterface
     {
         return $this->validUntil;
     }
-    public function setValidUntil(?\DateTimeInterface $validUntil): self
+
+    public function setValidUntil(?DateTimeInterface $validUntil): self
     {
         $this->validUntil = $validUntil;
+
         return $this;
     }
 
@@ -133,9 +143,11 @@ class Order
     {
         return $this->orderNumber;
     }
+
     public function setOrderNumber(string $orderNumber): self
     {
         $this->orderNumber = $orderNumber;
+
         return $this;
     }
 
@@ -143,9 +155,11 @@ class Order
     {
         return $this->notes;
     }
+
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
         return $this;
     }
 
@@ -153,9 +167,11 @@ class Order
     {
         return $this->contingenceAmount;
     }
+
     public function setContingenceAmount(?string $contingenceAmount): self
     {
         $this->contingenceAmount = $contingenceAmount;
+
         return $this;
     }
 
@@ -163,9 +179,11 @@ class Order
     {
         return $this->contingenceReason;
     }
+
     public function setContingenceReason(?string $contingenceReason): self
     {
         $this->contingenceReason = $contingenceReason;
+
         return $this;
     }
 
@@ -173,9 +191,11 @@ class Order
     {
         return $this->project;
     }
+
     public function setProject(?Project $project): self
     {
         $this->project = $project;
+
         return $this;
     }
 
@@ -183,29 +203,35 @@ class Order
     {
         return $this->totalAmount ?? '0.00';
     }
+
     public function setTotalAmount(?string $totalAmount): self
     {
         $this->totalAmount = $totalAmount ?? '0.00';
+
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeInterface
+    public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
     }
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+
+    public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getValidatedAt(): ?\DateTimeInterface
+    public function getValidatedAt(): ?DateTimeInterface
     {
         return $this->validatedAt;
     }
-    public function setValidatedAt(?\DateTimeInterface $validatedAt): self
+
+    public function setValidatedAt(?DateTimeInterface $validatedAt): self
     {
         $this->validatedAt = $validatedAt;
+
         return $this;
     }
 
@@ -213,9 +239,11 @@ class Order
     {
         return $this->status;
     }
+
     public function setStatus(string $status): self
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -223,14 +251,17 @@ class Order
     {
         return $this->tasks;
     }
+
     public function addTask(OrderTask $task): self
     {
         if (!$this->tasks->contains($task)) {
             $this->tasks[] = $task;
             $task->setOrder($this);
         }
+
         return $this;
     }
+
     public function removeTask(OrderTask $task): self
     {
         if ($this->tasks->removeElement($task)) {
@@ -238,6 +269,7 @@ class Order
                 $task->setOrder(null);
             }
         }
+
         return $this;
     }
 
@@ -245,14 +277,17 @@ class Order
     {
         return $this->sections;
     }
+
     public function addSection(OrderSection $section): self
     {
         if (!$this->sections->contains($section)) {
             $this->sections[] = $section;
             $section->setOrder($this);
         }
+
         return $this;
     }
+
     public function removeSection(OrderSection $section): self
     {
         if ($this->sections->removeElement($section)) {
@@ -260,11 +295,12 @@ class Order
                 $section->setOrder(null);
             }
         }
+
         return $this;
     }
 
     /**
-     * Calcule le montant total du devis à partir des sections
+     * Calcule le montant total du devis à partir des sections.
      */
     public function calculateTotalFromSections(): string
     {
@@ -272,15 +308,16 @@ class Order
         foreach ($this->sections as $section) {
             $total = bcadd($total, $section->getTotalAmount(), 2);
         }
+
         return $total;
     }
 
     /**
-     * Génère un numéro de devis unique
+     * Génère un numéro de devis unique.
      */
-    public static function generateOrderNumber(\DateTimeInterface $date): string
+    public static function generateOrderNumber(DateTimeInterface $date): string
     {
-        $year = $date->format('Y');
+        $year  = $date->format('Y');
         $month = $date->format('m');
 
         // TODO: Implémenter la logique incrémentale en base

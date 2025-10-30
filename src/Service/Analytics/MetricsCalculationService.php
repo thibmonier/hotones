@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace App\Service\Analytics;
 
-use App\Entity\Analytics\DimTime;
-use App\Entity\Analytics\DimProjectType;
 use App\Entity\Analytics\DimContributor;
+use App\Entity\Analytics\DimProjectType;
+use App\Entity\Analytics\DimTime;
 use App\Entity\Analytics\FactProjectMetrics;
-use App\Entity\Project;
 use App\Entity\Order;
-use App\Entity\User;
-use App\Entity\Contributor;
+use App\Entity\Project;
 use App\Entity\Timesheet;
+use App\Entity\User;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
 /**
- * Service de calcul et mise à jour des métriques dans le modèle en étoile
+ * Service de calcul et mise à jour des métriques dans le modèle en étoile.
  */
 readonly class MetricsCalculationService
 {
@@ -28,15 +31,15 @@ readonly class MetricsCalculationService
     }
 
     /**
-     * Calcule et met à jour toutes les métriques pour une période donnée
+     * Calcule et met à jour toutes les métriques pour une période donnée.
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function calculateMetricsForPeriod(\DateTimeInterface $date, string $granularity = 'monthly'): void
+    public function calculateMetricsForPeriod(DateTimeInterface $date, string $granularity = 'monthly'): void
     {
         $this->logger->info('Début du calcul des métriques', [
-            'date' => $date->format('Y-m-d'),
-            'granularity' => $granularity
+            'date'        => $date->format('Y-m-d'),
+            'granularity' => $granularity,
         ]);
 
         try {
@@ -53,25 +56,24 @@ readonly class MetricsCalculationService
 
             $this->entityManager->flush();
             $this->logger->info('Calcul des métriques terminé avec succès');
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error('Erreur lors du calcul des métriques', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
             throw $e;
         }
     }
 
     /**
-     * Calcule les métriques pour un projet spécifique
+     * Calcule les métriques pour un projet spécifique.
      */
     private function calculateProjectMetrics(Project $project, DimTime $dimTime, string $granularity): void
     {
         // Obtenir ou créer les dimensions
-        $dimProjectType = $this->getOrCreateDimProjectType($project);
-        $dimProjectManager = $this->getOrCreateDimContributor($project->getProjectManager(), 'project_manager');
-        $dimSalesPerson = $this->getOrCreateDimContributor($project->getSalesPerson(), 'sales_person');
+        $dimProjectType     = $this->getOrCreateDimProjectType($project);
+        $dimProjectManager  = $this->getOrCreateDimContributor($project->getProjectManager(), 'project_manager');
+        $dimSalesPerson     = $this->getOrCreateDimContributor($project->getSalesPerson(), 'sales_person');
         $dimProjectDirector = $this->getOrCreateDimContributor($project->getProjectDirector(), 'project_director');
 
         // Calculer les métriques pour chaque devis du projet
@@ -82,7 +84,7 @@ readonly class MetricsCalculationService
                 $dimProjectManager,
                 $dimSalesPerson,
                 $dimProjectDirector,
-                $granularity
+                $granularity,
             );
 
             $this->updateMetricsFromProject($metrics, $project, $order);
@@ -96,14 +98,14 @@ readonly class MetricsCalculationService
                 $dimProjectManager,
                 $dimSalesPerson,
                 $dimProjectDirector,
-                $granularity
+                $granularity,
             );
             $this->updateMetricsFromProject($metrics, $project, null);
         }
     }
 
     /**
-     * Met à jour les métriques à partir d'un projet et optionnellement d'un devis
+     * Met à jour les métriques à partir d'un projet et optionnellement d'un devis.
      */
     private function updateMetricsFromProject(FactProjectMetrics $metrics, Project $project, ?Order $order): void
     {
@@ -124,14 +126,14 @@ readonly class MetricsCalculationService
                 case 'a_signer':
                     $metrics->setPendingOrderCount($metrics->getPendingOrderCount() + 1);
                     $metrics->setPendingRevenue(
-                        bcadd($metrics->getPendingRevenue(), $order->getTotalAmount(), 2)
+                        bcadd($metrics->getPendingRevenue(), $order->getTotalAmount(), 2),
                     );
                     break;
                 case 'gagne':
                 case 'signe':
                     $metrics->setWonOrderCount($metrics->getWonOrderCount() + 1);
                     $metrics->setTotalRevenue(
-                        bcadd($metrics->getTotalRevenue(), $order->getTotalAmount(), 2)
+                        bcadd($metrics->getTotalRevenue(), $order->getTotalAmount(), 2),
                     );
                     break;
             }
@@ -140,7 +142,7 @@ readonly class MetricsCalculationService
             if ($metrics->getOrderCount() > 0) {
                 $totalOrderValue = bcadd($metrics->getTotalRevenue(), $metrics->getPendingRevenue(), 2);
                 $metrics->setAverageOrderValue(
-                    bcdiv($totalOrderValue, (string) $metrics->getOrderCount(), 2)
+                    bcdiv($totalOrderValue, (string) $metrics->getOrderCount(), 2),
                 );
             }
         }
@@ -158,11 +160,11 @@ readonly class MetricsCalculationService
             $metrics->setOrder($order);
         }
 
-        $metrics->setCalculatedAt(new \DateTime());
+        $metrics->setCalculatedAt(new DateTime());
     }
 
     /**
-     * Calcule les coûts d'un projet
+     * Calcule les coûts d'un projet.
      */
     private function calculateProjectCosts(FactProjectMetrics $metrics, Project $project): void
     {
@@ -185,8 +187,8 @@ readonly class MetricsCalculationService
         foreach ($timesheets as $timesheet) {
             $contributor = $timesheet->getContributor();
             if ($contributor && $contributor->getCjm()) {
-                $dailyCost = bcdiv($contributor->getCjm(), '8', 4); // Coût horaire
-                $timeCost = bcmul($dailyCost, (string) $timesheet->getHours(), 2);
+                $dailyCost  = bcdiv($contributor->getCjm(), '8', 4); // Coût horaire
+                $timeCost   = bcmul($dailyCost, (string) $timesheet->getHours(), 2);
                 $totalCosts = bcadd($totalCosts, $timeCost, 2);
             }
         }
@@ -195,7 +197,7 @@ readonly class MetricsCalculationService
     }
 
     /**
-     * Calcule les métriques de temps
+     * Calcule les métriques de temps.
      */
     private function calculateTimeMetrics(FactProjectMetrics $metrics, Project $project): void
     {
@@ -225,18 +227,18 @@ readonly class MetricsCalculationService
             $utilizationRate = bcmul(
                 bcdiv($metrics->getTotalWorkedDays(), $metrics->getTotalSoldDays(), 4),
                 '100',
-                2
+                2,
             );
             $metrics->setUtilizationRate($utilizationRate);
         }
     }
 
     /**
-     * Récupère ou crée une dimension temporelle
+     * Récupère ou crée une dimension temporelle.
      */
-    private function getOrCreateDimTime(\DateTimeInterface $date): DimTime
+    private function getOrCreateDimTime(DateTimeInterface $date): DimTime
     {
-        $repo = $this->entityManager->getRepository(DimTime::class);
+        $repo    = $this->entityManager->getRepository(DimTime::class);
         $dimTime = $repo->findOneBy(['date' => $date]);
 
         if (!$dimTime) {
@@ -251,7 +253,7 @@ readonly class MetricsCalculationService
     }
 
     /**
-     * Récupère ou crée une dimension type de projet
+     * Récupère ou crée une dimension type de projet.
      */
     private function getOrCreateDimProjectType(Project $project): DimProjectType
     {
@@ -262,10 +264,10 @@ readonly class MetricsCalculationService
             $project->getProjectType(),
             $serviceCategory ?? 'null',
             $project->getStatus(),
-            $project->getIsInternal() ? 'internal' : 'external'
+            $project->getIsInternal() ? 'internal' : 'external',
         );
 
-        $repo = $this->entityManager->getRepository(DimProjectType::class);
+        $repo           = $this->entityManager->getRepository(DimProjectType::class);
         $dimProjectType = $repo->findOneBy(['compositeKey' => $compositeKey]);
 
         if (!$dimProjectType) {
@@ -282,7 +284,7 @@ readonly class MetricsCalculationService
     }
 
     /**
-     * Récupère ou crée une dimension contributeur
+     * Récupère ou crée une dimension contributeur.
      */
     private function getOrCreateDimContributor(?User $user, string $role): ?DimContributor
     {
@@ -290,7 +292,7 @@ readonly class MetricsCalculationService
             return null;
         }
 
-        $repo = $this->entityManager->getRepository(DimContributor::class);
+        $repo           = $this->entityManager->getRepository(DimContributor::class);
         $dimContributor = $repo->findOneBy(['user' => $user, 'role' => $role, 'isActive' => true]);
 
         if (!$dimContributor) {
@@ -307,7 +309,7 @@ readonly class MetricsCalculationService
     }
 
     /**
-     * Récupère ou crée une métrique factuelle
+     * Récupère ou crée une métrique factuelle.
      */
     private function getOrCreateFactMetrics(
         DimTime $dimTime,
@@ -365,30 +367,30 @@ readonly class MetricsCalculationService
     }
 
     /**
-     * Récupère les projets pour une période donnée
+     * Récupère les projets pour une période donnée.
      */
-    private function getProjectsForPeriod(\DateTimeInterface $date, string $granularity): array
+    private function getProjectsForPeriod(DateTimeInterface $date, string $granularity): array
     {
         $repo = $this->entityManager->getRepository(Project::class);
-        $qb = $repo->createQueryBuilder('p');
+        $qb   = $repo->createQueryBuilder('p');
 
         switch ($granularity) {
             case 'monthly':
                 $startDate = (clone $date)->modify('first day of this month');
-                $endDate = (clone $date)->modify('last day of this month');
+                $endDate   = (clone $date)->modify('last day of this month');
                 break;
             case 'quarterly':
-                $quarter = ceil((int) $date->format('n') / 3);
+                $quarter    = ceil((int) $date->format('n') / 3);
                 $startMonth = ($quarter - 1) * 3 + 1;
-                $startDate = (new \DateTime($date->format('Y') . '-' . $startMonth . '-01'));
-                $endDate = (clone $startDate)->modify('+2 months')->modify('last day of this month');
+                $startDate  = (new DateTime($date->format('Y').'-'.$startMonth.'-01'));
+                $endDate    = (clone $startDate)->modify('+2 months')->modify('last day of this month');
                 break;
             case 'yearly':
-                $startDate = new \DateTime($date->format('Y') . '-01-01');
-                $endDate = new \DateTime($date->format('Y') . '-12-31');
+                $startDate = new DateTime($date->format('Y').'-01-01');
+                $endDate   = new DateTime($date->format('Y').'-12-31');
                 break;
             default:
-                throw new \InvalidArgumentException("Granularité non supportée: {$granularity}");
+                throw new InvalidArgumentException("Granularité non supportée: {$granularity}");
         }
 
         return $qb->where('p.startDate <= :endDate')
@@ -400,9 +402,9 @@ readonly class MetricsCalculationService
     }
 
     /**
-     * Recalcule toutes les métriques pour une année donnée
+     * Recalcule toutes les métriques pour une année donnée.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function recalculateMetricsForYear(int $year): void
     {
@@ -418,20 +420,20 @@ readonly class MetricsCalculationService
         ')->setParameter('year', $year)->execute();
 
         // Recalculer mois par mois
-        for ($month = 1; $month <= 12; $month++) {
-            $date = new \DateTime("$year-$month-01");
+        for ($month = 1; $month <= 12; ++$month) {
+            $date = new DateTime("$year-$month-01");
             $this->calculateMetricsForPeriod($date, 'monthly');
         }
 
         // Recalculer par trimestre
-        for ($quarter = 1; $quarter <= 4; $quarter++) {
+        for ($quarter = 1; $quarter <= 4; ++$quarter) {
             $month = ($quarter - 1) * 3 + 1;
-            $date = new \DateTime("$year-$month-01");
+            $date  = new DateTime("$year-$month-01");
             $this->calculateMetricsForPeriod($date, 'quarterly');
         }
 
         // Recalculer annuel
-        $date = new \DateTime("$year-01-01");
+        $date = new DateTime("$year-01-01");
         $this->calculateMetricsForPeriod($date, 'yearly');
     }
 }

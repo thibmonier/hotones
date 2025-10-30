@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'profiles')]
@@ -43,7 +43,7 @@ class Profile
     public function __construct()
     {
         $this->contributors = new ArrayCollection();
-        $this->orderTasks = new ArrayCollection();
+        $this->orderTasks   = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -55,9 +55,11 @@ class Profile
     {
         return $this->name;
     }
+
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -65,9 +67,11 @@ class Profile
     {
         return $this->description;
     }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -75,9 +79,11 @@ class Profile
     {
         return $this->defaultDailyRate;
     }
+
     public function setDefaultDailyRate(?string $defaultDailyRate): self
     {
         $this->defaultDailyRate = $defaultDailyRate;
+
         return $this;
     }
 
@@ -85,9 +91,11 @@ class Profile
     {
         return $this->color;
     }
+
     public function setColor(?string $color): self
     {
         $this->color = $color;
+
         return $this;
     }
 
@@ -95,9 +103,11 @@ class Profile
     {
         return $this->active;
     }
+
     public function setActive(bool $active): self
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -105,19 +115,23 @@ class Profile
     {
         return $this->contributors;
     }
+
     public function addContributor(Contributor $contributor): self
     {
         if (!$this->contributors->contains($contributor)) {
             $this->contributors[] = $contributor;
             $contributor->addProfile($this);
         }
+
         return $this;
     }
+
     public function removeContributor(Contributor $contributor): self
     {
         if ($this->contributors->removeElement($contributor)) {
             $contributor->removeProfile($this);
         }
+
         return $this;
     }
 
@@ -125,14 +139,17 @@ class Profile
     {
         return $this->orderTasks;
     }
+
     public function addOrderTask(OrderTask $orderTask): self
     {
         if (!$this->orderTasks->contains($orderTask)) {
             $this->orderTasks[] = $orderTask;
             $orderTask->setProfile($this);
         }
+
         return $this;
     }
+
     public function removeOrderTask(OrderTask $orderTask): self
     {
         if ($this->orderTasks->removeElement($orderTask)) {
@@ -140,6 +157,7 @@ class Profile
                 $orderTask->setProfile(null);
             }
         }
+
         return $this;
     }
 }

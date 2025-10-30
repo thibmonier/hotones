@@ -13,8 +13,14 @@
             <div class="col-lg-12">
                 <div class="text-center mb-5 text-muted">
                     <a href="/" class="d-block auth-logo">
-                        <img src="/assets/images/logo-dark.png" alt="" height="20" class="auth-logo-dark mx-auto">
-                        <img src="/assets/images/logo-light.png" alt="" height="20" class="auth-logo-light mx-auto">
+<picture class="auth-logo-dark mx-auto">
+                        <source srcset="{{ asset('assets/images/logo-hotones.png') }}" type="image/png">
+                        <img src="{{ asset('assets/images/logo-hotones.jpeg') }}" alt="HotOnes" class="img-fluid mx-auto" style="max-height:24px;height:auto;width:auto;">
+                    </picture>
+<picture class="auth-logo-light mx-auto">
+                        <source srcset="{{ asset('assets/images/logo-hotones.png') }}" type="image/png">
+                        <img src="{{ asset('assets/images/logo-hotones.jpeg') }}" alt="HotOnes" class="img-fluid mx-auto" style="max-height:24px;height:auto;width:auto;">
+                    </picture>
                     </a>
                     <p class="mt-3">Responsive Bootstrap 5 Admin Dashboard</p>
                 </div>

@@ -75,8 +75,14 @@
                         <div class="d-flex flex-column h-100">
                             <div class="mb-4 mb-md-5">
                                 <a href="/" class="d-block card-logo">
-                                    <img src="assets/images/logo-dark.png" alt="" height="18" class="card-logo-dark">
-                                    <img src="assets/images/logo-light.png" alt="" height="18" class="card-logo-light">
+<picture class="card-logo-dark">
+                                        <source srcset="{{ asset('assets/images/logo-hotones.png') }}" type="image/png">
+                                        <img src="{{ asset('assets/images/logo-hotones.jpeg') }}" alt="HotOnes" class="img-fluid" style="max-height:24px;height:auto;width:auto;">
+                                    </picture>
+<picture class="card-logo-light">
+                                        <source srcset="{{ asset('assets/images/logo-hotones.png') }}" type="image/png">
+                                        <img src="{{ asset('assets/images/logo-hotones.jpeg') }}" alt="HotOnes" class="img-fluid" style="max-height:24px;height:auto;width:auto;">
+                                    </picture>
                                 </a>
                             </div>
                             <div class="my-auto">

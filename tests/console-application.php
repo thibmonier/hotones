@@ -13,4 +13,5 @@ if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
 }
 
 $kernel = new Kernel($_SERVER['APP_ENV'] ?? 'dev', (bool) ($_SERVER['APP_DEBUG'] ?? true));
+
 return new Application($kernel);

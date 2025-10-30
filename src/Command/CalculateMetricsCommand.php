@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Service\Analytics\MetricsCalculationService;
+use DateTime;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:calculate-metrics',
-    description: 'Calcule les métriques analytics pour une période donnée'
+    description: 'Calcule les métriques analytics pour une période donnée',
 )]
 class CalculateMetricsCommand extends Command
 {
@@ -46,13 +48,14 @@ Exemples :
     {
         $io = new SymfonyStyle($input, $output);
 
-        $period = $input->getArgument('period');
-        $granularity = $input->getOption('granularity');
+        $period           = $input->getArgument('period');
+        $granularity      = $input->getOption('granularity');
         $forceRecalculate = $input->getOption('force-recalculate');
 
         // Validation de la granularité
         if (!in_array($granularity, ['monthly', 'quarterly', 'yearly'])) {
             $io->error('Granularité invalide. Valeurs acceptées: monthly, quarterly, yearly');
+
             return Command::FAILURE;
         }
 
@@ -70,48 +73,48 @@ Exemples :
 
                     switch ($granularity) {
                         case 'monthly':
-                            for ($month = 1; $month <= 12; $month++) {
-                                $date = new \DateTime("$year-$month-01");
+                            for ($month = 1; $month <= 12; ++$month) {
+                                $date = new DateTime("$year-$month-01");
                                 $this->metricsService->calculateMetricsForPeriod($date, 'monthly');
-                                $io->writeln("  ✓ " . $date->format('F Y'));
+                                $io->writeln('  ✓ '.$date->format('F Y'));
                             }
                             break;
 
                         case 'quarterly':
-                            for ($quarter = 1; $quarter <= 4; $quarter++) {
+                            for ($quarter = 1; $quarter <= 4; ++$quarter) {
                                 $month = ($quarter - 1) * 3 + 1;
-                                $date = new \DateTime("$year-$month-01");
+                                $date  = new DateTime("$year-$month-01");
                                 $this->metricsService->calculateMetricsForPeriod($date, 'quarterly');
                                 $io->writeln("  ✓ Q$quarter $year");
                             }
                             break;
 
                         case 'yearly':
-                            $date = new \DateTime("$year-01-01");
+                            $date = new DateTime("$year-01-01");
                             $this->metricsService->calculateMetricsForPeriod($date, 'yearly');
                             $io->writeln("  ✓ Année $year");
                             break;
                     }
                 }
-
             } elseif (preg_match('/^(\d{4})-(\d{1,2})$/', $period, $matches)) {
                 // Mois spécifique
-                $year = (int) $matches[1];
+                $year  = (int) $matches[1];
                 $month = (int) $matches[2];
 
                 if ($month < 1 || $month > 12) {
                     $io->error('Mois invalide. Doit être entre 1 et 12.');
+
                     return Command::FAILURE;
                 }
 
-                $date = new \DateTime("$year-$month-01");
-                $io->info("Calcul des métriques pour " . $date->format('F Y') . "...");
+                $date = new DateTime("$year-$month-01");
+                $io->info('Calcul des métriques pour '.$date->format('F Y').'...');
 
                 $this->metricsService->calculateMetricsForPeriod($date, $granularity);
-                $io->writeln("  ✓ " . $date->format('F Y'));
-
+                $io->writeln('  ✓ '.$date->format('F Y'));
             } else {
                 $io->error('Format de période invalide. Utilisez YYYY ou YYYY-MM');
+
                 return Command::FAILURE;
             }
 
@@ -124,9 +127,8 @@ Exemples :
             $io->writeln('  0 6 * * * cd /path/to/project && php bin/console app:calculate-metrics');
 
             return Command::SUCCESS;
-
-        } catch (\Exception $e) {
-            $io->error('Erreur lors du calcul des métriques : ' . $e->getMessage());
+        } catch (Exception $e) {
+            $io->error('Erreur lors du calcul des métriques : '.$e->getMessage());
 
             if ($output->isVerbose()) {
                 $io->writeln('Stack trace:');

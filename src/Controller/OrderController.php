@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Order;
-use App\Entity\Project;
-use App\Entity\OrderSection;
 use App\Entity\OrderLine;
+use App\Entity\OrderSection;
 use App\Entity\Profile;
-use App\Repository\OrderRepository;
+use App\Entity\Project;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,18 +23,18 @@ class OrderController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $projectId = $request->query->get('project');
-        $status = $request->query->get('status');
+        $status    = $request->query->get('status');
 
-        $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
-        $orders = $em->getRepository(Order::class)->findWithFilters($project, $status);
+        $project  = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
+        $orders   = $em->getRepository(Order::class)->findWithFilters($project, $status);
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
 
         return $this->render('order/index.html.twig', [
-            'orders' => $orders,
-            'projects' => $projects,
+            'orders'          => $orders,
+            'projects'        => $projects,
             'selectedProject' => $projectId,
-            'selectedStatus' => $status,
-            'statusOptions' => Order::STATUS_OPTIONS,
+            'selectedStatus'  => $status,
+            'statusOptions'   => Order::STATUS_OPTIONS,
         ]);
     }
 
@@ -69,24 +69,25 @@ class OrderController extends AbstractController
 
             // Contingence
             $contingency = $request->request->get('contingency_percentage');
-            $order->setContingencyPercentage($contingency !== '' ? (string)$contingency : null);
+            $order->setContingencyPercentage($contingency !== '' ? (string) $contingency : null);
 
             if ($request->request->get('valid_until')) {
-                $order->setValidUntil(new \DateTime($request->request->get('valid_until')));
+                $order->setValidUntil(new DateTime($request->request->get('valid_until')));
             }
 
             $em->persist($order);
             $em->flush();
 
             $this->addFlash('success', 'Devis créé avec succès');
+
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
 
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
 
         return $this->render('order/new.html.twig', [
-            'order' => $order,
-            'projects' => $projects,
+            'order'         => $order,
+            'projects'      => $projects,
             'statusOptions' => Order::STATUS_OPTIONS,
         ]);
     }
@@ -95,7 +96,7 @@ class OrderController extends AbstractController
     public function show(Order $order, EntityManagerInterface $em): Response
     {
         // Calculer les totaux
-        $totalAmount = 0;
+        $totalAmount    = 0;
         $totalPurchases = 0;
 
         foreach ($order->getSections() as $section) {
@@ -116,11 +117,11 @@ class OrderController extends AbstractController
         $finalAmount = $totalAmount - $contingencyAmount;
 
         return $this->render('order/show.html.twig', [
-            'order' => $order,
-            'totalAmount' => $totalAmount,
-            'totalPurchases' => $totalPurchases,
+            'order'             => $order,
+            'totalAmount'       => $totalAmount,
+            'totalPurchases'    => $totalPurchases,
             'contingencyAmount' => $contingencyAmount,
-            'finalAmount' => $finalAmount,
+            'finalAmount'       => $finalAmount,
         ]);
     }
 
@@ -141,10 +142,10 @@ class OrderController extends AbstractController
 
             // Contingence
             $contingency = $request->request->get('contingency_percentage');
-            $order->setContingencyPercentage($contingency !== '' ? (string)$contingency : null);
+            $order->setContingencyPercentage($contingency !== '' ? (string) $contingency : null);
 
             if ($request->request->get('valid_until')) {
-                $order->setValidUntil(new \DateTime($request->request->get('valid_until')));
+                $order->setValidUntil(new DateTime($request->request->get('valid_until')));
             } else {
                 $order->setValidUntil(null);
             }
@@ -152,14 +153,15 @@ class OrderController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Devis modifié avec succès');
+
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
 
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
 
         return $this->render('order/edit.html.twig', [
-            'order' => $order,
-            'projects' => $projects,
+            'order'         => $order,
+            'projects'      => $projects,
             'statusOptions' => Order::STATUS_OPTIONS,
         ]);
     }
@@ -168,12 +170,12 @@ class OrderController extends AbstractController
     public function sections(Order $order, EntityManagerInterface $em): Response
     {
         $profiles = $em->getRepository(Profile::class)->findBy(
-            ['active' => true], 
-            ['name' => 'ASC']
+            ['active' => true],
+            ['name' => 'ASC'],
         );
-        
+
         return $this->render('order/sections.html.twig', [
-            'order' => $order,
+            'order'    => $order,
             'profiles' => $profiles,
         ]);
     }
@@ -192,6 +194,7 @@ class OrderController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Section ajoutée avec succès');
+
         return $this->redirectToRoute('order_sections', ['id' => $order->getId()]);
     }
 
@@ -199,7 +202,7 @@ class OrderController extends AbstractController
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function addLine(Request $request, int $orderId, int $sectionId, EntityManagerInterface $em): Response
     {
-        $order = $em->getRepository(Order::class)->find($orderId);
+        $order   = $em->getRepository(Order::class)->find($orderId);
         $section = $em->getRepository(OrderSection::class)->find($sectionId);
 
         if (!$order || !$section || $section->getOrder() !== $order) {
@@ -218,35 +221,36 @@ class OrderController extends AbstractController
         }
 
         $tjm = $request->request->get('tjm');
-        $line->setTjm($tjm !== '' ? (string)$tjm : null);
+        $line->setTjm($tjm !== '' ? (string) $tjm : null);
 
         $days = $request->request->get('days');
-        $line->setDays($days !== '' ? (string)$days : '0');
+        $line->setDays($days !== '' ? (string) $days : '0');
 
         $purchaseAmount = $request->request->get('purchase_amount');
-        $line->setPurchaseAmount($purchaseAmount !== '' ? (string)$purchaseAmount : null);
+        $line->setPurchaseAmount($purchaseAmount !== '' ? (string) $purchaseAmount : null);
 
         $line->setSortOrder($section->getLines()->count() + 1);
 
         $em->persist($line);
-        
+
         // Recalculer le total du devis
         $this->updateOrderTotals($order, $em);
-        
+
         $em->flush();
 
         // Ajouter des informations sur la marge dans le message flash
         $marginInfo = '';
         if ($line->getProfile() && $line->getDays()) {
-            $margin = $line->getGrossMargin();
+            $margin     = $line->getGrossMargin();
             $marginRate = $line->getMarginRate();
-            $marginInfo = sprintf(' (Marge: %s€ - %s%%)', 
+            $marginInfo = sprintf(' (Marge: %s€ - %s%%)',
                 number_format(floatval($margin), 0, ',', ' '),
-                number_format(floatval($marginRate), 1, ',', ' ')
+                number_format(floatval($marginRate), 1, ',', ' '),
             );
         }
-        
-        $this->addFlash('success', 'Ligne ajoutée avec succès' . $marginInfo);
+
+        $this->addFlash('success', 'Ligne ajoutée avec succès'.$marginInfo);
+
         return $this->redirectToRoute('order_sections', ['id' => $orderId]);
     }
 
@@ -258,7 +262,7 @@ class OrderController extends AbstractController
         $newOrder->setOrderNumber($this->generateOrderNumber($em));
         $newOrder->setProject($originalOrder->getProject());
         $newOrder->setStatus('draft');
-        $newOrder->setDescription($originalOrder->getDescription() . ' (Copie)');
+        $newOrder->setDescription($originalOrder->getDescription().' (Copie)');
         $newOrder->setNotes($originalOrder->getNotes());
         $newOrder->setContingencyPercentage($originalOrder->getContingencyPercentage());
 
@@ -291,6 +295,7 @@ class OrderController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Devis dupliqué avec succès');
+
         return $this->redirectToRoute('order_show', ['id' => $newOrder->getId()]);
     }
 
@@ -312,16 +317,16 @@ class OrderController extends AbstractController
     public function getProfileInfo(Profile $profile): Response
     {
         return $this->json([
-            'id' => $profile->getId(),
-            'name' => $profile->getName(),
+            'id'               => $profile->getId(),
+            'name'             => $profile->getName(),
             'defaultDailyRate' => $profile->getDefaultDailyRate(),
-            'color' => $profile->getColor(),
+            'color'            => $profile->getColor(),
         ]);
     }
 
     private function generateOrderNumber(EntityManagerInterface $em): string
     {
-        $year = date('Y');
+        $year  = date('Y');
         $month = date('m');
 
         // Trouver le dernier numéro de devis pour ce mois
@@ -331,23 +336,23 @@ class OrderController extends AbstractController
         $increment = 1;
         if ($lastOrder) {
             $lastNumber = $lastOrder->getOrderNumber();
-            $increment = (int)substr($lastNumber, -3) + 1;
+            $increment  = (int) substr($lastNumber, -3) + 1;
         }
 
         return sprintf('D%s%s%03d', $year, $month, $increment);
     }
 
     /**
-     * Met à jour automatiquement le montant total du devis
+     * Met à jour automatiquement le montant total du devis.
      */
     private function updateOrderTotals(Order $order, EntityManagerInterface $em): void
     {
         $totalAmount = '0';
-        
+
         foreach ($order->getSections() as $section) {
             $totalAmount = bcadd($totalAmount, $section->getTotalAmount(), 2);
         }
-        
+
         $order->setTotalAmount($totalAmount);
     }
 }

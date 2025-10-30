@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\Analytics\DimTime;
-use App\Entity\Analytics\DimProjectType;
 use App\Entity\Analytics\DimContributor;
+use App\Entity\Analytics\DimProjectType;
+use App\Entity\Analytics\DimTime;
 use App\Entity\Analytics\FactProjectMetrics;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:generate-test-data',
-    description: 'Génère des données de test pour les métriques analytics'
+    description: 'Génère des données de test pour les métriques analytics',
 )]
 class GenerateTestDataCommand extends Command
 {
@@ -48,8 +50,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $year = (int) $input->getOption('year');
+        $io    = new SymfonyStyle($input, $output);
+        $year  = (int) $input->getOption('year');
         $force = $input->getOption('force');
 
         $io->title('Génération de données de test pour Analytics');
@@ -63,22 +65,22 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             // 1. Créer les dimensions temporelles
             $io->section('Création des dimensions temporelles');
             $dimTimes = $this->createTimeDimensions($year);
-            $io->writeln("✓ {$year} : " . count($dimTimes) . " mois créés");
+            $io->writeln("✓ {$year} : ".count($dimTimes).' mois créés');
 
             // 2. Créer les types de projets
             $io->section('Création des types de projets');
             $projectTypes = $this->createProjectTypes();
-            $io->writeln('✓ ' . count($projectTypes) . ' types de projets créés');
+            $io->writeln('✓ '.count($projectTypes).' types de projets créés');
 
             // 3. Créer les contributeurs
             $io->section('Création des contributeurs');
             $contributors = $this->createContributors();
-            $io->writeln('✓ ' . count($contributors) . ' contributeurs créés');
+            $io->writeln('✓ '.count($contributors).' contributeurs créés');
 
             // 4. Générer les métriques
             $io->section('Génération des métriques');
             $metrics = $this->generateMetrics($dimTimes, $projectTypes, $contributors);
-            $io->writeln('✓ ' . count($metrics) . ' métriques générées');
+            $io->writeln('✓ '.count($metrics).' métriques générées');
 
             // Sauvegarder
             $this->entityManager->flush();
@@ -90,9 +92,9 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             $this->displayStatistics($io, $year);
 
             return Command::SUCCESS;
+        } catch (Exception $e) {
+            $io->error('Erreur lors de la génération des données : '.$e->getMessage());
 
-        } catch (\Exception $e) {
-            $io->error('Erreur lors de la génération des données : ' . $e->getMessage());
             return Command::FAILURE;
         }
     }
@@ -119,8 +121,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     {
         $dimTimes = [];
 
-        for ($month = 1; $month <= 12; $month++) {
-            $date = new \DateTime("$year-$month-01");
+        for ($month = 1; $month <= 12; ++$month) {
+            $date = new DateTime("$year-$month-01");
 
             $dimTime = new DimTime();
             $dimTime->setDate($date);
@@ -187,15 +189,15 @@ Attention : Cette commande est uniquement pour les tests et le développement.
 
     private function generateMetrics(array $dimTimes, array $projectTypes, array $contributors): array
     {
-        $metrics = [];
+        $metrics         = [];
         $projectManagers = array_filter($contributors, fn ($c) => $c->getRole() === 'project_manager');
-        $salesPersons = array_filter($contributors, fn ($c) => $c->getRole() === 'sales_person');
+        $salesPersons    = array_filter($contributors, fn ($c) => $c->getRole() === 'sales_person');
 
         foreach ($dimTimes as $dimTime) {
             foreach ($projectTypes as $projectType) {
                 // Sélectionner aléatoirement un chef de projet et un commercial
                 $projectManager = $projectManagers[array_rand($projectManagers)];
-                $salesPerson = $salesPersons[array_rand($salesPersons)];
+                $salesPerson    = $salesPersons[array_rand($salesPersons)];
 
                 $metric = new FactProjectMetrics();
                 $metric->setDimTime($dimTime)
@@ -225,7 +227,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         };
 
         $baseRevenue = rand(10000, 50000) * $seasonalFactor;
-        $baseCosts = $baseRevenue * (0.6 + (rand(0, 20) / 100)); // 60-80% du CA
+        $baseCosts   = $baseRevenue       * (0.6 + (rand(0, 20) / 100)); // 60-80% du CA
 
         $metric->setProjectCount(rand(1, 5))
             ->setActiveProjectCount(rand(1, 3))
@@ -247,7 +249,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         if ($metric->getOrderCount() > 0) {
             $totalOrderValue = bcadd($metric->getTotalRevenue(), $metric->getPendingRevenue(), 2);
             $metric->setAverageOrderValue(
-                bcdiv($totalOrderValue, (string) $metric->getOrderCount(), 2)
+                bcdiv($totalOrderValue, (string) $metric->getOrderCount(), 2),
             );
         }
 
@@ -256,7 +258,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             $utilizationRate = bcmul(
                 bcdiv($metric->getTotalWorkedDays(), $metric->getTotalSoldDays(), 4),
                 '100',
-                2
+                2,
             );
             $metric->setUtilizationRate($utilizationRate);
         }
@@ -277,7 +279,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             ->setParameter('granularity', 'monthly')
             ->getSingleScalarResult();
 
-        $io->writeln("💰 CA total généré : " . number_format($totalRevenue, 0, ',', ' ') . "€");
+        $io->writeln('💰 CA total généré : '.number_format($totalRevenue, 0, ',', ' ').'€');
 
         // Nombre de projets
         $totalProjects = $this->entityManager->createQuery('

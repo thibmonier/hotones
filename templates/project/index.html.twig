@@ -1,4 +1,4 @@
-{% extends 'layouts/layouts-vertical.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}Projets{% endblock %}
 
@@ -34,7 +34,7 @@
                 {% set signed_orders = signed_orders + item.metrics.signed_orders_count %}
             {% endfor %}
             {% set global_margin_rate = global_revenue > 0 ? (global_margin / global_revenue * 100) : 0 %}
-            
+
             <div class="col-md-3">
                 <div class="card border-0 bg-light">
                     <div class="card-body text-center">
@@ -71,7 +71,7 @@
             </div>
         </div>
     {% endif %}
-    
+
     <div class="row">
         <div class="col-12">
             <div class="card">

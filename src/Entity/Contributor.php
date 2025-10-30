@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\ContributorRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ContributorRepository::class)]
 #[ORM\Table(name: 'contributors')]
@@ -60,9 +60,9 @@ class Contributor
 
     public function __construct()
     {
-        $this->profiles = new ArrayCollection();
+        $this->profiles          = new ArrayCollection();
         $this->employmentPeriods = new ArrayCollection();
-        $this->timesheets = new ArrayCollection();
+        $this->timesheets        = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,9 +74,11 @@ class Contributor
     {
         return $this->name;
     }
+
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -84,9 +86,11 @@ class Contributor
     {
         return $this->email;
     }
+
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -94,9 +98,11 @@ class Contributor
     {
         return $this->phone;
     }
+
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
@@ -104,9 +110,11 @@ class Contributor
     {
         return $this->notes;
     }
+
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
         return $this;
     }
 
@@ -114,9 +122,11 @@ class Contributor
     {
         return $this->cjm;
     }
+
     public function setCjm(?string $cjm): self
     {
         $this->cjm = $cjm;
+
         return $this;
     }
 
@@ -124,9 +134,11 @@ class Contributor
     {
         return $this->tjm;
     }
+
     public function setTjm(?string $tjm): self
     {
         $this->tjm = $tjm;
+
         return $this;
     }
 
@@ -134,9 +146,11 @@ class Contributor
     {
         return $this->active;
     }
+
     public function setActive(bool $active): self
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -144,9 +158,11 @@ class Contributor
     {
         return $this->user;
     }
+
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -154,16 +170,20 @@ class Contributor
     {
         return $this->profiles;
     }
+
     public function addProfile(Profile $profile): self
     {
         if (!$this->profiles->contains($profile)) {
             $this->profiles[] = $profile;
         }
+
         return $this;
     }
+
     public function removeProfile(Profile $profile): self
     {
         $this->profiles->removeElement($profile);
+
         return $this;
     }
 
@@ -171,14 +191,17 @@ class Contributor
     {
         return $this->employmentPeriods;
     }
+
     public function addEmploymentPeriod(EmploymentPeriod $employmentPeriod): self
     {
         if (!$this->employmentPeriods->contains($employmentPeriod)) {
             $this->employmentPeriods[] = $employmentPeriod;
             $employmentPeriod->setContributor($this);
         }
+
         return $this;
     }
+
     public function removeEmploymentPeriod(EmploymentPeriod $employmentPeriod): self
     {
         if ($this->employmentPeriods->removeElement($employmentPeriod)) {
@@ -187,6 +210,7 @@ class Contributor
                 $employmentPeriod->setContributor(null);
             }
         }
+
         return $this;
     }
 
@@ -194,14 +218,17 @@ class Contributor
     {
         return $this->timesheets;
     }
+
     public function addTimesheet(Timesheet $timesheet): self
     {
         if (!$this->timesheets->contains($timesheet)) {
             $this->timesheets[] = $timesheet;
             $timesheet->setContributor($this);
         }
+
         return $this;
     }
+
     public function removeTimesheet(Timesheet $timesheet): self
     {
         if ($this->timesheets->removeElement($timesheet)) {
@@ -210,6 +237,7 @@ class Contributor
                 $timesheet->setContributor(null);
             }
         }
+
         return $this;
     }
 

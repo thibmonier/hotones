@@ -39,6 +39,7 @@ class ServiceCategoryController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Catégorie de service créée avec succès');
+
             return $this->redirectToRoute('service_category_index');
         }
 
@@ -67,6 +68,7 @@ class ServiceCategoryController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Catégorie de service modifiée avec succès');
+
             return $this->redirectToRoute('service_category_index');
         }
 

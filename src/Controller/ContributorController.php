@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Contributor;
-use App\Entity\User;
 use App\Entity\Profile;
+use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,7 @@ class ContributorController extends AbstractController
     {
         $contributors = $em->getRepository(Contributor::class)->findBy(
             ['active' => true],
-            ['name' => 'ASC']
+            ['name' => 'ASC'],
         );
 
         return $this->render('contributor/index.html.twig', [
@@ -42,12 +43,12 @@ class ContributorController extends AbstractController
 
             // Gestion des montants (éviter les chaînes vides)
             $cjm = $request->request->get('cjm');
-            $contributor->setCjm($cjm !== '' ? (float)$cjm : null);
+            $contributor->setCjm($cjm !== '' ? (float) $cjm : null);
 
             $tjm = $request->request->get('tjm');
-            $contributor->setTjm($tjm !== '' ? (float)$tjm : null);
+            $contributor->setTjm($tjm !== '' ? (float) $tjm : null);
 
-            $contributor->setActive((bool)$request->request->get('active', true));
+            $contributor->setActive((bool) $request->request->get('active', true));
             $contributor->setNotes($request->request->get('notes'));
 
             // Association avec un utilisateur si sélectionné
@@ -73,16 +74,17 @@ class ContributorController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Contributeur créé avec succès');
+
             return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
         }
 
-        $users = $em->getRepository(User::class)->findBy(['totpEnabled' => true], ['firstName' => 'ASC']);
+        $users    = $em->getRepository(User::class)->findBy(['totpEnabled' => true], ['firstName' => 'ASC']);
         $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         return $this->render('contributor/new.html.twig', [
             'contributor' => $contributor,
-            'users' => $users,
-            'profiles' => $profiles,
+            'users'       => $users,
+            'profiles'    => $profiles,
         ]);
     }
 
@@ -105,12 +107,12 @@ class ContributorController extends AbstractController
 
             // Gestion des montants (éviter les chaînes vides)
             $cjm = $request->request->get('cjm');
-            $contributor->setCjm($cjm !== '' ? (float)$cjm : null);
+            $contributor->setCjm($cjm !== '' ? (float) $cjm : null);
 
             $tjm = $request->request->get('tjm');
-            $contributor->setTjm($tjm !== '' ? (float)$tjm : null);
+            $contributor->setTjm($tjm !== '' ? (float) $tjm : null);
 
-            $contributor->setActive((bool)$request->request->get('active'));
+            $contributor->setActive((bool) $request->request->get('active'));
             $contributor->setNotes($request->request->get('notes'));
 
             // Association avec un utilisateur
@@ -136,16 +138,17 @@ class ContributorController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Contributeur modifié avec succès');
+
             return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
         }
 
-        $users = $em->getRepository(User::class)->findBy(['totpEnabled' => true], ['firstName' => 'ASC']);
+        $users    = $em->getRepository(User::class)->findBy(['totpEnabled' => true], ['firstName' => 'ASC']);
         $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         return $this->render('contributor/edit.html.twig', [
             'contributor' => $contributor,
-            'users' => $users,
-            'profiles' => $profiles,
+            'users'       => $users,
+            'profiles'    => $profiles,
         ]);
     }
 
@@ -158,31 +161,31 @@ class ContributorController extends AbstractController
 
         return $this->render('contributor/employment_periods.html.twig', [
             'contributor' => $contributor,
-            'periods' => $periods,
+            'periods'     => $periods,
         ]);
     }
 
     #[Route('/{id}/timesheets', name: 'contributor_timesheets', methods: ['GET'])]
     public function timesheets(Request $request, Contributor $contributor, EntityManagerInterface $em): Response
     {
-        $month = $request->query->get('month', date('Y-m'));
-        $startDate = new \DateTime($month . '-01');
-        $endDate = clone $startDate;
+        $month     = $request->query->get('month', date('Y-m'));
+        $startDate = new DateTime($month.'-01');
+        $endDate   = clone $startDate;
         $endDate->modify('last day of this month');
 
         $timesheetRepo = $em->getRepository(\App\Entity\Timesheet::class);
-        $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
+        $timesheets    = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
         $projectTotals = $timesheetRepo->getHoursGroupedByProjectForContributor($contributor, $startDate, $endDate);
-        $totalHours = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
+        $totalHours    = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
 
         return $this->render('contributor/timesheets.html.twig', [
-            'contributor' => $contributor,
-            'timesheets' => $timesheets,
-            'totalHours' => $totalHours,
+            'contributor'   => $contributor,
+            'timesheets'    => $timesheets,
+            'totalHours'    => $totalHours,
             'projectTotals' => $projectTotals,
-            'month' => $month,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
+            'month'         => $month,
+            'startDate'     => $startDate,
+            'endDate'       => $endDate,
         ]);
     }
 

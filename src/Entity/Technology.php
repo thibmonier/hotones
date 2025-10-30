@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'technologies')]
@@ -45,9 +45,11 @@ class Technology
     {
         return $this->name;
     }
+
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -55,9 +57,11 @@ class Technology
     {
         return $this->category;
     }
+
     public function setCategory(string $category): self
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -65,9 +69,11 @@ class Technology
     {
         return $this->color;
     }
+
     public function setColor(?string $color): self
     {
         $this->color = $color;
+
         return $this;
     }
 
@@ -75,9 +81,11 @@ class Technology
     {
         return $this->active;
     }
+
     public function setActive(bool $active): self
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -85,19 +93,23 @@ class Technology
     {
         return $this->projects;
     }
+
     public function addProject(Project $project): self
     {
         if (!$this->projects->contains($project)) {
             $this->projects[] = $project;
             $project->addTechnology($this);
         }
+
         return $this;
     }
+
     public function removeProject(Project $project): self
     {
         if ($this->projects->removeElement($project)) {
             $project->removeTechnology($this);
         }
+
         return $this;
     }
 }

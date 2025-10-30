@@ -2,8 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\EmploymentPeriod;
 use App\Entity\Contributor;
+use App\Entity\EmploymentPeriod;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,7 +24,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les périodes d'emploi avec filtrage optionnel par contributeur
+     * Trouve les périodes d'emploi avec filtrage optionnel par contributeur.
      */
     public function findWithOptionalContributorFilter(?int $contributorId = null): array
     {
@@ -40,9 +41,9 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Vérifie s'il y a des chevauchements de périodes pour un contributeur donné
+     * Vérifie s'il y a des chevauchements de périodes pour un contributeur donné.
      */
-    public function hasOverlappingPeriods(EmploymentPeriod $period, int $excludeId = null): bool
+    public function hasOverlappingPeriods(EmploymentPeriod $period, ?int $excludeId = null): bool
     {
         if (!$period->getContributor() || !$period->getStartDate()) {
             return false;
@@ -62,14 +63,14 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
         if ($endDate) {
             // Période avec date de fin
             $queryBuilder->andWhere(
-                '(ep.startDate <= :endDate AND (ep.endDate IS NULL OR ep.endDate >= :startDate))'
+                '(ep.startDate <= :endDate AND (ep.endDate IS NULL OR ep.endDate >= :startDate))',
             )
             ->setParameter('startDate', $period->getStartDate())
             ->setParameter('endDate', $endDate);
         } else {
             // Période ouverte (sans date de fin)
             $queryBuilder->andWhere(
-                '(ep.endDate IS NULL OR ep.endDate >= :startDate)'
+                '(ep.endDate IS NULL OR ep.endDate >= :startDate)',
             )
             ->setParameter('startDate', $period->getStartDate());
         }
@@ -78,11 +79,11 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les périodes d'emploi actives (sans date de fin ou date de fin dans le futur)
+     * Récupère les périodes d'emploi actives (sans date de fin ou date de fin dans le futur).
      */
     public function findActivePeriods(): array
     {
-        $now = new \DateTime();
+        $now = new DateTime();
 
         return $this->createQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
@@ -95,7 +96,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les périodes d'emploi pour un contributeur donné
+     * Récupère les périodes d'emploi pour un contributeur donné.
      */
     public function findByContributor(Contributor $contributor): array
     {
@@ -108,11 +109,11 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère la période d'emploi active actuelle pour un contributeur
+     * Récupère la période d'emploi active actuelle pour un contributeur.
      */
     public function findCurrentPeriodForContributor(Contributor $contributor): ?EmploymentPeriod
     {
-        $now = new \DateTime();
+        $now = new DateTime();
 
         return $this->createQueryBuilder('ep')
             ->where('ep.contributor = :contributor')
@@ -127,7 +128,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les périodes d'emploi avec leurs profils associés
+     * Récupère les périodes d'emploi avec leurs profils associés.
      */
     public function findWithProfiles(): array
     {
@@ -141,7 +142,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Calcule le coût total d'une période d'emploi
+     * Calcule le coût total d'une période d'emploi.
      */
     public function calculatePeriodCost(EmploymentPeriod $period): ?float
     {
@@ -149,25 +150,25 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             return null;
         }
 
-        $endDate = $period->getEndDate() ?? new \DateTime();
-        $workingDays = $this->calculateWorkingDays($period->getStartDate(), $endDate);
+        $endDate             = $period->getEndDate() ?? new DateTime();
+        $workingDays         = $this->calculateWorkingDays($period->getStartDate(), $endDate);
         $adjustedWorkingDays = $workingDays * (floatval($period->getWorkTimePercentage()) / 100);
 
         return $adjustedWorkingDays * floatval($period->getCjm());
     }
 
     /**
-     * Calcule le nombre de jours ouvrés entre deux dates
+     * Calcule le nombre de jours ouvrés entre deux dates.
      */
-    public function calculateWorkingDays(\DateTime $startDate, \DateTime $endDate): int
+    public function calculateWorkingDays(DateTime $startDate, DateTime $endDate): int
     {
         $workingDays = 0;
-        $current = clone $startDate;
+        $current     = clone $startDate;
 
         while ($current <= $endDate) {
             // Exclure les weekends (samedi = 6, dimanche = 0)
             if ($current->format('w') != 0 && $current->format('w') != 6) {
-                $workingDays++;
+                ++$workingDays;
             }
             $current->modify('+1 day');
         }
@@ -176,7 +177,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les statistiques des périodes d'emploi
+     * Récupère les statistiques des périodes d'emploi.
      */
     public function getStatistics(): array
     {
@@ -188,7 +189,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         // Périodes actives
-        $now = new \DateTime();
+        $now           = new DateTime();
         $activePeriods = $this->createQueryBuilder('ep')
             ->select('COUNT(ep.id)')
             ->where('ep.endDate IS NULL OR ep.endDate >= :now')
@@ -204,9 +205,9 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return [
-            'total_periods' => $totalPeriods,
+            'total_periods'  => $totalPeriods,
             'active_periods' => $activePeriods,
-            'average_cjm' => $avgCjm ? round($avgCjm, 2) : null,
+            'average_cjm'    => $avgCjm ? round($avgCjm, 2) : null,
         ];
     }
 }

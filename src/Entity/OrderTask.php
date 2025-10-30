@@ -49,9 +49,11 @@ class OrderTask
     {
         return $this->order;
     }
+
     public function setOrder(Order $order): self
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -59,9 +61,11 @@ class OrderTask
     {
         return $this->name;
     }
+
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -69,9 +73,11 @@ class OrderTask
     {
         return $this->description;
     }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -79,9 +85,11 @@ class OrderTask
     {
         return $this->profile;
     }
+
     public function setProfile(Profile $profile): self
     {
         $this->profile = $profile;
+
         return $this;
     }
 
@@ -89,10 +97,12 @@ class OrderTask
     {
         return $this->soldDays;
     }
+
     public function setSoldDays(string $soldDays): self
     {
         $this->soldDays = $soldDays;
         $this->updateTotalAmount();
+
         return $this;
     }
 
@@ -100,10 +110,12 @@ class OrderTask
     {
         return $this->soldDailyRate;
     }
+
     public function setSoldDailyRate(string $soldDailyRate): self
     {
         $this->soldDailyRate = $soldDailyRate;
         $this->updateTotalAmount();
+
         return $this;
     }
 

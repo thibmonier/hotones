@@ -18,7 +18,7 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les devis avec filtres optionnels
+     * Trouve les devis avec filtres optionnels.
      */
     public function findWithFilters(?Project $project = null, ?string $status = null): array
     {
@@ -40,7 +40,7 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve le dernier numéro de devis pour un mois donné
+     * Trouve le dernier numéro de devis pour un mois donné.
      */
     public function findLastOrderNumberForMonth(string $year, string $month): ?Order
     {
@@ -54,7 +54,7 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les devis par projet
+     * Trouve les devis par projet.
      */
     public function findByProject(Project $project): array
     {
@@ -67,7 +67,7 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les devis par statut
+     * Trouve les devis par statut.
      */
     public function findByStatus(string $status): array
     {

@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\ProjectTask;
 use App\Entity\Project;
+use App\Entity\ProjectTask;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -18,7 +18,7 @@ class ProjectTaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve toutes les tâches d'un projet triées par position
+     * Trouve toutes les tâches d'un projet triées par position.
      */
     public function findByProjectOrderedByPosition(Project $project): array
     {
@@ -32,7 +32,7 @@ class ProjectTaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve la position maximum pour un projet donné
+     * Trouve la position maximum pour un projet donné.
      */
     public function findMaxPositionForProject(Project $project): int
     {
@@ -45,7 +45,7 @@ class ProjectTaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les tâches rentables d'un projet (countsForProfitability = true et type = regular)
+     * Trouve les tâches rentables d'un projet (countsForProfitability = true et type = regular).
      */
     public function findProfitableTasksByProject(Project $project): array
     {
@@ -61,7 +61,7 @@ class ProjectTaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * Compte les tâches par statut pour un projet donné (seulement les tâches rentables)
+     * Compte les tâches par statut pour un projet donné (seulement les tâches rentables).
      */
     public function countProfitableTasksByStatus(Project $project, string $status): int
     {
@@ -79,7 +79,7 @@ class ProjectTaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * Compte toutes les tâches rentables d'un projet
+     * Compte toutes les tâches rentables d'un projet.
      */
     public function countProfitableTasks(Project $project): int
     {

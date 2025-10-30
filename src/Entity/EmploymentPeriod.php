@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\EmploymentPeriodRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -41,10 +42,10 @@ class EmploymentPeriod
     private string $workTimePercentage = '100.00';
 
     #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $startDate;
+    private DateTimeInterface $startDate;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $endDate = null;
+    private ?DateTimeInterface $endDate = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $notes = null;
@@ -67,9 +68,11 @@ class EmploymentPeriod
     {
         return $this->contributor;
     }
+
     public function setContributor(Contributor $contributor): self
     {
         $this->contributor = $contributor;
+
         return $this;
     }
 
@@ -77,9 +80,11 @@ class EmploymentPeriod
     {
         return $this->salary;
     }
+
     public function setSalary(?float $salary): self
     {
-        $this->salary = $salary !== null ? (string)$salary : null;
+        $this->salary = $salary !== null ? (string) $salary : null;
+
         return $this;
     }
 
@@ -87,9 +92,11 @@ class EmploymentPeriod
     {
         return $this->cjm;
     }
+
     public function setCjm(?float $cjm): self
     {
-        $this->cjm = $cjm !== null ? (string)$cjm : null;
+        $this->cjm = $cjm !== null ? (string) $cjm : null;
+
         return $this;
     }
 
@@ -97,9 +104,11 @@ class EmploymentPeriod
     {
         return $this->tjm;
     }
+
     public function setTjm(?float $tjm): self
     {
-        $this->tjm = $tjm !== null ? (string)$tjm : null;
+        $this->tjm = $tjm !== null ? (string) $tjm : null;
+
         return $this;
     }
 
@@ -107,29 +116,35 @@ class EmploymentPeriod
     {
         return $this->weeklyHours;
     }
+
     public function setWeeklyHours(?float $weeklyHours): self
     {
-        $this->weeklyHours = $weeklyHours !== null ? (string)$weeklyHours : '35.00';
+        $this->weeklyHours = $weeklyHours !== null ? (string) $weeklyHours : '35.00';
+
         return $this;
     }
 
-    public function getStartDate(): \DateTimeInterface
+    public function getStartDate(): DateTimeInterface
     {
         return $this->startDate;
     }
-    public function setStartDate(\DateTimeInterface $startDate): self
+
+    public function setStartDate(DateTimeInterface $startDate): self
     {
         $this->startDate = $startDate;
+
         return $this;
     }
 
-    public function getEndDate(): ?\DateTimeInterface
+    public function getEndDate(): ?DateTimeInterface
     {
         return $this->endDate;
     }
-    public function setEndDate(?\DateTimeInterface $endDate): self
+
+    public function setEndDate(?DateTimeInterface $endDate): self
     {
         $this->endDate = $endDate;
+
         return $this;
     }
 
@@ -137,9 +152,11 @@ class EmploymentPeriod
     {
         return $this->workTimePercentage;
     }
+
     public function setWorkTimePercentage(?float $workTimePercentage): self
     {
-        $this->workTimePercentage = $workTimePercentage !== null ? (string)$workTimePercentage : '100.00';
+        $this->workTimePercentage = $workTimePercentage !== null ? (string) $workTimePercentage : '100.00';
+
         return $this;
     }
 
@@ -147,9 +164,11 @@ class EmploymentPeriod
     {
         return $this->notes;
     }
+
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
         return $this;
     }
 
@@ -178,31 +197,32 @@ class EmploymentPeriod
     }
 
     /**
-     * Calcule le CJM effectif en prenant en compte le temps partiel
+     * Calcule le CJM effectif en prenant en compte le temps partiel.
      */
     public function getEffectiveDailyCost(): string
     {
-        $baseCost = floatval($this->cjm);
+        $baseCost     = floatval($this->cjm);
         $workingRatio = floatval($this->workTimePercentage) / 100;
+
         return number_format($baseCost * $workingRatio, 2, '.', '');
     }
 
     /**
-     * Calcule le nombre de jours travaillés par semaine
+     * Calcule le nombre de jours travaillés par semaine.
      */
     public function getWorkingDaysPerWeek(): float
     {
         $standardHourPerDay = 7; // 7h par jour standard
-        $actualHours = floatval($this->weeklyHours);
-        $workingRatio = floatval($this->workTimePercentage) / 100;
+        $actualHours        = floatval($this->weeklyHours);
+        $workingRatio       = floatval($this->workTimePercentage) / 100;
 
         return ($actualHours * $workingRatio) / $standardHourPerDay;
     }
 
     /**
-     * Vérifie si la période est active à une date donnée
+     * Vérifie si la période est active à une date donnée.
      */
-    public function isActiveAt(\DateTimeInterface $date): bool
+    public function isActiveAt(DateTimeInterface $date): bool
     {
         if ($date < $this->startDate) {
             return false;

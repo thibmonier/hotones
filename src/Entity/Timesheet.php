@@ -3,8 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TimesheetRepository;
-use Doctrine\ORM\Mapping as ORM;
 use DateTimeInterface;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TimesheetRepository::class)]
 #[ORM\Table(name: 'timesheets')]
@@ -47,9 +47,11 @@ class Timesheet
     {
         return $this->contributor;
     }
+
     public function setContributor(Contributor $contributor): self
     {
         $this->contributor = $contributor;
+
         return $this;
     }
 
@@ -57,9 +59,11 @@ class Timesheet
     {
         return $this->project;
     }
+
     public function setProject(Project $project): self
     {
         $this->project = $project;
+
         return $this;
     }
 
@@ -67,9 +71,11 @@ class Timesheet
     {
         return $this->task;
     }
+
     public function setTask(?ProjectTask $task): self
     {
         $this->task = $task;
+
         return $this;
     }
 
@@ -77,9 +83,11 @@ class Timesheet
     {
         return $this->date;
     }
+
     public function setDate(DateTimeInterface $date): self
     {
         $this->date = $date;
+
         return $this;
     }
 
@@ -87,9 +95,11 @@ class Timesheet
     {
         return $this->hours;
     }
+
     public function setHours(string $hours): self
     {
         $this->hours = $hours;
+
         return $this;
     }
 
@@ -97,9 +107,11 @@ class Timesheet
     {
         return $this->notes;
     }
+
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
         return $this;
     }
 }

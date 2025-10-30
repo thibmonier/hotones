@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
-use App\Entity\Timesheet;
 use App\Entity\Contributor;
 use App\Entity\Project;
+use App\Entity\Timesheet;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,9 +25,9 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les temps d'un contributeur pour une période donnée
+     * Récupère les temps d'un contributeur pour une période donnée.
      */
-    public function findByContributorAndDateRange(Contributor $contributor, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    public function findByContributorAndDateRange(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('t')
             ->where('t.contributor = :contributor')
@@ -40,7 +41,7 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les temps récents d'un contributeur
+     * Récupère les temps récents d'un contributeur.
      */
     public function findRecentByContributor(Contributor $contributor, int $limit = 5): array
     {
@@ -55,9 +56,9 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère tous les temps pour une période avec filtrage optionnel par projet
+     * Récupère tous les temps pour une période avec filtrage optionnel par projet.
      */
-    public function findForPeriodWithProject(\DateTimeInterface $startDate, \DateTimeInterface $endDate, ?Project $project = null): array
+    public function findForPeriodWithProject(DateTimeInterface $startDate, DateTimeInterface $endDate, ?Project $project = null): array
     {
         $qb = $this->createQueryBuilder('t')
             ->leftJoin('t.project', 'p')
@@ -77,9 +78,9 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
-     * Calcule le total des heures pour un mois donné
+     * Calcule le total des heures pour un mois donné.
      */
-    public function getTotalHoursForMonth(\DateTimeInterface $startDate, \DateTimeInterface $endDate): float
+    public function getTotalHoursForMonth(DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
         $result = $this->createQueryBuilder('t')
             ->select('SUM(t.hours)')
@@ -93,9 +94,9 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les temps avec totaux par projet pour un contributeur
+     * Récupère les temps avec totaux par projet pour un contributeur.
      */
-    public function getHoursGroupedByProjectForContributor(Contributor $contributor, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    public function getHoursGroupedByProjectForContributor(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         $results = $this->createQueryBuilder('t')
             ->select('p as project, SUM(t.hours) as totalHours')
@@ -109,42 +110,42 @@ class TimesheetRepository extends ServiceEntityRepository
             ->orderBy('totalHours', 'DESC')
             ->getQuery()
             ->getResult();
-            
+
         // Reformater les résultats pour avoir project et totalHours clairement séparés
         $formatted = [];
         foreach ($results as $result) {
             $formatted[] = [
-                'project' => $result['project'],
-                'totalHours' => (float) $result['totalHours']
+                'project'    => $result['project'],
+                'totalHours' => (float) $result['totalHours'],
             ];
         }
-        
+
         return $formatted;
     }
 
     /**
-     * Trouve un timesheet existant pour éviter les doublons
+     * Trouve un timesheet existant pour éviter les doublons.
      */
-    public function findExistingTimesheet(Contributor $contributor, Project $project, \DateTimeInterface $date): ?Timesheet
+    public function findExistingTimesheet(Contributor $contributor, Project $project, DateTimeInterface $date): ?Timesheet
     {
         return $this->findOneBy([
             'contributor' => $contributor,
-            'project' => $project,
-            'date' => $date
+            'project'     => $project,
+            'date'        => $date,
         ]);
     }
-    
+
     /**
-     * Trouve un timesheet existant avec tâche spécifique pour éviter les doublons
+     * Trouve un timesheet existant avec tâche spécifique pour éviter les doublons.
      */
-    public function findExistingTimesheetWithTask(Contributor $contributor, Project $project, \DateTimeInterface $date, ?\App\Entity\ProjectTask $task = null): ?Timesheet
+    public function findExistingTimesheetWithTask(Contributor $contributor, Project $project, DateTimeInterface $date, ?\App\Entity\ProjectTask $task = null): ?Timesheet
     {
         $criteria = [
             'contributor' => $contributor,
-            'project' => $project,
-            'date' => $date
+            'project'     => $project,
+            'date'        => $date,
         ];
-        
+
         // Si une tâche est spécifiée, l'ajouter aux critères
         if ($task) {
             $criteria['task'] = $task;
@@ -162,14 +163,14 @@ class TimesheetRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getOneOrNullResult();
         }
-        
+
         return $this->findOneBy($criteria);
     }
 
     /**
-     * Récupère les statistiques de temps par contributeur pour une période
+     * Récupère les statistiques de temps par contributeur pour une période.
      */
-    public function getStatsPerContributor(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    public function getStatsPerContributor(DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('t')
             ->select('c.name as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')

@@ -47,6 +47,7 @@ class ProfileController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès');
+
             return $this->redirectToRoute('profile_me');
         }
 
@@ -54,6 +55,7 @@ class ProfileController extends AbstractController
             'user' => $user,
         ]);
     }
+
     #[Route('/me/2fa/setup', name: 'profile_2fa_setup')]
     #[IsGranted('ROLE_USER')]
     public function enable2fa(EntityManagerInterface $em): Response
@@ -78,7 +80,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/2fa_setup.html.twig', [
             'otpauth_uri' => $totp->getProvisioningUri(),
-            'secret' => $user->getTotpSecret(),
+            'secret'      => $user->getTotpSecret(),
         ]);
     }
 
@@ -92,6 +94,7 @@ class ProfileController extends AbstractController
             $user->setTotpEnabled(true);
             $em->flush();
         }
+
         return $this->redirectToRoute('profile_2fa_setup');
     }
 }

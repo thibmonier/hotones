@@ -76,8 +76,14 @@
                         <div class="d-flex flex-column h-100">
                             <div class="mb-4 mb-md-5">
                                 <a href="/" class="d-block auth-logo">
-                                    <img src="assets/images/logo-dark.png" alt="" height="18" class="auth-logo-dark">
-                                    <img src="assets/images/logo-light.png" alt="" height="18" class="auth-logo-light">
+<picture class="auth-logo-dark">
+                                    <source srcset="{{ asset('assets/images/logo-hotones-dark-18.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/images/logo-hotones-dark-18.png') }}" alt="HotOnes" height="18">
+                                </picture>
+<picture class="auth-logo-light">
+                                    <source srcset="{{ asset('assets/images/logo-hotones-light-18.webp') }}" type="image/webp">
+                                    <img src="{{ asset('assets/images/logo-hotones-light-18.png') }}" alt="HotOnes" height="18">
+                                </picture>
                                 </a>
                             </div>
                             <div class="my-auto">

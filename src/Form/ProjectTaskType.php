@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Form;
 
-use App\Entity\ProjectTask;
 use App\Entity\Contributor;
 use App\Entity\Profile;
+use App\Entity\ProjectTask;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -28,87 +28,87 @@ class ProjectTaskType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom de la tâche',
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Ex: Développement interface utilisateur'
+                'attr'  => [
+                    'class'       => 'form-control',
+                    'placeholder' => 'Ex: Développement interface utilisateur',
                 ],
                 'constraints' => [
                     new Assert\NotBlank(message: 'Le nom de la tâche est requis'),
-                    new Assert\Length(max: 255, maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères')
-                ]
+                    new Assert\Length(max: 255, maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères'),
+                ],
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Description',
+                'label'    => 'Description',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'rows' => 4,
-                    'placeholder' => 'Description détaillée de la tâche (optionnel)'
-                ]
+                'attr'     => [
+                    'class'       => 'form-control',
+                    'rows'        => 4,
+                    'placeholder' => 'Description détaillée de la tâche (optionnel)',
+                ],
             ])
             ->add('type', ChoiceType::class, [
-                'label' => 'Type de tâche',
+                'label'   => 'Type de tâche',
                 'choices' => ProjectTask::getAvailableTypes(),
-                'attr' => [
-                    'class' => 'form-select'
+                'attr'    => [
+                    'class' => 'form-select',
                 ],
-                'help' => 'Les tâches AVV et Non-vendu ne comptent pas dans la rentabilité'
+                'help' => 'Les tâches AVV et Non-vendu ne comptent pas dans la rentabilité',
             ])
             ->add('countsForProfitability', CheckboxType::class, [
-                'label' => 'Compte dans la rentabilité',
+                'label'    => 'Compte dans la rentabilité',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-check-input'
+                'attr'     => [
+                    'class' => 'form-check-input',
                 ],
-                'help' => 'Décochez si cette tâche ne doit pas être prise en compte dans les calculs de rentabilité'
+                'help' => 'Décochez si cette tâche ne doit pas être prise en compte dans les calculs de rentabilité',
             ])
             ->add('status', ChoiceType::class, [
-                'label' => 'Statut',
+                'label'   => 'Statut',
                 'choices' => ProjectTask::getAvailableStatuses(),
-                'attr' => [
-                    'class' => 'form-select'
-                ]
+                'attr'    => [
+                    'class' => 'form-select',
+                ],
             ])
             ->add('estimatedHoursSold', IntegerType::class, [
-                'label' => 'Heures vendues (estimées)',
+                'label'    => 'Heures vendues (estimées)',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'     => [
+                    'class'       => 'form-control',
                     'placeholder' => 'Ex: 40',
-                    'min' => 0
+                    'min'         => 0,
                 ],
-                'help' => 'Nombre d\'heures vendues au client pour cette tâche'
+                'help' => 'Nombre d\'heures vendues au client pour cette tâche',
             ])
             ->add('estimatedHoursRevised', IntegerType::class, [
-                'label' => 'Heures révisées (estimées)',
+                'label'    => 'Heures révisées (estimées)',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'     => [
+                    'class'       => 'form-control',
                     'placeholder' => 'Ex: 45',
-                    'min' => 0
+                    'min'         => 0,
                 ],
-                'help' => 'Estimation révisée du nombre d\'heures nécessaires'
+                'help' => 'Estimation révisée du nombre d\'heures nécessaires',
             ])
             ->add('progressPercentage', IntegerType::class, [
                 'label' => 'Avancement (%)',
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'  => [
+                    'class'       => 'form-control',
                     'placeholder' => '0',
-                    'min' => 0,
-                    'max' => 100
+                    'min'         => 0,
+                    'max'         => 100,
                 ],
                 'constraints' => [
-                    new Assert\Range(min: 0, max: 100, notInRangeMessage: 'L\'avancement doit être entre {{ min }}% et {{ max }}%')
+                    new Assert\Range(min: 0, max: 100, notInRangeMessage: 'L\'avancement doit être entre {{ min }}% et {{ max }}%'),
                 ],
-                'help' => 'Pourcentage d\'avancement de la tâche (0 à 100)'
+                'help' => 'Pourcentage d\'avancement de la tâche (0 à 100)',
             ])
             ->add('assignedContributor', EntityType::class, [
-                'class' => Contributor::class,
-                'label' => 'Contributeur assigné',
-                'required' => false,
+                'class'       => Contributor::class,
+                'label'       => 'Contributeur assigné',
+                'required'    => false,
                 'placeholder' => 'Sélectionner un contributeur',
-                'attr' => [
-                    'class' => 'form-select'
+                'attr'        => [
+                    'class' => 'form-select',
                 ],
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
@@ -117,62 +117,62 @@ class ProjectTaskType extends AbstractType
                         ->orderBy('c.name', 'ASC');
                 },
                 'choice_label' => 'name',
-                'help' => 'Contributeur responsable de cette tâche'
+                'help'         => 'Contributeur responsable de cette tâche',
             ])
             ->add('requiredProfile', EntityType::class, [
-                'class' => Profile::class,
-                'label' => 'Profil requis',
-                'required' => false,
+                'class'       => Profile::class,
+                'label'       => 'Profil requis',
+                'required'    => false,
                 'placeholder' => 'Sélectionner un profil',
-                'attr' => [
-                    'class' => 'form-select'
+                'attr'        => [
+                    'class' => 'form-select',
                 ],
                 'choice_label' => 'name',
-                'help' => 'Type de profil nécessaire pour cette tâche'
+                'help'         => 'Type de profil nécessaire pour cette tâche',
             ])
             ->add('dailyRate', MoneyType::class, [
-                'label' => 'Tarif journalier (€)',
+                'label'    => 'Tarif journalier (€)',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => '500.00'
+                'attr'     => [
+                    'class'       => 'form-control',
+                    'placeholder' => '500.00',
                 ],
-                'help' => 'Tarif journalier spécifique à cette tâche (optionnel)'
+                'help' => 'Tarif journalier spécifique à cette tâche (optionnel)',
             ])
             ->add('startDate', DateType::class, [
-                'label' => 'Date de début',
+                'label'    => 'Date de début',
                 'required' => false,
-                'widget' => 'single_text',
-                'attr' => [
-                    'class' => 'form-control'
+                'widget'   => 'single_text',
+                'attr'     => [
+                    'class' => 'form-control',
                 ],
-                'help' => 'Date prévue de début de la tâche'
+                'help' => 'Date prévue de début de la tâche',
             ])
             ->add('endDate', DateType::class, [
-                'label' => 'Date de fin',
+                'label'    => 'Date de fin',
                 'required' => false,
-                'widget' => 'single_text',
-                'attr' => [
-                    'class' => 'form-control'
+                'widget'   => 'single_text',
+                'attr'     => [
+                    'class' => 'form-control',
                 ],
-                'help' => 'Date prévue de fin de la tâche'
+                'help' => 'Date prévue de fin de la tâche',
             ])
             ->add('position', IntegerType::class, [
                 'label' => 'Position',
-                'attr' => [
+                'attr'  => [
                     'class' => 'form-control',
-                    'min' => 1
+                    'min'   => 1,
                 ],
-                'help' => 'Ordre d\'affichage de la tâche dans la liste'
+                'help' => 'Ordre d\'affichage de la tâche dans la liste',
             ])
             ->add('active', CheckboxType::class, [
-                'label' => 'Tâche active',
+                'label'    => 'Tâche active',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-check-input'
+                'attr'     => [
+                    'class' => 'form-check-input',
                 ],
-                'help' => 'Décochez pour désactiver cette tâche'
+                'help' => 'Décochez pour désactiver cette tâche',
             ])
         ;
     }

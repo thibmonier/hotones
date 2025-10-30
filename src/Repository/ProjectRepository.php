@@ -22,7 +22,7 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère tous les projets triés par nom
+     * Récupère tous les projets triés par nom.
      */
     public function findAllOrderedByName(): array
     {
@@ -33,7 +33,7 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les projets actifs triés par nom
+     * Récupère les projets actifs triés par nom.
      */
     public function findActiveOrderedByName(): array
     {
@@ -46,7 +46,7 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les projets récents (limité)
+     * Récupère les projets récents (limité).
      */
     public function findRecentProjects(int $limit = 5): array
     {
@@ -58,7 +58,7 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Compte les projets actifs
+     * Compte les projets actifs.
      */
     public function countActiveProjects(): int
     {
@@ -71,7 +71,7 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les projets avec leurs statistiques par statut
+     * Récupère les projets avec leurs statistiques par statut.
      */
     public function getProjectsByStatus(): array
     {
@@ -90,13 +90,13 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Recherche de projets par nom ou client
+     * Recherche de projets par nom ou client.
      */
     public function searchProjects(string $query): array
     {
         return $this->createQueryBuilder('p')
             ->where('p.name LIKE :query OR p.client LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
+            ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();

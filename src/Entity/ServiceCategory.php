@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'service_categories')]
@@ -45,9 +45,11 @@ class ServiceCategory
     {
         return $this->name;
     }
+
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -55,9 +57,11 @@ class ServiceCategory
     {
         return $this->description;
     }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -65,9 +69,11 @@ class ServiceCategory
     {
         return $this->color;
     }
+
     public function setColor(?string $color): self
     {
         $this->color = $color;
+
         return $this;
     }
 
@@ -75,9 +81,11 @@ class ServiceCategory
     {
         return $this->active;
     }
+
     public function setActive(bool $active): self
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -85,14 +93,17 @@ class ServiceCategory
     {
         return $this->projects;
     }
+
     public function addProject(Project $project): self
     {
         if (!$this->projects->contains($project)) {
             $this->projects[] = $project;
             $project->setServiceCategory($this);
         }
+
         return $this;
     }
+
     public function removeProject(Project $project): self
     {
         if ($this->projects->removeElement($project)) {
@@ -100,6 +111,7 @@ class ServiceCategory
                 $project->setServiceCategory(null);
             }
         }
+
         return $this;
     }
 }

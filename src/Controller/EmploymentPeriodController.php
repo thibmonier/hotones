@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\EmploymentPeriod;
 use App\Entity\Contributor;
+use App\Entity\EmploymentPeriod;
 use App\Entity\Profile;
-use App\Repository\EmploymentPeriodRepository;
 use App\Repository\ContributorRepository;
+use App\Repository\EmploymentPeriodRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,12 +24,12 @@ class EmploymentPeriodController extends AbstractController
     {
         $contributorId = $request->query->get('contributor');
 
-        $periods = $employmentPeriodRepository->findWithOptionalContributorFilter($contributorId);
+        $periods      = $employmentPeriodRepository->findWithOptionalContributorFilter($contributorId);
         $contributors = $contributorRepository->findActiveContributors();
 
         return $this->render('employment_period/index.html.twig', [
-            'periods' => $periods,
-            'contributors' => $contributors,
+            'periods'             => $periods,
+            'contributors'        => $contributors,
             'selectedContributor' => $contributorId,
         ]);
     }
@@ -56,28 +57,28 @@ class EmploymentPeriodController extends AbstractController
             }
 
             if ($request->request->get('start_date')) {
-                $period->setStartDate(new \DateTime($request->request->get('start_date')));
+                $period->setStartDate(new DateTime($request->request->get('start_date')));
             }
 
             if ($request->request->get('end_date')) {
-                $period->setEndDate(new \DateTime($request->request->get('end_date')));
+                $period->setEndDate(new DateTime($request->request->get('end_date')));
             }
 
             // Données financières
             $salary = $request->request->get('salary');
-            $period->setSalary($salary !== '' ? (float)$salary : null);
+            $period->setSalary($salary !== '' ? (float) $salary : null);
 
             $cjm = $request->request->get('cjm');
-            $period->setCjm($cjm !== '' ? (float)$cjm : null);
+            $period->setCjm($cjm !== '' ? (float) $cjm : null);
 
             $tjm = $request->request->get('tjm');
-            $period->setTjm($tjm !== '' ? (float)$tjm : null);
+            $period->setTjm($tjm !== '' ? (float) $tjm : null);
 
             $weeklyHours = $request->request->get('weekly_hours');
-            $period->setWeeklyHours($weeklyHours !== '' ? (float)$weeklyHours : 35.0);
+            $period->setWeeklyHours($weeklyHours !== '' ? (float) $weeklyHours : 35.0);
 
             $workTimePercentage = $request->request->get('work_time_percentage');
-            $period->setWorkTimePercentage($workTimePercentage !== '' ? (float)$workTimePercentage : 100.0);
+            $period->setWorkTimePercentage($workTimePercentage !== '' ? (float) $workTimePercentage : 100.0);
 
             // Gestion des profils
             $profileIds = $request->request->all('profiles');
@@ -97,12 +98,12 @@ class EmploymentPeriodController extends AbstractController
                 $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce contributeur.');
 
                 $contributors = $contributorRepository->findActiveContributors();
-                $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+                $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
                 return $this->render('employment_period/new.html.twig', [
-                    'period' => $period,
+                    'period'       => $period,
                     'contributors' => $contributors,
-                    'profiles' => $profiles,
+                    'profiles'     => $profiles,
                 ]);
             }
 
@@ -110,16 +111,17 @@ class EmploymentPeriodController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Période d\'emploi créée avec succès');
+
             return $this->redirectToRoute('employment_period_show', ['id' => $period->getId()]);
         }
 
         $contributors = $contributorRepository->findActiveContributors();
-        $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+        $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         return $this->render('employment_period/new.html.twig', [
-            'period' => $period,
+            'period'       => $period,
             'contributors' => $contributors,
-            'profiles' => $profiles,
+            'profiles'     => $profiles,
         ]);
     }
 
@@ -129,7 +131,7 @@ class EmploymentPeriodController extends AbstractController
         // Calculer la durée en jours
         $duration = null;
         if ($period->getStartDate()) {
-            $endDate = $period->getEndDate() ?? new \DateTime();
+            $endDate  = $period->getEndDate() ?? new DateTime();
             $duration = $period->getStartDate()->diff($endDate)->days + 1;
         }
 
@@ -137,8 +139,8 @@ class EmploymentPeriodController extends AbstractController
         $totalCost = $employmentPeriodRepository->calculatePeriodCost($period);
 
         return $this->render('employment_period/show.html.twig', [
-            'period' => $period,
-            'duration' => $duration,
+            'period'    => $period,
+            'duration'  => $duration,
             'totalCost' => $totalCost,
         ]);
     }
@@ -154,30 +156,30 @@ class EmploymentPeriodController extends AbstractController
             }
 
             if ($request->request->get('start_date')) {
-                $period->setStartDate(new \DateTime($request->request->get('start_date')));
+                $period->setStartDate(new DateTime($request->request->get('start_date')));
             }
 
             if ($request->request->get('end_date')) {
-                $period->setEndDate(new \DateTime($request->request->get('end_date')));
+                $period->setEndDate(new DateTime($request->request->get('end_date')));
             } else {
                 $period->setEndDate(null);
             }
 
             // Données financières
             $salary = $request->request->get('salary');
-            $period->setSalary($salary !== '' ? (float)$salary : null);
+            $period->setSalary($salary !== '' ? (float) $salary : null);
 
             $cjm = $request->request->get('cjm');
-            $period->setCjm($cjm !== '' ? (float)$cjm : null);
+            $period->setCjm($cjm !== '' ? (float) $cjm : null);
 
             $tjm = $request->request->get('tjm');
-            $period->setTjm($tjm !== '' ? (float)$tjm : null);
+            $period->setTjm($tjm !== '' ? (float) $tjm : null);
 
             $weeklyHours = $request->request->get('weekly_hours');
-            $period->setWeeklyHours($weeklyHours !== '' ? (float)$weeklyHours : 35.0);
+            $period->setWeeklyHours($weeklyHours !== '' ? (float) $weeklyHours : 35.0);
 
             $workTimePercentage = $request->request->get('work_time_percentage');
-            $period->setWorkTimePercentage($workTimePercentage !== '' ? (float)$workTimePercentage : 100.0);
+            $period->setWorkTimePercentage($workTimePercentage !== '' ? (float) $workTimePercentage : 100.0);
 
             // Gestion des profils
             $period->getProfiles()->clear();
@@ -198,28 +200,29 @@ class EmploymentPeriodController extends AbstractController
                 $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce contributeur.');
 
                 $contributors = $contributorRepository->findActiveContributors();
-                $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+                $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
                 return $this->render('employment_period/edit.html.twig', [
-                    'period' => $period,
+                    'period'       => $period,
                     'contributors' => $contributors,
-                    'profiles' => $profiles,
+                    'profiles'     => $profiles,
                 ]);
             }
 
             $em->flush();
 
             $this->addFlash('success', 'Période d\'emploi modifiée avec succès');
+
             return $this->redirectToRoute('employment_period_show', ['id' => $period->getId()]);
         }
 
         $contributors = $contributorRepository->findActiveContributors();
-        $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+        $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         return $this->render('employment_period/edit.html.twig', [
-            'period' => $period,
+            'period'       => $period,
             'contributors' => $contributors,
-            'profiles' => $profiles,
+            'profiles'     => $profiles,
         ]);
     }
 
@@ -234,5 +237,4 @@ class EmploymentPeriodController extends AbstractController
 
         return $this->redirectToRoute('employment_period_index');
     }
-
 }

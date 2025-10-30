@@ -15,9 +15,15 @@
     <div class="row">
       <div class="col-lg-12">
         <div class="text-center">
-          <a href="/" class="d-block auth-logo">
-            <img src="assets/images/logo-dark.png" alt="" height="20" class="auth-logo-dark mx-auto">
-            <img src="assets/images/logo-light.png" alt="" height="20" class="auth-logo-light mx-auto">
+<a href="/" class="d-block auth-logo">
+<picture class="auth-logo-dark mx-auto">
+            <source srcset="{{ asset('assets/images/logo-hotones-dark-24.webp') }}" type="image/webp">
+            <img src="{{ asset('assets/images/logo-hotones-dark-24.png') }}" alt="HotOnes" height="20">
+          </picture>
+<picture class="auth-logo-light mx-auto">
+            <source srcset="{{ asset('assets/images/logo-hotones-light-24.webp') }}" type="image/webp">
+            <img src="{{ asset('assets/images/logo-hotones-light-24.png') }}" alt="HotOnes" height="20">
+          </picture>
           </a>
           <div class="row justify-content-center mt-5">
             <div class="col-sm-4">
