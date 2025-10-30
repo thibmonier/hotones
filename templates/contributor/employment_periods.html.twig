@@ -1,0 +1,74 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Périodes d'emploi — {{ contributor.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Périodes d'emploi — {{ contributor.name }}</h4>
+      <div class="page-title-right d-flex gap-2">
+        <a href="{{ path('employment_period_new', {'contributor': contributor.id}) }}" class="btn btn-primary">
+          <i class="bx bx-plus me-1"></i> Nouvelle période
+        </a>
+        <a href="{{ path('contributor_show', {'id': contributor.id}) }}" class="btn btn-secondary">
+          <i class="bx bx-arrow-back me-1"></i> Retour au contributeur
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if periods %}
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Période</th>
+              <th>Profils</th>
+              <th class="text-end">CJM</th>
+              <th class="text-end">TJM</th>
+              <th class="text-end">Heures/sem.</th>
+              <th class="text-end">Temps (%)</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for p in periods %}
+            <tr>
+              <td>
+                {{ p.startDate|date('d/m/Y') }}
+                –
+                {{ p.endDate ? p.endDate|date('d/m/Y') : 'En cours' }}
+              </td>
+              <td>
+                {% for pr in p.profiles %}
+                  <span class="badge bg-secondary me-1">{{ pr.name }}</span>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endfor %}
+              </td>
+              <td class="text-end">{{ p.cjm ? p.cjm ~ ' €' : '-' }}</td>
+              <td class="text-end">{{ p.tjm ? p.tjm ~ ' €' : '-' }}</td>
+              <td class="text-end">{{ p.weeklyHours|default(35) }}</td>
+              <td class="text-end">{{ p.workTimePercentage|default(100) }}%</td>
+              <td class="text-end">
+                <a href="{{ path('employment_period_show', {'id': p.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                <a href="{{ path('employment_period_edit', {'id': p.id}) }}" class="btn btn-sm btn-outline-primary">Éditer</a>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-center text-muted py-5">
+        <i class="bx bx-briefcase font-size-48 d-block mb-2"></i>
+        Aucune période d'emploi
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

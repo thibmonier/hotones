@@ -32,7 +32,7 @@
                                 <select name="contributor_id" id="contributor_id" class="form-select" required>
                                     <option value="">Sélectionner un contributeur</option>
                                     {% for contributor in contributors %}
-                                        <option value="{{ contributor.id }}" {% if period.contributor is defined and period.contributor and period.contributor.id == contributor.id %}selected{% endif %}>
+                                        <option value="{{ contributor.id }}" {% if selectedContributorId is defined and selectedContributorId == contributor.id %}selected{% endif %}>
                                             {{ contributor.name }}
                                         </option>
                                     {% endfor %}

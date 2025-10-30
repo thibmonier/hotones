@@ -101,9 +101,10 @@ class EmploymentPeriodController extends AbstractController
                 $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
                 return $this->render('employment_period/new.html.twig', [
-                    'period'       => $period,
-                    'contributors' => $contributors,
-                    'profiles'     => $profiles,
+                    'period'                => $period,
+                    'contributors'          => $contributors,
+                    'profiles'              => $profiles,
+                    'selectedContributorId' => $period->getContributor() ? $period->getContributor()->getId() : null,
                 ]);
             }
 
@@ -119,9 +120,10 @@ class EmploymentPeriodController extends AbstractController
         $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         return $this->render('employment_period/new.html.twig', [
-            'period'       => $period,
-            'contributors' => $contributors,
-            'profiles'     => $profiles,
+            'period'                => $period,
+            'contributors'          => $contributors,
+            'profiles'              => $profiles,
+            'selectedContributorId' => $period->getContributor() ? $period->getContributor()->getId() : null,
         ]);
     }
 

@@ -19,7 +19,7 @@ class EmploymentPeriod
 
     #[ORM\ManyToOne(targetEntity: Contributor::class, inversedBy: 'employmentPeriods')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private Contributor $contributor;
+    private ?Contributor $contributor = null;
 
     // Salaire mensuel brut en EUR (ou net selon votre besoin)
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
@@ -57,6 +57,8 @@ class EmploymentPeriod
     public function __construct()
     {
         $this->profiles = new ArrayCollection();
+        // Initialiser pour éviter les erreurs d'accès avant initialisation dans les vues
+        $this->startDate = new \DateTime();
     }
 
     public function getId(): ?int
@@ -64,7 +66,7 @@ class EmploymentPeriod
         return $this->id;
     }
 
-    public function getContributor(): Contributor
+    public function getContributor(): ?Contributor
     {
         return $this->contributor;
     }
