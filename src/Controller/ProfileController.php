@@ -6,6 +6,8 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use OTPHP\TOTP;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -54,6 +56,23 @@ class ProfileController extends AbstractController
             $user->setPhonePersonal($request->request->get('phone_personal'));
             $user->setAddress($request->request->get('address'));
 
+            /** @var UploadedFile|null $avatarFile */
+            $avatarFile = $request->files->get('avatar');
+            if ($avatarFile instanceof UploadedFile && $avatarFile->isValid()) {
+                $mime = $avatarFile->getMimeType();
+                if (str_starts_with((string) $mime, 'image/')) {
+                    $projectDir = $this->getParameter('kernel.project_dir');
+                    $targetDir  = $projectDir.'/public/uploads/avatars';
+                    (new Filesystem())->mkdir($targetDir);
+                    $ext      = $avatarFile->guessExtension() ?: 'png';
+                    $safeName = 'u'.$user->getId().'_'.bin2hex(random_bytes(6)).'.'.$ext;
+                    $avatarFile->move($targetDir, $safeName);
+                    $user->setAvatar('/uploads/avatars/'.$safeName);
+                } else {
+                    $this->addFlash('danger', 'Format de fichier invalide pour l’avatar');
+                }
+            }
+
             $em->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès');
@@ -92,6 +111,37 @@ class ProfileController extends AbstractController
             'otpauth_uri' => $totp->getProvisioningUri(),
             'secret'      => $user->getTotpSecret(),
         ]);
+    }
+
+    #[Route('/me/password', name: 'profile_password', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function changePassword(Request $request, EntityManagerInterface $em, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if ($request->isMethod('POST')) {
+            $current = (string) $request->request->get('current_password');
+            $new     = (string) $request->request->get('new_password');
+            $confirm = (string) $request->request->get('confirm_password');
+
+            if (!$hasher->isPasswordValid($user, $current)) {
+                $this->addFlash('danger', 'Mot de passe actuel incorrect');
+            } elseif ($new === '' || $new !== $confirm) {
+                $this->addFlash('danger', 'Le nouveau mot de passe et la confirmation ne correspondent pas');
+            } else {
+                $user->setPassword($hasher->hashPassword($user, $new));
+                $em->flush();
+                $this->addFlash('success', 'Mot de passe mis à jour');
+
+                return $this->redirectToRoute('profile_me');
+            }
+        }
+
+        return $this->render('profile/password.html.twig');
     }
 
     #[Route('/me/2fa/activate', name: 'me_2fa_activate')]

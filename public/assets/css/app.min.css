@@ -199,7 +199,7 @@ body[data-topbar=dark] .app-search input.form-control::-webkit-input-placeholder
 }
 
 body[data-sidebar=dark] .navbar-brand-box {
-  background: #2a3042;
+  background: #444444;
 }
 body[data-sidebar=dark] .logo-dark {
   display: none;
@@ -595,7 +595,7 @@ body[data-layout=horizontal] .footer {
 }
 
 body[data-sidebar=dark] .vertical-menu {
-  background: #2a3042;
+  background: #444444;
 }
 body[data-sidebar=dark] #sidebar-menu ul li a {
   color: #a6b0cf;
@@ -619,7 +619,7 @@ body[data-sidebar=dark].vertical-collpsed {
   min-height: 1760px;
 }
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu > ul > li:hover > a {
-  background: rgb(45.9666666667, 52.5333333333, 72.2333333333);
+  background: rgb(73.1, 73.1, 73.1);
   color: #ffffff;
 }
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu > ul > li:hover > a i {
@@ -632,7 +632,7 @@ body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu > ul > li
   color: #ffffff;
 }
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu > ul ul {
-  background-color: #2a3042;
+  background-color: #444444;
 }
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu ul li.mm-active .active {
   color: #ffffff !important;
@@ -689,7 +689,7 @@ body[data-sidebar-size=small] .footer {
   }
 }
 body[data-sidebar-size=small] #sidebar-menu ul li.menu-title {
-  background-color: rgb(45.9666666667, 52.5333333333, 72.2333333333);
+  background-color: rgb(73.1, 73.1, 73.1);
 }
 body[data-sidebar-size=small] #sidebar-menu ul li a i {
   display: block;
@@ -4488,7 +4488,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before {
 
 .landing-footer {
   padding: 80px 0 40px;
-  background-color: #2a3042;
+  background-color: #444444;
   color: rgba(255, 255, 255, 0.5);
 }
 .landing-footer .footer-list-title {

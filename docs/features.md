@@ -12,7 +12,7 @@
 - Cette page doit reprendre les informations de ma carrière en mode lecture seule
 - il faudrait retirer les entrées My wallet, Settings et Lock screen du menu d'entête
 - dans le menu d'entête, il faudrait que le lien logout soit modifié en "Déconnexion" comme dans le menu vertical et que l'ensemble de la section "mon compte" soit retirée du menu vertical
-- 
+- dans la gestion de compte, un utilisateur doit pouvoir associer un avatar à son compte
 
 ## 👥 Gestion des utilisateurs & intervenants
 - User : Compte utilisateur avec authentification 2FA

@@ -1,0 +1,59 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Administration des utilisateurs{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Administration des utilisateurs</h4>
+      <div class="page-title-right d-flex gap-2">
+        <a href="{{ path('admin_users_new') }}" class="btn btn-primary"><i class="bx bx-user-plus me-1"></i> Nouvel utilisateur</a>
+        <a href="{{ path('profile_me') }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Nom</th>
+            <th>Contributeur</th>
+            <th>Rôles</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ u.email }}</td>
+            <td>{{ u.firstName }} {{ u.lastName }}</td>
+            <td>
+              {% set contrib = contributors[u.id]|default(null) %}
+              {% if contrib %}
+                {{ contrib.name }}
+              {% else %}
+                <span class="text-muted">Aucun</span>
+              {% endif %}
+            </td>
+            <td>
+              {% for r in u.roles %}
+                <span class="badge bg-primary me-1">{{ r }}</span>
+              {% endfor %}
+            </td>
+            <td class="text-end">
+              <a href="{{ path('admin_users_edit', {id: u.id}) }}" class="btn btn-sm btn-outline-primary"><i class="bx bx-edit"></i> Modifier</a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

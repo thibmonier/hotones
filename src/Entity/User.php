@@ -18,12 +18,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwoFactorInterface
 {
     // Rôles métier
-    public const ROLE_INTERVENANT = 'ROLE_INTERVENANT';
-    public const ROLE_CHEF_PROJET = 'ROLE_CHEF_PROJET';
-    public const ROLE_MANAGER     = 'ROLE_MANAGER';
-    public const ROLE_SUPERADMIN  = 'ROLE_SUPERADMIN';
+    public const string ROLE_INTERVENANT = 'ROLE_INTERVENANT';
+    public const string ROLE_CHEF_PROJET = 'ROLE_CHEF_PROJET';
+    public const string ROLE_MANAGER     = 'ROLE_MANAGER';
+    public const string ROLE_SUPERADMIN  = 'ROLE_SUPERADMIN';
 
-    public const ROLE_HIERARCHY = [
+    public const array ROLE_HIERARCHY = [
         self::ROLE_INTERVENANT => ['ROLE_USER'],
         self::ROLE_CHEF_PROJET => [self::ROLE_INTERVENANT],
         self::ROLE_MANAGER     => [self::ROLE_CHEF_PROJET],

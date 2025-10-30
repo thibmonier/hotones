@@ -99,24 +99,28 @@ class TimesheetRepository extends ServiceEntityRepository
     public function getHoursGroupedByProjectForContributor(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         $results = $this->createQueryBuilder('t')
-            ->select('p as project, SUM(t.hours) as totalHours')
+            ->select('p.id AS projectId, p.name AS projectName, p.client AS projectClient, SUM(t.hours) AS totalHours')
             ->leftJoin('t.project', 'p')
             ->where('t.contributor = :contributor')
             ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('contributor', $contributor)
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->groupBy('p.id')
+            ->groupBy('p.id, p.name, p.client')
             ->orderBy('totalHours', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
 
-        // Reformater les résultats pour avoir project et totalHours clairement séparés
+        // Reformater les résultats pour exposer un sous-tableau project compatible Twig
         $formatted = [];
-        foreach ($results as $result) {
+        foreach ($results as $r) {
             $formatted[] = [
-                'project'    => $result['project'],
-                'totalHours' => (float) $result['totalHours'],
+                'project'    => [
+                    'id'     => $r['projectId'] ?? null,
+                    'name'   => $r['projectName'] ?? null,
+                    'client' => $r['projectClient'] ?? null,
+                ],
+                'totalHours' => (float) ($r['totalHours'] ?? 0),
             ];
         }
 

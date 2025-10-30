@@ -38,7 +38,17 @@ class CreateUserCommand extends Command
         $user->setPassword($this->hasher->hashPassword($user, $input->getArgument('password')));
         $this->em->persist($user);
         $this->em->flush();
-        $output->writeln('User created: '.$user->getEmail());
+
+        // Create linked Contributor automatically
+        $contributor = new \App\Entity\Contributor();
+        $contributor->setName(trim($user->getFirstName().' '.$user->getLastName()))
+            ->setEmail($user->getEmail())
+            ->setUser($user)
+            ->setActive(true);
+        $this->em->persist($contributor);
+        $this->em->flush();
+
+        $output->writeln('User created: '.$user->getEmail().' (Contributor #'.$contributor->getId().')');
 
         return Command::SUCCESS;
     }

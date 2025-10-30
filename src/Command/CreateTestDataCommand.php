@@ -452,9 +452,6 @@ class CreateTestDataCommand extends Command
         return $contributors[array_rand($contributors)];
     }
 
-    /**
-     * @throws DateMalformedPeriodStringException
-     */
     private function createTimesheets(SymfonyStyle $io, array $projects, array $contributors): void
     {
         $io->section('Création des feuilles de temps');
@@ -463,7 +460,11 @@ class CreateTestDataCommand extends Command
         $endDate   = new DateTime('2024-10-19');
 
         $interval = new DateInterval('P1D');
-        $period   = new DatePeriod($startDate, $interval, $endDate);
+        try {
+            $period = new DatePeriod($startDate, $interval, $endDate);
+        } catch (\Exception $e) {
+            $e->getCode();
+        }
 
         $timesheetsCreated = 0;
 

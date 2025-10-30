@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="card">
@@ -75,6 +75,14 @@
                                               placeholder="Adresse complète...">{{ user.address }}</textarea>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="avatar" class="form-label">Avatar</label>
+                            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                            {% if user.avatar %}
+                                <small class="form-text text-muted">Actuel: <a href="{{ user.avatar }}" target="_blank">voir</a></small>
+                            {% endif %}
                         </div>
 
                         <div class="row">
