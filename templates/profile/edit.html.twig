@@ -46,24 +46,35 @@
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control" id="email" name="email"
-                                           value="{{ user.email }}" readonly>
-                                    <small class="form-text text-muted">L'email ne peut pas être modifié</small>
+                                           value="{{ user.email }}" required>
+                                    <small class="form-text text-muted">Cet email est utilisé pour la connexion</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="phone" class="form-label">Téléphone</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone"
-                                           value="{{ user.phone }}"
+                                    <label for="phone_work" class="form-label">Téléphone professionnel (optionnel)</label>
+                                    <input type="tel" class="form-control" id="phone_work" name="phone_work"
+                                           value="{{ user.phoneWork }}"
                                            placeholder="Ex: 01 23 45 67 89">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Adresse</label>
-                            <textarea class="form-control" id="address" name="address" rows="3"
-                                      placeholder="Adresse complète...">{{ user.address }}</textarea>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone_personal" class="form-label">Téléphone personnel</label>
+                                    <input type="tel" class="form-control" id="phone_personal" name="phone_personal"
+                                           value="{{ user.phonePersonal }}" placeholder="Ex: 06 12 34 56 78">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Adresse personnelle</label>
+                                    <textarea class="form-control" id="address" name="address" rows="3"
+                                              placeholder="Adresse complète...">{{ user.address }}</textarea>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -90,14 +101,14 @@
                                 <div class="mb-3">
                                     <label class="form-label">Authentification 2FA</label>
                                     <div>
-                                        {% if user.totpEnabled %}
+{% if user.isTotpAuthenticationEnabled() %}
                                             <span class="badge bg-success">Activée</span>
                                         {% else %}
                                             <span class="badge bg-warning">Désactivée</span>
                                         {% endif %}
                                     </div>
                                     <a href="{{ path('profile_2fa_setup') }}" class="btn btn-outline-primary btn-sm mt-2">
-                                        {% if user.totpEnabled %}
+{% if user.isTotpAuthenticationEnabled() %}
                                             Gérer 2FA
                                         {% else %}
                                             Configurer 2FA

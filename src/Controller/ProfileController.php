@@ -15,7 +15,7 @@ class ProfileController extends AbstractController
 {
     #[Route('/me', name: 'profile_me')]
     #[IsGranted('ROLE_USER')]
-    public function profile(): Response
+    public function profile(EntityManagerInterface $em): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -23,8 +23,16 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
+        $contributor       = $em->getRepository(\App\Entity\Contributor::class)->findOneBy(['user' => $user]);
+        $employmentPeriods = [];
+        if ($contributor) {
+            $employmentPeriods = $em->getRepository(\App\Entity\EmploymentPeriod::class)->findByContributor($contributor);
+        }
+
         return $this->render('profile/profile.html.twig', [
-            'user' => $user,
+            'user'              => $user,
+            'contributor'       => $contributor,
+            'employmentPeriods' => $employmentPeriods,
         ]);
     }
 
@@ -41,7 +49,9 @@ class ProfileController extends AbstractController
         if ($request->isMethod('POST')) {
             $user->setFirstName($request->request->get('first_name'));
             $user->setLastName($request->request->get('last_name'));
-            $user->setPhone($request->request->get('phone'));
+            $user->setEmail($request->request->get('email'));
+            $user->setPhoneWork($request->request->get('phone_work'));
+            $user->setPhonePersonal($request->request->get('phone_personal'));
             $user->setAddress($request->request->get('address'));
 
             $em->flush();

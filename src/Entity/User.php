@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
@@ -12,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwoFactorInterface
 {
     // Rôles métier
@@ -49,10 +52,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     private string $lastName;
 
     #[ORM\Column(type: 'string', length: 32, nullable: true)]
-    private ?string $phone = null;
+    private ?string $phone = null; // legacy, conservé pour compat
+
+    #[ORM\Column(type: 'string', length: 32, nullable: true)]
+    private ?string $phoneWork = null;
+
+    #[ORM\Column(type: 'string', length: 32, nullable: true)]
+    private ?string $phonePersonal = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $address = null;
+    private ?string $address = null; // adresse personnelle
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $avatar = null; // path/URL
@@ -63,6 +72,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     #[ORM\Column(type: 'boolean')]
     private bool $totpEnabled = false;
+
+    // Timestamps
+    #[ORM\Column(type: 'datetime_immutable')]
+    private DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $updatedAt = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -153,6 +174,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this;
     }
 
+    public function getPhoneWork(): ?string
+    {
+        return $this->phoneWork;
+    }
+
+    public function setPhoneWork(?string $phoneWork): self
+    {
+        $this->phoneWork = $phoneWork;
+
+        return $this;
+    }
+
+    public function getPhonePersonal(): ?string
+    {
+        return $this->phonePersonal;
+    }
+
+    public function setPhonePersonal(?string $phonePersonal): self
+    {
+        $this->phonePersonal = $phonePersonal;
+
+        return $this;
+    }
+
     public function getAddress(): ?string
     {
         return $this->address;
@@ -200,6 +245,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         $this->totpEnabled = $enabled;
 
         return $this;
+    }
+
+    // Timestamps getters/setters
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        if (!isset($this->createdAt)) {
+            $this->createdAt = new DateTimeImmutable();
+        }
+        $this->updatedAt = $this->createdAt;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Scheb 2FA v7 methods
