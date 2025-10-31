@@ -275,9 +275,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        if (!isset($this->createdAt)) {
-            $this->createdAt = new DateTimeImmutable();
-        }
+        $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = $this->createdAt;
     }
 

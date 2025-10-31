@@ -122,7 +122,9 @@
                                     <td>
                                         {% if project.technologies|length > 0 %}
                                             {% for tech in project.technologies|slice(0, 2) %}
-                                                <span class="badge bg-light text-dark me-1">{{ tech.name }}</span>
+                                                <span class="badge me-1" style="{% if tech.color %}background-color: {{ tech.color }}; color: #fff;{% else %}background-color: #f8f9fa; color: #212529;{% endif %}">
+                                                    {{ tech.name }}
+                                                </span>
                                             {% endfor %}
                                             {% if project.technologies|length > 2 %}
                                                 <small class="text-muted">+{{ project.technologies|length - 2 }}</small>

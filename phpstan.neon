@@ -6,6 +6,10 @@ parameters:
         - src/Kernel.php
         - src/Components/
         - migrations/
+        - docs
+        - vendor
+        - translations
+        - docker
     doctrine:
         objectManagerLoader: tests/object-manager.php
     symfony:
@@ -16,9 +20,5 @@ parameters:
         - '#Property .+ type mapping mismatch#'
         # Ignore undefined methods in entities during development
         - '#Call to an undefined method .+::(setDescription|setTjm|modify|setContingencyPercentage|setValidUntil|getContingencyPercentage|getDescription|setName|setSortOrder|setPurchaseAmount|getTimesheets|getTask|setWorkTimePercentage|addProfile|getWorkTimePercentage|getProfiles)\(\)#'
-        # Ignore constants that might not exist yet
-        - '#Access to undefined constant .+::STATUS_OPTIONS#'
         # Ignore binary operations with strings
         - '#Binary operation .+ between .+ and .+ results in an error#'
-        # Ignore deprecated warnings for now
-        - '#Deprecated in PHP 8\.4#'

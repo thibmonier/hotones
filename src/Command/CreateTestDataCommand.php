@@ -460,11 +460,8 @@ class CreateTestDataCommand extends Command
         $endDate   = new DateTime('2024-10-19');
 
         $interval = new DateInterval('P1D');
-        try {
-            $period = new DatePeriod($startDate, $interval, $endDate);
-        } catch (Exception $e) {
-            $e->getCode();
-        }
+
+        $period = new DatePeriod($startDate, $interval, $endDate);
 
         $timesheetsCreated = 0;
 
