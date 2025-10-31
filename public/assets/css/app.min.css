@@ -448,22 +448,22 @@ body[data-layout=horizontal] .footer {
 }
 
 .mm-active {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 .mm-active > a {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 .mm-active > a i {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 .mm-active .active {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 .mm-active .active i {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 .mm-active > i {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 
 @media (max-width: 992px) {
@@ -769,19 +769,19 @@ body[data-sidebar=colored].vertical-collpsed .vertical-menu #sidebar-menu > ul >
   color: #fff;
 }
 body[data-sidebar=colored].vertical-collpsed .vertical-menu #sidebar-menu ul li.mm-active .active {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 body[data-sidebar=colored].vertical-collpsed .vertical-menu #sidebar-menu ul li ul.sub-menu li a:hover {
-  color: #596d55;
+  color: #556ee6;
 }
 body[data-sidebar=colored].vertical-collpsed .vertical-menu #sidebar-menu ul li ul.sub-menu li.mm-active {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 body[data-sidebar=colored].vertical-collpsed .vertical-menu #sidebar-menu ul li ul.sub-menu li.mm-active > a {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 body[data-sidebar=colored].vertical-collpsed .vertical-menu #sidebar-menu ul li ul.sub-menu li.mm-active > a i {
-  color: #596d55 !important;
+  color: #556ee6 !important;
 }
 
 .topnav {

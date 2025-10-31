@@ -568,6 +568,7 @@
   "assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.mjs": "/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.mjs",
   "assets/libs/moment/locale/tlh.js": "/assets/libs/moment/locale/tlh.js",
   "assets/libs/tinymce/plugins/help/js/i18n/keynav/ms.js": "/assets/libs/tinymce/plugins/help/js/i18n/keynav/ms.js",
+  "assets/js/pages/subtask-kanban.init.js": "/assets/js/pages/subtask-kanban.init.js",
   "assets/libs/moment/locale/hu.js": "/assets/libs/moment/locale/hu.js",
   "assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css": "/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css",
   "assets/libs/moment/locale/me.js": "/assets/libs/moment/locale/me.js",

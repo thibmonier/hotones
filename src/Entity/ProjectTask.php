@@ -85,9 +85,12 @@ class ProjectTask
     // Note: Les temps sont liés au projet global, pas aux tâches spécifiques
     // pour simplifier le modèle actuel
 
+    #[ORM\OneToMany(mappedBy: 'task', targetEntity: ProjectSubTask::class, orphanRemoval: true)]
+    private Collection $subTasks;
+
     public function __construct()
     {
-        // Pas de collection timesheets pour l'instant
+        $this->subTasks = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     public function getId(): ?int
@@ -483,6 +486,31 @@ class ProjectTask
         $realMargin = $this->getRealMargin();
 
         return bcmul(bcdiv($realMargin, $soldAmount, 4), '100', 2);
+    }
+
+    /** @return Collection<int, ProjectSubTask> */
+    public function getSubTasks(): Collection
+    {
+        return $this->subTasks;
+    }
+
+    public function addSubTask(ProjectSubTask $subTask): self
+    {
+        if (!$this->subTasks->contains($subTask)) {
+            $this->subTasks->add($subTask);
+            $subTask->setTask($this);
+        }
+        return $this;
+    }
+
+    public function removeSubTask(ProjectSubTask $subTask): self
+    {
+        if ($this->subTasks->removeElement($subTask)) {
+            if ($subTask->getTask() === $this) {
+                // Keep project consistency handled in entity setter
+            }
+        }
+        return $this;
     }
 
     /**

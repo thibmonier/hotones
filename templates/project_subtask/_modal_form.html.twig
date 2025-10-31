@@ -1,0 +1,29 @@
+{% set modalId = 'subtaskModal-' ~ subTask.id %}
+<div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Éditer la sous-tâche</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ form_start(form, {attr: {id: 'subtask-edit-form-' ~ subTask.id, class: 'subtask-edit-form'}}) }}
+          {{ form_row(form.title) }}
+          {{ form_row(form.assignee) }}
+          <div class="row">
+            <div class="col">{{ form_row(form.initialEstimatedHours) }}</div>
+            <div class="col">{{ form_row(form.remainingHours) }}</div>
+          </div>
+          <div class="row">
+            <div class="col">{{ form_row(form.status) }}</div>
+            <div class="col">{{ form_row(form.position) }}</div>
+          </div>
+        {{ form_end(form) }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" data-action="save" data-st-id="{{ subTask.id }}">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>

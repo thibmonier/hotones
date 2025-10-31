@@ -28,6 +28,11 @@ class Timesheet
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?ProjectTask $task = null;
 
+    // Lien optionnel vers une sous-tâche du projet
+    #[ORM\ManyToOne(targetEntity: ProjectSubTask::class)]
+    #[ORM\JoinColumn(name: 'sub_task_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?ProjectSubTask $subTask = null;
+
     #[ORM\Column(type: 'date')]
     private DateTimeInterface $date;
 
@@ -75,6 +80,18 @@ class Timesheet
     public function setTask(?ProjectTask $task): self
     {
         $this->task = $task;
+
+        return $this;
+    }
+
+    public function getSubTask(): ?ProjectSubTask
+    {
+        return $this->subTask;
+    }
+
+    public function setSubTask(?ProjectSubTask $subTask): self
+    {
+        $this->subTask = $subTask;
 
         return $this;
     }

@@ -1,0 +1,63 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% set title = 'Kanban des sous-tâches : ' ~ project.name %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .kanban-col { min-height: 60vh; background: #f8f9fa; border-radius: 6px; padding: 12px; }
+        .kanban-card { background: #fff; border-radius: 6px; padding: 10px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+        .kanban-card .title { font-weight: 600; }
+        .kanban-card .meta { font-size: 12px; color: #6c757d; }
+        .progress-xs { height: 6px; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row align-items-center mb-3">
+        <div class="col">
+            <h4 class="page-title">{{ title }}</h4>
+        </div>
+        <div class="col-auto">
+            <a href="{{ path('project_details', {id: project.id}) }}" class="btn btn-light btn-sm">← Retour projet</a>
+        </div>
+    </div>
+
+    <div class="row" id="subtask-kanban" data-project-id="{{ project.id }}">
+        <div class="col-md-4">
+            <h6>À faire</h6>
+            <div id="upcoming-task" class="kanban-col" data-status="todo">
+                {% for st in todo %}
+                    {% include 'project_subtask/partials/_card.html.twig' with {st: st} %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h6>En cours</h6>
+            <div id="inprogress-task" class="kanban-col" data-status="in_progress">
+                {% for st in doing %}
+                    {% include 'project_subtask/partials/_card.html.twig' with {st: st} %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h6>Terminé</h6>
+            <div id="complete-task" class="kanban-col" data-status="done">
+                {% for st in done %}
+                    {% include 'project_subtask/partials/_card.html.twig' with {st: st} %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div id="subtaskModalContainer"></div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/libs/dragula/dragula.min.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/subtask-kanban.init.js') }}"></script>
+{% endblock %}

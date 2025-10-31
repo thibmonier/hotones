@@ -1,0 +1,26 @@
+<div class="kanban-card" data-id="{{ st.id }}">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <div class="title">{{ st.title }}</div>
+            <div class="meta">
+                {% if st.assignee %}<i class="mdi mdi-account"></i> {{ st.assignee.name }} · {% endif %}
+                Estimé init.: {{ (st.initialEstimatedHours / 8)|number_format(1) }}j · 
+                Passé: {{ (st.timeSpentHours / 8)|number_format(1) }}j · 
+                RAF: <span class="raf" data-st-id="{{ st.id }}">{{ (st.remainingHours / 8)|number_format(1) }}j</span>
+            </div>
+        </div>
+        <span class="badge bg-light text-dark">{{ st.task.name }}</span>
+    </div>
+    <div class="mt-2">
+        <div class="progress progress-xs">
+            <div class="progress-bar bg-success" style="width: {{ st.progressPercentage }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <small>{{ st.progressPercentage }}%</small>
+            <div class="btn-group btn-group-sm">
+                <a href="#" class="btn btn-light edit-raf" data-st-id="{{ st.id }}" title="Mettre à jour le RAF">RAF</a>
+                <a href="#" class="btn btn-outline-primary edit-subtask" data-st-id="{{ st.id }}" title="Éditer"><i class="mdi mdi-pencil"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
