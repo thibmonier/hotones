@@ -40,6 +40,15 @@ class AdminUserController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
+            // core data
+            $user->setFirstName((string) $request->request->get('first_name'));
+            $user->setLastName((string) $request->request->get('last_name'));
+            $user->setEmail((string) $request->request->get('email'));
+            $user->setPhoneWork($request->request->get('phone_work'));
+            $user->setPhonePersonal($request->request->get('phone_personal'));
+            $user->setAddress($request->request->get('address'));
+
+            // roles
             $roles = $request->request->all('roles');
             $roles = array_values(array_unique(array_filter($roles ?? [])));
             $user->setRoles($roles);

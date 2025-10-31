@@ -56,7 +56,8 @@ File: Main Js File
     }
 
     function initLeftMenuCollapse() {
-        $('#vertical-menu-btn').on('click', function (event) {
+        // Delegate to handle cases where the button is injected later or layouts override markup
+        $(document).on('click', '#vertical-menu-btn', function (event) {
             event.preventDefault();
             $('body').toggleClass('sidebar-enable');
             if ($(window).width() >= 992) {
@@ -145,8 +146,9 @@ File: Main Js File
     }
 
     function initRightSidebar() {
-        // right side-bar toggle
-        $('.right-bar-toggle').on('click', function (e) {
+        // right side-bar toggle (delegated for robustness across layouts)
+        $(document).on('click', '.right-bar-toggle', function (e) {
+            e.preventDefault();
             $('body').toggleClass('right-bar-enabled');
         });
 

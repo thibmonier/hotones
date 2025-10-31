@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\EmploymentPeriodRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -58,7 +59,7 @@ class EmploymentPeriod
     {
         $this->profiles = new ArrayCollection();
         // Initialiser pour éviter les erreurs d'accès avant initialisation dans les vues
-        $this->startDate = new \DateTime();
+        $this->startDate = new DateTime();
     }
 
     public function getId(): ?int

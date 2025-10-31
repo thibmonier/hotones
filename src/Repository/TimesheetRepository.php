@@ -115,9 +115,9 @@ class TimesheetRepository extends ServiceEntityRepository
         $formatted = [];
         foreach ($results as $r) {
             $formatted[] = [
-                'project'    => [
-                    'id'     => $r['projectId'] ?? null,
-                    'name'   => $r['projectName'] ?? null,
+                'project' => [
+                    'id'     => $r['projectId']     ?? null,
+                    'name'   => $r['projectName']   ?? null,
                     'client' => $r['projectClient'] ?? null,
                 ],
                 'totalHours' => (float) ($r['totalHours'] ?? 0),

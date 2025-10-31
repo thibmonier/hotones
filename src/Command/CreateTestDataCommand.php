@@ -462,7 +462,7 @@ class CreateTestDataCommand extends Command
         $interval = new DateInterval('P1D');
         try {
             $period = new DatePeriod($startDate, $interval, $endDate);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $e->getCode();
         }
 
