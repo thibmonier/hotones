@@ -1,0 +1,68 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Modifier {{ client.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Modifier le client</h4>
+      <div class="page-title-right">
+        <a href="{{ path('client_show', {id: client.id}) }}" class="btn btn-secondary me-2"><i class="bx bx-arrow-back me-1"></i> Retour</a>
+        <a href="{{ path('client_index') }}" class="btn btn-outline-secondary"><i class="bx bx-list-ul me-1"></i> Liste</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header"><h4 class="card-title">Informations</h4></div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label" for="name">Nom *</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ client.name }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="website">Site web</label>
+            <input type="url" class="form-control" id="website" name="website" value="{{ client.website }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ client.description }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h4 class="card-title">Logo</h4></div>
+        <div class="card-body">
+          {% if client.logoPath %}
+            <img src="{{ client.logoPath }}" class="img-fluid rounded mb-2" alt="logo {{ client.name }}">
+          {% endif %}
+          <input type="file" class="form-control" name="logo" accept="image/*">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <button type="submit" class="btn btn-primary w-100"><i class="bx bx-save me-1"></i> Enregistrer</button>
+        </div>
+      </div>
+      {% if is_granted('ROLE_MANAGER') %}
+      <div class="card">
+        <div class="card-header bg-danger text-white"><h4 class="card-title mb-0">Zone dangereuse</h4></div>
+        <div class="card-body">
+          <form method="post" action="{{ path('client_delete', {id: client.id}) }}" onsubmit="return confirm('Supprimer ce client ?')">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ client.id) }}">
+            <button type="submit" class="btn btn-danger w-100"><i class="bx bx-trash me-1"></i> Supprimer</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</form>
+{% endblock %}

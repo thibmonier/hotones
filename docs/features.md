@@ -29,10 +29,15 @@
   - Métadonnées: technologies, offre/service
   - Rôles associés: KAM, Chef de projet, Directeur de projet, Commercial identificateur
   - Types de projet: forfait (périmètre/échéancier/budget fixes) ou régie (facturé au temps passé)
+  - Listing projets: colonne « Type » affiche désormais le type métier Forfait/Régie, avec un badge secondaire « Interne/Client »
 
 ## Gestion des devis d'un projet
 - Order : Devis
   - Numéro unique: D[année][mois][incrément]
   - Statuts: A signer, Gagné, Signé, Perdu, Terminé, StandBy, Abandonné
+  - Mise à jour rapide du statut:
+    - Depuis la page d’un devis: sélecteur dans le panneau « Actions » (POST sécurisé CSRF)
+    - Depuis la liste des devis: sélecteur dans la colonne « Statut » (soumission auto au changement)
+    - Route: POST /orders/{id}/status (name: order_update_status)
   - Sections regroupant des lignes + totalisation
   - Lignes: profil, TJM, jours, total (jours×TJM), achats attachés (affiche marge nette)

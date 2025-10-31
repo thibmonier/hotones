@@ -500,6 +500,7 @@ class ProjectTask
             $this->subTasks->add($subTask);
             $subTask->setTask($this);
         }
+
         return $this;
     }
 
@@ -510,6 +511,7 @@ class ProjectTask
                 // Keep project consistency handled in entity setter
             }
         }
+
         return $this;
     }
 

@@ -99,19 +99,14 @@
                                         </a>
                                     </td>
                                     <td>
-                                        {% set statusClass = 'secondary' %}
-                                        {% if order.status == 'gagne' or order.status == 'signe' %}
-                                            {% set statusClass = 'success' %}
-                                        {% elseif order.status == 'termine' %}
-                                            {% set statusClass = 'primary' %}
-                                        {% elseif order.status == 'perdu' or order.status == 'abandonne' %}
-                                            {% set statusClass = 'danger' %}
-                                        {% elseif order.status == 'standby' %}
-                                            {% set statusClass = 'warning' %}
-                                        {% endif %}
-                                        <span class="badge bg-{{ statusClass }}">
-                                            {{ statusOptions[order.status] ?? order.status|title }}
-                                        </span>
+                                        <form method="post" action="{{ path('order_update_status', {'id': order.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('status' ~ order.id) }}">
+                                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                {% for key, label in statusOptions %}
+                                                    <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ label }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
                                     </td>
                                     <td>{{ order.createdAt|date('d/m/Y') }}</td>
                                     <td>{{ order.totalAmount|number_format(2, ',', ' ') }}€</td>

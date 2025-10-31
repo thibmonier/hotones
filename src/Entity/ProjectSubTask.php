@@ -7,18 +7,16 @@ namespace App\Entity;
 use App\Repository\ProjectSubTaskRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectSubTaskRepository::class)]
 #[ORM\Table(name: 'project_sub_tasks')]
 class ProjectSubTask
 {
-    public const STATUS_TODO       = 'todo';
+    public const STATUS_TODO        = 'todo';
     public const STATUS_IN_PROGRESS = 'in_progress';
-    public const STATUS_DONE       = 'done';
-    public const STATUS_BLOCKED    = 'blocked';
+    public const STATUS_DONE        = 'done';
+    public const STATUS_BLOCKED     = 'blocked';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -62,42 +60,139 @@ class ProjectSubTask
 
     public function __construct()
     {
-        $now = new DateTimeImmutable();
+        $now             = new DateTimeImmutable();
         $this->createdAt = $now;
         $this->updatedAt = $now;
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getProject(): Project { return $this->project; }
-    public function setProject(Project $project): self { $this->project = $project; return $this; }
+    public function getProject(): Project
+    {
+        return $this->project;
+    }
 
-    public function getTask(): ProjectTask { return $this->task; }
-    public function setTask(ProjectTask $task): self { $this->task = $task; $this->project = $task->getProject(); return $this; }
+    public function setProject(Project $project): self
+    {
+        $this->project = $project;
 
-    public function getAssignee(): ?Contributor { return $this->assignee; }
-    public function setAssignee(?Contributor $assignee): self { $this->assignee = $assignee; return $this; }
+        return $this;
+    }
 
-    public function getTitle(): string { return $this->title; }
-    public function setTitle(string $title): self { $this->title = $title; return $this; }
+    public function getTask(): ProjectTask
+    {
+        return $this->task;
+    }
 
-    public function getInitialEstimatedHours(): string { return $this->initialEstimatedHours; }
-    public function setInitialEstimatedHours(string $hours): self { $this->initialEstimatedHours = $hours; if ($this->remainingHours === '0.00') { $this->remainingHours = $hours; } return $this; }
+    public function setTask(ProjectTask $task): self
+    {
+        $this->task    = $task;
+        $this->project = $task->getProject();
 
-    public function getRemainingHours(): string { return $this->remainingHours; }
-    public function setRemainingHours(string $hours): self { $this->remainingHours = $hours; return $this; }
+        return $this;
+    }
 
-    public function getStatus(): string { return $this->status; }
-    public function setStatus(string $status): self { $this->status = $status; return $this; }
+    public function getAssignee(): ?Contributor
+    {
+        return $this->assignee;
+    }
 
-    public function getPosition(): int { return $this->position; }
-    public function setPosition(int $position): self { $this->position = $position; return $this; }
+    public function setAssignee(?Contributor $assignee): self
+    {
+        $this->assignee = $assignee;
 
-    public function getCreatedAt(): DateTimeInterface { return $this->createdAt; }
-    public function setCreatedAt(DateTimeInterface $createdAt): self { $this->createdAt = $createdAt; return $this; }
+        return $this;
+    }
 
-    public function getUpdatedAt(): DateTimeInterface { return $this->updatedAt; }
-    public function setUpdatedAt(DateTimeInterface $updatedAt): self { $this->updatedAt = $updatedAt; return $this; }
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getInitialEstimatedHours(): string
+    {
+        return $this->initialEstimatedHours;
+    }
+
+    public function setInitialEstimatedHours(string $hours): self
+    {
+        $this->initialEstimatedHours = $hours;
+        if ($this->remainingHours === '0.00') {
+            $this->remainingHours = $hours;
+        }
+
+return $this;
+    }
+
+    public function getRemainingHours(): string
+    {
+        return $this->remainingHours;
+    }
+
+    public function setRemainingHours(string $hours): self
+    {
+        $this->remainingHours = $hours;
+
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
 
     /**
      * Somme des heures passées (timesheets) sur cette sous-tâche.
@@ -111,11 +206,12 @@ class ProjectSubTask
                 $total = bcadd($total, $timesheet->getHours(), 2);
             }
         }
+
         return $total;
     }
 
     /**
-     * Pourcentage d'avancement = temps passé / (temps passé + RAF) * 100
+     * Pourcentage d'avancement = temps passé / (temps passé + RAF) * 100.
      */
     public function getProgressPercentage(): int
     {
@@ -126,6 +222,7 @@ class ProjectSubTask
             return 0;
         }
         $ratio = bcmul(bcdiv($spent, $den, 4), '100', 0);
+
         return (int) $ratio;
     }
 

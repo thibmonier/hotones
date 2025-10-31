@@ -23,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     public const string ROLE_MANAGER     = 'ROLE_MANAGER';
     public const string ROLE_SUPERADMIN  = 'ROLE_SUPERADMIN';
 
-    public const array ROLE_HIERARCHY = [
+    final public const array ROLE_HIERARCHY = [
         self::ROLE_INTERVENANT => ['ROLE_USER'],
         self::ROLE_CHEF_PROJET => [self::ROLE_INTERVENANT],
         self::ROLE_MANAGER     => [self::ROLE_CHEF_PROJET],

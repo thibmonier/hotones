@@ -95,7 +95,9 @@ class ProjectRepository extends ServiceEntityRepository
     public function searchProjects(string $query): array
     {
         return $this->createQueryBuilder('p')
-            ->where('p.name LIKE :query OR p.client LIKE :query')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->where('p.name LIKE :query OR c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.name', 'ASC')
             ->getQuery()

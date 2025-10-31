@@ -13,7 +13,7 @@
                             <option value="">Tous les projets</option>
                             {% for project in projects %}
                                 <option value="{{ project.id }}" {{ selectedProject == project.id ? 'selected' : '' }}>
-                                    {{ project.name }} - {{ project.client ?: 'Sans client' }}
+                                    {{ project.name }} - {{ project.client ? project.client.name : 'Sans client' }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -152,7 +152,8 @@
                     <h4 class="card-title mb-0">
                         Temps passés - {{ startDate|date('F Y')|title }}
                         {% if selectedProject %}
-                            - {{ projects|filter(p => p.id == selectedProject)|first.name }}
+                            {% set selProj = (projects|filter(p => p.id == selectedProject)|first) %}
+                            - {{ selProj ? selProj.name : '' }}
                         {% endif %}
                     </h4>
                     <div class="btn-group" role="group">
@@ -216,7 +217,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="text-muted">{{ timesheet.project.client ?: 'Non défini' }}</span>
+                                                <span class="text-muted">{{ timesheet.project.client ? timesheet.project.client.name : 'Non défini' }}</span>
                                             </td>
                                             <td class="text-end">
                                                 <span class="fw-bold text-primary">{{ timesheet.hours|number_format(2) }}h</span>
@@ -258,22 +259,23 @@
                                 {% set contributorTotals = {} %}
                                 {% for timesheet in timesheets %}
                                     {% set contributorId = timesheet.contributor.id %}
-                                    {% if contributorTotals[contributorId] is not defined %}
-                                        {% set contributorTotals = contributorTotals|merge({(contributorId): {
-                                            'contributor': timesheet.contributor,
-                                            'hours': 0,
-                                            'projects': []
-                                        }}) %}
-                                    {% endif %}
-                                    {% set projectsList = contributorTotals[contributorId].projects %}
-                                    {% if timesheet.project.name not in projectsList %}
-                                        {% set projectsList = projectsList|merge([timesheet.project.name]) %}
-                                    {% endif %}
-                                    {% set contributorTotals = contributorTotals|merge({(contributorId): {
-                                        'contributor': contributorTotals[contributorId].contributor,
-                                        'hours': contributorTotals[contributorId].hours + timesheet.hours,
-                                        'projects': projectsList
-                                    }}) %}
+                                {% set contributorKey = 'c_' ~ contributorId %}
+                                {% if contributorTotals[contributorKey] is not defined %}
+                                    {% set contributorTotals = contributorTotals|merge({ (contributorKey): {
+                                        'contributor': timesheet.contributor,
+                                        'hours': 0,
+                                        'projects': []
+                                    } }) %}
+                                {% endif %}
+                                {% set projectsList = contributorTotals[contributorKey].projects %}
+                                {% if timesheet.project.name not in projectsList %}
+                                    {% set projectsList = projectsList|merge([timesheet.project.name]) %}
+                                {% endif %}
+                                {% set contributorTotals = contributorTotals|merge({ (contributorKey): {
+                                    'contributor': contributorTotals[contributorKey].contributor,
+                                    'hours': contributorTotals[contributorKey].hours + timesheet.hours,
+                                    'projects': projectsList
+                                } }) %}
                                 {% endfor %}
 
                                 {% for contributorId, data in contributorTotals %}

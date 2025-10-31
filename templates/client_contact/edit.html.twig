@@ -1,0 +1,64 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Modifier contact{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Modifier contact — {{ contact.client.name }}</h4>
+      <div class="page-title-right">
+        <a href="{{ path('client_show', {id: contact.client.id}) }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="post">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Nom *</label>
+            <input type="text" class="form-control" name="last_name" value="{{ contact.lastName }}" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Prénom *</label>
+            <input type="text" class="form-control" name="first_name" value="{{ contact.firstName }}" required>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" value="{{ contact.email }}">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="mb-3">
+            <label class="form-label">Tél. fixe</label>
+            <input type="text" class="form-control" name="phone" value="{{ contact.phone }}">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="mb-3">
+            <label class="form-label">Mobile</label>
+            <input type="text" class="form-control" name="mobile_phone" value="{{ contact.mobilePhone }}">
+          </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Poste</label>
+        <input type="text" class="form-control" name="position_title" value="{{ contact.positionTitle }}">
+      </div>
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary"><i class="bx bx-save me-1"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

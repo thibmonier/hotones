@@ -22,40 +22,40 @@ class ProjectSubTaskType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre',
+                'label'       => 'Titre',
                 'constraints' => [new Assert\NotBlank(), new Assert\Length(max: 255)],
-                'attr' => ['class' => 'form-control'],
+                'attr'        => ['class' => 'form-control'],
             ])
             ->add('assignee', EntityType::class, [
-                'label' => 'Assigné à',
-                'class' => Contributor::class,
-                'required' => false,
-                'placeholder' => 'Sélectionner',
-                'attr' => ['class' => 'form-select'],
+                'label'        => 'Assigné à',
+                'class'        => Contributor::class,
+                'required'     => false,
+                'placeholder'  => 'Sélectionner',
+                'attr'         => ['class' => 'form-select'],
                 'choice_label' => 'name',
             ])
             ->add('initialEstimatedHours', NumberType::class, [
-                'label' => 'Estimation initiale (heures)',
-                'scale' => 2,
-                'html5' => true,
-                'attr' => ['class' => 'form-control', 'min' => 0, 'step' => '0.25'],
+                'label'       => 'Estimation initiale (heures)',
+                'scale'       => 2,
+                'html5'       => true,
+                'attr'        => ['class' => 'form-control', 'min' => 0, 'step' => '0.25'],
                 'constraints' => [new Assert\GreaterThanOrEqual(0)],
             ])
             ->add('remainingHours', NumberType::class, [
-                'label' => 'RAF (heures)',
-                'scale' => 2,
-                'html5' => true,
-                'attr' => ['class' => 'form-control', 'min' => 0, 'step' => '0.25'],
+                'label'       => 'RAF (heures)',
+                'scale'       => 2,
+                'html5'       => true,
+                'attr'        => ['class' => 'form-control', 'min' => 0, 'step' => '0.25'],
                 'constraints' => [new Assert\GreaterThanOrEqual(0)],
             ])
             ->add('status', ChoiceType::class, [
-                'label' => 'Statut',
+                'label'   => 'Statut',
                 'choices' => ProjectSubTask::getAvailableStatuses(),
-                'attr' => ['class' => 'form-select'],
+                'attr'    => ['class' => 'form-select'],
             ])
             ->add('position', IntegerType::class, [
-                'label' => 'Position',
-                'attr' => ['class' => 'form-control', 'min' => 1],
+                'label'       => 'Position',
+                'attr'        => ['class' => 'form-control', 'min' => 1],
                 'constraints' => [new Assert\GreaterThanOrEqual(1)],
             ])
         ;

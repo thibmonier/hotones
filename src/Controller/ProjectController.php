@@ -48,7 +48,13 @@ class ProjectController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $project->setName($request->request->get('name'));
-            $project->setClient($request->request->get('client'));
+            // Client (relation)
+            if ($clientId = $request->request->get('client_id')) {
+                $client = $em->getRepository(\App\Entity\Client::class)->find($clientId);
+                $project->setClient($client);
+            } else {
+                $project->setClient(null);
+            }
             $project->setDescription($request->request->get('description'));
             $project->setIsInternal((bool) $request->request->get('is_internal'));
 
@@ -132,10 +138,13 @@ class ProjectController extends AbstractController
         $technologies      = $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']);
         $serviceCategories = $em->getRepository(ServiceCategory::class)->findBy(['active' => true], ['name' => 'ASC']);
 
+        $clients = $em->getRepository(\App\Entity\Client::class)->findAllOrderedByName();
+
         return $this->render('project/new.html.twig', [
             'project'            => $project,
             'technologies'       => $technologies,
             'service_categories' => $serviceCategories,
+            'clients'            => $clients,
         ]);
     }
 
@@ -157,7 +166,11 @@ class ProjectController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $project->setName($request->request->get('name'));
-            $project->setClient($request->request->get('client'));
+            if (null !== $request->request->get('client_id')) {
+                $clientId = $request->request->get('client_id');
+                $client   = $clientId ? $em->getRepository(\App\Entity\Client::class)->find($clientId) : null;
+                $project->setClient($client);
+            }
             $project->setDescription($request->request->get('description'));
             $project->setIsInternal((bool) $request->request->get('is_internal'));
 
@@ -228,10 +241,13 @@ class ProjectController extends AbstractController
         $technologies      = $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']);
         $serviceCategories = $em->getRepository(ServiceCategory::class)->findBy(['active' => true], ['name' => 'ASC']);
 
+        $clients = $em->getRepository(\App\Entity\Client::class)->findAllOrderedByName();
+
         return $this->render('project/edit.html.twig', [
             'project'            => $project,
             'technologies'       => $technologies,
             'service_categories' => $serviceCategories,
+            'clients'            => $clients,
         ]);
     }
 

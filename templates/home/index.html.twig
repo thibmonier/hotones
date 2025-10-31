@@ -130,7 +130,7 @@
                                             <a href="{{ path('project_show', {'id': project.id}) }}">{{ project.name }}</a>
                                         </h5>
                                     </td>
-                                    <td>{{ project.client ?? '-' }}</td>
+                                    <td>{{ project.client ? project.client.name : '-' }}</td>
                                     <td>
                                         <span class="badge bg-{% if project.status == 'active' %}success{% elseif project.status == 'completed' %}primary{% else %}warning{% endif %}">
                                             {{ project.status|title }}

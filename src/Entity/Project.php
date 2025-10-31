@@ -20,8 +20,9 @@ class Project
     #[ORM\Column(type: 'string', length: 180)]
     private string $name;
 
-    #[ORM\Column(type: 'string', length: 180, nullable: true)]
-    private ?string $client = null;
+    #[ORM\ManyToOne(targetEntity: Client::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Client $client = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
@@ -115,12 +116,12 @@ class Project
         return $this;
     }
 
-    public function getClient(): ?string
+    public function getClient(): ?Client
     {
         return $this->client;
     }
 
-    public function setClient(?string $client): self
+    public function setClient(?Client $client): self
     {
         $this->client = $client;
 

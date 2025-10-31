@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\Contributor;
 use App\Entity\Project;
 use App\Entity\ProjectSubTask;
 use App\Entity\ProjectTask;
@@ -44,16 +43,17 @@ class CreateTestSubTasksCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $perTask = max(1, (int) $input->getOption('per-task'));
+        $io       = new SymfonyStyle($input, $output);
+        $perTask  = max(1, (int) $input->getOption('per-task'));
         $attachTs = (bool) $input->getOption('attach-timesheets');
 
         $io->title('Création de sous-tâches de test');
 
-        $projects = $this->projects->findAllOrderedByName();
+        $projects       = $this->projects->findAllOrderedByName();
         $activeContribs = $this->contributors->findActiveContributors();
         if (count($activeContribs) === 0) {
-            $io->warning("Aucun contributeur actif — arrêt.");
+            $io->warning('Aucun contributeur actif — arrêt.');
+
             return Command::SUCCESS;
         }
 
@@ -70,9 +70,9 @@ class CreateTestSubTasksCommand extends Command
 
                 // Heures de base pour découpage
                 $baseHours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? 24; // fallback 3j
-                $parts = $this->buildParts($perTask, (int) $baseHours);
+                $parts     = $this->buildParts($perTask, (int) $baseHours);
 
-                for ($i = 0; $i < count($parts); $i++) {
+                for ($i = 0; $i < count($parts); ++$i) {
                     $st = new ProjectSubTask();
                     $st->setTask($task);
                     $st->setTitle($this->defaultTitleForIndex($task, $i));
@@ -97,7 +97,7 @@ class CreateTestSubTasksCommand extends Command
                     $st->setPosition($i + 1);
 
                     $this->em->persist($st);
-                    $created++;
+                    ++$created;
                 }
             }
         }
@@ -115,26 +115,29 @@ class CreateTestSubTasksCommand extends Command
     private function defaultTitleForIndex(ProjectTask $task, int $i): string
     {
         $labels = ['Découverte', 'Implémentation', 'Revue & QA', 'Livraison'];
-        $label = $labels[$i % count($labels)];
+        $label  = $labels[$i % count($labels)];
+
         return sprintf('%s — %s', $task->getName(), $label);
     }
 
     /**
      * Découpe en parts approximativement équilibrées (au moins 2h par part).
+     *
      * @return int[]
      */
     private function buildParts(int $count, int $total): array
     {
         $count = max(1, $count);
-        $min = 2;
+        $min   = 2;
         if ($total < $count * $min) {
             return array_fill(0, $count, (int) max(1, floor($total / $count)));
         }
         $remaining = $total - ($count * $min);
-        $parts = array_fill(0, $count, $min);
-        for ($i = 0; $i < $remaining; $i++) {
-            $parts[$i % $count] += 1;
+        $parts     = array_fill(0, $count, $min);
+        for ($i = 0; $i < $remaining; ++$i) {
+            ++$parts[$i % $count];
         }
+
         return $parts;
     }
 
@@ -142,19 +145,23 @@ class CreateTestSubTasksCommand extends Command
     {
         // Affecter ~30% des timesheets existantes à des sous-tâches du même projet
         $tsRepo = $this->em->getRepository(Timesheet::class);
-        $allTs = $tsRepo->findBy([], ['date' => 'DESC']);
-        $count = 0;
+        $allTs  = $tsRepo->findBy([], ['date' => 'DESC']);
+        $count  = 0;
         foreach ($allTs as $ts) {
-            if (rand(1, 100) > 30) { continue; }
+            if (rand(1, 100) > 30) {
+                continue;
+            }
             /** @var Timesheet $ts */
-            $project = $ts->getProject();
+            $project  = $ts->getProject();
             $subTasks = $this->em->getRepository(ProjectSubTask::class)->findBy(['project' => $project]);
-            if (!$subTasks) { continue; }
+            if (!$subTasks) {
+                continue;
+            }
             // Si possible, choisir une sous-tâche assignée au même contributeur
-            $matching = array_values(array_filter($subTasks, fn(ProjectSubTask $st) => $st->getAssignee() && $st->getAssignee()->getId() === $ts->getContributor()->getId()));
-            $chosen = $matching ? $matching[array_rand($matching)] : $subTasks[array_rand($subTasks)];
+            $matching = array_values(array_filter($subTasks, fn (ProjectSubTask $st) => $st->getAssignee() && $st->getAssignee()->getId() === $ts->getContributor()->getId()));
+            $chosen   = $matching ? $matching[array_rand($matching)] : $subTasks[array_rand($subTasks)];
             $ts->setSubTask($chosen);
-            $count++;
+            ++$count;
         }
         $this->em->flush();
         $io->writeln("✓ $count timesheets rattachées à des sous-tâches");

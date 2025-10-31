@@ -14,5 +14,5 @@
 - Design responsive Bootstrap 5
 - Thème "Skote" (admin dashboard)
 - Formulaires avec validation
-- Tableaux interactifs
+- Tableaux interactifs (sélecteur inline du statut de devis dans les listings)
 - Graphiques (Chart.js ou similaire)

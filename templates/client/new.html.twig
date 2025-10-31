@@ -1,0 +1,54 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouveau client{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Nouveau client</h4>
+      <div class="page-title-right">
+        <a href="{{ path('client_index') }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header"><h4 class="card-title">Informations</h4></div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label" for="name">Nom *</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="website">Site web</label>
+            <input type="url" class="form-control" id="website" name="website">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h4 class="card-title">Logo</h4></div>
+        <div class="card-body">
+          <input type="file" class="form-control" name="logo" accept="image/*">
+          <small class="text-muted">PNG, JPG, SVG — 1 Mo max</small>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <button type="submit" class="btn btn-primary w-100"><i class="bx bx-save me-1"></i> Créer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

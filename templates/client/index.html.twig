@@ -1,0 +1,85 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Clients</h4>
+      <div class="page-title-right">
+        {% if is_granted('ROLE_CHEF_PROJET') %}
+          <a href="{{ path('client_new') }}" class="btn btn-primary">
+            <i class="bx bx-plus me-1"></i> Nouveau client
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-centered table-nowrap mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Client</th>
+                <th>Site web</th>
+                <th>Contacts</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for client in clients %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if client.logoPath %}
+                      <img src="{{ client.logoPath }}" alt="logo {{ client.name }}" class="rounded me-2" style="width:32px;height:32px;object-fit:cover;">
+                    {% else %}
+                      <div class="avatar-xs me-2"><span class="avatar-title rounded">{{ client.name|first|upper }}</span></div>
+                    {% endif %}
+                    <div>
+                      <a class="text-dark" href="{{ path('client_show', {id: client.id}) }}">{{ client.name }}</a>
+                      {% if client.description %}<div class="text-muted small">{{ client.description|length > 60 ? client.description|slice(0,60) ~ '...' : client.description }}</div>{% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {% if client.website %}
+                    <a href="{{ client.website }}" target="_blank" rel="noopener">{{ client.website }}</a>
+                  {% else %}
+                    <small class="text-muted">-</small>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark">{{ client.contacts|length }}</span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <a href="{{ path('client_show', {id: client.id}) }}" class="btn btn-outline-secondary btn-sm"><i class="bx bx-show"></i></a>
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                      <a href="{{ path('client_edit', {id: client.id}) }}" class="btn btn-outline-primary btn-sm"><i class="bx bx-edit"></i></a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">
+                  <i class="bx bx-user font-size-24 mb-2"></i>
+                  <div>Aucun client</div>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

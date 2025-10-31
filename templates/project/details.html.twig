@@ -77,7 +77,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Client :</strong> {{ project.client ?? 'Non défini' }}</p>
+                            <p><strong>Client :</strong> {{ project.client ? project.client.name : 'Non défini' }}</p>
                             <p><strong>Type :</strong>
                                 <span class="badge bg-{{ project.projectType == 'forfait' ? 'primary' : 'info' }}">
                                     {{ project.projectType|title }}

@@ -7,6 +7,9 @@ use App\Entity\OrderLine;
 use App\Entity\OrderSection;
 use App\Entity\Profile;
 use App\Entity\Project;
+
+use function array_key_exists;
+
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -122,6 +125,7 @@ class OrderController extends AbstractController
             'totalPurchases'    => $totalPurchases,
             'contingencyAmount' => $contingencyAmount,
             'finalAmount'       => $finalAmount,
+            'statusOptions'     => Order::STATUS_OPTIONS,
         ]);
     }
 
@@ -310,6 +314,31 @@ class OrderController extends AbstractController
         }
 
         return $this->redirectToRoute('order_index');
+    }
+
+    #[Route('/{id}/status', name: 'order_update_status', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function updateStatus(Request $request, Order $order, EntityManagerInterface $em): Response
+    {
+        if (!$this->isCsrfTokenValid('status'.$order->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Action non autorisée (CSRF).');
+
+            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+        }
+
+        $status = (string) $request->request->get('status');
+        if (!array_key_exists($status, Order::STATUS_OPTIONS)) {
+            $this->addFlash('danger', 'Statut invalide.');
+
+            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+        }
+
+        $order->setStatus($status);
+        $em->flush();
+
+        $this->addFlash('success', 'Statut du devis mis à jour.');
+
+        return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
     }
 
     #[Route('/api/profile/{id}', name: 'api_profile_info', methods: ['GET'])]

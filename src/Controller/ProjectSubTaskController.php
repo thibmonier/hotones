@@ -6,8 +6,9 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Entity\ProjectSubTask;
-use App\Repository\ProjectSubTaskRepository;
 use App\Form\ProjectSubTaskType;
+use App\Repository\ProjectSubTaskRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,14 +24,15 @@ class ProjectSubTaskController extends AbstractController
     public function __construct(
         private EntityManagerInterface $em,
         private ProjectSubTaskRepository $subTasks
-    ) {}
+    ) {
+    }
 
     #[Route('/{id}/subtasks/kanban', name: 'project_subtasks_kanban', methods: ['GET'])]
     public function kanban(Project $project): Response
     {
-        $todo = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_TODO);
+        $todo  = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_TODO);
         $doing = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_IN_PROGRESS);
-        $done = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_DONE);
+        $done  = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_DONE);
 
         return $this->render('project_subtask/kanban.html.twig', [
             'project' => $project,
@@ -44,8 +46,8 @@ class ProjectSubTaskController extends AbstractController
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function move(ProjectSubTask $subTask, Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent() ?: '[]', true);
-        $status = $data['status'] ?? null;
+        $data      = json_decode($request->getContent() ?: '[]', true);
+        $status    = $data['status']    ?? null;
         $positions = $data['positions'] ?? []; // [subTaskId => position]
 
         if (!in_array($status, array_keys(ProjectSubTask::getAvailableStatuses()), true)) {
@@ -60,7 +62,7 @@ class ProjectSubTaskController extends AbstractController
                 $st->setPosition((int) $pos);
             }
         }
-        $subTask->setUpdatedAt(new \DateTimeImmutable());
+        $subTask->setUpdatedAt(new DateTimeImmutable());
 
         $this->em->flush();
 
@@ -72,22 +74,22 @@ class ProjectSubTaskController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         $data = json_decode($request->getContent() ?: '[]', true);
-        $raf = $data['remainingHours'] ?? null;
+        $raf  = $data['remainingHours'] ?? null;
         if ($raf === null || !is_numeric($raf)) {
             return $this->json(['error' => 'Valeur invalide'], 400);
         }
         $subTask->setRemainingHours(number_format((float) $raf, 2, '.', ''));
-$subTask->setUpdatedAt(new \DateTimeImmutable());
+        $subTask->setUpdatedAt(new DateTimeImmutable());
         $this->em->flush();
 
         return $this->json([
-            'ok' => true,
-            'progress' => $subTask->getProgressPercentage(),
+            'ok'        => true,
+            'progress'  => $subTask->getProgressPercentage(),
             'timeSpent' => $subTask->getTimeSpentHours(),
         ]);
     }
 
-    #[Route('/subtasks/{id}/edit', name: 'project_subtask_edit', methods: ['GET','POST'])]
+    #[Route('/subtasks/{id}/edit', name: 'project_subtask_edit', methods: ['GET', 'POST'])]
     public function edit(ProjectSubTask $subTask, Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
@@ -99,24 +101,26 @@ $subTask->setUpdatedAt(new \DateTimeImmutable());
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-$subTask->setUpdatedAt(new \DateTimeImmutable());
+                $subTask->setUpdatedAt(new DateTimeImmutable());
                 $this->em->flush();
                 // Re-render the card HTML
                 $html = $this->renderView('project_subtask/partials/_card.html.twig', ['st' => $subTask]);
+
                 return $this->json(['ok' => true, 'html' => $html]);
             }
             // Invalid -> return modal with errors
             $html = $this->renderView('project_subtask/_modal_form.html.twig', [
                 'subTask' => $subTask,
-                'form' => $form->createView(),
+                'form'    => $form->createView(),
             ]);
+
             return new JsonResponse(['ok' => false, 'html' => $html], 400);
         }
 
         // Initial GET -> return modal content
         return $this->render('project_subtask/_modal_form.html.twig', [
             'subTask' => $subTask,
-            'form' => $form->createView(),
+            'form'    => $form->createView(),
         ]);
     }
 }

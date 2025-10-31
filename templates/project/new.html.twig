@@ -33,8 +33,13 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="client" class="form-label">Client</label>
-                                    <input type="text" class="form-control" id="client" name="client">
+                                    <label for="client_id" class="form-label">Client</label>
+                                    <select class="form-control" id="client_id" name="client_id">
+                                        <option value="">Sélectionner...</option>
+                                        {% for c in clients %}
+                                            <option value="{{ c.id }}">{{ c.name }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>

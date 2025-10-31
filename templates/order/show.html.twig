@@ -170,6 +170,20 @@
                         <h4 class="card-title">Actions</h4>
                     </div>
                     <div class="card-body">
+                        <form method="post" action="{{ path('order_update_status', {'id': order.id}) }}" class="mb-3">
+                            <input type="hidden" name="_token" value="{{ csrf_token('status' ~ order.id) }}">
+                            <div class="d-flex gap-2">
+                                <select name="status" class="form-select">
+                                    {% for key, label in statusOptions %}
+                                        <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bx bx-check me-1"></i> Mettre à jour
+                                </button>
+                            </div>
+                        </form>
+
                         <form method="post" action="{{ path('order_duplicate', {'id': order.id}) }}" class="d-grid gap-2">
                             <button type="submit" class="btn btn-outline-info" onclick="return confirm('Dupliquer ce devis ?')">
                                 <i class="bx bx-copy me-1"></i> Dupliquer

@@ -75,7 +75,7 @@
                             <tbody>
                                 <tr>
                                     <th scope="row" style="width: 50%;">Client :</th>
-                                    <td>{{ project.client ?? 'Non défini' }}</td>
+                                    <td>{{ project.client ? project.client.name : 'Non défini' }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Type de projet :</th>

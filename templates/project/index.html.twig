@@ -106,11 +106,14 @@
                                             <small class="text-muted">{{ project.description|length > 50 ? project.description|slice(0, 50) ~ '...' : project.description }}</small>
                                         {% endif %}
                                     </td>
-                                    <td>{{ project.client ?? '-' }}</td>
+                                    <td>{{ project.client ? project.client.name : '-' }}</td>
                                     <td>
-                                        <span class="badge bg-{% if project.isInternal %}info{% else %}primary{% endif %}">
-                                            {{ project.isInternal ? 'Interne' : 'Client' }}
-                                        </span>
+                                        {% set typeLabel = project.projectType == 'regie' ? 'Régie' : 'Forfait' %}
+                                        {% set typeClass = project.projectType == 'regie' ? 'warning' : 'primary' %}
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="badge bg-{{ typeClass }}">{{ typeLabel }}</span>
+                                            <span class="badge bg-{% if project.isInternal %}info{% else %}secondary{% endif %}">{{ project.isInternal ? 'Interne' : 'Client' }}</span>
+                                        </div>
                                     </td>
                                     <td>
                                         {% if project.serviceCategory %}

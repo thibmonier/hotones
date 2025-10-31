@@ -73,6 +73,8 @@ Application: http://localhost:8080
 - Création automatique des tâches par défaut (AVV, Non-vendu) à la création d’un projet
 - Prise en compte du type et du statut de projet à la création/édition
 - Ajout de la relation optionnelle Timesheet → ProjectTask (modèle)
+- Devis: modification rapide du statut depuis la page devis et la liste des devis (POST CSRF → route order_update_status)
+- Projets: la colonne « Type » du listing montre Forfait/Régie + badge « Interne/Client »
 
 Après pull, exécuter:
 ```bash path=null start=null
