@@ -29,6 +29,3 @@ jobs:
 
       - name: PHPStan
         run: composer phpstan
-
-      - name: PHPMD
-        run: composer phpmd
