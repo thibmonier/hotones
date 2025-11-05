@@ -17,7 +17,7 @@ final class ProjectFactory extends PersistentObjectFactory
         $faker = self::faker();
 
         return [
-            'name'                 => $faker->catchPhrase(),
+            'name'                 => $faker->company(),
             'client'               => null, // set in fixtures with ClientFactory::random()
             'description'          => $faker->optional()->paragraphs(3, true),
             'purchasesAmount'      => $faker->optional()->randomFloat(2, 100, 5000),

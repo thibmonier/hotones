@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Tests\E2E;
+
+use App\Factory\UserFactory;
+use Symfony\Component\Panther\PantherTestCase; // extends WebTestCase with browser
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
+
+class LoginAndNavigationE2ETest extends PantherTestCase
+{
+    use Factories;
+    use ResetDatabase;
+
+    public function testUserCanLoginAndSeeHomepage(): void
+    {
+        $client = static::createPantherClient();
+
+        $user = UserFactory::createOne([
+            'roles' => ['ROLE_INTERVENANT'],
+            'password' => 'password',
+        ]);
+
+        $crawler = $client->request('GET', '/login');
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        $form = $crawler->filter('form')->form([
+            '_username' => $user->getEmail(),
+            '_password' => 'password',
+        ]);
+        $client->submit($form);
+
+        $client->waitForInvisibility('#password-addon'); // rough wait after submit
+
+        // After successful login, default target is '/'
+        $this->assertStringEndsWith('/', parse_url($client->getCurrentURL(), PHP_URL_PATH));
+    }
+
+    public function testNavigateToProjectsIndex(): void
+    {
+        $client = static::createPantherClient();
+
+        $user = UserFactory::createOne([
+            'roles' => ['ROLE_INTERVENANT'],
+            'password' => 'password',
+        ]);
+
+        // Login
+        $crawler = $client->request('GET', '/login');
+        $form = $crawler->filter('form')->form([
+            '_username' => $user->getEmail(),
+            '_password' => 'password',
+        ]);
+        $client->submit($form);
+        $client->waitForElementToContain('h4', '');
+
+        // Go to projects index
+        $client->request('GET', '/projects');
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSelectorTextContains('h4', 'Projets');
+    }
+}
