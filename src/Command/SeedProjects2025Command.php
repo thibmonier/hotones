@@ -44,13 +44,13 @@ class SeedProjects2025Command extends Command
     {
         $this
             ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Nombre de projets à générer', '50')
-            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, "Année de génération", '2025');
+            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année de génération', '2025');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io   = new SymfonyStyle($input, $output);
-        $year = (int) $input->getOption('year');
+        $io    = new SymfonyStyle($input, $output);
+        $year  = (int) $input->getOption('year');
         $count = (int) $input->getOption('count');
 
         $io->title("Génération de $count projets de test pour $year");
@@ -86,8 +86,8 @@ class SeedProjects2025Command extends Command
 
     private function ensureProfiles(SymfonyStyle $io): array
     {
-        $repo = $this->em->getRepository(Profile::class);
-        $names = ['Développeur Frontend', 'Développeur Backend', 'Chef de projet', 'Designer UX/UI', 'DevOps'];
+        $repo     = $this->em->getRepository(Profile::class);
+        $names    = ['Développeur Frontend', 'Développeur Backend', 'Chef de projet', 'Designer UX/UI', 'DevOps'];
         $profiles = [];
         foreach ($names as $name) {
             $p = $repo->findOneBy(['name' => $name]);
@@ -99,23 +99,24 @@ class SeedProjects2025Command extends Command
             }
             $profiles[] = $p;
         }
+
         return $profiles;
     }
 
     private function ensureContributors(SymfonyStyle $io, array $profiles): array
     {
-        $repo = $this->em->getRepository(Contributor::class);
+        $repo     = $this->em->getRepository(Contributor::class);
         $existing = $repo->findBy(['active' => true]);
         if (count($existing) >= 5) {
             return $existing;
         }
-        $names = ['Alice Dupont','Bob Martin','Claire Rousseau','David Moreau','Emma Bernard','François Petit','Gaël Leroy'];
+        $names        = ['Alice Dupont', 'Bob Martin', 'Claire Rousseau', 'David Moreau', 'Emma Bernard', 'François Petit', 'Gaël Leroy'];
         $contributors = [];
         foreach ($names as $i => $name) {
             $c = $repo->findOneBy(['name' => $name]);
             if (!$c) {
                 $c = new Contributor();
-                $c->setName($name)->setActive(true)->setCjm((string) (400 + ($i%4)*50).'.00');
+                $c->setName($name)->setActive(true)->setCjm((string) (400 + ($i % 4) * 50).'.00');
                 // Associer 1 profil
                 if (isset($profiles[$i % count($profiles)])) {
                     $c->addProfile($profiles[$i % count($profiles)]);
@@ -125,17 +126,18 @@ class SeedProjects2025Command extends Command
             }
             $contributors[] = $c;
         }
+
         return $contributors;
     }
 
     private function ensureTechnologies(SymfonyStyle $io): array
     {
-        $repo = $this->em->getRepository(Technology::class);
+        $repo     = $this->em->getRepository(Technology::class);
         $existing = $repo->findBy(['active' => true]);
         if (count($existing) > 0) {
             return $existing;
         }
-        $techs = ['Symfony','React','Vue.js','Angular','Node.js','Docker','AWS','MySQL','PostgreSQL','Redis'];
+        $techs   = ['Symfony', 'React', 'Vue.js', 'Angular', 'Node.js', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis'];
         $created = [];
         foreach ($techs as $t) {
             $tech = $repo->findOneBy(['name' => $t]);
@@ -147,34 +149,39 @@ class SeedProjects2025Command extends Command
             }
             $created[] = $tech;
         }
+
         return $created;
     }
 
     private function createProjects(SymfonyStyle $io, int $year, int $count, array $technos): array
     {
         $projects = [];
-        for ($i = 1; $i <= $count; $i++) {
+        for ($i = 1; $i <= $count; ++$i) {
             $project = new Project();
             $project->setName(sprintf('Projet Test %d #%02d', $year, $i));
             $project->setDescription('Projet de test généré automatiquement.');
-            $project->setProjectType(rand(0,1) ? 'forfait' : 'regie');
-            $project->setStatus(rand(0,10) > 7 ? 'completed' : 'active');
+            $project->setProjectType(rand(0, 1) ? 'forfait' : 'regie');
+            $project->setStatus(rand(0, 10) > 7 ? 'completed' : 'active');
 
-            $start = new DateTime(sprintf('%d-%02d-%02d', $year, rand(1,11), rand(1,28)));
+            $start = new DateTime(sprintf('%d-%02d-%02d', $year, rand(1, 11), rand(1, 28)));
             $end   = (clone $start)->modify('+'.rand(30, 180).' days');
-            if ((int)$end->format('Y') > $year) { $end = new DateTime(sprintf('%d-12-15', $year)); }
+            if ((int) $end->format('Y') > $year) {
+                $end = new DateTime(sprintf('%d-12-15', $year));
+            }
             $project->setStartDate($start);
             $project->setEndDate($end);
 
             // Achats globaux aléatoires
-            if (rand(0,1)) {
-                $project->setPurchasesAmount((string)(rand(0, 3000)) . '.00');
+            if (rand(0, 1)) {
+                $project->setPurchasesAmount((string) rand(0, 3000).'.00');
                 $project->setPurchasesDescription('Achats tests (licenses, outils)');
             }
 
             // Associer 1-3 technologies
-            $used = array_rand($technos, min(3, max(1, rand(1,3))));
-            if (!is_array($used)) { $used = [$used]; }
+            $used = array_rand($technos, min(3, max(1, rand(1, 3))));
+            if (!is_array($used)) {
+                $used = [$used];
+            }
             foreach ($used as $idx) {
                 $project->addTechnology($technos[$idx]);
             }
@@ -183,18 +190,19 @@ class SeedProjects2025Command extends Command
             $projects[] = $project;
             $io->writeln('✓ Projet: '.$project->getName());
         }
+
         return $projects;
     }
 
     private function createSignedOrderForProject(Project $project, array $profiles): void
     {
         $createdAt = (clone $project->getStartDate()) ?: new DateTime('2025-01-15');
-        $order = new Order();
+        $order     = new Order();
         $order->setProject($project)
             ->setOrderNumber($this->generateOrderNumberForDate($createdAt))
-            ->setStatus(rand(0,1) ? 'signe' : 'gagne')
+            ->setStatus(rand(0, 1) ? 'signe' : 'gagne')
             ->setCreatedAt($createdAt)
-            ->setValidatedAt((clone $createdAt)->modify('+'.rand(1,30).' days'));
+            ->setValidatedAt((clone $createdAt)->modify('+'.rand(1, 30).' days'));
 
         // Section prestations
         $section = new OrderSection();
@@ -203,26 +211,26 @@ class SeedProjects2025Command extends Command
             ->setSortOrder(1);
 
         // 2-4 lignes de service
-        $numLines = rand(2,4);
-        for ($i = 0; $i < $numLines; $i++) {
+        $numLines = rand(2, 4);
+        for ($i = 0; $i < $numLines; ++$i) {
             $line = new OrderLine();
             $line->setSection($section)
-                ->setDescription('Prestation #'.($i+1))
-                ->setPosition($i+1)
+                ->setDescription('Prestation #'.($i + 1))
+                ->setPosition($i + 1)
                 ->setType('service')
                 ->setProfile($profiles[$i % count($profiles)])
-                ->setDailyRate((string)(400 + rand(0, 250)) . '.00')
-                ->setDays((string)(1 + rand(1, 15)));
+                ->setDailyRate((string) (400 + rand(0, 250)).'.00')
+                ->setDays((string) (1 + rand(1, 15)));
             // Attacher un achat ponctuel parfois
-            if (rand(0,3) === 0) {
-                $line->setAttachedPurchaseAmount((string)(rand(200, 1200)) . '.00');
+            if (rand(0, 3) === 0) {
+                $line->setAttachedPurchaseAmount((string) rand(200, 1200).'.00');
             }
             $section->addLine($line);
             $this->em->persist($line);
         }
 
         // Éventuelle section achats
-        if (rand(0,1)) {
+        if (rand(0, 1)) {
             $sec2 = new OrderSection();
             $sec2->setOrder($order)
                 ->setName('Achats')
@@ -233,7 +241,7 @@ class SeedProjects2025Command extends Command
                 ->setDescription('Licence annuelle')
                 ->setType('fixed_amount')
                 ->setPosition(1)
-                ->setDirectAmount((string)(rand(300, 2000)) . '.00');
+                ->setDirectAmount((string) rand(300, 2000).'.00');
             $sec2->addLine($purchase);
 
             $this->em->persist($sec2);
@@ -254,17 +262,17 @@ class SeedProjects2025Command extends Command
     {
         $positions = 1;
         $numTasks  = rand(3, 6);
-        for ($i = 0; $i < $numTasks; $i++) {
+        for ($i = 0; $i < $numTasks; ++$i) {
             $task = new ProjectTask();
             $task->setProject($project)
-                ->setName('Tâche #'.($i+1))
+                ->setName('Tâche #'.($i + 1))
                 ->setType(ProjectTask::TYPE_REGULAR)
                 ->setCountsForProfitability(true)
                 ->setPosition($positions++)
                 ->setStatus('in_progress')
                 ->setEstimatedHoursSold(rand(16, 80))
                 ->setEstimatedHoursRevised(rand(16, 100))
-                ->setDailyRate((string)(450 + rand(0, 200)) . '.00');
+                ->setDailyRate((string) (450 + rand(0, 200)).'.00');
             // assigner un contrib éventuel
             if (!empty($contributors)) {
                 $task->setAssignedContributor($contributors[array_rand($contributors)]);
@@ -275,24 +283,34 @@ class SeedProjects2025Command extends Command
 
     private function createTimesheetsForProject(Project $project, array $contributors, int $year): void
     {
-        if (empty($contributors)) { return; }
+        if (empty($contributors)) {
+            return;
+        }
         $start = $project->getStartDate() ?: new DateTime("$year-01-01");
         $end   = $project->getEndDate() ?: new DateTime("$year-12-20");
-        if ((int)$start->format('Y') < $year) { $start = new DateTime("$year-01-01"); }
-        if ((int)$end->format('Y') > $year) { $end   = new DateTime("$year-12-20"); }
+        if ((int) $start->format('Y') < $year) {
+            $start = new DateTime("$year-01-01");
+        }
+        if ((int) $end->format('Y') > $year) {
+            $end = new DateTime("$year-12-20");
+        }
 
         $period = new DatePeriod($start, new DateInterval('P1D'), $end);
         foreach ($period as $date) {
             // jours ouvrés uniquement
-            if ((int)$date->format('N') > 5) { continue; }
+            if ((int) $date->format('N') > 5) {
+                continue;
+            }
             // 25% de chances qu'il y ait du temps ce jour pour ce projet
-            if (rand(1, 100) > 25) { continue; }
+            if (rand(1, 100) > 25) {
+                continue;
+            }
 
             $timesheet = new Timesheet();
             $timesheet->setContributor($contributors[array_rand($contributors)])
                 ->setProject($project)
                 ->setDate($date)
-                ->setHours((string)(rand(4, 8)))
+                ->setHours((string) rand(4, 8))
                 ->setNotes('Temps saisi automatiquement (test)');
             $this->em->persist($timesheet);
         }
@@ -316,7 +334,7 @@ class SeedProjects2025Command extends Command
             $this->orderCounters[$key] = $lastIncrement;
         }
 
-        $this->orderCounters[$key]++;
+        ++$this->orderCounters[$key];
 
         return sprintf('D%s%s%03d', $year, $month, $this->orderCounters[$key]);
     }

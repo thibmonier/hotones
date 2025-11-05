@@ -7,13 +7,13 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Form\ProjectTaskType;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use DateTime;
 
 #[Route('/project')]
 #[IsGranted('ROLE_USER')]
@@ -43,12 +43,26 @@ class ProjectDetailController extends AbstractController
         $contributorHoursData = $this->getContributorHoursData($projectContributors);
 
         // Timeline de consommation (hebdomadaire entre bornes du projet)
-        $start = $project->getStartDate() ?: (function() use ($project) {
-            $min = null; foreach ($project->getTimesheets() as $t) { $d = $t->getDate(); if (!$min || $d < $min) { $min = $d; } }
+        $start = $project->getStartDate() ?: (function () use ($project) {
+            $min = null;
+            foreach ($project->getTimesheets() as $t) {
+                $d = $t->getDate();
+                if (!$min || $d < $min) {
+                    $min = $d;
+                }
+            }
+
             return $min ?: new DateTime(date('Y-01-01'));
         })();
-        $end = $project->getEndDate() ?: (function() use ($project) {
-            $max = null; foreach ($project->getTimesheets() as $t) { $d = $t->getDate(); if (!$max || $d > $max) { $max = $d; } }
+        $end = $project->getEndDate() ?: (function () use ($project) {
+            $max = null;
+            foreach ($project->getTimesheets() as $t) {
+                $d = $t->getDate();
+                if (!$max || $d > $max) {
+                    $max = $d;
+                }
+            }
+
             return $max ?: new DateTime();
         })();
         $timeline = $this->profitabilityService->buildConsumptionTimeline($project, $start, $end, 'weekly');

@@ -29,7 +29,7 @@ class ProfitabilityService
      * - Marge brute % = (Marge brute / CA) × 100
      * - Marge nette € = CA - Achats - Coût homme
      * - Marge nette % = (Marge nette / CA) × 100
-     * - TJR réel = CA / (Σ heures / 8)
+     * - TJR réel = CA / (Σ heures / 8).
      */
     public function calculatePeriodMetricsForProjects(array $projects, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
@@ -67,17 +67,17 @@ class ProfitabilityService
                     continue;
                 }
 
-                $hours = $timesheet->getHours();
+                $hours      = $timesheet->getHours();
                 $totalHours = bcadd($totalHours, $hours, 2);
 
                 // Coût
-                $dailyCost = $this->getContributorDailyCost($timesheet->getContributor(), $timesheet->getDate());
-                $timeCost  = bcdiv(bcmul($hours, $dailyCost, 4), '8', 2);
+                $dailyCost      = $this->getContributorDailyCost($timesheet->getContributor(), $timesheet->getDate());
+                $timeCost       = bcdiv(bcmul($hours, $dailyCost, 4), '8', 2);
                 $totalHumanCost = bcadd($totalHumanCost, $timeCost, 2);
 
                 // Revenu estimé (TJM)
-                $avgTjm     = $this->getAverageTjmForContributor($timesheet->getContributor(), $timesheet->getDate());
-                $timeRev    = bcdiv(bcmul($hours, $avgTjm, 4), '8', 2);
+                $avgTjm       = $this->getAverageTjmForContributor($timesheet->getContributor(), $timesheet->getDate());
+                $timeRev      = bcdiv(bcmul($hours, $avgTjm, 4), '8', 2);
                 $totalRevenue = bcadd($totalRevenue, $timeRev, 2);
             }
         }
@@ -97,18 +97,18 @@ class ProfitabilityService
             : '0.00';
 
         return [
-            'revenue'            => $totalRevenue,
-            'human_cost'         => $totalHumanCost,
-            'purchases'          => $totalPurchases,
-            'gross_margin_eur'   => $grossMargin,
-            'gross_margin_pct'   => $grossPct,
-            'net_margin_eur'     => $netMargin,
-            'net_margin_pct'     => $netPct,
-            'real_daily_rate'    => $realDailyRate,
-            'total_hours'        => $totalHours,
-            'total_days'         => $totalDays,
-            'start_date'         => $startDate,
-            'end_date'           => $endDate,
+            'revenue'          => $totalRevenue,
+            'human_cost'       => $totalHumanCost,
+            'purchases'        => $totalPurchases,
+            'gross_margin_eur' => $grossMargin,
+            'gross_margin_pct' => $grossPct,
+            'net_margin_eur'   => $netMargin,
+            'net_margin_pct'   => $netPct,
+            'real_daily_rate'  => $realDailyRate,
+            'total_hours'      => $totalHours,
+            'total_days'       => $totalDays,
+            'start_date'       => $startDate,
+            'end_date'         => $endDate,
         ];
     }
 
@@ -116,7 +116,7 @@ class ProfitabilityService
      * Construit une timeline de consommation (hebdo ou mensuelle) pour un projet.
      * - budgetLine: ligne horizontale au montant du budget (CA vendu via tâches)
      * - consumed: coût réel cumulé (heures × CJM/8)
-     * - forecast: coût prévisionnel cumulé, distribution linéaire du coût estimé
+     * - forecast: coût prévisionnel cumulé, distribution linéaire du coût estimé.
      */
     public function buildConsumptionTimeline(Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, string $granularity = 'weekly'): array
     {
@@ -126,10 +126,10 @@ class ProfitabilityService
         $interval = $granularity === 'monthly' ? new DateInterval('P1M') : new DateInterval('P1W');
         $period   = new DatePeriod($startDate, $interval, (clone $endDate)->modify('+1 day'));
 
-        $labels      = [];
-        $budgetLine  = [];
-        $consumed    = [];
-        $forecast    = [];
+        $labels     = [];
+        $budgetLine = [];
+        $consumed   = [];
+        $forecast   = [];
 
         $budgetRevenue   = $project->getTotalTasksSoldAmount();
         $estimatedCost   = $project->getTotalTasksEstimatedCost();
@@ -138,18 +138,22 @@ class ProfitabilityService
         // Distribuer linéairement le coût estimé sur la période
         // Nombre de points
         $points = 0;
-        foreach ($period as $_) { $points++; }
-        if ($points === 0) { $points = 1; }
+        foreach ($period as $_) {
+            ++$points;
+        }
+        if ($points === 0) {
+            $points = 1;
+        }
 
         // Recalculer le period après comptage (DatePeriod est itérable une fois)
         $period = new DatePeriod($startDate, $interval, (clone $endDate)->modify('+1 day'));
 
         $cumulativeConsumed = '0';
-        $i = 0;
+        $i                  = 0;
         foreach ($period as $dt) {
-            $i++;
+            ++$i;
             // Label
-            $labels[] = $granularity === 'monthly' ? $dt->format('M Y') : sprintf('S%02d %s', (int)$dt->format('W'), $dt->format('Y'));
+            $labels[]     = $granularity === 'monthly' ? $dt->format('M Y') : sprintf('S%02d %s', (int) $dt->format('W'), $dt->format('Y'));
             $budgetLine[] = (float) $budgetRevenue;
 
             // Fenêtre pour ce point
@@ -161,22 +165,26 @@ class ProfitabilityService
                 // semaine ISO: du lundi au dimanche
                 $windowEnd->modify('+6 days');
             }
-            if ($windowEnd > $endDate) { $windowEnd = clone $endDate; }
+            if ($windowEnd > $endDate) {
+                $windowEnd = clone $endDate;
+            }
 
             // Consommé (coût réel sur la fenêtre)
             $timesheets = $timesheetRepo->findForPeriodWithProject($windowStart, $windowEnd, $project);
             $windowCost = '0';
             foreach ($timesheets as $t) {
-                if (!$this->shouldCountTimesheet($t)) { continue; }
-                $dailyCost = $this->getContributorDailyCost($t->getContributor(), $t->getDate());
-                $timeCost  = bcdiv(bcmul($t->getHours(), $dailyCost, 4), '8', 2);
+                if (!$this->shouldCountTimesheet($t)) {
+                    continue;
+                }
+                $dailyCost  = $this->getContributorDailyCost($t->getContributor(), $t->getDate());
+                $timeCost   = bcdiv(bcmul($t->getHours(), $dailyCost, 4), '8', 2);
                 $windowCost = bcadd($windowCost, $timeCost, 2);
             }
             $cumulativeConsumed = bcadd($cumulativeConsumed, $windowCost, 2);
-            $consumed[] = (float) $cumulativeConsumed;
+            $consumed[]         = (float) $cumulativeConsumed;
 
             // Prévisionnel cumulé (distribution linéaire sur points)
-            $forecastCum = bcmul($estimatedCost, bcdiv((string)$i, (string)$points, 4), 2);
+            $forecastCum = bcmul($estimatedCost, bcdiv((string) $i, (string) $points, 4), 2);
             $forecast[]  = (float) $forecastCum;
         }
 

@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_INTERVENANT')]
 class ProjectController extends AbstractController
 {
-#[Route('', name: 'project_index', methods: ['GET'])]
+    #[Route('', name: 'project_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, \App\Service\ProfitabilityService $profitabilityService): Response
     {
         $projectRepo = $em->getRepository(Project::class);
@@ -29,8 +29,8 @@ class ProjectController extends AbstractController
         $startParam = $request->query->get('start_date');
         $endParam   = $request->query->get('end_date');
 
-        $startDate = $startParam ? new \DateTime($startParam) : new \DateTime($year.'-01-01');
-        $endDate   = $endParam   ? new \DateTime($endParam)   : new \DateTime($year.'-12-31');
+        $startDate = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
+        $endDate   = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
 
         // Filtres additionnels
         $filterProjectType = $request->query->get('project_type') ?: null;
@@ -39,7 +39,7 @@ class ProjectController extends AbstractController
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
-        $perPageParam   = (int) ($request->query->get('per_page', 10));
+        $perPageParam   = (int) $request->query->get('per_page', 10);
         $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 10;
         $page           = max(1, (int) $request->query->get('page', 1));
         $offset         = ($page - 1) * $perPage;
@@ -62,7 +62,7 @@ class ProjectController extends AbstractController
 
         // KPIs période (réel basé sur timesheets) - doivent refléter TOUT l'ensemble filtré (pas seulement la page)
         $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, null, null);
-        $periodKpis = $profitabilityService->calculatePeriodMetricsForProjects($allProjectsForKpis, $startDate, $endDate);
+        $periodKpis         = $profitabilityService->calculatePeriodMetricsForProjects($allProjectsForKpis, $startDate, $endDate);
 
         $pagination = [
             'current_page' => $page,
@@ -77,7 +77,7 @@ class ProjectController extends AbstractController
         $filterOptions = [
             'project_types' => $projectRepo->getDistinctProjectTypes(),
             'statuses'      => $projectRepo->getDistinctStatuses(),
-            'technologies'  => $em->getRepository(\App\Entity\Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
+            'technologies'  => $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
         ];
 
         return $this->render('project/index.html.twig', [
@@ -90,11 +90,11 @@ class ProjectController extends AbstractController
                 'status'       => $filterStatus,
                 'technology'   => $filterTechnology,
             ],
-'filter_options'       => $filterOptions,
-            'period_kpis'          => $periodKpis,
-            'pagination'           => $pagination,
+            'filter_options' => $filterOptions,
+            'period_kpis'    => $periodKpis,
+            'pagination'     => $pagination,
             // Filtres pour URL (types simples)
-            'filters_query'        => [
+            'filters_query' => [
                 'year'         => $year,
                 'start_date'   => $startDate->format('Y-m-d'),
                 'end_date'     => $endDate->format('Y-m-d'),

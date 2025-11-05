@@ -212,7 +212,7 @@ class ProjectRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn($r) => $r['type'], $rows)));
+        return array_values(array_filter(array_map(fn ($r) => $r['type'], $rows)));
     }
 
     /**
@@ -227,6 +227,6 @@ class ProjectRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn($r) => $r['status'], $rows)));
+        return array_values(array_filter(array_map(fn ($r) => $r['status'], $rows)));
     }
 }
