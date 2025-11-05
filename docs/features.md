@@ -40,4 +40,10 @@
     - Depuis la liste des devis: sélecteur dans la colonne « Statut » (soumission auto au changement)
     - Route: POST /orders/{id}/status (name: order_update_status)
   - Sections regroupant des lignes + totalisation
-  - Lignes: profil, TJM, jours, total (jours×TJM), achats attachés (affiche marge nette)
+- Lignes: profil, TJM, jours, total (jours×TJM), achats attachés (affiche marge nette)
+
+## 🧪 Tests E2E
+- Outil: Symfony Panther (Chrome headless)
+- Parcours couverts: authentification (login), navigation tableau de bord → projets, création d’un projet (flux minimal)
+- Commande: `./vendor/bin/phpunit` (voir `docs/tests.md` pour variables Chrome)
+- CI: exécution automatique des E2E via GitHub Actions (`.github/workflows/ci.yml`)

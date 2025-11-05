@@ -16,3 +16,8 @@
 - Formulaires avec validation
 - Tableaux interactifs (sélecteur inline du statut de devis dans les listings)
 - Graphiques (Chart.js ou similaire)
+
+## 🧪 Tests E2E (UX de bout en bout)
+- Scénarios: login, accès page d’accueil, listing projets, création de projet
+- Bonnes pratiques: privilégier des sélecteurs stables (id/classes dédiées ou data-testid) pour fiabiliser les tests
+- Outil: Panther (navigateur réel) — voir `docs/tests.md` pour configuration

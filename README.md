@@ -1,6 +1,6 @@
 # HotOnes
 
-[![WARP Index](https://img.shields.io/badge/WARP-Index-0A84FF?style=for-the-badge)](WARP.md) [![Agents Guide](https://img.shields.io/badge/Agents-Guide-2EA043?style=for-the-badge)](AGENTS.md)
+[![WARP Index](https://img.shields.io/badge/WARP-Index-0A84FF?style=for-the-badge)](WARP.md) [![Agents Guide](https://img.shields.io/badge/Agents-Guide-2EA043?style=for-the-badge)](AGENTS.md) [![CI](https://github.com/thibmonier/hotones/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GH_OWNER/YOUR_REPO/actions/workflows/ci.yml)
 Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en croisant ventes (jours/TJM), temps passés, coûts (CJM), achats et KPIs consolidés.
 
 ## 🚀 Guide Warp/Agents
@@ -83,13 +83,22 @@ docker compose exec app php bin/console doctrine:migrations:migrate -n
 ```
 
 ## Tests & qualité
-```bash path=null start=null
-# Tests (si présents)
+```bash
+# Tests (unit/int/func/E2E)
 docker compose exec app ./vendor/bin/phpunit
 
-# Analyse statique
+# Analyse statique & style
 docker compose exec app composer check-code
 ```
+
+- Environnement de test: `.env.test` utilise SQLite (isolation sans DB externe)
+- E2E (Panther): nécessite Chrome/Chromium; variables utiles (si besoin):
+```bash
+export PANTHER_CHROME_BINARY="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+export PANTHER_NO_SANDBOX=1
+```
+- CI: GitHub Actions exécute PHPUnit (incl. E2E headless) + qualité (`.github/workflows/ci.yml`)
+- Plus d’infos: `docs/tests.md`
 
 ## URLs utiles
 - App: http://localhost:8080
