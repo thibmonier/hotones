@@ -6,6 +6,8 @@ use App\Entity\Contributor;
 use App\Entity\Order;
 use App\Entity\Project;
 use App\Entity\Timesheet;
+use DateInterval;
+use DatePeriod;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -16,6 +18,195 @@ class ProfitabilityService
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
+    }
+
+    /**
+     * Agrégats sur une période pour un ensemble de projets (liste des projets).
+     * - CA période = Σ(heures facturables × TJM / 8)
+     * - Coût homme période = Σ(heures facturables × CJM / 8)
+     * - Achats période = Somme des achats rattachés aux projets (projet + lignes de devis)
+     * - Marge brute € = CA - Achats
+     * - Marge brute % = (Marge brute / CA) × 100
+     * - Marge nette € = CA - Achats - Coût homme
+     * - Marge nette % = (Marge nette / CA) × 100
+     * - TJR réel = CA / (Σ heures / 8)
+     */
+    public function calculatePeriodMetricsForProjects(array $projects, DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    {
+        $timesheetRepo = $this->entityManager->getRepository(Timesheet::class);
+
+        $totalRevenue   = '0';
+        $totalHumanCost = '0';
+        $totalPurchases = '0';
+        $totalHours     = '0';
+
+        // Pré-calcul des achats par projet (fixes, pas datés dans le modèle actuel)
+        foreach ($projects as $project) {
+            if (!$project instanceof Project) {
+                continue;
+            }
+            // Achats au niveau projet
+            if ($project->getPurchasesAmount()) {
+                $totalPurchases = bcadd($totalPurchases, $project->getPurchasesAmount(), 2);
+            }
+            // Achats issus des lignes de devis
+            foreach ($project->getOrders() as $order) {
+                foreach ($order->getSections() as $section) {
+                    foreach ($section->getLines() as $line) {
+                        if ($line->getPurchaseAmount()) {
+                            $totalPurchases = bcadd($totalPurchases, $line->getPurchaseAmount(), 2);
+                        }
+                    }
+                }
+            }
+
+            // Temps de la période pour ce projet
+            $timesheets = $timesheetRepo->findForPeriodWithProject($startDate, $endDate, $project);
+            foreach ($timesheets as $timesheet) {
+                if (!$this->shouldCountTimesheet($timesheet)) {
+                    continue;
+                }
+
+                $hours = $timesheet->getHours();
+                $totalHours = bcadd($totalHours, $hours, 2);
+
+                // Coût
+                $dailyCost = $this->getContributorDailyCost($timesheet->getContributor(), $timesheet->getDate());
+                $timeCost  = bcdiv(bcmul($hours, $dailyCost, 4), '8', 2);
+                $totalHumanCost = bcadd($totalHumanCost, $timeCost, 2);
+
+                // Revenu estimé (TJM)
+                $avgTjm     = $this->getAverageTjmForContributor($timesheet->getContributor(), $timesheet->getDate());
+                $timeRev    = bcdiv(bcmul($hours, $avgTjm, 4), '8', 2);
+                $totalRevenue = bcadd($totalRevenue, $timeRev, 2);
+            }
+        }
+
+        $totalDays   = bcdiv($totalHours, '8', 2);
+        $grossMargin = bcsub($totalRevenue, $totalPurchases, 2);
+        $netMargin   = bcsub($grossMargin, $totalHumanCost, 2);
+
+        $grossPct = (bccomp($totalRevenue, '0', 2) > 0)
+            ? bcmul(bcdiv($grossMargin, $totalRevenue, 4), '100', 2)
+            : '0.00';
+        $netPct = (bccomp($totalRevenue, '0', 2) > 0)
+            ? bcmul(bcdiv($netMargin, $totalRevenue, 4), '100', 2)
+            : '0.00';
+        $realDailyRate = (bccomp($totalDays, '0', 2) > 0)
+            ? bcdiv($totalRevenue, $totalDays, 2)
+            : '0.00';
+
+        return [
+            'revenue'            => $totalRevenue,
+            'human_cost'         => $totalHumanCost,
+            'purchases'          => $totalPurchases,
+            'gross_margin_eur'   => $grossMargin,
+            'gross_margin_pct'   => $grossPct,
+            'net_margin_eur'     => $netMargin,
+            'net_margin_pct'     => $netPct,
+            'real_daily_rate'    => $realDailyRate,
+            'total_hours'        => $totalHours,
+            'total_days'         => $totalDays,
+            'start_date'         => $startDate,
+            'end_date'           => $endDate,
+        ];
+    }
+
+    /**
+     * Construit une timeline de consommation (hebdo ou mensuelle) pour un projet.
+     * - budgetLine: ligne horizontale au montant du budget (CA vendu via tâches)
+     * - consumed: coût réel cumulé (heures × CJM/8)
+     * - forecast: coût prévisionnel cumulé, distribution linéaire du coût estimé
+     */
+    public function buildConsumptionTimeline(Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, string $granularity = 'weekly'): array
+    {
+        $timesheetRepo = $this->entityManager->getRepository(Timesheet::class);
+
+        // Déterminer pas de temps
+        $interval = $granularity === 'monthly' ? new DateInterval('P1M') : new DateInterval('P1W');
+        $period   = new DatePeriod($startDate, $interval, (clone $endDate)->modify('+1 day'));
+
+        $labels      = [];
+        $budgetLine  = [];
+        $consumed    = [];
+        $forecast    = [];
+
+        $budgetRevenue   = $project->getTotalTasksSoldAmount();
+        $estimatedCost   = $project->getTotalTasksEstimatedCost();
+        $purchasesAmount = $project->getPurchasesAmount() ?? '0.00';
+
+        // Distribuer linéairement le coût estimé sur la période
+        // Nombre de points
+        $points = 0;
+        foreach ($period as $_) { $points++; }
+        if ($points === 0) { $points = 1; }
+
+        // Recalculer le period après comptage (DatePeriod est itérable une fois)
+        $period = new DatePeriod($startDate, $interval, (clone $endDate)->modify('+1 day'));
+
+        $cumulativeConsumed = '0';
+        $i = 0;
+        foreach ($period as $dt) {
+            $i++;
+            // Label
+            $labels[] = $granularity === 'monthly' ? $dt->format('M Y') : sprintf('S%02d %s', (int)$dt->format('W'), $dt->format('Y'));
+            $budgetLine[] = (float) $budgetRevenue;
+
+            // Fenêtre pour ce point
+            $windowStart = clone $dt;
+            $windowEnd   = clone $dt;
+            if ($granularity === 'monthly') {
+                $windowEnd->modify('last day of this month');
+            } else {
+                // semaine ISO: du lundi au dimanche
+                $windowEnd->modify('+6 days');
+            }
+            if ($windowEnd > $endDate) { $windowEnd = clone $endDate; }
+
+            // Consommé (coût réel sur la fenêtre)
+            $timesheets = $timesheetRepo->findForPeriodWithProject($windowStart, $windowEnd, $project);
+            $windowCost = '0';
+            foreach ($timesheets as $t) {
+                if (!$this->shouldCountTimesheet($t)) { continue; }
+                $dailyCost = $this->getContributorDailyCost($t->getContributor(), $t->getDate());
+                $timeCost  = bcdiv(bcmul($t->getHours(), $dailyCost, 4), '8', 2);
+                $windowCost = bcadd($windowCost, $timeCost, 2);
+            }
+            $cumulativeConsumed = bcadd($cumulativeConsumed, $windowCost, 2);
+            $consumed[] = (float) $cumulativeConsumed;
+
+            // Prévisionnel cumulé (distribution linéaire sur points)
+            $forecastCum = bcmul($estimatedCost, bcdiv((string)$i, (string)$points, 4), 2);
+            $forecast[]  = (float) $forecastCum;
+        }
+
+        return [
+            'labels'     => $labels,
+            'budgetLine' => array_map('floatval', $budgetLine),
+            'consumed'   => $consumed,
+            'forecast'   => $forecast,
+        ];
+    }
+
+    /**
+     * Données pour donut de répartition du budget (marge, achats, coût homme).
+     * Utilise les cibles (estimations) par défaut.
+     */
+    public function buildBudgetDonut(Project $project): array
+    {
+        $revenue         = $project->getTotalTasksSoldAmount();
+        $estimatedCost   = $project->getTotalTasksEstimatedCost();
+        $purchasesAmount = $project->getPurchasesAmount() ?? '0.00';
+        $margin          = bcsub(bcsub($revenue, $estimatedCost, 2), $purchasesAmount, 2);
+
+        return [
+            'labels' => ['Marge', 'Achats', 'Coût homme'],
+            'data'   => [
+                max(0, (float) $margin),
+                (float) $purchasesAmount,
+                (float) $estimatedCost,
+            ],
+        ];
     }
 
     /**

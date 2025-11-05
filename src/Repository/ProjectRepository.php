@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Project;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -102,5 +103,130 @@ class ProjectRepository extends ServiceEntityRepository
             ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Projets "ouverts et actifs" qui intersectent une période.
+     * Un projet est considéré dans la période si:
+     *  - p.startDate <= end
+     *  - et (p.endDate IS NULL ou p.endDate >= start)
+     * Et avec statut = 'active'.
+     */
+    public function findActiveBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.status = :status')
+            ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
+            ->setParameter('status', 'active')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Projets qui intersectent une période avec filtres optionnels.
+     */
+    public function findBetweenDatesFiltered(
+        DateTimeInterface $start,
+        DateTimeInterface $end,
+        ?string $status = null,
+        ?string $projectType = null,
+        ?int $technologyId = null,
+        ?int $limit = null,
+        ?int $offset = null
+    ): array {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.technologies', 't')
+            ->addSelect('t')
+            ->where('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('p.name', 'ASC');
+
+        if ($status) {
+            $qb->andWhere('p.status = :status')->setParameter('status', $status);
+        }
+        if ($projectType) {
+            $qb->andWhere('p.projectType = :ptype')->setParameter('ptype', $projectType);
+        }
+        if ($technologyId) {
+            $qb->andWhere('t.id = :tech')->setParameter('tech', $technologyId);
+        }
+
+        $qb->groupBy('p.id');
+
+        if ($offset !== null) {
+            $qb->setFirstResult($offset);
+        }
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Compte les projets pour cette sélection (DISTINCT p.id).
+     */
+    public function countBetweenDatesFiltered(
+        DateTimeInterface $start,
+        DateTimeInterface $end,
+        ?string $status = null,
+        ?string $projectType = null,
+        ?int $technologyId = null
+    ): int {
+        $qb = $this->createQueryBuilder('p')
+            ->select('COUNT(DISTINCT p.id)')
+            ->leftJoin('p.technologies', 't')
+            ->where('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end);
+
+        if ($status) {
+            $qb->andWhere('p.status = :status')->setParameter('status', $status);
+        }
+        if ($projectType) {
+            $qb->andWhere('p.projectType = :ptype')->setParameter('ptype', $projectType);
+        }
+        if ($technologyId) {
+            $qb->andWhere('t.id = :tech')->setParameter('tech', $technologyId);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Liste des types de projet distincts.
+     */
+    public function getDistinctProjectTypes(): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('DISTINCT p.projectType AS type')
+            ->where('p.projectType IS NOT NULL')
+            ->orderBy('p.projectType', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_values(array_filter(array_map(fn($r) => $r['type'], $rows)));
+    }
+
+    /**
+     * Liste des statuts distincts.
+     */
+    public function getDistinctStatuses(): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('DISTINCT p.status AS status')
+            ->where('p.status IS NOT NULL')
+            ->orderBy('p.status', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_values(array_filter(array_map(fn($r) => $r['status'], $rows)));
     }
 }

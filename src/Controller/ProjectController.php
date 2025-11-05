@@ -19,13 +19,38 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_INTERVENANT')]
 class ProjectController extends AbstractController
 {
-    #[Route('', name: 'project_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $em): Response
+#[Route('', name: 'project_index', methods: ['GET'])]
+    public function index(Request $request, EntityManagerInterface $em, \App\Service\ProfitabilityService $profitabilityService): Response
     {
         $projectRepo = $em->getRepository(Project::class);
-        $projects    = $projectRepo->findAllOrderedByName();
 
-        // Calculer les métriques pour tous les projets
+        // Filtres période: année courante par défaut
+        $year       = (int) $request->query->get('year', date('Y'));
+        $startParam = $request->query->get('start_date');
+        $endParam   = $request->query->get('end_date');
+
+        $startDate = $startParam ? new \DateTime($startParam) : new \DateTime($year.'-01-01');
+        $endDate   = $endParam   ? new \DateTime($endParam)   : new \DateTime($year.'-12-31');
+
+        // Filtres additionnels
+        $filterProjectType = $request->query->get('project_type') ?: null;
+        $filterStatus      = $request->query->get('status', 'active') ?: null;
+        $filterTechnology  = $request->query->get('technology') ? (int) $request->query->get('technology') : null;
+
+        // Pagination
+        $allowedPerPage = [10, 20, 50, 100];
+        $perPageParam   = (int) ($request->query->get('per_page', 10));
+        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 10;
+        $page           = max(1, (int) $request->query->get('page', 1));
+        $offset         = ($page - 1) * $perPage;
+
+        // Total
+        $total = $projectRepo->countBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology);
+
+        // Projets sur la période avec filtres (paginés)
+        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $perPage, $offset);
+
+        // Calculer les métriques pour tous les projets (prévisionnel global par projet)
         $projectsWithMetrics = [];
         foreach ($projects as $project) {
             $metrics               = $this->calculateProjectMetrics($project);
@@ -35,8 +60,49 @@ class ProjectController extends AbstractController
             ];
         }
 
+        // KPIs période (réel basé sur timesheets) - doivent refléter TOUT l'ensemble filtré (pas seulement la page)
+        $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, null, null);
+        $periodKpis = $profitabilityService->calculatePeriodMetricsForProjects($allProjectsForKpis, $startDate, $endDate);
+
+        $pagination = [
+            'current_page' => $page,
+            'per_page'     => $perPage,
+            'total'        => $total,
+            'total_pages'  => (int) ceil($total / $perPage),
+            'has_prev'     => $page > 1,
+            'has_next'     => $page * $perPage < $total,
+        ];
+
+        // Options de filtres
+        $filterOptions = [
+            'project_types' => $projectRepo->getDistinctProjectTypes(),
+            'statuses'      => $projectRepo->getDistinctStatuses(),
+            'technologies'  => $em->getRepository(\App\Entity\Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
+        ];
+
         return $this->render('project/index.html.twig', [
             'projects_with_metrics' => $projectsWithMetrics,
+            'filters'               => [
+                'year'         => $year,
+                'start_date'   => $startDate,
+                'end_date'     => $endDate,
+                'project_type' => $filterProjectType,
+                'status'       => $filterStatus,
+                'technology'   => $filterTechnology,
+            ],
+'filter_options'       => $filterOptions,
+            'period_kpis'          => $periodKpis,
+            'pagination'           => $pagination,
+            // Filtres pour URL (types simples)
+            'filters_query'        => [
+                'year'         => $year,
+                'start_date'   => $startDate->format('Y-m-d'),
+                'end_date'     => $endDate->format('Y-m-d'),
+                'project_type' => $filterProjectType,
+                'status'       => $filterStatus,
+                'technology'   => $filterTechnology,
+                'per_page'     => $perPage,
+            ],
         ]);
     }
 

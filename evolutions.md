@@ -1,0 +1,34 @@
+Ce document représente une évolution de l'application en cours. Il va décrire comment faire évoluer les écrans déjà en place
+
+# Liste des projets
+
+ajouter un filtre sur la liste permettant de voir tous les projets ouverts et actifs entre 2 dates (l'année courante par défaut)
+pourrais-tu ajouter les filtres suivants :
+- par type de projet
+- par statut
+- par technologie
+- par catégorie
+
+la liste affichée soit paginée avec un nombre de résultats par page de (20, 50, 100)
+
+Dans cet écran, il faudrait ajouter des blocs de chiffres en entête de page montrant :
+- le chiffre d'affaire total sur la période filtrée sur la liste des projets
+- La marge brute sur la période (en pourcentage et en euros)
+- Le taux journalier réel utilisé sur le projet sur la période
+- le coût homme total sur le projet sur la période
+- la marge nette sur la période (en pourcentage et en euros)
+- La somme totale des achats portés par les projets sur la période
+
+Formules à utiliser :
+- Marge Brute : c'est la différence entre le chiffre d'affaire et les dépenses (achats et dépenses)
+- Marge Nette : C'est la marge brute - les couts de l'équipe (cout homme total). Le tout divisé par le chiffre d'affaire
+
+# Détail d'un projet
+
+Dans cet écran il faudrait montrer dans les encarts de chiffres :
+- la sommes des temps passés sur le projet / la somme totale des temps à passer sur le projet (révisée avec les déclaration de reste à faire)
+- Le budget consommé sur le projet / Le budget total sur le projet
+- La somme des coûts du projet
+- La marge brute en euros sur le projet (avec sa tendance et sa représentation en pourcentage en pills verte si supérieur à 25%, orange si entre 15 et 25% et rouge en dessous)
+- afficher un graphique représentant la consommation du projet dans le temps (par semaines ou par mois) montrant une ligne horizontale décrivant le budget du projet, une courbe montrant le budget consommé et une courbe montrant le budget prévisionnel à consommer
+- afficher un graphique sous forme de donut montrant la répartition du budget total entre la marge, les achats et le cout homme

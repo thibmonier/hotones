@@ -366,6 +366,22 @@
         </div>
     </div>
 
+    <!-- Graphiques consommation et répartition -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="chart-container">
+                <h5>Consommation du projet dans le temps</h5>
+                <canvas id="consumptionChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="chart-container">
+                <h5>Répartition du budget</h5>
+                <canvas id="budgetDonut"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Vue rapide des chiffres -->
     <div class="row">
         <div class="col-md-6">
@@ -383,11 +399,11 @@
                             <td class="text-end">{{ metrics.total_sold_amount|number_format(0, ',', ' ') }}€</td>
                         </tr>
                         <tr>
-                            <td><strong>CA tâches vendues</strong></td>
-                            <td class="text-end">{{ metrics.total_sold_amount|number_format(0, ',', ' ') }}€</td>
+                            <td><strong>Budget total (estimé)</strong></td>
+                            <td class="text-end">{{ (metrics.estimated_cost + metrics.purchases_amount)|number_format(0, ',', ' ') }}€</td>
                         </tr>
                         <tr>
-                            <td><strong>Coût estimé</strong></td>
+                            <td><strong>Coût estimé (homme)</strong></td>
                             <td class="text-end">{{ metrics.estimated_cost|number_format(0, ',', ' ') }}€</td>
                         </tr>
                         <tr>
@@ -444,9 +460,10 @@
                     </table>
                 </div>
             </div>
-        </div>
     </div>
-    
+</div>
+
+
     <!-- Comparaison Prévisionnel vs Réel -->
     {% if metrics.total_real_hours > 0 %}
     <div class="row">
@@ -590,6 +607,64 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        // Graphiques timeline et donut
+        const timeline = {{ timeline|json_encode|raw }};
+        const donut    = {{ budgetDonut|json_encode|raw }};
+
+        if (document.getElementById('consumptionChart')) {
+            const ctx1 = document.getElementById('consumptionChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: timeline.labels,
+                    datasets: [
+                        {
+                            label: 'Budget (CA vendu)',
+                            data: timeline.budgetLine,
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            borderDash: [5, 5],
+                            tension: 0.2,
+                        },
+                        {
+                            label: 'Budget consommé (coût réel)',
+                            data: timeline.consumed,
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.2,
+                        },
+                        {
+                            label: 'Prévisionnel à consommer',
+                            data: timeline.forecast,
+                            borderColor: 'rgba(234, 179, 8, 1)',
+                            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                            tension: 0.2,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        if (document.getElementById('budgetDonut')) {
+            const ctx2 = document.getElementById('budgetDonut').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: donut.labels,
+                    datasets: [{
+                        data: donut.data,
+                        backgroundColor: ['#10b981', '#60a5fa', '#f59e0b']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
         {% if taskProgressData.labels|length > 0 %}
         // Graphique d'avancement des tâches
         const taskCtx = document.getElementById('taskProgressChart').getContext('2d');

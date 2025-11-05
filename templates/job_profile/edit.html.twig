@@ -1,0 +1,61 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Modifier profil métier — {{ profile.name }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Modifier le profil métier</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('job_profile_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ profile.name }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Décrivez les compétences et responsabilités de ce profil">{{ profile.description }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="default_daily_rate" class="form-label">TJM par défaut (€)</label>
+                            <input type="number" class="form-control" id="default_daily_rate" name="default_daily_rate" min="0" step="10" value="{{ profile.defaultDailyRate }}">
+                            <div class="form-text">Taux journalier moyen par défaut pour ce profil</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="color" class="form-label">Couleur</label>
+                            <input type="color" class="form-control form-control-color" id="color" name="color" value="{{ profile.color ?? '#28a745' }}">
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="active" name="active" value="1" {% if profile.active %}checked{% endif %}>
+                            <label class="form-check-label" for="active">Actif</label>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ path('job_profile_index') }}" class="btn btn-outline-secondary me-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-save me-1"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
