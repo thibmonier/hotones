@@ -172,7 +172,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="chart-container">
-                <h5>Évolution du Chiffre d'Affaires</h5>
+                <h5>Évolution du CA produit (cumulé)</h5>
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
@@ -187,7 +187,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="chart-container">
-                <h5>Nombre de Projets</h5>
+                <h5>Nombre de Projets (cumulé)</h5>
                 <canvas id="projectChart"></canvas>
             </div>
         </div>
@@ -302,7 +302,7 @@
             data: {
                 labels: chartData.labels,
                 datasets: [{
-                    label: 'Chiffre d\'Affaires (€)',
+                    label: 'CA produit (cumulé, €)',
                     data: chartData.revenue,
                     borderColor: 'rgb(75, 192, 192)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -344,7 +344,7 @@
             data: {
                 labels: chartData.labels,
                 datasets: [{
-                    label: 'Nombre de Projets',
+                    label: 'Nombre de Projets (cumulé)',
                     data: chartData.projectCount,
                     backgroundColor: 'rgba(54, 162, 235, 0.5)',
                     borderColor: 'rgb(54, 162, 235)',

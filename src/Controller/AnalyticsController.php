@@ -197,6 +197,11 @@ class AnalyticsController extends AbstractController
         $projectCountData = [];
         $labels           = [];
 
+        // Cumuls pour assurer une évolution cumulée dans le temps
+        $cumulativeProducedRevenue = 0.0;
+        $cumulativeCosts           = 0.0;
+        $cumulativeProjectCount    = 0;
+
         foreach ($metrics as $metric) {
             $dimTime = $metric->getDimTime();
 
@@ -207,10 +212,30 @@ class AnalyticsController extends AbstractController
                 default     => $dimTime->getMonthName()
             };
 
-            $labels[]           = $label;
-            $revenueData[]      = (float) $metric->getTotalRevenue();
-            $marginData[]       = (float) $metric->getMarginPercentage();
-            $projectCountData[] = $metric->getProjectCount();
+            $labels[] = $label;
+
+            // CA produit sur la période = jours travaillés (période) × TJM vendu moyen
+            $soldDays              = (float) $metric->getTotalSoldDays();
+            $avgDailyRate          = $soldDays > 0.0 ? ((float) $metric->getTotalRevenue()) / $soldDays : 0.0;
+            $workedDaysPeriod      = (float) $metric->getTotalWorkedDays();
+            $producedRevenuePeriod = $workedDaysPeriod * $avgDailyRate;
+
+            // Evolution cumulée du CA produit
+            $cumulativeProducedRevenue += $producedRevenuePeriod;
+            $revenueData[] = round($cumulativeProducedRevenue, 2);
+
+            // Evolution cumulée de la marge (%) basée sur CA produit cumulé et coûts cumulés (période)
+            $cumulativeCosts += (float) $metric->getTotalCosts();
+            if ($cumulativeProducedRevenue > 0) {
+                $cumulativeMarginPct = (($cumulativeProducedRevenue - $cumulativeCosts) / $cumulativeProducedRevenue) * 100;
+            } else {
+                $cumulativeMarginPct = 0.0;
+            }
+            $marginData[] = round($cumulativeMarginPct, 2);
+
+            // Nombre de projets (cumulé)
+            $cumulativeProjectCount += (int) $metric->getProjectCount();
+            $projectCountData[] = $cumulativeProjectCount;
         }
 
         return [

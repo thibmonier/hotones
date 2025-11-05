@@ -70,6 +70,9 @@ readonly class MetricsCalculationService
      */
     private function calculateProjectMetrics(Project $project, DimTime $dimTime, string $granularity): void
     {
+        // Déterminer les bornes temporelles de la période courante
+        [$startDate, $endDate] = $this->getPeriodBoundsFromDimTime($dimTime, $granularity);
+
         // Obtenir ou créer les dimensions
         $dimProjectType     = $this->getOrCreateDimProjectType($project);
         $dimProjectManager  = $this->getOrCreateDimContributor($project->getProjectManager(), 'project_manager');
@@ -87,7 +90,7 @@ readonly class MetricsCalculationService
                 $granularity,
             );
 
-            $this->updateMetricsFromProject($metrics, $project, $order);
+            $this->updateMetricsFromProject($metrics, $project, $order, $startDate, $endDate);
         }
 
         // Si le projet n'a pas de devis, créer quand même une métrique
@@ -100,14 +103,14 @@ readonly class MetricsCalculationService
                 $dimProjectDirector,
                 $granularity,
             );
-            $this->updateMetricsFromProject($metrics, $project, null);
+            $this->updateMetricsFromProject($metrics, $project, null, $startDate, $endDate);
         }
     }
 
     /**
      * Met à jour les métriques à partir d'un projet et optionnellement d'un devis.
      */
-    private function updateMetricsFromProject(FactProjectMetrics $metrics, Project $project, ?Order $order): void
+    private function updateMetricsFromProject(FactProjectMetrics $metrics, Project $project, ?Order $order, DateTimeInterface $startDate, DateTimeInterface $endDate): void
     {
         // Métriques de base
         $metrics->setProjectCount($metrics->getProjectCount() + 1);
@@ -147,12 +150,12 @@ readonly class MetricsCalculationService
             }
         }
 
-        // Calcul des coûts et marges
-        $this->calculateProjectCosts($metrics, $project);
+        // Calcul des coûts (période) et marges
+        $this->calculateProjectCosts($metrics, $project, $startDate, $endDate);
         $metrics->calculateMargins();
 
-        // Calcul des temps et taux d'occupation
-        $this->calculateTimeMetrics($metrics, $project);
+        // Calcul des temps (période) et taux d'occupation
+        $this->calculateTimeMetrics($metrics, $project, $startDate, $endDate);
 
         // Mise à jour de la référence vers les entités sources
         $metrics->setProject($project);
@@ -166,21 +169,27 @@ readonly class MetricsCalculationService
     /**
      * Calcule les coûts d'un projet.
      */
-    private function calculateProjectCosts(FactProjectMetrics $metrics, Project $project): void
+    private function calculateProjectCosts(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate): void
     {
         $totalCosts = '0.00';
 
-        // Coûts des achats sur le projet
+        // Coûts des achats sur le projet (si pas de date, imputer au début du projet)
         if ($project->getPurchasesAmount()) {
-            $totalCosts = bcadd($totalCosts, $project->getPurchasesAmount(), 2);
+            $projectStart = $project->getStartDate();
+            if ($projectStart && $projectStart >= $startDate && $projectStart <= $endDate) {
+                $totalCosts = bcadd($totalCosts, $project->getPurchasesAmount(), 2);
+            }
         }
 
-        // Coûts des temps passés (CJM * jours travaillés)
+        // Coûts des temps passés (CJM * heures) sur la période
         $timesheets = $this->entityManager->getRepository(Timesheet::class)
             ->createQueryBuilder('t')
             ->join('t.project', 'p')
             ->where('p.id = :projectId')
+            ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('projectId', $project->getId())
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
             ->getQuery()
             ->getResult();
 
@@ -193,25 +202,47 @@ readonly class MetricsCalculationService
             }
         }
 
+        // Achats rattachés aux devis ou lignes (si on a une date: validatedAt ou createdAt)
+        foreach ($project->getOrders() as $order) {
+            $purchaseDate = $order->getValidatedAt() ?? $order->getCreatedAt();
+            if ($purchaseDate >= $startDate && $purchaseDate <= $endDate) {
+                foreach ($order->getSections() as $section) {
+                    foreach ($section->getLines() as $line) {
+                        // Achats attachés à une ligne de service
+                        if ($line->getAttachedPurchaseAmount()) {
+                            $totalCosts = bcadd($totalCosts, $line->getAttachedPurchaseAmount(), 2);
+                        }
+                        // Lignes d'achat direct ou montant fixe
+                        if (in_array($line->getType(), ['purchase', 'fixed_amount'], true) && $line->getDirectAmount()) {
+                            $totalCosts = bcadd($totalCosts, $line->getDirectAmount(), 2);
+                        }
+                    }
+                }
+            }
+        }
+
         $metrics->setTotalCosts($totalCosts);
     }
 
     /**
      * Calcule les métriques de temps.
      */
-    private function calculateTimeMetrics(FactProjectMetrics $metrics, Project $project): void
+    private function calculateTimeMetrics(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate): void
     {
-        // Jours vendus
+        // Jours vendus (total projet)
         $soldDays = $project->getTotalSoldDays();
         $metrics->setTotalSoldDays(bcadd($metrics->getTotalSoldDays(), $soldDays, 2));
 
-        // Jours travaillés réels
+        // Jours travaillés réels (période)
         $workedDays = '0.00';
         $timesheets = $this->entityManager->getRepository(Timesheet::class)
             ->createQueryBuilder('t')
             ->join('t.project', 'p')
             ->where('p.id = :projectId')
+            ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('projectId', $project->getId())
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
             ->getQuery()
             ->getResult();
 
@@ -374,24 +405,7 @@ readonly class MetricsCalculationService
         $repo = $this->entityManager->getRepository(Project::class);
         $qb   = $repo->createQueryBuilder('p');
 
-        switch ($granularity) {
-            case 'monthly':
-                $startDate = (clone $date)->modify('first day of this month');
-                $endDate   = (clone $date)->modify('last day of this month');
-                break;
-            case 'quarterly':
-                $quarter    = ceil((int) $date->format('n') / 3);
-                $startMonth = ($quarter - 1) * 3 + 1;
-                $startDate  = (new DateTime($date->format('Y').'-'.$startMonth.'-01'));
-                $endDate    = (clone $startDate)->modify('+2 months')->modify('last day of this month');
-                break;
-            case 'yearly':
-                $startDate = new DateTime($date->format('Y').'-01-01');
-                $endDate   = new DateTime($date->format('Y').'-12-31');
-                break;
-            default:
-                throw new InvalidArgumentException("Granularité non supportée: {$granularity}");
-        }
+        [$startDate, $endDate] = $this->getPeriodBounds($date, $granularity);
 
         return $qb->where('p.startDate <= :endDate')
             ->andWhere('p.endDate >= :startDate OR p.endDate IS NULL')
@@ -435,5 +449,43 @@ readonly class MetricsCalculationService
         // Recalculer annuel
         $date = new DateTime("$year-01-01");
         $this->calculateMetricsForPeriod($date, 'yearly');
+    }
+
+    /**
+     * Bornes (début/fin) pour une période à partir d'une date et granularité.
+     */
+    private function getPeriodBounds(DateTimeInterface $date, string $granularity): array
+    {
+        switch ($granularity) {
+            case 'monthly':
+                $startDate = (clone $date)->modify('first day of this month')->setTime(0, 0, 0);
+                $endDate   = (clone $date)->modify('last day of this month')->setTime(23, 59, 59);
+                break;
+            case 'quarterly':
+                $quarter    = (int) ceil((int) $date->format('n') / 3);
+                $startMonth = ($quarter - 1) * 3 + 1;
+                $startDate  = new DateTime($date->format('Y').'-'.$startMonth.'-01');
+                $startDate  = $startDate->setTime(0, 0, 0);
+                $endDate    = (clone $startDate)->modify('+2 months')->modify('last day of this month')->setTime(23, 59, 59);
+                break;
+            case 'yearly':
+                $startDate = (new DateTime($date->format('Y').'-01-01'))->setTime(0, 0, 0);
+                $endDate   = (new DateTime($date->format('Y').'-12-31'))->setTime(23, 59, 59);
+                break;
+            default:
+                throw new InvalidArgumentException("Granularité non supportée: {$granularity}");
+        }
+
+        return [$startDate, $endDate];
+    }
+
+    /**
+     * Bornes (début/fin) pour une période à partir d'un DimTime et granularité.
+     */
+    private function getPeriodBoundsFromDimTime(DimTime $dimTime, string $granularity): array
+    {
+        $date = $dimTime->getDate();
+
+        return $this->getPeriodBounds($date, $granularity);
     }
 }

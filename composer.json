@@ -53,6 +53,8 @@
         "twig/twig": "^2.12|^3.22.0"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
+        "fakerphp/faker": "^1.24",
         "friendsofphp/php-cs-fixer": "^3.89.1",
         "phpmd/phpmd": "^2.15",
         "phpstan/extension-installer": "^1.4.3",
@@ -65,7 +67,8 @@
         "symfony/debug-bundle": "7.3.*",
         "symfony/maker-bundle": "^1.64",
         "symfony/stopwatch": "7.3.*",
-        "symfony/web-profiler-bundle": "7.3.*"
+        "symfony/web-profiler-bundle": "7.3.*",
+        "zenstruck/foundry": "^2.7"
     },
     "config": {
         "allow-plugins": {

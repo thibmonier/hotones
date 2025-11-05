@@ -23,45 +23,74 @@
 
     <div class="row">
         <div class="col-lg-8">
+            <!-- Synthèse financière -->
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Vue d'ensemble</h4>
+                    <h4 class="card-title">Synthèse financière</h4>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="text-center">
-                                <h5 class="font-size-15 mb-1 text-{% if metrics.total_revenue > 0 %}success{% else %}muted{% endif %}">
-                                    {{ metrics.total_revenue|number_format(0, ',', ' ') }}€
-                                </h5>
-                                <p class="text-muted mb-0">CA Signé</p>
+                                <h5 class="mb-1 text-{% if metrics.total_revenue > 0 %}success{% else %}muted{% endif %}">{{ metrics.total_revenue|number_format(0, ',', ' ') }}€</h5>
+                                <p class="text-muted mb-0">CA signé</p>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="text-center">
-                                <h5 class="font-size-15 mb-1 text-{% if metrics.total_days > 0 %}info{% else %}muted{% endif %}">
-                                    {{ metrics.total_days|number_format(1, ',', ' ') }}j
-                                </h5>
+                                <h5 class="mb-1 text-warning">{{ metrics.total_purchases|number_format(0, ',', ' ') }}€</h5>
+                                <p class="text-muted mb-0">Achats</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h5 class="mb-1 text-info">{{ metrics.total_cost|number_format(0, ',', ' ') }}€</h5>
+                                <p class="text-muted mb-0">Coût estimé</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h5 class="mb-1 text-{% if metrics.margin_rate >= 20 %}success{% elseif metrics.margin_rate >= 10 %}warning{% else %}danger{% endif %}">{{ metrics.total_margin|number_format(0, ',', ' ') }}€</h5>
+                                <p class="text-muted mb-0">Marge brute <small>({{ metrics.margin_rate|number_format(1, ',', ' ') }}%)</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Synthèse temporelle -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Synthèse temporelle</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h5 class="mb-1 text-info">{{ metrics.total_days|number_format(1, ',', ' ') }}j</h5>
                                 <p class="text-muted mb-0">Jours vendus</p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="text-center">
-                                <h5 class="font-size-15 mb-1">
-                                    {{ metrics.signed_orders_count }}/{{ metrics.orders_count }}
-                                </h5>
+                                <h5 class="mb-1">{{ metrics.signed_orders_count }}/{{ metrics.orders_count }}</h5>
                                 <p class="text-muted mb-0">Devis signés</p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="text-center">
-                                <span class="badge bg-{% if project.status == 'active' %}success{% elseif project.status == 'completed' %}primary{% else %}warning{% endif %} font-size-12">
-                                    {{ project.status|title }}
-                                </span>
+                                <span class="badge bg-{% if project.status == 'active' %}success{% elseif project.status == 'completed' %}primary{% else %}warning{% endif %}">{{ project.status|title }}</span>
                                 <p class="text-muted mb-0">Statut</p>
                             </div>
                         </div>
                     </div>
+                    {% if project.startDate or project.endDate %}
+                        <hr>
+                        <div class="text-center text-muted">
+                            {% if project.startDate %}Du {{ project.startDate|date('d/m/Y') }}{% endif %}
+                            {% if project.endDate %} au {{ project.endDate|date('d/m/Y') }}{% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -140,48 +169,6 @@
             </div>
             {% endif %}
             
-            {% if metrics.total_revenue > 0 %}
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Rentabilité prévisionnelle</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="text-center mb-3">
-                                <h5 class="text-success mb-1">{{ metrics.total_revenue|number_format(0, ',', ' ') }}€</h5>
-                                <p class="text-muted mb-0">CA Signé</p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center mb-3">
-                                <h5 class="text-warning mb-1">{{ metrics.total_cost|number_format(0, ',', ' ') }}€</h5>
-                                <p class="text-muted mb-0">Coût Estimé</p>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="text-center">
-                                <h5 class="text-{% if metrics.margin_rate >= 20 %}success{% elseif metrics.margin_rate >= 10 %}warning{% else %}danger{% endif %} mb-1">
-                                    {{ metrics.total_margin|number_format(0, ',', ' ') }}€
-                                </h5>
-                                <p class="text-muted mb-0">Marge Brute</p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center">
-                                <h5 class="text-{% if metrics.margin_rate >= 20 %}success{% elseif metrics.margin_rate >= 10 %}warning{% else %}danger{% endif %} mb-1">
-                                    {{ metrics.margin_rate|number_format(1, ',', ' ') }}%
-                                </h5>
-                                <p class="text-muted mb-0">Taux de Marge</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
         </div>
 
         <div class="col-lg-4">

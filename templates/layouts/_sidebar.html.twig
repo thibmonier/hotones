@@ -87,7 +87,8 @@
                         <i class="bx bx-time-five"></i>
                         <span>Temps de travail</span>
                     </a>
-                    <ul class="sub-menu" aria-expanded="false">
+<ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('my_tasks_index') }}">Mes tâches</a></li>
                         <li><a href="{{ path('timesheet_index') }}">Saisir mes temps</a></li>
                         <li><a href="{{ path('timesheet_my_time') }}">Mon historique</a></li>
                         {% if is_granted('ROLE_CHEF_PROJET') %}

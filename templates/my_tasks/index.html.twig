@@ -1,0 +1,82 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Mes tâches — Semaine du {{ startDate|date('d/m/Y') }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Mes tâches</h4>
+      <div class="page-title-right">
+        <div class="btn-group">
+          <a href="?week={{ previousWeek }}" class="btn btn-outline-secondary">
+            <i class="bx bx-left-arrow-alt me-1"></i> Semaine précédente
+          </a>
+          <a href="?week={{ nextWeek }}" class="btn btn-outline-secondary">
+            Semaine suivante <i class="bx bx-right-arrow-alt ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          Semaine du {{ startDate|date('d/m/Y') }} au {{ endDate|date('d/m/Y') }}
+          <small class="text-muted">— {{ contributor.name }}</small>
+        </h5>
+      </div>
+      <div class="card-body">
+        {% if groups is empty %}
+          <div class="text-center text-muted py-5">
+            <i class="ri-task-line font-size-48 d-block mb-2"></i>
+            Aucune tâche assignée pour cette semaine.
+          </div>
+        {% else %}
+          {% for g in groups %}
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">
+                  <i class="bx bx-folder me-1"></i> {{ g.project.name }}
+                  {% if g.project.client %}
+                    <small class="text-muted">({{ g.project.client }})</small>
+                  {% endif %}
+                </h6>
+                <a href="{{ path('project_show', {id: g.project.id}) }}" class="btn btn-sm btn-outline-primary">Ouvrir le projet</a>
+              </div>
+              <div class="list-group list-group-flush">
+                {% for t in g.tasks %}
+                  <div class="list-group-item px-0 d-flex align-items-start justify-content-between">
+                    <div>
+                      <div class="fw-medium">{{ t.name }}</div>
+                      <div class="text-muted small">
+                        {% if t.startDate or t.endDate %}
+                          {{ t.startDate ? t.startDate|date('d/m') : '?' }} → {{ t.endDate ? t.endDate|date('d/m') : '?' }} ·
+                        {% endif %}
+                        Statut: <span class="badge bg-{% if t.status == 'completed' %}success{% elseif t.status == 'in_progress' %}primary{% elseif t.status == 'on_hold' %}warning{% else %}secondary{% endif %}">{{ t.statusLabel }}</span>
+                        {% if t.estimatedHoursRevised %} · Révisé: {{ (t.estimatedHoursRevised / 8)|number_format(1) }}j{% elseif t.estimatedHoursSold %} · Vendu: {{ (t.estimatedHoursSold / 8)|number_format(1) }}j{% endif %}
+                        {% if t.remainingHours is defined %} · RAF: {{ (t.remainingHours / 8)|number_format(1) }}j{% endif %}
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      {% set progress = t.progressPercentage is defined ? t.progressPercentage : 0 %}
+                      <div class="progress" style="width: 160px; height: 6px;">
+                        <div class="progress-bar bg-success" style="width: {{ progress }}%"></div>
+                      </div>
+                      <small class="text-muted">{{ progress }}%</small>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
