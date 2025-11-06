@@ -7,7 +7,11 @@ use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TimesheetRepository::class)]
-#[ORM\Table(name: 'timesheets')]
+#[ORM\Table(name: 'timesheets', indexes: [
+    new ORM\Index(name: 'idx_timesheet_project', columns: ['project_id']),
+    new ORM\Index(name: 'idx_timesheet_contributor', columns: ['contributor_id']),
+    new ORM\Index(name: 'idx_timesheet_date', columns: ['date']),
+])]
 class Timesheet
 {
     #[ORM\Id]

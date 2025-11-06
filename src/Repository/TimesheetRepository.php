@@ -78,6 +78,29 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
+     * Récupère tous les temps pour une période et une liste de projets.
+     */
+    public function findForPeriodWithProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
+    {
+        if (empty($projectIds)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.project', 'p')
+            ->leftJoin('t.contributor', 'c')
+            ->where('t.date BETWEEN :start AND :end')
+            ->andWhere('p.id IN (:projectIds)')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('projectIds', $projectIds)
+            ->orderBy('t.date', 'DESC')
+            ->addOrderBy('c.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Calcule le total des heures pour un mois donné.
      */
     public function getTotalHoursForMonth(DateTimeInterface $startDate, DateTimeInterface $endDate): float
@@ -234,5 +257,43 @@ class TimesheetRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Agrégats période pour un ensemble de projets: totalHours, totalHumanCost, totalRevenue.
+     * - Coût humain: Σ(hours × (effectiveCJM)/8), effectiveCJM = COALESCE(ep.cjm, c.cjm) × (COALESCE(ep.workTimePercentage, 100)/100)
+     * - Revenu: Σ(hours × (effectiveTJM)/8), effectiveTJM = COALESCE(ep.tjm, c.tjm).
+     */
+    public function getPeriodAggregatesForProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
+    {
+        if (empty($projectIds)) {
+            return [
+                'totalHours'     => 0.0,
+                'totalHumanCost' => '0',
+                'totalRevenue'   => '0',
+            ];
+        }
+
+        $qb = $this->createQueryBuilder('t')
+            ->select('COALESCE(SUM(t.hours), 0) AS totalHours')
+            ->addSelect('COALESCE(SUM(t.hours * ((COALESCE(ep.cjm, c.cjm, 0) * (COALESCE(ep.workTimePercentage, 100)/100)) / 8)), 0) AS totalHumanCost')
+            ->addSelect('COALESCE(SUM(t.hours * (COALESCE(ep.tjm, c.tjm, 0) / 8)), 0) AS totalRevenue')
+            ->leftJoin('t.contributor', 'c')
+            ->leftJoin('t.project', 'p')
+            ->leftJoin('App\\Entity\\EmploymentPeriod', 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
+            ->where('t.date BETWEEN :start AND :end')
+            ->andWhere('p.id IN (:projectIds)')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('projectIds', $projectIds);
+
+        $row = $qb->getQuery()->getSingleResult();
+
+        // Retourner sous formes attendues (strings pour montants comme ailleurs)
+        return [
+            'totalHours'     => (float) ($row['totalHours'] ?? 0),
+            'totalHumanCost' => (string) ($row['totalHumanCost'] ?? '0'),
+            'totalRevenue'   => (string) ($row['totalRevenue'] ?? '0'),
+        ];
     }
 }

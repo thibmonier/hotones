@@ -50,13 +50,42 @@ class ProjectController extends AbstractController
         // Projets sur la période avec filtres (paginés)
         $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $perPage, $offset);
 
-        // Calculer les métriques pour tous les projets (prévisionnel global par projet)
+        // Agrégats SQL en batch pour éviter le parcours objet
+        $projectIds = array_map(fn ($p) => $p->getId(), $projects);
+        $aggregates = $projectRepo->getAggregatedMetricsFor($projectIds);
+
+        // Construire la structure attendue par la vue
         $projectsWithMetrics = [];
         foreach ($projects as $project) {
-            $metrics               = $this->calculateProjectMetrics($project);
+            $pid = $project->getId();
+            $agg = $aggregates[$pid] ?? [
+                'total_revenue'       => '0',
+                'total_margin'        => '0',
+                'total_purchases'     => '0',
+                'orders_count'        => 0,
+                'signed_orders_count' => 0,
+            ];
+
+            // Ajouter l'achat projet (purchasesAmount)
+            $projectPurchases = $project->getPurchasesAmount() ?? '0';
+            $totalPurchases   = bcadd($agg['total_purchases'], $projectPurchases, 2);
+
+            // Taux de marge
+            $marginRate = '0';
+            if (bccomp($agg['total_revenue'], '0', 2) > 0) {
+                $marginRate = bcmul(bcdiv($agg['total_margin'], $agg['total_revenue'], 4), '100', 2);
+            }
+
             $projectsWithMetrics[] = [
                 'project' => $project,
-                'metrics' => $metrics,
+                'metrics' => [
+                    'total_revenue'       => $agg['total_revenue'],
+                    'total_margin'        => $agg['total_margin'],
+                    'margin_rate'         => $marginRate,
+                    'total_purchases'     => $totalPurchases,
+                    'orders_count'        => $agg['orders_count'],
+                    'signed_orders_count' => $agg['signed_orders_count'],
+                ],
             ];
         }
 

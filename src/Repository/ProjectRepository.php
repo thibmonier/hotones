@@ -23,6 +23,103 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
+     * Agrégats de métriques pour une liste de projets.
+     * Retourne un tableau indexé par projectId avec:
+     * - total_revenue, total_margin, margin_rate, total_purchases, orders_count, signed_orders_count.
+     */
+    public function getAggregatedMetricsFor(array $projectIds, array $signedStatuses = ['signed', 'won', 'completed', 'signe', 'gagne', 'termine']): array
+    {
+        if (empty($projectIds)) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.id AS projectId')
+            ->leftJoin('p.orders', 'o')
+            ->leftJoin('o.sections', 's')
+            ->leftJoin('s.lines', 'l')
+            ->leftJoin('l.profile', 'prof')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $projectIds)
+            // Totaux
+            ->addSelect(
+                // CA signé (services + achats attachés + montants fixes/achats directs)
+                "COALESCE(SUM(CASE 
+                    WHEN o.status IN (:signed) AND l.type = 'service' THEN (COALESCE(l.dailyRate,0) * COALESCE(l.days,0) + COALESCE(l.attachedPurchaseAmount,0))
+                    WHEN o.status IN (:signed) AND l.type IN ('purchase','fixed_amount') THEN COALESCE(l.directAmount,0)
+                    ELSE 0
+                END), 0) AS totalRevenue",
+            )
+            ->addSelect(
+                // Marge brute sur services (CA service - coût estimé), seulement sur les devis signés
+                "COALESCE(SUM(CASE 
+                    WHEN o.status IN (:signed) AND l.type = 'service' THEN (COALESCE(l.dailyRate,0) * COALESCE(l.days,0) - (COALESCE(l.days,0) * COALESCE(prof.defaultDailyRate,0) * 0.7))
+                    ELSE 0
+                END), 0) AS totalMargin",
+            )
+            ->addSelect(
+                // Achats attachés aux lignes de service signées
+                "COALESCE(SUM(CASE 
+                    WHEN o.status IN (:signed) AND l.type = 'service' THEN COALESCE(l.attachedPurchaseAmount,0)
+                    ELSE 0
+                END), 0) AS totalLinePurchases",
+            )
+            ->addSelect('COUNT(DISTINCT o.id) AS ordersCount')
+            ->addSelect('SUM(CASE WHEN o.status IN (:signed) THEN 1 ELSE 0 END) AS signedOrdersCount')
+            ->groupBy('p.id')
+            ->setParameter('signed', $signedStatuses);
+
+        $rows = $qb->getQuery()->getArrayResult();
+
+        // Reformater et additionner l'achat projet
+        $byId = [];
+        foreach ($rows as $r) {
+            $pid        = (int) $r['projectId'];
+            $byId[$pid] = [
+                'total_revenue'       => (string) $r['totalRevenue'],
+                'total_margin'        => (string) $r['totalMargin'],
+                'total_purchases'     => (string) $r['totalLinePurchases'], // on ajoutera purchasesAmount du projet côté contrôleur
+                'orders_count'        => (int) $r['ordersCount'],
+                'signed_orders_count' => (int) $r['signedOrdersCount'],
+            ];
+        }
+
+        return $byId;
+    }
+
+    /**
+     * Somme globale des achats pour un ensemble de projets (achats projet + achats attachés aux lignes de service).
+     * Retourne un string (decimal) totalPurchases.
+     */
+    public function getTotalPurchasesForProjects(array $projectIds): string
+    {
+        if (empty($projectIds)) {
+            return '0';
+        }
+
+        // Achats au niveau projet
+        $qb1 = $this->createQueryBuilder('p')
+            ->select('COALESCE(SUM(p.purchasesAmount), 0) AS totalProjectPurchases')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $projectIds);
+        $row1             = $qb1->getQuery()->getSingleResult();
+        $projectPurchases = (string) ($row1['totalProjectPurchases'] ?? '0');
+
+        // Achats attachés aux lignes de service
+        $qb2 = $this->createQueryBuilder('p')
+            ->select("COALESCE(SUM(CASE WHEN l.type = 'service' THEN COALESCE(l.attachedPurchaseAmount,0) ELSE 0 END), 0) AS totalLinePurchases")
+            ->leftJoin('p.orders', 'o')
+            ->leftJoin('o.sections', 's')
+            ->leftJoin('s.lines', 'l')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $projectIds);
+        $row2          = $qb2->getQuery()->getSingleResult();
+        $linePurchases = (string) ($row2['totalLinePurchases'] ?? '0');
+
+        return bcadd($projectPurchases, $linePurchases, 2);
+    }
+
+    /**
      * Récupère tous les projets triés par nom.
      */
     public function findAllOrderedByName(): array
@@ -141,6 +238,10 @@ class ProjectRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.technologies', 't')
             ->addSelect('t')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->addSelect('sc')
             ->where('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)

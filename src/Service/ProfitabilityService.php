@@ -34,54 +34,43 @@ class ProfitabilityService
     public function calculatePeriodMetricsForProjects(array $projects, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         $timesheetRepo = $this->entityManager->getRepository(Timesheet::class);
+        $projectRepo   = $this->entityManager->getRepository(Project::class);
 
-        $totalRevenue   = '0';
-        $totalHumanCost = '0';
-        $totalPurchases = '0';
-        $totalHours     = '0';
-
-        // Pré-calcul des achats par projet (fixes, pas datés dans le modèle actuel)
-        foreach ($projects as $project) {
-            if (!$project instanceof Project) {
-                continue;
-            }
-            // Achats au niveau projet
-            if ($project->getPurchasesAmount()) {
-                $totalPurchases = bcadd($totalPurchases, $project->getPurchasesAmount(), 2);
-            }
-            // Achats issus des lignes de devis
-            foreach ($project->getOrders() as $order) {
-                foreach ($order->getSections() as $section) {
-                    foreach ($section->getLines() as $line) {
-                        if ($line->getPurchaseAmount()) {
-                            $totalPurchases = bcadd($totalPurchases, $line->getPurchaseAmount(), 2);
-                        }
-                    }
-                }
-            }
-
-            // Temps de la période pour ce projet
-            $timesheets = $timesheetRepo->findForPeriodWithProject($startDate, $endDate, $project);
-            foreach ($timesheets as $timesheet) {
-                if (!$this->shouldCountTimesheet($timesheet)) {
-                    continue;
-                }
-
-                $hours      = $timesheet->getHours();
-                $totalHours = bcadd($totalHours, $hours, 2);
-
-                // Coût
-                $dailyCost      = $this->getContributorDailyCost($timesheet->getContributor(), $timesheet->getDate());
-                $timeCost       = bcdiv(bcmul($hours, $dailyCost, 4), '8', 2);
-                $totalHumanCost = bcadd($totalHumanCost, $timeCost, 2);
-
-                // Revenu estimé (TJM)
-                $avgTjm       = $this->getAverageTjmForContributor($timesheet->getContributor(), $timesheet->getDate());
-                $timeRev      = bcdiv(bcmul($hours, $avgTjm, 4), '8', 2);
-                $totalRevenue = bcadd($totalRevenue, $timeRev, 2);
+        // IDs des projets concernés
+        $projectIds = [];
+        foreach ($projects as $p) {
+            if ($p instanceof Project && $p->getId() !== null) {
+                $projectIds[] = $p->getId();
             }
         }
 
+        if (empty($projectIds)) {
+            return [
+                'revenue'          => '0',
+                'human_cost'       => '0',
+                'purchases'        => '0',
+                'gross_margin_eur' => '0',
+                'gross_margin_pct' => '0',
+                'net_margin_eur'   => '0',
+                'net_margin_pct'   => '0',
+                'real_daily_rate'  => '0',
+                'total_hours'      => '0',
+                'total_days'       => '0',
+                'start_date'       => $startDate,
+                'end_date'         => $endDate,
+            ];
+        }
+
+        // Agrégats SQL: heures, coût humain et revenu
+        $agg            = $timesheetRepo->getPeriodAggregatesForProjects($startDate, $endDate, $projectIds);
+        $totalHours     = (string) $agg['totalHours'];
+        $totalHumanCost = (string) $agg['totalHumanCost'];
+        $totalRevenue   = (string) $agg['totalRevenue'];
+
+        // Achats (non datés): achats projet + achats attachés aux lignes
+        $totalPurchases = $projectRepo->getTotalPurchasesForProjects($projectIds);
+
+        // Calculs dérivés
         $totalDays   = bcdiv($totalHours, '8', 2);
         $grossMargin = bcsub($totalRevenue, $totalPurchases, 2);
         $netMargin   = bcsub($grossMargin, $totalHumanCost, 2);

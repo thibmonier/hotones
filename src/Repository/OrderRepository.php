@@ -78,4 +78,23 @@ class OrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Précharge les devis avec sections et lignes pour une liste de projets afin d'éviter le N+1.
+     */
+    public function preloadForProjects(array $projects): void
+    {
+        if (empty($projects)) {
+            return;
+        }
+
+        $this->createQueryBuilder('o')
+            ->addSelect('s', 'l')
+            ->leftJoin('o.sections', 's')
+            ->leftJoin('s.lines', 'l')
+            ->where('o.project IN (:projects)')
+            ->setParameter('projects', $projects)
+            ->getQuery()
+            ->getResult();
+    }
 }

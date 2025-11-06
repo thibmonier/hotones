@@ -9,7 +9,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: \App\Repository\OrderRepository::class)]
-#[ORM\Table(name: 'orders')]
+#[ORM\Table(name: 'orders', indexes: [
+    new ORM\Index(name: 'idx_order_project', columns: ['project_id']),
+    new ORM\Index(name: 'idx_order_status', columns: ['status']),
+    new ORM\Index(name: 'idx_order_created_at', columns: ['created_at']),
+])]
 class Order
 {
     public const STATUS_OPTIONS = [

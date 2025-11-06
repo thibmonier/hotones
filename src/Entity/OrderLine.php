@@ -5,7 +5,11 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'order_lines')]
+#[ORM\Table(name: 'order_lines', indexes: [
+    new ORM\Index(name: 'idx_order_line_section', columns: ['section_id']),
+    new ORM\Index(name: 'idx_order_line_profile', columns: ['profile_id']),
+    new ORM\Index(name: 'idx_order_line_type', columns: ['type']),
+])]
 class OrderLine
 {
     #[ORM\Id]

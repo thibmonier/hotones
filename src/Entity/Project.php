@@ -9,7 +9,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ORM\Table(name: 'projects')]
+#[ORM\Table(name: 'projects', indexes: [
+    new ORM\Index(name: 'idx_project_status', columns: ['status']),
+    new ORM\Index(name: 'idx_project_start_date', columns: ['start_date']),
+    new ORM\Index(name: 'idx_project_end_date', columns: ['end_date']),
+    new ORM\Index(name: 'idx_project_type', columns: ['project_type']),
+    new ORM\Index(name: 'idx_project_service_category', columns: ['service_category_id']),
+])]
 class Project
 {
     #[ORM\Id]

@@ -7,7 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'order_sections')]
+#[ORM\Table(name: 'order_sections', indexes: [
+    new ORM\Index(name: 'idx_order_section_order', columns: ['order_id']),
+])]
 class OrderSection
 {
     #[ORM\Id]
