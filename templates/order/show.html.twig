@@ -37,19 +37,30 @@
                             <p><a href="{{ path('project_show', {'id': order.project.id}) }}" class="text-primary">{{ order.project.name }}</a></p>
                             
                             <h5>Statut</h5>
-                            {% set statusClass = 'secondary' %}
-                            {% if order.status == 'gagne' or order.status == 'signe' %}
-                                {% set statusClass = 'success' %}
-                            {% elseif order.status == 'termine' %}
-                                {% set statusClass = 'primary' %}
-                            {% elseif order.status == 'perdu' or order.status == 'abandonne' %}
-                                {% set statusClass = 'danger' %}
-                            {% elseif order.status == 'standby' %}
-                                {% set statusClass = 'warning' %}
-                            {% endif %}
-                            <p><span class="badge bg-{{ statusClass }} fs-6">{{ order.status|upper }}</span></p>
+                            <div id="order-status-summary">
+                                {% set statusClass = 'secondary' %}
+                                {% if order.status == 'gagne' or order.status == 'signe' %}
+                                    {% set statusClass = 'success' %}
+                                {% elseif order.status == 'termine' %}
+                                    {% set statusClass = 'primary' %}
+                                {% elseif order.status == 'perdu' or order.status == 'abandonne' %}
+                                    {% set statusClass = 'danger' %}
+                                {% elseif order.status == 'standby' %}
+                                    {% set statusClass = 'warning' %}
+                                {% endif %}
+                                <p><span class="badge bg-{{ statusClass }} fs-6">{{ order.status|upper }}</span></p>
+                            </div>
                         </div>
                         <div class="col-md-6">
+                            <h5>Contractualisation</h5>
+                            <p>
+                                {% if order.contractType == 'forfait' %}
+                                    <span class="badge bg-primary">Forfait</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Régie</span>
+                                {% endif %}
+                            </p>
+
                             <h5>Date de création</h5>
                             <p>{{ order.createdAt|date('d/m/Y') }}</p>
                             
@@ -136,23 +147,69 @@
                 <div class="card-header">
                     <h4 class="card-title">Résumé financier</h4>
                 </div>
+                <div class="px-3 pt-2">
+                    <div class="d-flex gap-3 align-items-center small text-muted">
+                        <span><span class="me-1 d-inline-block rounded-circle" style="width:10px;height:10px;background:var(--bs-primary);"></span> Prestations</span>
+                        <span><span class="me-1 d-inline-block rounded-circle" style="width:10px;height:10px;background:var(--bs-warning);"></span> Achats</span>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Total prestations :</span>
-                        <strong>{{ totalAmount|number_format(2, ',', ' ') }}€</strong>
+                        <span><span class="me-1 d-inline-block rounded-circle" style="width:10px;height:10px;background:var(--bs-primary);"></span> Prestations (hors achats) :</span>
+                        <strong>{{ servicesSubtotal|number_format(2, ',', ' ') }}€</strong>
                     </div>
-                    
-                    {% if totalPurchases > 0 %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><span class="me-1 d-inline-block rounded-circle" style="width:10px;height:10px;background:var(--bs-warning);"></span> Achats (attachés ou directs) :</span>
+                        <strong>{{ purchasesSubtotal|number_format(2, ',', ' ') }}€</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total sections :</span>
+                        <strong>{{ sectionsTotal|number_format(2, ',', ' ') }}€</strong>
+                    </div>
+
+                    {% set servicesPct = sectionsTotal > 0 ? (servicesSubtotal / sectionsTotal * 100) : 0 %}
+                    {% set purchasesPct = sectionsTotal > 0 ? (100 - servicesPct) : 0 %}
+                    <div class="mb-2">
+                        <div class="progress" style="height: 18px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ servicesPct }}%" aria-valuenow="{{ servicesPct|number_format(0, '.', '') }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ purchasesPct }}%" aria-valuenow="{{ purchasesPct|number_format(0, '.', '') }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mt-1">
+                            <span><span class="me-1 d-inline-block rounded-circle" style="width:8px;height:8px;background:var(--bs-primary);"></span> Prestations: {{ servicesPct|number_format(0, ',', ' ') }}%</span>
+                            <span><span class="me-1 d-inline-block rounded-circle" style="width:8px;height:8px;background:var(--bs-warning);"></span> Achats: {{ purchasesPct|number_format(0, ',', ' ') }}%</span>
+                        </div>
+                    </div>
+
+                    {% if order.contractType == 'forfait' %}
+                        {% set total = order.calculateTotalFromSections() %}
+                        {% set scheduled = 0 %}
+                        {% for s in order.paymentSchedules %}
+                            {% set scheduled = scheduled + s.computeAmount(total) %}
+                        {% endfor %}
+                        {% set pct = total > 0 ? (scheduled / total * 100) : 0 %}
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Total achats :</span>
-                            <strong>{{ totalPurchases|number_format(2, ',', ' ') }}€</strong>
+                            <span>Couverture échéancier :</span>
+                            <strong class="text-{% if scheduled == total %}success{% else %}warning{% endif %}">{{ scheduled|number_format(2, ',', ' ') }}€ / {{ total|number_format(2, ',', ' ') }}€ ({{ pct|number_format(0, ',', ' ') }}%)</strong>
                         </div>
                     {% endif %}
+                    
 
                     {% if contingencyAmount > 0 %}
                         <div class="d-flex justify-content-between mb-2 text-warning">
                             <span>Contingence :</span>
                             <strong>-{{ contingencyAmount|number_format(2, ',', ' ') }}€</strong>
+                        </div>
+                    {% endif %}
+
+                    {% if order.contractType == 'forfait' %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Planifié par échéancier :</span>
+                            <strong>{{ scheduledTotal|number_format(2, ',', ' ') }}€</strong>
+                        </div>
+                        {% set remaining = finalAmount - scheduledTotal %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Reste à planifier :</span>
+                            <strong class="text-{% if remaining == 0 %}success{% elseif remaining > 0 %}warning{% else %}danger{% endif %}">{{ remaining|number_format(2, ',', ' ') }}€</strong>
                         </div>
                     {% endif %}
 
@@ -165,12 +222,12 @@
             </div>
 
             {% if is_granted('ROLE_CHEF_PROJET') %}
-                <div class="card">
+                <div class="card" id="order-status-actions">
                     <div class="card-header">
                         <h4 class="card-title">Actions</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="{{ path('order_update_status', {'id': order.id}) }}" class="mb-3">
+                        <form method="post" action="{{ path('order_update_status', {'id': order.id}) }}" class="mb-3" id="order-status-form">
                             <input type="hidden" name="_token" value="{{ csrf_token('status' ~ order.id) }}">
                             <div class="d-flex gap-2">
                                 <select name="status" class="form-select">
@@ -200,6 +257,75 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <script>
+                (function(){
+                  function ensureToastContainer(){
+                    let tc = document.getElementById('toast-container');
+                    if (!tc) {
+                      tc = document.createElement('div');
+                      tc.id = 'toast-container';
+                      tc.style.position = 'fixed';
+                      tc.style.top = '1rem';
+                      tc.style.right = '1rem';
+                      tc.style.zIndex = '1080';
+                      tc.style.minWidth = '280px';
+                      document.body.appendChild(tc);
+                    }
+                    return tc;
+                  }
+                  function showToast(type, message){
+                    const tc = ensureToastContainer();
+                    const div = document.createElement('div');
+                    div.className = 'alert alert-' + (type || 'info') + ' shadow mb-2';
+                    div.textContent = message;
+                    tc.appendChild(div);
+                    setTimeout(()=>{ div.remove(); }, 3000);
+                  }
+
+                  const form = document.getElementById('order-status-form');
+                  const actionsCard = document.getElementById('order-status-actions');
+                  const summaryBox = document.getElementById('order-status-summary');
+                  if (!form || !actionsCard || !summaryBox) return;
+
+                  function showSpinnerInActions(){
+                    const body = actionsCard.querySelector('.card-body');
+                    if (body) {
+                      body.innerHTML = '<div class="d-flex justify-content-center my-2"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div></div>';
+                    }
+                  }
+
+                  async function refreshStatusBoxes(){
+                    const resp = await fetch(window.location.href, {headers: {'X-Requested-With':'fetch'}});
+                    const html = await resp.text();
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = html;
+                    const freshActions = tmp.querySelector('#order-status-actions');
+                    const freshSummary = tmp.querySelector('#order-status-summary');
+                    if (freshActions) actionsCard.innerHTML = freshActions.innerHTML;
+                    if (freshSummary) summaryBox.innerHTML = freshSummary.innerHTML;
+                    // Rebind after replacing form
+                    const newForm = actionsCard.querySelector('#order-status-form');
+                    if (newForm) bind(newForm);
+                  }
+
+                  async function onSubmit(e){
+                    e.preventDefault();
+                    const fd = new FormData(form);
+                    try {
+                      showSpinnerInActions();
+                      await fetch(form.action, {method: 'POST', body: fd});
+                      await refreshStatusBoxes();
+                      showToast('success', 'Statut du devis mis à jour');
+                    } catch(e) {
+                      showToast('danger', 'Erreur lors de la mise à jour');
+                    }
+                  }
+
+                  function bind(f){ f.addEventListener('submit', onSubmit); }
+                  bind(form);
+                })();
+                </script>
             {% endif %}
         </div>
     </div>

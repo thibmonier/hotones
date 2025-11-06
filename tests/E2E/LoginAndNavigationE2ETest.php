@@ -17,7 +17,7 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         $client = static::createPantherClient();
 
         $user = UserFactory::createOne([
-            'roles' => ['ROLE_INTERVENANT'],
+            'roles'    => ['ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
@@ -41,13 +41,13 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         $client = static::createPantherClient();
 
         $user = UserFactory::createOne([
-            'roles' => ['ROLE_INTERVENANT'],
+            'roles'    => ['ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
         // Login
         $crawler = $client->request('GET', '/login');
-        $form = $crawler->filter('form')->form([
+        $form    = $crawler->filter('form')->form([
             '_username' => $user->getEmail(),
             '_password' => 'password',
         ]);

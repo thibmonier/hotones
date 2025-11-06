@@ -11,6 +11,7 @@ use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\Timesheet;
 use App\Service\ProfitabilityService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -65,13 +66,13 @@ class ProfitabilityServiceTest extends TestCase
             ->setContributor($contributor)
             ->setProject($project)
             ->setTask($regularTask)
-            ->setDate(new \DateTime('2025-01-10'))
+            ->setDate(new DateTime('2025-01-10'))
             ->setHours('8.00');
         $ts2 = (new Timesheet())
             ->setContributor($contributor)
             ->setProject($project)
             ->setTask($regularTask)
-            ->setDate(new \DateTime('2025-01-11'))
+            ->setDate(new DateTime('2025-01-11'))
             ->setHours('8.00');
 
         // Attach timesheets to project collection
@@ -83,11 +84,11 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateProjectProfitabilityForExternalProject(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = $this->createProjectWithRevenueAndCosts();
-        $result = $service->calculateProjectProfitability($project);
+        $result  = $service->calculateProjectProfitability($project);
 
         // Revenue: 5 * 1000 with 0 contingency = 5000; method also supports contingency but none set
         // BUT calculateOrderTotal subtracts contingency if set; not set here
@@ -109,7 +110,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateProjectProfitabilityForInternalProject(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = (new Project())
@@ -123,7 +124,7 @@ class ProfitabilityServiceTest extends TestCase
         $ts = (new Timesheet())
             ->setContributor($contributor)
             ->setProject($project)
-            ->setDate(new \DateTime('2025-01-10'))
+            ->setDate(new DateTime('2025-01-10'))
             ->setHours('8.00');
         $project->getTimesheets()->add($ts);
 

@@ -18,6 +18,15 @@
         </div>
     </div>
 
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="d-flex gap-3 align-items-center small text-muted">
+                <span><span class="me-1 d-inline-block rounded-circle" style="width:10px;height:10px;background:var(--bs-primary);"></span> Prestations</span>
+                <span><span class="me-1 d-inline-block rounded-circle" style="width:10px;height:10px;background:var(--bs-warning);"></span> Achats</span>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -75,6 +84,7 @@
                                     <th>Projet</th>
                                     <th>Statut</th>
                                     <th>Date création</th>
+                                    <th>Répartition</th>
                                     <th>Montant total</th>
                                     <th>Actions</th>
                                 </tr>
@@ -109,6 +119,33 @@
                                         </form>
                                     </td>
                                     <td>{{ order.createdAt|date('d/m/Y') }}</td>
+                                    <td style="min-width:180px">
+                                        {# Calculs inline: prestations vs achats #}
+                                        {% set services = 0 %}
+                                        {% set purchases = 0 %}
+                                        {% for section in order.sections %}
+                                            {% for line in section.lines %}
+                                                {% set services = services + (line.serviceAmount ?? 0) %}
+                                                {% if line.purchaseAmount %}
+                                                    {% set purchases = purchases + line.purchaseAmount %}
+                                                {% endif %}
+                                                {% if line.type in ['purchase','fixed_amount'] and line.directAmount %}
+                                                    {% set purchases = purchases + line.directAmount %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {% set total = services + purchases %}
+                                        {% set sp = total > 0 ? (services / total * 100) : 0 %}
+                                        {% set pp = total > 0 ? (100 - sp) : 0 %}
+                                        <div class="progress" style="height:12px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ sp }}%" aria-valuenow="{{ sp|number_format(0,'.','') }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ pp }}%" aria-valuenow="{{ pp|number_format(0,'.','') }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small text-muted mt-1">
+                                            <span><span class="me-1 d-inline-block rounded-circle" style="width:8px;height:8px;background:var(--bs-primary);"></span>{{ sp|number_format(0, ',', ' ') }}%</span>
+                                            <span><span class="me-1 d-inline-block rounded-circle" style="width:8px;height:8px;background:var(--bs-warning);"></span>{{ pp|number_format(0, ',', ' ') }}%</span>
+                                        </div>
+                                    </td>
                                     <td>{{ order.totalAmount|number_format(2, ',', ' ') }}€</td>
                                     <td>
                                         <div class="btn-group" role="group">

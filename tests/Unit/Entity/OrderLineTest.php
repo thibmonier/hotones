@@ -60,7 +60,7 @@ class OrderLineTest extends TestCase
     public function testPurchaseLine(): void
     {
         $section = (new OrderSection())->setTitle('Section 1');
-        $line = (new OrderLine())
+        $line    = (new OrderLine())
             ->setSection($section)
             ->setDescription('Purchase')
             ->setType('purchase')

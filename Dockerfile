@@ -37,6 +37,7 @@ RUN apk add --no-cache \
     opcache \
     gd \
     bcmath \
+    zip \
   && rm -rf /var/cache/apk/*
 
 # Install Composer

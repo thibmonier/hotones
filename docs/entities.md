@@ -38,8 +38,10 @@ Order (devis)
 ├── name, orderNumber, notes
 ├── totalAmount, contingenceAmount, contingenceReason
 ├── createdAt, validatedAt, status
+├── contractType (forfait|regie)
 ├── project → Project
 ├── sections[] → OrderSection
+├── paymentSchedules[] → OrderPaymentSchedule (si forfait)
 └── tasks[] → OrderTask (ancienne structure)
 
 OrderSection (sections de devis)
@@ -51,6 +53,12 @@ OrderLine (lignes de devis)
 ├── profile → Profile, quantity, unitPrice
 ├── totalPrice, purchaseAmount
 └── section → OrderSection
+
+OrderPaymentSchedule (échéance devis au forfait)
+├── order → Order
+├── billingDate, amountType (percent|fixed)
+├── percent (si percent), fixedAmount (si fixed)
+└── computeAmount(totalOrder) → €
 
 // Temps & Planification
 Timesheet (temps passés)

@@ -35,12 +35,15 @@
 - Order : Devis
   - Numéro unique: D[année][mois][incrément]
   - Statuts: A signer, Gagné, Signé, Perdu, Terminé, StandBy, Abandonné
+  - Contractualisation: `forfait` (échéancier) ou `regie` (temps passé)
+    - Forfait: échéancier de paiement (lignes avec date + montant en % du total devis ou montant fixe). La somme doit couvrir 100% du devis (avertissement si ≠ 100%).
+    - Régie: facturation mensuelle basée sur les temps saisis (Σ heures × (TJM contributeur / 8)).
   - Mise à jour rapide du statut:
     - Depuis la page d’un devis: sélecteur dans le panneau « Actions » (POST sécurisé CSRF)
     - Depuis la liste des devis: sélecteur dans la colonne « Statut » (soumission auto au changement)
     - Route: POST /orders/{id}/status (name: order_update_status)
   - Sections regroupant des lignes + totalisation
-- Lignes: profil, TJM, jours, total (jours×TJM), achats attachés (affiche marge nette)
+  - Lignes: profil, TJM, jours, total (jours×TJM), achats attachés (affiche marge nette)
 
 ## 🧪 Tests E2E
 - Outil: Symfony Panther (Chrome headless)

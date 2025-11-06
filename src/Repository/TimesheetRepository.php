@@ -188,4 +188,51 @@ class TimesheetRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Heures mensuelles (YYYY, MM, totalHours) pour un projet.
+     */
+    public function getMonthlyHoursForProject(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours) as totalHours')
+            ->where('t.project = :project')
+            ->setParameter('project', $project)
+            ->groupBy('year, month')
+            ->orderBy('year', 'ASC')
+            ->addOrderBy('month', 'ASC');
+
+        if ($startDate) {
+            $qb->andWhere('t.date >= :start')->setParameter('start', $startDate);
+        }
+        if ($endDate) {
+            $qb->andWhere('t.date <= :end')->setParameter('end', $endDate);
+        }
+
+        return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Chiffre d'affaires mensuel en régie (TJM contributeur): Σ(hours * (tjm/8)).
+     */
+    public function getMonthlyRevenueForProjectUsingContributorTjm(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours * (c.tjm/8)) as revenue')
+            ->join('t.contributor', 'c')
+            ->where('t.project = :project')
+            ->setParameter('project', $project)
+            ->groupBy('year, month')
+            ->orderBy('year', 'ASC')
+            ->addOrderBy('month', 'ASC');
+
+        if ($startDate) {
+            $qb->andWhere('t.date >= :start')->setParameter('start', $startDate);
+        }
+        if ($endDate) {
+            $qb->andWhere('t.date <= :end')->setParameter('end', $endDate);
+        }
+
+        return $qb->getQuery()->getArrayResult();
+    }
 }

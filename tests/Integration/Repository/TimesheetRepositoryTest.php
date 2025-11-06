@@ -6,6 +6,7 @@ use App\Factory\ContributorFactory;
 use App\Factory\ProjectFactory;
 use App\Factory\TimesheetFactory;
 use App\Repository\TimesheetRepository;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -27,30 +28,30 @@ class TimesheetRepositoryTest extends KernelTestCase
         TimesheetFactory::createOne([
             'contributor' => $contributor,
             'project'     => $project,
-            'date'        => new \DateTime('2024-04-02'),
+            'date'        => new DateTime('2024-04-02'),
             'hours'       => '8.00',
         ]);
         TimesheetFactory::createOne([
             'contributor' => $contributor,
             'project'     => $project,
-            'date'        => new \DateTime('2024-04-10'),
+            'date'        => new DateTime('2024-04-10'),
             'hours'       => '7.50',
         ]);
         TimesheetFactory::createOne([
             'contributor' => $contributor,
             'project'     => $project,
-            'date'        => new \DateTime('2024-04-20'),
+            'date'        => new DateTime('2024-04-20'),
             'hours'       => '4.00',
         ]);
         TimesheetFactory::createOne([
             'contributor' => $contributor,
             'project'     => $project,
-            'date'        => new \DateTime('2024-05-01'),
+            'date'        => new DateTime('2024-05-01'),
             'hours'       => '8.00',
         ]);
 
-        $start = new \DateTime('2024-04-01');
-        $end   = new \DateTime('2024-04-30');
+        $start = new DateTime('2024-04-01');
+        $end   = new DateTime('2024-04-30');
         $sum   = $repo->getTotalHoursForMonth($start, $end);
 
         $this->assertEquals(19.5, $sum, '', 0.001);

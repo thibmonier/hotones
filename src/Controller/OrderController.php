@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Order;
 use App\Entity\OrderLine;
+use App\Entity\OrderPaymentSchedule;
 use App\Entity\OrderSection;
 use App\Entity\Profile;
 use App\Entity\Project;
@@ -67,6 +68,7 @@ class OrderController extends AbstractController
             }
 
             $order->setStatus($request->request->get('status', 'draft'));
+            $order->setContractType($request->request->get('contract_type', 'forfait'));
             $order->setDescription($request->request->get('description'));
             $order->setNotes($request->request->get('notes'));
 
@@ -98,33 +100,54 @@ class OrderController extends AbstractController
     #[Route('/{id}', name: 'order_show', methods: ['GET'])]
     public function show(Order $order, EntityManagerInterface $em): Response
     {
-        // Calculer les totaux
-        $totalAmount    = 0;
-        $totalPurchases = 0;
+        // Total basé sur les sections (incluant achats et montants fixes)
+        $sectionsTotal = (float) $order->calculateTotalFromSections();
+        if ($sectionsTotal <= 0 && $order->getTotalAmount()) {
+            // Fallback sur la colonne totalAmount si sections non définies
+            $sectionsTotal = (float) $order->getTotalAmount();
+        }
 
+        // Détail prestations vs achats
+        $servicesSubtotal  = 0.0; // Prestations hors achats
+        $purchasesSubtotal = 0.0; // Achats attachés + lignes d'achat/direct/fixe
         foreach ($order->getSections() as $section) {
             foreach ($section->getLines() as $line) {
-                $totalAmount += $line->getTotalAmount();
+                // Prestations (services uniquement), sans achats attachés
+                $servicesSubtotal += (float) $line->getServiceAmount();
+
+                // Achats attachés à une ligne de service
                 if ($line->getPurchaseAmount()) {
-                    $totalPurchases += $line->getPurchaseAmount();
+                    $purchasesSubtotal += (float) $line->getPurchaseAmount();
+                }
+
+                // Lignes d'achat direct ou montant fixe
+                if (in_array($line->getType(), ['purchase', 'fixed_amount'], true) && $line->getDirectAmount()) {
+                    $purchasesSubtotal += (float) $line->getDirectAmount();
                 }
             }
         }
 
-        // Calcul avec contingence
-        $contingencyAmount = 0;
-        if ($order->getContingencyPercentage()) {
-            $contingencyAmount = $totalAmount * ($order->getContingencyPercentage() / 100);
-        }
+        // Contingence
+        $contPct           = $order->getContingencyPercentage() ? (float) $order->getContingencyPercentage() : 0.0;
+        $contingencyAmount = $sectionsTotal * ($contPct / 100.0);
+        $finalTotal        = $sectionsTotal - $contingencyAmount;
 
-        $finalAmount = $totalAmount - $contingencyAmount;
+        // Couverture de l'échéancier (si forfait)
+        $scheduledTotal = 0.0;
+        if ($order->getContractType() === 'forfait') {
+            foreach ($order->getPaymentSchedules() as $s) {
+                $scheduledTotal += (float) $s->computeAmount(number_format($finalTotal, 2, '.', ''));
+            }
+        }
 
         return $this->render('order/show.html.twig', [
             'order'             => $order,
-            'totalAmount'       => $totalAmount,
-            'totalPurchases'    => $totalPurchases,
+            'sectionsTotal'     => $sectionsTotal,
+            'servicesSubtotal'  => $servicesSubtotal,
+            'purchasesSubtotal' => $purchasesSubtotal,
             'contingencyAmount' => $contingencyAmount,
-            'finalAmount'       => $finalAmount,
+            'finalAmount'       => $finalTotal,
+            'scheduledTotal'    => $scheduledTotal,
             'statusOptions'     => Order::STATUS_OPTIONS,
         ]);
     }
@@ -141,6 +164,7 @@ class OrderController extends AbstractController
             }
 
             $order->setStatus($request->request->get('status'));
+            $order->setContractType($request->request->get('contract_type', $order->getContractType()));
             $order->setDescription($request->request->get('description'));
             $order->setNotes($request->request->get('notes'));
 
@@ -383,5 +407,74 @@ class OrderController extends AbstractController
         }
 
         $order->setTotalAmount($totalAmount);
+    }
+
+    #[Route('/{id}/schedule/add', name: 'order_schedule_add', methods: ['POST'])]
+    public function addSchedule(Request $request, Order $order, EntityManagerInterface $em): Response
+    {
+        if ($order->getContractType() !== 'forfait') {
+            $this->addFlash('danger', 'L’échéancier n’est disponible que pour les contrats au forfait.');
+
+            return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+        }
+
+        $label       = (string) $request->request->get('label');
+        $billingDate = (string) $request->request->get('billing_date');
+        $amountType  = (string) $request->request->get('amount_type', 'percent');
+        $percent     = $request->request->get('percent');
+        $fixed       = $request->request->get('fixed_amount');
+
+        if (!$billingDate) {
+            $this->addFlash('danger', 'La date de facturation est requise.');
+
+            return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+        }
+
+        $schedule = new OrderPaymentSchedule();
+        $schedule->setOrder($order)
+            ->setLabel($label ?: null)
+            ->setBillingDate(new DateTime($billingDate))
+            ->setAmountType($amountType);
+
+        if ($amountType === OrderPaymentSchedule::TYPE_PERCENT) {
+            $schedule->setPercent($percent !== '' ? (string) $percent : '0');
+        } else {
+            $schedule->setFixedAmount($fixed !== '' ? (string) $fixed : '0');
+        }
+
+        $em->persist($schedule);
+        $em->flush();
+
+        // Vérifier la couverture
+        [$ok, $scheduled] = $order->validatePaymentScheduleCoverage();
+        if ($ok) {
+            $this->addFlash('success', 'Échéance ajoutée. Couverture à 100% du devis.');
+        } else {
+            $this->addFlash('warning', sprintf('Échéance ajoutée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format((float) $scheduled, 2, ',', ' ')));
+        }
+
+        return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+    }
+
+    #[Route('/{orderId}/schedule/{scheduleId}/delete', name: 'order_schedule_delete', methods: ['POST'])]
+    public function deleteSchedule(int $orderId, int $scheduleId, EntityManagerInterface $em): Response
+    {
+        $order    = $em->getRepository(Order::class)->find($orderId);
+        $schedule = $em->getRepository(OrderPaymentSchedule::class)->find($scheduleId);
+        if (!$order || !$schedule || $schedule->getOrder()->getId() !== $order->getId()) {
+            throw $this->createNotFoundException();
+        }
+
+        $em->remove($schedule);
+        $em->flush();
+
+        [$ok, $scheduled] = $order->validatePaymentScheduleCoverage();
+        if ($ok) {
+            $this->addFlash('success', 'Échéance supprimée. Couverture à 100% du devis.');
+        } else {
+            $this->addFlash('warning', sprintf('Échéance supprimée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format((float) $scheduled, 2, ',', ' ')));
+        }
+
+        return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
     }
 }

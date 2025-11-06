@@ -70,6 +70,10 @@ class Order
     #[ORM\Column(type: 'string', length: 20)]
     private string $status = 'a_signer'; // a_signer, gagne, signe, perdu, termine, standby, abandonne
 
+    // Type de contractualisation du devis: forfait (échéancier) ou regie (temps passé)
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => 'forfait'])]
+    private string $contractType = 'forfait'; // forfait, regie
+
     // Relation vers les tâches du devis (ancienne structure)
     #[ORM\OneToMany(targetEntity: OrderTask::class, mappedBy: 'order', cascade: ['persist', 'remove'])]
     private Collection $tasks;
@@ -79,11 +83,17 @@ class Order
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $sections;
 
+    // Échéancier de paiement (si contrat au forfait)
+    #[ORM\OneToMany(targetEntity: OrderPaymentSchedule::class, mappedBy: 'order', cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['billingDate' => 'ASC'])]
+    private Collection $paymentSchedules;
+
     public function __construct()
     {
-        $this->tasks     = new ArrayCollection();
-        $this->sections  = new ArrayCollection();
-        $this->createdAt = new DateTime();
+        $this->tasks            = new ArrayCollection();
+        $this->sections         = new ArrayCollection();
+        $this->paymentSchedules = new ArrayCollection();
+        $this->createdAt        = new DateTime();
     }
 
     public function getId(): ?int
@@ -235,6 +245,18 @@ class Order
         return $this;
     }
 
+    public function getContractType(): string
+    {
+        return $this->contractType;
+    }
+
+    public function setContractType(string $contractType): self
+    {
+        $this->contractType = $contractType;
+
+        return $this;
+    }
+
     public function getStatus(): string
     {
         return $this->status;
@@ -302,6 +324,47 @@ class Order
     /**
      * Calcule le montant total du devis à partir des sections.
      */
+    public function getPaymentSchedules(): Collection
+    {
+        return $this->paymentSchedules;
+    }
+
+    public function addPaymentSchedule(OrderPaymentSchedule $schedule): self
+    {
+        if (!$this->paymentSchedules->contains($schedule)) {
+            $this->paymentSchedules[] = $schedule;
+            $schedule->setOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaymentSchedule(OrderPaymentSchedule $schedule): self
+    {
+        if ($this->paymentSchedules->removeElement($schedule)) {
+            if ($schedule->getOrder() === $this) {
+                $schedule->setOrder($this);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Vérifie si la somme des échéances couvre 100% du total du devis.
+     * Retourne [isValid(bool), totalScheduled(string)].
+     */
+    public function validatePaymentScheduleCoverage(): array
+    {
+        $total     = $this->calculateTotalFromSections();
+        $scheduled = '0.00';
+        foreach ($this->paymentSchedules as $s) {
+            $scheduled = bcadd($scheduled, $s->computeAmount($total), 2);
+        }
+
+        return [bccomp($scheduled, $total, 2) === 0, $scheduled];
+    }
+
     public function calculateTotalFromSections(): string
     {
         $total = '0';

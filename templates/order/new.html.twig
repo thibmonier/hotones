@@ -38,7 +38,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="status" class="form-label">Statut</label>
                                     <select class="form-select" id="status" name="status">
@@ -47,6 +47,15 @@
                                                 {{ label }}
                                             </option>
                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="contract_type" class="form-label">Contractualisation</label>
+                                    <select class="form-select" id="contract_type" name="contract_type">
+                                        <option value="forfait" selected>Forfait (échéancier)</option>
+                                        <option value="regie">Régie (temps passé)</option>
                                     </select>
                                 </div>
                             </div>

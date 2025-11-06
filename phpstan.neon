@@ -20,5 +20,4 @@ parameters:
         - '#Property .+ type mapping mismatch#'
         # Ignore undefined methods in entities during development
         - '#Call to an undefined method .+::(setDescription|setTjm|modify|setContingencyPercentage|setValidUntil|getContingencyPercentage|getDescription|setName|setSortOrder|setPurchaseAmount|getTimesheets|getTask|setWorkTimePercentage|addProfile|getWorkTimePercentage|getProfiles)\(\)#'
-        # Ignore binary operations with strings
-        - '#Binary operation .+ between .+ and .+ results in an error#'
+
