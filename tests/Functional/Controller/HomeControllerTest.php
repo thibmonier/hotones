@@ -26,9 +26,9 @@ class HomeControllerTest extends WebTestCase
 
         $user = UserFactory::createOne();
         // Link a Contributor to the user for the controller's optional section
-        ContributorFactory::createOne(['user' => $user->object()]);
+        ContributorFactory::createOne(['user' => $user]);
 
-        $client->loginUser($user->object());
+        $client->loginUser($user);
 
         $client->request('GET', '/');
         $this->assertResponseIsSuccessful();

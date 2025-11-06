@@ -80,6 +80,16 @@
                 </li>
                 {% endif %}
 
+                {% if is_granted('ROLE_COMPTA') or is_granted('ROLE_ADMIN') %}
+                <li class="menu-title">Comptabilité</li>
+                <li>
+                    <a href="{{ path('billing_index') }}" class="waves-effect">
+                        <i class="bx bx-receipt"></i>
+                        <span>Facturation</span>
+                    </a>
+                </li>
+                {% endif %}
+
                 <li class="menu-title">Suivi des temps</li>
 
                 <li>

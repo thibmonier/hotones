@@ -54,6 +54,7 @@
         "twig/twig": "^2.12|^3.22.0"
     },
     "require-dev": {
+        "dbrekelmans/bdi": "^1.4",
         "doctrine/doctrine-fixtures-bundle": "^4.3",
         "fakerphp/faker": "^1.24.1",
         "friendsofphp/php-cs-fixer": "^3.89.1",
@@ -67,9 +68,9 @@
         "symfony/css-selector": "7.3.*",
         "symfony/debug-bundle": "7.3.*",
         "symfony/maker-bundle": "^1.64",
+        "symfony/panther": "^2.2",
         "symfony/stopwatch": "7.3.*",
         "symfony/web-profiler-bundle": "7.3.*",
-        "symfony/panther": "^2.2",
         "zenstruck/foundry": "^2.7.8"
     },
     "config": {

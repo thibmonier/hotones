@@ -7,6 +7,9 @@ use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+/**
+ * @group e2e
+ */
 class ProjectCreationE2ETest extends PantherTestCase
 {
     use Factories;
@@ -32,7 +35,7 @@ class ProjectCreationE2ETest extends PantherTestCase
 
         // Navigate to project creation page
         $crawler = $client->request('GET', '/projects/new');
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $client->waitFor('form');
 
         // Minimal form submission: only name (others optional)
         $form = $crawler->filter('form')->form([

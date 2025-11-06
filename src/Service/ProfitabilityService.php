@@ -218,14 +218,16 @@ class ProfitabilityService
     {
         // Si c'est un projet interne, pas de calcul de rentabilité
         if ($project->getIsInternal()) {
+            $totalHours = $this->getTotalProjectHours($project);
+
             return [
                 'revenue'          => '0',
                 'cost'             => '0',
                 'margin'           => '0',
                 'margin_rate'      => '0',
                 'sold_days'        => '0',
-                'worked_hours'     => $this->getTotalProjectHours($project),
-                'worked_days'      => bcdiv($this->getTotalProjectHours($project), '8', 2),
+                'worked_hours'     => rtrim(rtrim($totalHours, '0'), '.'),
+                'worked_days'      => bcdiv($totalHours, '8', 2),
                 'is_internal'      => true,
                 'excluded_hours'   => $this->getExcludedHours($project),
                 'orders_count'     => count($project->getOrders()),
@@ -260,7 +262,7 @@ class ProfitabilityService
             'margin'           => $margin,
             'margin_rate'      => $marginRate,
             'sold_days'        => $soldDays,
-            'worked_hours'     => $totalHours,
+            'worked_hours'     => rtrim(rtrim($totalHours, '0'), '.'),
             'worked_days'      => bcdiv($totalHours, '8', 2),
             'billable_hours'   => $billableHours,
             'billable_days'    => bcdiv($billableHours, '8', 2),

@@ -35,10 +35,14 @@ class TimeConversionService
             $days           = self::hoursToDays($hours);
             $remainingHours = bcmod($hours, (string) self::HOURS_PER_DAY, 2);
 
+            // Truncate days to 1 decimal instead of rounding (tests expect 10h => 1,2j 2,0h)
+            $daysFloat     = floatval($days);
+            $daysTruncated = floor($daysFloat * 10) / 10;
+
             if ($remainingHours === '0.00') {
-                return number_format(floatval($days), 1, ',', ' ').'j';
+                return number_format($daysTruncated, 1, ',', ' ').'j';
             } else {
-                return number_format(floatval($days), 1, ',', ' ').'j '.
+                return number_format($daysTruncated, 1, ',', ' ').'j '.
                        number_format(floatval($remainingHours), 1, ',', ' ').'h';
             }
         }

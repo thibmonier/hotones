@@ -125,7 +125,9 @@ class OrderPaymentSchedule
         }
 
         $pct = $this->percent ?? '0';
+        // Use higher precision for percentage to avoid rounding issues (e.g. 66.6667% of 3000 = 2000.00)
+        $ratio = bcdiv($pct, '100', 6);
 
-        return bcmul($orderTotal, bcdiv($pct, '100', 4), 2);
+        return bcmul($orderTotal, $ratio, 2);
     }
 }

@@ -1,0 +1,132 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Facturation globale — {{ month|date('F Y') }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Facturation globale — {{ month|date('F Y') }}</h4>
+      <div class="page-title-right d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{{ path('billing_index', {month: prevMonth}) }}">← {{ (month|date_modify('-1 month'))|date('F Y') }}</a>
+        <a class="btn btn-outline-secondary" href="{{ path('billing_index', {month: nextMonth}) }}">{{ (month|date_modify('+1 month'))|date('F Y') }} →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Projet</th>
+            <th>Devis</th>
+            <th>Libellé</th>
+            <th class="text-end">Montant</th>
+            <th>Émise ?</th>
+            <th>Émise le</th>
+            <th>Payée le</th>
+            <th>Commentaire</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in entries %}
+            {% set marker = null %}
+            {% if e.type == 'forfait' %}
+              {% set marker = markers.bySchedule[e.schedule.id] ?? null %}
+            {% else %}
+              {% set key = e.order.id ~ '-' ~ (e.year|default(month|date('Y'))) ~ '-' ~ (e.month|default(month|date('n'))) %}
+              {% set marker = markers.byRegie[key] ?? null %}
+            {% endif %}
+            <tr>
+              <td>{{ e.date|date('Y-m-d') }}</td>
+              <td>
+                {% if e.type == 'forfait' %}
+                  <span class="badge bg-primary">Forfait</span>
+                {% else %}
+                  <span class="badge bg-warning">Régie</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{{ path('project_show', {id: e.project.id}) }}">{{ e.project.name }}</a>
+              </td>
+              <td>
+                <a href="{{ path('order_show', {id: e.order.id}) }}">{{ e.order.orderNumber }}</a>
+              </td>
+              <td>{{ e.label }}</td>
+              <td class="text-end">{{ e.amount|number_format(2, ',', ' ') }} €</td>
+              <td>
+                <input type="checkbox" class="form-check-input js-issued" {% if marker and marker.isIssued %}checked{% endif %}>
+              </td>
+              <td><input type="date" class="form-control form-control-sm js-issued-at" value="{{ marker and marker.issuedAt ? marker.issuedAt|date('Y-m-d') : '' }}"></td>
+              <td><input type="date" class="form-control form-control-sm js-paid-at" value="{{ marker and marker.paidAt ? marker.paidAt|date('Y-m-d') : '' }}"></td>
+              <td><input type="text" class="form-control form-control-sm js-comment" value="{{ marker and marker.comment ? marker.comment : '' }}" placeholder="Notes client..."/></td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary js-save" data-type="{{ e.type }}" data-schedule-id="{{ e.schedule ? e.schedule.id : '' }}" data-order-id="{{ e.order.id }}" data-year="{{ e.year|default(month|date('Y')) }}" data-month="{{ e.month|default(month|date('n')) }}">
+                  Enregistrer
+                </button>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="11" class="text-center text-muted">Aucune facture à émettre pour ce mois.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  async function save(row){
+    const btn = row.querySelector('.js-save');
+    if (!btn) return;
+    const type = btn.dataset.type;
+    const issued = row.querySelector('.js-issued').checked;
+    const issuedAt = row.querySelector('.js-issued-at').value;
+    const paidAt = row.querySelector('.js-paid-at').value;
+    const comment = row.querySelector('.js-comment').value;
+    const month = new URLSearchParams(window.location.search).get('month') || '{{ month|date('Y-m') }}';
+
+    let url = '';
+    const body = new FormData();
+    body.append('is_issued', issued ? '1' : '0');
+    if (issuedAt) body.append('issued_at', issuedAt);
+    if (paidAt) body.append('paid_at', paidAt);
+    if (comment) body.append('comment', comment);
+
+    if (type === 'forfait') {
+      url = '{{ path('billing_mark_schedule', {id: 0})|replace({'0':'__ID__'}) }}'.replace('__ID__', btn.dataset.scheduleId);
+    } else {
+      url = '{{ path('billing_mark_regie', {orderId: 0})|replace({'0':'__OID__'}) }}'.replace('__OID__', btn.dataset.orderId);
+      body.append('year', btn.dataset.year);
+      body.append('month', btn.dataset.month);
+    }
+
+    try {
+      btn.disabled = true; btn.textContent = '...';
+      const resp = await fetch(url + '?month=' + encodeURIComponent(month), {method: 'POST', body, headers: {'X-Requested-With': 'fetch'}});
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      btn.textContent = 'OK';
+      setTimeout(()=>{ btn.textContent = 'Enregistrer'; btn.disabled = false; }, 800);
+    } catch(e) {
+      btn.textContent = 'Erreur';
+      setTimeout(()=>{ btn.textContent = 'Enregistrer'; btn.disabled = false; }, 1200);
+    }
+  }
+
+  document.addEventListener('click', function(e){
+    const t = e.target;
+    if (t && t.classList && t.classList.contains('js-save')) {
+      const row = t.closest('tr');
+      if (row) save(row);
+    }
+  });
+})();
+</script>
+{% endblock %}

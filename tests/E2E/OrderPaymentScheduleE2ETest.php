@@ -12,6 +12,9 @@ use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+/**
+ * @group e2e
+ */
 class OrderPaymentScheduleE2ETest extends PantherTestCase
 {
     use Factories;
@@ -25,7 +28,7 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
         // Build a minimal order with one section/line totaling 5000€
         $order = new Order();
         $order->setOrderNumber('DE2E-001')
-            ->setProject($project->object())
+            ->setProject($project)
             ->setStatus('a_signer')
             ->setContractType('forfait');
 
@@ -37,7 +40,7 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
             ->setSection($section)
             ->setDescription('Implémentation')
             ->setType('service')
-            ->setProfile($profile->object())
+            ->setProfile($profile)
             ->setDailyRate('1000')
             ->setDays('5'); // 5000€
 
@@ -71,7 +74,7 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
 
         // Go to edit order
         $client->request('GET', '/orders/'.$order->getId().'/edit');
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $client->waitFor('form');
 
         // Fill schedule form (50% on a date)
         $crawler = $client->getCrawler();

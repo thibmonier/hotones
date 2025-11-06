@@ -7,6 +7,9 @@ use Symfony\Component\Panther\PantherTestCase; // extends WebTestCase with brows
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+/**
+ * @group e2e
+ */
 class LoginAndNavigationE2ETest extends PantherTestCase
 {
     use Factories;
@@ -22,7 +25,7 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         ]);
 
         $crawler = $client->request('GET', '/login');
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $client->waitFor('form'); // Ensure page loaded in WebDriver mode
 
         $form = $crawler->filter('form')->form([
             '_username' => $user->getEmail(),
@@ -56,7 +59,7 @@ class LoginAndNavigationE2ETest extends PantherTestCase
 
         // Go to projects index
         $client->request('GET', '/projects');
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $client->waitFor('h4');
         $this->assertSelectorTextContains('h4', 'Projets');
     }
 }
