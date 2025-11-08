@@ -24,7 +24,7 @@
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h4 class="card-title mb-0">Liste des contributeurs actifs</h4>
+                            <h4 class="card-title mb-0">Liste des contributeurs</h4>
                         </div>
                         <div class="col-auto">
                             <span class="badge bg-primary">{{ contributors|length }} contributeur{{ contributors|length > 1 ? 's' : '' }}</span>
@@ -32,6 +32,33 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {# Filtres #}
+                    <form method="get" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" name="search" class="form-control" 
+                                       placeholder="Rechercher par nom, prénom ou email..." 
+                                       value="{{ search }}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="active" class="form-select">
+                                    <option value="all" {{ active == 'all' ? 'selected' : '' }}>Tous les statuts</option>
+                                    <option value="active" {{ active == 'active' ? 'selected' : '' }}>Actifs uniquement</option>
+                                    <option value="inactive" {{ active == 'inactive' ? 'selected' : '' }}>Inactifs uniquement</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="btn-group w-100" role="group">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-search"></i> Filtrer
+                                    </button>
+                                    <a href="{{ path('contributor_index') }}" class="btn btn-secondary">
+                                        <i class="bx bx-reset"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                     {% if contributors %}
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
@@ -51,15 +78,24 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar-xs me-3">
-                                                        <span class="avatar-title rounded-circle bg-primary text-white font-size-16">
-                                                            {{ contributor.name|slice(0, 1)|upper }}
-                                                        </span>
+                                                        {% if contributor.avatarFilename %}
+                                                            <img src="{{ asset('uploads/avatars/' ~ contributor.avatarFilename) }}" 
+                                                                 alt="{{ contributor.name }}" 
+                                                                 class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+                                                        {% else %}
+                                                            <span class="avatar-title rounded-circle bg-primary text-white font-size-16">
+                                                                {{ contributor.firstName|slice(0, 1)|upper }}{{ contributor.lastName|slice(0, 1)|upper }}
+                                                            </span>
+                                                        {% endif %}
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0">
                                                             <a href="{{ path('contributor_show', {'id': contributor.id}) }}" class="text-dark">
                                                                 {{ contributor.name }}
                                                             </a>
+                                                            {% if not contributor.active %}
+                                                                <span class="badge bg-secondary ms-2">Inactif</span>
+                                                            {% endif %}
                                                         </h6>
                                                         {% if contributor.notes %}
                                                             <small class="text-muted">{{ contributor.notes|slice(0, 50) }}...</small>
@@ -71,10 +107,13 @@
                                                 {% if contributor.email %}
                                                     <div><i class="bx bx-envelope me-1 text-muted"></i> {{ contributor.email }}</div>
                                                 {% endif %}
-                                                {% if contributor.phone %}
-                                                    <div><i class="bx bx-phone me-1 text-muted"></i> {{ contributor.phone }}</div>
+                                                {% if contributor.phoneProfessional %}
+                                                    <div><i class="bx bx-phone me-1 text-muted"></i> {{ contributor.phoneProfessional }}</div>
                                                 {% endif %}
-                                                {% if not contributor.email and not contributor.phone %}
+                                                {% if contributor.phonePersonal %}
+                                                    <div><i class="bx bx-mobile me-1 text-muted"></i> {{ contributor.phonePersonal }}</div>
+                                                {% endif %}
+                                                {% if not contributor.email and not contributor.phoneProfessional and not contributor.phonePersonal %}
                                                     <span class="text-muted">Non renseigné</span>
                                                 {% endif %}
                                             </td>

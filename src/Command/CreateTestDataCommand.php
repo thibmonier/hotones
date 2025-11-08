@@ -153,23 +153,24 @@ class CreateTestDataCommand extends Command
         $io->section('Création des contributeurs');
 
         $contributorsData = [
-            ['name' => 'Emma Développeuse', 'profile' => 0, 'cjm' => '450.00', 'active' => true],
-            ['name' => 'Lucas Backend', 'profile' => 1, 'cjm' => '500.00', 'active' => true],
-            ['name' => 'Sophie Designer', 'profile' => 3, 'cjm' => '400.00', 'active' => true],
-            ['name' => 'Thomas DevOps', 'profile' => 4, 'cjm' => '550.00', 'active' => true],
-            ['name' => 'Julie Frontend', 'profile' => 0, 'cjm' => '480.00', 'active' => true],
+            ['firstName' => 'Emma', 'lastName' => 'Développeuse', 'profile' => 0, 'cjm' => '450.00', 'active' => true],
+            ['firstName' => 'Lucas', 'lastName' => 'Backend', 'profile' => 1, 'cjm' => '500.00', 'active' => true],
+            ['firstName' => 'Sophie', 'lastName' => 'Designer', 'profile' => 3, 'cjm' => '400.00', 'active' => true],
+            ['firstName' => 'Thomas', 'lastName' => 'DevOps', 'profile' => 4, 'cjm' => '550.00', 'active' => true],
+            ['firstName' => 'Julie', 'lastName' => 'Frontend', 'profile' => 0, 'cjm' => '480.00', 'active' => true],
         ];
 
         $contributors = [];
         $repo         = $this->entityManager->getRepository(Contributor::class);
         foreach ($contributorsData as $data) {
-            $contributor = $repo->findOneBy(['name' => $data['name']]);
+            $contributor = $repo->findOneBy(['firstName' => $data['firstName'], 'lastName' => $data['lastName']]);
             if (!$contributor) {
                 $contributor = new Contributor();
-                $contributor->setName($data['name']);
-                $io->writeln("✓ Contributeur créé : {$data['name']}");
+                $contributor->setFirstName($data['firstName']);
+                $contributor->setLastName($data['lastName']);
+                $io->writeln("✓ Contributeur créé : {$data['firstName']} {$data['lastName']}");
             } else {
-                $io->writeln("• Contributeur existant : {$data['name']}");
+                $io->writeln("• Contributeur existant : {$data['firstName']} {$data['lastName']}");
             }
             $contributor->setCjm($data['cjm']);
             $contributor->setActive($data['active']);

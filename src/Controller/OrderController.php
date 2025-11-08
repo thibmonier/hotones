@@ -8,6 +8,7 @@ use App\Entity\OrderPaymentSchedule;
 use App\Entity\OrderSection;
 use App\Entity\Profile;
 use App\Entity\Project;
+use App\Form\OrderType as OrderFormType;
 
 use function array_key_exists;
 
@@ -56,29 +57,11 @@ class OrderController extends AbstractController
             }
         }
 
-        if ($request->isMethod('POST')) {
+        $form = $this->createForm(OrderFormType::class, $order);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
             $order->setOrderNumber($this->generateOrderNumber($em));
-
-            // Projet
-            if ($projectId = $request->request->get('project_id')) {
-                $project = $em->getRepository(Project::class)->find($projectId);
-                if ($project) {
-                    $order->setProject($project);
-                }
-            }
-
-            $order->setStatus($request->request->get('status', 'draft'));
-            $order->setContractType($request->request->get('contract_type', 'forfait'));
-            $order->setDescription($request->request->get('description'));
-            $order->setNotes($request->request->get('notes'));
-
-            // Contingence
-            $contingency = $request->request->get('contingency_percentage');
-            $order->setContingencyPercentage($contingency !== '' ? (string) $contingency : null);
-
-            if ($request->request->get('valid_until')) {
-                $order->setValidUntil(new DateTime($request->request->get('valid_until')));
-            }
 
             $em->persist($order);
             $em->flush();
@@ -88,12 +71,9 @@ class OrderController extends AbstractController
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
 
-        $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
-
         return $this->render('order/new.html.twig', [
-            'order'         => $order,
-            'projects'      => $projects,
-            'statusOptions' => Order::STATUS_OPTIONS,
+            'order' => $order,
+            'form'  => $form,
         ]);
     }
 
@@ -156,28 +136,10 @@ class OrderController extends AbstractController
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function edit(Request $request, Order $order, EntityManagerInterface $em): Response
     {
-        if ($request->isMethod('POST')) {
-            // Projet
-            if ($projectId = $request->request->get('project_id')) {
-                $project = $em->getRepository(Project::class)->find($projectId);
-                $order->setProject($project);
-            }
+        $form = $this->createForm(OrderFormType::class, $order);
+        $form->handleRequest($request);
 
-            $order->setStatus($request->request->get('status'));
-            $order->setContractType($request->request->get('contract_type', $order->getContractType()));
-            $order->setDescription($request->request->get('description'));
-            $order->setNotes($request->request->get('notes'));
-
-            // Contingence
-            $contingency = $request->request->get('contingency_percentage');
-            $order->setContingencyPercentage($contingency !== '' ? (string) $contingency : null);
-
-            if ($request->request->get('valid_until')) {
-                $order->setValidUntil(new DateTime($request->request->get('valid_until')));
-            } else {
-                $order->setValidUntil(null);
-            }
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
             $this->addFlash('success', 'Devis modifié avec succès');
@@ -185,12 +147,9 @@ class OrderController extends AbstractController
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
 
-        $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
-
         return $this->render('order/edit.html.twig', [
-            'order'         => $order,
-            'projects'      => $projects,
-            'statusOptions' => Order::STATUS_OPTIONS,
+            'order' => $order,
+            'form'  => $form,
         ]);
     }
 

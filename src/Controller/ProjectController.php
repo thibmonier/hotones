@@ -4,9 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Entity\ProjectTask;
-use App\Entity\ServiceCategory;
-use App\Entity\Technology;
-use App\Entity\User;
+use App\Form\ProjectType as ProjectFormType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -140,81 +138,10 @@ class ProjectController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $project = new Project();
+        $form    = $this->createForm(ProjectFormType::class, $project);
+        $form->handleRequest($request);
 
-        if ($request->isMethod('POST')) {
-            $project->setName($request->request->get('name'));
-            // Client (relation)
-            if ($clientId = $request->request->get('client_id')) {
-                $client = $em->getRepository(\App\Entity\Client::class)->find($clientId);
-                $project->setClient($client);
-            } else {
-                $project->setClient(null);
-            }
-            $project->setDescription($request->request->get('description'));
-            $project->setIsInternal((bool) $request->request->get('is_internal'));
-
-            // Statut et type de projet
-            if ($request->request->get('status')) {
-                $project->setStatus($request->request->get('status'));
-            }
-            if ($request->request->get('project_type')) {
-                $project->setProjectType($request->request->get('project_type'));
-            }
-
-            // Gestion des montants (éviter les chaînes vides)
-            $purchasesAmount = $request->request->get('purchases_amount');
-            $project->setPurchasesAmount($purchasesAmount !== '' ? $purchasesAmount : null);
-            $project->setPurchasesDescription($request->request->get('purchases_description'));
-
-            if ($request->request->get('start_date')) {
-                $project->setStartDate(new DateTime($request->request->get('start_date')));
-            }
-            if ($request->request->get('end_date')) {
-                $project->setEndDate(new DateTime($request->request->get('end_date')));
-            }
-
-            // Rôles projet (utilisateurs)
-            $userRepo = $em->getRepository(User::class);
-            if ($userId = $request->request->get('key_account_manager')) {
-                if ($user = $userRepo->find($userId)) {
-                    $project->setKeyAccountManager($user);
-                }
-            }
-            if ($userId = $request->request->get('project_manager')) {
-                if ($user = $userRepo->find($userId)) {
-                    $project->setProjectManager($user);
-                }
-            }
-            if ($userId = $request->request->get('project_director')) {
-                if ($user = $userRepo->find($userId)) {
-                    $project->setProjectDirector($user);
-                }
-            }
-            if ($userId = $request->request->get('sales_person')) {
-                if ($user = $userRepo->find($userId)) {
-                    $project->setSalesPerson($user);
-                }
-            }
-
-            // Service Category
-            if ($serviceCategoryId = $request->request->get('service_category')) {
-                $serviceCategory = $em->getRepository(ServiceCategory::class)->find($serviceCategoryId);
-                if ($serviceCategory) {
-                    $project->setServiceCategory($serviceCategory);
-                }
-            }
-
-            // Technologies
-            $technologyIds = $request->request->all('technologies');
-            if (!empty($technologyIds)) {
-                foreach ($technologyIds as $techId) {
-                    $technology = $em->getRepository(Technology::class)->find($techId);
-                    if ($technology) {
-                        $project->addTechnology($technology);
-                    }
-                }
-            }
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($project);
             $em->flush();
 
@@ -230,16 +157,9 @@ class ProjectController extends AbstractController
             return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
 
-        $technologies      = $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']);
-        $serviceCategories = $em->getRepository(ServiceCategory::class)->findBy(['active' => true], ['name' => 'ASC']);
-
-        $clients = $em->getRepository(\App\Entity\Client::class)->findAllOrderedByName();
-
         return $this->render('project/new.html.twig', [
-            'project'            => $project,
-            'technologies'       => $technologies,
-            'service_categories' => $serviceCategories,
-            'clients'            => $clients,
+            'project' => $project,
+            'form'    => $form,
         ]);
     }
 
@@ -259,73 +179,10 @@ class ProjectController extends AbstractController
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function edit(Request $request, Project $project, EntityManagerInterface $em): Response
     {
-        if ($request->isMethod('POST')) {
-            $project->setName($request->request->get('name'));
-            if (null !== $request->request->get('client_id')) {
-                $clientId = $request->request->get('client_id');
-                $client   = $clientId ? $em->getRepository(\App\Entity\Client::class)->find($clientId) : null;
-                $project->setClient($client);
-            }
-            $project->setDescription($request->request->get('description'));
-            $project->setIsInternal((bool) $request->request->get('is_internal'));
+        $form = $this->createForm(ProjectFormType::class, $project);
+        $form->handleRequest($request);
 
-            // Gestion des montants (éviter les chaînes vides)
-            $purchasesAmount = $request->request->get('purchases_amount');
-            $project->setPurchasesAmount($purchasesAmount !== '' ? $purchasesAmount : null);
-            $project->setPurchasesDescription($request->request->get('purchases_description'));
-            if ($request->request->get('status')) {
-                $project->setStatus($request->request->get('status'));
-            }
-            if ($request->request->get('project_type')) {
-                $project->setProjectType($request->request->get('project_type'));
-            }
-
-            if ($request->request->get('start_date')) {
-                $project->setStartDate(new DateTime($request->request->get('start_date')));
-            }
-            if ($request->request->get('end_date')) {
-                $project->setEndDate(new DateTime($request->request->get('end_date')));
-            }
-
-            // Rôles projet (utilisateurs)
-            $userRepo = $em->getRepository(User::class);
-            if (null !== $request->request->get('key_account_manager')) {
-                $userId = $request->request->get('key_account_manager');
-                $project->setKeyAccountManager($userId ? $userRepo->find($userId) : null);
-            }
-            if (null !== $request->request->get('project_manager')) {
-                $userId = $request->request->get('project_manager');
-                $project->setProjectManager($userId ? $userRepo->find($userId) : null);
-            }
-            if (null !== $request->request->get('project_director')) {
-                $userId = $request->request->get('project_director');
-                $project->setProjectDirector($userId ? $userRepo->find($userId) : null);
-            }
-            if (null !== $request->request->get('sales_person')) {
-                $userId = $request->request->get('sales_person');
-                $project->setSalesPerson($userId ? $userRepo->find($userId) : null);
-            }
-
-            // Service Category
-            if ($serviceCategoryId = $request->request->get('service_category')) {
-                $serviceCategory = $em->getRepository(ServiceCategory::class)->find($serviceCategoryId);
-                $project->setServiceCategory($serviceCategory);
-            } else {
-                $project->setServiceCategory(null);
-            }
-
-            // Technologies
-            $project->getTechnologies()->clear();
-            $technologyIds = $request->request->all('technologies');
-            if (!empty($technologyIds)) {
-                foreach ($technologyIds as $techId) {
-                    $technology = $em->getRepository(Technology::class)->find($techId);
-                    if ($technology) {
-                        $project->addTechnology($technology);
-                    }
-                }
-            }
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
             $this->addFlash('success', 'Projet modifié avec succès');
@@ -333,16 +190,9 @@ class ProjectController extends AbstractController
             return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
 
-        $technologies      = $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']);
-        $serviceCategories = $em->getRepository(ServiceCategory::class)->findBy(['active' => true], ['name' => 'ASC']);
-
-        $clients = $em->getRepository(\App\Entity\Client::class)->findAllOrderedByName();
-
         return $this->render('project/edit.html.twig', [
-            'project'            => $project,
-            'technologies'       => $technologies,
-            'service_categories' => $serviceCategories,
-            'clients'            => $clients,
+            'project' => $project,
+            'form'    => $form,
         ]);
     }
 

@@ -73,6 +73,18 @@ readonly class MetricsCalculationService
         // Déterminer les bornes temporelles de la période courante
         [$startDate, $endDate] = $this->getPeriodBoundsFromDimTime($dimTime, $granularity);
 
+        // Précharger les timesheets du projet pour la période (réutilisés coûts + temps)
+        $timesheets = $this->entityManager->getRepository(Timesheet::class)
+            ->createQueryBuilder('t')
+            ->join('t.project', 'p')
+            ->where('p.id = :projectId')
+            ->andWhere('t.date BETWEEN :start AND :end')
+            ->setParameter('projectId', $project->getId())
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->getQuery()
+            ->getResult();
+
         // Obtenir ou créer les dimensions
         $dimProjectType     = $this->getOrCreateDimProjectType($project);
         $dimProjectManager  = $this->getOrCreateDimContributor($project->getProjectManager(), 'project_manager');
@@ -90,7 +102,7 @@ readonly class MetricsCalculationService
                 $granularity,
             );
 
-            $this->updateMetricsFromProject($metrics, $project, $order, $startDate, $endDate);
+            $this->updateMetricsFromProject($metrics, $project, $order, $startDate, $endDate, $timesheets);
         }
 
         // Si le projet n'a pas de devis, créer quand même une métrique
@@ -103,14 +115,14 @@ readonly class MetricsCalculationService
                 $dimProjectDirector,
                 $granularity,
             );
-            $this->updateMetricsFromProject($metrics, $project, null, $startDate, $endDate);
+            $this->updateMetricsFromProject($metrics, $project, null, $startDate, $endDate, $timesheets);
         }
     }
 
     /**
      * Met à jour les métriques à partir d'un projet et optionnellement d'un devis.
      */
-    private function updateMetricsFromProject(FactProjectMetrics $metrics, Project $project, ?Order $order, DateTimeInterface $startDate, DateTimeInterface $endDate): void
+    private function updateMetricsFromProject(FactProjectMetrics $metrics, Project $project, ?Order $order, DateTimeInterface $startDate, DateTimeInterface $endDate, array $timesheets): void
     {
         // Métriques de base
         $metrics->setProjectCount($metrics->getProjectCount() + 1);
@@ -151,11 +163,11 @@ readonly class MetricsCalculationService
         }
 
         // Calcul des coûts (période) et marges
-        $this->calculateProjectCosts($metrics, $project, $startDate, $endDate);
+        $this->calculateProjectCosts($metrics, $project, $startDate, $endDate, $timesheets);
         $metrics->calculateMargins();
 
         // Calcul des temps (période) et taux d'occupation
-        $this->calculateTimeMetrics($metrics, $project, $startDate, $endDate);
+        $this->calculateTimeMetrics($metrics, $project, $startDate, $endDate, $timesheets);
 
         // Mise à jour de la référence vers les entités sources
         $metrics->setProject($project);
@@ -169,7 +181,7 @@ readonly class MetricsCalculationService
     /**
      * Calcule les coûts d'un projet.
      */
-    private function calculateProjectCosts(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate): void
+    private function calculateProjectCosts(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, array $timesheets): void
     {
         $totalCosts = '0.00';
 
@@ -181,18 +193,7 @@ readonly class MetricsCalculationService
             }
         }
 
-        // Coûts des temps passés (CJM * heures) sur la période
-        $timesheets = $this->entityManager->getRepository(Timesheet::class)
-            ->createQueryBuilder('t')
-            ->join('t.project', 'p')
-            ->where('p.id = :projectId')
-            ->andWhere('t.date BETWEEN :start AND :end')
-            ->setParameter('projectId', $project->getId())
-            ->setParameter('start', $startDate)
-            ->setParameter('end', $endDate)
-            ->getQuery()
-            ->getResult();
-
+        // Coûts des temps passés (CJM * heures) sur la période (timesheets préchargés)
         foreach ($timesheets as $timesheet) {
             $contributor = $timesheet->getContributor();
             if ($contributor && $contributor->getCjm()) {
@@ -227,7 +228,7 @@ readonly class MetricsCalculationService
     /**
      * Calcule les métriques de temps.
      */
-    private function calculateTimeMetrics(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate): void
+    private function calculateTimeMetrics(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, array $timesheets): void
     {
         // Jours vendus (total projet)
         $soldDays = $project->getTotalSoldDays();
@@ -235,16 +236,6 @@ readonly class MetricsCalculationService
 
         // Jours travaillés réels (période)
         $workedDays = '0.00';
-        $timesheets = $this->entityManager->getRepository(Timesheet::class)
-            ->createQueryBuilder('t')
-            ->join('t.project', 'p')
-            ->where('p.id = :projectId')
-            ->andWhere('t.date BETWEEN :start AND :end')
-            ->setParameter('projectId', $project->getId())
-            ->setParameter('start', $startDate)
-            ->setParameter('end', $endDate)
-            ->getQuery()
-            ->getResult();
 
         foreach ($timesheets as $timesheet) {
             $dailyHours = bcdiv((string) $timesheet->getHours(), '8', 2);

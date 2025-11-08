@@ -233,4 +233,56 @@ class EmploymentPeriod
 
         return $this->endDate === null || $date <= $this->endDate;
     }
+
+    /**
+     * Calcule automatiquement le CJM à partir du salaire mensuel brut.
+     *
+     * Formule : (Salaire brut + Charges patronales) / Nombre de jours travaillés par mois
+     *
+     * @param float|null $chargesRate Taux de charges patronales (par défaut 0.45 = 45%)
+     *
+     * @return float|null Le CJM calculé ou null si le salaire n'est pas défini
+     */
+    public function calculateCjmFromSalary(?float $chargesRate = 0.45): ?float
+    {
+        if (!$this->salary) {
+            return null;
+        }
+
+        $salaryFloat        = floatval($this->salary);
+        $weeklyHours        = floatval($this->weeklyHours);
+        $workTimePercentage = floatval($this->workTimePercentage);
+
+        // Charges sociales patronales (par défaut 45%)
+        $totalCost = $salaryFloat * (1 + $chargesRate);
+
+        // Nombre de jours travaillés par semaine (basé sur 7h/jour)
+        $hoursPerDay = 7;
+        $daysPerWeek = ($weeklyHours * ($workTimePercentage / 100)) / $hoursPerDay;
+
+        // Nombre de jours travaillés par mois (en moyenne : 4.33 semaines par mois)
+        $daysPerMonth = $daysPerWeek * 4.33;
+
+        if ($daysPerMonth <= 0) {
+            return null;
+        }
+
+        // CJM = Coût total / Jours travaillés par mois
+        return round($totalCost / $daysPerMonth, 2);
+    }
+
+    /**
+     * Applique le calcul automatique du CJM si un salaire est défini et que le CJM n'est pas renseigné.
+     */
+    public function autoCalculateCjm(): self
+    {
+        if ($this->salary && !$this->cjm) {
+            $calculatedCjm = $this->calculateCjmFromSalary();
+            if ($calculatedCjm !== null) {
+                $this->setCjm($calculatedCjm);
+            }
+        }
+
+        return $this;
+    }
 }

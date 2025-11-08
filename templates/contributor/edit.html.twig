@@ -1,27 +1,22 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}Modifier {{ contributor.name }}{% endblock %}
+{% block title %}Modifier contributeur{% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Modifier {{ contributor.name }}</h4>
+                <h4 class="mb-sm-0 font-size-18">Modifier contributeur : {{ contributor.name }}</h4>
                 <div class="page-title-right">
-                    <div class="btn-group">
-                        <a href="{{ path('contributor_show', {'id': contributor.id}) }}" class="btn btn-secondary">
-                            <i class="bx bx-arrow-back me-1"></i> Retour
-                        </a>
-                        <a href="{{ path('contributor_index') }}" class="btn btn-outline-secondary">
-                            <i class="bx bx-list-ul me-1"></i> Liste
-                        </a>
-                    </div>
+                    <a href="{{ path('contributor_index') }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <form method="post">
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
         <div class="row">
             <div class="col-lg-8">
                 <div class="card">
@@ -31,64 +26,35 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Nom complet *</label>
-                                    <input type="text" class="form-control" id="name" name="name"
-                                           value="{{ contributor.name }}" required>
-                                </div>
+                                {{ form_row(form.firstName) }}
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email"
-                                           value="{{ contributor.email }}">
-                                </div>
+                                {{ form_row(form.lastName) }}
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="phone" class="form-label">Téléphone</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone"
-                                           value="{{ contributor.phone }}">
-                                </div>
+                                {{ form_row(form.email) }}
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="user_id" class="form-label">Compte utilisateur</label>
-                                    <select class="form-control" id="user_id" name="user_id">
-                                        <option value="">Aucun compte lié</option>
-                                        {% for user in users %}
-                                            <option value="{{ user.id }}"
-                                                    {{ contributor.user and contributor.user.id == user.id ? 'selected' : '' }}>
-                                                {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                    <small class="form-text text-muted">Associer à un compte utilisateur existant</small>
-                                </div>
+                                {{ form_row(form.user) }}
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ contributor.notes }}</textarea>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="active" name="active"
-                                               value="1" {{ contributor.active ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="active">
-                                            Contributeur actif
-                                        </label>
-                                    </div>
-                                </div>
+                                {{ form_row(form.phoneProfessional) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.phonePersonal) }}
                             </div>
                         </div>
+
+                        {{ form_row(form.address) }}
+                        {{ form_row(form.avatarFile) }}
+                        {{ form_row(form.notes) }}
+                        {{ form_row(form.active) }}
                     </div>
                 </div>
 
@@ -104,56 +70,12 @@
 
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="cjm" class="form-label">Coût Journalier Moyen (CJM)</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="cjm" name="cjm"
-                                               step="1" min="0" value="{{ contributor.cjm }}">
-                                        <span class="input-group-text">€</span>
-                                    </div>
-                                    <small class="form-text text-muted">Coût pour l'entreprise par jour</small>
-                                </div>
+                                {{ form_row(form.cjm) }}
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="tjm" class="form-label">Tarif Journalier Moyen (TJM)</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="tjm" name="tjm"
-                                               step="1" min="0" value="{{ contributor.tjm }}">
-                                        <span class="input-group-text">€</span>
-                                    </div>
-                                    <small class="form-text text-muted">Tarif de vente moyen par jour</small>
-                                </div>
+                                {{ form_row(form.tjm) }}
                             </div>
                         </div>
-
-                        <div class="row" id="margin-preview" style="display: none;">
-                            <div class="col-md-6">
-                                <div class="alert alert-light border">
-                                    <h6 class="mb-2">Aperçu de la marge</h6>
-                                    <div id="margin-calculation"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {% if contributor.cjm and contributor.tjm %}
-                            {% set currentMargin = contributor.tjm - contributor.cjm %}
-                            {% set currentMarginRate = (currentMargin / contributor.tjm * 100)|round(1) %}
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="alert alert-light border">
-                                        <h6 class="mb-2">Marge actuelle</h6>
-                                        <div class="d-flex justify-content-between">
-                                            <span>Marge :</span>
-                                            <span class="fw-bold {% if currentMarginRate >= 20 %}text-success{% elseif currentMarginRate >= 10 %}text-warning{% else %}text-danger{% endif %}">
-                                                {{ currentMargin }}€ ({{ currentMarginRate }}%)
-                                            </span>
-                                        </div>
-                                        <small class="text-muted">TJM {{ contributor.tjm }}€ - CJM {{ contributor.cjm }}€</small>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -164,39 +86,7 @@
                         <h4 class="card-title">Profils métier</h4>
                     </div>
                     <div class="card-body">
-                        {% if profiles %}
-                            <div class="mb-3">
-                                <small class="text-muted">Sélectionnez les profils correspondant aux compétences du contributeur</small>
-                            </div>
-                            {% for profile in profiles %}
-                                {% set isSelected = false %}
-                                {% for contributorProfile in contributor.profiles %}
-                                    {% if contributorProfile.id == profile.id %}
-                                        {% set isSelected = true %}
-                                    {% endif %}
-                                {% endfor %}
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="profile_{{ profile.id }}"
-                                           name="profiles[]" value="{{ profile.id }}" {{ isSelected ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="profile_{{ profile.id }}">
-                                        <strong>{{ profile.name }}</strong>
-                                        {% if profile.description %}
-                                            <br><small class="text-muted">{{ profile.description }}</small>
-                                        {% endif %}
-                                    </label>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="text-center py-3">
-                                <div class="avatar-sm mx-auto mb-3">
-                                    <div class="avatar-title bg-light text-muted rounded-circle">
-                                        <i class="bx bx-user-circle"></i>
-                                    </div>
-                                </div>
-                                <p class="text-muted mb-0">Aucun profil disponible</p>
-                                <small class="text-muted">Créez d'abord des profils métier</small>
-                            </div>
-                        {% endif %}
+                        {{ form_row(form.profiles) }}
                     </div>
                 </div>
 
@@ -206,46 +96,14 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="bx bx-save me-1"></i> Enregistrer les modifications
                             </button>
-                            <a href="{{ path('contributor_show', {'id': contributor.id}) }}" class="btn btn-outline-secondary">
+                            <a href="{{ path('contributor_index') }}" class="btn btn-outline-secondary">
                                 <i class="bx bx-x me-1"></i> Annuler
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Actions rapides</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <a href="{{ path('contributor_timesheets', {'id': contributor.id}) }}" class="btn btn-outline-primary btn-sm">
-                                <i class="bx bx-time me-1"></i> Voir les temps passés
-                            </a>
-                            <a href="{{ path('contributor_employment_periods', {'id': contributor.id}) }}" class="btn btn-outline-info btn-sm">
-                                <i class="bx bx-briefcase me-1"></i> Périodes d'emploi
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                {% if is_granted('ROLE_MANAGER') %}
-                <div class="card">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="card-title mb-0">Zone dangereuse</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted mb-3">Désactiver ce contributeur le rendra invisible dans les nouvelles saisies.</p>
-                        <form method="post" action="{{ path('contributor_delete', {'id': contributor.id}) }}" class="d-inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ contributor.id) }}">
-                            <button type="submit" class="btn btn-danger btn-sm w-100"
-                                    onclick="return confirm('Êtes-vous sûr de vouloir désactiver ce contributeur ?')">
-                                <i class="bx bx-user-x me-1"></i> Désactiver le contributeur
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                {% endif %}
+                {{ form_rest(form) }}
 
                 <div class="card">
                     <div class="card-header">
@@ -275,7 +133,7 @@
                 </div>
             </div>
         </div>
-    </form>
+    {{ form_end(form) }}
 {% endblock %}
 
 {% block javascripts %}
@@ -301,7 +159,7 @@
 
                     marginCalculation.innerHTML = `
                         <div class="d-flex justify-content-between">
-                            <span>Nouvelle marge :</span>
+                            <span>Marge :</span>
                             <span class="${colorClass} fw-bold">${margin}€ (${marginRate}%)</span>
                         </div>
                         <small class="text-muted">TJM ${tjm}€ - CJM ${cjm}€</small>
@@ -311,9 +169,6 @@
                     marginPreview.style.display = 'none';
                 }
             }
-
-            // Calculer la marge au chargement si les valeurs sont présentes
-            updateMarginPreview();
 
             cjmInput.addEventListener('input', updateMarginPreview);
             tjmInput.addEventListener('input', updateMarginPreview);

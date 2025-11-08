@@ -30,9 +30,15 @@
                 <div class="card-body">
                     <div class="text-center mb-4">
                         <div class="avatar-lg mx-auto mb-3">
-                            <div class="avatar-title bg-primary text-white rounded-circle font-size-24">
-                                {{ contributor.name|slice(0, 1)|upper }}
-                            </div>
+                            {% if contributor.avatarFilename %}
+                                <img src="{{ asset('uploads/avatars/' ~ contributor.avatarFilename) }}" 
+                                     alt="{{ contributor.name }}" 
+                                     class="rounded-circle" style="width: 72px; height: 72px; object-fit: cover;">
+                            {% else %}
+                                <div class="avatar-title bg-primary text-white rounded-circle font-size-24">
+                                    {{ contributor.firstName|slice(0, 1)|upper }}{{ contributor.lastName|slice(0, 1)|upper }}
+                                </div>
+                            {% endif %}
                         </div>
                         <h5 class="mb-1">{{ contributor.name }}</h5>
                         {% if contributor.active %}
@@ -42,7 +48,7 @@
                         {% endif %}
                     </div>
 
-                    {% if contributor.email or contributor.phone %}
+                    {% if contributor.email or contributor.phoneProfessional or contributor.phonePersonal %}
                         <div class="mb-4">
                             {% if contributor.email %}
                                 <div class="d-flex align-items-center mb-2">
@@ -50,12 +56,25 @@
                                     <a href="mailto:{{ contributor.email }}" class="text-muted">{{ contributor.email }}</a>
                                 </div>
                             {% endif %}
-                            {% if contributor.phone %}
-                                <div class="d-flex align-items-center">
+                            {% if contributor.phoneProfessional %}
+                                <div class="d-flex align-items-center mb-2">
                                     <i class="bx bx-phone text-primary me-2"></i>
-                                    <a href="tel:{{ contributor.phone }}" class="text-muted">{{ contributor.phone }}</a>
+                                    <a href="tel:{{ contributor.phoneProfessional }}" class="text-muted">{{ contributor.phoneProfessional }}</a>
                                 </div>
                             {% endif %}
+                            {% if contributor.phonePersonal %}
+                                <div class="d-flex align-items-center">
+                                    <i class="bx bx-mobile text-primary me-2"></i>
+                                    <a href="tel:{{ contributor.phonePersonal }}" class="text-muted">{{ contributor.phonePersonal }}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% if contributor.address %}
+                        <div class="mb-4">
+                            <h6 class="font-size-14 mb-2">Adresse</h6>
+                            <p class="text-muted mb-0">{{ contributor.address|nl2br }}</p>
                         </div>
                     {% endif %}
 

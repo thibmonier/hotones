@@ -17,14 +17,18 @@ final class ContributorFactory extends PersistentObjectFactory
         $faker = self::faker();
 
         return [
-            'name'   => $faker->name(),
-            'email'  => $faker->optional()->safeEmail(),
-            'phone'  => $faker->optional()->phoneNumber(),
-            'notes'  => $faker->optional()->sentence(12),
-            'cjm'    => (string) $faker->numberBetween(300, 700),
-            'tjm'    => (string) $faker->numberBetween(450, 1000),
-            'active' => true,
-            'user'   => null,
+            'firstName'         => $faker->firstName(),
+            'lastName'          => $faker->lastName(),
+            'email'             => $faker->optional()->safeEmail(),
+            'phonePersonal'     => $faker->optional()->phoneNumber(),
+            'phoneProfessional' => $faker->optional()->phoneNumber(),
+            'address'           => $faker->optional()->address(),
+            'notes'             => $faker->optional()->sentence(12),
+            'cjm'               => (string) $faker->numberBetween(300, 700),
+            'tjm'               => (string) $faker->numberBetween(450, 1000),
+            'active'            => true,
+            'user'              => null,
+            'avatarFilename'    => null,
             // profiles set in fixtures as it's ManyToMany with domain rules
         ];
     }

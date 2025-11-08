@@ -49,6 +49,13 @@ jobs:
           mkdir -p var
           ./vendor/bin/phpunit --colors=always
 
+      - name: Run E2E testsuite
+        env:
+          APP_ENV: test
+          PANTHER_NO_SANDBOX: 1
+          PANTHER_CHROME_BINARY: ${{ steps.chrome.outputs.chrome-path }}
+        run: ./vendor/bin/phpunit --testsuite e2e --colors=always
+
   php-quality:
     runs-on: ubuntu-latest
     steps:

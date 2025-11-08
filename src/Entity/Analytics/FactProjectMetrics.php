@@ -16,6 +16,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'fact_project_metrics')]
+#[ORM\UniqueConstraint(
+    name: 'unique_fact_metrics',
+    columns: ['dim_time_id', 'dim_project_type_id', 'dim_project_manager_id', 'dim_sales_person_id', 'dim_project_director_id', 'granularity', 'project_id', 'order_id'],
+)]
 class FactProjectMetrics
 {
     #[ORM\Id]

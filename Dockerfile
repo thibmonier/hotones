@@ -30,6 +30,8 @@ RUN apk add --no-cache \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && pecl install apcu \
   && docker-php-ext-enable apcu \
+  && pecl install redis \
+  && docker-php-ext-enable redis \
   && docker-php-ext-install \
     pdo \
     pdo_mysql \

@@ -31,7 +31,8 @@ class ContributorRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->where('c.active = :active')
             ->setParameter('active', true)
-            ->orderBy('c.name', 'ASC')
+            ->orderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -67,7 +68,8 @@ class ContributorRepository extends ServiceEntityRepository
             ->addSelect('p')
             ->where('c.active = :active')
             ->setParameter('active', true)
-            ->orderBy('c.name', 'ASC')
+            ->orderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -78,11 +80,12 @@ class ContributorRepository extends ServiceEntityRepository
     public function searchByName(string $query): array
     {
         return $this->createQueryBuilder('c')
-            ->where('c.name LIKE :query')
+            ->where('c.firstName LIKE :query OR c.lastName LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
-            ->orderBy('c.name', 'ASC')
+            ->orderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC')
             ->getQuery()
             ->getResult();
     }

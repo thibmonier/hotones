@@ -40,6 +40,7 @@ security:
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/2fa, roles: PUBLIC_ACCESS }
         - { path: ^/public, roles: PUBLIC_ACCESS }
+        - { path: ^/status$, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

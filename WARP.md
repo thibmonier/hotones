@@ -23,3 +23,5 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 - Bonnes pratiques: docs/good-practices.md
 - Spécifications détaillées: docs/specs.md
 - Guide agents: AGENTS.md
+- Opérations Worker: docs/worker-operations.md
+- Roadmap & Lots: docs/roadmap-lots.md

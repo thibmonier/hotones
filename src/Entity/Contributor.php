@@ -16,14 +16,26 @@ class Contributor
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 180)]
-    private string $name;
+    #[ORM\Column(type: 'string', length: 100)]
+    private string $firstName;
+
+    #[ORM\Column(type: 'string', length: 100)]
+    private string $lastName;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $email = null;
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
-    private ?string $phone = null;
+    private ?string $phonePersonal = null;
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $phoneProfessional = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $avatarFilename = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $notes = null;
@@ -70,16 +82,33 @@ class Contributor
         return $this->id;
     }
 
-    public function getName(): string
+    public function getFirstName(): string
     {
-        return $this->name;
+        return $this->firstName;
     }
 
-    public function setName(string $name): self
+    public function setFirstName(string $firstName): self
     {
-        $this->name = $name;
+        $this->firstName = $firstName;
 
         return $this;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return trim($this->firstName.' '.$this->lastName);
     }
 
     public function getEmail(): ?string
@@ -94,14 +123,50 @@ class Contributor
         return $this;
     }
 
-    public function getPhone(): ?string
+    public function getPhonePersonal(): ?string
     {
-        return $this->phone;
+        return $this->phonePersonal;
     }
 
-    public function setPhone(?string $phone): self
+    public function setPhonePersonal(?string $phonePersonal): self
     {
-        $this->phone = $phone;
+        $this->phonePersonal = $phonePersonal;
+
+        return $this;
+    }
+
+    public function getPhoneProfessional(): ?string
+    {
+        return $this->phoneProfessional;
+    }
+
+    public function setPhoneProfessional(?string $phoneProfessional): self
+    {
+        $this->phoneProfessional = $phoneProfessional;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getAvatarFilename(): ?string
+    {
+        return $this->avatarFilename;
+    }
+
+    public function setAvatarFilename(?string $avatarFilename): self
+    {
+        $this->avatarFilename = $avatarFilename;
 
         return $this;
     }

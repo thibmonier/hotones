@@ -11,6 +11,7 @@ services:
       APP_ENV: dev
     depends_on:
       - db
+      - redis
 
   web:
     image: nginx:1.27-alpine
@@ -35,6 +36,13 @@ services:
       - "3307:3306"
     volumes:
       - db-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: hotones_redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
 
 
 volumes:

@@ -16,186 +16,126 @@
         </div>
     </div>
 
-    <form method="post">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Informations générales</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Nom du projet *</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="client_id" class="form-label">Client</label>
-                                    <select class="form-control" id="client_id" name="client_id">
-                                        <option value="">Sélectionner...</option>
-                                        {% for c in clients %}
-                                            <option value="{{ c.id }}">{{ c.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+    {{ form_start(form) }}
 
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="start_date" class="form-label">Date de début</label>
-                                    <input type="date" class="form-control" id="start_date" name="start_date">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="end_date" class="form-label">Date de fin</label>
-                                    <input type="date" class="form-control" id="end_date" name="end_date">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="project_type" class="form-label">Type de projet *</label>
-                                    <select class="form-control" id="project_type" name="project_type" required>
-                                        <option value="">Sélectionner...</option>
-                                        <option value="forfait">Forfait (engagement de résultat)</option>
-                                        <option value="regie">Régie (temps passé)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">Statut</label>
-                                    <select class="form-control" id="status" name="status">
-                                        <option value="active">Actif</option>
-                                        <option value="standby">En attente</option>
-                                        <option value="completed">Terminé</option>
-                                        <option value="cancelled">Annulé</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="is_internal" name="is_internal" value="1">
-                                <label class="form-check-label" for="is_internal">
-                                    Projet interne (ne compte pas dans les calculs de rentabilité)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Informations générales</h4>
                 </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Achats et fournitures</h4>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_row(form.name) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_row(form.client) }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="purchases_amount" class="form-label">Montant des achats (€)</label>
-                            <input type="number" step="0.01" class="form-control" id="purchases_amount" name="purchases_amount">
+
+                    <div class="mb-3">
+                        {{ form_row(form.description) }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_row(form.startDate) }}
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="purchases_description" class="form-label">Description des achats</label>
-                            <textarea class="form-control" id="purchases_description" name="purchases_description" rows="3"></textarea>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_row(form.endDate) }}
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_row(form.projectType) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_row(form.status) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.isInternal) }}
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Équipe projet</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="key_account_manager" class="form-label">Key Account Manager</label>
-                            <select class="form-control" name="key_account_manager">
-                                <option value="">Sélectionner...</option>
-                                {# TODO: Ajouter la liste des utilisateurs avec rôle commercial #}
-                            </select>
-                            <small class="form-text text-muted">Commercial en charge du projet</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="project_manager" class="form-label">Chef de projet</label>
-                            <select class="form-control" name="project_manager">
-                                <option value="">Sélectionner...</option>
-                                {# TODO: Ajouter la liste des chefs de projet #}
-                            </select>
-                            <small class="form-text text-muted">Responsable du pilotage</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="project_director" class="form-label">Directeur de projet</label>
-                            <select class="form-control" name="project_director">
-                                <option value="">Sélectionner...</option>
-                                {# TODO: Ajouter la liste des directeurs #}
-                            </select>
-                            <small class="form-text text-muted">Responsable financier</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="sales_person" class="form-label">Commercial identifiant</label>
-                            <select class="form-control" name="sales_person">
-                                <option value="">Sélectionner...</option>
-                                {# TODO: Ajouter la liste des commerciaux #}
-                            </select>
-                            <small class="form-text text-muted">Ayant identifié le projet en premier</small>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Achats et fournitures</h4>
                 </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Catégorie de service</h4>
+                <div class="card-body">
+                    <div class="mb-3">
+                        {{ form_row(form.purchasesAmount) }}
                     </div>
-                    <div class="card-body">
-                        <select class="form-control" name="service_category">
-                            <option value="">Sélectionner...</option>
-                            {% for category in service_categories %}
-                                <option value="{{ category.id }}">{{ category.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Technologies</h4>
-                    </div>
-                    <div class="card-body">
-                        {% for technology in technologies %}
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="tech_{{ technology.id }}" name="technologies[]" value="{{ technology.id }}">
-                                <label class="form-check-label" for="tech_{{ technology.id }}">
-                                    {{ technology.name }}
-                                    <small class="text-muted">({{ technology.category }})</small>
-                                </label>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bx bx-save me-1"></i> Créer le projet
-                        </button>
+                    <div class="mb-3">
+                        {{ form_row(form.purchasesDescription) }}
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Équipe projet</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        {{ form_row(form.keyAccountManager) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.projectManager) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.projectDirector) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.salesPerson) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Catégorie de service</h4>
+                </div>
+                <div class="card-body">
+                    {{ form_row(form.serviceCategory) }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Technologies</h4>
+                </div>
+                <div class="card-body">
+                    {{ form_row(form.technologies) }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bx bx-save me-1"></i> Créer le projet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
 {% endblock %}
