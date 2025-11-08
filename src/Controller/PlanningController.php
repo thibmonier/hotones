@@ -58,7 +58,8 @@ class PlanningController extends AbstractController
             ->andWhere('p.startDate <= :end')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
-            ->orderBy('c.name', 'ASC');
+            ->orderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC');
 
         if (!empty($selectedContributors)) {
             $qb->andWhere('c.id IN (:cids)')->setParameter('cids', $selectedContributors);

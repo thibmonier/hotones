@@ -188,6 +188,34 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
+     * Charge un projet avec toutes ses relations pour l'affichage.
+     */
+    public function findOneWithRelations(int $id): ?Project
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->addSelect('sc')
+            ->leftJoin('p.technologies', 't')
+            ->addSelect('t')
+            ->leftJoin('p.orders', 'o')
+            ->addSelect('o')
+            ->leftJoin('p.keyAccountManager', 'kam')
+            ->addSelect('kam')
+            ->leftJoin('p.projectManager', 'pm')
+            ->addSelect('pm')
+            ->leftJoin('p.projectDirector', 'pd')
+            ->addSelect('pd')
+            ->leftJoin('p.salesPerson', 'sp')
+            ->addSelect('sp')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Recherche de projets par nom ou client.
      */
     public function searchProjects(string $query): array
@@ -195,7 +223,7 @@ class ProjectRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
-            ->where('p.name LIKE :query OR c.name LIKE :query')
+            ->where('p.name LIKE :query OR CONCAT(c.firstName, \' \', c.lastName) LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.name', 'ASC')
             ->getQuery()

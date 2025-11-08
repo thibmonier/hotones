@@ -80,6 +80,26 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
+     * Charge un devis avec toutes ses relations pour l'affichage.
+     */
+    public function findOneWithRelations(int $id): ?Order
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.project', 'p')
+            ->addSelect('p')
+            ->leftJoin('o.sections', 's')
+            ->addSelect('s')
+            ->leftJoin('s.lines', 'l')
+            ->addSelect('l')
+            ->leftJoin('o.paymentSchedules', 'ps')
+            ->addSelect('ps')
+            ->where('o.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Précharge les devis avec sections et lignes pour une liste de projets afin d'éviter le N+1.
      */
     public function preloadForProjects(array $projects): void

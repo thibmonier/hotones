@@ -67,7 +67,8 @@ class TimesheetRepository extends ServiceEntityRepository
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
             ->orderBy('t.date', 'DESC')
-            ->addOrderBy('c.name', 'ASC');
+            ->addOrderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC');
 
         if ($project) {
             $qb->andWhere('p.id = :projectId')
@@ -95,7 +96,8 @@ class TimesheetRepository extends ServiceEntityRepository
             ->setParameter('end', $endDate)
             ->setParameter('projectIds', $projectIds)
             ->orderBy('t.date', 'DESC')
-            ->addOrderBy('c.name', 'ASC')
+            ->addOrderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -122,7 +124,7 @@ class TimesheetRepository extends ServiceEntityRepository
     public function getHoursGroupedByProjectForContributor(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         $results = $this->createQueryBuilder('t')
-            ->select('p.id AS projectId, p.name AS projectName, pc.name AS projectClient, SUM(t.hours) AS totalHours')
+            ->select('p.id AS projectId, p.name AS projectName, CONCAT(pc.firstName, \' \', pc.lastName) AS projectClient, SUM(t.hours) AS totalHours')
             ->leftJoin('t.project', 'p')
             ->leftJoin('p.client', 'pc')
             ->where('t.contributor = :contributor')
@@ -130,7 +132,7 @@ class TimesheetRepository extends ServiceEntityRepository
             ->setParameter('contributor', $contributor)
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->groupBy('p.id, p.name, pc.name')
+            ->groupBy('p.id, p.name, pc.firstName, pc.lastName')
             ->orderBy('totalHours', 'DESC')
             ->getQuery()
             ->getArrayResult();
@@ -201,7 +203,7 @@ class TimesheetRepository extends ServiceEntityRepository
     public function getStatsPerContributor(DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('t')
-            ->select('c.name as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')
+            ->select('CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')
             ->leftJoin('t.contributor', 'c')
             ->where('t.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)

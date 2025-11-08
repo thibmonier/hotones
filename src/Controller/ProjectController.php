@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Entity\ProjectTask;
+use App\Entity\Technology;
 use App\Form\ProjectType as ProjectFormType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -164,8 +165,14 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/{id}', name: 'project_show', methods: ['GET'])]
-    public function show(Project $project): Response
+    public function show(int $id, EntityManagerInterface $em): Response
     {
+        $project = $em->getRepository(Project::class)->findOneWithRelations($id);
+
+        if (!$project) {
+            throw $this->createNotFoundException('Projet non trouvé');
+        }
+
         // Calculer les métriques des devis
         $projectMetrics = $this->calculateProjectMetrics($project);
 

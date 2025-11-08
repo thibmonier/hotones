@@ -114,10 +114,13 @@ class ProjectTaskType extends AbstractType
                     return $er->createQueryBuilder('c')
                         ->where('c.active = :active')
                         ->setParameter('active', true)
-                        ->orderBy('c.name', 'ASC');
+                        ->orderBy('c.lastName', 'ASC')
+                        ->addOrderBy('c.firstName', 'ASC');
                 },
-                'choice_label' => 'name',
-                'help'         => 'Contributeur responsable de cette tâche',
+                'choice_label' => function ($contributor) {
+                    return $contributor->getFirstName().' '.$contributor->getLastName();
+                },
+                'help' => 'Contributeur responsable de cette tâche',
             ])
             ->add('requiredProfile', EntityType::class, [
                 'class'       => Profile::class,

@@ -78,8 +78,14 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}', name: 'order_show', methods: ['GET'])]
-    public function show(Order $order, EntityManagerInterface $em): Response
+    public function show(int $id, EntityManagerInterface $em): Response
     {
+        $order = $em->getRepository(Order::class)->findOneWithRelations($id);
+
+        if (!$order) {
+            throw $this->createNotFoundException('Devis non trouvé');
+        }
+
         // Total basé sur les sections (incluant achats et montants fixes)
         $sectionsTotal = (float) $order->calculateTotalFromSections();
         if ($sectionsTotal <= 0 && $order->getTotalAmount()) {
@@ -134,8 +140,14 @@ class OrderController extends AbstractController
 
     #[Route('/{id}/edit', name: 'order_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function edit(Request $request, Order $order, EntityManagerInterface $em): Response
+    public function edit(Request $request, int $id, EntityManagerInterface $em): Response
     {
+        $order = $em->getRepository(Order::class)->findOneWithRelations($id);
+
+        if (!$order) {
+            throw $this->createNotFoundException('Devis non trouvé');
+        }
+
         $form = $this->createForm(OrderFormType::class, $order);
         $form->handleRequest($request);
 
@@ -371,10 +383,12 @@ class OrderController extends AbstractController
     #[Route('/{id}/schedule/add', name: 'order_schedule_add', methods: ['POST'])]
     public function addSchedule(Request $request, Order $order, EntityManagerInterface $em): Response
     {
-        if ($order->getContractType() !== 'forfait') {
-            $this->addFlash('danger', 'L’échéancier n’est disponible que pour les contrats au forfait.');
+        if (!$this->isCsrfTokenValid('schedule_add_'.$order->getId(), $request->request->get('_token'))) {
+            return $this->json(['error' => 'Token CSRF invalide'], 422);
+        }
 
-            return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+        if ($order->getContractType() !== 'forfait') {
+            return $this->json(['error' => 'L\'\u00e9ch\u00e9ancier n\'est disponible que pour les contrats au forfait'], 422);
         }
 
         $label       = (string) $request->request->get('label');

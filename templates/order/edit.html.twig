@@ -93,6 +93,7 @@
                 </div>
             </div>
         </div>
+    {{ form_end(form) }}
 
         <div class="col-lg-4">
         {% if order.contractType == 'forfait' %}
@@ -100,7 +101,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Échéancier de paiement</h4>
                 </div>
-                <div class="card-body" id="schedule-box">
+                <div class="card-body">
+                    <div id="schedule-box">
                     {% if order.paymentSchedules|length > 0 %}
                         <div class="table-responsive mb-3">
                             <table class="table table-sm">
@@ -152,6 +154,7 @@
                         <p class="text-muted">Aucune échéance définie.</p>
                         <span id="schedule-coverage-meta" data-total="{{ (order.totalAmount ?? 0)|number_format(2, '.', '') }}" data-scheduled="0.00" hidden></span>
                     {% endif %}
+                    </div>
 
                     <hr>
                     <h6>Ajouter une échéance</h6>
@@ -161,6 +164,7 @@
                     {% set _contAdd = order.contingencyPercentage ? order.contingencyPercentage : 0 %}
                     {% set _totalForJs = _baseAdd - (_baseAdd * _contAdd / 100) %}
                     <form method="post" action="{{ path('order_schedule_add', {id: order.id}) }}" id="schedule-add-form" data-order-total="{{ _totalForJs|number_format(2, '.', '') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('schedule_add_' ~ order.id) }}">
                         <div class="mb-2">
                             <label class="form-label">Libellé</label>
                             <input type="text" class="form-control" name="label" placeholder="ex: Acompte 30%">
@@ -332,8 +336,14 @@
             </div>
         </div>
         {% else %}
-            <div class="alert alert-info">Contrat en régie: la facturation est calculée automatiquement selon les temps passés.</div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-info mb-0">Contrat en régie: la facturation est calculée automatiquement selon les temps passés.</div>
+                </div>
+            </div>
         {% endif %}
+
+            <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Informations</h4>
                 </div>
