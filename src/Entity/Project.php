@@ -78,10 +78,14 @@ class Project
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
     private Collection $orders;
 
-    // Technologies utilisées dans le projet
+    // Technologies utilisées dans le projet (relation historique sans version)
     #[ORM\ManyToMany(targetEntity: Technology::class, inversedBy: 'projects')]
     #[ORM\JoinTable(name: 'project_technologies')]
     private Collection $technologies;
+
+    // Technologies avec version par projet (nouvelle relation)
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectTechnology::class, cascade: ['persist', 'remove'])]
+    private Collection $projectTechnologies;
 
     // Catégorie de service (Brand, E-commerce, etc.)
     #[ORM\ManyToOne(targetEntity: ServiceCategory::class, inversedBy: 'projects')]
@@ -97,12 +101,29 @@ class Project
     #[ORM\OneToMany(targetEntity: Timesheet::class, mappedBy: 'project', cascade: ['remove'])]
     private Collection $timesheets;
 
+    // Liens et accès techniques (Sprint 9)
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $repoLinks = null; // Liens gestionnaires de sources (un par ligne)
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $envLinks = null; // Liens environnements (un par ligne)
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $dbAccess = null; // Informations d'accès BDD
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $sshAccess = null; // Informations d'accès SSH
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $ftpAccess = null; // Informations d'accès FTP
+
     public function __construct()
     {
-        $this->orders       = new ArrayCollection();
-        $this->technologies = new ArrayCollection();
-        $this->tasks        = new ArrayCollection();
-        $this->timesheets   = new ArrayCollection();
+        $this->orders              = new ArrayCollection();
+        $this->technologies        = new ArrayCollection();
+        $this->projectTechnologies = new ArrayCollection();
+        $this->tasks               = new ArrayCollection();
+        $this->timesheets          = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -315,6 +336,32 @@ class Project
     public function getTechnologies(): Collection
     {
         return $this->technologies;
+    }
+
+    public function getProjectTechnologies(): Collection
+    {
+        return $this->projectTechnologies;
+    }
+
+    public function addProjectTechnology(ProjectTechnology $pt): self
+    {
+        if (!$this->projectTechnologies->contains($pt)) {
+            $this->projectTechnologies[] = $pt;
+            $pt->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectTechnology(ProjectTechnology $pt): self
+    {
+        if ($this->projectTechnologies->removeElement($pt)) {
+            if ($pt->getProject() === $this) {
+                $pt->setProject($this); // keep relation consistent or set null if nullable
+            }
+        }
+
+        return $this;
     }
 
     public function addTechnology(Technology $technology): self
@@ -724,6 +771,67 @@ class Project
                 $timesheet->setProject(null);
             }
         }
+
+        return $this;
+    }
+
+    // === Accès & Liens techniques ===
+    public function getRepoLinks(): ?string
+    {
+        return $this->repoLinks;
+    }
+
+    public function setRepoLinks(?string $repoLinks): self
+    {
+        $this->repoLinks = $repoLinks;
+
+        return $this;
+    }
+
+    public function getEnvLinks(): ?string
+    {
+        return $this->envLinks;
+    }
+
+    public function setEnvLinks(?string $envLinks): self
+    {
+        $this->envLinks = $envLinks;
+
+        return $this;
+    }
+
+    public function getDbAccess(): ?string
+    {
+        return $this->dbAccess;
+    }
+
+    public function setDbAccess(?string $dbAccess): self
+    {
+        $this->dbAccess = $dbAccess;
+
+        return $this;
+    }
+
+    public function getSshAccess(): ?string
+    {
+        return $this->sshAccess;
+    }
+
+    public function setSshAccess(?string $sshAccess): self
+    {
+        $this->sshAccess = $sshAccess;
+
+        return $this;
+    }
+
+    public function getFtpAccess(): ?string
+    {
+        return $this->ftpAccess;
+    }
+
+    public function setFtpAccess(?string $ftpAccess): self
+    {
+        $this->ftpAccess = $ftpAccess;
 
         return $this;
     }

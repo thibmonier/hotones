@@ -1,0 +1,71 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Technologies & versions — {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Technologies & versions — {{ project.name }}</h4>
+      <div class="page-title-right">
+        <a href="{{ path('project_show', {id: project.id}) }}#tab-tech-identity" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour au projet</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Liste des technologies ({{ project.projectTechnologies|length }})</h4>
+        {% if project.projectTechnologies|length > 0 %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+              <tr>
+                <th>Technologie</th>
+                <th>Version</th>
+                <th>Notes</th>
+                <th class="text-end">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for pt in project.projectTechnologies %}
+                <tr>
+                  <td>{{ pt.technology.name }}</td>
+                  <td>{{ pt.version ?: '—' }}</td>
+                  <td class="text-muted">{{ pt.notes ?: '—' }}</td>
+                  <td class="text-end">
+                    <a href="{{ path('project_tech_edit', {id: pt.id}) }}" class="btn btn-sm btn-outline-primary"><i class="bx bx-edit"></i></a>
+                    <form action="{{ path('project_tech_delete', {id: pt.id}) }}" method="post" class="d-inline" onsubmit="return confirm('Retirer cette technologie ?');">
+                      <input type="hidden" name="_token" value="{{ csrf_token('delete_pt' ~ pt.id) }}">
+                      <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bx bx-trash"></i></button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-muted">Aucune technologie pour l’instant.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Ajouter une technologie</h4>
+        {{ form_start(form) }}
+          <div class="mb-3">{{ form_label(form.technology) }}{{ form_widget(form.technology) }}{{ form_errors(form.technology) }}</div>
+          <div class="mb-3">{{ form_label(form.version) }}{{ form_widget(form.version) }}{{ form_errors(form.version) }}</div>
+          <div class="mb-3">{{ form_label(form.notes) }}{{ form_widget(form.notes) }}{{ form_errors(form.notes) }}</div>
+          <button class="btn btn-primary" type="submit"><i class="bx bx-plus me-1"></i> Ajouter</button>
+        {{ form_end(form) }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

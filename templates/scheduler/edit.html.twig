@@ -1,0 +1,34 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Éditer une entrée scheduler{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Éditer l'entrée</h4>
+      <div class="page-title-right">
+        <a href="{{ path('admin_scheduler_index') }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        {{ form_start(form) }}
+          <div class="mb-3">{{ form_label(form.name) }}{{ form_widget(form.name) }}{{ form_errors(form.name) }}</div>
+          <div class="mb-3">{{ form_label(form.cronExpression) }}{{ form_widget(form.cronExpression) }}{{ form_errors(form.cronExpression) }}</div>
+          <div class="mb-3">{{ form_label(form.command) }}{{ form_widget(form.command) }}{{ form_errors(form.command) }}</div>
+          <div class="mb-3">{{ form_label(form.timezone) }}{{ form_widget(form.timezone) }}{{ form_errors(form.timezone) }}</div>
+          <div class="form-check form-switch mb-3">{{ form_widget(form.enabled) }} {{ form_label(form.enabled) }}</div>
+          <div class="mb-3">{{ form_label(form.payload) }}{{ form_widget(form.payload) }}{{ form_errors(form.payload) }}</div>
+          <button class="btn btn-primary" type="submit"><i class="bx bx-save me-1"></i> Enregistrer</button>
+        {{ form_end(form) }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

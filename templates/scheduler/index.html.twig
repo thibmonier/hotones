@@ -1,0 +1,95 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Planification des tâches{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Planification des tâches</h4>
+      <div class="page-title-right d-flex align-items-center gap-2">
+        {% set current_locale = app.request.query.get('cron_locale') ?? 'fr' %}
+        <div class="btn-group me-2" role="group">
+          <a class="btn btn-outline-secondary btn-sm {{ current_locale == 'fr' ? 'active' : '' }}" href="{{ path('admin_scheduler_index', app.request.query.all | merge({'cron_locale':'fr'})) }}">FR</a>
+          <a class="btn btn-outline-secondary btn-sm {{ current_locale == 'en' ? 'active' : '' }}" href="{{ path('admin_scheduler_index', app.request.query.all | merge({'cron_locale':'en'})) }}">EN</a>
+        </div>
+        <a class="btn btn-primary" href="{{ path('admin_scheduler_new') }}"><i class="bx bx-plus me-1"></i> Nouvelle entrée</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="alert alert-info">
+      Le scheduler Symfony est installé et activé. Cette page permettra de gérer les entrées (création, édition, activation/désactivation).
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Entrées configurées</h4>
+        {% if entries is defined and entries|length > 0 %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Cron</th>
+                <th>Commande</th>
+                <th>Description</th>
+                <th>Prochaine exécution</th>
+                <th>Activé</th>
+                <th>Fuseau</th>
+                <th>Créé le</th>
+                <th class="text-end">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for e in entries %}
+                <tr>
+                  <td>{{ e.name }}</td>
+                  <td><code>{{ e.cronExpression }}</code></td>
+                  <td><code>{{ e.command }}</code></td>
+                  {% set cronLocale = app.request.query.get('cron_locale') ?? 'fr' %}
+                  <td>{{ e.cronExpression|human_cron(cronLocale) }}</td>
+                  <td>
+                    {% set next = e.cronExpression|cron_next_run(e.timezone) %}
+                    {{ next ? next|date('Y-m-d H:i') : '—' }}
+                  </td>
+                  <td>
+                    {% if e.enabled %}
+                      <span class="badge bg-success">Oui</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Non</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ e.timezone }}</td>
+                  <td>{{ e.createdAt|date('Y-m-d H:i') }}</td>
+                  <td class="text-end">
+                    <a href="{{ path('admin_scheduler_edit', {id: e.id}) }}" class="btn btn-sm btn-outline-primary"><i class="bx bx-edit"></i></a>
+                    <form action="{{ path('admin_scheduler_toggle', {id: e.id}) }}" method="post" class="d-inline">
+                      <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ e.id) }}">
+                      <button class="btn btn-sm btn-outline-warning" type="submit"><i class="bx bx-power-off"></i></button>
+                    </form>
+                    <form action="{{ path('admin_scheduler_delete', {id: e.id}) }}" method="post" class="d-inline" onsubmit="return confirm('Supprimer cette entrée ?');">
+                      <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ e.id) }}">
+                      <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bx bx-trash"></i></button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-muted">Aucune entrée configurée.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

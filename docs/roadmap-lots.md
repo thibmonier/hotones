@@ -396,6 +396,8 @@ Cet onglet permettra de donner les informations techniques principales du projet
 ### Sprint 11 (2 semaines) : ajout d’un tableau récapitulatif des dépenses
 
 ### Sprint 12 (2 semaines) : mettre en place Symfony Scheduler et ajouter une page d’administration des entrées du scheduler
+- en s'inspirant de la documentation de Symfony Scheduler et en utilisant les expressions de crontab directement dans le formulaire de saisie (avec des exemples ou de l'aide)
+
 
 ---
 
@@ -406,3 +408,4 @@ Cet onglet permettra de donner les informations techniques principales du projet
 - La documentation technique est à maintenir au fil des développements
 - Prévoir des revues de code et QA entre chaque lot
 - Possibilité de paralléliser certains lots (ex: Lot 4 + Lot 5)
+    

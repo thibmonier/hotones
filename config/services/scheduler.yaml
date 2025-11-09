@@ -1,0 +1,5 @@
+services:
+  App\Scheduler\DbScheduleProvider:
+    tags: ['scheduler.schedule_provider']
+  App\Scheduler\MetricsScheduleProvider:
+    tags: ['scheduler.schedule_provider']

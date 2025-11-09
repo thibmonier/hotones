@@ -143,7 +143,33 @@ class ProjectType extends AbstractType
                 'expanded'     => true,
                 'required'     => false,
                 'attr'         => ['class' => 'form-check-input'],
-            ]);
+            ])
+            ->add('repoLinks', TextareaType::class, [
+                'label'    => 'Liens dépôts (un par ligne)',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'rows' => 3, 'placeholder' => "https://gitlab.com/..\nhttps://github.com/.."],
+            ])
+            ->add('envLinks', TextareaType::class, [
+                'label'    => 'Liens environnements (un par ligne)',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'rows' => 3, 'placeholder' => "https://staging.example.com\nhttps://prod.example.com"],
+            ])
+            ->add('dbAccess', TextareaType::class, [
+                'label'    => 'Accès BDD',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'rows' => 3],
+            ])
+            ->add('sshAccess', TextareaType::class, [
+                'label'    => 'Accès SSH',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'rows' => 3],
+            ])
+            ->add('ftpAccess', TextareaType::class, [
+                'label'    => 'Accès FTP',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'rows' => 3],
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

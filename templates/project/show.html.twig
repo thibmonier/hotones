@@ -154,6 +154,12 @@
                                 Rentabilité
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab-tech-identity" role="tab">
+                                <i class="bx bx-chip me-1"></i>
+                                Fiche technique
+                            </a>
+                        </li>
                     </ul>
 
                     <div class="tab-content p-3">
@@ -185,6 +191,11 @@
                         <!-- Onglet Rentabilité -->
                         <div class="tab-pane" id="tab-profitability" role="tabpanel">
                             {% include 'project/tabs/_profitability.html.twig' %}
+                        </div>
+
+                        <!-- Onglet Fiche technique -->
+                        <div class="tab-pane" id="tab-tech-identity" role="tabpanel">
+                            {% include 'project/tabs/_tech_identity.html.twig' %}
                         </div>
                     </div>
                 </div>

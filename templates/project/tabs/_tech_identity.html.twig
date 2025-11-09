@@ -1,0 +1,126 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <h4 class="card-title mb-3">Technologies utilisées</h4>
+          {% if is_granted('ROLE_CHEF_PROJET') %}
+            <a class="btn btn-sm btn-outline-primary" href="{{ path('project_tech_index', {id: project.id}) }}">
+              <i class="bx bx-edit me-1"></i> Gérer versions
+            </a>
+          {% endif %}
+        </div>
+
+        {% set ptech = project.projectTechnologies ?? [] %}
+        {% if ptech|length > 0 or project.technologies|length > 0 %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+              <tr>
+                <th>Technologie</th>
+                <th>Catégorie</th>
+                <th>Version</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% if ptech|length > 0 %}
+                {% for pt in ptech %}
+                  <tr>
+                    <td>
+                      <span class="badge rounded-pill bg-secondary" style="background-color: {{ pt.technology.color ?: '#6c757d' }}">{{ pt.technology.name }}</span>
+                    </td>
+                    <td>{{ pt.technology.category|capitalize }}</td>
+                    <td>{{ pt.version ?: '—' }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                {% for tech in project.technologies %}
+                  <tr>
+                    <td>
+                      <span class="badge rounded-pill bg-secondary" style="background-color: {{ tech.color ?: '#6c757d' }}">{{ tech.name }}</span>
+                    </td>
+                    <td>{{ tech.category|capitalize }}</td>
+                    <td>
+                      <span class="text-muted">—</span>
+                      <small class="text-muted">(à préciser par projet)</small>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="alert alert-warning mb-0">
+            Aucune technologie associée pour le moment.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Gestionnaires de sources</h4>
+        {% if project.repoLinks %}
+          <ul class="list-unstyled mb-0" id="repo-links">
+            {% for line in project.repoLinks|split('\n') %}
+              {% set link = line|trim %}
+              {% if link %}
+                <li><a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">Aucun lien renseigné.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Environnements</h4>
+        {% if project.envLinks %}
+          <ul class="list-unstyled mb-0" id="env-links">
+            {% for line in project.envLinks|split('\n') %}
+              {% set link = line|trim %}
+              {% if link %}
+                <li><a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">Aucun environnement renseigné.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Informations d'accès</h4>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <h6 class="text-muted">Base de données</h6>
+            <div class="text-muted">{{ project.dbAccess ?: 'Non renseigné' }}</div>
+          </div>
+          <div class="col-md-4">
+            <h6 class="text-muted">SSH</h6>
+            <div class="text-muted">{{ project.sshAccess ?: 'Non renseigné' }}</div>
+          </div>
+          <div class="col-md-4">
+            <h6 class="text-muted">FTP</h6>
+            <div class="text-muted">{{ project.ftpAccess ?: 'Non renseigné' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
