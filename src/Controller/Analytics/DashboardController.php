@@ -7,6 +7,7 @@ namespace App\Controller\Analytics;
 use App\Message\RecalculateMetricsMessage;
 use App\Service\MetricsCalculationService;
 use DateTime;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,18 +31,18 @@ class DashboardController extends AbstractController
     {
         // Récupérer la période depuis l'URL en priorité
         $period = $request->query->get('period');
-        
+
         // Si pas de période dans l'URL, utiliser la session ou 'month' par défaut
         if ($period === null) {
             $session = $request->getSession();
-            $period = $session->get('dashboard_period', 'month');
+            $period  = $session->get('dashboard_period', 'month');
         } else {
             // Si période fournie dans l'URL, la sauvegarder en session
             $request->getSession()->set('dashboard_period', $period);
         }
-        
+
         $customStart = $request->query->get('start_date');
-        $customEnd = $request->query->get('end_date');
+        $customEnd   = $request->query->get('end_date');
 
         // Calculer les dates selon la période sélectionnée
         [$startDate, $endDate] = $this->calculatePeriodDates($period, $customStart, $customEnd);
@@ -53,11 +54,11 @@ class DashboardController extends AbstractController
         $monthlyEvolution = $this->metricsService->calculateMonthlyEvolution(12);
 
         return $this->render('analytics/dashboard.html.twig', [
-            'kpis' => $kpis,
+            'kpis'              => $kpis,
             'monthly_evolution' => $monthlyEvolution,
-            'selected_period' => $period,
-            'start_date' => $startDate,
-            'end_date' => $endDate,
+            'selected_period'   => $period,
+            'start_date'        => $startDate,
+            'end_date'          => $endDate,
         ]);
     }
 
@@ -105,13 +106,13 @@ class DashboardController extends AbstractController
      */
     private function getQuarterStart(DateTime $date): DateTime
     {
-        $month = (int) $date->format('n');
+        $month             = (int) $date->format('n');
         $quarterStartMonth = (int) (floor(($month - 1) / 3) * 3) + 1;
-        
+
         return (clone $date)->setDate(
             (int) $date->format('Y'),
             $quarterStartMonth,
-            1
+            1,
         )->setTime(0, 0);
     }
 
@@ -121,6 +122,7 @@ class DashboardController extends AbstractController
     private function getQuarterEnd(DateTime $date): DateTime
     {
         $quarterStart = $this->getQuarterStart($date);
+
         return (clone $quarterStart)->modify('+3 months')->modify('-1 day')->setTime(23, 59, 59);
     }
 
@@ -128,13 +130,13 @@ class DashboardController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function recalculate(Request $request): JsonResponse
     {
-        $period = $request->request->get('period', date('Y'));
+        $period      = $request->request->get('period', date('Y'));
         $granularity = $request->request->get('granularity', 'monthly');
 
         try {
             // Dispatch le message de recalcul
             $this->messageBus->dispatch(
-                new RecalculateMetricsMessage($period, $granularity)
+                new RecalculateMetricsMessage($period, $granularity),
             );
 
             $this->addFlash('success', 'Recalcul des métriques lancé en arrière-plan.');
@@ -143,7 +145,7 @@ class DashboardController extends AbstractController
                 'success' => true,
                 'message' => 'Recalcul des métriques lancé en arrière-plan.',
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return new JsonResponse([
                 'success' => false,
                 'message' => $e->getMessage(),

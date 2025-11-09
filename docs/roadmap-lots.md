@@ -383,6 +383,20 @@ Exposer une API REST pour intégrations externes et applications tierces en util
 - Lot 7 : Rapports
 - Lot 8 : API REST
 
+### Sprint 9 (2 semaines) : ajout d’un onglet « fiche d’identité technique » pour les projets
+Cet onglet permettra de donner les informations techniques principales du projet
+- Un tableau donnant le détail des technologies utilisées, avec les versions 
+- Les liens vers le ou les gestionnaires de sources (gitlab, GitHub, etc.)
+- Les liens vers les différents environnements de tests ou production
+- Les informations d’accès (BDD, SSH, FTP, etc.)
+
+### Sprint 10 (2 semaines) : ajout de KPIs
+- Ajouter un récapitulatif des achats par période (tout type)
+
+### Sprint 11 (2 semaines) : ajout d’un tableau récapitulatif des dépenses
+
+### Sprint 12 (2 semaines) : mettre en place Symfony Scheduler et ajouter une page d’administration des entrées du scheduler
+
 ---
 
 ## 📝 Notes

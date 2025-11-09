@@ -1,0 +1,205 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Notifications</h4>
+      <div class="page-title-right">
+        <button type="button" class="btn btn-light" id="mark-all-read">
+          <i class="bx bx-check-double me-1"></i> Tout marquer comme lu
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <!-- Filtres -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Type</label>
+            <select class="form-select" id="type-filter">
+              <option value="">Tous les types</option>
+              <option value="quote_won" {{ type_filter == 'quote_won' ? 'selected' : '' }}>Devis gagné</option>
+              <option value="quote_lost" {{ type_filter == 'quote_lost' ? 'selected' : '' }}>Devis perdu</option>
+              <option value="quote_to_sign" {{ type_filter == 'quote_to_sign' ? 'selected' : '' }}>Devis à signer</option>
+              <option value="project_budget_alert" {{ type_filter == 'project_budget_alert' ? 'selected' : '' }}>Alerte budget</option>
+              <option value="timesheet_pending_validation" {{ type_filter == 'timesheet_pending_validation' ? 'selected' : '' }}>Temps à valider</option>
+              <option value="payment_due_alert" {{ type_filter == 'payment_due_alert' ? 'selected' : '' }}>Échéance paiement</option>
+              <option value="kpi_threshold_exceeded" {{ type_filter == 'kpi_threshold_exceeded' ? 'selected' : '' }}>Seuil KPI dépassé</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Statut</label>
+            <select class="form-select" id="status-filter">
+              <option value="">Toutes</option>
+              <option value="unread" {{ status_filter == 'unread' ? 'selected' : '' }}>Non lues</option>
+              <option value="read" {{ status_filter == 'read' ? 'selected' : '' }}>Lues</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Liste des notifications -->
+        <div class="list-group">
+        {% for notification in notifications %}
+          <div class="list-group-item {{ notification.isRead ? '' : 'bg-light' }}" data-notification-id="{{ notification.id }}">
+            <div class="d-flex w-100 align-items-start">
+              <div class="me-3">
+                <span class="avatar-title bg-{{ notification.type.color }} rounded-circle">
+                  <i class="bx {{ notification.type.icon }}"></i>
+                </span>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">{{ notification.title }}</h6>
+                  <small class="text-muted">{{ notification.createdAt|date('d/m/Y H:i') }}</small>
+                </div>
+                <p class="mb-1">{{ notification.message }}</p>
+                {% if notification.entityUrl %}
+                  <a href="{{ notification.entityUrl }}" class="btn btn-sm btn-outline-primary mt-2">
+                    <i class="bx bx-link-external me-1"></i> Voir
+                  </a>
+                {% endif %}
+              </div>
+              <div class="ms-2">
+                {% if not notification.isRead %}
+                  <button type="button" class="btn btn-sm btn-light mark-as-read" data-notification-id="{{ notification.id }}">
+                    <i class="bx bx-check"></i>
+                  </button>
+                {% endif %}
+                <form method="post" action="{{ path('notification_delete', {id: notification.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette notification ?');">
+                  <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ notification.id) }}">
+                  <button type="submit" class="btn btn-sm btn-light text-danger">
+                    <i class="bx bx-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="text-center text-muted py-5">
+            <i class="bx bx-bell font-size-24 mb-2"></i>
+            <div>Aucune notification</div>
+          </div>
+        {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <nav aria-label="Pagination" class="mt-4">
+          <ul class="pagination justify-content-center">
+            {% if current_page > 1 %}
+            <li class="page-item">
+              <a class="page-link" href="{{ path('notification_index', {page: current_page - 1, type: type_filter, status: status_filter}) }}">Précédent</a>
+            </li>
+            {% endif %}
+
+            {% for page in 1..total_pages %}
+              {% if page == current_page %}
+                <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+              {% elseif page <= 3 or page > total_pages - 3 or (page >= current_page - 2 and page <= current_page + 2) %}
+                <li class="page-item">
+                  <a class="page-link" href="{{ path('notification_index', {page: page, type: type_filter, status: status_filter}) }}">{{ page }}</a>
+                </li>
+              {% elseif page == 4 or page == total_pages - 3 %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if current_page < total_pages %}
+            <li class="page-item">
+              <a class="page-link" href="{{ path('notification_index', {page: current_page + 1, type: type_filter, status: status_filter}) }}">Suivant</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Marquer une notification comme lue
+  document.querySelectorAll('.mark-as-read').forEach(button => {
+    button.addEventListener('click', function() {
+      const notificationId = this.dataset.notificationId;
+      
+      fetch(`/notifications/${notificationId}/read`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const listItem = document.querySelector(`[data-notification-id="${notificationId}"]`);
+          listItem.classList.remove('bg-light');
+          this.remove();
+        }
+      });
+    });
+  });
+
+  // Marquer toutes les notifications comme lues
+  document.getElementById('mark-all-read').addEventListener('click', function() {
+    if (!confirm('Marquer toutes les notifications comme lues ?')) {
+      return;
+    }
+
+    fetch('/notifications/mark-all-read', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      }
+    });
+  });
+
+  // Filtres
+  document.getElementById('type-filter').addEventListener('change', function() {
+    updateFilters();
+  });
+
+  document.getElementById('status-filter').addEventListener('change', function() {
+    updateFilters();
+  });
+
+  function updateFilters() {
+    const type = document.getElementById('type-filter').value;
+    const status = document.getElementById('status-filter').value;
+    const url = new URL(window.location.href);
+    
+    if (type) {
+      url.searchParams.set('type', type);
+    } else {
+      url.searchParams.delete('type');
+    }
+    
+    if (status) {
+      url.searchParams.set('status', status);
+    } else {
+      url.searchParams.delete('status');
+    }
+    
+    url.searchParams.delete('page');
+    window.location.href = url.toString();
+  }
+});
+</script>
+{% endblock %}

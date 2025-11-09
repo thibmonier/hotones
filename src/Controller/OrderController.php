@@ -9,6 +9,8 @@ use App\Entity\OrderSection;
 use App\Entity\Profile;
 use App\Entity\Project;
 use App\Entity\ProjectTask;
+use App\Enum\OrderStatus;
+use App\Event\QuoteStatusChangedEvent;
 use App\Form\OrderType as OrderFormType;
 
 use function array_key_exists;
@@ -16,6 +18,7 @@ use function array_key_exists;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -386,23 +389,54 @@ class OrderController extends AbstractController
 
     #[Route('/{id}/status', name: 'order_update_status', methods: ['POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function updateStatus(Request $request, Order $order, EntityManagerInterface $em): Response
-    {
+    public function updateStatus(
+        Request $request,
+        Order $order,
+        EntityManagerInterface $em,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
         if (!$this->isCsrfTokenValid('status'.$order->getId(), $request->request->get('_token'))) {
             $this->addFlash('danger', 'Action non autorisée (CSRF).');
 
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
 
-        $status = (string) $request->request->get('status');
-        if (!array_key_exists($status, Order::STATUS_OPTIONS)) {
+        $statusString = (string) $request->request->get('status');
+        if (!array_key_exists($statusString, Order::STATUS_OPTIONS)) {
             $this->addFlash('danger', 'Statut invalide.');
 
             return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
         }
 
-        $order->setStatus($status);
+        $oldStatus = $order->getStatus();
+        $order->setStatus($statusString);
         $em->flush();
+
+        // Dispatcher l'événement de notification si le statut a changé
+        $newStatus = OrderStatus::fromString($statusString);
+        if ($oldStatus !== $statusString && $newStatus && in_array($newStatus, [OrderStatus::WON, OrderStatus::LOST, OrderStatus::PENDING], true)) {
+            // Déterminer les destinataires : chef de projet, commercial, KAM
+            $recipients = [];
+            if ($project = $order->getProject()) {
+                if ($pm = $project->getProjectManager()) {
+                    $recipients[] = $pm;
+                }
+                if ($kam = $project->getKam()) {
+                    $recipients[] = $kam;
+                }
+                if ($sales = $project->getSalesPerson()) {
+                    $recipients[] = $sales;
+                }
+            }
+
+            // Retirer les doublons
+            $recipients = array_unique($recipients, SORT_REGULAR);
+
+            if (!empty($recipients)) {
+                $event = new QuoteStatusChangedEvent($order, $newStatus, $recipients);
+                $eventDispatcher->dispatch($event);
+            }
+        }
 
         $this->addFlash('success', 'Statut du devis mis à jour.');
 

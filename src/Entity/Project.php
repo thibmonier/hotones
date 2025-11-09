@@ -242,6 +242,14 @@ class Project
         return $this;
     }
 
+    /**
+     * Alias pour getKeyAccountManager().
+     */
+    public function getKam(): ?User
+    {
+        return $this->keyAccountManager;
+    }
+
     public function getProjectManager(): ?User
     {
         return $this->projectManager;

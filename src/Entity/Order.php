@@ -393,4 +393,28 @@ class Order
 
         return "D{$year}{$month}{$increment}";
     }
+
+    /**
+     * Retourne un titre pour le devis (nom ou numéro de commande).
+     */
+    public function getTitle(): string
+    {
+        return $this->name ?: $this->orderNumber;
+    }
+
+    /**
+     * Retourne la référence du devis (numéro de commande).
+     */
+    public function getReference(): string
+    {
+        return $this->orderNumber;
+    }
+
+    /**
+     * Calcule le total du devis (alias pour compatibilité).
+     */
+    public function calculateTotal(): float
+    {
+        return (float) $this->calculateTotalFromSections();
+    }
 }
