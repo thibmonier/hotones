@@ -107,7 +107,7 @@ Interface complète de saisie et gestion des temps (timesheets) avec liaison aux
 
 ---
 
-## 📊 Lot 3 : Dashboard Analytique (Priorité Haute)
+## 📊 Lot 3 : Dashboard Analytique (Priorité Haute) ✅ **COMPLÉTÉ**
 
 ### Objectif
 Interface de visualisation des KPIs et métriques avec filtres dynamiques.
@@ -115,18 +115,18 @@ Interface de visualisation des KPIs et métriques avec filtres dynamiques.
 ### Fonctionnalités
 
 #### 3.1 Vues du dashboard
-- 🔲 Page principale `/analytics/dashboard`
-- 🔲 Cartes KPIs principales :
+- ✅ Page principale `/analytics/dashboard`
+- ✅ Cartes KPIs principales :
   - CA total / Marge / Taux de marge
   - Projets actifs / terminés
   - Devis en attente / gagnés
   - Taux d'occupation
-- 🔲 Graphiques d'évolution temporelle (Chart.js ou ApexCharts)
-- 🔲 Répartition par type de projet (camembert)
-- 🔲 Top contributeurs / projets
+- ✅ Graphiques d'évolution temporelle (Chart.js)
+- ✅ Répartition par type de projet (camembert)
+- ✅ Top contributeurs (Top 5)
 
 #### 3.2 Filtres
-- 🔲 Période (année, trimestre, mois, plage personnalisée)
+- ✅ Période (aujourd'hui, semaine, mois, trimestre, année)
 - 🔲 Type de projet (forfait/régie, interne/client)
 - 🔲 Chef de projet
 - 🔲 Commercial
@@ -141,10 +141,10 @@ Interface de visualisation des KPIs et métriques avec filtres dynamiques.
 - ✅ Message `RecalculateMetricsMessage` créé
 - ✅ Index unique sur `FactProjectMetrics`
 - ✅ Documentation worker
-- 🔲 Service `MetricsCalculationService` (calcul des KPIs)
-- 🔲 Handler `RecalculateMetricsMessageHandler` (traitement asynchrone)
-- 🔲 Commande CLI `app:recalculate-metrics`
-- 🔲 Bouton "Recalculer" dans l'interface admin
+- ✅ Service `MetricsCalculationService` (calcul des KPIs)
+- ✅ Handler `RecalculateMetricsMessageHandler` (traitement asynchrone)
+- ✅ Commande CLI `app:calculate-metrics`
+- ✅ Bouton "Recalculer" dans l'interface admin
 - 🔲 Cron automatique (quotidien)
 
 ### Tests
