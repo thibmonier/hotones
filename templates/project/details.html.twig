@@ -225,7 +225,7 @@
                             <i class="mdi mdi-view-kanban"></i> Kanban sous-tâches
                         </a>
                         {% if is_granted('ROLE_CHEF_PROJET') %}
-                        <a href="{{ path('project_task_new', {id: project.id}) }}" class="btn btn-primary btn-sm">
+                        <a href="{{ path('project_task_new', {projectId: project.id}) }}" class="btn btn-primary btn-sm">
                             <i class="mdi mdi-plus"></i> Nouvelle tâche
                         </a>
                         {% endif %}
@@ -324,7 +324,7 @@
                                     <td>
                                         {% if is_granted('ROLE_CHEF_PROJET') %}
                                         <div class="btn-group" role="group">
-                                            <a href="{{ path('project_task_edit', {id: task.id}) }}" 
+                                            <a href="{{ path('project_task_edit', {projectId: project.id, id: task.id}) }}" 
                                                class="btn btn-outline-primary btn-sm" title="Éditer">
                                                 <i class="mdi mdi-pencil"></i>
                                             </a>
@@ -338,10 +338,10 @@
                                         
                                         <!-- Formulaire caché pour la suppression -->
                                         <form id="delete-form-{{ task.id }}" 
-                                              action="{{ path('project_task_delete', {id: task.id}) }}" 
+                                              action="{{ path('project_task_delete', {projectId: project.id, id: task.id}) }}" 
                                               method="post" 
                                               style="display: none;">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ task.id) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_task_' ~ task.id) }}">
                                         </form>
                                         {% endif %}
                                     </td>
@@ -355,7 +355,7 @@
                         <i class="mdi mdi-clipboard-outline" style="font-size: 48px; color: #ccc;"></i>
                         <p class="text-muted">Aucune tâche définie pour ce projet.</p>
                         {% if is_granted('ROLE_CHEF_PROJET') %}
-                        <a href="{{ path('project_task_new', {id: project.id}) }}" class="btn btn-primary">
+                        <a href="{{ path('project_task_new', {projectId: project.id}) }}" class="btn btn-primary">
                             <i class="mdi mdi-plus"></i> Créer la première tâche
                         </a>
                         {% endif %}

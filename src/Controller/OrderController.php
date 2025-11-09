@@ -8,6 +8,7 @@ use App\Entity\OrderPaymentSchedule;
 use App\Entity\OrderSection;
 use App\Entity\Profile;
 use App\Entity\Project;
+use App\Entity\ProjectTask;
 use App\Form\OrderType as OrderFormType;
 
 use function array_key_exists;
@@ -195,6 +196,78 @@ class OrderController extends AbstractController
         $this->addFlash('success', 'Section ajoutée avec succès');
 
         return $this->redirectToRoute('order_sections', ['id' => $order->getId()]);
+    }
+
+    #[Route('/{id}/generate-tasks', name: 'order_generate_tasks', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function generateTasks(Request $request, int $id, EntityManagerInterface $em): Response
+    {
+        $order = $em->getRepository(Order::class)->findOneWithRelations($id);
+
+        if (!$order) {
+            throw $this->createNotFoundException('Devis non trouvé');
+        }
+
+        // Vérifier le token CSRF
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('generate_tasks_'.$order->getId(), $token)) {
+            $this->addFlash('error', 'Token CSRF invalide');
+
+            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+        }
+
+        $project = $order->getProject();
+        if (!$project) {
+            $this->addFlash('error', 'Le devis n\'est attaché à aucun projet');
+
+            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+        }
+
+        // Parcourir toutes les sections et lignes pour générer les tâches
+        $createdCount = 0;
+        $skippedCount = 0;
+
+        foreach ($order->getSections() as $section) {
+            foreach ($section->getLines() as $line) {
+                // Vérifier si une tâche existe déjà pour cette ligne
+                $existingTask = $em->getRepository(ProjectTask::class)->findOneBy([
+                    'orderLine' => $line,
+                ]);
+
+                if ($existingTask) {
+                    ++$skippedCount;
+                    continue;
+                }
+
+                // Tenter de créer une tâche depuis la ligne
+                $task = $line->createProjectTask($project);
+
+                if ($task) {
+                    $em->persist($task);
+                    ++$createdCount;
+                } else {
+                    // Ligne non éligible (type purchase ou fixed_amount)
+                    ++$skippedCount;
+                }
+            }
+        }
+
+        if ($createdCount > 0) {
+            $em->flush();
+        }
+
+        // Message de feedback
+        if ($createdCount > 0) {
+            $this->addFlash('success', sprintf(
+                '%d tâche(s) créée(s) avec succès. %d ligne(s) ignorée(s) (déjà liées ou non éligibles).',
+                $createdCount,
+                $skippedCount,
+            ));
+        } else {
+            $this->addFlash('info', 'Aucune tâche créée. Toutes les lignes sont déjà liées à des tâches ou ne sont pas éligibles.');
+        }
+
+        return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
     }
 
     #[Route('/{orderId}/section/{sectionId}/add-line', name: 'order_add_line', methods: ['POST'])]

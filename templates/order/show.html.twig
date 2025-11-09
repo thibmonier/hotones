@@ -241,11 +241,23 @@
                             </div>
                         </form>
 
-                        <form method="post" action="{{ path('order_duplicate', {'id': order.id}) }}" class="d-grid gap-2">
+                        <form method="post" action="{{ path('order_duplicate', {'id': order.id}) }}" class="d-grid gap-2 mb-2">
                             <button type="submit" class="btn btn-outline-info" onclick="return confirm('Dupliquer ce devis ?')">
                                 <i class="bx bx-copy me-1"></i> Dupliquer
                             </button>
                         </form>
+
+                        {% if order.sections|length > 0 %}
+                            <form method="post" action="{{ path('order_generate_tasks', {'id': order.id}) }}" class="d-grid gap-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('generate_tasks_' ~ order.id) }}">
+                                <button type="submit" class="btn btn-outline-success" onclick="return confirm('Générer les tâches projet depuis les lignes de service de ce devis ?')">
+                                    <i class="bx bx-task me-1"></i> Générer les tâches
+                                </button>
+                            </form>
+                            <small class="text-muted mt-2 d-block">
+                                <i class="bx bx-info-circle"></i> Crée automatiquement des tâches projet depuis les lignes de service
+                            </small>
+                        {% endif %}
                         
                         {% if is_granted('ROLE_MANAGER') %}
                             <form method="post" action="{{ path('order_delete', {'id': order.id}) }}" class="mt-2">

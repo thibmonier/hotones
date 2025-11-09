@@ -365,11 +365,20 @@ class Project
     }
 
     // Méthodes de calcul pour la rentabilité consolidée
+
+    /**
+     * Calcule le CA total du projet = somme des montants des devis signés/validés.
+     * Seuls les devis avec statut 'signe', 'gagne' ou 'termine' sont comptabilisés.
+     */
     public function getTotalSoldAmount(): string
     {
-        $total = '0';
+        $total         = '0';
+        $validStatuses = ['signe', 'gagne', 'termine'];
+
         foreach ($this->orders as $order) {
-            $total = bcadd($total, $order->getTotalAmount(), 2);
+            if (in_array($order->getStatus(), $validStatuses, true)) {
+                $total = bcadd($total, $order->getTotalAmount(), 2);
+            }
         }
 
         return $total;

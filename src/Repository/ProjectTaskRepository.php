@@ -45,6 +45,14 @@ class ProjectTaskRepository extends ServiceEntityRepository
     }
 
     /**
+     * Alias pour findMaxPositionForProject (raccourci).
+     */
+    public function getMaxPosition(Project $project): int
+    {
+        return $this->findMaxPositionForProject($project);
+    }
+
+    /**
      * Trouve les tâches rentables d'un projet (countsForProfitability = true et type = regular).
      */
     public function findProfitableTasksByProject(Project $project): array

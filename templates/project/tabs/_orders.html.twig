@@ -1,0 +1,179 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="card-title mb-0">Vue consolidée des devis</h5>
+    {% if is_granted('ROLE_CHEF_PROJET') %}
+        <a href="{{ path('order_new', {'project': project.id}) }}" class="btn btn-primary btn-sm">
+            <i class="bx bx-plus me-1"></i> Nouveau devis
+        </a>
+    {% endif %}
+</div>
+
+{% if project.orders is empty %}
+    <div class="alert alert-info">
+        <i class="bx bx-info-circle me-2"></i>
+        Aucun devis n'a encore été créé pour ce projet.
+    </div>
+{% else %}
+    {# Tableau consolidé #}
+    <div class="table-responsive mb-4">
+        <table class="table table-hover table-centered table-nowrap align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Numéro</th>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Statut</th>
+                    <th class="text-end">Montant HT</th>
+                    <th class="text-end">Jours vendus</th>
+                    <th>Date création</th>
+                    <th>Valide jusqu'au</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set totalAmount = 0 %}
+                {% set totalDays = 0 %}
+                {% for order in project.orders %}
+                    {% set orderTotal = order.calculateTotalFromSections %}
+                    {% set orderDays = 0 %}
+                    {% for section in order.sections %}
+                        {% set orderDays = orderDays + section.totalDays %}
+                    {% endfor %}
+                    
+                    {% if order.status in ['signe', 'gagne', 'termine'] %}
+                        {% set totalAmount = totalAmount + orderTotal %}
+                        {% set totalDays = totalDays + orderDays %}
+                    {% endif %}
+                    
+                    <tr>
+                        <td>
+                            <a href="{{ path('order_show', {'id': order.id}) }}" class="fw-bold text-primary">
+                                {{ order.orderNumber }}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="text-truncate" style="max-width: 200px;">
+                                {{ order.name|default('Sans nom') }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if order.contractType == 'forfait' %}info{% else %}warning{% endif %}">
+                                {{ order.contractType|capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if order.status == 'signe' or order.status == 'gagne' or order.status == 'termine' %}success{% elseif order.status == 'a_signer' %}primary{% elseif order.status == 'perdu' or order.status == 'abandonne' %}danger{% else %}secondary{% endif %}">
+                                {% if order.status in constant('App\\Entity\\Order::STATUS_OPTIONS') %}
+                                    {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] }}
+                                {% else %}
+                                    {{ order.status }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <span class="fw-semibold">{{ orderTotal|number_format(2, ',', ' ') }} €</span>
+                        </td>
+                        <td class="text-end">
+                            {{ orderDays|number_format(1, ',', ' ') }}j
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ order.createdAt|date('d/m/Y') }}</small>
+                        </td>
+                        <td>
+                            {% if order.validUntil %}
+                                <small class="text-muted">{{ order.validUntil|date('d/m/Y') }}</small>
+                            {% else %}
+                                <small class="text-muted">-</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ path('order_show', {'id': order.id}) }}" class="btn btn-outline-primary" title="Voir">
+                                    <i class="bx bx-show"></i>
+                                </a>
+                                {% if is_granted('ROLE_CHEF_PROJET') %}
+                                    <a href="{{ path('order_edit', {'id': order.id}) }}" class="btn btn-outline-secondary" title="Modifier">
+                                        <i class="bx bx-edit"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <th colspan="4" class="text-end">Total CA signés/gagnés/terminés :</th>
+                    <th class="text-end">
+                        <span class="text-success fw-bold">{{ totalAmount|number_format(2, ',', ' ') }} €</span>
+                    </th>
+                    <th class="text-end">
+                        <span class="fw-bold">{{ totalDays|number_format(1, ',', ' ') }}j</span>
+                    </th>
+                    <th colspan="3"></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {# Cartes détaillées par devis #}
+    <h6 class="mb-3 mt-4">Détail par devis</h6>
+    <div class="row">
+        {% for order in project.orders %}
+            <div class="col-lg-6 col-xl-4 mb-3">
+                <div class="card h-100 border {% if order.status in ['signe', 'gagne', 'termine'] %}border-success{% endif %}">
+                    <div class="card-header bg-transparent">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">
+                                    <a href="{{ path('order_show', {'id': order.id}) }}">{{ order.orderNumber }}</a>
+                                </h6>
+                                <p class="text-muted mb-0 small">{{ order.name|default('Sans nom') }}</p>
+                            </div>
+                            <span class="badge bg-{% if order.status == 'signe' or order.status == 'gagne' or order.status == 'termine' %}success{% elseif order.status == 'a_signer' %}primary{% else %}secondary{% endif %}">
+                                {% if order.status in constant('App\\Entity\\Order::STATUS_OPTIONS') %}
+                                    {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] }}
+                                {% else %}
+                                    {{ order.status }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% set orderTotal = order.calculateTotalFromSections %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Montant HT</span>
+                                <span class="fw-semibold">{{ orderTotal|number_format(2, ',', ' ') }} €</span>
+                            </div>
+                        </div>
+
+                        {% if order.sections|length > 0 %}
+                            <hr class="my-2">
+                            <div class="small">
+                                <strong>{{ order.sections|length }} section(s)</strong>
+                                <ul class="list-unstyled mb-0 mt-2">
+                                    {% for section in order.sections %}
+                                        <li class="d-flex justify-content-between">
+                                            <span class="text-truncate me-2">{{ section.title }}</span>
+                                            <span class="text-nowrap">{{ section.totalAmount|number_format(0, ',', ' ') }} €</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bx bx-calendar me-1"></i>{{ order.createdAt|date('d/m/Y') }}
+                            </small>
+                            <a href="{{ path('order_show', {'id': order.id}) }}" class="btn btn-sm btn-outline-primary">
+                                Détails <i class="bx bx-right-arrow-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

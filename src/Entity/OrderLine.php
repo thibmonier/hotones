@@ -307,4 +307,49 @@ class OrderLine
 
         return bcmul(bcdiv($margin, $revenue, 4), '100', 2);
     }
+
+    /**
+     * Crée une ProjectTask depuis cette ligne budgétaire.
+     * Utile lors de la validation d'un devis pour générer automatiquement les tâches du projet.
+     *
+     * @param Project $project Le projet auquel attacher la tâche
+     *
+     * @return ProjectTask|null La tâche créée, ou null si la ligne n'est pas de type service
+     */
+    public function createProjectTask(Project $project): ?ProjectTask
+    {
+        // Seules les lignes de type service génèrent des tâches
+        if ($this->type !== 'service' || !$this->profile || !$this->days) {
+            return null;
+        }
+
+        $task = new ProjectTask();
+        $task->setProject($project);
+        $task->setOrderLine($this);
+
+        // Nom de la tâche = description de la ligne
+        $task->setName($this->description);
+
+        // Type et propriétés par défaut
+        $task->setType(ProjectTask::TYPE_REGULAR);
+        $task->setCountsForProfitability(true);
+        $task->setActive(true);
+
+        // Heures vendues = jours × 8
+        $soldHours = (int) round(bcmul($this->days, '8', 2));
+        $task->setEstimatedHoursSold($soldHours);
+
+        // Profil requis
+        $task->setRequiredProfile($this->profile);
+
+        // TJM de la tâche = TJM de la ligne
+        $task->setDailyRate($this->dailyRate);
+
+        // Notes
+        if ($this->notes) {
+            $task->setDescription($this->notes);
+        }
+
+        return $task;
+    }
 }

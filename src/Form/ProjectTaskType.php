@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\Contributor;
+use App\Entity\OrderLine;
 use App\Entity\Profile;
 use App\Entity\ProjectTask;
 use Doctrine\ORM\EntityRepository;
@@ -25,7 +26,36 @@ class ProjectTaskType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var ProjectTask|null $task */
+        $task                = $builder->getData();
+        $isLinkedToOrderLine = $task && $task->getOrderLine() !== null;
+
         $builder
+            // Ligne budgétaire source (lecture seule)
+            ->add('orderLine', EntityType::class, [
+                'class'    => OrderLine::class,
+                'label'    => 'Ligne budgétaire source',
+                'required' => false,
+                'disabled' => true, // Toujours en lecture seule
+                'attr'     => [
+                    'class' => 'form-select',
+                ],
+                'choice_label' => function (?OrderLine $line) {
+                    if (!$line) {
+                        return null;
+                    }
+                    $order = $line->getSection()->getOrder();
+
+                    return sprintf('%s - %s (%s j)',
+                        $order->getOrderNumber(),
+                        $line->getDescription(),
+                        $line->getDays() ?? '0',
+                    );
+                },
+                'help' => $isLinkedToOrderLine
+                    ? 'Cette tâche provient d\'une ligne budgétaire de devis (modification restreinte)'
+                    : 'Pas de ligne budgétaire associée',
+            ])
             ->add('name', TextType::class, [
                 'label' => 'Nom de la tâche',
                 'attr'  => [
@@ -72,12 +102,15 @@ class ProjectTaskType extends AbstractType
             ->add('estimatedHoursSold', IntegerType::class, [
                 'label'    => 'Heures vendues (estimées)',
                 'required' => false,
+                'disabled' => $isLinkedToOrderLine, // Verrouillé si lié à une ligne de devis
                 'attr'     => [
                     'class'       => 'form-control',
                     'placeholder' => 'Ex: 40',
                     'min'         => 0,
                 ],
-                'help' => 'Nombre d\'heures vendues au client pour cette tâche',
+                'help' => $isLinkedToOrderLine
+                    ? 'Heures vendues (définies par la ligne budgétaire - non modifiable)'
+                    : 'Nombre d\'heures vendues au client pour cette tâche',
             ])
             ->add('estimatedHoursRevised', IntegerType::class, [
                 'label'    => 'Heures révisées (estimées)',

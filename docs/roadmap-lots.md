@@ -37,9 +37,12 @@ Compléter les interfaces de gestion des entités principales pour permettre une
   - Commercial
 - ✅ Formulaire ProjectType complet avec EntityType
 - ✅ Templates new/edit modernisés avec form_widget
-- 🔲 Gestion des tâches du projet (existant mais à compléter)
-- 🔲 Vue consolidée multi-devis (si plusieurs devis)
-- 🔲 Onglets : Infos générales, Devis, Tâches, Temps saisis, Contributeurs
+- ✅ Gestion des tâches du projet (ProjectTaskController + CRUD complet)
+- ✅ Vue consolidée multi-devis (onglet Devis avec tableau agrégé)
+- ✅ Onglets : Aperçu, Devis, Tâches, Planning, Temps, Rentabilité
+- ✅ Génération automatique des tâches depuis les lignes budgétaires
+- ✅ Relation OrderLine → ProjectTask → ProjectSubTask
+- ✅ Calculs agrégés cohérents (temps révisés et passés)
 - ✅ Filtres avancés dans le listing (statut, type, technologies, dates, contributeurs)
 
 #### 1.4 Gestion des Devis

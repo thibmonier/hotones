@@ -1,0 +1,135 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="card-title mb-0">Gestion des tâches</h5>
+    {% if is_granted('ROLE_CHEF_PROJET') %}
+        <a href="{{ path('project_task_new', {'projectId': project.id}) }}" class="btn btn-primary btn-sm">
+            <i class="bx bx-plus me-1"></i> Nouvelle tâche
+        </a>
+    {% endif %}
+</div>
+
+{% if project.tasks is empty %}
+    <div class="alert alert-info">
+        <i class="bx bx-info-circle me-2"></i>
+        Aucune tâche n'a encore été créée pour ce projet.
+    </div>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 40px;">#</th>
+                    <th>Tâche</th>
+                    <th>Type</th>
+                    <th class="text-center">Statut</th>
+                    <th class="text-end">H. vendues</th>
+                    <th class="text-end">H. révisées</th>
+                    <th class="text-end">H. passées</th>
+                    <th class="text-center">Avancement</th>
+                    <th>Assigné à</th>
+                    <th class="text-end">Ligne budg.</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in project.tasks %}
+                    <tr>
+                        <td>{{ task.position }}</td>
+                        <td>
+                            <strong>{{ task.name }}</strong>
+                            {% if task.description %}
+                                <br><small class="text-muted">{{ task.description|length > 60 ? task.description|slice(0, 60) ~ '...' : task.description }}</small>
+                            {% endif %}
+                            {% if task.subTasks|length > 0 %}
+                                <br><span class="badge bg-info badge-sm">{{ task.subTasks|length }} sous-tâche(s)</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if task.type == 'regular' %}primary{% elseif task.type == 'avv' %}warning{% else %}secondary{% endif %}">
+                                {{ task.typeLabel }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-{% if task.status == 'completed' %}success{% elseif task.status == 'in_progress' %}info{% elseif task.status == 'on_hold' %}warning{% else %}secondary{% endif %}">
+                                {{ task.statusLabel }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            {% if task.estimatedHoursSold %}
+                                {{ task.estimatedHoursSold }}h
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if task.estimatedHoursRevised %}
+                                <span class="fw-semibold">{{ task.estimatedHoursRevised }}h</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <span class="text-warning fw-semibold">{{ task.totalHours|number_format(1) }}h</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar {% if task.progressPercentage >= 75 %}bg-success{% elseif task.progressPercentage >= 50 %}bg-info{% elseif task.progressPercentage >= 25 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                     role="progressbar" 
+                                     style="width: {{ task.progressPercentage }}%;"
+                                     aria-valuenow="{{ task.progressPercentage }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    {{ task.progressPercentage }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if task.assignedContributor %}
+                                <span class="badge bg-secondary">{{ task.assignedContributor.firstName }} {{ task.assignedContributor.lastName }}</span>
+                            {% else %}
+                                <span class="text-muted">Non assignée</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if task.orderLine %}
+                                <i class="bx bx-link-alt text-success" title="Liée à une ligne budgétaire"></i>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ path('project_task_show', {'projectId': project.id, 'id': task.id}) }}" class="btn btn-outline-primary" title="Voir">
+                                    <i class="bx bx-show"></i>
+                                </a>
+                                {% if is_granted('ROLE_CHEF_PROJET') %}
+                                    <a href="{{ path('project_task_edit', {'projectId': project.id, 'id': task.id}) }}" class="btn btn-outline-secondary" title="Modifier">
+                                        <i class="bx bx-edit"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <th colspan="4" class="text-end">Totaux (tâches rentables) :</th>
+                    <th class="text-end"><strong>{{ project.totalTasksSoldHours|number_format(0) }}h</strong></th>
+                    <th class="text-end"><strong>{{ project.totalTasksRevisedHours|number_format(0) }}h</strong></th>
+                    <th class="text-end"><strong class="text-warning">{{ project.totalTasksSpentHours|number_format(1) }}h</strong></th>
+                    <th colspan="4"></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {# Légende #}
+    <div class="mt-3">
+        <small class="text-muted">
+            <i class="bx bx-info-circle"></i>
+            <strong>H. révisées</strong> = estimation actuelle incluant les sous-tâches |
+            <strong>H. passées</strong> = temps réel saisi |
+            <i class="bx bx-link-alt text-success"></i> = Tâche liée à une ligne budgétaire de devis
+        </small>
+    </div>
+{% endif %}

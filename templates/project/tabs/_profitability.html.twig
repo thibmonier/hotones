@@ -1,0 +1,56 @@
+<h6 class="mb-3">Analyse de rentabilité</h6>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="card-title">Vendu vs Coût estimé</h6>
+                <table class="table table-sm table-nowrap mb-0">
+                    <tr>
+                        <td>CA total (devis signés)</td>
+                        <td class="text-end fw-bold text-success">{{ project.totalSoldAmount|number_format(2, ',', ' ') }} €</td>
+                    </tr>
+                    <tr>
+                        <td>Coût estimé (tâches)</td>
+                        <td class="text-end fw-bold">{{ project.totalTasksEstimatedCost|number_format(2, ',', ' ') }} €</td>
+                    </tr>
+                    <tr class="table-light">
+                        <td><strong>Marge cible</strong></td>
+                        <td class="text-end fw-bold text-primary">{{ project.targetGrossMargin|number_format(2, ',', ' ') }} € ({{ project.targetMarginPercentage|number_format(1) }}%)</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="card-title">Réel vs Prévisionnel</h6>
+                <table class="table table-sm table-nowrap mb-0">
+                    <tr>
+                        <td>Heures révisées</td>
+                        <td class="text-end">{{ project.totalTasksRevisedHours|number_format(0) }}h</td>
+                    </tr>
+                    <tr>
+                        <td>Heures passées</td>
+                        <td class="text-end fw-bold text-warning">{{ project.totalTasksSpentHours|number_format(1) }}h</td>
+                    </tr>
+                    <tr>
+                        <td>Coût réel</td>
+                        <td class="text-end fw-bold">{{ project.totalRealCost|number_format(2, ',', ' ') }} €</td>
+                    </tr>
+                    <tr class="table-light">
+                        <td><strong>Marge réelle</strong></td>
+                        <td class="text-end fw-bold text-{% if project.realMarginPercentage|number_format(1) >= 20 %}success{% elseif project.realMarginPercentage|number_format(1) >= 10 %}warning{% else %}danger{% endif %}">
+                            {{ project.totalRealMargin|number_format(2, ',', ' ') }} € ({{ project.realMarginPercentage|number_format(1) }}%)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning mt-3">
+    <i class="bx bx-info-circle me-2"></i>
+    <strong>Note :</strong> Les calculs de rentabilité sont basés sur les tâches marquées comme "Compte dans la rentabilité" et de type "Tâche vendue".
+</div>

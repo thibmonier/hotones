@@ -23,6 +23,11 @@ class ProjectTask
     #[ORM\JoinColumn(nullable: false)]
     private Project $project;
 
+    // Ligne budgétaire du devis dont provient cette tâche (null pour AVV/non-vendu)
+    #[ORM\ManyToOne(targetEntity: OrderLine::class)]
+    #[ORM\JoinColumn(name: 'order_line_id', nullable: true, onDelete: 'SET NULL')]
+    private ?OrderLine $orderLine = null;
+
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
 
@@ -106,6 +111,18 @@ class ProjectTask
     public function setProject(Project $project): self
     {
         $this->project = $project;
+
+        return $this;
+    }
+
+    public function getOrderLine(): ?OrderLine
+    {
+        return $this->orderLine;
+    }
+
+    public function setOrderLine(?OrderLine $orderLine): self
+    {
+        $this->orderLine = $orderLine;
 
         return $this;
     }
@@ -195,18 +212,23 @@ class ProjectTask
     }
 
     /**
-     * Calcule le total des heures passées sur cette tâche via les timesheets.
+     * Calcule le total des heures passées : timesheets sur cette tâche + timesheets sur ses sous-tâches.
+     * Cohérence garantie : temps_tâche = temps_propre + somme(temps_sous_tâches).
      */
     public function getTotalHours(): string
     {
-        // Récupérer tous les timesheets liés à cette tâche
         $totalHours = '0.00';
 
-        // Les timesheets sont liés au projet, on filtre ceux qui ont cette tâche
+        // 1. Temps passé directement sur la tâche (sans sous-tâche spécifiée)
         foreach ($this->project->getTimesheets() as $timesheet) {
-            if ($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId()) {
+            if ($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId() && $timesheet->getSubTask() === null) {
                 $totalHours = bcadd($totalHours, $timesheet->getHours(), 2);
             }
+        }
+
+        // 2. Temps passé sur les sous-tâches
+        foreach ($this->subTasks as $subTask) {
+            $totalHours = bcadd($totalHours, $subTask->getTimeSpentHours(), 2);
         }
 
         return $totalHours;
@@ -280,8 +302,28 @@ class ProjectTask
         return $this;
     }
 
+    /**
+     * Retourne le temps révisé total : somme des temps révisés des sous-tâches + temps propre de la tâche.
+     * Si aucune sous-tâche et aucun temps révisé propre, retourne null.
+     */
     public function getEstimatedHoursRevised(): ?int
     {
+        // Si on a des sous-tâches, on agrège leur temps
+        if (!$this->subTasks->isEmpty()) {
+            $totalFromSubTasks = '0';
+            foreach ($this->subTasks as $subTask) {
+                $totalFromSubTasks = bcadd($totalFromSubTasks, $subTask->getInitialEstimatedHours(), 2);
+            }
+
+            // Ajouter le temps propre de la tâche si présent
+            if ($this->estimatedHoursRevised !== null) {
+                $totalFromSubTasks = bcadd($totalFromSubTasks, (string) $this->estimatedHoursRevised, 2);
+            }
+
+            return (int) round((float) $totalFromSubTasks);
+        }
+
+        // Pas de sous-tâches : retourner le temps révisé propre
         return $this->estimatedHoursRevised;
     }
 

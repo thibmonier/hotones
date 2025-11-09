@@ -11,9 +11,6 @@
                     <a href="{{ path('project_index') }}" class="btn btn-secondary me-2">
                         <i class="bx bx-arrow-back me-1"></i> Retour
                     </a>
-                    <a href="{{ path('project_billing', {'id': project.id}) }}" class="btn btn-outline-primary me-2">
-                        <i class="bx bx-receipt me-1"></i> Facturation
-                    </a>
                     {% if is_granted('ROLE_CHEF_PROJET') %}
                         <a href="{{ path('project_edit', {'id': project.id}) }}" class="btn btn-primary">
                             <i class="bx bx-edit me-1"></i> Modifier
@@ -24,221 +21,198 @@
         </div>
     </div>
 
+    <!-- Indicateurs KPI rapides -->
     <div class="row">
-        <div class="col-lg-8">
-            <!-- Synthèse financière -->
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Synthèse financière</h4>
-                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h5 class="mb-1 text-{% if metrics.total_revenue > 0 %}success{% else %}muted{% endif %}">{{ metrics.total_revenue|number_format(0, ',', ' ') }}€</h5>
-                                <p class="text-muted mb-0">CA signé</p>
-                            </div>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">CA signé</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-success">{{ project.totalSoldAmount|number_format(0, ',', ' ') }}€</span>
+                            </h4>
                         </div>
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h5 class="mb-1 text-warning">{{ metrics.total_purchases|number_format(0, ',', ' ') }}€</h5>
-                                <p class="text-muted mb-0">Achats</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h5 class="mb-1 text-info">{{ metrics.total_cost|number_format(0, ',', ' ') }}€</h5>
-                                <p class="text-muted mb-0">Coût estimé</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h5 class="mb-1 text-{% if metrics.margin_rate >= 20 %}success{% elseif metrics.margin_rate >= 10 %}warning{% else %}danger{% endif %}">{{ metrics.total_margin|number_format(0, ',', ' ') }}€</h5>
-                                <p class="text-muted mb-0">Marge brute <small>({{ metrics.margin_rate|number_format(1, ',', ' ') }}%)</small></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Synthèse temporelle -->
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Synthèse temporelle</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <h5 class="mb-1 text-info">{{ metrics.total_days|number_format(1, ',', ' ') }}j</h5>
-                                <p class="text-muted mb-0">Jours vendus</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <h5 class="mb-1">{{ metrics.signed_orders_count }}/{{ metrics.orders_count }}</h5>
-                                <p class="text-muted mb-0">Devis signés</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <span class="badge bg-{% if project.status == 'active' %}success{% elseif project.status == 'completed' %}primary{% else %}warning{% endif %}">{{ project.status|title }}</span>
-                                <p class="text-muted mb-0">Statut</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% if project.startDate or project.endDate %}
-                        <hr>
-                        <div class="text-center text-muted">
-                            {% if project.startDate %}Du {{ project.startDate|date('d/m/Y') }}{% endif %}
-                            {% if project.endDate %} au {{ project.endDate|date('d/m/Y') }}{% endif %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Informations</h4>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-nowrap mb-0">
-                            <tbody>
-                                <tr>
-                                    <th scope="row" style="width: 50%;">Client :</th>
-                                    <td>{{ project.client ? project.client.name : 'Non défini' }}</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Type de projet :</th>
-                                    <td>
-                                        <span class="badge bg-{% if project.isInternal %}info{% else %}primary{% endif %}">
-                                            {{ project.isInternal ? 'Interne' : 'Client' }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Catégorie :</th>
-                                    <td>
-                                        {% if project.serviceCategory %}
-                                            <span class="badge bg-secondary">{{ project.serviceCategory.name }}</span>
-                                        {% else %}
-                                            Non définie
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Technologies :</th>
-                                    <td>
-                                        {% for tech in project.technologies %}
-                                            <span class="badge bg-light text-dark me-1">{{ tech.name }}</span>
-                                        {% else %}
-                                            Aucune technologie définie
-                                        {% endfor %}
-                                    </td>
-                                </tr>
-                                {% if project.startDate %}
-                                <tr>
-                                    <th scope="row">Date de début :</th>
-                                    <td>{{ project.startDate|date('d/m/Y') }}</td>
-                                </tr>
-                                {% endif %}
-                                {% if project.endDate %}
-                                <tr>
-                                    <th scope="row">Date de fin :</th>
-                                    <td>{{ project.endDate|date('d/m/Y') }}</td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            {% if project.purchasesAmount %}
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Achats et fournitures</h4>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <span class="text-muted">Montant total des achats</span>
-                        <h5 class="mb-0">{{ project.purchasesAmount|number_format(2, ',', ' ') }}€</h5>
-                    </div>
-                    {% if project.purchasesDescription %}
-                        <p class="text-muted mb-0">{{ project.purchasesDescription|nl2br }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-            
-        </div>
-
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Devis du projet</h4>
-                    <div class="card-header-action">
-                        {% if is_granted('ROLE_CHEF_PROJET') %}
-                            <a href="{{ path('order_new', {'project': project.id}) }}" class="btn btn-sm btn-primary">
-                                <i class="bx bx-plus"></i> Nouveau devis
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="card-body">
-                    {% for order in project.orders %}
-                        <div class="border rounded p-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="mb-1">
-                                    <a href="{{ path('order_show', {'id': order.id}) }}" class="text-decoration-none">
-                                        {{ order.orderNumber }}
-                                    </a>
-                                </h6>
-                                <span class="badge bg-{% if order.status == 'signe' or order.status == 'gagne' or order.status == 'termine' %}success{% elseif order.status == 'a_signer' %}primary{% else %}secondary{% endif %}">
-                                    {% if order.status in constant('App\\Entity\\Order::STATUS_OPTIONS') %}
-                                        {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] }}
-                                    {% else %}
-                                        {{ order.status|title }}
-                                    {% endif %}
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-success rounded">
+                                <span class="avatar-title bg-soft-success text-success font-size-24">
+                                    <i class="bx bx-euro"></i>
                                 </span>
                             </div>
-                            {% if order.name %}
-                                <div class="mb-2"><small class="text-muted">{{ order.name }}</small></div>
-                            {% endif %}
-                            <div class="text-muted small">
-                                {% set orderTotal = order.calculateTotalFromSections() %}
-                                <div class="d-flex justify-content-between">
-                                    <span>CA:</span>
-                                    <strong class="text-{% if orderTotal > 0 %}success{% else %}muted{% endif %}">{{ orderTotal|number_format(0, ',', ' ') }}€</strong>
-                                </div>
-                                {% if order.contingenceAmount %}
-                                    <div class="d-flex justify-content-between">
-                                        <span>Contingence:</span>
-                                        <span class="text-warning">{{ order.contingenceAmount|number_format(2, ',', ' ') }}€</span>
-                                    </div>
-                                {% endif %}
-                                <div class="d-flex justify-content-between mt-1 pt-1 border-top">
-                                    <span>Sections:</span>
-                                    <span>{{ order.sections|length }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Créé le:</span>
-                                    <span>{{ order.createdAt|date('d/m/Y') }}</span>
-                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Heures vendues</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-info">{{ project.totalTasksSoldHours|number_format(0, ',', ' ') }}h</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-info rounded">
+                                <span class="avatar-title bg-soft-info text-info font-size-24">
+                                    <i class="bx bx-time"></i>
+                                </span>
                             </div>
                         </div>
-                    {% else %}
-                        <div class="text-center text-muted py-4">
-                            <i class="bx bx-file font-size-24 mb-2"></i>
-                            <p>Aucun devis pour ce projet</p>
-                            {% if is_granted('ROLE_CHEF_PROJET') %}
-                                <a href="{{ path('order_new', {'project': project.id}) }}" class="btn btn-primary btn-sm">Créer le premier devis</a>
-                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Temps passé</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-warning">{{ project.totalTasksSpentHours|number_format(0, ',', ' ') }}h</span>
+                            </h4>
                         </div>
-                    {% endfor %}
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-warning rounded">
+                                <span class="avatar-title bg-soft-warning text-warning font-size-24">
+                                    <i class="bx bx-trending-up"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Avancement</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-primary">{{ project.globalProgress|number_format(0) }}%</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-primary rounded">
+                                <span class="avatar-title bg-soft-primary text-primary font-size-24">
+                                    <i class="bx bx-line-chart"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Onglets principaux -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tab-overview" role="tab">
+                                <i class="bx bx-info-circle me-1"></i>
+                                Aperçu
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab-orders" role="tab">
+                                <i class="bx bx-receipt me-1"></i>
+                                Devis <span class="badge bg-primary ms-1">{{ project.orders|length }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab-tasks" role="tab">
+                                <i class="bx bx-task me-1"></i>
+                                Tâches <span class="badge bg-primary ms-1">{{ project.tasks|length }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab-planning" role="tab">
+                                <i class="bx bx-calendar me-1"></i>
+                                Planning
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab-time" role="tab">
+                                <i class="bx bx-time-five me-1"></i>
+                                Temps
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab-profitability" role="tab">
+                                <i class="bx bx-trending-up me-1"></i>
+                                Rentabilité
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3">
+                        <!-- Onglet Aperçu -->
+                        <div class="tab-pane active" id="tab-overview" role="tabpanel">
+                            {% include 'project/tabs/_overview.html.twig' %}
+                        </div>
+
+                        <!-- Onglet Devis -->
+                        <div class="tab-pane" id="tab-orders" role="tabpanel">
+                            {% include 'project/tabs/_orders.html.twig' %}
+                        </div>
+
+                        <!-- Onglet Tâches -->
+                        <div class="tab-pane" id="tab-tasks" role="tabpanel">
+                            {% include 'project/tabs/_tasks.html.twig' %}
+                        </div>
+
+                        <!-- Onglet Planning -->
+                        <div class="tab-pane" id="tab-planning" role="tabpanel">
+                            {% include 'project/tabs/_planning.html.twig' %}
+                        </div>
+
+                        <!-- Onglet Temps -->
+                        <div class="tab-pane" id="tab-time" role="tabpanel">
+                            {% include 'project/tabs/_time.html.twig' %}
+                        </div>
+
+                        <!-- Onglet Rentabilité -->
+                        <div class="tab-pane" id="tab-profitability" role="tabpanel">
+                            {% include 'project/tabs/_profitability.html.twig' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Sauvegarder l'onglet actif dans l'URL
+        document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (e) {
+                const tabId = e.target.getAttribute('href');
+                history.replaceState(null, null, tabId);
+            });
+        });
+
+        // Restaurer l'onglet depuis l'URL au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash;
+            if (hash) {
+                const tab = document.querySelector(`a[href="${hash}"]`);
+                if (tab) {
+                    new bootstrap.Tab(tab).show();
+                }
+            }
+        });
+    </script>
 {% endblock %}
