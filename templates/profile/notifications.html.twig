@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Mes notifications{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Préférences de notifications</h4>
+      <div class="page-title-right">
+        <a href="{{ path('profile_me') }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <form method="post">
+          <h5 class="mb-3">Rappels hebdomadaires — Saisie des temps</h5>
+          {% set pref = current['timesheet_missing_weekly'] ?? null %}
+          <div class="form-check form-switch mb-2">
+            <input type="checkbox" class="form-check-input" id="pref_inapp" name="timesheet_missing_weekly_inapp" value="1" {{ pref ? (pref.inApp ? 'checked' : '') : 'checked' }}>
+            <label class="form-check-label" for="pref_inapp">Notification in-app</label>
+          </div>
+          <div class="form-check form-switch mb-4">
+            <input type="checkbox" class="form-check-input" id="pref_email" name="timesheet_missing_weekly_email" value="1" {{ pref ? (pref.email ? 'checked' : '') : 'checked' }}>
+            <label class="form-check-label" for="pref_email">Email</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary"><i class="bx bx-save me-1"></i> Enregistrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

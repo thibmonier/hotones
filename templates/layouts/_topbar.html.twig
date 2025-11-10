@@ -294,6 +294,50 @@
                 </button>
             </div>
 
+            {# Compteur de temps - démarrage rapide #}
+            <div class="dropdown d-inline-block ms-1">
+                <button type="button" class="btn header-item noti-icon waves-effect position-relative" id="page-header-timer-dropdown"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Démarrer un compteur">
+                    <i class="bx bx-time-five" id="timer-icon"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle" id="timer-active-dot" style="display:none;"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                     aria-labelledby="page-header-timer-dropdown" style="min-width: 320px;">
+                    <div class="p-3 border-bottom">
+                        <h6 class="m-0">Compteur de temps</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="mb-2">
+                            <label class="form-label mb-1">Projet</label>
+                            <select class="form-select" id="timer-project-select" disabled>
+                                <option>Chargement...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label mb-1">Tâche</label>
+                            <select class="form-select" id="timer-task-select" disabled>
+                                <option>—</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label mb-1">Sous-tâche (optionnel)</label>
+                            <select class="form-select" id="timer-subtask-select" disabled>
+                                <option value="">—</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-outline-danger btn-sm" id="timer-stop-btn" disabled>
+                                <i class="bx bx-stop me-1"></i> Arrêter
+                            </button>
+                            <button class="btn btn-success btn-sm" id="timer-start-btn" disabled>
+                                <i class="bx bx-play me-1"></i> Démarrer
+                            </button>
+                        </div>
+                        <div class="mt-2 text-muted small" id="timer-status"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="dropdown d-inline-block">
                 <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -319,8 +363,41 @@
                         </div>
                     </div>
                     <div class="p-2 border-top d-grid">
-                        <a class="btn btn-sm btn-link font-size-14 text-center" href="{{ path('notification_index') }}">
-                            <i class="mdi mdi-arrow-right-circle me-1"></i> <span>Voir toutes les notifications</span>
+                        <div class="d-flex justify-content-between">
+                          <a class="btn btn-sm btn-link font-size-14" href="{{ path('notification_index') }}">
+                            <i class="mdi mdi-arrow-right-circle me-1"></i> <span>Voir toutes</span>
+                          </a>
+                          <a class="btn btn-sm btn-link font-size-14" href="{{ path('profile_notifications') }}">
+                            <i class="bx bx-cog me-1"></i> <span>Mes préférences</span>
+                          </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown d-inline-block ms-1">
+                <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-tasks-dropdown"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Mes tâches">
+                    <i class="bx bx-task"></i>
+                    <span class="badge bg-warning rounded-pill" id="task-overdue-count" style="display: none;">0</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                     aria-labelledby="page-header-tasks-dropdown">
+                    <div class="p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h6 class="m-0">Tâches en retard</h6>
+                            <a href="{{ path('my_tasks_index') }}" class="small">Tout voir</a>
+                        </div>
+                    </div>
+                    <div id="task-overdue-list" data-simplebar style="max-height: 300px;">
+                        <div class="text-center text-muted py-3">
+                            <i class="bx bx-loader bx-spin font-size-18"></i>
+                            <p class="mb-0 mt-2">Chargement...</p>
+                        </div>
+                    </div>
+                    <div class="p-2 border-top d-grid">
+                        <a class="btn btn-sm btn-link font-size-14 text-center" href="{{ path('my_tasks_index') }}">
+                            <i class="mdi mdi-arrow-right-circle me-1"></i> <span>Voir mes tâches</span>
                         </a>
                     </div>
                 </div>
@@ -337,6 +414,14 @@
                 <div class="dropdown-menu dropdown-menu-end">
                     <!-- item-->
 <a class="dropdown-item" href="{{ path('profile_me') }}"><i class="bx bx-user font-size-16 align-middle me-1"></i> Mon compte</a>
+<a class="dropdown-item d-flex align-items-center justify-content-between" href="{{ path('profile_notifications') }}">
+  <span><i class="bx bx-bell font-size-16 align-middle me-1"></i> Mes notifications</span>
+  <span id="user-menu-unread-count" class="badge bg-danger rounded-pill" style="display:none;">0</span>
+</a>
+<a class="dropdown-item d-flex align-items-center justify-content-between" href="{{ path('my_tasks_index') }}">
+  <span><i class="bx bx-task font-size-16 align-middle me-1"></i> Mes tâches</span>
+  <span id="user-menu-overdue-tasks-count" class="badge bg-warning rounded-pill" style="display:none;">0</span>
+</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> Déconnexion</a>
                 </div>
@@ -351,3 +436,270 @@
         </div>
     </div>
 </header>
+<script>
+  (function(){
+    var unreadInterval = null;
+
+    // ---- Compteur de temps (topbar) ----
+    var timerLoaded = false;
+    var timerProjects = []; // [{id, name, tasks: [{id,name}, ...]}]
+    var projectSelect = null, taskSelect = null, subTaskSelect = null, startBtn = null, stopBtn = null, statusEl = null, activeDot = null;
+
+    var timerTooltipInterval = null;
+    var timerIcon = null;
+    var activeStart = null;
+    var activeLabelBase = '';
+
+    function setTimerActive(active, label, startedAtIso) {
+      if (!activeDot) return;
+      activeDot.style.display = active ? 'block' : 'none';
+      if (statusEl) statusEl.textContent = label || '';
+      if (stopBtn) stopBtn.disabled = !active;
+      if (!timerIcon) timerIcon = document.getElementById('timer-icon');
+      if (timerIcon) {
+        if (active) timerIcon.classList.add('bx-spin'); else timerIcon.classList.remove('bx-spin');
+      }
+      if (active) {
+        activeStart = startedAtIso ? new Date(startedAtIso) : new Date();
+        activeLabelBase = label || '';
+        if (timerTooltipInterval) clearInterval(timerTooltipInterval);
+        timerTooltipInterval = setInterval(function(){
+          var s = Math.floor((Date.now() - activeStart.getTime())/1000);
+          var h = Math.floor(s/3600);
+          var m = Math.floor((s%3600)/60).toString().padStart(2,'0');
+          var sec = (s%60).toString().padStart(2,'0');
+          var title = (activeLabelBase ? activeLabelBase + ' — ' : '') + h+":"+m+":"+sec;
+          var btn = document.getElementById('page-header-timer-dropdown');
+          if (btn) btn.setAttribute('title', title);
+        }, 1000);
+      } else {
+        if (timerTooltipInterval) clearInterval(timerTooltipInterval);
+        var btn = document.getElementById('page-header-timer-dropdown');
+        if (btn) btn.setAttribute('title', 'Démarrer un compteur');
+      }
+    }
+
+    function loadTimerActive() {
+      fetch('{{ path('timesheet_timer_active') }}')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.timer) {
+            var suffix = '';
+            if (data.timer.task) { suffix += ' · ' + data.timer.task.name; }
+            if (data.timer.subTask) { suffix += ' · ' + data.timer.subTask.title; }
+            setTimerActive(true, 'En cours: ' + data.timer.project.name + suffix, data.timer.started_at);
+          } else {
+            setTimerActive(false, 'Aucun compteur en cours');
+          }
+        })
+        .catch(() => setTimerActive(false, ''));
+    }
+
+    function loadTimerOptions() {
+      return fetch('{{ path('timesheet_timer_options') }}')
+        .then(r => r.json())
+        .then(data => {
+          timerProjects = data.projects || [];
+          // Remplir le select projet
+          projectSelect.innerHTML = '<option value="">Sélectionner un projet</option>';
+          timerProjects.forEach(p => {
+            var opt = document.createElement('option');
+            opt.value = p.id; opt.textContent = p.name;
+            projectSelect.appendChild(opt);
+          });
+          projectSelect.disabled = false;
+          taskSelect.innerHTML = '<option value="">Sélectionner une tâche</option>';
+          taskSelect.disabled = true;
+          startBtn.disabled = true;
+        });
+    }
+
+    function onProjectChange() {
+      var pid = projectSelect.value;
+      var proj = timerProjects.find(p => String(p.id) === String(pid));
+      taskSelect.innerHTML = '<option value="">Sélectionner une tâche</option>';
+      subTaskSelect.innerHTML = '<option value="">—</option>';
+      subTaskSelect.disabled = true;
+      if (!proj) { taskSelect.disabled = true; startBtn.disabled = true; return; }
+      (proj.tasks || []).forEach(t => {
+        var opt = document.createElement('option');
+        opt.value = t.id; opt.textContent = t.name;
+        opt.dataset.subtasks = JSON.stringify(t.subTasks || []);
+        taskSelect.appendChild(opt);
+      });
+      taskSelect.disabled = false;
+      startBtn.disabled = false;
+    }
+
+    function onTaskChange() {
+      var opt = taskSelect.options[taskSelect.selectedIndex];
+      subTaskSelect.innerHTML = '<option value="">—</option>';
+      subTaskSelect.disabled = true;
+      if (!opt || !opt.dataset.subtasks) return;
+      try {
+        var subs = JSON.parse(opt.dataset.subtasks) || [];
+        subs.forEach(function(s){
+          var o = document.createElement('option'); o.value = s.id; o.textContent = s.title; subTaskSelect.appendChild(o);
+        });
+        subTaskSelect.disabled = subs.length === 0;
+      } catch(e) { /* noop */ }
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      projectSelect = document.getElementById('timer-project-select');
+      taskSelect = document.getElementById('timer-task-select');
+      subTaskSelect = document.getElementById('timer-subtask-select');
+      startBtn = document.getElementById('timer-start-btn');
+      stopBtn = document.getElementById('timer-stop-btn');
+      statusEl = document.getElementById('timer-status');
+      activeDot = document.getElementById('timer-active-dot');
+
+      if (projectSelect) {
+        projectSelect.addEventListener('change', onProjectChange);
+      }
+      if (taskSelect) {
+        taskSelect.addEventListener('change', onTaskChange);
+      }
+
+      if (startBtn) {
+        startBtn.addEventListener('click', function(){
+          var pid = projectSelect.value; var tid = taskSelect.value; var sid = subTaskSelect.value;
+          if (!pid) return;
+          var params = new URLSearchParams({ project_id: pid });
+          if (tid) params.append('task_id', tid);
+          if (sid) params.append('sub_task_id', sid);
+          fetch('{{ path('timesheet_timer_start') }}', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params })
+            .then(r => r.json())
+            .then(data => {
+              if (!data.success) { alert(data.error || 'Erreur'); return; }
+              var suffix = '';
+              if (data.timer.task) { suffix += ' · ' + data.timer.task.name; }
+              if (data.timer.subTask) { suffix += ' · ' + data.timer.subTask.title; }
+              setTimerActive(true, 'En cours: ' + data.timer.project.name + suffix, data.timer.started_at);
+            })
+            .catch(() => alert('Erreur de connexion'));
+        });
+      }
+
+      if (stopBtn) {
+        stopBtn.addEventListener('click', function(){
+          fetch('{{ path('timesheet_timer_stop') }}', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+              if (!data.success) { alert(data.error || 'Erreur'); return; }
+              setTimerActive(false, 'Aucun compteur en cours');
+            })
+            .catch(() => alert('Erreur de connexion'));
+        });
+      }
+
+      // Charger options et statut au premier affichage du menu
+      var timerDropdownBtn = document.getElementById('page-header-timer-dropdown');
+      if (timerDropdownBtn) {
+        timerDropdownBtn.addEventListener('click', function(){
+          if (!timerLoaded) {
+            loadTimerOptions().then(loadTimerActive);
+            timerLoaded = true;
+          } else {
+            loadTimerActive();
+          }
+        });
+      }
+
+      // Init point vert si un timer est actif
+      loadTimerActive();
+    });
+
+    // ---- Notifications ----
+    function updateUnreadBadges() {
+      // Notifications non lues
+      fetch('/notifications/api/unread')
+        .then(r => r.json())
+        .then(data => {
+          var count = (data && typeof data.count === 'number') ? data.count : 0;
+          var bell = document.getElementById('notification-count');
+          var userBadge = document.getElementById('user-menu-unread-count');
+          if (bell) {
+            if (count > 0) { bell.style.display = 'inline-block'; bell.textContent = count; }
+            else { bell.style.display = 'none'; }
+          }
+          if (userBadge) {
+            if (count > 0) { userBadge.style.display = 'inline-block'; userBadge.textContent = count; }
+            else { userBadge.style.display = 'none'; }
+          }
+        })
+        .catch(()=>{});
+      // Tâches en retard
+      fetch('/tasks/api/overdue-count')
+        .then(r => r.json())
+        .then(data => {
+          var overdue = (data && typeof data.count === 'number') ? data.count : 0;
+          var noContributor = !!(data && data.no_contributor);
+          var tasksBadge = document.getElementById('user-menu-overdue-tasks-count');
+          var tasksTopbar = document.getElementById('task-overdue-count');
+          var tasksSidebar = document.getElementById('sidebar-overdue-tasks-count');
+          if (tasksBadge) {
+            if (overdue > 0) { tasksBadge.style.display = 'inline-block'; tasksBadge.textContent = overdue; }
+            else { tasksBadge.style.display = 'none'; }
+          }
+          if (tasksTopbar) {
+            if (overdue > 0) { tasksTopbar.style.display = 'inline-block'; tasksTopbar.textContent = overdue; }
+            else { tasksTopbar.style.display = 'none'; }
+          }
+          if (tasksSidebar) {
+            if (overdue > 0) { tasksSidebar.style.display = 'inline-block'; tasksSidebar.textContent = overdue; }
+            else { tasksSidebar.style.display = 'none'; }
+          }
+          // Si des tâches en retard existent, charger la liste (top 5)
+          if (overdue > 0) {
+            fetch('/tasks/api/overdue-list?limit=5')
+              .then(r => r.json())
+              .then(listData => {
+                var container = document.getElementById('task-overdue-list');
+                if (!container) return;
+                var tasks = (listData && Array.isArray(listData.tasks)) ? listData.tasks : [];
+                if (tasks.length === 0) {
+                  container.innerHTML = '<div class="text-center text-muted py-3">Aucune tâche en retard</div>';
+                  return;
+                }
+                var html = '<div class="list-group list-group-flush">';
+                tasks.forEach(function(t){
+                  var end = t.end_date ? ('<small class="text-muted"> (échéance '+t.end_date+')</small>') : '';
+                  html += '<a class="list-group-item list-group-item-action" href="'+t.url+'">'
+                        + '<div class="d-flex w-100 justify-content-between">'
+                        + '<div><strong>'+t.name.replace(/</g,'&lt;')+'</strong><br><small class="text-muted">'+t.project.replace(/</g,'&lt;')+'</small></div>'
+                        + end
+                        + '</div>'
+                        + '</a>';
+                });
+                html += '</div>';
+                container.innerHTML = html;
+              })
+              .catch(()=>{});
+          } else {
+            var container = document.getElementById('task-overdue-list');
+            if (container) container.innerHTML = noContributor
+              ? '<div class="text-center text-muted py-3">Profil non lié à un contributeur</div>'
+              : '<div class="text-center text-muted py-3">Aucune tâche en retard</div>';
+          }
+        })
+        .catch(()=>{});
+    }
+    function startUnreadInterval() {
+      if (unreadInterval) { clearInterval(unreadInterval); }
+      unreadInterval = setInterval(updateUnreadBadges, 60000); // 60s
+    }
+    document.addEventListener('visibilitychange', function(){
+      if (document.hidden) {
+        if (unreadInterval) { clearInterval(unreadInterval); unreadInterval = null; }
+      } else {
+        updateUnreadBadges();
+        startUnreadInterval();
+      }
+    });
+    document.addEventListener('DOMContentLoaded', function(){
+      updateUnreadBadges();
+      startUnreadInterval();
+    });
+  })();
+</script>

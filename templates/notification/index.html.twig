@@ -7,7 +7,12 @@
   <div class="col-12">
     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
       <h4 class="mb-sm-0 font-size-18">Notifications</h4>
-      <div class="page-title-right">
+      <div class="page-title-right d-flex align-items-center gap-2">
+        {% if is_granted('ROLE_MANAGER') %}
+        <a href="{{ path('admin_notification_settings') }}" class="btn btn-outline-secondary">
+          <i class="bx bx-cog me-1"></i> Paramètres
+        </a>
+        {% endif %}
         <button type="button" class="btn btn-light" id="mark-all-read">
           <i class="bx bx-check-double me-1"></i> Tout marquer comme lu
         </button>

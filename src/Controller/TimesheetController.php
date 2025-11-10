@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Contributor;
 use App\Entity\Project;
+use App\Entity\ProjectTask;
+use App\Entity\RunningTimer;
 use App\Entity\Timesheet;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,7 +46,31 @@ class TimesheetController extends AbstractController
         if ($contributor) {
             // Récupérer les projets avec tâches assignées au contributeur
             $projectsWithTasks = $contributorRepo->findProjectsWithTasksForContributor($contributor);
-            $timesheets        = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
+
+            // Ajouter les sous-tâches assignées pour chaque tâche
+            foreach ($projectsWithTasks as &$row) {
+                $taskList = [];
+                foreach ($row['tasks'] as $task) {
+                    $subTasks = $em->createQueryBuilder()
+                        ->select('st')
+                        ->from('App\\Entity\\ProjectSubTask', 'st')
+                        ->where('st.task = :task')
+                        ->andWhere('st.assignee = :contributor')
+                        ->setParameter('task', $task)
+                        ->setParameter('contributor', $contributor)
+                        ->orderBy('st.position', 'ASC')
+                        ->getQuery()
+                        ->getResult();
+                    $taskList[] = [
+                        'task'     => $task,
+                        'subTasks' => $subTasks,
+                    ];
+                }
+                $row['taskRows'] = $taskList;
+            }
+            unset($row);
+
+            $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
         }
 
         // Organiser les temps par projet, tâche et date
@@ -53,6 +80,17 @@ class TimesheetController extends AbstractController
             $taskId                                    = $timesheet->getTask() ? $timesheet->getTask()->getId() : 'no_task';
             $date                                      = $timesheet->getDate()->format('Y-m-d');
             $timesheetGrid[$projectId][$taskId][$date] = $timesheet;
+            // Carte séparée pour sous-tâches (si présentes)
+            if ($timesheet->getSubTask()) {
+                $subId                                           = $timesheet->getSubTask()->getId();
+                $timesheetGrid['sub'][$projectId][$subId][$date] = $timesheet;
+            }
+        }
+
+        // Timer en cours pour l'utilisateur (si existant)
+        $activeTimer = null;
+        if ($contributor) {
+            $activeTimer = $em->getRepository(RunningTimer::class)->findActiveByContributor($contributor);
         }
 
         return $this->render('timesheet/index.html.twig', [
@@ -64,6 +102,7 @@ class TimesheetController extends AbstractController
             'currentWeek'       => $currentWeek,
             'previousWeek'      => $year.'-W'.str_pad($week - 1, 2, '0', STR_PAD_LEFT),
             'nextWeek'          => $year.'-W'.str_pad($week + 1, 2, '0', STR_PAD_LEFT),
+            'activeTimer'       => $activeTimer,
         ]);
     }
 
@@ -91,7 +130,7 @@ class TimesheetController extends AbstractController
 
         $task = null;
         if ($taskId) {
-            $task = $em->getRepository(\App\Entity\ProjectTask::class)->find($taskId);
+            $task = $em->getRepository(ProjectTask::class)->find($taskId);
             if (!$task) {
                 return new JsonResponse(['error' => 'Tâche non trouvée'], 400);
             }
@@ -192,5 +231,222 @@ class TimesheetController extends AbstractController
             'startDate'       => $startDate,
             'endDate'         => $endDate,
         ]);
+    }
+
+    /**
+     * Démarre un compteur de temps pour un projet/tâche.
+     * Si un compteur est déjà actif, il est arrêté et imputé automatiquement avant de démarrer le nouveau.
+     */
+    #[Route('/timer/start', name: 'timesheet_timer_start', methods: ['POST'])]
+    public function startTimer(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
+        if (!$contributor) {
+            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+        }
+
+        $projectId = (int) $request->request->get('project_id');
+        $taskId    = $request->request->get('task_id');
+        $subTaskId = $request->request->get('sub_task_id');
+
+        $project = $em->getRepository(Project::class)->find($projectId);
+        if (!$project) {
+            return new JsonResponse(['error' => 'Projet non trouvé'], 400);
+        }
+
+        $task = null;
+        if ($taskId) {
+            $task = $em->getRepository(ProjectTask::class)->find($taskId);
+            if (!$task) {
+                return new JsonResponse(['error' => 'Tâche non trouvée'], 400);
+            }
+            if ($task->getProject()->getId() !== $project->getId()) {
+                return new JsonResponse(['error' => 'La tâche ne correspond pas au projet'], 400);
+            }
+        }
+
+        $subTask = null;
+        if ($subTaskId) {
+            $subTask = $em->getRepository(\App\Entity\ProjectSubTask::class)->find($subTaskId);
+            if (!$subTask) {
+                return new JsonResponse(['error' => 'Sous-tâche non trouvée'], 400);
+            }
+            if (($task && $subTask->getTask()->getId() !== $task->getId()) || $subTask->getProject()->getId() !== $project->getId()) {
+                return new JsonResponse(['error' => 'La sous-tâche ne correspond pas au projet/tâche'], 400);
+            }
+        }
+
+        $timerRepo = $em->getRepository(RunningTimer::class);
+        $active    = $timerRepo->findActiveByContributor($contributor);
+
+        // Si un timer est actif, l'arrêter et l'imputer
+        if ($active) {
+            $this->finalizeTimer($active, $em);
+        }
+
+        // Démarrer un nouveau timer
+        $timer = new RunningTimer();
+        $timer->setContributor($contributor)
+            ->setProject($project)
+            ->setTask($task)
+            ->setSubTask($subTask)
+            ->setStartedAt(new DateTime());
+
+        $em->persist($timer);
+        $em->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'timer'   => [
+                'id'         => $timer->getId(),
+                'project'    => ['id' => $project->getId(), 'name' => $project->getName()],
+                'task'       => $task ? ['id' => $task->getId(), 'name' => $task->getName()] : null,
+                'subTask'    => $subTask ? ['id' => $subTask->getId(), 'title' => $subTask->getTitle()] : null,
+                'started_at' => $timer->getStartedAt()->format(DateTimeInterface::ATOM),
+            ],
+        ]);
+    }
+
+    /** Arrête le compteur actif et impute le temps aux timesheets (min 0,125j = 1h). */
+    #[Route('/timer/stop', name: 'timesheet_timer_stop', methods: ['POST'])]
+    public function stopTimer(EntityManagerInterface $em): JsonResponse
+    {
+        $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
+        if (!$contributor) {
+            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+        }
+
+        $timer = $em->getRepository(RunningTimer::class)->findActiveByContributor($contributor);
+        if (!$timer) {
+            return new JsonResponse(['error' => 'Aucun compteur actif'], 400);
+        }
+
+        $hoursLogged = $this->finalizeTimer($timer, $em);
+
+        return new JsonResponse(['success' => true, 'hours_logged' => $hoursLogged]);
+    }
+
+    /** Donne la liste des projets et tâches assignées pour démarrer un timer. */
+    #[Route('/timer/options', name: 'timesheet_timer_options', methods: ['GET'])]
+    public function timerOptions(EntityManagerInterface $em): JsonResponse
+    {
+        $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
+        if (!$contributor) {
+            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+        }
+
+        $rows = $em->getRepository(Contributor::class)->findProjectsWithTasksForContributor($contributor);
+
+        // Récupérer les sous-tâches assignées au contributeur pour chaque tâche
+        $projects = [];
+        foreach ($rows as $row) {
+            /** @var Project $p */
+            $p         = $row['project'];
+            $taskItems = [];
+            foreach ($row['tasks'] as $task) {
+                $subTasks = $em->createQueryBuilder()
+                    ->select('st')
+                    ->from('App\\Entity\\ProjectSubTask', 'st')
+                    ->where('st.task = :task')
+                    ->andWhere('st.assignee = :contributor')
+                    ->setParameter('task', $task)
+                    ->setParameter('contributor', $contributor)
+                    ->orderBy('st.position', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+                $taskItems[] = [
+                    'id'       => $task->getId(),
+                    'name'     => $task->getName(),
+                    'subTasks' => array_map(fn ($st) => ['id' => $st->getId(), 'title' => $st->getTitle()], $subTasks),
+                ];
+            }
+            $projects[] = [
+                'id'    => $p->getId(),
+                'name'  => $p->getName(),
+                'tasks' => $taskItems,
+            ];
+        }
+
+        return new JsonResponse(['projects' => $projects]);
+    }
+
+    /** Retourne le timer actif pour l'utilisateur courant (si présent). */
+    #[Route('/timer/active', name: 'timesheet_timer_active', methods: ['GET'])]
+    public function activeTimer(EntityManagerInterface $em): JsonResponse
+    {
+        $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
+        if (!$contributor) {
+            return new JsonResponse(['timer' => null]);
+        }
+
+        $timer = $em->getRepository(RunningTimer::class)->findActiveByContributor($contributor);
+        if (!$timer) {
+            return new JsonResponse(['timer' => null]);
+        }
+
+        return new JsonResponse([
+            'timer' => [
+                'id'         => $timer->getId(),
+                'project'    => ['id' => $timer->getProject()->getId(), 'name' => $timer->getProject()->getName()],
+                'task'       => $timer->getTask() ? ['id' => $timer->getTask()->getId(), 'name' => $timer->getTask()->getName()] : null,
+                'subTask'    => $timer->getSubTask() ? ['id' => $timer->getSubTask()->getId(), 'title' => $timer->getSubTask()->getTitle()] : null,
+                'started_at' => $timer->getStartedAt()->format(DateTimeInterface::ATOM),
+            ],
+        ]);
+    }
+
+    /**
+     * Convertit un timer en entrée de timesheet et le clôture.
+     * Retourne le nombre d'heures imputées.
+     */
+    private function finalizeTimer(RunningTimer $timer, EntityManagerInterface $em): float
+    {
+        $now = new DateTime();
+        $timer->setStoppedAt($now);
+
+        $startedAt = $timer->getStartedAt();
+        $elapsed   = $now->getTimestamp() - $startedAt->getTimestamp(); // en secondes
+        if ($elapsed < 0) {
+            $elapsed = 0;
+        }
+
+        // Conversion en heures (2 décimales), minimum 1h (0,125j)
+        $hours = round($elapsed / 3600, 2);
+        if ($hours < 1.0) {
+            $hours = 1.0;
+        }
+
+        // Imputation sur la date du jour (date d'arrêt)
+        $date = new DateTime($now->format('Y-m-d'));
+
+        $timesheetRepo = $em->getRepository(Timesheet::class);
+        $existing      = $timesheetRepo->findExistingTimesheetWithTaskAndSubTask(
+            $timer->getContributor(),
+            $timer->getProject(),
+            $date,
+            $timer->getTask(),
+            $timer->getSubTask(),
+        );
+
+        if ($existing) {
+            $newHours = (float) $existing->getHours() + $hours;
+            $existing->setHours(number_format($newHours, 2, '.', ''));
+            $em->persist($existing);
+        } else {
+            $t = new Timesheet();
+            $t->setContributor($timer->getContributor())
+              ->setProject($timer->getProject())
+              ->setTask($timer->getTask())
+              ->setSubTask($timer->getSubTask())
+              ->setDate($date)
+              ->setHours(number_format($hours, 2, '.', ''));
+            $em->persist($t);
+        }
+
+        // Supprimer le timer (ou le laisser historisé). On choisit de le supprimer pour ne garder que l'actif.
+        $em->remove($timer);
+        $em->flush();
+
+        return (float) $hours;
     }
 }

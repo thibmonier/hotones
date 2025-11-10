@@ -1,0 +1,129 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Tâche - {{ project.name }}{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+        <h4 class="mb-sm-0 font-size-18">
+          Tâche du projet
+          <a href="{{ path('project_show', {'id': project.id}) }}" class="text-decoration-none">{{ project.name }}</a>
+        </h4>
+        <div class="page-title-right">
+          <a href="{{ path('project_show', {'id': project.id}) }}" class="btn btn-secondary btn-sm">
+            <i class="bx bx-arrow-back me-1"></i> Retour au projet
+          </a>
+          {% if is_granted('ROLE_CHEF_PROJET') %}
+            <a href="{{ path('project_task_edit', {'projectId': project.id, 'id': task.id}) }}" class="btn btn-primary btn-sm">
+              <i class="bx bx-edit me-1"></i> Modifier
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">{{ task.name }}</h4>
+        </div>
+        <div class="card-body">
+          {% if task.description %}
+            <p class="text-muted">{{ task.description }}</p>
+            <hr>
+          {% endif %}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-2"><strong>Type:</strong>
+                <span class="badge bg-{% if task.type == 'regular' %}primary{% elseif task.type == 'avv' %}warning{% else %}secondary{% endif %}">{{ task.typeLabel }}</span>
+              </div>
+              <div class="mb-2"><strong>Statut:</strong>
+                <span class="badge bg-{% if task.status == 'completed' %}success{% elseif task.status == 'in_progress' %}info{% elseif task.status == 'on_hold' %}warning{% else %}secondary{% endif %}">{{ task.statusLabel }}</span>
+              </div>
+              <div class="mb-2"><strong>Assigné à:</strong>
+                {% if task.assignedContributor %}
+                  {{ task.assignedContributor.name }}
+                {% else %}
+                  <span class="text-muted">Non assignée</span>
+                {% endif %}
+              </div>
+              <div class="mb-2"><strong>Position:</strong> {{ task.position }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-2"><strong>Heures vendues:</strong> {{ task.estimatedHoursSold ?? '-' }}h</div>
+              <div class="mb-2"><strong>Heures révisées:</strong> {{ task.estimatedHoursRevised ?? '-' }}h</div>
+              <div class="mb-2"><strong>Heures passées:</strong> {{ task.totalHours|number_format(1) }}h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="card-title mb-0">Sous-tâches</h4>
+          {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('project_task_subtask_new', {'projectId': project.id, 'id': task.id}) }}" class="btn btn-outline-primary btn-sm">
+              <i class="bx bx-plus me-1"></i> Nouvelle sous-tâche
+            </a>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          {% if task.subTasks|length == 0 %}
+            <div class="text-muted">Aucune sous-tâche.</div>
+          {% else %}
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Titre</th>
+                    <th>Assigné</th>
+                    <th>Statut</th>
+                    <th class="text-end">Estimé</th>
+                    <th class="text-end">RAF</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for st in task.subTasks %}
+                    <tr>
+                      <td>{{ st.position }}</td>
+                      <td>{{ st.title }}</td>
+                      <td>{{ st.assignee ? st.assignee.name : '-' }}</td>
+                      <td>
+                        <span class="badge bg-{% if st.status == 'done' %}success{% elseif st.status == 'in_progress' %}info{% elseif st.status == 'blocked' %}danger{% else %}secondary{% endif %}">
+                          {{ st.status|replace({'_':' '})|title }}
+                        </span>
+                      </td>
+                      <td class="text-end">{{ st.initialEstimatedHours }}h</td>
+                      <td class="text-end">{{ st.remainingHours }}h</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">Projet</h4>
+        </div>
+        <div class="card-body">
+          <div><strong>Nom:</strong> {{ project.name }}</div>
+          <div><strong>Client:</strong> {{ project.client ?? 'Non défini' }}</div>
+          <div class="mt-2">
+            <a href="{{ path('project_show', {'id': project.id}) }}" class="btn btn-outline-secondary btn-sm w-100">
+              <i class="bx bx-folder-open me-1"></i> Ouvrir le projet
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

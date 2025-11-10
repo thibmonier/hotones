@@ -31,6 +31,14 @@
   - Types de projet: forfait (périmètre/échéancier/budget fixes) ou régie (facturé au temps passé)
   - Listing projets: colonne « Type » affiche désormais le type métier Forfait/Régie, avec un badge secondaire « Interne/Client »
 
+## ⏱️ Saisie des temps & compteur
+- Saisie hebdomadaire par projet/tâche (pas de sous-tâche obligatoire)
+- Historique personnel et vue globale par mois
+- Compteur de temps intégré:
+  - Démarrer/arrêter depuis la page de saisie; un seul compteur actif par contributeur
+  - À l’arrêt, imputation automatique sur la tâche du jour avec minimum de 0,125j (1h)
+  - Démarrer un nouveau compteur stoppe et impute le précédent
+
 ## Gestion des devis d'un projet
 - Order : Devis
   - Numéro unique: D[année][mois][incrément]

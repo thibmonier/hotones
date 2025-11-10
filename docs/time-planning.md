@@ -2,8 +2,12 @@
 
 ## Timesheet (Suivi du temps)
 - Date et durée en heures (ex : 7.5h)
-- Lien Contributor ↔ Project
+- Lien Contributor ↔ Project (et optionnellement ProjectTask)
 - Notes optionnelles
+- Nouveau: Compteur de temps en direct (start/stop) avec imputation automatique sur la tâche
+  - Démarrer depuis la page « Saisie des temps » via le bouton ▶️ d’une tâche
+  - Un seul compteur peut être actif à la fois (démarrer un nouveau stoppe l’ancien et l’impute)
+  - À l’arrêt, le temps est imputé immédiatement dans les temps passés du jour, avec un minimum de 0,125j (1h) crédité
 
 ## Planning (Planification future)
 - Écran Planning: timeline par contributeur (drag & drop, édition in-place)

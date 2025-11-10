@@ -157,4 +157,35 @@ class ProfileController extends AbstractController
 
         return $this->redirectToRoute('profile_2fa_setup');
     }
+
+    #[Route('/me/notifications', name: 'profile_notifications', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function notifications(Request $request, EntityManagerInterface $em, \App\Repository\NotificationPreferenceRepository $prefs): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Charger les préférences existantes indexées par event type
+        $current = $prefs->findByUserIndexedByEventType($user);
+
+        if ($request->isMethod('POST')) {
+            // Uniquement la préférence pour le rappel hebdo de temps pour commencer
+            $inApp   = (bool) $request->request->get('timesheet_missing_weekly_inapp', false);
+            $email   = (bool) $request->request->get('timesheet_missing_weekly_email', false);
+            $webhook = false; // non exposé pour l'instant
+
+            $prefs->upsert($user, \App\Enum\NotificationType::TIMESHEET_MISSING_WEEKLY, $inApp, $email, $webhook);
+            $this->addFlash('success', 'Préférences de notifications mises à jour');
+
+            return $this->redirectToRoute('profile_notifications');
+        }
+
+        return $this->render('profile/notifications.html.twig', [
+            'user'    => $user,
+            'current' => $current,
+        ]);
+    }
 }

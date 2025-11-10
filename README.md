@@ -70,6 +70,7 @@ Application: http://localhost:8080
 - Analytics: `/analytics/dashboard` (KPIs, filtres, graphiques)
 
 ## Dernières mises à jour
+- Compteur de temps: start/stop depuis la saisie hebdo (un seul actif), imputation auto (min 0,125j)
 - Création automatique des tâches par défaut (AVV, Non-vendu) à la création d’un projet
 - Prise en compte du type et du statut de projet à la création/édition
 - Ajout de la relation optionnelle Timesheet → ProjectTask (modèle)

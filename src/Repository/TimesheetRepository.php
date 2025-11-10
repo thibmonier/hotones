@@ -124,7 +124,7 @@ class TimesheetRepository extends ServiceEntityRepository
     public function getHoursGroupedByProjectForContributor(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         $results = $this->createQueryBuilder('t')
-            ->select('p.id AS projectId, p.name AS projectName, CONCAT(pc.firstName, \' \', pc.lastName) AS projectClient, SUM(t.hours) AS totalHours')
+            ->select('p.id AS projectId, p.name AS projectName, pc.name AS projectClientName, SUM(t.hours) AS totalHours')
             ->leftJoin('t.project', 'p')
             ->leftJoin('p.client', 'pc')
             ->where('t.contributor = :contributor')
@@ -132,7 +132,7 @@ class TimesheetRepository extends ServiceEntityRepository
             ->setParameter('contributor', $contributor)
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->groupBy('p.id, p.name, pc.firstName, pc.lastName')
+            ->groupBy('p.id, p.name, pc.name')
             ->orderBy('totalHours', 'DESC')
             ->getQuery()
             ->getArrayResult();
@@ -142,9 +142,9 @@ class TimesheetRepository extends ServiceEntityRepository
         foreach ($results as $r) {
             $formatted[] = [
                 'project' => [
-                    'id'     => $r['projectId']     ?? null,
-                    'name'   => $r['projectName']   ?? null,
-                    'client' => $r['projectClient'] ?? null,
+                    'id'     => $r['projectId']         ?? null,
+                    'name'   => $r['projectName']       ?? null,
+                    'client' => $r['projectClientName'] ?? null,
                 ],
                 'totalHours' => (float) ($r['totalHours'] ?? 0),
             ];
@@ -166,35 +166,43 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve un timesheet existant avec tâche spécifique pour éviter les doublons.
+     * Trouve un timesheet existant pour éviter les doublons (avec tâche et/ou sous-tâche).
+     */
+    public function findExistingTimesheetWithTaskAndSubTask(
+        Contributor $contributor,
+        Project $project,
+        DateTimeInterface $date,
+        ?\App\Entity\ProjectTask $task = null,
+        ?\App\Entity\ProjectSubTask $subTask = null
+    ): ?Timesheet {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.contributor = :contributor')
+            ->andWhere('t.project = :project')
+            ->andWhere('t.date = :date')
+            ->setParameter('contributor', $contributor)
+            ->setParameter('project', $project)
+            ->setParameter('date', $date)
+            ->setMaxResults(1);
+
+        if ($subTask) {
+            $qb->andWhere('t.subTask = :subTask')->setParameter('subTask', $subTask);
+        } elseif ($task) {
+            $qb->andWhere('t.task = :task')->setParameter('task', $task)
+               ->andWhere('t.subTask IS NULL');
+        } else {
+            $qb->andWhere('t.task IS NULL')->andWhere('t.subTask IS NULL');
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * (Déprécié) Trouve un timesheet existant avec tâche spécifique pour éviter les doublons.
+     * Conserver pour compat ascendante.
      */
     public function findExistingTimesheetWithTask(Contributor $contributor, Project $project, DateTimeInterface $date, ?\App\Entity\ProjectTask $task = null): ?Timesheet
     {
-        $criteria = [
-            'contributor' => $contributor,
-            'project'     => $project,
-            'date'        => $date,
-        ];
-
-        // Si une tâche est spécifiée, l'ajouter aux critères
-        if ($task) {
-            $criteria['task'] = $task;
-        } else {
-            // Si pas de tâche spécifiée, chercher les timesheets sans tâche
-            return $this->createQueryBuilder('t')
-                ->where('t.contributor = :contributor')
-                ->andWhere('t.project = :project')
-                ->andWhere('t.date = :date')
-                ->andWhere('t.task IS NULL')
-                ->setParameter('contributor', $contributor)
-                ->setParameter('project', $project)
-                ->setParameter('date', $date)
-                ->setMaxResults(1)
-                ->getQuery()
-                ->getOneOrNullResult();
-        }
-
-        return $this->findOneBy($criteria);
+        return $this->findExistingTimesheetWithTaskAndSubTask($contributor, $project, $date, $task, null);
     }
 
     /**

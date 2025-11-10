@@ -39,8 +39,9 @@ Compléter les interfaces de gestion des entités principales pour permettre une
 - ✅ Templates new/edit modernisés avec form_widget
 - ✅ Gestion des tâches du projet (ProjectTaskController + CRUD complet)
 - ✅ Vue consolidée multi-devis (onglet Devis avec tableau agrégé)
-- ✅ Onglets : Aperçu, Devis, Tâches, Planning, Temps, Rentabilité
+- ✅ Onglets : Aperçu, Devis, Tâches, Planning, Temps, Rentabilité, Fiche technique
 - ✅ Génération automatique des tâches depuis les lignes budgétaires
+- ✅ Onglet "Fiche d’identité technique" (technologies avec versions, liens dépôts/env., accès BDD/SSH/FTP)
 - ✅ Relation OrderLine → ProjectTask → ProjectSubTask
 - ✅ Calculs agrégés cohérents (temps révisés et passés)
 - ✅ Filtres avancés dans le listing (statut, type, technologies, dates, contributeurs)
@@ -75,7 +76,8 @@ Interface complète de saisie et gestion des temps (timesheets) avec liaison aux
 
 #### 2.1 Interface de saisie
 - ✅ Entity `Timesheet` existante avec relation optionnelle vers `ProjectTask`
-- 🔲 Formulaire de saisie quotidienne/hebdomadaire
+- ✅ Grille de saisie hebdomadaire (auto-save)
+- ✅ Compteur de temps (start/stop, un seul actif, imputation min 0,125j)
 - 🔲 Sélection projet → tâche (cascade)
 - 🔲 Validation : max 24h/jour
 - 🔲 Saisie en heures ou jours (conversion auto 1j = 8h)
@@ -145,7 +147,7 @@ Interface de visualisation des KPIs et métriques avec filtres dynamiques.
 - ✅ Handler `RecalculateMetricsMessageHandler` (traitement asynchrone)
 - ✅ Commande CLI `app:calculate-metrics`
 - ✅ Bouton "Recalculer" dans l'interface admin
-- 🔲 Cron automatique (quotidien)
+- ✅ Cron automatique (quotidien) via Symfony Scheduler (providers DB + métriques, admin `/admin/scheduler`)
 
 ### Tests
 - 🔲 Tests unitaires calculs métriques
@@ -247,11 +249,17 @@ Système de notifications pour les événements importants.
 
 ### Fonctionnalités
 
+#### 6.0 Infrastructure
+- ✅ Entités et schéma en place (`Notification`, `NotificationPreference`, `NotificationSetting`) + migrations
+- ✅ Page d’index des notifications (lecture)
+- 🔲 Déclencheurs d’événements (création, budget, échéances, validations) et routage des notifications
+
 #### 6.1 Types d'événements
 - 🔲 Nouveau devis à signer
 - 🔲 Devis gagné/perdu
 - 🔲 Projet proche de son budget
 - 🔲 Temps en attente de validation
+- ✅ Rappel hebdomadaire de saisie des temps (vendredi 12h, tolérance configurable, email si autorisé)
 - 🔲 Échéance de paiement proche
 - 🔲 Seuil d'alerte KPI dépassé
 
@@ -285,6 +293,7 @@ Génération de rapports et exports pour la direction et les clients.
 - 🔲 Rapport financier (CA, marges, coûts)
 - 🔲 Rapport contributeur (temps, projets, performance)
 - 🔲 Rapport commercial (pipeline, taux de conversion)
+- 🔲 Rapport devis actifs entre 2 dates (client, projet, CA, commercial, achats sur projet, rentabilité, statut)
 
 #### 7.2 Formats
 - 🔲 PDF (DomPDF ou Snappy)
@@ -322,6 +331,8 @@ Exposer une API REST pour intégrations externes et applications tierces en util
 - 🔲 `/api/contributors` (liste contributeurs)
 - 🔲 `/api/orders` (devis)
 - 🔲 `/api/metrics` (KPIs lecture seule)
+- 🔲 `/api/users` (CRUD utilisateurs)
+- 🔲 `/api/running-timer` (utilisation du système de timer en dehors de l'interface)
 
 #### 8.2 Sécurité
 - 🔲 Authentification JWT (lexik/jwt-authentication-bundle)
@@ -398,6 +409,24 @@ Cet onglet permettra de donner les informations techniques principales du projet
 ### Sprint 12 (2 semaines) : mettre en place Symfony Scheduler et ajouter une page d’administration des entrées du scheduler
 - en s'inspirant de la documentation de Symfony Scheduler et en utilisant les expressions de crontab directement dans le formulaire de saisie (avec des exemples ou de l'aide)
 
+### Sprint 13 : mettre en place des Business Units 
+- Les business units sont aussi appelées BU
+- Les business units permettent de cloisonner plusieurs équipes au sein de la même société
+- Les business Units sont manager par un des contributeurs
+- Les contibuteurs sont attachés  à une Business Unit uniquement
+- Les dashboards doivent pouvoir être visibles par les membres de la Business Unit avec les chiffres de la business unit uniquement.
+- les devis sont attachés à une BU
+- Tous les contributeurs peuvent intervenir sur les projets, peu importe leur business unit
+- les clients peuvent être attachés à une business unit préférentielle
+- Chaque BU a des objectifs de CA signé, de Marge générée et de contributeurs à l'année
+- les objectifs doivent pouvoir être visibles dans les KPIs 
+
+### Sprint 14 : mettre en place le workflow de recrutement
+- lors d'un recrutement, un candidat doit etre défini par ses coordonnées, son CV, ses technologies de préférences avec son niveau, ses prétentions salariales (en k€ par an), son type de contrat visé (CDI, CDD, Alternance, stage), la BU identifiée pour le poste.
+- le candidat doit etre attaché à un poste ou profil type.
+- Lors de l'embauche, le candidat devient un contributeur et on doit pouvoir revoir les informations saisies lors de son process de recrutement.
+- lors d'un process de recrutement, on doit pouvoir définir qui le contacte ou le rencontre, et qui doit encore le rencontrer lors des prochaines étapes (la derniere étant l'embauche ou le refus d'embauche)
+- 
 
 ---
 

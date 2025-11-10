@@ -8,10 +8,11 @@
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-redis": "*",
         "beberlei/doctrineextensions": "^1.5",
         "doctrine/dbal": "^3.10.3",
         "doctrine/doctrine-bundle": "^2.18.1",
-        "doctrine/doctrine-migrations-bundle": "^3.5",
+        "doctrine/doctrine-migrations-bundle": "^3.6",
         "doctrine/orm": "^3.5.3",
         "dragonmantank/cron-expression": "^3.6",
         "endroid/qr-code-bundle": ">=6",
@@ -57,10 +58,10 @@
         "twig/twig": "^2.12|^3.22.0"
     },
     "require-dev": {
-        "dbrekelmans/bdi": "^1.4",
+        "dbrekelmans/bdi": "^1.4.1",
         "doctrine/doctrine-fixtures-bundle": "^4.3",
         "fakerphp/faker": "^1.24.1",
-        "friendsofphp/php-cs-fixer": "^3.89.1",
+        "friendsofphp/php-cs-fixer": "^3.89.2",
         "phpmd/phpmd": "^2.15",
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan": "^2.1.31",
@@ -74,7 +75,7 @@
         "symfony/panther": "^2.2",
         "symfony/stopwatch": "7.3.*",
         "symfony/web-profiler-bundle": "7.3.*",
-        "zenstruck/foundry": "^2.7.8"
+        "zenstruck/foundry": "^2.8.0"
     },
     "config": {
         "allow-plugins": {

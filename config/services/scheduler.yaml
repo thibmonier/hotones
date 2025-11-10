@@ -3,3 +3,5 @@ services:
     tags: ['scheduler.schedule_provider']
   App\Scheduler\MetricsScheduleProvider:
     tags: ['scheduler.schedule_provider']
+  App\Scheduler\NotificationsScheduleProvider:
+    tags: ['scheduler.schedule_provider']

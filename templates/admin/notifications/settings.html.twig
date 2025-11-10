@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Paramètres - Notifications{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Paramètres des notifications</h4>
+      <div class="page-title-right">
+        <a href="{{ path('admin_scheduler_index') }}" class="btn btn-outline-secondary"><i class="bx bx-timer me-1"></i> Scheduler</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <form method="post">
+          <h5 class="mb-3">Rappel hebdomadaire — Saisie des temps</h5>
+          <div class="row align-items-center mb-3">
+            <label for="tol" class="col-sm-5 col-form-label">Tolérance hebdo (0–0.5)</label>
+            <div class="col-sm-4">
+              <input type="number" step="0.01" min="0" max="0.5" class="form-control" id="tol" name="timesheet_weekly_tolerance" value="{{ timesheet_weekly_tolerance }}">
+              <small class="text-muted">0.15 = 15%</small>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="bx bx-save me-1"></i> Enregistrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

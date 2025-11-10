@@ -41,6 +41,25 @@
                         </h4>
                     </div>
                     <div class="card-body">
+                        {# Bandeau compteur en cours #}
+                        <div id="running-timer-banner" class="alert alert-warning d-flex justify-content-between align-items-center {{ activeTimer ? '' : 'd-none' }}">
+                            <div>
+                                <i class="bx bx-time-five me-2"></i>
+                                <span id="timer-label">
+                                    {% if activeTimer %}
+                                        Compteur en cours — <strong>{{ activeTimer.project.name }}</strong>{% if activeTimer.task %} · {{ activeTimer.task.name }}{% endif %}{% if activeTimer.subTask %} · {{ activeTimer.subTask.title }}{% endif %}
+                                        · démarré à <span id="timer-started-at" data-start="{{ activeTimer.startedAt|date('c') }}">{{ activeTimer.startedAt|date('H:i') }}</span>
+                                        · écoulé: <span id="timer-elapsed">0:00:00</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div>
+                                <button type="button" id="stop-timer-btn" class="btn btn-sm btn-danger">
+                                    <i class="bx bx-stop me-1"></i> Arrêter et imputer
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover" id="timesheet-table">
                                 <thead class="table-light">
@@ -81,12 +100,39 @@
                                                 <td class="ps-4">
                                                     <div class="d-flex align-items-center">
                                                         <i class="bx bx-task text-muted me-2"></i>
-                                                        <div>
+                                                        <div class="flex-grow-1">
                                                             <div class="fw-medium">{{ task.name }}</div>
                                                             {% if task.description %}
                                                                 <small class="text-muted">{{ task.description|slice(0, 50) }}{% if task.description|length > 50 %}...{% endif %}</small>
                                                             {% endif %}
+
+                                                            {# Liste des sous-tâches assignées (si présentes) #}
+                                                            {% set row = (projectData.taskRows|filter(r => r.task.id == task.id)|first) %}
+                                                            {% if row and row.subTasks|length > 0 %}
+                                                                <div class="mt-2">
+                                                                    <small class="text-muted">Sous-tâches :</small>
+                                                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                                                        {% for st in row.subTasks %}
+                                                                            <button type="button"
+                                                                                class="btn btn-xs btn-outline-primary start-timer-btn"
+                                                                                title="Démarrer sur: {{ st.title }}"
+                                                                                data-project-id="{{ project.id }}"
+                                                                                data-task-id="{{ task.id }}"
+                                                                                data-sub-task-id="{{ st.id }}">
+                                                                                <i class="bx bx-play"></i> {{ st.title|slice(0, 24) }}{% if st.title|length > 24 %}…{% endif %}
+                                                                            </button>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
                                                         </div>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-success start-timer-btn ms-2"
+                                                                title="Démarrer le compteur sur cette tâche"
+                                                                data-project-id="{{ project.id }}"
+                                                                data-task-id="{{ task.id }}">
+                                                            <i class="bx bx-play"></i>
+                                                        </button>
                                                     </div>
                                                 </td>
                                                 {% for i in 0..6 %}
@@ -207,6 +253,13 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const timeInputs = document.querySelectorAll('.time-input');
+        const startButtons = document.querySelectorAll('.start-timer-btn');
+        const stopBtn = document.getElementById('stop-timer-btn');
+        const banner = document.getElementById('running-timer-banner');
+        const label = document.getElementById('timer-label');
+        const startedAtEl = document.getElementById('timer-started-at');
+        const elapsedEl = document.getElementById('timer-elapsed');
+        let elapsedInterval = null;
         const dayTotals = document.querySelectorAll('.day-total');
         const weekTotal = document.getElementById('week-total');
         const weekProgress = document.getElementById('week-progress');
@@ -301,6 +354,71 @@
                 alert('Erreur de connexion');
             });
         }, 1000);
+
+        // Gestion compteur — démarrage
+        startButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const projectId = btn.dataset.projectId;
+                const taskId = btn.dataset.taskId;
+                const subTaskId = btn.dataset.subTaskId;
+                const params = new URLSearchParams({ project_id: projectId, task_id: taskId });
+                if (subTaskId) params.append('sub_task_id', subTaskId);
+                fetch('{{ path('timesheet_timer_start') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) { alert(data.error || 'Erreur lors du démarrage du compteur'); return; }
+                    // Afficher le bandeau et initialiser l'horloge
+                    banner.classList.remove('d-none');
+                    const startedAt = new Date(data.timer.started_at);
+                    const suffix = `${data.timer.task ? ' · ' + data.timer.task.name : ''}${data.timer.subTask ? ' · ' + data.timer.subTask.title : ''}`;
+                    label.innerHTML = `Compteur en cours — <strong>${data.timer.project.name}</strong>${suffix} · démarré à <span id=\"timer-started-at\" data-start=\"${data.timer.started_at}\">${startedAt.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</span> · écoulé: <span id=\"timer-elapsed\">0:00:00</span>`;
+                    // Reset refs
+                    const newStartedAtEl = document.getElementById('timer-started-at');
+                    const newElapsedEl = document.getElementById('timer-elapsed');
+                    if (elapsedInterval) clearInterval(elapsedInterval);
+                    elapsedInterval = setInterval(() => {
+                        const s = Math.floor((Date.now() - new Date(newStartedAtEl.dataset.start).getTime()) / 1000);
+                        const h = Math.floor(s/3600);
+                        const m = Math.floor((s%3600)/60).toString().padStart(2,'0');
+                        const sec = (s%60).toString().padStart(2,'0');
+                        newElapsedEl.textContent = `${h}:${m}:${sec}`;
+                    }, 1000);
+                })
+                .catch(() => alert('Erreur de connexion'));
+            });
+        });
+
+        // Gestion compteur — arrêt
+        if (stopBtn) {
+            stopBtn.addEventListener('click', () => {
+                fetch('{{ path('timesheet_timer_stop') }}', { method: 'POST' })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (!data.success) { alert(data.error || 'Erreur lors de l\'arrêt du compteur'); return; }
+                        if (elapsedInterval) clearInterval(elapsedInterval);
+                        banner.classList.add('d-none');
+                        // Optionnel: recharger pour mettre à jour le tableau des temps de la semaine
+                        window.location.reload();
+                    })
+                    .catch(() => alert('Erreur de connexion'));
+            });
+        }
+
+        // Si un timer est déjà en cours au chargement, lancer l'interval pour afficher l'écoulé
+        if (startedAtEl && elapsedEl) {
+            if (elapsedInterval) clearInterval(elapsedInterval);
+            elapsedInterval = setInterval(() => {
+                const s = Math.floor((Date.now() - new Date(startedAtEl.dataset.start).getTime()) / 1000);
+                const h = Math.floor(s/3600);
+                const m = Math.floor((s%3600)/60).toString().padStart(2,'0');
+                const sec = (s%60).toString().padStart(2,'0');
+                elapsedEl.textContent = `${h}:${m}:${sec}`;
+            }, 1000);
+        }
 
         // Event listeners pour les inputs de temps
         timeInputs.forEach(input => {

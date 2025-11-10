@@ -11,6 +11,7 @@ enum NotificationType: string
     case TIMESHEET_PENDING_VALIDATION = 'timesheet_pending_validation';
     case PAYMENT_DUE_ALERT            = 'payment_due_alert';
     case KPI_THRESHOLD_EXCEEDED       = 'kpi_threshold_exceeded';
+    case TIMESHEET_MISSING_WEEKLY     = 'timesheet_missing_weekly';
 
     public function getLabel(): string
     {
@@ -22,6 +23,7 @@ enum NotificationType: string
             self::TIMESHEET_PENDING_VALIDATION => 'Temps en attente de validation',
             self::PAYMENT_DUE_ALERT            => 'Échéance de paiement proche',
             self::KPI_THRESHOLD_EXCEEDED       => 'Seuil KPI dépassé',
+            self::TIMESHEET_MISSING_WEEKLY     => 'Rappel saisie temps hebdo',
         };
     }
 
@@ -35,6 +37,7 @@ enum NotificationType: string
             self::TIMESHEET_PENDING_VALIDATION => 'fa-clock',
             self::PAYMENT_DUE_ALERT            => 'fa-calendar-alt',
             self::KPI_THRESHOLD_EXCEEDED       => 'fa-chart-line',
+            self::TIMESHEET_MISSING_WEEKLY     => 'fa-hourglass-half',
         };
     }
 
@@ -48,6 +51,7 @@ enum NotificationType: string
             self::TIMESHEET_PENDING_VALIDATION => 'primary',
             self::PAYMENT_DUE_ALERT            => 'warning',
             self::KPI_THRESHOLD_EXCEEDED       => 'danger',
+            self::TIMESHEET_MISSING_WEEKLY     => 'primary',
         };
     }
 }
