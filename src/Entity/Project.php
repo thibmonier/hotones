@@ -2,11 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\ProjectRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: 'projects', indexes: [
@@ -16,45 +24,69 @@ use Doctrine\ORM\Mapping as ORM;
     new ORM\Index(name: 'idx_project_type', columns: ['project_type']),
     new ORM\Index(name: 'idx_project_service_category', columns: ['service_category_id']),
 ])]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ROLE_USER')"),
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Post(security: "is_granted('ROLE_CHEF_PROJET')"),
+        new Put(security: "is_granted('ROLE_CHEF_PROJET')"),
+        new Patch(security: "is_granted('ROLE_CHEF_PROJET')"),
+        new Delete(security: "is_granted('ROLE_MANAGER')"),
+    ],
+    normalizationContext: ['groups' => ['project:read']],
+    denormalizationContext: ['groups' => ['project:write']],
+    paginationItemsPerPage: 30,
+)]
 class Project
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['project:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 180)]
+    #[Groups(['project:read', 'project:write'])]
     private string $name;
 
     #[ORM\ManyToOne(targetEntity: Client::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['project:read', 'project:write'])]
     private ?Client $client = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['project:read', 'project:write'])]
     private ?string $description = null;
 
     // Achats sur le projet (fournitures ou renfort externes)
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
+    #[Groups(['project:read', 'project:write'])]
     private ?string $purchasesAmount = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['project:read', 'project:write'])]
     private ?string $purchasesDescription = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups(['project:read', 'project:write'])]
     private ?DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups(['project:read', 'project:write'])]
     private ?DateTimeInterface $endDate = null;
 
     #[ORM\Column(type: 'string', length: 20)]
+    #[Groups(['project:read', 'project:write'])]
     private string $status = 'active'; // active, completed, cancelled
 
     // Type de projet (interne/externe)
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['project:read', 'project:write'])]
     private bool $isInternal = false;
 
     // Type de projet (forfait ou régie)
     #[ORM\Column(type: 'string', length: 20)]
+    #[Groups(['project:read', 'project:write'])]
     private string $projectType = 'forfait'; // forfait, regie
 
     // Rôles projet - références vers User

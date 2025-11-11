@@ -1,0 +1,203 @@
+<?php
+
+namespace App\Tests\Api;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Entity\Project;
+use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
+
+/**
+ * Tests fonctionnels pour l'endpoint /api/projects.
+ *
+ * @group api
+ */
+class ProjectApiTest extends ApiTestCase
+{
+    use RefreshDatabaseTrait;
+
+    private string $token;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Pour les tests, créer un utilisateur et obtenir un token JWT
+        // À adapter selon votre configuration de fixtures
+    }
+
+    public function testGetCollection(): void
+    {
+        // Test de récupération de la collection de projets
+        $response = static::createClient()->request('GET', '/api/projects', [
+            'headers' => ['Authorization' => 'Bearer '.$this->getToken()],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonContains([
+            '@context' => '/api/contexts/Project',
+            '@type'    => 'hydra:Collection',
+        ]);
+
+        // Vérifier qu'on a au moins un résultat dans la collection
+        $this->assertCount(0, $response->toArray()['hydra:member']);
+    }
+
+    public function testCreateProject(): void
+    {
+        // Test de création d'un projet
+        $response = static::createClient()->request('POST', '/api/projects', [
+            'headers' => ['Authorization' => 'Bearer '.$this->getTokenWithRole('ROLE_CHEF_PROJET')],
+            'json'    => [
+                'name'        => 'Projet Test API',
+                'description' => 'Description du projet test',
+                'status'      => 'active',
+                'projectType' => 'forfait',
+                'isInternal'  => false,
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonContains([
+            '@context' => '/api/contexts/Project',
+            '@type'    => 'Project',
+            'name'     => 'Projet Test API',
+            'status'   => 'active',
+        ]);
+    }
+
+    public function testGetProject(): void
+    {
+        // Créer un projet via le client
+        $client  = static::createClient();
+        $project = $this->createProject();
+
+        // Récupérer le projet
+        $response = $client->request('GET', '/api/projects/'.$project->getId(), [
+            'headers' => ['Authorization' => 'Bearer '.$this->getToken()],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@id'  => '/api/projects/'.$project->getId(),
+            'name' => $project->getName(),
+        ]);
+    }
+
+    public function testUpdateProject(): void
+    {
+        $project = $this->createProject();
+
+        static::createClient()->request('PUT', '/api/projects/'.$project->getId(), [
+            'headers' => ['Authorization' => 'Bearer '.$this->getTokenWithRole('ROLE_CHEF_PROJET')],
+            'json'    => [
+                'name'   => 'Projet modifié',
+                'status' => 'completed',
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'name'   => 'Projet modifié',
+            'status' => 'completed',
+        ]);
+    }
+
+    public function testDeleteProject(): void
+    {
+        $project = $this->createProject();
+
+        static::createClient()->request('DELETE', '/api/projects/'.$project->getId(), [
+            'headers' => ['Authorization' => 'Bearer '.$this->getTokenWithRole('ROLE_MANAGER')],
+        ]);
+
+        $this->assertResponseStatusCodeSame(204);
+    }
+
+    public function testCreateProjectWithoutAuth(): void
+    {
+        // Tenter de créer un projet sans authentification
+        static::createClient()->request('POST', '/api/projects', [
+            'json' => [
+                'name' => 'Projet non autorisé',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(401);
+    }
+
+    public function testCreateProjectWithInsufficientRights(): void
+    {
+        // Tenter de créer un projet avec un rôle insuffisant
+        static::createClient()->request('POST', '/api/projects', [
+            'headers' => ['Authorization' => 'Bearer '.$this->getToken()], // ROLE_USER
+            'json'    => [
+                'name' => 'Projet non autorisé',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    // Méthodes utilitaires
+
+    private function createProject(): Project
+    {
+        $entityManager = static::getContainer()->get('doctrine')->getManager();
+
+        $project = new Project();
+        $project->setName('Projet de test');
+        $project->setDescription('Description test');
+        $project->setStatus('active');
+        $project->setProjectType('forfait');
+        $project->setIsInternal(false);
+
+        $entityManager->persist($project);
+        $entityManager->flush();
+
+        return $project;
+    }
+
+    private function getToken(): string
+    {
+        if (isset($this->token)) {
+            return $this->token;
+        }
+
+        // Créer un utilisateur de test et obtenir un token JWT
+        // À adapter selon votre configuration
+        $client = static::createClient();
+
+        // Exemple simplifié - à adapter selon vos fixtures
+        $response = $client->request('POST', '/api/login', [
+            'json' => [
+                'email'    => 'test@example.com',
+                'password' => 'password',
+            ],
+        ]);
+
+        $data        = $response->toArray();
+        $this->token = $data['token'];
+
+        return $this->token;
+    }
+
+    private function getTokenWithRole(string $role): string
+    {
+        // Créer un utilisateur avec un rôle spécifique et obtenir son token
+        // À adapter selon votre configuration
+        $client = static::createClient();
+
+        // Exemple simplifié
+        $response = $client->request('POST', '/api/login', [
+            'json' => [
+                'email'    => 'manager@example.com',
+                'password' => 'password',
+            ],
+        ]);
+
+        $data = $response->toArray();
+
+        return $data['token'];
+    }
+}

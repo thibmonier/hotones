@@ -1,0 +1,25 @@
+api_platform:
+    title: HotOnes API
+    description: API REST pour la gestion de projets HotOnes
+    version: 1.0.0
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    docs_formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+        html: ['text/html']
+    swagger:
+        versions: [3]
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header
+    # Configuration Swagger UI - désactivé car on utilise notre propre template
+    enable_docs: true
+    enable_swagger_ui: false
+    enable_re_doc: false

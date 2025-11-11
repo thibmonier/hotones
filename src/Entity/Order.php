@@ -2,11 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: \App\Repository\OrderRepository::class)]
 #[ORM\Table(name: 'orders', indexes: [
@@ -14,6 +22,19 @@ use Doctrine\ORM\Mapping as ORM;
     new ORM\Index(name: 'idx_order_status', columns: ['status']),
     new ORM\Index(name: 'idx_order_created_at', columns: ['created_at']),
 ])]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ROLE_USER')"),
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Post(security: "is_granted('ROLE_CHEF_PROJET')"),
+        new Put(security: "is_granted('ROLE_CHEF_PROJET')"),
+        new Patch(security: "is_granted('ROLE_CHEF_PROJET')"),
+        new Delete(security: "is_granted('ROLE_MANAGER')"),
+    ],
+    normalizationContext: ['groups' => ['order:read']],
+    denormalizationContext: ['groups' => ['order:write']],
+    paginationItemsPerPage: 30,
+)]
 class Order
 {
     public const STATUS_OPTIONS = [
@@ -29,22 +50,28 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['order:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 180, nullable: true)]
+    #[Groups(['order:read', 'order:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['order:read', 'order:write'])]
     private ?string $description = null;
 
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)]
+    #[Groups(['order:read', 'order:write'])]
     private ?string $contingencyPercentage = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups(['order:read', 'order:write'])]
     private ?DateTimeInterface $validUntil = null;
 
     // Numéro unique du devis D[année][mois][numéro incrémental]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
+    #[Groups(['order:read'])]
     private string $orderNumber;
 
     #[ORM\Column(type: 'text', nullable: true)]

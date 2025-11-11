@@ -2,6 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,11 +17,25 @@ use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ROLE_MANAGER') or object == user"),
+        new GetCollection(security: "is_granted('ROLE_MANAGER')"),
+        new Post(security: "is_granted('ROLE_MANAGER')"),
+        new Put(security: "is_granted('ROLE_MANAGER') or object == user"),
+        new Patch(security: "is_granted('ROLE_MANAGER') or object == user"),
+        new Delete(security: "is_granted('ROLE_SUPERADMIN')"),
+    ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']],
+    paginationItemsPerPage: 30,
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwoFactorInterface
 {
     // Rôles métier
@@ -32,23 +53,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email]
+    #[Groups(['user:read', 'user:write'])]
     private string $email;
 
     #[ORM\Column(type: 'json')]
+    #[Groups(['user:read', 'user:write'])]
     private array $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Groups(['user:write'])]
     private string $password;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(['user:read', 'user:write'])]
     private string $firstName;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(['user:read', 'user:write'])]
     private string $lastName;
 
     #[ORM\Column(type: 'string', length: 32, nullable: true)]

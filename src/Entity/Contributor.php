@@ -2,27 +2,43 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ContributorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ContributorRepository::class)]
 #[ORM\Table(name: 'contributors')]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ROLE_USER')"),
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+    ],
+    normalizationContext: ['groups' => ['contributor:read']],
+    paginationItemsPerPage: 30,
+)]
 class Contributor
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['contributor:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(['contributor:read'])]
     private string $firstName;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(['contributor:read'])]
     private string $lastName;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['contributor:read'])]
     private ?string $email = null;
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]

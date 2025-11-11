@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Entity\Analytics;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Order;
 use App\Entity\Project;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Table de faits centrale pour les métriques de projets
@@ -20,11 +24,20 @@ use Doctrine\ORM\Mapping as ORM;
     name: 'unique_fact_metrics',
     columns: ['dim_time_id', 'dim_project_type_id', 'dim_project_manager_id', 'dim_sales_person_id', 'dim_project_director_id', 'granularity', 'project_id', 'order_id'],
 )]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ROLE_MANAGER')"),
+        new GetCollection(security: "is_granted('ROLE_MANAGER')"),
+    ],
+    normalizationContext: ['groups' => ['metrics:read']],
+    paginationItemsPerPage: 50,
+)]
 class FactProjectMetrics
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private ?int $id = null;
 
     // Clés étrangères vers les dimensions
@@ -59,60 +72,78 @@ class FactProjectMetrics
 
     // KPIs - Métriques de base
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $projectCount = 0; // Nombre de projets
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $activeProjectCount = 0; // Projets actifs
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $completedProjectCount = 0; // Projets terminés
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $orderCount = 0; // Nombre de devis
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $pendingOrderCount = 0; // Devis en attente de signature
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $wonOrderCount = 0; // Devis gagnés
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $contributorCount = 0; // Nombre de contributeurs
 
     // KPIs - Métriques financières
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $totalRevenue = '0.00'; // CA total
 
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $totalCosts = '0.00'; // Coûts totaux
 
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $grossMargin = '0.00'; // Marge brute (CA - Coûts)
 
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $marginPercentage = '0.00'; // Pourcentage de marge
 
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $pendingRevenue = '0.00'; // CA potentiel (devis en attente)
 
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $averageOrderValue = '0.00'; // Valeur moyenne des devis
 
     // KPIs - Métriques de temps
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $totalSoldDays = '0.00'; // Jours vendus total
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $totalWorkedDays = '0.00'; // Jours travaillés réels
 
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
+    #[Groups(['metrics:read'])]
     private string $utilizationRate = '0.00'; // Taux d'occupation (%)
 
     // Métadonnées
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['metrics:read'])]
     private DateTimeInterface $calculatedAt;
 
     #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(['metrics:read'])]
     private string $granularity; // monthly, quarterly, yearly
 
     public function __construct()
