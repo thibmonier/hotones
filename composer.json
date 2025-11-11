@@ -9,16 +9,16 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-redis": "*",
-        "api-platform/core": "^4.0",
+        "api-platform/core": "^4.2.3",
         "beberlei/doctrineextensions": "^1.5",
         "doctrine/dbal": "^3.10.3",
         "doctrine/doctrine-bundle": "^2.18.1",
         "doctrine/doctrine-migrations-bundle": "^3.6",
-        "doctrine/orm": "^3.5.3",
+        "doctrine/orm": "^3.5.6",
         "dragonmantank/cron-expression": "^3.6",
         "endroid/qr-code-bundle": ">=6",
         "gedmo/doctrine-extensions": ">=3.21",
-        "lexik/jwt-authentication-bundle": "^3.1",
+        "lexik/jwt-authentication-bundle": "^3.1.1",
         "phpdocumentor/reflection-docblock": "^5.6.3",
         "phpstan/phpdoc-parser": "^2.3",
         "scheb/2fa-bundle": ">=7.11",
@@ -66,7 +66,7 @@
         "friendsofphp/php-cs-fixer": "^3.89.2",
         "phpmd/phpmd": "^2.15",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^2.1.31",
+        "phpstan/phpstan": "^2.1.32",
         "phpstan/phpstan-doctrine": "^2.0.11",
         "phpstan/phpstan-symfony": "^2.0.8",
         "phpunit/phpunit": "^12.4.2",
@@ -131,7 +131,13 @@
             "@phpcsfixer",
             "@phpstan",
             "@phpmd"
-        ]
+        ],
+        "test": "phpunit -c phpunit.xml.dist",
+        "test-unit": "phpunit --testsuite unit",
+        "test-functional": "phpunit --testsuite functional",
+        "test-integration": "phpunit --testsuite integration",
+        "test-api": "phpunit --testsuite api",
+        "test-e2e": "phpunit --testsuite e2e"
     },
     "conflict": {
         "symfony/symfony": "*"

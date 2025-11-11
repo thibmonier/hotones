@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+function dc() {
+  if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+    docker compose "$@"
+  else
+    docker-compose "$@"
+  fi
+}
+
+printf "[pre-push] Running full test suite...\n"
+# Run full PHPUnit suite inside the app container before pushing
+# Feel free to replace with a faster subset if needed
+if ! dc run --rm -T app composer test; then
+  printf "[pre-push] Tests failed. Aborting push.\n" >&2
+  exit 1
+fi
+
+printf "[pre-push] OK\n"

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+# Use docker compose if available, else fallback to docker-compose
+function dc() {
+  if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+    docker compose "$@"
+  else
+    docker-compose "$@"
+  fi
+}
+
+# 1) Auto-fix coding style using PHP-CS-Fixer via Composer inside the app container
+printf "[pre-commit] Running php-cs-fixer...\n"
+dc run --rm -T app composer phpcsfixer-fix
+
+# Re-stage any files modified by the fixer
+git add -A
+
+# 2) If endpoint-related files changed, run API test suite
+changed_files=$(git diff --cached --name-only)
+if echo "$changed_files" | grep -Eq '^(src/Controller/|config/routes|src/Entity/)'; then
+  printf "[pre-commit] Endpoint changes detected -> running API tests...\n"
+  # Run the API tests; if they fail, abort the commit
+  dc run --rm -T app composer test-api
+else
+  printf "[pre-commit] No endpoint changes detected; skipping API tests.\n"
+fi
+
+printf "[pre-commit] OK\n"
