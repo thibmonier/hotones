@@ -9,10 +9,9 @@ function dc() {
   fi
 }
 
-printf "[pre-push] Running full test suite...\n"
-# Run full PHPUnit suite inside the app container before pushing
-# Feel free to replace with a faster subset if needed
-if ! dc run --rm -T app composer test; then
+printf "[pre-push] Running test suite (excluding E2E)...\n"
+# Run PHPUnit suite excluding E2E tests (require geckodriver)
+if ! dc run --rm -T app ./vendor/bin/phpunit tests/Unit tests/Integration tests/Api tests/Functional; then
   printf "[pre-push] Tests failed. Aborting push.\n" >&2
   exit 1
 fi
