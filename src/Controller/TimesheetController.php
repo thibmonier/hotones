@@ -243,13 +243,23 @@ class TimesheetController extends AbstractController
             ]);
         }
 
+        // Calculer le nombre de filtres actifs
+        $activeFiltersCount = 0;
+        if ($projectId) {
+            ++$activeFiltersCount;
+        }
+        if ($month !== date('Y-m')) {
+            ++$activeFiltersCount;
+        }
+
         return $this->render('timesheet/all.html.twig', [
-            'timesheets'      => $timesheets,
-            'projects'        => $projects,
-            'month'           => $month,
-            'selectedProject' => $projectId,
-            'startDate'       => $startDate,
-            'endDate'         => $endDate,
+            'timesheets'         => $timesheets,
+            'projects'           => $projects,
+            'month'              => $month,
+            'selectedProject'    => $projectId,
+            'startDate'          => $startDate,
+            'endDate'            => $endDate,
+            'activeFiltersCount' => $activeFiltersCount,
         ]);
     }
 
