@@ -41,7 +41,8 @@ class CreateUserCommand extends Command
 
         // Create linked Contributor automatically
         $contributor = new \App\Entity\Contributor();
-        $contributor->setName(trim($user->getFirstName().' '.$user->getLastName()))
+        $contributor->setFirstName($user->getFirstName())
+            ->setLastName($user->getLastName())
             ->setEmail($user->getEmail())
             ->setUser($user)
             ->setActive(true);

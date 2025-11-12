@@ -110,19 +110,27 @@ class SeedProjects2025Command extends Command
         if (count($existing) >= 5) {
             return $existing;
         }
-        $names        = ['Alice Dupont', 'Bob Martin', 'Claire Rousseau', 'David Moreau', 'Emma Bernard', 'François Petit', 'Gaël Leroy'];
+        $names = [
+            ['Alice', 'Dupont'],
+            ['Bob', 'Martin'],
+            ['Claire', 'Rousseau'],
+            ['David', 'Moreau'],
+            ['Emma', 'Bernard'],
+            ['François', 'Petit'],
+            ['Gaël', 'Leroy'],
+        ];
         $contributors = [];
-        foreach ($names as $i => $name) {
-            $c = $repo->findOneBy(['name' => $name]);
+        foreach ($names as $i => [$firstName, $lastName]) {
+            $c = $repo->findOneBy(['firstName' => $firstName, 'lastName' => $lastName]);
             if (!$c) {
                 $c = new Contributor();
-                $c->setName($name)->setActive(true)->setCjm((string) (400 + ($i % 4) * 50).'.00');
+                $c->setFirstName($firstName)->setLastName($lastName)->setActive(true)->setCjm((string) (400 + ($i % 4) * 50).'.00');
                 // Associer 1 profil
                 if (isset($profiles[$i % count($profiles)])) {
                     $c->addProfile($profiles[$i % count($profiles)]);
                 }
                 $this->em->persist($c);
-                $io->writeln("✓ Contributeur créé: $name");
+                $io->writeln("✓ Contributeur créé: $firstName $lastName");
             }
             $contributors[] = $c;
         }
