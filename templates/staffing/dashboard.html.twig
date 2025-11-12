@@ -1,0 +1,286 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Dashboard de Suivi du Staffing{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Dashboard de Staffing</h4>
+                <div class="page-title-right">
+                    <form method="get" action="{{ path('staffing_dashboard') }}" class="d-flex gap-2">
+                        <select name="contributor" class="form-select form-select-sm" style="width: 200px;">
+                            <option value="">Tous les contributeurs</option>
+                            {% for contributor in contributors %}
+                                <option value="{{ contributor.id }}" {% if selected_contributor == contributor.id %}selected{% endif %}>
+                                    {{ contributor.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <select name="granularity" class="form-select form-select-sm" style="width: 150px;">
+                            <option value="monthly" {% if selected_granularity == 'monthly' %}selected{% endif %}>Mensuel</option>
+                            <option value="quarterly" {% if selected_granularity == 'quarterly' %}selected{% endif %}>Trimestriel</option>
+                            <option value="weekly" {% if selected_granularity == 'weekly' %}selected{% endif %}>Hebdomadaire</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Filtrer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info mb-0">
+                <i class="bx bx-calendar me-2"></i>
+                Période analysée : <strong>{{ start_date|date('d/m/Y') }}</strong> au <strong>{{ end_date|date('d/m/Y') }}</strong>
+            </div>
+        </div>
+    </div>
+
+    {% if chart_data.labels is empty %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h5 class="alert-heading"><i class="bx bx-error-circle me-2"></i>Aucune donnée disponible</h5>
+                <p class="mb-3">Les métriques de staffing n'ont pas encore été calculées pour cette période.</p>
+                <hr>
+                <p class="mb-2"><strong>Pour générer les données, suivez ces étapes :</strong></p>
+                <ol class="mb-3">
+                    <li>Créez les migrations de base de données :
+                        <br><code class="bg-dark text-white p-2 d-inline-block mt-1">php bin/console make:migration</code>
+                        <br><code class="bg-dark text-white p-2 d-inline-block mt-1">php bin/console doctrine:migrations:migrate</code>
+                    </li>
+                    <li class="mt-2">Exécutez la commande de calcul des métriques :
+                        <br><code class="bg-dark text-white p-2 d-inline-block mt-1">php bin/console app:calculate-staffing-metrics --range=12</code>
+                    </li>
+                </ol>
+                <p class="mb-0 text-muted">
+                    <i class="bx bx-info-circle me-1"></i>
+                    Cette commande calculera les métriques pour les 12 derniers mois. Le calcul peut prendre quelques minutes selon le volume de données.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Graphiques #}
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bx bx-trending-up me-2"></i>Taux de Staffing</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Pourcentage du temps où les contributeurs sont affectés à des missions</p>
+                    <canvas id="staffingRateChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bx bx-time-five me-2"></i>TACE (Taux d'Activité Congés Exclus)</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Jours produits / jours travaillés hors congés</p>
+                    <canvas id="taceChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Tableaux de métriques #}
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bx bx-briefcase-alt me-2"></i>Taux de Staffing par Profil</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Profil</th>
+                                    <th class="text-center">Taux de Staffing</th>
+                                    <th class="text-center">TACE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for metric in metrics_by_profile %}
+                                    <tr>
+                                        <td><strong>{{ metric.profileName }}</strong></td>
+                                        <td class="text-center">
+                                            <span class="badge bg-{{ metric.staffingRate >= 85 ? 'success' : (metric.staffingRate >= 70 ? 'warning' : 'danger') }} font-size-12">
+                                                {{ metric.staffingRate|number_format(1) }}%
+                                            </span>
+                                        </td>
+                                        <td class="text-center">{{ metric.tace|number_format(1) }}%</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            <i class="bx bx-info-circle me-2"></i>Aucune donnée disponible
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bx bx-group me-2"></i>Top 10 Contributeurs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Contributeur</th>
+                                    <th class="text-center">Taux de Staffing</th>
+                                    <th class="text-center">TACE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for metric in metrics_by_contributor|slice(0, 10) %}
+                                    <tr>
+                                        <td><strong>{{ metric.contributorName }}</strong></td>
+                                        <td class="text-center">
+                                            <span class="badge bg-{{ metric.staffingRate >= 85 ? 'success' : (metric.staffingRate >= 70 ? 'warning' : 'danger') }} font-size-12">
+                                                {{ metric.staffingRate|number_format(1) }}%
+                                            </span>
+                                        </td>
+                                        <td class="text-center">{{ metric.tace|number_format(1) }}%</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            <i class="bx bx-info-circle me-2"></i>Aucune donnée disponible
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Informations #}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bx bx-info-circle me-2"></i>Informations</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="font-size-14"><i class="bx bx-trending-up text-success me-2"></i>Taux de Staffing</h6>
+                            <p class="text-muted mb-3">
+                                Le taux de staffing mesure le pourcentage du temps où les collaborateurs sont affectés à des missions par rapport à leur temps total disponible.
+                            </p>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-2"><span class="badge bg-success">85%+</span> Bonne utilisation, marge pour formation</p>
+                                <p class="mb-2"><span class="badge bg-warning">70-84%</span> Utilisation correcte</p>
+                                <p class="mb-0"><span class="badge bg-danger">&lt;70%</span> Sous-utilisation</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="font-size-14"><i class="bx bx-time-five text-warning me-2"></i>TACE (Taux d'Activité Congés Exclus)</h6>
+                            <p class="text-muted mb-3">
+                                Le TACE mesure le nombre de jours produits par les collaborateurs par rapport au nombre de jours travaillés en entreprise, hors congés.
+                            </p>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-0">
+                                    <strong>Formule :</strong><br>
+                                    <code>(Jours produits / Jours travaillés hors congés) × 100</code>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Données pour les graphiques
+        const chartData = {{ chart_data|json_encode|raw }};
+        
+        // Configuration commune
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        };
+        
+        // Graphique Taux de Staffing
+        const ctxStaffing = document.getElementById('staffingRateChart').getContext('2d');
+        new Chart(ctxStaffing, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Taux de Staffing',
+                    data: chartData.staffingRates,
+                    borderColor: '#4bc0c0',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    borderWidth: 2
+                }]
+            },
+            options: commonOptions
+        });
+        
+        // Graphique TACE
+        const ctxTace = document.getElementById('taceChart').getContext('2d');
+        new Chart(ctxTace, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'TACE',
+                    data: chartData.taceRates,
+                    borderColor: '#ff9f40',
+                    backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    borderWidth: 2
+                }]
+            },
+            options: commonOptions
+        });
+    </script>
+{% endblock %}

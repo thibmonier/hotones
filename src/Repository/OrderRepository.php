@@ -20,11 +20,16 @@ class OrderRepository extends ServiceEntityRepository
     /**
      * Trouve les devis avec filtres optionnels.
      */
-    public function findWithFilters(?Project $project = null, ?string $status = null): array
-    {
+    public function findWithFilters(
+        ?Project $project = null,
+        ?string $status = null,
+        ?string $sortField = 'createdAt',
+        ?string $sortDir = 'DESC',
+        ?int $limit = null,
+        ?int $offset = null
+    ): array {
         $qb = $this->createQueryBuilder('o')
-            ->leftJoin('o.project', 'p')
-            ->orderBy('o.createdAt', 'DESC');
+            ->leftJoin('o.project', 'p');
 
         if ($project) {
             $qb->andWhere('o.project = :project')
@@ -36,7 +41,50 @@ class OrderRepository extends ServiceEntityRepository
                 ->setParameter('status', $status);
         }
 
+        // Tri sécurisé par liste blanche
+        $map = [
+            'number'    => 'o.orderNumber',
+            'name'      => 'o.name',
+            'project'   => 'p.name',
+            'status'    => 'o.status',
+            'createdAt' => 'o.createdAt',
+            'total'     => 'o.totalAmount',
+        ];
+        $col = $map[$sortField] ?? 'o.createdAt';
+        $dir = strtoupper($sortDir) === 'ASC' ? 'ASC' : 'DESC';
+        $qb->orderBy($col, $dir);
+
+        if ($col !== 'o.createdAt') {
+            $qb->addOrderBy('o.createdAt', 'DESC');
+        }
+
+        if ($offset !== null) {
+            $qb->setFirstResult($offset);
+        }
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+
         return $qb->getQuery()->getResult();
+    }
+
+    public function countWithFilters(?Project $project = null, ?string $status = null): int
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('COUNT(DISTINCT o.id)')
+            ->leftJoin('o.project', 'p');
+
+        if ($project) {
+            $qb->andWhere('o.project = :project')
+                ->setParameter('project', $project);
+        }
+
+        if ($status) {
+            $qb->andWhere('o.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**

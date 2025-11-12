@@ -3,6 +3,7 @@
 {% block title %}Projets{% endblock %}
 
 {% block content %}
+    {{ component('breadcrumb', { title: 'Projets', pagetitle: 'Gestion' }) }}
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -23,7 +24,69 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="get" class="row g-2 align-items-end">
+                    {% set activeFiltersCount = 0 %}
+                    {% set activeFiltersCount = activeFiltersCount
+                        + (filters.project_type ? 1 : 0)
+                        + (filters.status ? 1 : 0)
+                        + (filters.technology ? 1 : 0)
+                        + (filters.start_date|date('Y-m-d') != (filters.year ~ '-01-01') ? 1 : 0)
+                        + (filters.end_date|date('Y-m-d') != (filters.year ~ '-12-31') ? 1 : 0)
+                        + (sort != 'name' ? 1 : 0)
+                        + (dir != 'ASC' ? 1 : 0)
+                        + (pagination.per_page != 10 ? 1 : 0)
+                    %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">Filtres
+                            {% if activeFiltersCount > 0 %}
+                                <span class="badge bg-info ms-2">{{ activeFiltersCount }}</span>
+                            {% endif %}
+                        </h5>
+                        <div class="btn-group">
+                            <a href="{{ path('project_export_csv', filters_query|merge({ sort: sort, dir: dir })) }}" class="btn btn-sm btn-outline-primary">Exporter CSV</a>
+                            <a href="{{ path('project_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                            <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-projects" aria-expanded="true" aria-controls="filters-projects" id="filters-toggle-projects">
+                                <i class="bx bx-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="filters-projects" class="collapse show">
+                        {% set chips = [] %}
+                    {% if filters.project_type %}
+                        {% set chips = chips|merge(['Type: ' ~ filters.project_type|title]) %}
+                    {% endif %}
+                    {% if filters.status %}
+                        {% set chips = chips|merge(['Statut: ' ~ filters.status|title]) %}
+                    {% endif %}
+                    {% if filters.technology %}
+                        {% set techObj = (filter_options.technologies|filter(t => t.id == filters.technology)|first) %}
+                        {% set chips = chips|merge(['Technologie: ' ~ (techObj ? techObj.name : filters.technology)]) %}
+                    {% endif %}
+                    {% set defaultStart = (filters.year ~ '-01-01') %}
+                    {% set defaultEnd = (filters.year ~ '-12-31') %}
+                    {% if filters.start_date|date('Y-m-d') != defaultStart or filters.end_date|date('Y-m-d') != defaultEnd %}
+                        {% set chips = chips|merge(['Période: ' ~ filters.start_date|date('d/m/Y') ~ ' → ' ~ filters.end_date|date('d/m/Y')]) %}
+                    {% endif %}
+                    {% if sort != 'name' or dir != 'ASC' %}
+                        {% set chips = chips|merge(['Tri: ' ~ sort ~ ' ' ~ dir]) %}
+                    {% endif %}
+                    {% if pagination.per_page != 10 %}
+                        {% set chips = chips|merge(['Par page: ' ~ pagination.per_page]) %}
+                    {% endif %}
+                    {% if chips|length > 0 %}
+                        <div class="mb-2 small text-muted">
+                            {% for c in chips %}
+                                <span class="badge bg-light text-dark me-1">{{ c }}</span>
+                            {% endfor %}
+                        </div>
+                        <script>
+                          (function(){
+                            try { window.__ACTIVE_FILTERS = {{ chips|json_encode|raw }}; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}
+                          })();
+                        </script>
+                    {% else %}
+                        <script>try { window.__ACTIVE_FILTERS = []; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}</script>
+                        {% endif %}
+                        <form method="get" class="row g-2 align-items-end">
                         <div class="col-md-2">
                             <label class="form-label">Année</label>
                             <select name="year" class="form-select">
@@ -67,11 +130,37 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-12 mt-2">
+                        <div class="col-12 mt-2 d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Filtrer</button>
+                            <a href="{{ path('project_index', { reset: 1 }) }}" class="btn btn-outline-secondary">Réinitialiser</a>
                         </div>
-                    </form>
+                        </form>
+                    </div>
+                    <script>
+                        (function(){
+                          var key='filters:projects:collapsed';
+                          var el=document.getElementById('filters-projects');
+                          var btn=document.getElementById('filters-toggle-projects');
+                          if(!el||!btn) return;
+                          try {
+                            var hasActive={{ (chips|length > 0) ? 'true' : 'false' }};
+                            var isSmall=window.matchMedia('(max-width: 767.98px)').matches;
+                            var collapsed = localStorage.getItem(key) === '1' || (isSmall && !hasActive);
+                            if (collapsed) { el.classList.remove('show'); btn.setAttribute('aria-expanded','false'); }
+                            var updateIcon=function(){ var i=btn.querySelector('i'); if(!i) return; if (el.classList.contains('show')) { i.className='bx bx-chevron-up'; localStorage.setItem(key,'0'); btn.setAttribute('aria-expanded','true'); } else { i.className='bx bx-chevron-down'; localStorage.setItem(key,'1'); btn.setAttribute('aria-expanded','false'); } };
+                            el.addEventListener('shown.bs.collapse', updateIcon);
+                            el.addEventListener('hidden.bs.collapse', updateIcon);
+                            updateIcon();
+                          } catch(e) {}
+                        })();
+                    </script>
                 </div>
+                {% set hasFilters = (filters.project_type) or (filters.status) or (filters.technology) or (filters.start_date|date('Y-m-d') != (filters.year ~ '-01-01')) or (filters.end_date|date('Y-m-d') != (filters.year ~ '-12-31')) or (sort != 'name') or (dir != 'ASC') or (pagination.per_page != 10) %}
+                {% if hasFilters %}
+                    <div class="small text-muted mt-2">
+                        Filtres actifs · <a href="{{ path('project_index', { reset: 1 }) }}">Effacer</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -157,12 +246,40 @@
                         <table class="table table-centered table-nowrap mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>Client</th>
-                                    <th>Type</th>
+                                    <th>
+                                        <a href="{{ path('project_index', filters_query|merge({ sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Nom
+                                            {% if sort == 'name' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('project_index', filters_query|merge({ sort: 'client', dir: sort == 'client' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Client
+                                            {% if sort == 'client' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('project_index', filters_query|merge({ sort: 'type', dir: sort == 'type' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Type
+                                            {% if sort == 'type' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
                                     <th>Catégorie</th>
                                     <th>Technologies</th>
-                                    <th>Statut</th>
+                                    <th>
+                                        <a href="{{ path('project_index', filters_query|merge({ sort: 'status', dir: sort == 'status' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Statut
+                                            {% if sort == 'status' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
                                     <th class="text-end">CA Signé</th>
                                     <th class="text-end">Marge Brute</th>
                                     <th class="text-end">Achats</th>

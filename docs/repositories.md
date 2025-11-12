@@ -39,9 +39,17 @@ L'application suit le pattern Repository pour séparer la logique métier des co
 - findBetweenDatesFiltered()/countBetweenDatesFiltered() : Sélection paginée + filtres
 - getDistinctProjectTypes()/getDistinctStatuses() : Options de filtres
 
+### StaffingMetricsRepository
+- findByPeriod() : Métriques de staffing sur une période (avec filtres profil/contributeur)
+- getAggregatedMetricsByPeriod() : Métriques agrégées pour graphiques (staffingRate, TACE)
+- getMetricsByProfile() : Métriques moyennes par profil
+- getMetricsByContributor() : Métriques moyennes par contributeur
+- deleteForPeriod() : Suppression pour recalcul
+- existsForPeriod() : Vérification existence métriques
+
 ## Avantages
 - Séparation claire des responsabilités
 - Réutilisabilité de la logique métier
-- Testabilité améliorée (tests d’intégration fournis)
+- Testabilité améliorée (tests d'intégration fournis)
 - Contrôleurs plus légers et focalisés sur HTTP
 - Optimisation possible des requêtes dans les repositories

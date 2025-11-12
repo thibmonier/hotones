@@ -3,6 +3,7 @@
 {% block title %}Contributeurs{% endblock %}
 
 {% block content %}
+    {{ component('breadcrumb', { title: 'Contributeurs', pagetitle: 'Gestion' }) }}
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -18,6 +19,121 @@
         </div>
     </div>
 
+    <!-- Bloc filtres (contributeurs) -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% set activeFiltersCount = 0 %}
+                    {% set activeFiltersCount = activeFiltersCount
+                        + ((search and search|length > 0) ? 1 : 0)
+                        + (active != 'all' ? 1 : 0)
+                        + (sort != 'name' ? 1 : 0)
+                        + (dir != 'ASC' ? 1 : 0)
+                        + (pagination.per_page != 20 ? 1 : 0)
+                    %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">Filtres
+                            {% if activeFiltersCount > 0 %}
+                                <span class="badge bg-info ms-2">{{ activeFiltersCount }}</span>
+                            {% endif %}
+                        </h5>
+                        <div class="btn-group">
+                            <a href="{{ path('contributor_export_csv', { search: search, active: active, sort: sort, dir: dir }) }}" class="btn btn-sm btn-outline-primary">Exporter CSV</a>
+                            <a href="{{ path('contributor_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                            <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-contributors" aria-expanded="true" aria-controls="filters-contributors" id="filters-toggle-contributors">
+                                <i class="bx bx-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="filters-contributors" class="collapse show">
+                        {% set chips = [] %}
+                        {% if search and search|length > 0 %}
+                            {% set chips = chips|merge(['Recherche: ' ~ search]) %}
+                        {% endif %}
+                        {% if active != 'all' %}
+                            {% set chips = chips|merge(['Statut: ' ~ (active == 'active' ? 'Actifs' : 'Inactifs')]) %}
+                        {% endif %}
+                        {% if sort != 'name' or dir != 'ASC' %}
+                            {% set chips = chips|merge(['Tri: ' ~ sort ~ ' ' ~ dir]) %}
+                        {% endif %}
+                        {% if pagination.per_page != 20 %}
+                            {% set chips = chips|merge(['Par page: ' ~ pagination.per_page]) %}
+                        {% endif %}
+                        {% if chips|length > 0 %}
+                            <div class="mb-2 small text-muted">
+                                {% for c in chips %}
+                                    <span class="badge bg-light text-dark me-1">{{ c }}</span>
+                                {% endfor %}
+                            </div>
+                            <script>
+                              (function(){ try { window.__ACTIVE_FILTERS = {{ chips|json_encode|raw }}; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {} })();
+                            </script>
+                        {% else %}
+                            <script>try { window.__ACTIVE_FILTERS = []; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}</script>
+                        {% endif %}
+                        <form method="get" class="mb-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label">Recherche</label>
+                                    <input type="text" name="search" class="form-control" 
+                                           placeholder="Rechercher par nom, prénom ou email..." 
+                                           value="{{ search }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Statut</label>
+                                    <select name="active" class="form-select">
+                                        <option value="all" {{ active == 'all' ? 'selected' : '' }}>Tous les statuts</option>
+                                        <option value="active" {{ active == 'active' ? 'selected' : '' }}>Actifs uniquement</option>
+                                        <option value="inactive" {{ active == 'inactive' ? 'selected' : '' }}>Inactifs uniquement</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Par page</label>
+                                    <select name="per_page" class="form-select">
+                                        {% for n in [10,20,50,100] %}
+                                            <option value="{{ n }}" {{ pagination.per_page == n ? 'selected' : '' }}>{{ n }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="btn-group w-100" role="group">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bx bx-search"></i> Filtrer
+                                        </button>
+                                        <a href="{{ path('contributor_index', { reset: 1 }) }}" class="btn btn-secondary" title="Réinitialiser">
+                                            <i class="bx bx-reset"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="sort" value="{{ sort }}">
+                                <input type="hidden" name="dir" value="{{ dir }}">
+                            </div>
+                        </form>
+                    </div>
+                    <script>
+                        (function(){
+                          var key='filters:contributors:collapsed';
+                          var el=document.getElementById('filters-contributors');
+                          var btn=document.getElementById('filters-toggle-contributors');
+                          if(!el||!btn) return;
+                          try {
+                            var hasActive={{ (chips|length > 0) ? 'true' : 'false' }};
+                            var isSmall=window.matchMedia('(max-width: 767.98px)').matches;
+                            var collapsed = localStorage.getItem(key) === '1' || (isSmall && !hasActive);
+                            if (collapsed) { el.classList.remove('show'); btn.setAttribute('aria-expanded','false'); }
+                            var updateIcon=function(){ var i=btn.querySelector('i'); if(!i) return; if (el.classList.contains('show')) { i.className='bx bx-chevron-up'; localStorage.setItem(key,'0'); btn.setAttribute('aria-expanded','true'); } else { i.className='bx bx-chevron-down'; localStorage.setItem(key,'1'); btn.setAttribute('aria-expanded','false'); } };
+                            el.addEventListener('shown.bs.collapse', updateIcon);
+                            el.addEventListener('hidden.bs.collapse', updateIcon);
+                            updateIcon();
+                          } catch(e) {}
+                        })();
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -27,45 +143,32 @@
                             <h4 class="card-title mb-0">Liste des contributeurs</h4>
                         </div>
                         <div class="col-auto">
-                            <span class="badge bg-primary">{{ contributors|length }} contributeur{{ contributors|length > 1 ? 's' : '' }}</span>
+                            <span class="badge bg-primary">{{ pagination.total }} contributeur{{ pagination.total > 1 ? 's' : '' }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    {# Filtres #}
-                    <form method="get" class="mb-4">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <input type="text" name="search" class="form-control" 
-                                       placeholder="Rechercher par nom, prénom ou email..." 
-                                       value="{{ search }}">
-                            </div>
-                            <div class="col-md-3">
-                                <select name="active" class="form-select">
-                                    <option value="all" {{ active == 'all' ? 'selected' : '' }}>Tous les statuts</option>
-                                    <option value="active" {{ active == 'active' ? 'selected' : '' }}>Actifs uniquement</option>
-                                    <option value="inactive" {{ active == 'inactive' ? 'selected' : '' }}>Inactifs uniquement</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="btn-group w-100" role="group">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bx bx-search"></i> Filtrer
-                                    </button>
-                                    <a href="{{ path('contributor_index') }}" class="btn btn-secondary">
-                                        <i class="bx bx-reset"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
                     {% if contributors %}
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Nom</th>
-                                        <th>Contact</th>
+                                        <th>
+                                            <a href="{{ path('contributor_index', { search: search, active: active, sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' }) }}" class="text-decoration-none text-reset">
+                                                Nom
+                                                {% if sort == 'name' %}
+                                                    <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                                {% endif %}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="{{ path('contributor_index', { search: search, active: active, sort: 'email', dir: sort == 'email' and dir == 'ASC' ? 'DESC' : 'ASC' }) }}" class="text-decoration-none text-reset">
+                                                Contact
+                                                {% if sort == 'email' %}
+                                                    <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                                {% endif %}
+                                            </a>
+                                        </th>
                                         <th>Profils</th>
                                         <th>Coûts</th>
                                         <th>Compte lié</th>
@@ -198,15 +301,58 @@
         </div>
     </div>
 
-    {% if contributors|length > 0 %}
+    {% if pagination.total_pages > 1 %}
+    <div class="row mt-2">
+        <div class="col-12">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item {{ pagination.current_page == 1 ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page - 1 }) }}">Précédent</a>
+                    </li>
+                    {% for p in 1..pagination.total_pages %}
+                        <li class="page-item {{ p == pagination.current_page ? 'active' : '' }}">
+                            <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, sort: sort, dir: dir, per_page: pagination.per_page, page: p }) }}">{{ p }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="page-item {{ pagination.current_page == pagination.total_pages ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page + 1 }) }}">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1">
+                            <p class="text-truncate font-size-14 mb-2">TJM moyen</p>
+                            {% if stats_avg_tjm is not null %}
+                                <h4 class="mb-2">{{ stats_avg_tjm|number_format(0) }}€</h4>
+                            {% else %}
+                                <h4 class="mb-2">-</h4>
+                            {% endif %}
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-light text-primary rounded-3">
+                                <i class="bx bx-euro font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if pagination.total > 0 %}
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-lg-3 col-md-6">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="flex-1">
                             <p class="text-truncate font-size-14 mb-2">Total contributeurs</p>
-                            <h4 class="mb-2">{{ contributors|length }}</h4>
+                            <h4 class="mb-2">{{ pagination.total }}</h4>
                         </div>
                         <div class="avatar-sm">
                             <span class="avatar-title bg-light text-primary rounded-3">
@@ -218,14 +364,13 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-lg-3 col-md-6">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="flex-1">
                             <p class="text-truncate font-size-14 mb-2">Avec compte utilisateur</p>
-                            {% set linkedUsers = contributors|filter(c => c.user is not null) %}
-                            <h4 class="mb-2">{{ linkedUsers|length }}</h4>
+                            <h4 class="mb-2">{{ stats_linked_users }}</h4>
                         </div>
                         <div class="avatar-sm">
                             <span class="avatar-title bg-light text-success rounded-3">
@@ -237,16 +382,14 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-lg-3 col-md-6">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="flex-1">
                             <p class="text-truncate font-size-14 mb-2">CJM moyen</p>
-                            {% set contributorsWithCjm = contributors|filter(c => c.cjm is not null) %}
-                            {% if contributorsWithCjm|length > 0 %}
-                                {% set avgCjm = contributorsWithCjm|reduce((carry, c) => carry + c.cjm, 0) / contributorsWithCjm|length %}
-                                <h4 class="mb-2">{{ avgCjm|number_format(0) }}€</h4>
+                            {% if stats_avg_cjm is not null %}
+                                <h4 class="mb-2">{{ stats_avg_cjm|number_format(0) }}€</h4>
                             {% else %}
                                 <h4 class="mb-2">-</h4>
                             {% endif %}

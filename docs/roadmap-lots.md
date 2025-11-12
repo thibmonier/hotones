@@ -2,6 +2,22 @@
 
 Ce document liste les lots de fonctionnalités à mettre en œuvre par ordre de priorité.
 
+## Liens
+- État d'avancement: [docs/status.md](./status.md)
+
+---
+
+## Légende
+- ✅ Terminé
+- 🔄 En cours
+- 🔲 À faire
+
+## Définition de Done (DoD)
+- Fonctionnalités implémentées et validées métier
+- Tests unitaires, fonctionnels et E2E au vert en CI
+- Documentation mise à jour
+- Revue de code effectuée
+
 ---
 
 ## 🎯 Lot 1 : CRUD Entités Principales (Priorité Haute)
@@ -16,7 +32,7 @@ Compléter les interfaces de gestion des entités principales pour permettre une
 - ✅ CRUD complet (liste, création, édition, suppression)
 - ✅ Recherche et filtres (nom, profil actuel, statut actif/inactif)
 - ✅ Affichage des périodes d'emploi associées
-- ✅ Upload et gestion d'avatar
+- 🔲 Upload et gestion d'avatar
 - ✅ Vue détaillée avec historique (emplois, projets, temps saisis)
 
 #### 1.2 Gestion des Périodes d'Emploi
@@ -44,7 +60,7 @@ Compléter les interfaces de gestion des entités principales pour permettre une
 - ✅ Onglet "Fiche d’identité technique" (technologies avec versions, liens dépôts/env., accès BDD/SSH/FTP)
 - ✅ Relation OrderLine → ProjectTask → ProjectSubTask
 - ✅ Calculs agrégés cohérents (temps révisés et passés)
-- ✅ Filtres avancés dans le listing (statut, type, technologies, dates, contributeurs)
+- 🔲 Filtres avancés dans le listing (statut, type, technologies, dates, contributeurs)
 
 #### 1.4 Gestion des Devis
 - ✅ Entity `Order` existante
@@ -76,8 +92,8 @@ Interface complète de saisie et gestion des temps (timesheets) avec liaison aux
 
 #### 2.1 Interface de saisie
 - ✅ Entity `Timesheet` existante avec relation optionnelle vers `ProjectTask`
-- ✅ Grille de saisie hebdomadaire (auto-save)
-- ✅ Compteur de temps (start/stop, un seul actif, imputation min 0,125j)
+- 🔲 Grille de saisie hebdomadaire (auto-save)
+- 🔲 Compteur de temps (start/stop, un seul actif, imputation min 0,125j)
 - 🔲 Sélection projet → tâche (cascade)
 - 🔲 Validation : max 24h/jour
 - 🔲 Saisie en heures ou jours (conversion auto 1j = 8h)
@@ -109,7 +125,7 @@ Interface complète de saisie et gestion des temps (timesheets) avec liaison aux
 
 ---
 
-## 📊 Lot 3 : Dashboard Analytique (Priorité Haute) ✅ **COMPLÉTÉ**
+## 📊 Lot 3 : Dashboard Analytique (Priorité Haute) 🔄 En cours
 
 ### Objectif
 Interface de visualisation des KPIs et métriques avec filtres dynamiques.
@@ -117,18 +133,18 @@ Interface de visualisation des KPIs et métriques avec filtres dynamiques.
 ### Fonctionnalités
 
 #### 3.1 Vues du dashboard
-- ✅ Page principale `/analytics/dashboard`
-- ✅ Cartes KPIs principales :
+- 🔲 Page principale `/analytics/dashboard`
+- 🔲 Cartes KPIs principales :
   - CA total / Marge / Taux de marge
   - Projets actifs / terminés
   - Devis en attente / gagnés
   - Taux d'occupation
-- ✅ Graphiques d'évolution temporelle (Chart.js)
-- ✅ Répartition par type de projet (camembert)
-- ✅ Top contributeurs (Top 5)
+- 🔲 Graphiques d'évolution temporelle (Chart.js)
+- 🔲 Répartition par type de projet (camembert)
+- 🔲 Top contributeurs (Top 5)
 
 #### 3.2 Filtres
-- ✅ Période (aujourd'hui, semaine, mois, trimestre, année)
+- 🔲 Période (aujourd'hui, semaine, mois, trimestre, année)
 - 🔲 Type de projet (forfait/régie, interne/client)
 - 🔲 Chef de projet
 - 🔲 Commercial
@@ -139,15 +155,15 @@ Interface de visualisation des KPIs et métriques avec filtres dynamiques.
 - 🔲 Export Excel des données
 
 #### 3.4 Intégration Worker
-- ✅ Modèle en étoile créé (dimensions + faits)
-- ✅ Message `RecalculateMetricsMessage` créé
-- ✅ Index unique sur `FactProjectMetrics`
-- ✅ Documentation worker
-- ✅ Service `MetricsCalculationService` (calcul des KPIs)
-- ✅ Handler `RecalculateMetricsMessageHandler` (traitement asynchrone)
-- ✅ Commande CLI `app:calculate-metrics`
-- ✅ Bouton "Recalculer" dans l'interface admin
-- ✅ Cron automatique (quotidien) via Symfony Scheduler (providers DB + métriques, admin `/admin/scheduler`)
+- 🔲 Modèle en étoile créé (dimensions + faits)
+- 🔲 Message `RecalculateMetricsMessage` créé
+- 🔲 Index unique sur `FactProjectMetrics`
+- 🔲 Documentation worker
+- 🔲 Service `MetricsCalculationService` (calcul des KPIs)
+- 🔲 Handler `RecalculateMetricsMessageHandler` (traitement asynchrone)
+- 🔲 Commande CLI `app:calculate-metrics`
+- 🔲 Bouton "Recalculer" dans l'interface admin
+- 🔲 Cron automatique (quotidien) via Symfony Scheduler (providers DB + métriques, admin `/admin/scheduler`)
 
 ### Tests
 - 🔲 Tests unitaires calculs métriques
@@ -394,22 +410,28 @@ Exposer une API REST pour intégrations externes et applications tierces en util
 - Lot 7 : Rapports
 - Lot 8 : API REST
 
-### Sprint 9 (2 semaines) : ajout d’un onglet « fiche d’identité technique » pour les projets
+## Backlog
+
+### Fiche d’identité technique — Projets
 Cet onglet permettra de donner les informations techniques principales du projet
 - Un tableau donnant le détail des technologies utilisées, avec les versions 
 - Les liens vers le ou les gestionnaires de sources (gitlab, GitHub, etc.)
 - Les liens vers les différents environnements de tests ou production
 - Les informations d’accès (BDD, SSH, FTP, etc.)
+- Dépendances : Lot 1.3 (Projets), Lot 5 (UX/UI)
 
-### Sprint 10 (2 semaines) : ajout de KPIs
+### KPIs — récapitulatif des achats par période
 - Ajouter un récapitulatif des achats par période (tout type)
+- Dépendances : Lot 3 (modèle de métriques/worker), entités Achats/Orders
 
-### Sprint 11 (2 semaines) : ajout d’un tableau récapitulatif des dépenses
+### Tableau récapitulatif des dépenses
+- Dépendances : Lot 3 (agrégations), Lot 1.3 (Projets/Orders)
 
-### Sprint 12 (2 semaines) : mettre en place Symfony Scheduler et ajouter une page d’administration des entrées du scheduler
-- en s'inspirant de la documentation de Symfony Scheduler et en utilisant les expressions de crontab directement dans le formulaire de saisie (avec des exemples ou de l'aide)
+### Symfony Scheduler — page d’administration
+- S’inspirer de la documentation de Symfony Scheduler et utiliser des expressions crontab dans le formulaire (avec exemples/aide)
+- Dépendances : Base Admin, premiers jobs (ex: recalcul KPIs du Lot 3)
 
-### Sprint 13 : mettre en place des Business Units 
+### Business Units (BU)
 - Les business units sont aussi appelées BU
 - Les business units permettent de cloisonner plusieurs équipes au sein de la même société
 - Les business Units sont manager par un des contributeurs
@@ -420,13 +442,35 @@ Cet onglet permettra de donner les informations techniques principales du projet
 - les clients peuvent être attachés à une business unit préférentielle
 - Chaque BU a des objectifs de CA signé, de Marge générée et de contributeurs à l'année
 - les objectifs doivent pouvoir être visibles dans les KPIs 
+- Dépendances : Lots 1 (Contributors/Projects/Orders), 3 (KPIs), 4 (Gestion compte)
 
-### Sprint 14 : mettre en place le workflow de recrutement
+### Workflow de recrutement
 - lors d'un recrutement, un candidat doit etre défini par ses coordonnées, son CV, ses technologies de préférences avec son niveau, ses prétentions salariales (en k€ par an), son type de contrat visé (CDI, CDD, Alternance, stage), la BU identifiée pour le poste.
 - le candidat doit etre attaché à un poste ou profil type.
 - Lors de l'embauche, le candidat devient un contributeur et on doit pouvoir revoir les informations saisies lors de son process de recrutement.
 - lors d'un process de recrutement, on doit pouvoir définir qui le contacte ou le rencontre, et qui doit encore le rencontrer lors des prochaines étapes (la derniere étant l'embauche ou le refus d'embauche)
-- 
+- Dépendances : Lot 1.1 (Contributors), 1.2 (EmploymentPeriod), 4 (Mon compte)
+
+### ✅ Dashboard de suivi du staffing
+Ce dashboard devra montrer :
+- ✅ Une courbe avec le taux de staffing (pourcentage d’occupation des personnes productives). Cette courbe devra être filtrable sur des profils, des contributeurs, des BU. Si nécessaire préparer des données dans un modèle de données étoiles pour conserver des performances acceptables. Le Graph devra montrer l’évolution sur des périodes de temps longues (-6mois à +6mois par rapport à la date actuelle)
+- ✅ Une courbe montrant le TACE (Taux d’activité Congés Exclus) des personnes productives (contributeurs avec des profils identifiés comme productifs). Le Graph devra montrer l’évolution sur des périodes de temps longues (-6mois à +6mois par rapport à la date actuelle)
+- ✅ Modèle en étoile : DimProfile, DimTime, FactStaffingMetrics
+- ✅ Service StaffingMetricsCalculationService pour les calculs
+- ✅ Repository StaffingMetricsRepository avec méthodes d'agrégation
+- ✅ Commande CLI app:calculate-staffing-metrics
+- ✅ Controller et templates /staffing/dashboard avec graphiques Chart.js
+- ✅ Tableaux par profil et par contributeur
+
+Définition :
+- Taux de staffing : Le taux de staffing est un indicateur de pilotage des ressources. Il représente le pourcentage du temps où une équipe ou un collaborateur est affecté à des missions (souvent facturables) par rapport à son temps total disponible sur une période. Formule courante: Temps staffé (missions, projets, production) ÷ Temps disponible total (hors absences) × 100. Exemples d’interprétations:
+    - 85%: bonne utilisation, marge pour formation/projets internes.
+    - 100%: utilisation maximale, risque de surcharge.
+    - <70%: sous-utilisation, besoin d’affectations supplémentaires.
+      Variantes:
+    - Taux de staffing facturable: ne compte que les heures vendues.
+    - Taux de staffing global: inclut projets internes, support, formation.
+- TACE : Le Taux d'Activité Congés Exclus est un indicateur qui permet de mesurer le nombre de jours produits par les collaborateurs (activités clients et internes) par rapport au nombre de jours travaillés en entreprise, hors congés.
 
 ---
 

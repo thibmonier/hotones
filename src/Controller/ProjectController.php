@@ -23,22 +23,41 @@ class ProjectController extends AbstractController
     {
         $projectRepo = $em->getRepository(Project::class);
 
+        $session = $request->getSession();
+        $reset   = (bool) $request->query->get('reset', false);
+        if ($reset && $session) {
+            $session->remove('project_filters');
+
+            return $this->redirectToRoute('project_index');
+        }
+
+        // Charger filtres depuis la session si aucun filtre explicite n'est fourni
+        $queryAll   = $request->query->all();
+        $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'per_page', 'sort', 'dir'];
+        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved      = ($session && $session->has('project_filters')) ? (array) $session->get('project_filters') : [];
+
         // Filtres période: année courante par défaut
-        $year       = (int) $request->query->get('year', date('Y'));
-        $startParam = $request->query->get('start_date');
-        $endParam   = $request->query->get('end_date');
+        $yearParam  = $hasFilter ? ($request->query->get('year') ?? null) : ($saved['year'] ?? null);
+        $year       = (int) ($yearParam ?: date('Y'));
+        $startParam = $hasFilter ? ($request->query->get('start_date') ?: null) : ($saved['start_date'] ?? null);
+        $endParam   = $hasFilter ? ($request->query->get('end_date') ?: null) : ($saved['end_date'] ?? null);
 
         $startDate = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
         $endDate   = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
 
         // Filtres additionnels
-        $filterProjectType = $request->query->get('project_type') ?: null;
-        $filterStatus      = $request->query->get('status', 'active') ?: null;
-        $filterTechnology  = $request->query->get('technology') ? (int) $request->query->get('technology') : null;
+        $filterProjectType = $hasFilter ? ($request->query->get('project_type') ?: null) : ($saved['project_type'] ?? null);
+        $filterStatus      = $hasFilter ? ($request->query->get('status') ?: null) : ($saved['status'] ?? 'active');
+        $filterTechnology  = $hasFilter ? ($request->query->get('technology') ? (int) $request->query->get('technology') : null) : (isset($saved['technology']) ? (int) $saved['technology'] : null);
+
+        // Tri
+        $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'name')) : ($saved['sort'] ?? 'name');
+        $dir  = $hasFilter ? ($request->query->get('dir') ?: ($saved['dir'] ?? 'ASC')) : ($saved['dir'] ?? 'ASC');
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
-        $perPageParam   = (int) $request->query->get('per_page', 10);
+        $perPageParam   = (int) ($hasFilter ? ($request->query->get('per_page', 10)) : ($saved['per_page'] ?? 10));
         $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 10;
         $page           = max(1, (int) $request->query->get('page', 1));
         $offset         = ($page - 1) * $perPage;
@@ -47,7 +66,7 @@ class ProjectController extends AbstractController
         $total = $projectRepo->countBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology);
 
         // Projets sur la période avec filtres (paginés)
-        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $perPage, $offset);
+        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset);
 
         // Agrégats SQL en batch pour éviter le parcours objet
         $projectIds = array_map(fn ($p) => $p->getId(), $projects);
@@ -108,6 +127,21 @@ class ProjectController extends AbstractController
             'technologies'  => $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
         ];
 
+        // Sauvegarder les filtres en session
+        if ($session) {
+            $session->set('project_filters', [
+                'year'         => $year,
+                'start_date'   => $startDate->format('Y-m-d'),
+                'end_date'     => $endDate->format('Y-m-d'),
+                'project_type' => $filterProjectType,
+                'status'       => $filterStatus,
+                'technology'   => $filterTechnology,
+                'per_page'     => $perPage,
+                'sort'         => $sort,
+                'dir'          => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
+            ]);
+        }
+
         return $this->render('project/index.html.twig', [
             'projects_with_metrics' => $projectsWithMetrics,
             'filters'               => [
@@ -130,7 +164,11 @@ class ProjectController extends AbstractController
                 'status'       => $filterStatus,
                 'technology'   => $filterTechnology,
                 'per_page'     => $perPage,
+                'sort'         => $sort,
+                'dir'          => $dir,
             ],
+            'sort' => $sort,
+            'dir'  => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
         ]);
     }
 
@@ -165,7 +203,7 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/{id}', name: 'project_show', methods: ['GET'])]
-    public function show(int $id, EntityManagerInterface $em): Response
+    public function show(Request $request, int $id, EntityManagerInterface $em): Response
     {
         $project = $em->getRepository(Project::class)->findOneWithRelations($id);
 
@@ -176,9 +214,35 @@ class ProjectController extends AbstractController
         // Calculer les métriques des devis
         $projectMetrics = $this->calculateProjectMetrics($project);
 
+        // Devis du projet: tri + pagination
+        $orderRepo      = $em->getRepository(\App\Entity\Order::class);
+        $allowedPerPage = [5, 10, 20, 50];
+        $oSort          = (string) $request->query->get('o_sort', 'createdAt');
+        $oDir           = (string) $request->query->get('o_dir', 'DESC');
+        $oPerPage       = (int) $request->query->get('o_per_page', 10);
+        $oPerPage       = in_array($oPerPage, $allowedPerPage, true) ? $oPerPage : 10;
+        $oPage          = max(1, (int) $request->query->get('o_page', 1));
+        $oOffset        = ($oPage - 1) * $oPerPage;
+
+        $orders      = $orderRepo->findWithFilters($project, null, $oSort, $oDir, $oPerPage, $oOffset);
+        $oTotal      = $orderRepo->countWithFilters($project, null);
+        $oPagination = [
+            'current_page' => $oPage,
+            'per_page'     => $oPerPage,
+            'total'        => $oTotal,
+            'total_pages'  => (int) ceil($oTotal / $oPerPage),
+            'has_prev'     => $oPage > 1,
+            'has_next'     => $oPage * $oPerPage < $oTotal,
+        ];
+
         return $this->render('project/show.html.twig', [
-            'project' => $project,
-            'metrics' => $projectMetrics,
+            'project'           => $project,
+            'metrics'           => $projectMetrics,
+            'orders'            => $orders,
+            'orders_pagination' => $oPagination,
+            'orders_sort'       => $oSort,
+            'orders_dir'        => strtoupper($oDir) === 'ASC' ? 'ASC' : 'DESC',
+            'orders_per_page'   => $oPerPage,
         ]);
     }
 
@@ -291,5 +355,63 @@ class ProjectController extends AbstractController
             'orders_by_status'    => $ordersByStatus,
             'signed_orders_count' => array_sum(array_intersect_key($ordersByStatus, array_flip(['signed', 'won', 'completed', 'signe', 'gagne', 'termine']))),
         ];
+    }
+
+    #[Route('/export.csv', name: 'project_export_csv', methods: ['GET'])]
+    public function exportCsv(Request $request, EntityManagerInterface $em, \App\Service\ProfitabilityService $profitabilityService): Response
+    {
+        $projectRepo = $em->getRepository(Project::class);
+        $session     = $request->getSession();
+        $saved       = ($session && $session->has('project_filters')) ? (array) $session->get('project_filters') : [];
+
+        // Lire filtres depuis requête ou session
+        $year       = (int) $request->query->get('year', $saved['year'] ?? date('Y'));
+        $startParam = $request->query->get('start_date', $saved['start_date'] ?? null);
+        $endParam   = $request->query->get('end_date', $saved['end_date'] ?? null);
+        $startDate  = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
+        $endDate    = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
+
+        $filterProjectType = $request->query->get('project_type', $saved['project_type'] ?? null) ?: null;
+        $filterStatus      = $request->query->get('status', $saved['status'] ?? null) ?: null;
+        $filterTechnology  = $request->query->getInt('technology', $saved['technology'] ?? 0) ?: null;
+        $sort              = (string) $request->query->get('sort', $saved['sort'] ?? 'name');
+        $dir               = (string) $request->query->get('dir', $saved['dir'] ?? 'ASC');
+
+        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, null, null);
+
+        // CSV headers
+        $rows   = [];
+        $header = ['Nom', 'Client', 'Type', 'Statut', 'Catégorie', 'Technologies'];
+        $rows[] = $header;
+
+        foreach ($projects as $p) {
+            $techs = [];
+            foreach ($p->getTechnologies() as $t) {
+                $techs[] = $t->getName();
+            }
+            $rows[] = [
+                $p->getName(),
+                $p->getClient() ? $p->getClient()->getName() : '',
+                $p->getProjectType() ?: '',
+                $p->getStatus() ?: '',
+                $p->getServiceCategory() ? $p->getServiceCategory()->getName() : '',
+                implode('|', $techs),
+            ];
+        }
+
+        // Génération CSV sécurisée
+        $handle = fopen('php://temp', 'r+');
+        foreach ($rows as $r) {
+            fputcsv($handle, $r);
+        }
+        rewind($handle);
+        $csv = "\xEF\xBB\xBF".stream_get_contents($handle);
+
+        $filename = sprintf('projets_%s.csv', date('Y-m-d'));
+        $response = new Response($csv);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+
+        return $response;
     }
 }

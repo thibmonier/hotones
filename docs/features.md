@@ -6,6 +6,8 @@
 - Gestion des profils utilisateurs (nom, prénom, adresse, téléphone, avatar)
 
 ## Gestion de mon compte
+
+Référence: Roadmap — Lot 4 (Gestion de Compte Utilisateur) → [docs/roadmap-lots.md](./roadmap-lots.md)
 - dans le header, mon avatar et mon prénom doivent être présents à la place de l'avatar par défaut du thème et "Henry"
 - à l'ouverture du menu, il faut que le lien "Profile" soit transformé en "Mon compte" et renvoit vers une page permettant de gérer mon compte (actuellement "/me")
 - Cette page de compte doit pouvoir me permettre de gérer mes informations personnelles (nom, prénom, mail, téléphone professionnel en optionnel, téléphone personnel, adresse personnelle) et les informations de connexion (mot de passe, 2FA)
@@ -53,8 +55,20 @@
   - Sections regroupant des lignes + totalisation
   - Lignes: profil, TJM, jours, total (jours×TJM), achats attachés (affiche marge nette)
 
+## 📊 Dashboard de Suivi du Staffing
+- URL : `/staffing/dashboard`
+- Menu : Administration > Analyses & Rapports > 📈 Staffing & TACE
+- Graphiques d'évolution sur -6 mois à aujourd'hui :
+  - Taux de staffing : (Temps staffé / Temps disponible) × 100
+  - TACE (Taux d'Activité Congés Exclus) : (Jours produits / Jours travaillés hors congés) × 100
+- Tableaux de métriques par profil et par contributeur
+- Filtres : contributeur, profil, granularité (hebdo/mensuel/trimestriel)
+- Modèle en étoile : DimProfile, DimTime, FactStaffingMetrics
+- Commande CLI : `php bin/console app:calculate-staffing-metrics`
+- Calcul automatique des jours disponibles, travaillés, staffés et congés
+
 ## 🧪 Tests E2E
 - Outil: Symfony Panther (Chrome headless)
-- Parcours couverts: authentification (login), navigation tableau de bord → projets, création d’un projet (flux minimal)
+- Parcours couverts: authentification (login), navigation tableau de bord → projets, création d'un projet (flux minimal)
 - Commande: `./vendor/bin/phpunit` (voir `docs/tests.md` pour variables Chrome)
 - CI: exécution automatique des E2E via GitHub Actions (`.github/workflows/ci.yml`)

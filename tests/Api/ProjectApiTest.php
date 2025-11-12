@@ -4,7 +4,9 @@ namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Entity\Project;
-use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
+use App\Factory\UserFactory;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * Tests fonctionnels pour l'endpoint /api/projects.
@@ -13,7 +15,8 @@ use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
  */
 class ProjectApiTest extends ApiTestCase
 {
-    use RefreshDatabaseTrait;
+    use Factories;
+    use ResetDatabase;
 
     private string $token;
 
@@ -35,11 +38,11 @@ class ProjectApiTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
         $this->assertJsonContains([
             '@context' => '/api/contexts/Project',
-            '@type'    => 'hydra:Collection',
+            '@type'    => 'Collection',
         ]);
 
         // Vérifier qu'on a au moins un résultat dans la collection
-        $this->assertCount(0, $response->toArray()['hydra:member']);
+        $this->assertCount(0, $response->toArray()['member']);
     }
 
     public function testCreateProject(): void
@@ -164,40 +167,20 @@ class ProjectApiTest extends ApiTestCase
             return $this->token;
         }
 
-        // Créer un utilisateur de test et obtenir un token JWT
-        // À adapter selon votre configuration
-        $client = static::createClient();
-
-        // Exemple simplifié - à adapter selon vos fixtures
-        $response = $client->request('POST', '/api/login', [
-            'json' => [
-                'email'    => 'test@example.com',
-                'password' => 'password',
-            ],
-        ]);
-
-        $data        = $response->toArray();
-        $this->token = $data['token'];
+        // Crée un utilisateur aléatoire et génère un JWT sans appeler /api/login
+        $user        = UserFactory::createOne();
+        $jwtManager  = static::getContainer()->get('lexik_jwt_authentication.jwt_manager');
+        $this->token = $jwtManager->create($user);
 
         return $this->token;
     }
 
     private function getTokenWithRole(string $role): string
     {
-        // Créer un utilisateur avec un rôle spécifique et obtenir son token
-        // À adapter selon votre configuration
-        $client = static::createClient();
+        // Crée un utilisateur avec le rôle demandé et génère un JWT
+        $user       = UserFactory::createOne(['roles' => [$role]]);
+        $jwtManager = static::getContainer()->get('lexik_jwt_authentication.jwt_manager');
 
-        // Exemple simplifié
-        $response = $client->request('POST', '/api/login', [
-            'json' => [
-                'email'    => 'manager@example.com',
-                'password' => 'password',
-            ],
-        ]);
-
-        $data = $response->toArray();
-
-        return $data['token'];
+        return $jwtManager->create($user);
     }
 }

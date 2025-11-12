@@ -3,6 +3,7 @@
 {% block title %}Saisie des temps - Semaine du {{ startDate|date('d/m/Y') }}{% endblock %}
 
 {% block content %}
+    {{ component('breadcrumb', { title: 'Saisie des temps', pagetitle: 'Temps' }) }}
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">

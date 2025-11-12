@@ -208,8 +208,21 @@ class TimesheetController extends AbstractController
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function all(Request $request, EntityManagerInterface $em): Response
     {
-        $month     = $request->query->get('month', date('Y-m'));
-        $projectId = $request->query->get('project');
+        $session = $request->getSession();
+        $reset   = (bool) $request->query->get('reset', false);
+        if ($reset && $session) {
+            $session->remove('timesheet_all_filters');
+
+            return $this->redirectToRoute('timesheet_all');
+        }
+
+        $queryAll = $request->query->all();
+        $keys     = ['month', 'project'];
+        $has      = count(array_intersect(array_keys($queryAll), $keys)) > 0;
+        $saved    = ($session && $session->has('timesheet_all_filters')) ? (array) $session->get('timesheet_all_filters') : [];
+
+        $month     = $has ? ($request->query->get('month', date('Y-m'))) : ($saved['month'] ?? date('Y-m'));
+        $projectId = $has ? ($request->query->get('project')) : ($saved['project'] ?? null);
 
         $startDate = new DateTime($month.'-01');
         $endDate   = clone $startDate;
@@ -222,6 +235,13 @@ class TimesheetController extends AbstractController
         $selectedProject = $projectId ? $projectRepo->find($projectId) : null;
         $timesheets      = $timesheetRepo->findForPeriodWithProject($startDate, $endDate, $selectedProject);
         $projects        = $projectRepo->findActiveOrderedByName();
+
+        if ($session) {
+            $session->set('timesheet_all_filters', [
+                'month'   => $month,
+                'project' => $projectId,
+            ]);
+        }
 
         return $this->render('timesheet/all.html.twig', [
             'timesheets'      => $timesheets,

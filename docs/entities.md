@@ -129,11 +129,29 @@ DimContributor (dimension contributeurs)
 ├── user → User, name, role, isActive
 └── compositeKey (unicité)
 
+DimProfile (dimension profils métier)
+├── profile → Profile, name
+├── isProductive (indique si productif)
+├── isActive
+└── compositeKey (unicité)
+
 FactProjectMetrics (table de faits)
 ├── dimTime, dimProjectType, dimProjectManager...
 ├── projectCount, activeProjectCount, orderCount...
 ├── totalRevenue, totalCosts, grossMargin, marginPercentage
 ├── totalSoldDays, totalWorkedDays, utilizationRate
+└── calculatedAt, granularity
+
+FactStaffingMetrics (table de faits staffing)
+├── dimTime, dimProfile, contributor
+├── availableDays (jours disponibles hors congés)
+├── workedDays (jours travaillés réels)
+├── staffedDays (jours staffés sur missions)
+├── vacationDays (jours de congés)
+├── plannedDays (jours planifiés futur)
+├── staffingRate (taux de staffing en %)
+├── tace (Taux d’Activité Congés Exclus en %)
+├── contributorCount
 └── calculatedAt, granularity
 ```
 

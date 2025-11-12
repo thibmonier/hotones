@@ -14,6 +14,7 @@ Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en 
 - Frontend: Twig + Bootstrap 5 (thème Skote)
 - Assets: Webpack Encore + Sass
 - 2FA: scheb/2fa-bundle (TOTP)
+- ApiPlatform 4 (REST)
 
 ## Prérequis
 - Docker + Docker Compose
@@ -106,6 +107,7 @@ export PANTHER_NO_SANDBOX=1
 - Admin config: /admin/technologies, /admin/service-categories, /admin/job-profiles
 - Périodes d'emploi: /employment-periods
 - Analytics: /analytics/dashboard
+- /api/documentation pour avoir la documentation swagger de l'API
 
 ## Accès Base de données (clients externes)
 - Host: localhost

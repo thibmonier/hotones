@@ -31,12 +31,56 @@ class OrderController extends AbstractController
     #[Route('', name: 'order_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
-        $projectId = $request->query->get('project');
-        $status    = $request->query->get('status');
+        $session = $request->getSession();
+        $reset   = (bool) $request->query->get('reset', false);
+        if ($reset && $session) {
+            $session->remove('order_filters');
 
-        $project  = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
-        $orders   = $em->getRepository(Order::class)->findWithFilters($project, $status);
+            return $this->redirectToRoute('order_index');
+        }
+
+        $queryAll   = $request->query->all();
+        $filterKeys = ['project', 'status'];
+        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved      = ($session && $session->has('order_filters')) ? (array) $session->get('order_filters') : [];
+
+        $projectId = $hasFilter ? ($request->query->get('project') ?? null) : ($saved['project'] ?? null);
+        $status    = $hasFilter ? ($request->query->get('status') ?? null) : ($saved['status'] ?? null);
+
+        $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
+        // Tri
+        $sort = $hasFilter ? ($request->query->get('sort') ?? ($saved['sort'] ?? 'createdAt')) : ($saved['sort'] ?? 'createdAt');
+        $dir  = $hasFilter ? ($request->query->get('dir') ?? ($saved['dir'] ?? 'DESC')) : ($saved['dir'] ?? 'DESC');
+
+        // Pagination
+        $allowedPerPage = [10, 20, 50, 100];
+        $perPageParam   = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
+        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
+        $page           = max(1, (int) $request->query->get('page', 1));
+        $offset         = ($page - 1) * $perPage;
+
+        $orders   = $em->getRepository(Order::class)->findWithFilters($project, $status, $sort, $dir, $perPage, $offset);
+        $total    = $em->getRepository(Order::class)->countWithFilters($project, $status);
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
+
+        $pagination = [
+            'current_page' => $page,
+            'per_page'     => $perPage,
+            'total'        => $total,
+            'total_pages'  => (int) ceil($total / $perPage),
+            'has_prev'     => $page > 1,
+            'has_next'     => $page * $perPage < $total,
+        ];
+
+        if ($session) {
+            $session->set('order_filters', [
+                'project'  => $projectId,
+                'status'   => $status,
+                'sort'     => $sort,
+                'dir'      => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+                'per_page' => $perPage,
+            ]);
+        }
 
         return $this->render('order/index.html.twig', [
             'orders'          => $orders,
@@ -44,6 +88,10 @@ class OrderController extends AbstractController
             'selectedProject' => $projectId,
             'selectedStatus'  => $status,
             'statusOptions'   => Order::STATUS_OPTIONS,
+            'filters_query'   => ['project' => $projectId, 'status' => $status, 'sort' => $sort, 'dir' => $dir, 'per_page' => $perPage],
+            'sort'            => $sort,
+            'dir'             => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+            'pagination'      => $pagination,
         ]);
     }
 
@@ -556,5 +604,53 @@ class OrderController extends AbstractController
         }
 
         return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+    }
+
+    #[Route('/export.csv', name: 'order_export_csv', methods: ['GET'])]
+    public function exportCsv(Request $request, EntityManagerInterface $em): Response
+    {
+        $session   = $request->getSession();
+        $saved     = ($session && $session->has('order_filters')) ? (array) $session->get('order_filters') : [];
+        $projectId = $request->query->get('project', $saved['project'] ?? null);
+        $status    = $request->query->get('status', $saved['status'] ?? null);
+        $sort      = $request->query->get('sort', $saved['sort'] ?? 'createdAt');
+        $dir       = $request->query->get('dir', $saved['dir'] ?? 'DESC');
+
+        $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
+        $orders  = $em->getRepository(Order::class)->findWithFilters($project, $status, $sort, $dir, null, null);
+
+        $rows   = [];
+        $header = ['Numéro', 'Nom', 'Projet', 'Statut', 'Date création', 'Montant total HT'];
+        $rows[] = $header;
+        foreach ($orders as $o) {
+            $total = (float) $o->calculateTotalFromSections();
+            if ($total <= 0 && $o->getTotalAmount()) {
+                $total = (float) $o->getTotalAmount();
+            }
+            $statusLabel = Order::STATUS_OPTIONS[$o->getStatus()] ?? $o->getStatus();
+            $rows[]      = [
+                $o->getOrderNumber(),
+                $o->getName() ?: '',
+                $o->getProject() ? $o->getProject()->getName() : '',
+                $statusLabel,
+                $o->getCreatedAt() ? $o->getCreatedAt()->format('Y-m-d') : '',
+                number_format($total, 2, '.', ''),
+            ];
+        }
+
+        // Génération CSV sécurisée
+        $handle = fopen('php://temp', 'r+');
+        foreach ($rows as $r) {
+            fputcsv($handle, $r);
+        }
+        rewind($handle);
+        $csv = "\xEF\xBB\xBF".stream_get_contents($handle);
+
+        $filename = sprintf('devis_%s.csv', date('Y-m-d'));
+        $response = new Response($csv);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+
+        return $response;
     }
 }

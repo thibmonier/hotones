@@ -260,6 +260,8 @@ class ProjectRepository extends ServiceEntityRepository
         ?string $status = null,
         ?string $projectType = null,
         ?int $technologyId = null,
+        ?string $sortField = 'name',
+        ?string $sortDir = 'ASC',
         ?int $limit = null,
         ?int $offset = null
     ): array {
@@ -273,8 +275,20 @@ class ProjectRepository extends ServiceEntityRepository
             ->where('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
-            ->setParameter('end', $end)
-            ->orderBy('p.name', 'ASC');
+            ->setParameter('end', $end);
+
+        // Tri sécurisé par liste blanche
+        $map = [
+            'name'   => 'p.name',
+            'client' => 'c.name',
+            'status' => 'p.status',
+            'type'   => 'p.projectType',
+            'start'  => 'p.startDate',
+            'end'    => 'p.endDate',
+        ];
+        $col = $map[$sortField] ?? 'p.name';
+        $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        $qb->orderBy($col, $dir);
 
         if ($status) {
             $qb->andWhere('p.status = :status')->setParameter('status', $status);

@@ -4,7 +4,9 @@
 - dim_time : Dimension temporelle (année, trimestre, mois)
 - dim_project_type : Types de projets (forfait/régie, catégorie, statut)
 - dim_contributor : Contributeurs avec rôles (chef projet, commercial, directeur)
+- dim_profile : Profils métier (dev, lead, chef projet) avec flag productif
 - fact_project_metrics : Métriques centralisées avec KPIs
+- fact_staffing_metrics : Métriques de staffing et TACE
 
 ## KPIs Suivis
 ### Financiers
@@ -22,6 +24,16 @@
 - Filtres : période, année/mois, type de projet, chef de projet, commercial
 - Visualisations : cartes KPIs, graphiques d'évolution, répartition, table détaillée
 
+## Dashboard de Staffing
+- URL : `/staffing/dashboard`
+- Filtres : contributeur, profil, granularité (weekly/monthly/quarterly)
+- Graphiques : Taux de staffing et TACE sur période -6 mois à aujourd'hui
+- Tableaux : Métriques par profil et top 10 contributeurs
+- KPIs staffing :
+  - Taux de staffing : (Temps staffé / Temps disponible) × 100
+  - TACE : (Jours produits / Jours travaillés hors congés) × 100
+  - Jours disponibles, travaillés, staffés, congés
+
 ## Calculs Automatisés
 - Recalcul temps réel (admin)
 - Agrégations par période et dimensions
@@ -30,11 +42,19 @@
 
 ## Commandes CLI
 ```bash
+# Métriques projets
 php bin/console app:calculate-metrics
 php bin/console app:calculate-metrics 2024
 php bin/console app:calculate-metrics 2024-03
 php bin/console app:calculate-metrics 2024 --force-recalculate
 php bin/console app:calculate-metrics --granularity=quarterly
+
+# Métriques staffing
+php bin/console app:calculate-staffing-metrics
+php bin/console app:calculate-staffing-metrics 2024
+php bin/console app:calculate-staffing-metrics --range=12
+php bin/console app:calculate-staffing-metrics --granularity=weekly
+php bin/console app:calculate-staffing-metrics 2024 --force-recalculate
 ```
 
 ### Génération de données de test

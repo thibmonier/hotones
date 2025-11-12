@@ -31,14 +31,25 @@ class ContributorController extends AbstractController
     #[Route('', name: 'contributor_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $search = $request->query->get('search', '');
-        $active = $request->query->get('active', 'all');
+        $session = $request->getSession();
+        $reset   = (bool) $request->query->get('reset', false);
+        if ($reset && $session) {
+            $session->remove('contributor_filters');
+
+            return $this->redirectToRoute('contributor_index');
+        }
+
+        $queryAll  = $request->query->all();
+        $keys      = ['search', 'active'];
+        $hasFilter = count(array_intersect(array_keys($queryAll), $keys)) > 0;
+        $saved     = ($session && $session->has('contributor_filters')) ? (array) $session->get('contributor_filters') : [];
+
+        $search = $hasFilter ? ($request->query->get('search', '')) : ($saved['search'] ?? '');
+        $active = $hasFilter ? ($request->query->get('active', 'all')) : ($saved['active'] ?? 'all');
 
         $qb = $this->contributorRepository->createQueryBuilder('c')
             ->leftJoin('c.profiles', 'p')
-            ->addSelect('p')
-            ->orderBy('c.lastName', 'ASC')
-            ->addOrderBy('c.firstName', 'ASC');
+            ->addSelect('p');
 
         if ($search) {
             $qb->andWhere('c.firstName LIKE :search OR c.lastName LIKE :search OR c.email LIKE :search')
@@ -50,12 +61,92 @@ class ContributorController extends AbstractController
                ->setParameter('active', $active === 'active');
         }
 
+        // Tri
+        $sort = $hasFilter ? ($request->query->get('sort', 'name')) : ($saved['sort'] ?? 'name');
+        $dir  = $hasFilter ? ($request->query->get('dir', 'ASC')) : ($saved['dir'] ?? 'ASC');
+        $map  = [
+            'name'   => ['c.lastName', 'c.firstName'],
+            'email'  => ['c.email'],
+            'active' => ['c.active'],
+        ];
+        $columns   = $map[$sort] ?? ['c.lastName', 'c.firstName'];
+        $direction = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $first     = true;
+        foreach ($columns as $col) {
+            if ($first) {
+                $qb->orderBy($col, $direction);
+                $first = false;
+            } else {
+                $qb->addOrderBy($col, $direction);
+            }
+        }
+
+        // Pagination
+        $allowedPerPage = [10, 20, 50, 100];
+        $perPageParam   = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
+        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
+        $page           = max(1, (int) $request->query->get('page', 1));
+        $offset         = ($page - 1) * $perPage;
+
+        $countQb = clone $qb;
+        $total   = (int) $countQb->select('COUNT(DISTINCT c.id)')->getQuery()->getSingleScalarResult();
+
+        // Stats globales (sur l'ensemble filtré)
+        $withUserQb = clone $qb;
+        $withUser   = (int) $withUserQb
+            ->select('COUNT(DISTINCT c.id)')
+            ->andWhere('c.user IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $avgCjmQb = clone $qb;
+        $avgCjm   = $avgCjmQb
+            ->select('AVG(c.cjm)')
+            ->andWhere('c.cjm IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+        $avgCjm = $avgCjm !== null ? (float) $avgCjm : null;
+
+        $avgTjmQb = clone $qb;
+        $avgTjm   = $avgTjmQb
+            ->select('AVG(c.tjm)')
+            ->andWhere('c.tjm IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+        $avgTjm = $avgTjm !== null ? (float) $avgTjm : null;
+
+        $qb->setFirstResult($offset)->setMaxResults($perPage);
         $contributors = $qb->getQuery()->getResult();
 
+        $pagination = [
+            'current_page' => $page,
+            'per_page'     => $perPage,
+            'total'        => $total,
+            'total_pages'  => (int) ceil($total / $perPage),
+            'has_prev'     => $page > 1,
+            'has_next'     => $page * $perPage < $total,
+        ];
+
+        if ($session) {
+            $session->set('contributor_filters', [
+                'search'   => $search,
+                'active'   => $active,
+                'sort'     => $sort,
+                'dir'      => $direction,
+                'per_page' => $perPage,
+            ]);
+        }
+
         return $this->render('contributor/index.html.twig', [
-            'contributors' => $contributors,
-            'search'       => $search,
-            'active'       => $active,
+            'contributors'       => $contributors,
+            'search'             => $search,
+            'active'             => $active,
+            'sort'               => $sort,
+            'dir'                => $direction,
+            'pagination'         => $pagination,
+            'stats_linked_users' => $withUser,
+            'stats_avg_cjm'      => $avgCjm,
+            'stats_avg_tjm'      => $avgTjm,
         ]);
     }
 
@@ -188,5 +279,73 @@ class ContributorController extends AbstractController
         );
 
         return $newFilename;
+    }
+
+    #[Route('/export.csv', name: 'contributor_export_csv', methods: ['GET'])]
+    public function exportCsv(Request $request): Response
+    {
+        $session = $request->getSession();
+        $saved   = ($session && $session->has('contributor_filters')) ? (array) $session->get('contributor_filters') : [];
+        $search  = $request->query->get('search', $saved['search'] ?? '');
+        $active  = $request->query->get('active', $saved['active'] ?? 'all');
+        $sort    = $request->query->get('sort', $saved['sort'] ?? 'name');
+        $dir     = $request->query->get('dir', $saved['dir'] ?? 'ASC');
+
+        $qb = $this->contributorRepository->createQueryBuilder('c')
+            ->leftJoin('c.profiles', 'p')->addSelect('p');
+        if ($search) {
+            $qb->andWhere('c.firstName LIKE :s OR c.lastName LIKE :s OR c.email LIKE :s')->setParameter('s', '%'.$search.'%');
+        }
+        if ($active !== 'all') {
+            $qb->andWhere('c.active = :a')->setParameter('a', $active === 'active');
+        }
+        $map       = ['name' => ['c.lastName', 'c.firstName'], 'email' => ['c.email'], 'active' => ['c.active']];
+        $cols      = $map[$sort] ?? ['c.lastName', 'c.firstName'];
+        $direction = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $first     = true;
+        foreach ($cols as $col) {
+            if ($first) {
+                $qb->orderBy($col, $direction);
+                $first = false;
+            } else {
+                $qb->addOrderBy($col, $direction);
+            }
+        }
+        $contributors = $qb->getQuery()->getResult();
+
+        $rows   = [];
+        $header = ['Nom', 'Email', 'Téléphone pro', 'Téléphone perso', 'Actif', 'Profils', 'CJM', 'TJM'];
+        $rows[] = $header;
+        foreach ($contributors as $c) {
+            $profiles = [];
+            foreach ($c->getProfiles() as $prof) {
+                $profiles[] = $prof->getName();
+            }
+            $rows[] = [
+                method_exists($c, 'getName') ? $c->getName() : trim(($c->getFirstName() ?: '').' '.($c->getLastName() ?: '')),
+                $c->getEmail() ?: '',
+                $c->getPhoneProfessional() ?: '',
+                $c->getPhonePersonal() ?: '',
+                $c->isActive() ? 'Oui' : 'Non',
+                implode('|', $profiles),
+                $c->getCjm() ?: '',
+                $c->getTjm() ?: '',
+            ];
+        }
+
+        // Génération CSV sécurisée
+        $handle = fopen('php://temp', 'r+');
+        foreach ($rows as $r) {
+            fputcsv($handle, $r);
+        }
+        rewind($handle);
+        $csv = "\xEF\xBB\xBF".stream_get_contents($handle);
+
+        $filename = sprintf('contributeurs_%s.csv', date('Y-m-d'));
+        $response = new Response($csv);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+
+        return $response;
     }
 }

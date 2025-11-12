@@ -1,13 +1,42 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="card-title mb-0">Vue consolidée des devis</h5>
-    {% if is_granted('ROLE_CHEF_PROJET') %}
-        <a href="{{ path('order_new', {'project': project.id}) }}" class="btn btn-primary btn-sm">
-            <i class="bx bx-plus me-1"></i> Nouveau devis
-        </a>
-    {% endif %}
+    <div class="d-flex align-items-center gap-2">
+        <form method="get" class="d-flex align-items-center">
+            <input type="hidden" name="o_sort" value="{{ orders_sort|default('createdAt') }}">
+            <input type="hidden" name="o_dir" value="{{ orders_dir|default('DESC') }}">
+            <label class="form-label mb-0 me-2 small text-muted">Par page</label>
+            <select name="o_per_page" class="form-select form-select-sm" onchange="this.form.submit()">
+                {% for n in [5,10,20,50] %}
+                    <option value="{{ n }}" {{ (orders_per_page|default(10)) == n ? 'selected' : '' }}>{{ n }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        {% if is_granted('ROLE_CHEF_PROJET') %}
+            <a href="{{ path('order_new', {'project': project.id}) }}" class="btn btn-primary btn-sm">
+                <i class="bx bx-plus me-1"></i> Nouveau devis
+            </a>
+        {% endif %}
+    </div>
 </div>
 
-{% if project.orders is empty %}
+{# Rappel des critères actifs sur l’onglet Devis #}
+{% set chips = [] %}
+{% if orders_sort is defined and (orders_sort != 'createdAt' or orders_dir != 'DESC') %}
+    {% set chips = chips|merge(['Tri: ' ~ orders_sort ~ ' ' ~ orders_dir]) %}
+{% endif %}
+{% if orders_per_page is defined and orders_per_page != 10 %}
+    {% set chips = chips|merge(['Par page: ' ~ orders_per_page]) %}
+{% endif %}
+{% if chips|length > 0 %}
+    <div class="mb-2 small text-muted">
+        {% for c in chips %}
+            <span class="badge bg-light text-dark me-1">{{ c }}</span>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% set orders_list = orders|default(project.orders) %}
+{% if orders_list is empty %}
     <div class="alert alert-info">
         <i class="bx bx-info-circle me-2"></i>
         Aucun devis n'a encore été créé pour ce projet.
@@ -18,13 +47,33 @@
         <table class="table table-hover table-centered table-nowrap align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>Numéro</th>
-                    <th>Nom</th>
+                    <th>
+                        <a href="?o_sort=number&o_dir={{ orders_sort == 'number' and orders_dir == 'ASC' ? 'DESC' : 'ASC' }}#tab-orders" class="text-decoration-none text-reset">
+                            Numéro {% if orders_sort == 'number' %}<i class="bx bx-sort-{{ orders_dir == 'ASC' ? 'up' : 'down' }}-alt"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?o_sort=name&o_dir={{ orders_sort == 'name' and orders_dir == 'ASC' ? 'DESC' : 'ASC' }}#tab-orders" class="text-decoration-none text-reset">
+                            Nom {% if orders_sort == 'name' %}<i class="bx bx-sort-{{ orders_dir == 'ASC' ? 'up' : 'down' }}-alt"></i>{% endif %}
+                        </a>
+                    </th>
                     <th>Type</th>
-                    <th>Statut</th>
-                    <th class="text-end">Montant HT</th>
+                    <th>
+                        <a href="?o_sort=status&o_dir={{ orders_sort == 'status' and orders_dir == 'ASC' ? 'DESC' : 'ASC' }}#tab-orders" class="text-decoration-none text-reset">
+                            Statut {% if orders_sort == 'status' %}<i class="bx bx-sort-{{ orders_dir == 'ASC' ? 'up' : 'down' }}-alt"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th class="text-end">
+                        <a href="?o_sort=total&o_dir={{ orders_sort == 'total' and orders_dir == 'ASC' ? 'DESC' : 'ASC' }}#tab-orders" class="text-decoration-none text-reset">
+                            Montant HT {% if orders_sort == 'total' %}<i class="bx bx-sort-{{ orders_dir == 'ASC' ? 'up' : 'down' }}-alt"></i>{% endif %}
+                        </a>
+                    </th>
                     <th class="text-end">Jours vendus</th>
-                    <th>Date création</th>
+                    <th>
+                        <a href="?o_sort=createdAt&o_dir={{ orders_sort == 'createdAt' and orders_dir == 'ASC' ? 'DESC' : 'ASC' }}#tab-orders" class="text-decoration-none text-reset">
+                            Date création {% if orders_sort == 'createdAt' %}<i class="bx bx-sort-{{ orders_dir == 'ASC' ? 'up' : 'down' }}-alt"></i>{% endif %}
+                        </a>
+                    </th>
                     <th>Valide jusqu'au</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -32,7 +81,7 @@
             <tbody>
                 {% set totalAmount = 0 %}
                 {% set totalDays = 0 %}
-                {% for order in project.orders %}
+                {% for order in orders_list %}
                     {% set orderTotal = order.calculateTotalFromSections %}
                     {% set orderDays = 0 %}
                     {% for section in order.sections %}
@@ -118,7 +167,7 @@
     {# Cartes détaillées par devis #}
     <h6 class="mb-3 mt-4">Détail par devis</h6>
     <div class="row">
-        {% for order in project.orders %}
+        {% for order in orders_list %}
             <div class="col-lg-6 col-xl-4 mb-3">
                 <div class="card h-100 border {% if order.status in ['signe', 'gagne', 'termine'] %}border-success{% endif %}">
                     <div class="card-header bg-transparent">
@@ -176,4 +225,24 @@
             </div>
         {% endfor %}
     </div>
+
+    {% if orders_pagination is defined and orders_pagination.total_pages > 1 %}
+    <div class="d-flex justify-content-center mt-3">
+        <nav>
+            <ul class="pagination">
+                <li class="page-item {{ not orders_pagination.has_prev ? 'disabled' : '' }}">
+                    <a class="page-link" href="?o_sort={{ orders_sort }}&o_dir={{ orders_dir }}&o_per_page={{ orders_per_page }}&o_page={{ orders_pagination.current_page - 1 }}#tab-orders">Précédent</a>
+                </li>
+                {% for p in 1..orders_pagination.total_pages %}
+                    <li class="page-item {{ p == orders_pagination.current_page ? 'active' : '' }}">
+                        <a class="page-link" href="?o_sort={{ orders_sort }}&o_dir={{ orders_dir }}&o_per_page={{ orders_per_page }}&o_page={{ p }}#tab-orders">{{ p }}</a>
+                    </li>
+                {% endfor %}
+                <li class="page-item {{ not orders_pagination.has_next ? 'disabled' : '' }}">
+                    <a class="page-link" href="?o_sort={{ orders_sort }}&o_dir={{ orders_dir }}&o_per_page={{ orders_per_page }}&o_page={{ orders_pagination.current_page + 1 }}#tab-orders">Suivant</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
 {% endif %}

@@ -3,6 +3,7 @@
 {% block title %}Devis{% endblock %}
 
 {% block content %}
+    {{ component('breadcrumb', { title: 'Devis', pagetitle: 'Gestion' }) }}
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -31,9 +32,58 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Filtres</h4>
+                    {% set activeFiltersCount = 0 %}
+                    {% set activeFiltersCount = activeFiltersCount
+                        + (selectedProject ? 1 : 0)
+                        + (selectedStatus ? 1 : 0)
+                        + (sort != 'createdAt' ? 1 : 0)
+                        + (dir != 'DESC' ? 1 : 0)
+                        + (pagination.per_page != 20 ? 1 : 0)
+                    %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Filtres
+                            {% if activeFiltersCount > 0 %}
+                                <span class="badge bg-info ms-2">{{ activeFiltersCount }}</span>
+                            {% endif %}
+                        </h4>
+                        <div class="btn-group">
+                            <a href="{{ path('order_export_csv', filters_query) }}" class="btn btn-sm btn-outline-primary">Exporter CSV</a>
+                            <a href="{{ path('order_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                            <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-orders" aria-expanded="true" aria-controls="filters-orders" id="filters-toggle-orders">
+                                <i class="bx bx-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
+                    <div id="filters-orders" class="collapse show">
+                    {# Rappel des critères actifs #}
+                    {% set chips = [] %}
+                    {% if selectedProject %}
+                        {% set proj = (projects|filter(p => p.id == selectedProject)|first) %}
+                        {% set chips = chips|merge(['Projet: ' ~ (proj ? proj.name : selectedProject)]) %}
+                    {% endif %}
+                    {% if selectedStatus %}
+                        {% set chips = chips|merge(['Statut: ' ~ (statusOptions[selectedStatus] ?? selectedStatus)]) %}
+                    {% endif %}
+                    {% if sort != 'createdAt' or dir != 'DESC' %}
+                        {% set chips = chips|merge(['Tri: ' ~ sort ~ ' ' ~ dir]) %}
+                    {% endif %}
+                    {% if pagination.per_page != 20 %}
+                        {% set chips = chips|merge(['Par page: ' ~ pagination.per_page]) %}
+                    {% endif %}
+                    {% if chips|length > 0 %}
+                        <div class="mb-3 small text-muted">
+                            {% for c in chips %}
+                                <span class="badge bg-light text-dark me-1">{{ c }}</span>
+                            {% endfor %}
+                        </div>
+                        <script>
+                          (function(){ try { window.__ACTIVE_FILTERS = {{ chips|json_encode|raw }}; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {} })();
+                        </script>
+                    {% else %}
+                        <script>try { window.__ACTIVE_FILTERS = []; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}</script>
+                    {% endif %}
                     <form method="GET" class="row g-3">
                         <div class="col-md-4">
                             <label for="project" class="form-label">Projet</label>
@@ -61,12 +111,37 @@
                             <button type="submit" class="btn btn-primary me-2">
                                 <i class="bx bx-search"></i> Filtrer
                             </button>
-                            <a href="{{ path('order_index') }}" class="btn btn-outline-secondary">
-                                <i class="bx bx-refresh"></i>
+                            <a href="{{ path('order_index', { reset: 1 }) }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                                <i class="bx bx-reset"></i>
                             </a>
                         </div>
                     </form>
+                    </div>
+                    <script>
+                        (function(){
+                          var key='filters:orders:collapsed';
+                          var el=document.getElementById('filters-orders');
+                          var btn=document.getElementById('filters-toggle-orders');
+                          if(!el||!btn) return;
+                          try {
+                            var hasActive={{ (chips|length > 0) ? 'true' : 'false' }};
+                            var isSmall=window.matchMedia('(max-width: 767.98px)').matches;
+                            var collapsed = localStorage.getItem(key) === '1' || (isSmall && !hasActive);
+                            if (collapsed) { el.classList.remove('show'); btn.setAttribute('aria-expanded','false'); }
+                            var updateIcon=function(){ var i=btn.querySelector('i'); if(!i) return; if (el.classList.contains('show')) { i.className='bx bx-chevron-up'; localStorage.setItem(key,'0'); btn.setAttribute('aria-expanded','true'); } else { i.className='bx bx-chevron-down'; localStorage.setItem(key,'1'); btn.setAttribute('aria-expanded','false'); } };
+                            el.addEventListener('shown.bs.collapse', updateIcon);
+                            el.addEventListener('hidden.bs.collapse', updateIcon);
+                            updateIcon();
+                          } catch(e) {}
+                        })();
+                    </script>
                 </div>
+                {% set hasFilters = selectedProject or selectedStatus or (sort != 'createdAt') or (dir != 'DESC') or (pagination.per_page != 20) %}
+                {% if hasFilters %}
+                    <div class="small text-muted mt-2">
+                        Filtres actifs · <a href="{{ path('order_index', { reset: 1 }) }}">Effacer</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -74,18 +149,85 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="card-title mb-0">Liste des devis</h4>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-primary">{{ pagination.total }} devis</span>
+                        </div>
+                    </div>
+                </div>
                 <div class="card-body">
+                    <div class="d-flex justify-content-end align-items-center mb-2">
+                        <form method="get" action="{{ path('order_index') }}" class="d-flex align-items-center">
+                            <input type="hidden" name="project" value="{{ selectedProject }}">
+                            <input type="hidden" name="status" value="{{ selectedStatus }}">
+                            <input type="hidden" name="sort" value="{{ sort }}">
+                            <input type="hidden" name="dir" value="{{ dir }}">
+                            <label class="form-label mb-0 me-2">Par page</label>
+                            <select name="per_page" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+                                {% for n in [10,20,50,100] %}
+                                    <option value="{{ n }}" {{ pagination.per_page == n ? 'selected' : '' }}>{{ n }}</option>
+                                {% endfor %}
+                            </select>
+                            <noscript><button type="submit" class="btn btn-sm btn-outline-secondary">Appliquer</button></noscript>
+                        </form>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-centered table-nowrap mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Numéro</th>
-                                    <th>Nom</th>
-                                    <th>Projet</th>
-                                    <th>Statut</th>
-                                    <th>Date création</th>
+                                    <th>
+                                        <a href="{{ path('order_index', filters_query|merge({ sort: 'number', dir: sort == 'number' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Numéro
+                                            {% if sort == 'number' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('order_index', filters_query|merge({ sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Nom
+                                            {% if sort == 'name' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('order_index', filters_query|merge({ sort: 'project', dir: sort == 'project' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Projet
+                                            {% if sort == 'project' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('order_index', filters_query|merge({ sort: 'status', dir: sort == 'status' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Statut
+                                            {% if sort == 'status' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('order_index', filters_query|merge({ sort: 'createdAt', dir: sort == 'createdAt' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Date création
+                                            {% if sort == 'createdAt' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
                                     <th>Répartition</th>
-                                    <th>Montant total</th>
+                                    <th>
+                                        <a href="{{ path('order_index', filters_query|merge({ sort: 'total', dir: sort == 'total' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Montant total
+                                            {% if sort == 'total' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -185,4 +327,26 @@
             </div>
         </div>
     </div>
+
+    {% if pagination.total_pages > 1 %}
+    <div class="row mt-2">
+        <div class="col-12">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item {{ not pagination.has_prev ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ path('order_index', filters_query|merge({page: pagination.current_page - 1})) }}">Précédent</a>
+                    </li>
+                    {% for p in 1..pagination.total_pages %}
+                        <li class="page-item {{ p == pagination.current_page ? 'active' : '' }}">
+                            <a class="page-link" href="{{ path('order_index', filters_query|merge({page: p})) }}">{{ p }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="page-item {{ not pagination.has_next ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ path('order_index', filters_query|merge({page: pagination.current_page + 1})) }}">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

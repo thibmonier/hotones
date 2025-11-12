@@ -610,6 +610,26 @@
       loadTimerActive();
     });
 
+    // ---- Filtres actifs (topbar) ----
+    function updateActiveFiltersIndicator() {
+      var badge = document.getElementById('active-filters-badge');
+      if (!badge) return;
+      var filters = Array.isArray(window.__ACTIVE_FILTERS) ? window.__ACTIVE_FILTERS : [];
+      if (filters.length > 0) {
+        badge.style.display = 'inline-block';
+        badge.textContent = String(filters.length);
+        var text = filters.slice(0, 6).join(' • ');
+        badge.setAttribute('title', text);
+        try { if (bootstrap && bootstrap.Tooltip) new bootstrap.Tooltip(badge); } catch(e) {}
+      } else {
+        badge.style.display = 'none';
+        badge.removeAttribute('title');
+      }
+    }
+
+    window.addEventListener('active-filters-changed', updateActiveFiltersIndicator);
+    document.addEventListener('DOMContentLoaded', updateActiveFiltersIndicator);
+
     // ---- Notifications ----
     function updateUnreadBadges() {
       // Notifications non lues

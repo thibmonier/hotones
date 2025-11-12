@@ -1,5 +1,20 @@
 # 🚀 État d'avancement
 
+## Liens
+- Roadmap: [docs/roadmap-lots.md](./roadmap-lots.md)
+- Backlog: [docs/roadmap-lots.md#backlog](./roadmap-lots.md#backlog)
+
+## Légende
+- ✅ Terminé
+- 🔄 En cours
+- 🔲 À faire
+
+## Définition de Done (DoD)
+- Fonctionnalités validées métier
+- Tests unitaires, fonctionnels et E2E au vert en CI
+- Documentation mise à jour
+- Revue de code effectuée
+
 ## ✅ Implémenté
 - Setup Docker (PHP 8.4, Nginx, MariaDB)
 - Entities Doctrine + migrations
@@ -20,10 +35,13 @@
 - CI GitHub Actions: PHPUnit (+ Chrome headless) et qualité (phpstan/phpmd/php-cs-fixer)
 
 ## 🔄 En cours / À faire
+
+Référence: détails, périmètre et dépendances dans la Roadmap → [Lots](./roadmap-lots.md) et [Backlog](./roadmap-lots.md#backlog)
 - CRUD complet des entités principales (Contributor, Project, Order, Timesheet, EmploymentPeriod)
 - Interface de saisie des temps (Timesheet) avec sélection de tâche
 - Dashboard analytique avec métriques et graphiques
 - Système de suivi KPIs avec modèle en étoile
+- ✅ Dashboard de suivi du staffing (taux de staffing et TACE)
 - Gestion des périodes d'emploi (interface complète avec relation profils)
 - Alimenter les listes des rôles projet (KAM, Chef de projet, Directeur, Commercial) dans le formulaire
 - Upload et gestion d'avatars

@@ -3,29 +3,122 @@
 {% block title %}Tous les temps - {{ month }}{% endblock %}
 
 {% block content %}
+    {{ component('breadcrumb', { title: 'Tous les temps', pagetitle: 'Temps' }) }}
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">Tous les temps passés</h4>
                 <div class="page-title-right">
-                    <form method="get" class="d-inline-flex">
-                        <select class="form-control me-2" name="project" onchange="this.form.submit()">
-                            <option value="">Tous les projets</option>
-                            {% for project in projects %}
-                                <option value="{{ project.id }}" {{ selectedProject == project.id ? 'selected' : '' }}>
-                                    {{ project.name }} - {{ project.client ? project.client.name : 'Sans client' }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <input type="month" class="form-control me-2" name="month" value="{{ month }}" onchange="this.form.submit()">
-                        <a href="{{ path('timesheet_index') }}" class="btn btn-primary">
-                            <i class="bx bx-plus me-1"></i> Saisir temps
-                        </a>
+                    {% if activeFiltersCount > 0 %}
+                        <span class="badge bg-info me-2">{{ activeFiltersCount }}</span>
+                    {% endif %}
+                    <a href="{{ path('timesheet_index') }}" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Saisir temps
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Bloc filtres repliable #}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Filtres
+                        {% if activeFiltersCount > 0 %}
+                            <span class="badge bg-info ms-2">{{ activeFiltersCount }}</span>
+                        {% endif %}
+                    </h4>
+                    <div class="btn-group">
+                        <a href="{{ path('timesheet_all', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                        <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-timesheet-all" aria-expanded="true" aria-controls="filters-timesheet-all" id="filters-toggle-timesheet-all">
+                            <i class="bx bx-chevron-up"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="filters-timesheet-all" class="collapse show">
+                        {% set chips = [] %}
+                        {% if selectedProject %}
+                            {% set selProj = (projects|filter(p => p.id == selectedProject)|first) %}
+                            {% set chips = chips|merge(['Projet: ' ~ (selProj ? selProj.name : selectedProject)]) %}
+                        {% endif %}
+                        {% set nowMonth = "now"|date('Y-m') %}
+                        {% if month != nowMonth %}
+                            {% set chips = chips|merge(['Mois: ' ~ month]) %}
+                        {% endif %}
+                        {% if chips|length > 0 %}
+                            <div class="mb-2 small text-muted">
+                                {% for c in chips %}
+                                    <span class="badge bg-light text-dark me-1">{{ c }}</span>
+                                {% endfor %}
+                            </div>
+                            <script>
+                              (function(){ try { window.__ACTIVE_FILTERS = {{ chips|json_encode|raw }}; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {} })();
+                            </script>
+                        {% else %}
+                            <script>try { window.__ACTIVE_FILTERS = []; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}</script>
+                        {% endif %}
+                        <form method="get" class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label">Projet</label>
+                                <select class="form-select" name="project" onchange="this.form.submit()">
+                                    <option value="">Tous les projets</option>
+                                    {% for project in projects %}
+                                        <option value="{{ project.id }}" {{ selectedProject == project.id ? 'selected' : '' }}>
+                                            {{ project.name }} - {{ project.client ? project.client.name : 'Sans client' }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Mois</label>
+                                <input type="month" class="form-control" name="month" value="{{ month }}" onchange="this.form.submit()">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <a href="{{ path('timesheet_all', { reset: 1 }) }}" class="btn btn-outline-secondary w-100" title="Réinitialiser">
+                                    <i class="bx bx-reset"></i>
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                    <script>
+                        (function(){
+                          var key='filters:timesheet_all:collapsed';
+                          var el=document.getElementById('filters-timesheet-all');
+                          var btn=document.getElementById('filters-toggle-timesheet-all');
+                          if(!el||!btn) return;
+                          try {
+                            var hasActive={{ (chips|length > 0) ? 'true' : 'false' }};
+                            var isSmall=window.matchMedia('(max-width: 767.98px)').matches;
+                            var collapsed = localStorage.getItem(key) === '1' || (isSmall && !hasActive);
+                            if (collapsed) { el.classList.remove('show'); btn.setAttribute('aria-expanded','false'); }
+                            var updateIcon=function(){ var i=btn.querySelector('i'); if(!i) return; if (el.classList.contains('show')) { i.className='bx bx-chevron-up'; localStorage.setItem(key,'0'); btn.setAttribute('aria-expanded','true'); } else { i.className='bx bx-chevron-down'; localStorage.setItem(key,'1'); btn.setAttribute('aria-expanded','false'); } };
+                            el.addEventListener('shown.bs.collapse', updateIcon);
+                            el.addEventListener('hidden.bs.collapse', updateIcon);
+                            updateIcon();
+                          } catch(e) {}
+                        })();
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    {% set hasFilters = selectedProject or (month != ("now"|date('Y-m'))) %}
+    {% if hasFilters %}
+        <div class="row mb-2">
+            <div class="col-12 small text-muted">
+                Filtres actifs · <a href="{{ path('timesheet_all', { reset: 1 }) }}">Effacer</a>
+            </div>
+        </div>
+    {% endif %}
 
     <!-- Filtres et statistiques -->
     <div class="row">
