@@ -228,10 +228,10 @@
                                 
                                 <!-- Formulaire caché pour la suppression -->
                                 <form id="delete-form" 
-                                      action="{{ path('project_task_delete', {id: task.id}) }}" 
+                                      action="{{ path('project_task_delete', {projectId: project.id, id: task.id}) }}" 
                                       method="post" 
                                       style="display: none;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ task.id) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_task_' ~ task.id) }}">
                                 </form>
                             </div>
                         </div>
