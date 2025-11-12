@@ -71,8 +71,8 @@ class StaffingMetricsCalculationServiceTest extends TestCase
         // TACE = (18 / 20) * 100 = 90%
         $this->assertEquals('90.00', $fact->getTace());
 
-        // Staffing Rate = (18 / 22) * 100 = 81.82%
-        $this->assertEquals('81.82', $fact->getStaffingRate());
+        // Staffing Rate = (18 / 22) * 100 = 81.818... arrondi à 81.81%
+        $this->assertEquals('81.81', $fact->getStaffingRate());
     }
 
     /**

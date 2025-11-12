@@ -51,7 +51,8 @@ class ProfitabilityServiceTest extends TestCase
 
         // Timesheets: 2 days total (16h) with CJM 400
         $contributor = (new Contributor())
-            ->setName('Alice')
+            ->setFirstName('Alice')
+            ->setLastName('Test')
             ->setCjm('400')
             ->setTjm('800');
 
@@ -118,7 +119,8 @@ class ProfitabilityServiceTest extends TestCase
             ->setIsInternal(true);
 
         $contributor = (new Contributor())
-            ->setName('Bob')
+            ->setFirstName('Bob')
+            ->setLastName('Test')
             ->setCjm('400');
 
         $ts = (new Timesheet())
