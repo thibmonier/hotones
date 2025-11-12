@@ -272,6 +272,8 @@ class StaffingMetricsCalculationService
             $dimProfile->setIsProductive(true); // Par défaut productif
             $dimProfile->setIsActive(true);
             $this->entityManager->persist($dimProfile);
+            // Flush immédiatement pour éviter les doublons dans la même transaction
+            $this->entityManager->flush();
         }
 
         return $dimProfile;
