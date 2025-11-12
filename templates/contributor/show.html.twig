@@ -284,8 +284,8 @@
                                             </td>
                                             <td>
                                                 {{ period.weeklyHours|default(35) }}h/sem
-                                                {% if period.workingTimePercentage and period.workingTimePercentage != 100 %}
-                                                    ({{ period.workingTimePercentage }}%)
+                                                {% if period.workTimePercentage and period.workTimePercentage != 100 %}
+                                                    ({{ period.workTimePercentage }}%)
                                                 {% endif %}
                                             </td>
                                             <td>
