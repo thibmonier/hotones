@@ -22,7 +22,8 @@ class DashboardController extends AbstractController
 {
     public function __construct(
         private MetricsCalculationService $metricsService,
-        private MessageBusInterface $messageBus
+        private MessageBusInterface $messageBus,
+        private \App\Repository\ProjectRepository $projectRepository
     ) {
     }
 
@@ -47,11 +48,29 @@ class DashboardController extends AbstractController
         // Calculer les dates selon la période sélectionnée
         [$startDate, $endDate] = $this->calculatePeriodDates($period, $customStart, $customEnd);
 
+        // Filtres (Lot 3.2)
+        $filters = [
+            'project_type'        => $request->query->get('project_type') ?: null, // 'forfait' | 'regie'
+            'is_internal'         => $request->query->get('client_type') === 'internal' ? true : ($request->query->get('client_type') === 'client' ? false : null),
+            'project_manager_id'  => $request->query->get('project_manager_id') ? (int) $request->query->get('project_manager_id') : null,
+            'sales_person_id'     => $request->query->get('sales_person_id') ? (int) $request->query->get('sales_person_id') : null,
+            'technology_id'       => $request->query->get('technology_id') ? (int) $request->query->get('technology_id') : null,
+            'service_category_id' => $request->query->get('service_category_id') ? (int) $request->query->get('service_category_id') : null,
+        ];
+
         // Calculer les KPIs
-        $kpis = $this->metricsService->calculateKPIs($startDate, $endDate);
+        $kpis = $this->metricsService->calculateKPIs($startDate, $endDate, $filters);
 
         // Calculer l'évolution mensuelle pour les graphiques
-        $monthlyEvolution = $this->metricsService->calculateMonthlyEvolution(12);
+        $monthlyEvolution = $this->metricsService->calculateMonthlyEvolution(12, $filters);
+
+        // Options de filtres (listes déroulantes)
+        $filterOptions = [
+            'project_managers'   => $this->projectRepository->getDistinctProjectManagersBetweenDates($startDate, $endDate),
+            'sales_persons'      => $this->projectRepository->getDistinctSalesPersonsBetweenDates($startDate, $endDate),
+            'technologies'       => $this->projectRepository->getDistinctTechnologiesBetweenDates($startDate, $endDate),
+            'service_categories' => $this->projectRepository->getDistinctServiceCategoriesBetweenDates($startDate, $endDate),
+        ];
 
         return $this->render('analytics/dashboard.html.twig', [
             'kpis'              => $kpis,
@@ -59,6 +78,8 @@ class DashboardController extends AbstractController
             'selected_period'   => $period,
             'start_date'        => $startDate,
             'end_date'          => $endDate,
+            'filters'           => $filters,
+            'filter_options'    => $filterOptions,
         ]);
     }
 

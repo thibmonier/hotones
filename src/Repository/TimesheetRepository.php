@@ -223,6 +223,53 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
+     * Statistiques par contributeur restreintes à une liste de projets.
+     */
+    public function getStatsPerContributorForProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
+    {
+        if (empty($projectIds)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('t')
+            ->select('CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')
+            ->leftJoin('t.contributor', 'c')
+            ->leftJoin('t.project', 'p')
+            ->where('t.date BETWEEN :start AND :end')
+            ->andWhere('p.id IN (:projectIds)')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('projectIds', $projectIds)
+            ->groupBy('c.id')
+            ->orderBy('totalHours', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Total d'heures pour une période restreint à des projets.
+     */
+    public function getTotalHoursForPeriodAndProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): float
+    {
+        if (empty($projectIds)) {
+            return 0;
+        }
+
+        $result = $this->createQueryBuilder('t')
+            ->select('SUM(t.hours)')
+            ->leftJoin('t.project', 'p')
+            ->where('t.date BETWEEN :start AND :end')
+            ->andWhere('p.id IN (:projectIds)')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('projectIds', $projectIds)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $result ?: 0;
+    }
+
+    /**
      * Heures mensuelles (YYYY, MM, totalHours) pour un projet.
      */
     public function getMonthlyHoursForProject(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array

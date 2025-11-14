@@ -369,9 +369,15 @@ class StaffingMetricsCalculationService
 
             case 'weekly':
                 $interval = new DateInterval('P1W');
-                $current  = clone $startDate;
+                $current  = $startDate instanceof DateTime
+                    ? clone $startDate
+                    : new DateTime($startDate->format('Y-m-d'));
 
-                while ($current <= $endDate) {
+                $end = $endDate instanceof DateTime
+                    ? clone $endDate
+                    : new DateTime($endDate->format('Y-m-d'));
+
+                while ($current <= $end) {
                     $periods[] = clone $current;
                     $current->add($interval);
                 }

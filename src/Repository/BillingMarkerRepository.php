@@ -61,7 +61,7 @@ class BillingMarkerRepository extends ServiceEntityRepository
         }
         $bm = new BillingMarker();
         $bm->setSchedule($schedule);
-        $this->_em->persist($bm);
+        $this->getEntityManager()->persist($bm);
 
         return $bm;
     }
@@ -74,7 +74,7 @@ class BillingMarkerRepository extends ServiceEntityRepository
         }
         $bm = new BillingMarker();
         $bm->setOrder($order)->setYear($year)->setMonth($month);
-        $this->_em->persist($bm);
+        $this->getEntityManager()->persist($bm);
 
         return $bm;
     }

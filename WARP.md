@@ -25,3 +25,7 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 - Guide agents: AGENTS.md
 - Opérations Worker: docs/worker-operations.md
 - Roadmap & Lots: docs/roadmap-lots.md
+- **Sprint 1 - Récapitulatif ✅: docs/sprint-1-recap.md**
+- **Sprint 3 - Lancement 🚀: docs/sprint-3-launch.md**
+- Rôles de l'application: docs/roles.md
+- Arborescence du menu: docs/arborescence.md

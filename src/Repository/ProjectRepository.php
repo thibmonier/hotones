@@ -223,7 +223,7 @@ class ProjectRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
-            ->where('p.name LIKE :query OR CONCAT(c.firstName, \' \', c.lastName) LIKE :query')
+            ->where('p.name LIKE :query OR c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
@@ -263,7 +263,11 @@ class ProjectRepository extends ServiceEntityRepository
         ?string $sortField = 'name',
         ?string $sortDir = 'ASC',
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
+        ?bool $isInternal = null,
+        ?int $projectManagerId = null,
+        ?int $salesPersonId = null,
+        ?int $serviceCategoryId = null
     ): array {
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.technologies', 't')
@@ -272,6 +276,10 @@ class ProjectRepository extends ServiceEntityRepository
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
             ->addSelect('sc')
+            ->leftJoin('p.projectManager', 'pm')
+            ->addSelect('pm')
+            ->leftJoin('p.salesPerson', 'sp')
+            ->addSelect('sp')
             ->where('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
@@ -298,6 +306,18 @@ class ProjectRepository extends ServiceEntityRepository
         }
         if ($technologyId) {
             $qb->andWhere('t.id = :tech')->setParameter('tech', $technologyId);
+        }
+        if ($isInternal !== null) {
+            $qb->andWhere('p.isInternal = :internal')->setParameter('internal', $isInternal);
+        }
+        if ($projectManagerId) {
+            $qb->andWhere('pm.id = :pmId')->setParameter('pmId', $projectManagerId);
+        }
+        if ($salesPersonId) {
+            $qb->andWhere('sp.id = :spId')->setParameter('spId', $salesPersonId);
+        }
+        if ($serviceCategoryId) {
+            $qb->andWhere('sc.id = :scId')->setParameter('scId', $serviceCategoryId);
         }
 
         $qb->groupBy('p.id');
@@ -341,6 +361,109 @@ class ProjectRepository extends ServiceEntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Liste distincte des Chefs de projet (Users) sur la période.
+     * Retourne un tableau de ['id' => int, 'name' => string].
+     */
+    public function getDistinctProjectManagersBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('DISTINCT pm.id AS id, pm.firstName AS firstName, pm.lastName AS lastName')
+            ->leftJoin('p.projectManager', 'pm')
+            ->where('pm.id IS NOT NULL')
+            ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('pm.lastName', 'ASC')
+            ->addOrderBy('pm.firstName', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(static function (array $r) {
+            return [
+                'id'   => (int) $r['id'],
+                'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
+            ];
+        }, $rows);
+    }
+
+    /**
+     * Liste distincte des Commerciaux (Users) sur la période.
+     */
+    public function getDistinctSalesPersonsBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('DISTINCT sp.id AS id, sp.firstName AS firstName, sp.lastName AS lastName')
+            ->leftJoin('p.salesPerson', 'sp')
+            ->where('sp.id IS NOT NULL')
+            ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('sp.lastName', 'ASC')
+            ->addOrderBy('sp.firstName', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(static function (array $r) {
+            return [
+                'id'   => (int) $r['id'],
+                'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
+            ];
+        }, $rows);
+    }
+
+    /**
+     * Liste distincte des technologies utilisées sur la période.
+     */
+    public function getDistinctTechnologiesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('DISTINCT t.id AS id, t.name AS name')
+            ->leftJoin('p.technologies', 't')
+            ->where('t.id IS NOT NULL')
+            ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('t.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(static function (array $r) {
+            return [
+                'id'   => (int) $r['id'],
+                'name' => (string) ($r['name'] ?? ''),
+            ];
+        }, $rows);
+    }
+
+    /**
+     * Liste distincte des catégories de service utilisées sur la période.
+     */
+    public function getDistinctServiceCategoriesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
+    {
+        $rows = $this->createQueryBuilder('p')
+            ->select('DISTINCT sc.id AS id, sc.name AS name')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->where('sc.id IS NOT NULL')
+            ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('sc.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(static function (array $r) {
+            return [
+                'id'   => (int) $r['id'],
+                'name' => (string) ($r['name'] ?? ''),
+            ];
+        }, $rows);
     }
 
     /**

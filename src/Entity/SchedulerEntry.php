@@ -150,7 +150,7 @@ class SchedulerEntry
     #[Assert\Callback]
     public function validateCron(\Symfony\Component\Validator\Context\ExecutionContextInterface $context): void
     {
-        if (!CronExpression::isValid($this->cronExpression ?? '')) {
+        if (!CronExpression::isValidExpression($this->cronExpression ?? '')) {
             $context->buildViolation('Expression CRON invalide.')->atPath('cronExpression')->addViolation();
         }
     }

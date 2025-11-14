@@ -24,7 +24,7 @@ class MetricsCalculationService
     /**
      * Calcule tous les KPIs pour une période donnée.
      */
-    public function calculateKPIs(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
+    public function calculateKPIs(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, array $filters = []): array
     {
         $startDate = $startDate ?? new DateTime('first day of this month');
         $endDate   = $endDate   ?? new DateTime('last day of this month');
@@ -34,21 +34,21 @@ class MetricsCalculationService
                 'start' => $startDate,
                 'end'   => $endDate,
             ],
-            'revenue'      => $this->calculateRevenue($startDate, $endDate),
-            'projects'     => $this->calculateProjectMetrics($startDate, $endDate),
-            'orders'       => $this->calculateOrderMetrics($startDate, $endDate),
-            'contributors' => $this->calculateContributorMetrics($startDate, $endDate),
-            'time'         => $this->calculateTimeMetrics($startDate, $endDate),
+            'revenue'      => $this->calculateRevenue($startDate, $endDate, $filters),
+            'projects'     => $this->calculateProjectMetrics($startDate, $endDate, $filters),
+            'orders'       => $this->calculateOrderMetrics($startDate, $endDate, $filters),
+            'contributors' => $this->calculateContributorMetrics($startDate, $endDate, $filters),
+            'time'         => $this->calculateTimeMetrics($startDate, $endDate, $filters),
         ];
     }
 
     /**
      * Calcule les métriques de revenus et marges.
      */
-    private function calculateRevenue(DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    private function calculateRevenue(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
     {
-        // Récupérer tous les projets avec dates dans la période
-        $projects = $this->projectRepo->findActiveBetweenDates($startDate, $endDate);
+        // Projets filtrés (statut 'active' par défaut pour le CA)
+        $projects = $this->getFilteredProjects($startDate, $endDate, $filters, 'active');
 
         $totalRevenue = '0';
         $totalCost    = '0';
@@ -78,20 +78,21 @@ class MetricsCalculationService
     /**
      * Calcule les métriques projets.
      */
-    private function calculateProjectMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    private function calculateProjectMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
     {
-        // Projets dans la période
-        $projectsInPeriod = $this->projectRepo->findActiveBetweenDates($startDate, $endDate);
+        // Projets dans la période, avec filtres
+        $projectsInPeriod = $this->getFilteredProjects($startDate, $endDate, $filters, null);
 
         // Compter les statuts
         $activeCount    = 0;
         $completedCount = 0;
 
         // Répartition par type
-        $forfaitCount  = 0;
-        $regieCount    = 0;
-        $internalCount = 0;
-        $clientCount   = 0;
+        $forfaitCount          = 0;
+        $regieCount            = 0;
+        $internalCount         = 0;
+        $clientCount           = 0;
+        $serviceCategoryCounts = [];
 
         foreach ($projectsInPeriod as $project) {
             // Statuts
@@ -113,7 +114,17 @@ class MetricsCalculationService
             } else {
                 ++$clientCount;
             }
+
+            // Catégorie de service
+            $sc = $project->getServiceCategory();
+            if ($sc) {
+                $name                         = $sc->getName();
+                $serviceCategoryCounts[$name] = ($serviceCategoryCounts[$name] ?? 0) + 1;
+            }
         }
+
+        // Ordonner les catégories par libellé pour stabilité
+        ksort($serviceCategoryCounts);
 
         return [
             'total'     => count($projectsInPeriod),
@@ -128,19 +139,29 @@ class MetricsCalculationService
                 'internal' => $internalCount,
                 'client'   => $clientCount,
             ],
+            'by_service_category' => $serviceCategoryCounts,
         ];
     }
 
     /**
      * Calcule les métriques devis.
      */
-    private function calculateOrderMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    private function calculateOrderMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
     {
-        // Récupérer les devis dont la date de création est dans la période
+        // Restreindre aux projets filtrés si des filtres sont fournis
+        $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
+        $projectIds = array_map(static fn ($p) => $p->getId(), $projects);
+
         $qb = $this->orderRepo->createQueryBuilder('o')
             ->where('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
+
+        if (!empty($projectIds)) {
+            $qb->join('o.project', 'p')
+               ->andWhere('p.id IN (:pids)')
+               ->setParameter('pids', $projectIds);
+        }
 
         $ordersInPeriod = $qb->getQuery()->getResult();
 
@@ -186,12 +207,19 @@ class MetricsCalculationService
     /**
      * Calcule les métriques contributeurs.
      */
-    private function calculateContributorMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    private function calculateContributorMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
     {
         $activeContributors = $this->contributorRepo->findBy(['active' => true]);
 
-        // Top contributeurs par temps passé
-        $topContributors = $this->timesheetRepo->getStatsPerContributor($startDate, $endDate);
+        // Restreindre aux projets filtrés si applicable
+        $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
+        $projectIds = array_map(static fn ($p) => $p->getId(), $projects);
+
+        if (!empty($projectIds)) {
+            $topContributors = $this->timesheetRepo->getStatsPerContributorForProjects($startDate, $endDate, $projectIds);
+        } else {
+            $topContributors = $this->timesheetRepo->getStatsPerContributor($startDate, $endDate);
+        }
 
         // Limiter aux 10 premiers
         $topContributors = array_slice($topContributors, 0, 10);
@@ -205,9 +233,17 @@ class MetricsCalculationService
     /**
      * Calcule les métriques de temps.
      */
-    private function calculateTimeMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    private function calculateTimeMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
     {
-        $totalHours = $this->timesheetRepo->getTotalHoursForMonth($startDate, $endDate);
+        // Restreindre les heures aux projets filtrés si applicable
+        $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
+        $projectIds = array_map(static fn ($p) => $p->getId(), $projects);
+
+        if (!empty($projectIds)) {
+            $totalHours = $this->timesheetRepo->getTotalHoursForPeriodAndProjects($startDate, $endDate, $projectIds);
+        } else {
+            $totalHours = $this->timesheetRepo->getTotalHoursForMonth($startDate, $endDate);
+        }
 
         // Nombre de jours ouvrés dans la période
         $workingDays = $this->calculateWorkingDays($startDate, $endDate);
@@ -256,7 +292,7 @@ class MetricsCalculationService
     /**
      * Calcule l'évolution mensuelle du CA et des marges pour les graphiques.
      */
-    public function calculateMonthlyEvolution(int $months = 12): array
+    public function calculateMonthlyEvolution(int $months = 12, array $filters = []): array
     {
         $data    = [];
         $endDate = new DateTime('last day of this month');
@@ -265,7 +301,7 @@ class MetricsCalculationService
             $monthStart = (clone $endDate)->modify("-{$i} months")->modify('first day of this month');
             $monthEnd   = (clone $monthStart)->modify('last day of this month');
 
-            $metrics = $this->calculateKPIs($monthStart, $monthEnd);
+            $metrics = $this->calculateKPIs($monthStart, $monthEnd, $filters);
 
             $data[] = [
                 'month'       => $monthStart->format('Y-m'),
@@ -278,5 +314,35 @@ class MetricsCalculationService
         }
 
         return $data;
+    }
+
+    /**
+     * Récupère les projets de la période en appliquant les filtres fournis.
+     */
+    private function getFilteredProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = [], ?string $statusOverride = null): array
+    {
+        $status            = $statusOverride                 ?? ($filters['status'] ?? null);
+        $projectType       = $filters['project_type']        ?? null;
+        $technologyId      = $filters['technology_id']       ?? null;
+        $isInternal        = $filters['is_internal']         ?? null;
+        $projectManager    = $filters['project_manager_id']  ?? null;
+        $salesPerson       = $filters['sales_person_id']     ?? null;
+        $serviceCategoryId = $filters['service_category_id'] ?? null;
+
+        return $this->projectRepo->findBetweenDatesFiltered(
+            $startDate,
+            $endDate,
+            $status,
+            $projectType,
+            $technologyId,
+            'name',
+            'ASC',
+            null,
+            null,
+            $isInternal,
+            $projectManager,
+            $salesPerson,
+            $serviceCategoryId,
+        );
     }
 }

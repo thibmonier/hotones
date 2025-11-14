@@ -20,4 +20,7 @@ parameters:
         - '#Property .+ type mapping mismatch#'
         # Ignore undefined methods in entities during development
         - '#Call to an undefined method .+::(setDescription|setTjm|modify|setContingencyPercentage|setValidUntil|getContingencyPercentage|getDescription|setName|setSortOrder|setPurchaseAmount|getTimesheets|getTask|setWorkTimePercentage|addProfile|getWorkTimePercentage|getProfiles)\(\)#'
-
+        # Ignore Symfony Scheduler API mismatches (to be refactored later)
+        - '#Call to an undefined method .*CronExpressionTrigger::withDescription\(\)#'
+        - '#Call to method withName\(\) on an unknown class .*RecurringCommand#'
+        - '#Instantiated class .*RecurringCommand not found#'

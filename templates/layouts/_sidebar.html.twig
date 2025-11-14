@@ -16,72 +16,56 @@
                     </a>
                 </li>
 
+                {# Commerce - Accessible aux Chefs de projet et Commerciaux #}
                 {% if is_granted('ROLE_CHEF_PROJET') %}
-                <li class="menu-title">Gestion de projets</li>
+                <li class="menu-title">Commerce</li>
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-folder"></i>
-                        <span>Projets</span>
+                        <i class="bx bx-store"></i>
+                        <span>Commerce</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('project_index') }}">Liste des projets</a></li>
-                        {% if is_granted('ROLE_CHEF_PROJET') %}
-                        <li><a href="{{ path('project_new') }}">Nouveau projet</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-buildings"></i>
-                        <span>Clients</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('client_index') }}">Liste des clients</a></li>
-                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <li><a href="{{ path('client_index') }}">Clients</a></li>
                         <li><a href="{{ path('client_new') }}">Nouveau client</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-receipt"></i>
-                        <span>Devis</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('order_index') }}">Liste des devis</a></li>
+                        <li><a href="{{ path('order_index') }}">Devis</a></li>
                         <li><a href="{{ path('order_new') }}">Nouveau devis</a></li>
+                        <li><a href="#" class="text-muted">Performances commerciales</a></li>
                     </ul>
                 </li>
+                {% endif %}
+
+                {# Delivery - Accessible selon les rôles #}
+                {% if is_granted('ROLE_CHEF_PROJET') or is_granted('ROLE_INTERVENANT') %}
+                <li class="menu-title">Delivery</li>
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-group"></i>
-                        <span>Contributeurs</span>
+                        <i class="bx bx-package"></i>
+                        <span>Delivery</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('contributor_index') }}">Liste des contributeurs</a></li>
-                        {% if is_granted('ROLE_MANAGER') %}
-                        <li><a href="{{ path('contributor_new') }}">Nouveau contributeur</a></li>
+                        {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <li><a href="{{ path('project_index') }}">Projets</a></li>
+                        <li><a href="{{ path('project_new') }}">Nouveau Projet</a></li>
+                        <li><a href="{{ path('planning_index') }}">Planning</a></li>
+                        {% endif %}
+                        {% if is_granted('ROLE_INTERVENANT') %}
+                        <li><a href="{{ path('my_tasks_index') }}">Mes tâches <span id="sidebar-overdue-tasks-count" class="badge bg-warning ms-2" style="display:none;">0</span></a></li>
+                        <li><a href="{{ path('timesheet_index') }}">Saisir mes temps</a></li>
+                        <li><a href="{{ path('timesheet_my_time') }}">Mon historique</a></li>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <li><a href="{{ path('timesheet_all') }}">Tous les temps</a></li>
                         {% endif %}
                     </ul>
                 </li>
                 {% endif %}
 
-                {% if is_granted('ROLE_CHEF_PROJET') %}
-                <li class="menu-title">Planification</li>
-                <li>
-                    <a href="{{ path('planning_index') }}" class="waves-effect">
-                        <i class="bx bx-calendar"></i>
-                        <span>Planning</span>
-                    </a>
-                </li>
-                {% endif %}
-
-                {% if is_granted('ROLE_COMPTA') or is_granted('ROLE_ADMIN') %}
+                {# Comptabilité - Accessible à la compta #}
+                {% if is_granted('ROLE_COMPTA') %}
                 <li class="menu-title">Comptabilité</li>
+
                 <li>
                     <a href="{{ path('billing_index') }}" class="waves-effect">
                         <i class="bx bx-receipt"></i>
@@ -90,51 +74,27 @@
                 </li>
                 {% endif %}
 
-                <li class="menu-title">Suivi des temps</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-time-five"></i>
-                        <span>Temps de travail</span>
-                    </a>
-<ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('my_tasks_index') }}">Mes tâches <span id="sidebar-overdue-tasks-count" class="badge bg-warning ms-2" style="display:none;">0</span></a></li>
-                        <li><a href="{{ path('timesheet_index') }}">Saisir mes temps</a></li>
-                        <li><a href="{{ path('timesheet_my_time') }}">Mon historique</a></li>
-                        {% if is_granted('ROLE_CHEF_PROJET') %}
-                        <li><a href="{{ path('timesheet_all') }}">Tous les temps</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-
-                {% if is_granted('ROLE_MANAGER') %}
+                {# Administration - Accessible à la compta et delivery #}
+                {% if is_granted('ROLE_COMPTA') %}
                 <li class="menu-title">Administration</li>
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="bx bx-briefcase"></i>
-                        <span>Ressources humaines</span>
+                        <span>Administration</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('contributor_index') }}">Contributeurs</a></li>
+                        <li><a href="{{ path('contributor_new') }}">Nouveau contributeur</a></li>
+                        <li><a href="{{ path('admin_users') }}">Utilisateurs et rôles</a></li>
                         <li><a href="{{ path('employment_period_index') }}">Périodes d'emploi</a></li>
-                        <li><a href="{{ path('employment_period_new') }}">Nouvelle période</a></li>
                     </ul>
                 </li>
+                {% endif %}
 
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-bar-chart-alt-2"></i>
-                        <span>Analyses & Rapports</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('analytics_dashboard') }}">📊 Dashboard KPIs</a></li>
-                        <li><a href="{{ path('staffing_dashboard') }}">📈 Staffing & TACE</a></li>
-                        <li><a href="#">Rentabilité projets</a></li>
-                        <li><a href="#">Performance équipe</a></li>
-                        <li><a href="#">Évolution temporelle</a></li>
-                        <li><a href="#">Comparaison vendu/réalisé</a></li>
-                    </ul>
-                </li>
+                {# Configuration - Accessible aux administrateurs #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="menu-title">Configuration</li>
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -145,17 +105,28 @@
                         <li><a href="{{ path('technology_index') }}">Technologies</a></li>
                         <li><a href="{{ path('service_category_index') }}">Catégories de service</a></li>
                         <li><a href="{{ path('job_profile_index') }}">Profils métier</a></li>
-                        <li><a href="#">Paramètres généraux</a></li>
-                        <li class="mt-2"><a href="{{ path('admin_scheduler_index') }}">Scheduler</a></li>
-                        <li class="mt-2"><a href="{{ path('admin_notification_settings') }}">Notifications</a></li>
+                        <li><a href="#" class="text-muted">Paramètres généraux</a></li>
+                        <li><a href="{{ path('admin_scheduler_index') }}">Scheduler</a></li>
+                        <li><a href="{{ path('admin_notification_settings') }}">Notifications</a></li>
                     </ul>
                 </li>
+                {% endif %}
+
+                {# Analytics - Accessible aux administrateurs et delivery #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="menu-title">Analytics</li>
 
                 <li>
-                    <a href="{{ path('admin_users') }}" class="waves-effect">
-                        <i class="bx bx-user-check"></i>
-                        <span>Utilisateurs & rôles</span>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                        <span>Analytics</span>
                     </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('analytics_dashboard') }}">Dashboard KPIs</a></li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <li><a href="{{ path('staffing_dashboard') }}">Staffing & TACE</a></li>
+                        {% endif %}
+                    </ul>
                 </li>
                 {% endif %}
 

@@ -32,7 +32,7 @@ Compléter les interfaces de gestion des entités principales pour permettre une
 - ✅ CRUD complet (liste, création, édition, suppression)
 - ✅ Recherche et filtres (nom, profil actuel, statut actif/inactif)
 - ✅ Affichage des périodes d'emploi associées
-- 🔲 Upload et gestion d'avatar
+- ✅ Upload et gestion d'avatar
 - ✅ Vue détaillée avec historique (emplois, projets, temps saisis)
 
 #### 1.2 Gestion des Périodes d'Emploi
@@ -183,31 +183,31 @@ Permettre à chaque utilisateur de gérer ses informations personnelles et param
 ### Fonctionnalités
 
 #### 4.1 Page "Mon compte"
-- 🔲 Route `/me` accessible depuis header
-- 🔲 Onglets : Informations / Sécurité / Carrière
-- 🔲 Informations personnelles :
+- ✅ Route `/me` accessible depuis header
+- ✅ Onglets : Informations / Sécurité / Carrière
+- ✅ Informations personnelles :
   - Nom, prénom, email
   - Téléphones (pro optionnel, perso)
   - Adresse personnelle
-- 🔲 Upload avatar
-- 🔲 Affichage avatar dans header (remplace avatar par défaut)
-- 🔲 Affichage prénom dans header
+- ✅ Upload avatar
+- ✅ Affichage avatar dans header (remplace avatar par défaut)
+- ✅ Affichage prénom dans header
 
 #### 4.2 Sécurité
-- 🔲 Changement de mot de passe
-- 🔲 Gestion 2FA (activer/désactiver, régénérer QR code)
+- ✅ Changement de mot de passe
+- ✅ Gestion 2FA (activer/désactiver, régénérer QR code)
 - 🔲 Sessions actives (liste et révocation)
 
 #### 4.3 Carrière (lecture seule)
-- 🔲 Historique des périodes d'emploi
-- 🔲 Profils occupés
-- 🔲 Statistiques personnelles (projets, heures)
+- ✅ Historique des périodes d'emploi
+- ✅ Profils occupés
+- ✅ Statistiques personnelles (projets, heures)
 
 #### 4.4 Menu header
-- 🔲 Retirer : "My wallet", "Settings", "Lock screen"
-- 🔲 Renommer "Profile" → "Mon compte"
-- 🔲 Renommer "Logout" → "Déconnexion"
-- 🔲 Retirer section "mon compte" du menu vertical
+- ✅ Retirer : "My wallet", "Settings", "Lock screen"
+- ✅ Renommer "Profile" → "Mon compte"
+- ✅ Renommer "Logout" → "Déconnexion"
+- ✅ Retirer section "mon compte" du menu vertical
 
 ### Tests
 - 🔲 Tests fonctionnels modification profil
@@ -371,16 +371,16 @@ Exposer une API REST pour intégrations externes et applications tierces en util
 
 ## 📊 Récapitulatif des priorités
 
-| Lot | Priorité | Estimation | Dépendances |
-|-----|----------|-----------|-------------|
-| Lot 1 : CRUD Entités | 🔴 Haute | 8-10j | - |
-| Lot 2 : Saisie Temps | 🔴 Haute | 5-7j | Lot 1 (projets/tâches) |
-| Lot 3 : Dashboard Analytics | 🔴 Haute | 7-10j | Lot 1 + Lot 2 |
-| Lot 4 : Gestion Compte | 🟡 Moyenne | 3-4j | - |
-| Lot 5 : UX/UI | 🟡 Moyenne | 5-6j | - |
-| Lot 6 : Notifications | 🟢 Basse | 4-5j | Lot 1 |
-| Lot 7 : Rapports | 🟢 Basse | 6-7j | Lot 3 |
-| Lot 8 : API REST | 🟢 Basse | 8-10j | Lots 1-3 |
+| Lot                         | Priorité   | Estimation | Dépendances            |
+|-----------------------------|------------|------------|------------------------|
+| Lot 1 : CRUD Entités        | 🔴 Haute   | 8-10j      | -                      |
+| Lot 2 : Saisie Temps        | 🔴 Haute   | 5-7j       | Lot 1 (projets/tâches) |
+| Lot 3 : Dashboard Analytics | 🔴 Haute   | 7-10j      | Lot 1 + Lot 2          |
+| Lot 4 : Gestion Compte      | 🟡 Moyenne | 3-4j       | -                      |
+| Lot 5 : UX/UI               | 🟡 Moyenne | 5-6j       | -                      |
+| Lot 6 : Notifications       | 🟢 Basse   | 4-5j       | Lot 1                  |
+| Lot 7 : Rapports            | 🟢 Basse   | 6-7j       | Lot 3                  |
+| Lot 8 : API REST            | 🟢 Basse   | 8-10j      | Lots 1-3               |
 
 **Total estimé : 46-59 jours** de développement
 
@@ -388,10 +388,10 @@ Exposer une API REST pour intégrations externes et applications tierces en util
 
 ## 🎯 Sprint Planning suggéré
 
-### Sprint 1 (2 semaines) : Fondations
-- Lot 1.1 : Contributeurs (CRUD)
-- Lot 1.2 : Périodes d'emploi
-- Lot 4 : Gestion compte utilisateur
+### Sprint 1 (2 semaines) : Fondations ✅ TERMINÉ
+- ✅ Lot 1.1 : Contributeurs (CRUD + avatar)
+- ✅ Lot 1.2 : Périodes d'emploi
+- ✅ Lot 4 : Gestion compte utilisateur (sauf sessions actives)
 
 ### Sprint 2 (2 semaines) : Projets & Devis
 - Lot 1.3 : Projets (complet)

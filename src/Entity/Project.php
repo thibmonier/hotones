@@ -501,6 +501,14 @@ class Project
     }
 
     /**
+     * Nombre de jours budgétés sur le projet (1 jour = 8h), basé sur les heures vendues.
+     */
+    public function calculateBudgetedDays(): float
+    {
+        return (float) bcdiv($this->getTotalTasksSoldHours(), '8', 2);
+    }
+
+    /**
      * Calcule le total des heures estimées révisées.
      */
     public function getTotalTasksRevisedHours(): string
@@ -544,6 +552,14 @@ class Project
         }
 
         return $total;
+    }
+
+    /**
+     * Nombre de jours restants (1 jour = 8h), basé sur les heures restantes.
+     */
+    public function calculateRemainingDays(): float
+    {
+        return (float) bcdiv($this->getTotalRemainingHours(), '8', 2);
     }
 
     /**

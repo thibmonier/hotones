@@ -9,13 +9,55 @@
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">Dashboard Analytique</h4>
                 <div class="page-title-right">
-                    <div class="btn-group">
+                    <div class="btn-group me-2">
                         <a href="{{ path('analytics_dashboard', {period: 'today'}) }}" class="btn btn-sm btn-outline-primary {% if selected_period == 'today' %}active{% endif %}">Aujourd'hui</a>
                         <a href="{{ path('analytics_dashboard', {period: 'week'}) }}" class="btn btn-sm btn-outline-primary {% if selected_period == 'week' %}active{% endif %}">Semaine</a>
                         <a href="{{ path('analytics_dashboard', {period: 'month'}) }}" class="btn btn-sm btn-outline-primary {% if selected_period == 'month' %}active{% endif %}">Mois</a>
                         <a href="{{ path('analytics_dashboard', {period: 'quarter'}) }}" class="btn btn-sm btn-outline-primary {% if selected_period == 'quarter' %}active{% endif %}">Trimestre</a>
                         <a href="{{ path('analytics_dashboard', {period: 'year'}) }}" class="btn btn-sm btn-outline-primary {% if selected_period == 'year' %}active{% endif %}">Année</a>
                     </div>
+                    <form method="get" action="{{ path('analytics_dashboard') }}" class="d-inline-flex gap-2 align-items-center">
+                        <input type="hidden" name="period" value="{{ selected_period }}" />
+                        <select class="form-select form-select-sm" name="project_type">
+                            <option value="">Type</option>
+                            <option value="forfait" {% if filters.project_type == 'forfait' %}selected{% endif %}>Forfait</option>
+                            <option value="regie" {% if filters.project_type == 'regie' %}selected{% endif %}>Régie</option>
+                        </select>
+                        <select class="form-select form-select-sm" name="service_category_id">
+                            <option value="">Catégorie</option>
+                            {% for sc in (filter_options.service_categories ?? []) %}
+                                <option value="{{ sc.id }}" {% if filters.service_category_id is not empty and filters.service_category_id == sc.id %}selected{% endif %}>{{ sc.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select class="form-select form-select-sm" name="client_type">
+                            <option value="">Client</option>
+                            <option value="internal" {% if filters.is_internal is same as(true) %}selected{% endif %}>Interne</option>
+                            <option value="client" {% if filters.is_internal is same as(false) %}selected{% endif %}>Client</option>
+                        </select>
+                        <select class="form-select form-select-sm" name="project_manager_id">
+                            <option value="">Chef de projet</option>
+                            {% for u in (filter_options.project_managers ?? []) %}
+                                <option value="{{ u.id }}" {% if filters.project_manager_id is not empty and filters.project_manager_id == u.id %}selected{% endif %}>{{ u.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select class="form-select form-select-sm" name="sales_person_id">
+                            <option value="">Commercial</option>
+                            {% for u in (filter_options.sales_persons ?? []) %}
+                                <option value="{{ u.id }}" {% if filters.sales_person_id is not empty and filters.sales_person_id == u.id %}selected{% endif %}>{{ u.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select class="form-select form-select-sm" name="technology_id">
+                            <option value="">Technologie</option>
+                            {% for t in (filter_options.technologies ?? []) %}
+                                <option value="{{ t.id }}" {% if filters.technology_id is not empty and filters.technology_id == t.id %}selected{% endif %}>{{ t.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Filtrer</button>
+                        <a class="btn btn-sm btn-light" href="{{ path('analytics_dashboard', {period: selected_period}) }}">Réinitialiser</a>
+                        <button type="button" id="export-all-pdf" class="btn btn-sm btn-outline-secondary ms-2">
+                            <i class="bx bxs-file-pdf me-1"></i>Exporter tout (PDF)
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -166,11 +208,33 @@
 
         <div class="col-xl-4">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bx bx-pie-chart-alt me-2"></i>Répartition Projets</h5>
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0"><i class="bx bx-pie-chart-alt me-2"></i>Répartition par Type</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-light" id="export-type-png">PNG</button>
+                        <button type="button" class="btn btn-light" id="export-type-pdf">PDF</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <canvas id="projectTypeChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0"><i class="bx bx-category me-2"></i>Répartition par Catégorie</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-light" id="export-category-png">PNG</button>
+                        <button type="button" class="btn btn-light" id="export-category-pdf">PDF</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="projectCategoryChart" height="200"></canvas>
+                    {% if (kpis.projects.by_service_category ?? {}) is empty %}
+                        <div class="text-muted small mt-2">Aucune catégorie disponible sur la période.</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -197,12 +261,44 @@
         </div>
     </div>
 
+    {# KPI Devis (cartes principales) #}
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-1 lh-1 d-block">Devis</span>
+                            <h6 class="text-muted mb-2">en attente / gagnés</h6>
+                            <h4 class="mb-0">
+                                <span class="text-primary">{{ kpis.orders.pending }}</span>
+                                <small class="text-muted">/</small>
+                                <span class="text-success">{{ kpis.orders.won + kpis.orders.signed }}</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-info rounded">
+                                <span class="avatar-title bg-soft-info text-info font-size-24">
+                                    <i class="bx bx-receipt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {# Charts #}
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0"><i class="bx bx-line-chart me-2"></i>Évolution CA & Marges (12 mois)</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-light" id="export-evolution-png">PNG</button>
+                        <button type="button" class="btn btn-light" id="export-evolution-pdf">PDF</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <canvas id="evolutionChart" height="80"></canvas>
@@ -228,11 +324,12 @@
 {% block javascripts %}
 {{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 // Evolution Chart (Line)
 const evolutionData = {{ monthly_evolution|json_encode|raw }};
 const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
-new Chart(evolutionCtx, {
+const evolutionChart = new Chart(evolutionCtx, {
     type: 'line',
     data: {
         labels: evolutionData.map(d => d.month_label),
@@ -281,27 +378,218 @@ new Chart(evolutionCtx, {
     }
 });
 
-// Project Type Chart (Doughnut)
-const projectTypeCtx = document.getElementById('projectTypeChart').getContext('2d');
-new Chart(projectTypeCtx, {
+// Project Distribution Charts (Doughnut)
+const typeCtx = document.getElementById('projectTypeChart').getContext('2d');
+const typeLabels = ['Forfait', 'Régie'];
+const typeData = [{{ kpis.projects.by_type.forfait }}, {{ kpis.projects.by_type.regie }}];
+const typeDonutChart = new Chart(typeCtx, {
     type: 'doughnut',
     data: {
-        labels: ['Forfait', 'Régie'],
-        datasets: [{
-            data: [{{ kpis.projects.by_type.forfait }}, {{ kpis.projects.by_type.regie }}],
-            backgroundColor: ['#007bff', '#ffc107']
-        }]
+        labels: typeLabels,
+        datasets: [{ data: typeData, backgroundColor: ['#007bff', '#ffc107'] }]
     },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom'
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+});
+
+const categoryMap = {{ (kpis.projects.by_service_category ?? {})|json_encode|raw }};
+const categoryLabels = Object.keys(categoryMap);
+const categoryData = categoryLabels.map(k => categoryMap[k]);
+let categoryDonutChart = null;
+if (document.getElementById('projectCategoryChart') && categoryLabels.length > 0) {
+    const categoryCtx = document.getElementById('projectCategoryChart').getContext('2d');
+    const palette = ['#0d6efd','#6610f2','#6f42c1','#d63384','#dc3545','#fd7e14','#ffc107','#198754','#20c997','#0dcaf0','#6c757d'];
+    categoryDonutChart = new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{ data: categoryData, backgroundColor: categoryLabels.map((_, i) => palette[i % palette.length]) }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+}
+
+// Export helpers
+function exportChartPNG(chart, filename) {
+    const a = document.createElement('a');
+    a.href = chart.toBase64Image('image/png', 1);
+    a.download = filename;
+    a.click();
+}
+
+async function exportChartPDF(chart, filename, title = '') {
+    if (!window.jspdf && !window.jspdf?.jsPDF) {
+        // UMD exposes window.jspdf.jsPDF
+    }
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'l', unit: 'mm', format: 'a4' });
+    if (title) {
+        pdf.setFontSize(14);
+        pdf.text(title, 10, 15);
+    }
+    const imgData = chart.toBase64Image('image/png', 1);
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    const w = pageWidth - margin * 2;
+    const h = pageHeight - margin * 2 - (title ? 8 : 0);
+    pdf.addImage(imgData, 'PNG', margin, margin + (title ? 8 : 0), w, h);
+    // Footer date/heure
+    pdf.setFontSize(9);
+    pdf.setTextColor(150);
+    const genAt = new Date().toLocaleString('fr-FR');
+    const pageCount = pdf.getNumberOfPages ? pdf.getNumberOfPages() : 1;
+    for (let i = 1; i <= pageCount; i++) {
+        pdf.setPage(i);
+        const pw = pdf.internal.pageSize.getWidth();
+        const ph = pdf.internal.pageSize.getHeight();
+        pdf.text('Généré le ' + genAt + ' — ' + i + ' / ' + pageCount, pw - margin, ph - 6, { align: 'right' });
+    }
+    pdf.setTextColor(0);
+    pdf.save(filename);
+}
+
+// Bind export buttons
+const btnTypePng = document.getElementById('export-type-png');
+const btnTypePdf = document.getElementById('export-type-pdf');
+if (btnTypePng) btnTypePng.addEventListener('click', () => exportChartPNG(typeDonutChart, 'repartition-type.png'));
+if (btnTypePdf) btnTypePdf.addEventListener('click', () => exportChartPDF(typeDonutChart, 'repartition-type.pdf', 'Répartition par Type'));
+
+const btnCatPng = document.getElementById('export-category-png');
+const btnCatPdf = document.getElementById('export-category-pdf');
+if (btnCatPng && categoryDonutChart) btnCatPng.addEventListener('click', () => exportChartPNG(categoryDonutChart, 'repartition-categorie.png'));
+if (btnCatPdf && categoryDonutChart) btnCatPdf.addEventListener('click', () => exportChartPDF(categoryDonutChart, 'repartition-categorie.pdf', 'Répartition par Catégorie'));
+
+const btnEvoPng = document.getElementById('export-evolution-png');
+const btnEvoPdf = document.getElementById('export-evolution-pdf');
+if (btnEvoPng) btnEvoPng.addEventListener('click', () => exportChartPNG(evolutionChart, 'evolution-ca-marges.png'));
+if (btnEvoPdf) btnEvoPdf.addEventListener('click', () => exportChartPDF(evolutionChart, 'evolution-ca-marges.pdf', 'Évolution CA & Marges (12 mois)'));
+
+// Export All (multi-pages PDF)
+const btnAll = document.getElementById('export-all-pdf');
+if (btnAll) {
+    btnAll.addEventListener('click', async () => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'l', unit: 'mm', format: 'a4' });
+
+        // Helpers for logo and filters
+        async function loadAsDataURL(url) {
+            try {
+                const res = await fetch(url, { cache: 'no-store' });
+                const blob = await res.blob();
+                return await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+            } catch (_) { return null; }
+        }
+
+        const logoUrl = '{{ asset('assets/images/logo-hotones-light-250.png') }}';
+        const logoDataUrl = await loadAsDataURL(logoUrl);
+
+        // Page 1: résumé période + KPIs + filtres
+        const startStr = '{{ start_date|date("d/m/Y") }}';
+        const endStr = '{{ end_date|date("d/m/Y") }}';
+        const kpis = {{ kpis|json_encode|raw }};
+        const filtersState = {{ filters|json_encode|raw }};
+        const filterOptions = {{ filter_options|json_encode|raw }};
+
+        // En-tête avec logo
+        if (logoDataUrl) {
+            // 40mm de large environ, hauteur proportionnelle
+            pdf.addImage(logoDataUrl, 'PNG', 10, 8, 40, 0);
+        }
+        pdf.setFontSize(16);
+        pdf.text('Dashboard analytique — HotOnes', 55, 15);
+        pdf.setFontSize(12);
+        pdf.text('Période: ' + startStr + ' → ' + endStr, 55, 22);
+
+        const lines = [
+            'CA Total: ' + (kpis.revenue.total_revenue ?? 0).toLocaleString('fr-FR') + ' €',
+            'Marge brute: ' + (kpis.revenue.total_margin ?? 0).toLocaleString('fr-FR') + ' € (' + (kpis.revenue.margin_rate ?? 0) + '%)',
+            'Projets actifs/total: ' + (kpis.projects.active ?? 0) + ' / ' + (kpis.projects.total ?? 0),
+            'Taux d\'occupation: ' + (kpis.time.occupation_rate ?? 0) + ' %',
+            'Conversion devis: ' + (kpis.orders.conversion_rate ?? 0) + ' %',
+        ];
+        let y = 32;
+        for (const l of lines) { pdf.text(l, 10, y); y += 7; }
+
+        // Filtres actifs (table légère sur 2 colonnes)
+        const idToName = (id, list) => {
+            if (!id || !Array.isArray(list)) return null;
+            const found = list.find(it => String(it.id) === String(id));
+            return found ? found.name : null;
+        };
+        const filterLines = [];
+        if (filtersState.project_type) filterLines.push(['Type de projet', filtersState.project_type === 'forfait' ? 'Forfait' : 'Régie']);
+        if (filtersState.service_category_id) filterLines.push(['Catégorie', idToName(filtersState.service_category_id, filterOptions.service_categories) || ('#'+filtersState.service_category_id)]);
+        if (filtersState.is_internal !== null && filtersState.is_internal !== undefined) filterLines.push(['Client', filtersState.is_internal ? 'Interne' : 'Client']);
+        if (filtersState.project_manager_id) filterLines.push(['Chef de projet', idToName(filtersState.project_manager_id, filterOptions.project_managers) || ('#'+filtersState.project_manager_id)]);
+        if (filtersState.sales_person_id) filterLines.push(['Commercial', idToName(filtersState.sales_person_id, filterOptions.sales_persons) || ('#'+filtersState.sales_person_id)]);
+        if (filtersState.technology_id) filterLines.push(['Technologie', idToName(filtersState.technology_id, filterOptions.technologies) || ('#'+filtersState.technology_id)]);
+
+        if (filterLines.length > 0) {
+            pdf.setFontSize(12);
+            pdf.text('Filtres actifs:', 120, 32);
+            let y2 = 38; const x1 = 120, x2 = 190;
+            const half = Math.ceil(filterLines.length / 2);
+            for (let i = 0; i < half; i++) {
+                const [k, v] = filterLines[i];
+                pdf.text(k + ': ' + String(v), x1, y2);
+                if (i + half < filterLines.length) {
+                    const [k2, v2] = filterLines[i + half];
+                    pdf.text(k2 + ': ' + String(v2), x2, y2);
+                }
+                y2 += 7;
             }
         }
-    }
-});
+
+        // Page 2: Répartition par Type
+        pdf.addPage('a4', 'l');
+        pdf.setFontSize(14); pdf.text('Répartition par Type', 10, 15);
+        const imgType = typeDonutChart.toBase64Image('image/png', 1);
+        embedChart(pdf, imgType);
+
+        // Page 3: Répartition par Catégorie (si dispo)
+        if (categoryDonutChart) {
+            pdf.addPage('a4', 'l');
+            pdf.setFontSize(14); pdf.text('Répartition par Catégorie', 10, 15);
+            const imgCat = categoryDonutChart.toBase64Image('image/png', 1);
+            embedChart(pdf, imgCat);
+        }
+
+        // Dernière page: Évolution CA & Marges
+        pdf.addPage('a4', 'l');
+        pdf.setFontSize(14); pdf.text('Évolution CA & Marges (12 mois)', 10, 15);
+        const imgEvo = evolutionChart.toBase64Image('image/png', 1);
+        embedChart(pdf, imgEvo);
+
+        // Footer sur toutes les pages
+        const pageCount = pdf.getNumberOfPages();
+        const genAt = new Date().toLocaleString('fr-FR');
+        for (let i = 1; i <= pageCount; i++) {
+            pdf.setPage(i);
+            const pw = pdf.internal.pageSize.getWidth();
+            const ph = pdf.internal.pageSize.getHeight();
+            const margin = 10;
+            pdf.setFontSize(9);
+            pdf.setTextColor(150);
+            pdf.text('HotOnes — Généré le ' + genAt + ' — ' + i + ' / ' + pageCount, pw - margin, ph - 6, { align: 'right' });
+            pdf.setTextColor(0);
+        }
+
+        pdf.save('dashboard-analytics.pdf');
+    });
+}
+
+function embedChart(pdf, imgData) {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 10; const yTitle = 8;
+    const w = pageWidth - margin * 2;
+    const h = pageHeight - margin * 2 - yTitle;
+    pdf.addImage(imgData, 'PNG', margin, margin + yTitle, w, h);
+}
 
 // Recalculate button handler
 {% if is_granted('ROLE_ADMIN') %}

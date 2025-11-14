@@ -127,6 +127,14 @@ class Contributor
         return trim($this->firstName.' '.$this->lastName);
     }
 
+    /**
+     * Alias plus explicite pour le nom complet du contributeur.
+     */
+    public function getFullName(): string
+    {
+        return $this->getName();
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
