@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Contributor;
+use App\Entity\Profile;
 use App\Entity\User;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -31,6 +32,23 @@ class ContributorRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->where('c.active = :active')
             ->setParameter('active', true)
+            ->orderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupère les contributeurs actifs pour un profil donné.
+     */
+    public function findActiveContributorsByProfile(Profile $profile): array
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.profiles', 'p')
+            ->where('c.active = :active')
+            ->andWhere('p = :profile')
+            ->setParameter('active', true)
+            ->setParameter('profile', $profile)
             ->orderBy('c.lastName', 'ASC')
             ->addOrderBy('c.firstName', 'ASC')
             ->getQuery()

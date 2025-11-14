@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller\Staffing;
 
+use App\Entity\Profile;
 use App\Repository\ContributorRepository;
 use App\Repository\StaffingMetricsRepository;
 use DateInterval;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +22,8 @@ class StaffingDashboardController extends AbstractController
 {
     public function __construct(
         private StaffingMetricsRepository $staffingRepo,
-        private ContributorRepository $contributorRepo
+        private ContributorRepository $contributorRepo,
+        private ManagerRegistry $doctrine,
     ) {
     }
 
@@ -40,11 +43,25 @@ class StaffingDashboardController extends AbstractController
         $endDate = new DateTime();
         $endDate->modify('last day of this month');
 
+        // Charger les entités associées aux filtres (si fournies)
+        $selectedProfile     = null;
+        $selectedContributor = null;
+
+        if ($profileId) {
+            $selectedProfile = $this->doctrine->getRepository(Profile::class)->find($profileId);
+        }
+
+        if ($contributorId) {
+            $selectedContributor = $this->contributorRepo->find($contributorId);
+        }
+
         // Récupérer les métriques agrégées pour les graphiques
         $metrics = $this->staffingRepo->getAggregatedMetricsByPeriod(
             $startDate,
             $endDate,
             $granularity,
+            $selectedProfile,
+            $selectedContributor,
         );
 
         // Récupérer les métriques par profil
@@ -52,6 +69,8 @@ class StaffingDashboardController extends AbstractController
             $startDate,
             $endDate,
             $granularity,
+            $selectedProfile,
+            $selectedContributor,
         );
 
         // Récupérer les métriques par contributeur
@@ -59,10 +78,19 @@ class StaffingDashboardController extends AbstractController
             $startDate,
             $endDate,
             $granularity,
+            $selectedProfile,
+            $selectedContributor,
         );
 
-        // Récupérer les contributeurs actifs pour les filtres
-        $contributors = $this->contributorRepo->findActiveContributors();
+        // Récupérer les profils et contributeurs actifs pour les filtres
+        $profileRepo = $this->doctrine->getRepository(Profile::class);
+        $profiles    = $profileRepo->findBy(['active' => true], ['name' => 'ASC']);
+
+        if ($selectedProfile) {
+            $contributors = $this->contributorRepo->findActiveContributorsByProfile($selectedProfile);
+        } else {
+            $contributors = $this->contributorRepo->findActiveContributors();
+        }
 
         // Préparer les données pour Chart.js
         $chartData = $this->prepareChartData($metrics);
@@ -71,6 +99,7 @@ class StaffingDashboardController extends AbstractController
             'chart_data'             => $chartData,
             'metrics_by_profile'     => $metricsByProfile,
             'metrics_by_contributor' => $metricsByContributor,
+            'profiles'               => $profiles,
             'contributors'           => $contributors,
             'selected_profile'       => $profileId,
             'selected_contributor'   => $contributorId,

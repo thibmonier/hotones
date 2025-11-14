@@ -10,10 +10,22 @@
                 <h4 class="mb-sm-0 font-size-18">Dashboard de Staffing</h4>
                 <div class="page-title-right">
                     <form method="get" action="{{ path('staffing_dashboard') }}" class="d-flex gap-2">
-                        <select name="contributor" class="form-select form-select-sm" style="width: 200px;">
+                        <select name="profile" class="form-select form-select-sm" style="width: 200px;">
+                            <option value="">Tous les profils</option>
+                            {% for profile in profiles %}
+                                <option value="{{ profile.id }}" {% if selected_profile == profile.id %}selected{% endif %}>
+                                    {{ profile.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <select name="contributor" class="form-select form-select-sm" style="width: 220px;">
                             <option value="">Tous les contributeurs</option>
                             {% for contributor in contributors %}
-                                <option value="{{ contributor.id }}" {% if selected_contributor == contributor.id %}selected{% endif %}>
+                                <option
+                                    value="{{ contributor.id }}"
+                                    data-profiles="{% for profile in contributor.profiles %}{{ profile.id }}{% if not loop.last %},{% endif %}{% endfor %}"
+                                    {% if selected_contributor == contributor.id %}selected{% endif %}
+                                >
                                     {{ contributor.name }}
                                 </option>
                             {% endfor %}
@@ -221,6 +233,47 @@
     <script>
         // Données pour les graphiques
         const chartData = {{ chart_data|json_encode|raw }};
+
+        // Filtrage UX des contributeurs en fonction du profil sélectionné
+        const profileSelect = document.querySelector('select[name="profile"]');
+        const contributorSelect = document.querySelector('select[name="contributor"]');
+
+        if (profileSelect && contributorSelect) {
+            const allContributorOptions = Array.from(contributorSelect.options);
+
+            const filterContributorsByProfile = () => {
+                const selectedProfileId = profileSelect.value;
+
+                allContributorOptions.forEach((option) => {
+                    // Toujours afficher l'option "Tous les contributeurs"
+                    if (!option.value) {
+                        option.hidden = false;
+                        option.disabled = false;
+                        return;
+                    }
+
+                    const profileIdsAttr = option.getAttribute('data-profiles') || '';
+                    const profileIds = profileIdsAttr ? profileIdsAttr.split(',') : [];
+
+                    if (!selectedProfileId || profileIds.includes(selectedProfileId)) {
+                        option.hidden = false;
+                        option.disabled = false;
+                    } else {
+                        option.hidden = true;
+                        option.disabled = true;
+
+                        // Si l'option actuellement sélectionnée n'est plus compatible, on la désélectionne
+                        if (option.selected) {
+                            option.selected = false;
+                        }
+                    }
+                });
+            };
+
+            profileSelect.addEventListener('change', filterContributorsByProfile);
+            // Appliquer le filtre au chargement (ex: profil déjà sélectionné via la query string)
+            filterContributorsByProfile();
+        }
         
         // Configuration commune
         const commonOptions = {

@@ -77,7 +77,9 @@ class StaffingMetricsRepository extends ServiceEntityRepository
     public function getAggregatedMetricsByPeriod(
         DateTimeInterface $startDate,
         DateTimeInterface $endDate,
-        string $granularity = 'monthly'
+        string $granularity = 'monthly',
+        ?Profile $profile = null,
+        ?Contributor $contributor = null
     ): array {
         $qb = $this->createQueryBuilder('fsm')
             ->select(
@@ -94,9 +96,20 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->andWhere('dp.isProductive = true OR dp.isProductive IS NULL')
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
-            ->setParameter('granularity', $granularity)
-            ->groupBy('dt.yearMonth')
-            ->orderBy('dt.yearMonth', 'ASC');
+            ->setParameter('granularity', $granularity);
+
+        if ($profile) {
+            $qb->andWhere('dp.profile = :profile')
+               ->setParameter('profile', $profile);
+        }
+
+        if ($contributor) {
+            $qb->andWhere('fsm.contributor = :contributor')
+               ->setParameter('contributor', $contributor);
+        }
+
+        $qb->groupBy('dt.yearMonth')
+           ->orderBy('dt.yearMonth', 'ASC');
 
         return $qb->getQuery()->getResult();
     }
@@ -117,7 +130,9 @@ class StaffingMetricsRepository extends ServiceEntityRepository
     public function getMetricsByProfile(
         DateTimeInterface $startDate,
         DateTimeInterface $endDate,
-        string $granularity = 'monthly'
+        string $granularity = 'monthly',
+        ?Profile $profile = null,
+        ?Contributor $contributor = null
     ): array {
         $qb = $this->createQueryBuilder('fsm')
             ->select(
@@ -133,9 +148,20 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->andWhere('dp.isProductive = true')
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
-            ->setParameter('granularity', $granularity)
-            ->groupBy('dp.name')
-            ->orderBy('staffingRate', 'DESC');
+            ->setParameter('granularity', $granularity);
+
+        if ($profile) {
+            $qb->andWhere('dp.profile = :profile')
+               ->setParameter('profile', $profile);
+        }
+
+        if ($contributor) {
+            $qb->andWhere('fsm.contributor = :contributor')
+               ->setParameter('contributor', $contributor);
+        }
+
+        $qb->groupBy('dp.name')
+           ->orderBy('staffingRate', 'DESC');
 
         return $qb->getQuery()->getResult();
     }
@@ -157,12 +183,14 @@ class StaffingMetricsRepository extends ServiceEntityRepository
     public function getMetricsByContributor(
         DateTimeInterface $startDate,
         DateTimeInterface $endDate,
-        string $granularity = 'monthly'
+        string $granularity = 'monthly',
+        ?Profile $profile = null,
+        ?Contributor $contributor = null
     ): array {
         $qb = $this->createQueryBuilder('fsm')
             ->select(
                 'c.id as contributorId',
-                'CONCAT(c.firstName, \' \', c.lastName) as contributorName',
+                'CONCAT(c.firstName, \' \' , c.lastName) as contributorName',
                 'AVG(fsm.staffingRate) as staffingRate',
                 'AVG(fsm.tace) as tace',
             )
@@ -174,9 +202,21 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->andWhere('fsm.contributor IS NOT NULL')
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
-            ->setParameter('granularity', $granularity)
-            ->groupBy('c.id', 'c.firstName', 'c.lastName')
-            ->orderBy('staffingRate', 'DESC');
+            ->setParameter('granularity', $granularity);
+
+        if ($profile) {
+            $qb->leftJoin('fsm.dimProfile', 'dp')
+               ->andWhere('dp.profile = :profile')
+               ->setParameter('profile', $profile);
+        }
+
+        if ($contributor) {
+            $qb->andWhere('fsm.contributor = :contributor')
+               ->setParameter('contributor', $contributor);
+        }
+
+        $qb->groupBy('c.id', 'c.firstName', 'c.lastName')
+           ->orderBy('staffingRate', 'DESC');
 
         return $qb->getQuery()->getResult();
     }
