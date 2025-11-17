@@ -31,8 +31,8 @@ class SalesDashboardController extends AbstractController
         $endDate   = new DateTime("$year-12-31");
 
         // Filtres utilisateur
-        $filterUserId   = $request->query->get('user_id');
-        $filterUserRole = $request->query->get('user_role'); // 'commercial' ou 'chef_projet'
+        $filterUserId   = $request->query->get('user_id') ? (int) $request->query->get('user_id') : null;
+        $filterUserRole = $request->query->get('user_role') ?: null; // 'commercial' ou 'chef_projet'
 
         // KPI 1: Nombre de devis en attente de signature
         $pendingCount = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
@@ -150,8 +150,8 @@ class SalesDashboardController extends AbstractController
         $startDate = new DateTime("$year-01-01");
         $endDate   = new DateTime("$year-12-31");
 
-        $filterUserId   = $request->query->get('user_id');
-        $filterUserRole = $request->query->get('user_role');
+        $filterUserId   = $request->query->get('user_id') ? (int) $request->query->get('user_id') : null;
+        $filterUserRole = $request->query->get('user_role') ?: null;
 
         // Récupération des données
         $pendingCount   = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
