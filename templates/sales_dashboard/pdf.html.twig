@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Commercial {{ selectedYear }}</title>
+    <style>
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+            margin: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #34495e;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .kpi-container {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .kpi-box {
+            display: table-cell;
+            width: 33%;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+        .kpi-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .kpi-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .kpi-success { color: #28a745; }
+        .kpi-warning { color: #ffc107; }
+        .kpi-danger { color: #dc3545; }
+        .kpi-info { color: #17a2b8; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .badge-success { background-color: #28a745; color: white; }
+        .badge-warning { background-color: #ffc107; color: #333; }
+        .badge-danger { background-color: #dc3545; color: white; }
+        .badge-secondary { background-color: #6c757d; color: white; }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 10px;
+            color: #6c757d;
+            text-align: center;
+        }
+        .comparison-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+        .comparison-item {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .comparison-col {
+            display: table-cell;
+            width: 33%;
+            text-align: center;
+        }
+        .trend-up { color: #28a745; }
+        .trend-down { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dashboard de Performance Commerciale</h1>
+        <p>Année {{ selectedYear }}</p>
+        <p style="font-size: 10px; color: #6c757d;">Généré le {{ generatedAt|date('d/m/Y à H:i') }}</p>
+    </div>
+
+    <h2>Indicateurs Clés de Performance</h2>
+    <div class="kpi-container">
+        <div class="kpi-box">
+            <div class="kpi-label">Devis en attente</div>
+            <div class="kpi-value kpi-warning">{{ pendingCount }}</div>
+            <div style="font-size: 10px; color: #6c757d; margin-top: 5px;">À signer</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">CA Signé {{ selectedYear }}</div>
+            <div class="kpi-value kpi-success">{{ signedRevenue|number_format(0, ',', ' ') }} €</div>
+            <div style="font-size: 10px; color: #6c757d; margin-top: 5px;">Moyenne mensuelle: {{ (signedRevenue / 12)|number_format(0, ',', ' ') }} €</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-label">Taux de conversion</div>
+            <div class="kpi-value {% if conversionRate >= 50 %}kpi-success{% elseif conversionRate >= 30 %}kpi-warning{% else %}kpi-danger{% endif %}">{{ conversionRate|number_format(1, ',', ' ') }}%</div>
+            <div style="font-size: 10px; color: #6c757d; margin-top: 5px;">Devis signés / Créés</div>
+        </div>
+    </div>
+
+    {% if yearComparison %}
+    <h2>Comparaison {{ yearComparison.current.year }} vs {{ yearComparison.previous.year }}</h2>
+    <div class="comparison-box">
+        <div class="comparison-item">
+            <div class="comparison-col">
+                <strong>Chiffre d'affaires</strong><br>
+                {{ yearComparison.current.revenue|number_format(0, ',', ' ') }} €
+                {% set revenueDiff = yearComparison.current.revenue - yearComparison.previous.revenue %}
+                {% set revenuePercent = yearComparison.previous.revenue > 0 ? ((revenueDiff / yearComparison.previous.revenue) * 100) : 0 %}
+                <span class="{% if revenueDiff >= 0 %}trend-up{% else %}trend-down{% endif %}">
+                    ({{ revenueDiff >= 0 ? '+' : '' }}{{ revenuePercent|number_format(1, ',', ' ') }}%)
+                </span>
+            </div>
+            <div class="comparison-col">
+                <strong>Nombre de devis</strong><br>
+                {{ yearComparison.current.count }}
+                {% set countDiff = yearComparison.current.count - yearComparison.previous.count %}
+                {% set countPercent = yearComparison.previous.count > 0 ? ((countDiff / yearComparison.previous.count) * 100) : 0 %}
+                <span class="{% if countDiff >= 0 %}trend-up{% else %}trend-down{% endif %}">
+                    ({{ countDiff >= 0 ? '+' : '' }}{{ countPercent|number_format(1, ',', ' ') }}%)
+                </span>
+            </div>
+            <div class="comparison-col">
+                <strong>Taux de conversion</strong><br>
+                {{ yearComparison.current.conversion_rate|number_format(1, ',', ' ') }}%
+                {% set conversionDiff = yearComparison.current.conversion_rate - yearComparison.previous.conversion_rate %}
+                <span class="{% if conversionDiff >= 0 %}trend-up{% else %}trend-down{% endif %}">
+                    ({{ conversionDiff >= 0 ? '+' : '' }}{{ conversionDiff|number_format(1, ',', ' ') }} pts)
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <h2>Répartition du CA par Statut</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Statut</th>
+                <th class="text-right">Nombre de devis</th>
+                <th class="text-right">CA Total (€)</th>
+                <th class="text-right">CA Moyen (€)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set totalCount = 0 %}
+            {% set totalAmount = 0 %}
+            {% for stat in statsByStatus %}
+                {% set totalCount = totalCount + stat.count %}
+                {% set totalAmount = totalAmount + stat.total %}
+                <tr>
+                    <td>
+                        <span class="badge badge-{% if stat.status in ['signe', 'gagne', 'termine'] %}success{% elseif stat.status == 'a_signer' %}warning{% elseif stat.status == 'perdu' %}danger{% else %}secondary{% endif %}">
+                            {{ stat.label }}
+                        </span>
+                    </td>
+                    <td class="text-right">{{ stat.count }}</td>
+                    <td class="text-right"><strong>{{ stat.total|number_format(0, ',', ' ') }}</strong></td>
+                    <td class="text-right">
+                        {% if stat.count > 0 %}
+                            {{ (stat.total / stat.count)|number_format(0, ',', ' ') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="background-color: #e9ecef; font-weight: bold;">
+                <th>Total</th>
+                <th class="text-right">{{ totalCount }}</th>
+                <th class="text-right">{{ totalAmount|number_format(0, ',', ' ') }}</th>
+                <th class="text-right">
+                    {% if totalCount > 0 %}
+                        {{ (totalAmount / totalCount)|number_format(0, ',', ' ') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="footer">
+        <p>Document généré automatiquement - Dashboard Commercial {{ selectedYear }}</p>
+    </div>
+</body>
+</html>

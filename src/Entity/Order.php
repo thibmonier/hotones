@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     new ORM\Index(name: 'idx_order_project', columns: ['project_id']),
     new ORM\Index(name: 'idx_order_status', columns: ['status']),
     new ORM\Index(name: 'idx_order_created_at', columns: ['created_at']),
+    new ORM\Index(name: 'idx_order_validated_at', columns: ['validated_at']),
 ])]
 #[ApiResource(
     operations: [

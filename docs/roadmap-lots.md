@@ -451,10 +451,36 @@ Cet onglet permettra de donner les informations techniques principales du projet
 - lors d'un process de recrutement, on doit pouvoir définir qui le contacte ou le rencontre, et qui doit encore le rencontrer lors des prochaines étapes (la derniere étant l'embauche ou le refus d'embauche)
 - Dépendances : Lot 1.1 (Contributors), 1.2 (EmploymentPeriod), 4 (Mon compte)
 
+### ✅ Dashboard de suivi commercial
+Ce dashboard permet de suivre les performances commerciales :
+- ✅ KPI : Nombre de devis en attente de signature (statut `a_signer`)
+- ✅ KPI : CA signé sur une période (statuts `signe`, `gagne`, `termine`)
+- ✅ KPI : CA moyen mensuel
+- ✅ KPI : Total des devis (tous statuts)
+- ✅ Graphique d'évolution du CA signé (mensuel sur l'année)
+- ✅ Tableau de répartition du CA par statut (nombre, CA total, CA moyen)
+- ✅ Liste des 5 derniers devis récents
+- ✅ Filtre par année
+- ✅ Controller SalesDashboardController
+- ✅ Template sales_dashboard/index.html.twig avec Chart.js
+- ✅ Méthodes d'agrégation dans OrderRepository
+- ✅ Documentation dans docs/sales-dashboard.md
+- ✅ Lien actif dans le menu Commerce
+
+Améliorations futures :
+- ⏳ Filtres par commercial/chef de projet
+- ⏳ Export PDF du dashboard
+- ⏳ Taux de conversion (devis signés / devis créés)
+- ⏳ Évolution comparative (année N vs N-1)
+- ⏳ Graphique de répartition par type de contrat (forfait/régie)
+- ⏳ Top 5 des projets par CA
+- ⏳ Prévisionnel du CA (pipeline)
+- ⏳ Durée moyenne de signature d'un devis
+
 ### ✅ Dashboard de suivi du staffing
 Ce dashboard devra montrer :
-- ✅ Une courbe avec le taux de staffing (pourcentage d’occupation des personnes productives). Cette courbe devra être filtrable sur des profils, des contributeurs, des BU. Si nécessaire préparer des données dans un modèle de données étoiles pour conserver des performances acceptables. Le Graph devra montrer l’évolution sur des périodes de temps longues (-6mois à +6mois par rapport à la date actuelle)
-- ✅ Une courbe montrant le TACE (Taux d’activité Congés Exclus) des personnes productives (contributeurs avec des profils identifiés comme productifs). Le Graph devra montrer l’évolution sur des périodes de temps longues (-6mois à +6mois par rapport à la date actuelle)
+- ✅ Une courbe avec le taux de staffing (pourcentage d'occupation des personnes productives). Cette courbe devra être filtrable sur des profils, des contributeurs, des BU. Si nécessaire préparer des données dans un modèle de données étoiles pour conserver des performances acceptables. Le Graph devra montrer l'évolution sur des périodes de temps longues (-6mois à +6mois par rapport à la date actuelle)
+- ✅ Une courbe montrant le TACE (Taux d'activité Congés Exclus) des personnes productives (contributeurs avec des profils identifiés comme productifs). Le Graph devra montrer l'évolution sur des périodes de temps longues (-6mois à +6mois par rapport à la date actuelle)
 - ✅ Modèle en étoile : DimProfile, DimTime, FactStaffingMetrics
 - ✅ Service StaffingMetricsCalculationService pour les calculs
 - ✅ Repository StaffingMetricsRepository avec méthodes d'agrégation

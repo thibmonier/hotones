@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Order;
 use App\Entity\Project;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -164,5 +166,258 @@ class OrderRepository extends ServiceEntityRepository
             ->setParameter('projects', $projects)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Compte le nombre de devis par statut.
+     */
+    public function countByStatus(string $status, ?int $userId = null, ?string $userRole = null): int
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('COUNT(o.id)')
+            ->where('o.status = :status')
+            ->setParameter('status', $status);
+
+        if ($userId && $userRole) {
+            $qb->leftJoin('o.project', 'p');
+            if ($userRole === 'commercial') {
+                $qb->andWhere('p.keyAccountManager = :user');
+            } elseif ($userRole === 'chef_projet') {
+                $qb->andWhere('p.projectManager = :user');
+            }
+            $qb->setParameter('user', $userId);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Calcule le CA total par statut.
+     */
+    public function getTotalAmountByStatus(string $status): float
+    {
+        $result = $this->createQueryBuilder('o')
+            ->select('SUM(o.totalAmount)')
+            ->where('o.status = :status')
+            ->setParameter('status', $status)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $result ? (float) $result : 0.0;
+    }
+
+    /**
+     * Obtient les statistiques par statut (count + CA).
+     */
+    public function getStatsByStatus(?int $userId = null, ?string $userRole = null): array
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('o.status, COUNT(o.id) as count, SUM(o.totalAmount) as total')
+            ->groupBy('o.status');
+
+        if ($userId && $userRole) {
+            $qb->leftJoin('o.project', 'p');
+            if ($userRole === 'commercial') {
+                $qb->andWhere('p.keyAccountManager = :user');
+            } elseif ($userRole === 'chef_projet') {
+                $qb->andWhere('p.projectManager = :user');
+            }
+            $qb->setParameter('user', $userId);
+        }
+
+        $results = $qb->getQuery()->getResult();
+
+        $stats = [];
+        foreach ($results as $row) {
+            $stats[$row['status']] = [
+                'count' => (int) $row['count'],
+                'total' => $row['total'] ? (float) $row['total'] : 0.0,
+            ];
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Calcule le CA signé sur une période.
+     * Statuts considérés comme signés: signe, gagne, termine.
+     */
+    public function getSignedRevenueForPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): float
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('SUM(o.totalAmount)')
+            ->where('o.status IN (:statuses)')
+            ->andWhere('o.validatedAt BETWEEN :start AND :end')
+            ->setParameter('statuses', ['signe', 'gagne', 'termine'])
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate);
+
+        if ($userId && $userRole) {
+            $qb->leftJoin('o.project', 'p');
+            if ($userRole === 'commercial') {
+                $qb->andWhere('p.keyAccountManager = :user');
+            } elseif ($userRole === 'chef_projet') {
+                $qb->andWhere('p.projectManager = :user');
+            }
+            $qb->setParameter('user', $userId);
+        }
+
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        return $result ? (float) $result : 0.0;
+    }
+
+    /**
+     * Obtient l'évolution mensuelle du CA signé sur une période.
+     * Retourne un tableau [month => CA].
+     */
+    public function getRevenueEvolution(DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT 
+                DATE_FORMAT(validated_at, "%Y-%m") as month, 
+                SUM(total_amount) as total
+            FROM orders
+            WHERE status IN (:statuses)
+            AND validated_at BETWEEN :start AND :end
+            GROUP BY month
+            ORDER BY month ASC
+        ';
+
+        $results = $conn->executeQuery(
+            $sql,
+            [
+                'statuses' => ['signe', 'gagne', 'termine'],
+                'start'    => $startDate->format('Y-m-d'),
+                'end'      => $endDate->format('Y-m-d'),
+            ],
+            [
+                'statuses' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY,
+            ],
+        )->fetchAllAssociative();
+
+        $evolution = [];
+        foreach ($results as $row) {
+            $evolution[$row['month']] = $row['total'] ? (float) $row['total'] : 0.0;
+        }
+
+        return $evolution;
+    }
+
+    /**
+     * Obtient les devis récents (par défaut 10).
+     */
+    public function getRecentOrders(int $limit = 10): array
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.project', 'p')
+            ->addSelect('p')
+            ->orderBy('o.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Calcule le taux de conversion sur une période.
+     * Retourne le pourcentage de devis signés par rapport au total de devis créés.
+     */
+    public function getConversionRate(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): float
+    {
+        $qbTotal = $this->createQueryBuilder('o')
+            ->select('COUNT(o.id)')
+            ->where('o.createdAt BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate);
+
+        if ($userId && $userRole) {
+            $qbTotal->leftJoin('o.project', 'p');
+            if ($userRole === 'commercial') {
+                $qbTotal->andWhere('p.keyAccountManager = :user');
+            } elseif ($userRole === 'chef_projet') {
+                $qbTotal->andWhere('p.projectManager = :user');
+            }
+            $qbTotal->setParameter('user', $userId);
+        }
+
+        $total = $qbTotal->getQuery()->getSingleScalarResult();
+
+        if (!$total || $total == 0) {
+            return 0.0;
+        }
+
+        $qbSigned = $this->createQueryBuilder('o')
+            ->select('COUNT(o.id)')
+            ->where('o.createdAt BETWEEN :start AND :end')
+            ->andWhere('o.status IN (:statuses)')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('statuses', ['signe', 'gagne', 'termine']);
+
+        if ($userId && $userRole) {
+            $qbSigned->leftJoin('o.project', 'p');
+            if ($userRole === 'commercial') {
+                $qbSigned->andWhere('p.keyAccountManager = :user');
+            } elseif ($userRole === 'chef_projet') {
+                $qbSigned->andWhere('p.projectManager = :user');
+            }
+            $qbSigned->setParameter('user', $userId);
+        }
+
+        $signed = $qbSigned->getQuery()->getSingleScalarResult();
+
+        return round(($signed / $total) * 100, 2);
+    }
+
+    /**
+     * Obtient les statistiques comparatives entre deux années.
+     */
+    public function getYearComparison(int $currentYear, int $previousYear, ?int $userId = null, ?string $userRole = null): array
+    {
+        $currentStart  = new DateTime("$currentYear-01-01");
+        $currentEnd    = new DateTime("$currentYear-12-31");
+        $previousStart = new DateTime("$previousYear-01-01");
+        $previousEnd   = new DateTime("$previousYear-12-31");
+
+        return [
+            'current' => [
+                'year'            => $currentYear,
+                'revenue'         => $this->getSignedRevenueForPeriod($currentStart, $currentEnd, $userId, $userRole),
+                'count'           => $this->countOrdersInPeriod($currentStart, $currentEnd, $userId, $userRole),
+                'conversion_rate' => $this->getConversionRate($currentStart, $currentEnd, $userId, $userRole),
+            ],
+            'previous' => [
+                'year'            => $previousYear,
+                'revenue'         => $this->getSignedRevenueForPeriod($previousStart, $previousEnd, $userId, $userRole),
+                'count'           => $this->countOrdersInPeriod($previousStart, $previousEnd, $userId, $userRole),
+                'conversion_rate' => $this->getConversionRate($previousStart, $previousEnd, $userId, $userRole),
+            ],
+        ];
+    }
+
+    /**
+     * Compte le nombre de devis créés sur une période.
+     */
+    public function countOrdersInPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): int
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->select('COUNT(o.id)')
+            ->where('o.createdAt BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate);
+
+        if ($userId && $userRole) {
+            $qb->leftJoin('o.project', 'p');
+            if ($userRole === 'commercial') {
+                $qb->andWhere('p.keyAccountManager = :user');
+            } elseif ($userRole === 'chef_projet') {
+                $qb->andWhere('p.projectManager = :user');
+            }
+            $qb->setParameter('user', $userId);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }
