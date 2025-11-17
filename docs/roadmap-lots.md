@@ -463,7 +463,7 @@ Ce dashboard devra montrer :
 - ✅ Tableaux par profil et par contributeur
 
 Définition :
-- Taux de staffing : Le taux de staffing est un indicateur de pilotage des ressources. Il représente le pourcentage du temps où une équipe ou un collaborateur est affecté à des missions (souvent facturables) par rapport à son temps total disponible sur une période. Formule courante: Temps staffé (missions, projets, production) ÷ Temps disponible total (hors absences) × 100. Exemples d’interprétations:
+- Taux de staffing : Le taux de staffing est un indicateur de pilotage des ressources. Il représente le pourcentage du temps où une équipe ou un collaborateur est affecté à des missions (souvent facturables) par rapport à son temps total disponible sur une période.Formule courante:Temps staffé (missions, projets, production) ÷ Temps disponible total (hors absences) × 100.Exemples d’interprétations:
     - 85%: bonne utilisation, marge pour formation/projets internes.
     - 100%: utilisation maximale, risque de surcharge.
     - <70%: sous-utilisation, besoin d’affectations supplémentaires.
@@ -481,4 +481,5 @@ Définition :
 - La documentation technique est à maintenir au fil des développements
 - Prévoir des revues de code et QA entre chaque lot
 - Possibilité de paralléliser certains lots (ex: Lot 4 + Lot 5)
+- s'assurer que la génération de données via faker utilise la locale fr_FR
     

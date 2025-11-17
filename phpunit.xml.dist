@@ -17,7 +17,10 @@
         <!-- Use Chrome for Panther in container -->
         <server name="PANTHER_BROWSER" value="chrome" />
         <server name="PANTHER_CHROME_BINARY" value="/usr/bin/chromium-browser" />
+        <server name="PANTHER_CHROME_DRIVER_BINARY" value="${{ github.workspace }}/vendor/bin/chromedriver" />
         <server name="PANTHER_NO_SANDBOX" value="1" />
+        <server name="PANTHER_NO_HEADLESS" value="0" />
+        <server name="PANTHER_GECKO_BINARY" value="" />
         <server name="MOZ_HEADLESS" value="1" />
     </php>
 
@@ -63,6 +66,7 @@
     </groups>
 
     <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
         <bootstrap class="Symfony\Component\Panther\ServerExtension" />
         <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension" />
     </extensions>

@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\Profile;
+use Faker\Factory as FakerFactory;
 use Faker\Generator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -14,7 +15,7 @@ final class ProfileFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         /** @var Generator $faker */
-        $faker = self::faker();
+        $faker = FakerFactory::create('fr_FR');
 
         return [
             'name'             => $faker->unique()->jobTitle(),
