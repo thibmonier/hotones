@@ -249,8 +249,9 @@ class StaffingMetricsRepository extends ServiceEntityRepository
      */
     public function deleteForDateRange(DateTimeInterface $startDate, DateTimeInterface $endDate, string $granularity): int
     {
-        $result = $this->createQueryBuilder('fsm')
-            ->delete()
+        // D'abord, récupérer les IDs des métriques à supprimer (DQL DELETE ne supporte pas les JOINs)
+        $ids = $this->createQueryBuilder('fsm')
+            ->select('fsm.id')
             ->join('fsm.dimTime', 'dt')
             ->where('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
@@ -258,6 +259,21 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
             ->setParameter('granularity', $granularity)
+            ->getQuery()
+            ->getResult();
+
+        if (empty($ids)) {
+            return 0;
+        }
+
+        // Extraire les IDs
+        $idList = array_map(fn ($row) => $row['id'], $ids);
+
+        // Supprimer par IDs
+        $result = $this->createQueryBuilder('fsm')
+            ->delete()
+            ->where('fsm.id IN (:ids)')
+            ->setParameter('ids', $idList)
             ->getQuery()
             ->execute();
 
