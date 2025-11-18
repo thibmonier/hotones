@@ -17,8 +17,18 @@
   - Blocs: une planification par période (couleur selon statut planned/confirmed/cancelled), taille proportionnelle au nombre de jours
   - Actions: déplacer un bloc (drag&drop) pour changer la date de début; clic pour éditer début/fin, heures/jour, statut, notes via modal
   - Sécurité: endpoints protégés par CSRF et rôles; mise à jour en AJAX
+  - chaque jour ne peut durer que le nombre d'heure de travail d'un collaborateur, dans le cas ou la tâche dépasse cette durée, il faut l'étaler sur plusieurs jours.
+  - La somme des durées des tâches par jour pour un contributeur ne doit pas excéder la durée de travail quotidien de ce contributeur, sans quoi il faut que ce dépassement soit visible
+  - il faut que pour chaque semaine, le taux de staffing d'un contributeur soit visible (en pourcentage ou en jour)
+  - les jours de congés ou off doivent être indiqué dans une couleurs "désactivée" (en gris ou en noir par exemple)
+  - il faut qu'on puisse séparer une tâche en 2 pour pouvoir la positionner sur plusieurs jours non consécutifs en drag&drop
+  - les temps passés (uniquement si la semaine est terminée) ne doivent plus être modifiables et apparaissent comme non modifiables (ils le sont par la saisies des temps mais pas par le planning)
 - Positionnement de tâches/temps futurs (jours/semaines/mois), lien Contributeur ↔ Project, notes optionnelles
 
 ## Congés (Vacation)
 - Dates, durée, type (congés payés, repos compensateur, absence exceptionnelle, arrêt maladie)
 - Notes, statut
+- chaque contributeur peut poser des congés soumis à validation de son manager
+- dans son profil un contributeur peut voir les congés qu'il a posé sur l'année courante et les congés qu'il peut utiliser sur l'année suivante (principe de cumul n / n+1 de 0,8 jours de congés payés par mois travaillé)
+- lorsque le congés est à une date antérieure, il n'est plus modifiable par le contributeur, seul le manager ou la compta peuvent le modifier
+- 

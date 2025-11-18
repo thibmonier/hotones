@@ -3,32 +3,26 @@
 {% block title %}Planning{% endblock %}
 
 {% block stylesheets %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.10/index.global.min.css" rel="stylesheet">
 <style>
-  .planning-wrapper { display: grid; grid-template-columns: 320px 1fr; }
-  .planning-left { position: sticky; left: 0; z-index: 3; background: var(--bs-body-bg); border-right: 1px solid #eee; }
-  .planning-right { overflow-x: auto; }
-  .planning-grid { min-width: calc(var(--cell-width) * {{ timeline_dates|length }}); position: relative; }
-:root { --cell-width: 40px; --row-height: 56px; }
-  .totals-row { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: var(--cell-width); height: var(--row-height); align-items: center; }
-  .day-total { text-align: center; font-size: 11px; line-height: 1.1; }
-  .day-total .actual { font-weight: 700; color: #0d6efd; }
-  .day-total .planned { font-weight: 700; color: #16a34a; }
-  .header-row, .planning-row { display: grid; grid-auto-flow: column; grid-auto-columns: var(--cell-width); }
-  .header-cell { text-align: center; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #e9ecef; border-right: 1px solid #f1f1f1; }
-  .header-week { font-weight: 600; padding: 8px 6px; border-bottom: 1px solid #dee2e6; background: #fafbfc; position: sticky; top: 0; z-index: 2; }
-  .day-weekend { background: #fafafa; }
-  .contributor-cell { height: var(--row-height); display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f1f1f1; }
-  .contributor-name { font-weight: 600; }
-  .row-canvas { position: relative; height: var(--row-height); border-bottom: 1px solid #f1f1f1; }
-  .plan-block { position: absolute; top: 8px; height: calc(var(--row-height) - 16px); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 12px; cursor: grab; display: flex; align-items: center; gap: 8px; }
-  .plan-block:active { cursor: grabbing; }
-  .plan-block[data-status="planned"] { background: #3b82f6; }
-  .plan-block[data-status="confirmed"] { background: #22c55e; }
-  .plan-block[data-status="cancelled"] { background: #9CA3AF; text-decoration: line-through; }
-  .plan-block .badge { background: rgba(255,255,255,0.2); }
-  .week-divider { position: absolute; top: 0; bottom: 0; width: 1px; background: #e5e7eb; z-index: 1; }
-  .grid-bg { position: absolute; inset: 0; display: grid; grid-auto-flow: column; grid-auto-columns: var(--cell-width); }
-  .grid-bg > div { border-right: 1px dashed #f0f0f0; }
+  #calendar {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  .fc-resource-timeline .fc-scrollgrid-sync-table {
+    width: 100% !important;
+  }
+  /* Custom event colors */
+  .fc-event.status-planned { background-color: #3b82f6; border-color: #2563eb; }
+  .fc-event.status-confirmed { background-color: #22c55e; border-color: #16a34a; }
+  .fc-event.status-cancelled { background-color: #9ca3af; border-color: #6b7280; text-decoration: line-through; }
+  .fc-event.event-vacation { background-color: #6b7280; border-color: #4b5563; opacity: 0.5; }
+  .fc-event.readonly { opacity: 0.6; cursor: not-allowed; }
+  /* Staffing info in resource labels */
+  .staffing-info { font-size: 10px; color: #6b7280; margin-top: 2px; }
+  .staffing-badge { display: inline-block; padding: 1px 4px; margin: 0 2px; border-radius: 2px; background: #f3f4f6; font-size: 9px; }
+  .staffing-badge.high { background: #dcfce7; color: #166534; }
+  .staffing-badge.overload { background: #fee2e2; color: #991b1b; }
 </style>
 {% endblock %}
 
@@ -90,99 +84,8 @@
 </div>
 
 <div class="card">
-  <div class="card-body planning-wrapper">
-    <!-- Left fixed column: contributor project rows -->
-    <div class="planning-left">
-      <div class="header-week">Contributeur · Projet</div>
-      {% for g in groups %}
-        {% set c = g.contributor %}
-        <!-- Summary row label -->
-        <div class="contributor-cell">
-          <div class="avatar-xs me-2"><span class="avatar-title rounded-circle bg-primary bg-soft text-primary">{{ c.name|first|upper }}</span></div>
-          <div>
-            <div class="contributor-name">{{ c.name }}</div>
-            <div class="text-muted small">Passées vs Prévisionnelles (h/j)</div>
-          </div>
-        </div>
-        {% for prj in g.projectRows %}
-          <div class="contributor-cell">
-            <div class="avatar-xs me-2"><span class="avatar-title rounded-circle bg-primary bg-soft text-primary">{{ c.name|first|upper }}</span></div>
-            <div>
-              <div class="contributor-name">{{ c.name }}</div>
-              <div class="text-muted small">{{ prj.project.name }}</div>
-            </div>
-          </div>
-        {% endfor %}
-      {% endfor %}
-    </div>
-
-    <!-- Right scrollable timeline -->
-    <div class="planning-right">
-      <div style="position: sticky; left: 0;">
-        <!-- Header with days -->
-        <div class="header-week">{{ timeline_start|date('d M Y') }} → {{ timeline_end|date('d M Y') }}</div>
-        <div class="header-row">
-          {% for d in timeline_dates %}
-            {% set isWeekend = d|date('w') in ['0','6'] %}
-            <div class="header-cell {% if isWeekend %}day-weekend{% endif %}">
-              <div>{{ d|date('D') }}</div>
-              <div><strong>{{ d|date('d') }}</strong></div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Rows canvas -->
-      {% for g in groups %}
-        {# Summary totals row #}
-        <div class="row-canvas position-relative" data-contributor-id="{{ g.contributor.id }}" data-summary="true">
-          <div class="grid-bg">
-            {% for d in timeline_dates %}<div data-date="{{ d|date('Y-m-d') }}"></div>{% endfor %}
-          </div>
-          <div class="totals-row">
-            {% for d in timeline_dates %}
-              {% set key = d|date('Y-m-d') %}
-              <div class="day-total">
-                <div class="actual">{% if g.totals[key] is defined and g.totals[key] > 0 %}{{ g.totals[key]|number_format(1, ',', ' ') }}h{% else %}&nbsp;{% endif %}</div>
-                {% set planned = planned_totals_by_contributor[g.contributor.id][key] ?? 0 %}
-                <div class="planned">{% if planned > 0 %}{{ planned|number_format(1, ',', ' ') }}h{% else %}&nbsp;{% endif %}</div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-        {# Project rows #}
-        {% for prj in g.projectRows %}
-          {% set items = prj.items %}
-          <div class="row-canvas position-relative" data-contributor-id="{{ g.contributor.id }}" data-project-id="{{ prj.project.id }}">
-            <div class="grid-bg">
-              {% for d in timeline_dates %}<div data-date="{{ d|date('Y-m-d') }}" class="drop-target"></div>{% endfor %}
-            </div>
-
-            {# Render blocks for this contributor+project #}
-            {% for p in items %}
-              {% set blockStart = p.startDate < timeline_start ? timeline_start : p.startDate %}
-              {% set blockEnd = p.endDate > timeline_end ? timeline_end : p.endDate %}
-              {% set leftDays = (blockStart|date('U') - timeline_start|date('U')) / 86400 %}
-              {% set totalDays = ((blockEnd|date('U') - blockStart|date('U')) / 86400) + 1 %}
-              {% set left = leftDays * 40 %}
-              {% set width = totalDays * 40 %}
-              <div class="plan-block"
-                   draggable="true"
-                   data-id="{{ p.id }}"
-                   data-status="{{ p.status }}"
-                   data-start="{{ p.startDate|date('Y-m-d') }}"
-                   data-end="{{ p.endDate|date('Y-m-d') }}"
-                   data-token-move="{{ csrf_token('move_planning_' ~ p.id) }}"
-                   data-token-edit="{{ csrf_token('edit_planning_' ~ p.id) }}"
-                   style="left: {{ left }}px; width: {{ width }}px;">
-                <span class="badge">{{ prj.project.name }}</span>
-                <span>{{ p.dailyHours }}h/j</span>
-              </div>
-            {% endfor %}
-          </div>
-        {% endfor %}
-      {% endfor %}
-    </div>
+  <div class="card-body">
+    <div id="calendar"></div>
   </div>
 </div>
 
@@ -196,6 +99,7 @@
       </div>
       <div class="modal-body">
         <form id="planEditForm">
+          <input type="hidden" name="planningId">
           <div class="mb-3">
             <label class="form-label">Début</label>
             <input type="date" name="startDate" class="form-control">
@@ -220,11 +124,71 @@
             <label class="form-label">Notes</label>
             <textarea name="notes" class="form-control" rows="3"></textarea>
           </div>
+          <div class="mb-3">
+            <label class="form-label">Diviser la tâche à cette date</label>
+            <input type="date" name="splitDate" class="form-control">
+            <small class="text-muted">La tâche sera divisée en 2 parties : avant et à partir de cette date</small>
+          </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-warning" id="planSplit">Diviser</button>
         <button type="button" class="btn btn-primary" id="planEditSave">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create modal -->
+<div class="modal fade" id="planCreateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Créer une planification</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="planCreateForm">
+          <input type="hidden" name="contributorId">
+          <div class="mb-3">
+            <label class="form-label">Projet</label>
+            <select name="projectId" class="form-select" required>
+              <option value="">Sélectionner un projet...</option>
+              {% for p in all_projects %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Début</label>
+            <input type="date" name="startDate" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Fin</label>
+            <input type="date" name="endDate" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Heures par jour</label>
+            <input type="number" step="0.25" min="0" max="12" name="dailyHours" class="form-control" value="7">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Statut</label>
+            <select name="status" class="form-select">
+              <option value="planned">Planifié</option>
+              <option value="confirmed">Confirmé</option>
+              <option value="cancelled">Annulé</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea name="notes" class="form-control" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" id="planCreateSave">Créer</button>
       </div>
     </div>
   </div>
@@ -232,11 +196,305 @@
 {% endblock %}
 
 {% block javascripts %}
-<script src="{{ asset('assets/js/planning.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/fr.global.min.js"></script>
 <script>
-  window.PLANNING_CONFIG = {
-    moveUrl: '{{ path('planning_move', {id: 0})|replace({'/0/move':'/{id}/move'}) }}',
-    updateUrl: '{{ path('planning_update', {id: 0})|replace({'/0/update':'/{id}/update'}) }}'
-  };
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('calendar');
+
+  // Prepare resources (contributors) - one line per contributor
+  const resources = [
+    {% for g in groups %}
+    {
+      id: 'contributor-{{ g.contributor.id }}',
+      title: '{{ g.contributor.name|e('js') }}',
+      extendedProps: {
+        contributorId: {{ g.contributor.id }},
+        dailyHours: {{ contributor_daily_hours[g.contributor.id] ?? 7.0 }},
+        staffing: {{ weekly_staffing[g.contributor.id]|default({})|json_encode|raw }}
+      }
+    },
+    {% endfor %}
+  ];
+
+  // Prepare events (plannings + vacations)
+  const events = [
+    {% for g in groups %}
+      {% for prj in g.projectRows %}
+        {% for p in prj.items %}
+          {% set weekEnd = p.endDate|date_modify('Sunday this week') %}
+          {% set isReadonly = weekEnd < date('now') %}
+        {
+          id: 'planning-{{ p.id }}',
+          resourceId: 'contributor-{{ g.contributor.id }}',
+          title: '{{ prj.project.name|e('js') }} ({{ p.dailyHours }}h/j)',
+          start: '{{ p.startDate|date('Y-m-d') }}',
+          end: '{{ p.endDate|date_modify('+1 day')|date('Y-m-d') }}',
+          classNames: ['status-{{ p.status }}', '{{ isReadonly ? "readonly" : "" }}'],
+          editable: {{ isReadonly ? 'false' : 'true' }},
+          extendedProps: {
+            type: 'planning',
+            planningId: {{ p.id }},
+            projectName: '{{ prj.project.name|e('js') }}',
+            dailyHours: {{ p.dailyHours }},
+            status: '{{ p.status }}',
+            notes: '{{ p.notes|default('')|e('js') }}',
+            readonly: {{ isReadonly ? 'true' : 'false' }},
+            csrfMove: '{{ csrf_token('move_planning_' ~ p.id) }}',
+            csrfEdit: '{{ csrf_token('edit_planning_' ~ p.id) }}',
+            csrfSplit: '{{ csrf_token('split_planning_' ~ p.id) }}'
+          }
+        },
+        {% endfor %}
+      {% endfor %}
+      {% if vacations_by_contributor[g.contributor.id] is defined %}
+        {% for v in vacations_by_contributor[g.contributor.id] %}
+        {
+          id: 'vacation-{{ v.id }}',
+          resourceId: 'contributor-{{ g.contributor.id }}',
+          title: '{{ v.typeLabel|e('js') }}',
+          start: '{{ v.startDate|date('Y-m-d') }}',
+          end: '{{ v.endDate|date_modify('+1 day')|date('Y-m-d') }}',
+          classNames: ['event-vacation'],
+          editable: false,
+          extendedProps: {
+            type: 'vacation'
+          }
+        },
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  ];
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+    locale: 'fr',
+    initialView: 'resourceTimelineMonth',
+    initialDate: '{{ timeline_start|date('Y-m-d') }}',
+    aspectRatio: 2.5,
+    headerToolbar: {
+      left: 'today prev,next',
+      center: 'title',
+      right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
+    },
+    editable: true,
+    selectable: true,
+    resourceAreaHeaderContent: 'Contributeurs',
+    resourceAreaWidth: '250px',
+    resources: resources,
+    events: events,
+    resourceOrder: 'title',
+    slotMinWidth: 50,
+    height: 'auto',
+    select: function(info) {
+      // Open create modal
+      const form = document.getElementById('planCreateForm');
+      // Extract contributor ID from 'contributor-123' format
+      const contributorId = info.resource.extendedProps.contributorId;
+      form.contributorId.value = contributorId;
+
+      // FullCalendar uses exclusive end dates, so subtract 1 day
+      const startDate = new Date(info.start);
+      const endDate = new Date(info.end);
+      endDate.setDate(endDate.getDate() - 1); // Subtract 1 day
+
+      // Format dates in local timezone
+      form.startDate.value = startDate.toISOString().split('T')[0];
+      form.endDate.value = endDate.toISOString().split('T')[0];
+
+      // Ensure end date is not before start date
+      if (form.endDate.value < form.startDate.value) {
+        form.endDate.value = form.startDate.value;
+      }
+
+      form.projectId.value = '';
+      form.dailyHours.value = '7';
+      form.status.value = 'planned';
+      form.notes.value = '';
+
+      const modal = new bootstrap.Modal(document.getElementById('planCreateModal'));
+      modal.show();
+
+      calendar.unselect();
+    },
+    resourceLabelContent: function(arg) {
+      const staffing = arg.resource.extendedProps.staffing;
+      let html = '<div><strong>' + arg.resource.title + '</strong>';
+      if (staffing && Object.keys(staffing).length > 0) {
+        html += '<div class="staffing-info">';
+        for (let week in staffing) {
+          if (week.endsWith('_h')) continue;
+          const pct = Math.round(staffing[week]);
+          const cls = pct > 100 ? 'overload' : (pct >= 80 ? 'high' : '');
+          html += '<span class="staffing-badge ' + cls + '">S' + week.split('-')[1] + ': ' + pct + '%</span>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+      return { html: html };
+    },
+    eventClick: function(info) {
+      if (info.event.extendedProps.type === 'vacation') return;
+      if (info.event.extendedProps.readonly) return;
+
+      // Open edit modal
+      const form = document.getElementById('planEditForm');
+      form.planningId.value = info.event.extendedProps.planningId;
+      form.startDate.value = info.event.start.toISOString().split('T')[0];
+      form.endDate.value = new Date(info.event.end.getTime() - 86400000).toISOString().split('T')[0];
+      form.dailyHours.value = info.event.extendedProps.dailyHours;
+      form.status.value = info.event.extendedProps.status;
+      form.notes.value = info.event.extendedProps.notes;
+
+      const modal = new bootstrap.Modal(document.getElementById('planEditModal'));
+      modal.show();
+
+      // Store event ref for later
+      window.currentEvent = info.event;
+    },
+    eventDrop: async function(info) {
+      if (info.event.extendedProps.readonly) {
+        info.revert();
+        return;
+      }
+
+      // Call move endpoint
+      try {
+        const res = await fetch('/planning/' + info.event.extendedProps.planningId + '/move', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            _token: info.event.extendedProps.csrfMove,
+            targetDate: info.event.start.toISOString().split('T')[0]
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Move failed');
+      } catch (err) {
+        alert(err.message);
+        info.revert();
+      }
+    },
+    eventResize: async function(info) {
+      if (info.event.extendedProps.readonly) {
+        info.revert();
+        return;
+      }
+
+      // Call update endpoint
+      try {
+        const res = await fetch('/planning/' + info.event.extendedProps.planningId + '/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            _token: info.event.extendedProps.csrfEdit,
+            startDate: info.event.start.toISOString().split('T')[0],
+            endDate: new Date(info.event.end.getTime() - 86400000).toISOString().split('T')[0]
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Update failed');
+      } catch (err) {
+        alert(err.message);
+        info.revert();
+      }
+    }
+  });
+
+  calendar.render();
+
+  // Edit modal save button
+  document.getElementById('planEditSave').addEventListener('click', async function() {
+    const form = document.getElementById('planEditForm');
+    const event = window.currentEvent;
+    if (!event) return;
+
+    try {
+      const res = await fetch('/planning/' + form.planningId.value + '/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _token: event.extendedProps.csrfEdit,
+          startDate: form.startDate.value,
+          endDate: form.endDate.value,
+          dailyHours: form.dailyHours.value,
+          status: form.status.value,
+          notes: form.notes.value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Update failed');
+
+      // Reload page to refresh
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Split button
+  document.getElementById('planSplit').addEventListener('click', async function() {
+    const form = document.getElementById('planEditForm');
+    const event = window.currentEvent;
+    if (!event || !form.splitDate.value) {
+      alert('Veuillez sélectionner une date de division');
+      return;
+    }
+
+    try {
+      const res = await fetch('/planning/' + form.planningId.value + '/split', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _token: event.extendedProps.csrfSplit,
+          splitDate: form.splitDate.value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Split failed');
+
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Create button
+  document.getElementById('planCreateSave').addEventListener('click', async function() {
+    const form = document.getElementById('planCreateForm');
+
+    if (!form.projectId.value || !form.startDate.value || !form.endDate.value) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    try {
+      const res = await fetch('/planning/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _token: '{{ csrf_token('create_planning') }}',
+          contributorId: form.contributorId.value,
+          projectId: form.projectId.value,
+          startDate: form.startDate.value,
+          endDate: form.endDate.value,
+          dailyHours: form.dailyHours.value,
+          status: form.status.value,
+          notes: form.notes.value
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Create failed');
+
+      // Redirect to the start date of the created planning
+      const url = new URL(window.location.href);
+      url.searchParams.set('start', data.startDate);
+      window.location.href = url.toString();
+    } catch (err) {
+      alert('Erreur: ' + err.message);
+    }
+  });
+});
 </script>
 {% endblock %}
