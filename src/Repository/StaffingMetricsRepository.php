@@ -333,7 +333,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->select(
                 'c.id as contributorId',
                 'CONCAT(c.firstName, \' \', c.lastName) as contributorName',
-                'dt.yearMonth as weekNumber',
+                'CONCAT(:year, \'-S\', LPAD(WEEK(dt.date, 1), 2, \'0\')) as weekNumber',
                 'fsm.availableDays',
                 'fsm.staffedDays',
                 'fsm.plannedDays',
@@ -348,7 +348,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->setParameter('granularity', 'weekly')
             ->orderBy('c.lastName', 'ASC')
             ->addOrderBy('c.firstName', 'ASC')
-            ->addOrderBy('dt.yearMonth', 'ASC');
+            ->addOrderBy('dt.date', 'ASC');
 
         if ($profile) {
             $qb->leftJoin('fsm.dimProfile', 'dp')
@@ -391,7 +391,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('fsm')
             ->select(
-                'dt.yearMonth as weekNumber',
+                'CONCAT(:year, \'-S\', LPAD(WEEK(dt.date, 1), 2, \'0\')) as weekNumber',
                 'AVG(fsm.tace) as tace',
                 'SUM(fsm.contributorCount) as contributorCount',
                 'SUM(fsm.staffedDays) as staffedDays',
@@ -401,15 +401,17 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->leftJoin('fsm.dimProfile', 'dp')
             ->where('dt.year = :year')
             ->andWhere('fsm.granularity = :granularity')
-            ->andWhere('dp.isProductive = true OR dp.isProductive IS NULL')
             ->setParameter('year', $year)
             ->setParameter('granularity', 'weekly')
-            ->groupBy('dt.yearMonth')
-            ->orderBy('dt.yearMonth', 'ASC');
+            ->groupBy('WEEK(dt.date, 1)')
+            ->orderBy('dt.date', 'ASC');
 
         if ($profile) {
             $qb->andWhere('dp.profile = :profile')
                ->setParameter('profile', $profile);
+        } else {
+            // Inclure les profils productifs ou sans profil
+            $qb->andWhere('dp.id IS NULL OR dp.isProductive = true');
         }
 
         return $qb->getQuery()->getResult();
