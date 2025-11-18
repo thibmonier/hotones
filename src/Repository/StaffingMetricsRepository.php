@@ -93,14 +93,18 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->where('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
             ->andWhere('fsm.granularity = :granularity')
-            ->andWhere('dp.isProductive = true OR dp.isProductive IS NULL')
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
             ->setParameter('granularity', $granularity);
 
+        // Ne filtrer par productivité que s'il y a un profil
+        // Les métriques sans profil (dimProfile NULL) sont considérées comme productives par défaut
         if ($profile) {
             $qb->andWhere('dp.profile = :profile')
                ->setParameter('profile', $profile);
+        } else {
+            // Si pas de filtre profil spécifique, inclure soit les profils productifs soit pas de profil du tout
+            $qb->andWhere('dp.id IS NULL OR dp.isProductive = true');
         }
 
         if ($contributor) {
@@ -196,6 +200,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             )
             ->join('fsm.dimTime', 'dt')
             ->join('fsm.contributor', 'c')
+            ->leftJoin('fsm.dimProfile', 'dp')
             ->where('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
             ->andWhere('fsm.granularity = :granularity')
@@ -205,9 +210,11 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->setParameter('granularity', $granularity);
 
         if ($profile) {
-            $qb->leftJoin('fsm.dimProfile', 'dp')
-               ->andWhere('dp.profile = :profile')
+            $qb->andWhere('dp.profile = :profile')
                ->setParameter('profile', $profile);
+        } else {
+            // Inclure les contributeurs avec profils productifs ou sans profil
+            $qb->andWhere('dp.id IS NULL OR dp.isProductive = true');
         }
 
         if ($contributor) {
