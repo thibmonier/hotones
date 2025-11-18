@@ -73,7 +73,7 @@ class SalesDashboardController extends AbstractController
         // Comparaison avec l'année précédente
         $yearComparison = null;
         if ($year > min($availableYears)) {
-            $previousYear   = $year - 1;
+            $previousYear   = (int) $year - 1;
             $yearComparison = $orderRepository->getYearComparison((int) $year, $previousYear, $filterUserId, $filterUserRole);
         }
 
@@ -175,7 +175,7 @@ class SalesDashboardController extends AbstractController
         $availableYears = $this->getAvailableYears($em);
         $yearComparison = null;
         if ($year > min($availableYears)) {
-            $previousYear   = $year - 1;
+            $previousYear   = (int) $year - 1;
             $yearComparison = $orderRepository->getYearComparison((int) $year, $previousYear, $filterUserId, $filterUserRole);
         }
 
