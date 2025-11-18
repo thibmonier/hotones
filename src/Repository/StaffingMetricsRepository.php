@@ -241,6 +241,30 @@ class StaffingMetricsRepository extends ServiceEntityRepository
     }
 
     /**
+     * Supprime les métriques pour une plage de dates.
+     *
+     * @param DateTimeInterface $startDate   Date de début
+     * @param DateTimeInterface $endDate     Date de fin
+     * @param string            $granularity Granularité
+     */
+    public function deleteForDateRange(DateTimeInterface $startDate, DateTimeInterface $endDate, string $granularity): int
+    {
+        $result = $this->createQueryBuilder('fsm')
+            ->delete()
+            ->join('fsm.dimTime', 'dt')
+            ->where('dt.date >= :startDate')
+            ->andWhere('dt.date <= :endDate')
+            ->andWhere('fsm.granularity = :granularity')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('granularity', $granularity)
+            ->getQuery()
+            ->execute();
+
+        return (int) $result;
+    }
+
+    /**
      * Vérifie si des métriques existent pour une période donnée.
      *
      * @param DateTimeInterface $date        Période à vérifier

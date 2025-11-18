@@ -107,15 +107,15 @@ Exemples :
                 $io->info("Calcul des métriques de staffing pour les $range derniers mois ($granularity)...");
             }
 
-            // Vérifier si on doit forcer le recalcul
-            if (!$forceRecalculate && $this->staffingRepo->existsForPeriod($startDate, $granularity)) {
-                $io->warning('Des métriques existent déjà pour cette période. Utilisez --force-recalculate pour recalculer.');
-            }
-
             // Si force recalculate, supprimer les anciennes données
             if ($forceRecalculate) {
                 $io->writeln('Suppression des anciennes métriques...');
-                // On pourrait implémenter une méthode deleteForDateRange dans le repository
+                $deleted = $this->staffingRepo->deleteForDateRange($startDate, $endDate, $granularity);
+                $io->info("$deleted métriques supprimées.");
+            } elseif ($this->staffingRepo->existsForPeriod($startDate, $granularity)) {
+                $io->warning('Des métriques existent déjà pour cette période. Utilisez --force-recalculate pour recalculer.');
+
+                return Command::SUCCESS;
             }
 
             // Calculer et enregistrer les métriques
