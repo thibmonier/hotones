@@ -443,28 +443,31 @@
                 }
             }
         };
-        
-        // Graphique Taux de Staffing
-        const ctxStaffing = document.getElementById('staffingRateChart').getContext('2d');
-        new Chart(ctxStaffing, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [{
-                    label: 'Taux de Staffing',
-                    data: chartData.staffingRates,
-                    borderColor: '#4bc0c0',
-                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                    tension: 0.3,
-                    fill: true,
-                    borderWidth: 2
-                }]
-            },
-            options: commonOptions
-        });
-        
-        // Graphique TACE (vue standard)
+
+        // Graphiques pour vue standard
         if (viewMode === 'standard') {
+            // Graphique Taux de Staffing
+            const ctxStaffing = document.getElementById('staffingRateChart');
+            if (ctxStaffing) {
+                new Chart(ctxStaffing.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'Taux de Staffing',
+                            data: chartData.staffingRates,
+                            borderColor: '#4bc0c0',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: commonOptions
+                });
+            }
+
+            // Graphique TACE
             const ctxTace = document.getElementById('taceChart');
             if (ctxTace) {
                 new Chart(ctxTace.getContext('2d'), {
