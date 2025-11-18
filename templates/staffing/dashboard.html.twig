@@ -10,6 +10,15 @@
                 <h4 class="mb-sm-0 font-size-18">Dashboard de Staffing</h4>
                 <div class="page-title-right">
                     <form method="get" action="{{ path('staffing_dashboard') }}" class="d-flex gap-2">
+                        <select name="view" class="form-select form-select-sm" style="width: 150px;" id="viewModeSelect">
+                            <option value="standard" {% if selected_view_mode == 'standard' %}selected{% endif %}>Vue standard</option>
+                            <option value="annual" {% if selected_view_mode == 'annual' %}selected{% endif %}>Vue annuelle</option>
+                        </select>
+                        <select name="year" class="form-select form-select-sm" style="width: 120px;" id="yearSelect" {% if selected_view_mode != 'annual' %}style="display:none;"{% endif %}>
+                            {% for year in available_years %}
+                                <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
                         <select name="profile" class="form-select form-select-sm" style="width: 200px;">
                             <option value="">Tous les profils</option>
                             {% for profile in profiles %}
@@ -30,7 +39,7 @@
                                 </option>
                             {% endfor %}
                         </select>
-                        <select name="granularity" class="form-select form-select-sm" style="width: 150px;">
+                        <select name="granularity" class="form-select form-select-sm" style="width: 150px;" id="granularitySelect" {% if selected_view_mode == 'annual' %}disabled{% endif %}>
                             <option value="monthly" {% if selected_granularity == 'monthly' %}selected{% endif %}>Mensuel</option>
                             <option value="quarterly" {% if selected_granularity == 'quarterly' %}selected{% endif %}>Trimestriel</option>
                             <option value="weekly" {% if selected_granularity == 'weekly' %}selected{% endif %}>Hebdomadaire</option>
@@ -77,7 +86,25 @@
     </div>
     {% endif %}
 
-    {# Graphiques #}
+    {# Vue annuelle : Graphique TACE global hebdomadaire #}
+    {% if selected_view_mode == 'annual' %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bx bx-line-chart me-2"></i>TACE Global Hebdomadaire {{ selected_year }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Taux d'Activité Congés Exclus global (tous contributeurs productifs) par semaine</p>
+                    <canvas id="weeklyGlobalTaceChart" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Graphiques standards #}
+    {% if selected_view_mode == 'standard' %}
     <div class="row">
         <div class="col-xl-6">
             <div class="card">
@@ -90,7 +117,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header">
@@ -103,8 +130,105 @@
             </div>
         </div>
     </div>
+    {% endif %}
+
+    {# Vue annuelle : Tableau d'occupation par contributeur #}
+    {% if selected_view_mode == 'annual' and weekly_occupancy is not empty %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="bx bx-calendar-week me-2"></i>Taux d'Occupation Hebdomadaire par Contributeur</h5>
+                    <span class="badge bg-info">{{ selected_year }}</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Charge de travail (staffé + planifié) vs capacité disponible (hors congés) par semaine</p>
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-bordered table-sm mb-0">
+                            <thead class="table-light" style="position: sticky; top: 0; z-index: 10;">
+                                <tr>
+                                    <th style="min-width: 180px;">Contributeur</th>
+                                    {% set weeks = [] %}
+                                    {% for data in weekly_occupancy %}
+                                        {% if data.weekNumber not in weeks %}
+                                            {% set weeks = weeks|merge([data.weekNumber]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for week in weeks %}
+                                        <th class="text-center" style="min-width: 70px;">{{ week }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set currentContributor = null %}
+                                {% set contributorData = {} %}
+                                {% for data in weekly_occupancy %}
+                                    {% if currentContributor != data.contributorName %}
+                                        {% if currentContributor is not null %}
+                                            <tr>
+                                                <td><strong>{{ currentContributor }}</strong></td>
+                                                {% for week in weeks %}
+                                                    {% set weekData = contributorData[week] ?? null %}
+                                                    <td class="text-center" style="padding: 4px;">
+                                                        {% if weekData %}
+                                                            {% set rate = weekData.occupancyRate %}
+                                                            {% set bgClass = rate > 100 ? 'danger' : (rate >= 90 ? 'warning' : (rate >= 70 ? 'success' : 'secondary')) %}
+                                                            <span class="badge bg-{{ bgClass }}" style="font-size: 10px; width: 100%;"
+                                                                  title="Staffé: {{ weekData.staffedDays }}j | Planifié: {{ weekData.plannedDays }}j | Dispo: {{ weekData.availableDays }}j | Reste: {{ weekData.remainingCapacity|number_format(1) }}j">
+                                                                {{ rate|number_format(0) }}%
+                                                            </span>
+                                                        {% else %}
+                                                            <span class="text-muted">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% set contributorData = {} %}
+                                        {% endif %}
+                                        {% set currentContributor = data.contributorName %}
+                                    {% endif %}
+                                    {% set contributorData = contributorData|merge({(data.weekNumber): data}) %}
+                                {% endfor %}
+                                {# Dernière ligne #}
+                                {% if currentContributor is not null %}
+                                    <tr>
+                                        <td><strong>{{ currentContributor }}</strong></td>
+                                        {% for week in weeks %}
+                                            {% set weekData = contributorData[week] ?? null %}
+                                            <td class="text-center" style="padding: 4px;">
+                                                {% if weekData %}
+                                                    {% set rate = weekData.occupancyRate %}
+                                                    {% set bgClass = rate > 100 ? 'danger' : (rate >= 90 ? 'warning' : (rate >= 70 ? 'success' : 'secondary')) %}
+                                                    <span class="badge bg-{{ bgClass }}" style="font-size: 10px; width: 100%;"
+                                                          title="Staffé: {{ weekData.staffedDays }}j | Planifié: {{ weekData.plannedDays }}j | Dispo: {{ weekData.availableDays }}j | Reste: {{ weekData.remainingCapacity|number_format(1) }}j">
+                                                        {{ rate|number_format(0) }}%
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <span class="badge bg-danger me-2">&gt;100%</span> Surcharge
+                            <span class="badge bg-warning me-2">90-100%</span> Proche capacité max
+                            <span class="badge bg-success me-2">70-89%</span> Bonne utilisation
+                            <span class="badge bg-secondary">&lt;70%</span> Sous-utilisation
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     {# Tableaux de métriques #}
+    {% if selected_view_mode == 'standard' %}
     <div class="row">
         <div class="col-xl-6">
             <div class="card">
@@ -186,8 +310,10 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     {# Informations #}
+    {% if selected_view_mode == 'standard' %}
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -233,6 +359,25 @@
     <script>
         // Données pour les graphiques
         const chartData = {{ chart_data|json_encode|raw }};
+        const weeklyTaceData = {{ weekly_tace_chart_data|json_encode|raw }};
+        const viewMode = '{{ selected_view_mode }}';
+
+        // Gestion du sélecteur de mode de vue
+        const viewModeSelect = document.getElementById('viewModeSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const granularitySelect = document.getElementById('granularitySelect');
+
+        if (viewModeSelect) {
+            viewModeSelect.addEventListener('change', function() {
+                if (this.value === 'annual') {
+                    yearSelect.style.display = '';
+                    granularitySelect.disabled = true;
+                } else {
+                    yearSelect.style.display = 'none';
+                    granularitySelect.disabled = false;
+                }
+            });
+        }
 
         // Filtrage UX des contributeurs en fonction du profil sélectionné
         const profileSelect = document.querySelector('select[name="profile"]');
@@ -317,23 +462,85 @@
             options: commonOptions
         });
         
-        // Graphique TACE
-        const ctxTace = document.getElementById('taceChart').getContext('2d');
-        new Chart(ctxTace, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [{
-                    label: 'TACE',
-                    data: chartData.taceRates,
-                    borderColor: '#ff9f40',
-                    backgroundColor: 'rgba(255, 159, 64, 0.1)',
-                    tension: 0.3,
-                    fill: true,
-                    borderWidth: 2
-                }]
-            },
-            options: commonOptions
-        });
+        // Graphique TACE (vue standard)
+        if (viewMode === 'standard') {
+            const ctxTace = document.getElementById('taceChart');
+            if (ctxTace) {
+                new Chart(ctxTace.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'TACE',
+                            data: chartData.taceRates,
+                            borderColor: '#ff9f40',
+                            backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: commonOptions
+                });
+            }
+        }
+
+        // Graphique TACE global hebdomadaire (vue annuelle)
+        if (viewMode === 'annual') {
+            const ctxWeeklyTace = document.getElementById('weeklyGlobalTaceChart');
+            if (ctxWeeklyTace) {
+                new Chart(ctxWeeklyTace.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: weeklyTaceData.labels,
+                        datasets: [{
+                            label: 'TACE Global',
+                            data: weeklyTaceData.tace,
+                            borderColor: '#ff6384',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'TACE: ' + context.parsed.y.toFixed(1) + '%';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 90,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
     </script>
 {% endblock %}
