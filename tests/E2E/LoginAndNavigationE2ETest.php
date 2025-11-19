@@ -36,7 +36,7 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         $client->waitForInvisibility('#password-addon'); // rough wait after submit
 
         // After successful login, default target is '/' --> maybe not
-        // $this->assertStringEndsWith('/', parse_url($client->getCurrentURL(), PHP_URL_PATH));
+        $this->assertStringEndsWith('/', parse_url($client->getCurrentURL(), PHP_URL_PATH));
     }
 
     public function testNavigateToProjectsIndex(): void
