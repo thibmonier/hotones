@@ -496,7 +496,7 @@ Définition :
       Variantes:
     - Taux de staffing facturable: ne compte que les heures vendues.
     - Taux de staffing global: inclut projets internes, support, formation.
-- TACE : Le Taux d'Activité Congés Exclus est un indicateur qui permet de mesurer le nombre de jours produits par les collaborateurs (activités clients et internes) par rapport au nombre de jours travaillés en entreprise, hors congés.
+- TACE : Le Taux d'Activité Congés Exclus est un indicateur qui permet de mesurer le nombre de jours produits par les collaborateurs (activités clients et internes) par rapport au nombre de jours travaillés en entreprise, hors congés.
 
 ---
 

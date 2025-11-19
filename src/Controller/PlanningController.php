@@ -8,10 +8,12 @@ use App\Entity\Planning;
 use App\Entity\Timesheet;
 use App\Entity\Vacation;
 use App\Repository\ContributorRepository;
+use App\Service\Planning\TaceAnalyzer;
 use DateInterval;
 use DatePeriod;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PlanningController extends AbstractController
 {
     #[Route('', name: 'planning_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em, ContributorRepository $contributorRepo): Response
+    public function index(Request $request, EntityManagerInterface $em, ContributorRepository $contributorRepo, TaceAnalyzer $taceAnalyzer): Response
     {
         $weeks      = max(1, (int) $request->query->get('weeks', 8));
         $startParam = $request->query->get('start');
@@ -269,6 +271,19 @@ class PlanningController extends AbstractController
         // Get all projects for creation dropdown
         $allProjects = $em->getRepository(\App\Entity\Project::class)->findAll();
 
+        // Quick TACE analysis for optimization alerts (only for managers)
+        $taceAnalysis = null;
+        if ($this->isGranted('ROLE_MANAGER')) {
+            try {
+                $analysisStart = new DateTime('first day of this month');
+                $analysisEnd   = new DateTime('last day of next month');
+                $taceAnalysis  = $taceAnalyzer->analyzeAllContributors($analysisStart, $analysisEnd);
+            } catch (Exception $e) {
+                // Silently fail if analysis fails (missing metrics data)
+                $taceAnalysis = ['critical' => [], 'overloaded' => [], 'underutilized' => [], 'optimal' => []];
+            }
+        }
+
         return $this->render('planning/index.html.twig', [
             'contributors'                  => $contributors,
             'timeline_start'                => $start,
@@ -290,6 +305,7 @@ class PlanningController extends AbstractController
             'selected_project_managers' => $selectedManagers,
             'selected_projects'         => $selectedProjects,
             'selected_project_types'    => $selectedProjectTypes,
+            'tace_analysis'             => $taceAnalysis,
         ]);
     }
 

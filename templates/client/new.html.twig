@@ -34,6 +34,35 @@
           </div>
         </div>
       </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">Niveau de service</h4>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Mode de définition</label>
+            <select class="form-select" id="service_level_mode" name="service_level_mode">
+              <option value="auto" selected>Automatique (basé sur le CA)</option>
+              <option value="manual">Manuel</option>
+            </select>
+            <div class="form-text">
+              En mode auto, le niveau est calculé selon le CA annuel
+            </div>
+          </div>
+
+          <div class="mb-3" id="manual_level_container" style="display: none;">
+            <label class="form-label">Niveau de service</label>
+            <select class="form-select" name="service_level">
+              <option value="">-- Sélectionner --</option>
+              <option value="vip">VIP</option>
+              <option value="priority">Prioritaire</option>
+              <option value="standard" selected>Standard</option>
+              <option value="low">Basse priorité</option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col-lg-4">
       <div class="card">
@@ -51,4 +80,20 @@
     </div>
   </div>
 </form>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modeSelect = document.getElementById('service_level_mode');
+    const manualContainer = document.getElementById('manual_level_container');
+
+    if (modeSelect && manualContainer) {
+        modeSelect.addEventListener('change', function() {
+            manualContainer.style.display = this.value === 'manual' ? 'block' : 'none';
+        });
+    }
+});
+</script>
 {% endblock %}

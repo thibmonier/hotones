@@ -172,6 +172,7 @@
                                         <th>Profils</th>
                                         <th>Coûts</th>
                                         <th>Compte lié</th>
+                                        <th>Manager</th>
                                         <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -250,6 +251,19 @@
                                                     <span class="badge bg-warning">
                                                         <i class="bx bx-x me-1"></i>
                                                         Aucun compte
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if contributor.manager %}
+                                                    <a href="{{ path('contributor_show', {'id': contributor.manager.id}) }}" class="text-dark text-decoration-none">
+                                                        <i class="bx bx-user-check me-1 text-info"></i>
+                                                        {{ contributor.manager.fullName }}
+                                                    </a>
+                                                {% else %}
+                                                    <span class="text-muted">
+                                                        <i class="bx bx-user-x me-1"></i>
+                                                        Aucun manager
                                                     </span>
                                                 {% endif %}
                                             </td>

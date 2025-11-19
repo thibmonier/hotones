@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Contributor;
 use App\Entity\Project;
 use App\Entity\Timesheet;
+use App\Entity\Vacation;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,6 +54,23 @@ class HomeController extends AbstractController
         // Projets par statut via repository
         $projectsByStatus = $projectRepo->getProjectsByStatus();
 
+        // Demandes de congés en attente pour les managers
+        $pendingVacations = [];
+        if ($this->isGranted('ROLE_MANAGER') && $contributor) {
+            $vacationRepo        = $em->getRepository(Vacation::class);
+            $managedContributors = $contributor->getManagedContributors();
+
+            foreach ($managedContributors as $managedContributor) {
+                $contributorVacations = $vacationRepo->findBy(
+                    ['contributor' => $managedContributor, 'status' => 'pending'],
+                    ['createdAt' => 'DESC'],
+                );
+                foreach ($contributorVacations as $vacation) {
+                    $pendingVacations[] = $vacation;
+                }
+            }
+        }
+
         return $this->render('home/index.html.twig', [
             'totalProjects'      => $totalProjects,
             'activeProjects'     => $activeProjects,
@@ -63,6 +81,7 @@ class HomeController extends AbstractController
             'myRecentTimesheets' => $myRecentTimesheets,
             'contributor'        => $contributor,
             'projectsByStatus'   => $projectsByStatus,
+            'pendingVacations'   => $pendingVacations,
         ]);
     }
 }

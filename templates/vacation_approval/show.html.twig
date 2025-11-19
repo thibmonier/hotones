@@ -1,0 +1,156 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Détails de la demande de congé{% endblock %}
+
+{% block content %}
+<div class="page-title-box d-flex align-items-center justify-content-between">
+    <h4 class="mb-0">Détails de la demande de congé</h4>
+    <a href="{{ path('vacation_approval_index') }}" class="btn btn-light">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+
+{% for message in app.flashes('error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Informations de la demande</h5>
+
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th width="200">Contributeur</th>
+                            <td><strong>{{ vacation.contributor.fullName }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Type de congé</th>
+                            <td><span class="badge bg-info">{{ vacation.typeLabel }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Date de début</th>
+                            <td>{{ vacation.startDate|date('d/m/Y') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date de fin</th>
+                            <td>{{ vacation.endDate|date('d/m/Y') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nombre de jours</th>
+                            <td>
+                                {{ vacation.numberOfDays }} jour(s) total
+                                <br>
+                                <small class="text-muted">{{ vacation.numberOfWorkingDays }} jour(s) ouvré(s)</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Heures par jour</th>
+                            <td>{{ vacation.dailyHours }}h</td>
+                        </tr>
+                        <tr>
+                            <th>Heures totales</th>
+                            <td>{{ vacation.totalHours }}h</td>
+                        </tr>
+                        {% if vacation.reason %}
+                            <tr>
+                                <th>Motif</th>
+                                <td>{{ vacation.reason|nl2br }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Statut</th>
+                            <td>
+                                {% if vacation.status == 'pending' %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% elseif vacation.status == 'approved' %}
+                                    <span class="badge bg-success">Approuvé</span>
+                                {% elseif vacation.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejeté</span>
+                                {% elseif vacation.status == 'cancelled' %}
+                                    <span class="badge bg-secondary">Annulé</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Demandé le</th>
+                            <td>{{ vacation.createdAt|date('d/m/Y à H:i') }}</td>
+                        </tr>
+                        {% if vacation.approvedAt %}
+                            <tr>
+                                <th>Validé le</th>
+                                <td>
+                                    {{ vacation.approvedAt|date('d/m/Y à H:i') }}
+                                    {% if vacation.approvedBy %}
+                                        par {{ vacation.approvedBy.fullName ?? vacation.approvedBy.email }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+
+                {% if vacation.status == 'pending' %}
+                    <hr>
+                    <div class="d-flex gap-2 justify-content-end">
+                        <form method="post" action="{{ path('vacation_approval_reject', {id: vacation.id}) }}"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir rejeter cette demande ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ vacation.id) }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times"></i> Rejeter
+                            </button>
+                        </form>
+
+                        <form method="post" action="{{ path('vacation_approval_approve', {id: vacation.id}) }}"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir approuver cette demande ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ vacation.id) }}">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Approuver
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Informations du contributeur</h5>
+
+                <div class="mb-3">
+                    <strong>Nom complet</strong><br>
+                    {{ vacation.contributor.fullName }}
+                </div>
+
+                {% if vacation.contributor.email %}
+                    <div class="mb-3">
+                        <strong>Email</strong><br>
+                        <a href="mailto:{{ vacation.contributor.email }}">{{ vacation.contributor.email }}</a>
+                    </div>
+                {% endif %}
+
+                {% if vacation.contributor.phoneProfessional %}
+                    <div class="mb-3">
+                        <strong>Téléphone professionnel</strong><br>
+                        <a href="tel:{{ vacation.contributor.phoneProfessional }}">{{ vacation.contributor.phoneProfessional }}</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

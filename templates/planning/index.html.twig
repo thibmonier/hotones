@@ -16,7 +16,20 @@
   .fc-event.status-planned { background-color: #3b82f6; border-color: #2563eb; }
   .fc-event.status-confirmed { background-color: #22c55e; border-color: #16a34a; }
   .fc-event.status-cancelled { background-color: #9ca3af; border-color: #6b7280; text-decoration: line-through; }
-  .fc-event.event-vacation { background-color: #6b7280; border-color: #4b5563; opacity: 0.5; }
+  .fc-event.event-vacation {
+    background-color: #374151 !important;
+    border-color: #1f2937 !important;
+    color: #d1d5db !important;
+    opacity: 0.8 !important;
+    cursor: not-allowed !important;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(0, 0, 0, 0.1) 10px,
+      rgba(0, 0, 0, 0.1) 20px
+    );
+  }
   .fc-event.readonly { opacity: 0.6; cursor: not-allowed; }
   /* Staffing info in resource labels */
   .staffing-info { font-size: 10px; color: #6b7280; margin-top: 2px; }
@@ -30,6 +43,25 @@
 <div class="page-title-box d-flex align-items-center justify-content-between">
   <h4 class="mb-0">Planning</h4>
   <div class="w-100">
+    {% if tace_analysis is not null %}
+      {% set criticalCount = tace_analysis.critical|length %}
+      {% set overloadedCount = tace_analysis.overloaded|length %}
+      {% set totalIssues = criticalCount + overloadedCount %}
+      {% if totalIssues > 0 %}
+      <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
+        <i class="bx bx-error-circle me-2"></i>
+        <strong>Attention !</strong> {{ totalIssues }} contributeur(s) en situation critique ou surchargé(s).
+        {% if criticalCount > 0 %}
+          <span class="badge bg-danger">{{ criticalCount }} critique{{ criticalCount > 1 ? 's' : '' }}</span>
+        {% endif %}
+        {% if overloadedCount > 0 %}
+          <span class="badge bg-warning">{{ overloadedCount }} surchargé{{ overloadedCount > 1 ? 's' : '' }}</span>
+        {% endif %}
+        <a href="{{ path('planning_optimization_index') }}" class="alert-link ms-2">Voir les recommandations d'optimisation</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+    {% endif %}
     <form method="get" class="row g-2 align-items-end">
       <div class="col-auto">
         <label class="form-label">Début</label>

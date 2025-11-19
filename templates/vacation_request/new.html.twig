@@ -1,0 +1,106 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouvelle demande de congé{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouvelle demande de congé</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('vacation_request_index') }}">Mes congés</a></li>
+                        <li class="breadcrumb-item active">Nouvelle demande</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="bx bx-calendar-plus me-2"></i>
+                        Formulaire de demande
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                {{ form_row(form.type) }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form_row(form.startDate) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.endDate) }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                {{ form_row(form.dailyHours) }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                {{ form_row(form.reason) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-check me-1"></i> Enregistrer la demande
+                                    </button>
+                                    <a href="{{ path('vacation_request_index') }}" class="btn btn-secondary">
+                                        <i class="bx bx-x me-1"></i> Annuler
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Informations
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <h6 class="fw-bold">Types de congés disponibles :</h6>
+                    <ul class="mb-3">
+                        <li><strong>Congés payés :</strong> Vacances annuelles</li>
+                        <li><strong>RTT :</strong> Récupération temps de travail</li>
+                        <li><strong>Absence exceptionnelle :</strong> Événements familiaux, etc.</li>
+                        <li><strong>Arrêt maladie :</strong> Maladie, accident</li>
+                        <li><strong>Formation :</strong> Formation professionnelle</li>
+                        <li><strong>Autre :</strong> Autres types d'absence</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4">Instructions :</h6>
+                    <ul class="mb-0">
+                        <li>Remplissez tous les champs obligatoires</li>
+                        <li>La date de début doit être dans le futur</li>
+                        <li>La date de fin doit être postérieure à la date de début</li>
+                        <li>Précisez le nombre d'heures par jour (8h = journée complète)</li>
+                        <li>Votre demande sera soumise pour validation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

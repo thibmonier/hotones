@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Demande de congé approuvée</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #22c55e;">Demande de congé approuvée ✓</h2>
+
+        <p>Bonjour {{ contributor.fullName }},</p>
+
+        <p>Bonne nouvelle ! Votre demande de congé a été <strong style="color: #22c55e;">approuvée</strong>.</p>
+
+        <div style="background-color: #dcfce7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="margin-top: 0;">Détails de votre congé :</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li><strong>Type :</strong> {{ vacation.typeLabel }}</li>
+                <li><strong>Date de début :</strong> {{ vacation.startDate|date('d/m/Y') }}</li>
+                <li><strong>Date de fin :</strong> {{ vacation.endDate|date('d/m/Y') }}</li>
+                <li><strong>Jours ouvrés :</strong> {{ vacation.numberOfWorkingDays }} jour(s)</li>
+                {% if vacation.approvedAt %}
+                <li><strong>Approuvé le :</strong> {{ vacation.approvedAt|date('d/m/Y à H:i') }}</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <p>
+            <a href="{{ url('vacation_request_show', {id: vacation.id}) }}"
+               style="display: inline-block; padding: 10px 20px; background-color: #22c55e; color: white; text-decoration: none; border-radius: 5px;">
+                Voir ma demande
+            </a>
+        </p>
+
+        <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+            Cet email a été envoyé automatiquement par HotOnes.
+        </p>
+    </div>
+</body>
+</html>

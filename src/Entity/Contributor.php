@@ -72,6 +72,15 @@ class Contributor
     #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
+    // Manager responsable de ce contributeur
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'managedContributors')]
+    #[ORM\JoinColumn(name: 'manager_id', nullable: true, onDelete: 'SET NULL')]
+    private ?Contributor $manager = null;
+
+    // Contributeurs gérés par ce manager
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'manager')]
+    private Collection $managedContributors;
+
     // Profils multiples du contributeur (dev, lead dev, chef projet, etc.)
     #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'contributors')]
     #[ORM\JoinTable(name: 'contributor_profiles')]
@@ -88,9 +97,10 @@ class Contributor
 
     public function __construct()
     {
-        $this->profiles          = new ArrayCollection();
-        $this->employmentPeriods = new ArrayCollection();
-        $this->timesheets        = new ArrayCollection();
+        $this->profiles            = new ArrayCollection();
+        $this->employmentPeriods   = new ArrayCollection();
+        $this->timesheets          = new ArrayCollection();
+        $this->managedContributors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -324,6 +334,45 @@ class Contributor
             // set the owning side to null (unless already changed)
             if ($timesheet->getContributor() === $this) {
                 $timesheet->setContributor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getManager(): ?Contributor
+    {
+        return $this->manager;
+    }
+
+    public function setManager(?Contributor $manager): self
+    {
+        $this->manager = $manager;
+
+        return $this;
+    }
+
+    public function getManagedContributors(): Collection
+    {
+        return $this->managedContributors;
+    }
+
+    public function addManagedContributor(Contributor $contributor): self
+    {
+        if (!$this->managedContributors->contains($contributor)) {
+            $this->managedContributors[] = $contributor;
+            $contributor->setManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManagedContributor(Contributor $contributor): self
+    {
+        if ($this->managedContributors->removeElement($contributor)) {
+            // set the owning side to null (unless already changed)
+            if ($contributor->getManager() === $this) {
+                $contributor->setManager(null);
             }
         }
 

@@ -38,6 +38,17 @@ class ClientController extends AbstractController
             $client->setWebsite($request->request->get('website'));
             $client->setDescription($request->request->get('description'));
 
+            // Gestion du niveau de service
+            $serviceLevelMode = $request->request->get('service_level_mode', 'auto');
+            $client->setServiceLevelMode($serviceLevelMode);
+
+            if ($serviceLevelMode === 'manual') {
+                $client->setServiceLevel($request->request->get('service_level'));
+            } else {
+                // En mode auto, le niveau sera calculé plus tard par la commande
+                $client->setServiceLevel(null);
+            }
+
             /** @var UploadedFile|null $logo */
             $logo = $request->files->get('logo');
             if ($logo instanceof UploadedFile && $logo->isValid()) {
@@ -80,6 +91,17 @@ class ClientController extends AbstractController
             $client->setName($request->request->get('name'));
             $client->setWebsite($request->request->get('website'));
             $client->setDescription($request->request->get('description'));
+
+            // Gestion du niveau de service
+            $serviceLevelMode = $request->request->get('service_level_mode', 'auto');
+            $client->setServiceLevelMode($serviceLevelMode);
+
+            if ($serviceLevelMode === 'manual') {
+                $client->setServiceLevel($request->request->get('service_level'));
+            } else {
+                // En mode auto, le niveau sera calculé plus tard par la commande
+                $client->setServiceLevel(null);
+            }
 
             /** @var UploadedFile|null $logo */
             $logo = $request->files->get('logo');

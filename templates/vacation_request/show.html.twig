@@ -1,0 +1,175 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Demande de congé - {{ vacation.startDate|date('d/m/Y') }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Détail de la demande de congé</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('vacation_request_index') }}">Mes congés</a></li>
+                        <li class="breadcrumb-item active">Détail</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">
+                            <i class="bx bx-calendar me-2"></i>
+                            Informations de la demande
+                        </h4>
+                        {% if vacation.status == 'pending' %}
+                            <button class="btn btn-outline-danger btn-sm" onclick="cancelVacation()">
+                                <i class="bx bx-x me-1"></i> Annuler la demande
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Type de congé</h6>
+                            <p class="mb-0">
+                                <span class="badge bg-soft-primary text-primary fs-6">
+                                    {{ vacation.typeLabel }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Statut</h6>
+                            <p class="mb-0">
+                                {% if vacation.status == 'pending' %}
+                                    <span class="badge bg-warning fs-6">En attente</span>
+                                {% elseif vacation.status == 'approved' %}
+                                    <span class="badge bg-success fs-6">Approuvée</span>
+                                {% elseif vacation.status == 'rejected' %}
+                                    <span class="badge bg-danger fs-6">Refusée</span>
+                                {% elseif vacation.status == 'cancelled' %}
+                                    <span class="badge bg-secondary fs-6">Annulée</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Date de début</h6>
+                            <p class="mb-0">
+                                <i class="bx bx-calendar me-1"></i>
+                                <strong>{{ vacation.startDate|date('d/m/Y') }}</strong>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Date de fin</h6>
+                            <p class="mb-0">
+                                <i class="bx bx-calendar me-1"></i>
+                                <strong>{{ vacation.endDate|date('d/m/Y') }}</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Heures par jour</h6>
+                            <p class="mb-0">{{ vacation.dailyHours }}h</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-muted">Durée totale</h6>
+                            <p class="mb-0">
+                                <strong>{{ vacation.totalHours|number_format(1) }}h</strong>
+                                <small class="text-muted">({{ vacation.numberOfWorkingDays }} jours ouvrés)</small>
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if vacation.reason %}
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold text-muted">Motif</h6>
+                                <div class="alert alert-light">
+                                    {{ vacation.reason|nl2br }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="fw-bold text-muted">Date de demande</h6>
+                            <p class="mb-0">{{ vacation.createdAt|date('d/m/Y à H:i') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {% if vacation.status == 'approved' or vacation.status == 'rejected' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">
+                            <i class="bx bx-user-check me-2"></i>
+                            Validation
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if vacation.approvedBy %}
+                            <h6 class="fw-bold text-muted">Validée par</h6>
+                            <p class="mb-3">{{ vacation.approvedBy.fullName }}</p>
+                        {% endif %}
+
+                        {% if vacation.approvedAt %}
+                            <h6 class="fw-bold text-muted">Date de validation</h6>
+                            <p class="mb-0">{{ vacation.approvedAt|date('d/m/Y à H:i') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('vacation_request_index') }}" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                        </a>
+                        {% if vacation.status == 'pending' %}
+                            <hr>
+                            <button class="btn btn-outline-danger" onclick="cancelVacation()">
+                                <i class="bx bx-x me-1"></i> Annuler la demande
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire caché pour l'annulation -->
+    <form id="cancel-form" method="post" action="{{ path('vacation_request_cancel', {id: vacation.id}) }}" style="display: none;">
+        <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ vacation.id) }}">
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function cancelVacation() {
+            const message = 'Voulez-vous vraiment annuler cette demande de congé ?\n\nCette action est irréversible.';
+
+            if (confirm(message)) {
+                document.getElementById('cancel-form').submit();
+            }
+        }
+    </script>
+{% endblock %}

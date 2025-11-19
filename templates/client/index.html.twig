@@ -28,6 +28,7 @@
               <tr>
                 <th>Client</th>
                 <th>Site web</th>
+                <th>Niveau de service</th>
                 <th>Contacts</th>
                 <th>Actions</th>
               </tr>
@@ -56,6 +57,16 @@
                   {% endif %}
                 </td>
                 <td>
+                  {% if client.serviceLevel %}
+                    <span class="badge {{ client.serviceLevelBadgeClass }}">{{ client.serviceLevelLabel }}</span>
+                    {% if client.serviceLevelMode == 'auto' %}
+                      <small class="text-muted d-block mt-1">Auto</small>
+                    {% endif %}
+                  {% else %}
+                    <small class="text-muted">Non défini</small>
+                  {% endif %}
+                </td>
+                <td>
                   <span class="badge bg-light text-dark">{{ client.contacts|length }}</span>
                 </td>
                 <td>
@@ -69,7 +80,7 @@
               </tr>
             {% else %}
               <tr>
-                <td colspan="4" class="text-center text-muted py-4">
+                <td colspan="5" class="text-center text-muted py-4">
                   <i class="bx bx-user font-size-24 mb-2"></i>
                   <div>Aucun client</div>
                 </td>

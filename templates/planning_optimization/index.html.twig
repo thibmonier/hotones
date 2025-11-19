@@ -1,0 +1,344 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Optimisation du Planning{% endblock %}
+
+{% block content %}
+<div class="page-title-box d-flex align-items-center justify-content-between">
+    <h4 class="mb-0">Optimisation du Planning</h4>
+    <div>
+        <a href="{{ path('planning_index') }}" class="btn btn-secondary">
+            <i class="bx bx-arrow-back me-1"></i> Retour au planning
+        </a>
+    </div>
+</div>
+
+{# Résumé #}
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Contributeurs critiques</span>
+                        <h4 class="mb-3">
+                            <span class="counter-value text-danger" data-target="{{ analysis.critical|length }}">{{ analysis.critical|length }}</span>
+                        </h4>
+                    </div>
+                    <div class="flex-shrink-0 text-end">
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-danger-subtle rounded fs-3">
+                                <i class="bx bx-error-circle text-danger"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Surchargés</span>
+                        <h4 class="mb-3">
+                            <span class="counter-value text-warning" data-target="{{ analysis.overloaded|length }}">{{ analysis.overloaded|length }}</span>
+                        </h4>
+                    </div>
+                    <div class="flex-shrink-0 text-end">
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-warning-subtle rounded fs-3">
+                                <i class="bx bx-trending-up text-warning"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Sous-utilisés</span>
+                        <h4 class="mb-3">
+                            <span class="counter-value text-info" data-target="{{ analysis.underutilized|length }}">{{ analysis.underutilized|length }}</span>
+                        </h4>
+                    </div>
+                    <div class="flex-shrink-0 text-end">
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-info-subtle rounded fs-3">
+                                <i class="bx bx-trending-down text-info"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Recommandations</span>
+                        <h4 class="mb-3">
+                            <span class="counter-value text-primary" data-target="{{ recommendations|length }}">{{ recommendations|length }}</span>
+                        </h4>
+                    </div>
+                    <div class="flex-shrink-0 text-end">
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-primary-subtle rounded fs-3">
+                                <i class="bx bx-bulb text-primary"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# IA Enhancement Banner #}
+{% if ai_enhanced and ai_enhanced.enhanced %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success border-0" role="alert">
+            <i class="bx bx-brain me-2"></i>
+            <strong>Intelligence Artificielle activée</strong> - Recommandations enrichies par {{ ai_enhanced.provider|upper }}
+        </div>
+    </div>
+</div>
+{% elseif ai_enhanced and not ai_enhanced.enhanced %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info border-0" role="alert">
+            <i class="bx bx-info-circle me-2"></i>
+            <strong>Intelligence Artificielle disponible</strong> - Configurez OPENAI_API_KEY ou ANTHROPIC_API_KEY dans .env pour activer l'enrichissement par IA
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# Recommandations #}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="bx bx-bulb me-2"></i>
+                    Recommandations d'optimisation
+                    {% if summary.high_priority_count > 0 %}
+                        <span class="badge bg-danger ms-2">{{ summary.high_priority_count }} prioritaires</span>
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if recommendations is empty %}
+                    <div class="text-center py-5">
+                        <div class="avatar-md mx-auto mb-4">
+                            <span class="avatar-title bg-success-subtle rounded-circle fs-1">
+                                <i class="bx bx-check-circle text-success"></i>
+                            </span>
+                        </div>
+                        <h5>Aucune optimisation nécessaire</h5>
+                        <p class="text-muted">Le planning est optimal pour la période sélectionnée !</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="50">Priorité</th>
+                                    <th>Recommandation</th>
+                                    <th width="150">Type</th>
+                                    <th width="150">Impact attendu</th>
+                                    <th width="100">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rec in recommendations %}
+                                <tr>
+                                    <td class="text-center">
+                                        {% if rec.severity_level == 'critical' %}
+                                            <span class="badge bg-danger rounded-pill">{{ rec.priority_score }}</span>
+                                        {% elseif rec.severity_level == 'high' %}
+                                            <span class="badge bg-warning rounded-pill">{{ rec.priority_score }}</span>
+                                        {% else %}
+                                            <span class="badge bg-info rounded-pill">{{ rec.priority_score }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <h6 class="mb-1">
+                                            {% if rec.type == 'reassign_planning' %}
+                                                <i class="bx bx-transfer me-1 text-primary"></i>
+                                            {% elseif rec.type == 'increase_allocation' %}
+                                                <i class="bx bx-trending-up me-1 text-success"></i>
+                                            {% else %}
+                                                <i class="bx bx-adjust me-1 text-info"></i>
+                                            {% endif %}
+                                            {{ rec.title }}
+                                        </h6>
+                                        <p class="text-muted mb-1 small">{{ rec.description|slice(0, 200) }}{% if rec.description|length > 200 %}...{% endif %}</p>
+                                        {% if rec.actions %}
+                                            <div class="mt-2">
+                                                {% for action in rec.actions %}
+                                                    <span class="badge bg-light text-dark me-1">
+                                                        <i class="bx bx-right-arrow-alt"></i> {{ action }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if rec.type == 'reassign_planning' %}
+                                            <span class="badge bg-primary">Réaffectation</span>
+                                        {% elseif rec.type == 'increase_allocation' %}
+                                            <span class="badge bg-success">Allocation+</span>
+                                        {% elseif rec.type == 'reduce_workload' %}
+                                            <span class="badge bg-warning">Réduction</span>
+                                        {% endif %}
+
+                                        {% if rec.client_priority %}
+                                            <br>
+                                            <small>Client:
+                                                {% if rec.client_priority == 'vip' %}
+                                                    <span class="badge bg-danger mt-1">VIP</span>
+                                                {% elseif rec.client_priority == 'priority' %}
+                                                    <span class="badge bg-warning mt-1">Prioritaire</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary mt-1">{{ rec.client_priority|capitalize }}</span>
+                                                {% endif %}
+                                            </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if rec.expected_impact %}
+                                            <small class="text-success">
+                                                <i class="bx bx-trending-up"></i>
+                                                {{ rec.expected_impact }}
+                                            </small>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="applyRecommendation({{ loop.index0 }})">
+                                            <i class="bx bx-check"></i> Appliquer
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Détail de l'analyse TACE #}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bx bx-error-circle me-1"></i>
+                    Contributeurs en surcharge
+                </h5>
+            </div>
+            <div class="card-body">
+                {% set all_overloaded = analysis.critical|filter(c => c.status == 'critical_high')|merge(analysis.overloaded) %}
+                {% if all_overloaded is empty %}
+                    <p class="text-muted text-center py-3">Aucun contributeur en surcharge</p>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Contributeur</th>
+                                    <th>TACE</th>
+                                    <th>Écart</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in all_overloaded|slice(0, 10) %}
+                                <tr>
+                                    <td>{{ item.contributor.fullName }}</td>
+                                    <td>
+                                        <span class="badge {{ item.status == 'critical_high' ? 'bg-danger' : 'bg-warning' }}">
+                                            {{ item.tace }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-danger">+{{ item.deviation }} pts</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bx bx-trending-down me-1"></i>
+                    Contributeurs sous-utilisés
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if analysis.underutilized is empty %}
+                    <p class="text-muted text-center py-3">Aucun contributeur sous-utilisé</p>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Contributeur</th>
+                                    <th>TACE</th>
+                                    <th>Disponible</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in analysis.underutilized|slice(0, 10) %}
+                                <tr>
+                                    <td>{{ item.contributor.fullName }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ item.tace }}%</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-success">{{ 100 - item.tace }}%</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function applyRecommendation(index) {
+    if (confirm('Voulez-vous vraiment appliquer cette recommandation ?')) {
+        alert('Fonctionnalité à venir : application automatique des recommandations');
+        // TODO: Implémenter l'application automatique via API
+    }
+}
+</script>
+{% endblock %}

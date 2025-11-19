@@ -403,6 +403,36 @@
                 </div>
             </div>
 
+            {% if is_granted('ROLE_MANAGER') %}
+            <div class="dropdown d-inline-block ms-1">
+                <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-vacations-dropdown"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Demandes de congés">
+                    <i class="bx bx-calendar-exclamation"></i>
+                    <span class="badge bg-warning rounded-pill" id="vacation-pending-count" style="display: none;">0</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                     aria-labelledby="page-header-vacations-dropdown">
+                    <div class="p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h6 class="m-0">Demandes en attente</h6>
+                            <a href="{{ path('vacation_approval_index') }}" class="small">Tout voir</a>
+                        </div>
+                    </div>
+                    <div id="vacation-pending-list" data-simplebar style="max-height: 300px;">
+                        <div class="text-center text-muted py-3">
+                            <i class="bx bx-loader bx-spin font-size-18"></i>
+                            <p class="mb-0 mt-2">Chargement...</p>
+                        </div>
+                    </div>
+                    <div class="p-2 border-top d-grid">
+                        <a class="btn btn-sm btn-link font-size-14 text-center" href="{{ path('vacation_approval_index') }}">
+                            <i class="mdi mdi-arrow-right-circle me-1"></i> <span>Voir toutes les demandes</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="dropdown d-inline-block">
                 <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -422,6 +452,7 @@
   <span><i class="bx bx-task font-size-16 align-middle me-1"></i> Mes tâches</span>
   <span id="user-menu-overdue-tasks-count" class="badge bg-warning rounded-pill" style="display:none;">0</span>
 </a>
+<a class="dropdown-item" href="{{ path('vacation_request_index') }}"><i class="bx bx-calendar font-size-16 align-middle me-1"></i> Mes congés</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> Déconnexion</a>
                 </div>
@@ -704,6 +735,49 @@
           }
         })
         .catch(()=>{});
+      // Demandes de congés en attente (managers seulement)
+      var vacationBadge = document.getElementById('vacation-pending-count');
+      var sidebarVacationBadge = document.getElementById('sidebar-pending-vacations-count');
+      if (vacationBadge || sidebarVacationBadge) {
+        fetch('/manager/conges/api/pending-count')
+          .then(r => r.json())
+          .then(data => {
+            var count = (data && typeof data.count === 'number') ? data.count : 0;
+            if (vacationBadge) {
+              if (count > 0) { vacationBadge.style.display = 'inline-block'; vacationBadge.textContent = count; }
+              else { vacationBadge.style.display = 'none'; }
+            }
+            if (sidebarVacationBadge) {
+              if (count > 0) { sidebarVacationBadge.style.display = 'inline-block'; sidebarVacationBadge.textContent = count; }
+              else { sidebarVacationBadge.style.display = 'none'; }
+            }
+            // Charger la liste des demandes
+            if (count > 0) {
+              var container = document.getElementById('vacation-pending-list');
+              if (!container) return;
+              var vacations = (data && Array.isArray(data.vacations)) ? data.vacations : [];
+              if (vacations.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3">Aucune demande en attente</div>';
+                return;
+              }
+              var html = '<div class="list-group list-group-flush">';
+              vacations.forEach(function(v){
+                html += '<a class="list-group-item list-group-item-action" href="'+v.url+'">'
+                      + '<div class="d-flex w-100 justify-content-between">'
+                      + '<div><strong>'+v.contributor.replace(/</g,'&lt;')+'</strong><br>'
+                      + '<small class="text-muted">'+v.type+' · '+v.start_date+' au '+v.end_date+' ('+v.working_days+' j.)</small></div>'
+                      + '</div>'
+                      + '</a>';
+              });
+              html += '</div>';
+              container.innerHTML = html;
+            } else {
+              var container = document.getElementById('vacation-pending-list');
+              if (container) container.innerHTML = '<div class="text-center text-muted py-3">Aucune demande en attente</div>';
+            }
+          })
+          .catch(()=>{});
+      }
     }
     function startUnreadInterval() {
       if (unreadInterval) { clearInterval(unreadInterval); }

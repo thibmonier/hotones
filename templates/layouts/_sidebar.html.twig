@@ -50,10 +50,17 @@
                         <li><a href="{{ path('project_new') }}">Nouveau Projet</a></li>
                         <li><a href="{{ path('planning_index') }}">Planning</a></li>
                         {% endif %}
+                        {% if is_granted('ROLE_MANAGER') %}
+                        <li><a href="{{ path('planning_optimization_index') }}"><i class="bx bx-bulb"></i> Optimisation</a></li>
+                        {% endif %}
                         {% if is_granted('ROLE_INTERVENANT') %}
                         <li><a href="{{ path('my_tasks_index') }}">Mes tâches <span id="sidebar-overdue-tasks-count" class="badge bg-warning ms-2" style="display:none;">0</span></a></li>
                         <li><a href="{{ path('timesheet_index') }}">Saisir mes temps</a></li>
                         <li><a href="{{ path('timesheet_my_time') }}">Mon historique</a></li>
+                        <li><a href="{{ path('vacation_request_index') }}">Mes congés</a></li>
+                        {% endif %}
+                        {% if is_granted('ROLE_MANAGER') %}
+                        <li><a href="{{ path('vacation_approval_index') }}">Validation congés <span id="sidebar-pending-vacations-count" class="badge bg-warning ms-2" style="display:none;">0</span></a></li>
                         {% endif %}
                         {% if is_granted('ROLE_ADMIN') %}
                         <li><a href="{{ path('timesheet_all') }}">Tous les temps</a></li>

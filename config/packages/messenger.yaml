@@ -9,7 +9,8 @@ framework:
 
         routing:
             # Route your messages to the transports
-            #'App\\Message\\RecalculateMetricsMessage': async
+            'App\Message\RecalculateMetricsMessage': async
+            'App\Message\VacationNotificationMessage': async
 
 when@test:
     framework:

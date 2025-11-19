@@ -107,6 +107,24 @@ class ContributorType extends AbstractType
                 'placeholder' => '-- Aucun compte --',
                 'attr'        => ['class' => 'form-select'],
             ])
+            ->add('manager', EntityType::class, [
+                'label'        => 'Manager responsable',
+                'class'        => Contributor::class,
+                'choice_label' => function (Contributor $contributor) {
+                    return $contributor->getFullName();
+                },
+                'required'      => false,
+                'placeholder'   => '-- Aucun manager --',
+                'attr'          => ['class' => 'form-select'],
+                'help'          => 'Sélectionnez le manager qui validera les demandes de congés de ce contributeur',
+                'query_builder' => function ($er) {
+                    return $er->createQueryBuilder('c')
+                        ->where('c.active = :active')
+                        ->setParameter('active', true)
+                        ->orderBy('c.lastName', 'ASC')
+                        ->addOrderBy('c.firstName', 'ASC');
+                },
+            ])
             ->add('profiles', EntityType::class, [
                 'label'        => 'Profils métier',
                 'class'        => Profile::class,

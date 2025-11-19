@@ -35,6 +35,42 @@
           </div>
         </div>
       </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">Niveau de service</h4>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Mode de définition</label>
+            <select class="form-select" id="service_level_mode" name="service_level_mode">
+              <option value="auto" {{ client.serviceLevelMode == 'auto' ? 'selected' : '' }}>Automatique (basé sur le CA)</option>
+              <option value="manual" {{ client.serviceLevelMode == 'manual' ? 'selected' : '' }}>Manuel</option>
+            </select>
+            <div class="form-text">
+              En mode auto, le niveau est calculé selon le CA annuel
+            </div>
+          </div>
+
+          <div class="mb-3" id="manual_level_container" style="display: {{ client.serviceLevelMode == 'manual' ? 'block' : 'none' }};">
+            <label class="form-label">Niveau de service</label>
+            <select class="form-select" name="service_level">
+              <option value="">-- Sélectionner --</option>
+              <option value="vip" {{ client.serviceLevel == 'vip' ? 'selected' : '' }}>VIP</option>
+              <option value="priority" {{ client.serviceLevel == 'priority' ? 'selected' : '' }}>Prioritaire</option>
+              <option value="standard" {{ client.serviceLevel == 'standard' ? 'selected' : '' }}>Standard</option>
+              <option value="low" {{ client.serviceLevel == 'low' ? 'selected' : '' }}>Basse priorité</option>
+            </select>
+          </div>
+
+          {% if client.serviceLevelMode == 'auto' and client.serviceLevel %}
+            <div class="alert alert-info">
+              <strong>Niveau actuel (calculé) :</strong>
+              <span class="badge {{ client.serviceLevelBadgeClass }} ms-2">{{ client.serviceLevelLabel }}</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
     <div class="col-lg-4">
       <div class="card">
@@ -65,4 +101,20 @@
     </div>
   </div>
 </form>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modeSelect = document.getElementById('service_level_mode');
+    const manualContainer = document.getElementById('manual_level_container');
+
+    if (modeSelect && manualContainer) {
+        modeSelect.addEventListener('change', function() {
+            manualContainer.style.display = this.value === 'manual' ? 'block' : 'none';
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\VacationRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: VacationRepository::class)]
 #[ORM\Table(name: 'vacations')]
 class Vacation
 {

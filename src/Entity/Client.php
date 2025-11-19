@@ -28,6 +28,14 @@ class Client
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
+    // Service Level: vip, priority, standard, low
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $serviceLevel = null;
+
+    // Service Level Mode: auto (calculé automatiquement) ou manual (défini manuellement)
+    #[ORM\Column(type: 'string', length: 10, options: ['default' => 'auto'])]
+    private string $serviceLevelMode = 'auto';
+
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: ClientContact::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $contacts;
 
@@ -114,6 +122,52 @@ class Client
         }
 
         return $this;
+    }
+
+    public function getServiceLevel(): ?string
+    {
+        return $this->serviceLevel;
+    }
+
+    public function setServiceLevel(?string $serviceLevel): self
+    {
+        $this->serviceLevel = $serviceLevel;
+
+        return $this;
+    }
+
+    public function getServiceLevelMode(): string
+    {
+        return $this->serviceLevelMode;
+    }
+
+    public function setServiceLevelMode(string $serviceLevelMode): self
+    {
+        $this->serviceLevelMode = $serviceLevelMode;
+
+        return $this;
+    }
+
+    public function getServiceLevelLabel(): string
+    {
+        return match ($this->serviceLevel) {
+            'vip'      => 'VIP',
+            'priority' => 'Prioritaire',
+            'standard' => 'Standard',
+            'low'      => 'Basse priorité',
+            default    => 'Non défini',
+        };
+    }
+
+    public function getServiceLevelBadgeClass(): string
+    {
+        return match ($this->serviceLevel) {
+            'vip'      => 'bg-danger',
+            'priority' => 'bg-warning',
+            'standard' => 'bg-info',
+            'low'      => 'bg-secondary',
+            default    => 'bg-light text-dark',
+        };
     }
 
     public function __toString()
