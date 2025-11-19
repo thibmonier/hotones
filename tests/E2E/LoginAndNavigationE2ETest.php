@@ -20,7 +20,7 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         $client = static::createPantherClient();
 
         $user = UserFactory::createOne([
-            'roles'    => ['ROLE_INTERVENANT'],
+            'roles'    => ['ROLE_USER', 'ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
@@ -44,7 +44,7 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         $client = static::createPantherClient();
 
         $user = UserFactory::createOne([
-            'roles'    => ['ROLE_INTERVENANT'],
+            'roles'    => ['ROLE_USER', 'ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
