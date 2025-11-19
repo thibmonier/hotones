@@ -241,6 +241,7 @@
       <path value="$PROJECT_DIR$/vendor/openai-php/client" />
       <path value="$PROJECT_DIR$/vendor/psr/http-client" />
       <path value="$PROJECT_DIR$/vendor/nyholm/psr7" />
+      <path value="$PROJECT_DIR$/vendor/anthropic-ai/sdk" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
