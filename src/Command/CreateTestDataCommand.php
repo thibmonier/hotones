@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Client;
 use App\Entity\Contributor;
 use App\Entity\Planning;
 use App\Entity\Profile;
@@ -18,19 +19,48 @@ use DatePeriod;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
     name: 'app:create-test-data',
-    description: 'Crée des données de test pour les projets, tâches et contributeurs',
+    description: 'Crée des contributeurs réels et optionnellement des données de test (projets, devis, tâches)',
 )]
 class CreateTestDataCommand extends Command
 {
+    // Répartition des contributeurs selon les profils
+    private const CONTRIBUTORS_DISTRIBUTION = [
+        'développeur fullstack' => 6,
+        'développeur frontend'  => 5,
+        'développeur backend'   => 4,
+        'chef de projet'        => 4,
+        'product owner'         => 2,
+        'scrumm master'         => 1,
+        'consultant'            => 1,
+        'Directeur artistique'  => 1,
+        'UX designer'           => 1,
+        'UI designer'           => 1,
+    ];
+
+    // Prénoms et noms français
+    private const FIRST_NAMES = [
+        'Alice', 'Bob', 'Claire', 'David', 'Emma', 'François', 'Gabrielle', 'Hugo',
+        'Isabelle', 'Julien', 'Karim', 'Léa', 'Marc', 'Nathalie', 'Olivier', 'Patricia',
+        'Quentin', 'Rachel', 'Sophie', 'Thomas', 'Valérie', 'William', 'Xavier', 'Yasmine', 'Zoé',
+    ];
+
+    private const LAST_NAMES = [
+        'Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert', 'Petit', 'Durand', 'Leroy',
+        'Moreau', 'Simon', 'Laurent', 'Lefebvre', 'Michel', 'Garcia', 'David', 'Bertrand',
+        'Roux', 'Vincent', 'Fournier', 'Morel', 'Girard', 'André', 'Lefevre', 'Mercier', 'Dupont',
+    ];
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher
@@ -38,42 +68,76 @@ class CreateTestDataCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this
+            ->addOption(
+                'with-test-data',
+                null,
+                InputOption::VALUE_NONE,
+                'Générer également des données de test (projets, devis, tâches)',
+            )
+            ->setHelp('
+Cette commande crée les contributeurs selon la répartition définie.
+Utilisez --with-test-data pour générer également des projets, devis et tâches fictifs.
+
+Répartition des contributeurs :
+- 6 développeurs fullstack
+- 5 développeurs frontend
+- 4 développeurs backend
+- 4 chefs de projet
+- 2 product owners
+- 1 scrum master
+- 1 consultant
+- 1 directeur artistique
+- 1 UX designer
+- 1 UI designer
+            ');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $io           = new SymfonyStyle($input, $output);
+        $withTestData = $input->getOption('with-test-data');
 
-        $io->title('Création des données de test');
+        $io->title('Création des données'.($withTestData ? ' de test' : ''));
 
         try {
-            // 1. Créer des profils
-            $profiles = $this->createProfiles($io);
+            // 1. Vérifier que les données de référence existent
+            $this->checkReferenceData($io);
 
-            // 2. Créer des utilisateurs
+            // 2. Créer des utilisateurs de test
             $users = $this->createUsers($io);
 
-            // 3. Créer des contributeurs
-            $contributors = $this->createContributors($io, $profiles);
+            // 3. Créer les contributeurs avec la bonne répartition
+            $contributors = $this->createContributorsWithDistribution($io);
 
-            // 4. Créer des catégories de service
-            $categories = $this->createServiceCategories($io);
+            if ($withTestData) {
+                // 4. Créer des catégories de service
+                $categories = $this->createServiceCategories($io);
 
-            // 5. Créer des technologies
-            $technologies = $this->createTechnologies($io);
+                // 5. Créer des clients
+                $clients = $this->createClients($io, $users);
 
-            // 6. Créer des projets
-            $projects = $this->createProjects($io, $users, $categories, $technologies);
+                // 6. Créer des projets
+                $projects = $this->createProjects($io, $clients, $users, $categories);
 
-            // 7. Créer des tâches de projet
-            $this->createProjectTasks($io, $projects, $contributors);
+                // 7. Créer des tâches de projet
+                $this->createProjectTasks($io, $projects, $contributors);
 
-            // 8. Créer des feuilles de temps
-            $this->createTimesheets($io, $projects, $contributors);
+                // 9. Créer des feuilles de temps
+                $this->createTimesheets($io, $projects, $contributors);
 
-            // 9. Créer du planning prévisionnel
-            $this->createPlannings($io, $projects, $contributors);
+                // 10. Créer du planning prévisionnel
+                $this->createPlannings($io, $projects, $contributors);
+            }
 
             $this->entityManager->flush();
-            $io->success('Données de test créées avec succès !');
+
+            $io->success('Données créées avec succès !');
+            if (!$withTestData) {
+                $io->note('Utilisez --with-test-data pour générer également des projets, devis et tâches fictifs.');
+            }
 
             return Command::SUCCESS;
         } catch (Exception $e) {
@@ -83,45 +147,30 @@ class CreateTestDataCommand extends Command
         }
     }
 
-    private function createProfiles(SymfonyStyle $io): array
+    private function checkReferenceData(SymfonyStyle $io): void
     {
-        $io->section('Création des profils');
+        $io->section('Vérification des données de référence');
 
-        $profilesData = [
-            ['name' => 'Développeur Frontend', 'description' => 'Spécialisé React, Vue, Angular'],
-            ['name' => 'Développeur Backend', 'description' => 'API REST, bases de données'],
-            ['name' => 'Chef de projet', 'description' => 'Gestion de projet et équipe'],
-            ['name' => 'Designer UX/UI', 'description' => 'Interface utilisateur et expérience'],
-            ['name' => 'DevOps', 'description' => 'Déploiement et infrastructure'],
-        ];
+        $profileCount = $this->entityManager->getRepository(Profile::class)->count([]);
+        $techCount    = $this->entityManager->getRepository(Technology::class)->count([]);
 
-        $profiles = [];
-        $repo     = $this->entityManager->getRepository(Profile::class);
-        foreach ($profilesData as $data) {
-            $profile = $repo->findOneBy(['name' => $data['name']]);
-            if (!$profile) {
-                $profile = new Profile();
-                $profile->setName($data['name']);
-                $profile->setDescription($data['description']);
-                $this->entityManager->persist($profile);
-                $io->writeln("✓ Profil créé : {$data['name']}");
-            } else {
-                $io->writeln("• Profil existant : {$data['name']}");
-            }
-            $profiles[] = $profile;
+        if ($profileCount === 0 || $techCount === 0) {
+            $io->warning('Les données de référence (profils/technologies) sont manquantes.');
+            $io->note('Exécutez d\'abord : php bin/console app:load-reference-data');
+            throw new RuntimeException('Données de référence manquantes');
         }
 
-        return $profiles;
+        $io->writeln("✓ $profileCount profils et $techCount technologies trouvés");
     }
 
     private function createUsers(SymfonyStyle $io): array
     {
-        $io->section('Création des utilisateurs');
+        $io->section('Création des utilisateurs de test');
 
         $usersData = [
             ['email' => 'chef.projet@test.com', 'firstName' => 'Alice', 'lastName' => 'Martin', 'roles' => ['ROLE_CHEF_PROJET']],
             ['email' => 'commercial@test.com', 'firstName' => 'Bob', 'lastName' => 'Durand', 'roles' => ['ROLE_COMMERCIAL']],
-            ['email' => 'directeur@test.com', 'firstName' => 'Claire', 'lastName' => 'Moreau', 'roles' => ['ROLE_DIRECTEUR']],
+            ['email' => 'manager@test.com', 'firstName' => 'Claire', 'lastName' => 'Moreau', 'roles' => ['ROLE_MANAGER']],
             ['email' => 'admin@test.com', 'firstName' => 'David', 'lastName' => 'Admin', 'roles' => ['ROLE_ADMIN']],
         ];
 
@@ -139,7 +188,6 @@ class CreateTestDataCommand extends Command
             $user->setFirstName($data['firstName']);
             $user->setLastName($data['lastName']);
             $user->setRoles($data['roles']);
-            // reset test password
             $user->setPassword($this->passwordHasher->hashPassword($user, 'test123'));
             $this->entityManager->persist($user);
             $users[] = $user;
@@ -148,43 +196,74 @@ class CreateTestDataCommand extends Command
         return $users;
     }
 
-    private function createContributors(SymfonyStyle $io, array $profiles): array
+    private function createContributorsWithDistribution(SymfonyStyle $io): array
     {
-        $io->section('Création des contributeurs');
+        $io->section('Création des contributeurs selon la répartition');
 
-        $contributorsData = [
-            ['firstName' => 'Emma', 'lastName' => 'Développeuse', 'profile' => 0, 'cjm' => '450.00', 'active' => true],
-            ['firstName' => 'Lucas', 'lastName' => 'Backend', 'profile' => 1, 'cjm' => '500.00', 'active' => true],
-            ['firstName' => 'Sophie', 'lastName' => 'Designer', 'profile' => 3, 'cjm' => '400.00', 'active' => true],
-            ['firstName' => 'Thomas', 'lastName' => 'DevOps', 'profile' => 4, 'cjm' => '550.00', 'active' => true],
-            ['firstName' => 'Julie', 'lastName' => 'Frontend', 'profile' => 0, 'cjm' => '480.00', 'active' => true],
-        ];
+        $profileRepo     = $this->entityManager->getRepository(Profile::class);
+        $contributorRepo = $this->entityManager->getRepository(Contributor::class);
 
         $contributors = [];
-        $repo         = $this->entityManager->getRepository(Contributor::class);
-        foreach ($contributorsData as $data) {
-            $contributor = $repo->findOneBy(['firstName' => $data['firstName'], 'lastName' => $data['lastName']]);
-            if (!$contributor) {
-                $contributor = new Contributor();
-                $contributor->setFirstName($data['firstName']);
-                $contributor->setLastName($data['lastName']);
-                $io->writeln("✓ Contributeur créé : {$data['firstName']} {$data['lastName']}");
-            } else {
-                $io->writeln("• Contributeur existant : {$data['firstName']} {$data['lastName']}");
-            }
-            $contributor->setCjm($data['cjm']);
-            $contributor->setActive($data['active']);
+        $usedNames    = [];
 
-            // Ajouter le profil
-            if (isset($profiles[$data['profile']])) {
-                if (!$contributor->getProfiles()->contains($profiles[$data['profile']])) {
-                    $contributor->addProfile($profiles[$data['profile']]);
+        foreach (self::CONTRIBUTORS_DISTRIBUTION as $profileName => $count) {
+            $profile = $profileRepo->findOneBy(['name' => $profileName]);
+            if (!$profile) {
+                $io->warning("Profil '$profileName' introuvable, passage...");
+                continue;
+            }
+
+            for ($i = 0; $i < $count; ++$i) {
+                // Générer un nom unique
+                do {
+                    $firstName = self::FIRST_NAMES[array_rand(self::FIRST_NAMES)];
+                    $lastName  = self::LAST_NAMES[array_rand(self::LAST_NAMES)];
+                    $fullName  = "$firstName $lastName";
+                } while (in_array($fullName, $usedNames));
+
+                $usedNames[] = $fullName;
+
+                // Vérifier si le contributeur existe déjà
+                $contributor = $contributorRepo->findOneBy([
+                    'firstName' => $firstName,
+                    'lastName'  => $lastName,
+                ]);
+
+                if (!$contributor) {
+                    $contributor = new Contributor();
+                    $contributor->setFirstName($firstName);
+                    $contributor->setLastName($lastName);
+                    $io->writeln("✓ Contributeur créé : $firstName $lastName ($profileName)");
+                } else {
+                    $io->writeln("• Contributeur existant : $firstName $lastName");
                 }
-            }
 
-            $this->entityManager->persist($contributor);
-            $contributors[] = $contributor;
+                // CJM selon le profil
+                $cjm = match (true) {
+                    str_contains(strtolower($profileName), 'lead')      => '600.00',
+                    str_contains(strtolower($profileName), 'directeur') => '700.00',
+                    str_contains(strtolower($profileName), 'senior')    => '550.00',
+                    str_contains(strtolower($profileName), 'chef')      => '500.00',
+                    str_contains(strtolower($profileName), 'designer')  => '450.00',
+                    default                                             => '400.00',
+                };
+
+                $contributor->setCjm($cjm);
+                $contributor->setTjm((string) (floatval($cjm) * 1.3)); // TJM = CJM * 1.3
+                $contributor->setActive(true);
+
+                // Ajouter le profil s'il n'est pas déjà présent
+                if (!$contributor->getProfiles()->contains($profile)) {
+                    $contributor->addProfile($profile);
+                }
+
+                $this->entityManager->persist($contributor);
+                $contributors[] = $contributor;
+            }
         }
+
+        $io->writeln('');
+        $io->writeln('✓ Total : '.count($contributors).' contributeurs créés');
 
         return $contributors;
     }
@@ -219,104 +298,88 @@ class CreateTestDataCommand extends Command
         return $categories;
     }
 
-    private function createTechnologies(SymfonyStyle $io): array
+    private function createClients(SymfonyStyle $io, array $users): array
     {
-        $io->section('Création des technologies');
+        $io->section('Création des clients');
 
-        $technologiesData = [
-            'Symfony', 'React', 'Vue.js', 'Angular', 'Laravel', 'Node.js',
-            'Python', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis',
+        $clientsData = [
+            'Fashion Store Paris',
+            'CreditCorp',
+            'Cabinet Juridique Associés',
+            'HRTech Solutions',
+            'Restaurant Le Gourmet',
         ];
 
-        $technologies     = [];
-        $repo             = $this->entityManager->getRepository(Technology::class);
-        $categoriesByTech = [
-            'Symfony'    => ['framework', '#6f42c1'],
-            'Laravel'    => ['framework', '#ff2d20'],
-            'React'      => ['framework', '#61dafb'],
-            'Vue.js'     => ['framework', '#42b883'],
-            'Angular'    => ['framework', '#dd0031'],
-            'Node.js'    => ['runtime', '#3c873a'],
-            'Python'     => ['language', '#3776ab'],
-            'Docker'     => ['infra', '#2496ed'],
-            'AWS'        => ['hosting', '#ff9900'],
-            'MySQL'      => ['database', '#00758f'],
-            'PostgreSQL' => ['database', '#336791'],
-            'Redis'      => ['cache', '#dc382d'],
-        ];
-
-        foreach ($technologiesData as $name) {
-            $technology = $repo->findOneBy(['name' => $name]);
-            if (!$technology) {
-                $technology = new Technology();
-                $technology->setName($name);
-                $io->writeln("✓ Technologie créée : $name");
+        $clients = [];
+        $repo    = $this->entityManager->getRepository(Client::class);
+        foreach ($clientsData as $name) {
+            $client = $repo->findOneBy(['name' => $name]);
+            if (!$client) {
+                $client = new Client();
+                $client->setName($name);
+                $io->writeln("✓ Client créé : $name");
             } else {
-                $io->writeln("• Technologie existante : $name");
+                $io->writeln("• Client existant : $name");
             }
-            // Set required fields
-            $category = $categoriesByTech[$name][0] ?? 'tool';
-            $color    = $categoriesByTech[$name][1] ?? null;
-            $technology->setCategory($category);
-            $technology->setColor($color);
-            $technology->setActive(true);
-
-            $this->entityManager->persist($technology);
-            $technologies[] = $technology;
+            $this->entityManager->persist($client);
+            $clients[] = $client;
         }
 
-        return $technologies;
+        return $clients;
     }
 
     /**
      * @throws Exception
      */
-    private function createProjects(SymfonyStyle $io, array $users, array $categories, array $technologies): array
+    private function createProjects(SymfonyStyle $io, array $clients, array $users, array $categories): array
     {
         $io->section('Création des projets');
+
+        $techRepo     = $this->entityManager->getRepository(Technology::class);
+        $technologies = $techRepo->findAll();
 
         $projectsData = [
             [
                 'name'          => 'E-shop Mode Parisienne',
-                'client'        => 'Fashion Store Paris',
+                'client'        => 0,
                 'description'   => 'Refonte complète de la boutique en ligne avec système de recommandation',
                 'type'          => 'forfait',
                 'status'        => 'active',
                 'categoryIndex' => 0,
-                'techIndices'   => [0, 1, 9], // Symfony, React, MySQL
+                'techNames'     => ['Symfony', 'React', 'MariaDB'],
                 'startDate'     => '2024-09-01',
                 'endDate'       => '2024-12-15',
             ],
             [
                 'name'          => 'App Mobile Banking',
-                'client'        => 'CreditCorp',
+                'client'        => 1,
                 'description'   => 'Application mobile pour la gestion des comptes bancaires',
                 'type'          => 'regie',
                 'status'        => 'active',
                 'categoryIndex' => 3,
-                'techIndices'   => [5, 10, 11], // Node.js, PostgreSQL, Redis
+                'techNames'     => ['React', 'MongoDB'],
                 'startDate'     => '2024-10-01',
                 'endDate'       => '2025-03-30',
             ],
             [
                 'name'          => 'Site Vitrine Avocat',
-                'client'        => 'Cabinet Juridique Associés',
+                'client'        => 2,
                 'description'   => 'Site vitrine moderne avec système de prise de rendez-vous',
                 'type'          => 'forfait',
                 'status'        => 'active',
                 'categoryIndex' => 1,
-                'techIndices'   => [4, 2], // Laravel, Vue.js
+                'techNames'     => ['Laravel', 'VueJS'],
                 'startDate'     => '2024-08-15',
                 'endDate'       => '2024-11-30',
             ],
             [
                 'name'          => 'Plateforme SaaS RH',
-                'client'        => 'HRTech Solutions',
+                'client'        => 3,
                 'description'   => 'Plateforme de gestion des ressources humaines en mode SaaS',
                 'type'          => 'forfait',
                 'status'        => 'completed',
                 'categoryIndex' => 2,
-                'techIndices'   => [0, 3, 10], // Symfony, Angular, PostgreSQL
+                'techNames'     => ['Symfony', 'Angular', 'MariaDB'],
                 'startDate'     => '2024-06-01',
                 'endDate'       => '2024-09-30',
             ],
@@ -333,7 +396,7 @@ class CreateTestDataCommand extends Command
             } else {
                 $io->writeln("• Projet existant : {$data['name']}");
             }
-            $project->setClient($data['client']);
+            $project->setClient($clients[$data['client']]);
             $project->setDescription($data['description']);
             $project->setProjectType($data['type']);
             $project->setStatus($data['status']);
@@ -345,18 +408,19 @@ class CreateTestDataCommand extends Command
             $project->setKeyAccountManager($users[1]);
             $project->setProjectDirector($users[2]);
 
-            // Assigner catégorie et technologies
+            // Assigner catégorie
             if (isset($categories[$data['categoryIndex']])) {
                 $project->setServiceCategory($categories[$data['categoryIndex']]);
             }
 
-            // reset techs
+            // Assigner technologies
             foreach ($project->getTechnologies() as $t) {
                 $project->removeTechnology($t);
             }
-            foreach ($data['techIndices'] as $index) {
-                if (isset($technologies[$index])) {
-                    $project->addTechnology($technologies[$index]);
+            foreach ($data['techNames'] as $techName) {
+                $tech = $techRepo->findOneBy(['name' => $techName]);
+                if ($tech) {
+                    $project->addTechnology($tech);
                 }
             }
 
@@ -432,25 +496,25 @@ class CreateTestDataCommand extends Command
 
     private function assignContributorToTask(string $taskName, array $contributors, array $contributorsByProfile): ?Contributor
     {
-        // Logique simple d'affectation basée sur le nom de la tâche
-        if (str_contains($taskName, 'Frontend') || str_contains($taskName, 'design')) {
-            return $contributorsByProfile['Développeur Frontend'][0] ?? $contributors[0];
+        // Logique d'affectation basée sur le nom de la tâche
+        if (str_contains($taskName, 'Frontend')) {
+            return $contributorsByProfile['développeur frontend'][0] ?? $contributors[0];
         }
 
         if (str_contains($taskName, 'Backend')) {
-            return $contributorsByProfile['Développeur Backend'][0] ?? $contributors[1];
+            return $contributorsByProfile['développeur backend'][0] ?? $contributors[1];
         }
 
         if (str_contains($taskName, 'Design') || str_contains($taskName, 'Maquettage')) {
-            return $contributorsByProfile['Designer UX/UI'][0] ?? $contributors[2];
+            return $contributorsByProfile['UI designer'][0] ?? $contributorsByProfile['UX designer'][0] ?? $contributors[2];
         }
 
-        if (str_contains($taskName, 'Déploiement')) {
-            return $contributorsByProfile['DevOps'][0] ?? $contributors[3];
+        if (str_contains($taskName, 'Analyse') || str_contains($taskName, 'spécification')) {
+            return $contributorsByProfile['product owner'][0] ?? $contributorsByProfile['chef de projet'][0] ?? $contributors[0];
         }
 
-        // Par défaut, assigner aléatoirement
-        return $contributors[array_rand($contributors)];
+        // Par défaut, assigner un développeur fullstack ou aléatoire
+        return $contributorsByProfile['développeur fullstack'][0] ?? $contributors[array_rand($contributors)];
     }
 
     private function createTimesheets(SymfonyStyle $io, array $projects, array $contributors): void
@@ -458,11 +522,10 @@ class CreateTestDataCommand extends Command
         $io->section('Création des feuilles de temps');
 
         $startDate = new DateTime('2024-09-01');
-        $endDate   = new DateTime('2024-10-19');
+        $endDate   = new DateTime('2024-10-31');
 
         $interval = new DateInterval('P1D');
-
-        $period = new DatePeriod($startDate, $interval, $endDate);
+        $period   = new DatePeriod($startDate, $interval, $endDate);
 
         $timesheetsCreated = 0;
 
