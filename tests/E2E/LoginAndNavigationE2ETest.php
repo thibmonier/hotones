@@ -33,10 +33,17 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         ]);
         $client->submit($form);
 
-        $client->waitForInvisibility('#password-addon'); // rough wait after submit
+        // Wait for navigation after login (either to / or to 2FA page)
+        $client->waitFor('body');
+        sleep(2); // Give time for any redirects to complete
 
-        // After successful login, default target is '/' --> maybe not
-        $this->assertStringEndsWith('/', parse_url($client->getCurrentURL(), PHP_URL_PATH));
+        $currentPath = parse_url($client->getCurrentURL(), PHP_URL_PATH);
+
+        // After successful login, should be on homepage (/)
+        // If 2FA is enabled, user would be on /2fa instead
+        $this->assertStringEndsWith('/', $currentPath,
+            sprintf('Expected to be on homepage (/), but currently on: %s', $currentPath),
+        );
     }
 
     public function testNavigateToProjectsIndex(): void

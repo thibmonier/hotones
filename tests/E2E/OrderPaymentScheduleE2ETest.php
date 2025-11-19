@@ -78,12 +78,12 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
 
         // Fill schedule form (50% on a date)
         $crawler = $client->getCrawler();
-        $crawler->filter('input[name="billing_date"]').first()->getNode(0)->setAttribute('value', '2025-01-15');
-        $crawler->filter('select[name="amount_type"]').selectOption('percent');
-        $crawler->filter('input[name="percent"]').first()->getNode(0)->setAttribute('value', '50');
+        $crawler->filter('input[name="billing_date"]')->first()->getNode(0)->setAttribute('value', '2025-01-15');
+        $crawler->filter('select[name="amount_type"]')->selectOption('percent');
+        $crawler->filter('input[name="percent"]')->first()->getNode(0)->setAttribute('value', '50');
 
         // Submit the schedule form
-        $formNode = $crawler->filter('form[action$="/schedule/add"]').first();
+        $formNode = $crawler->filter('form[action$="/schedule/add"]')->first();
         $client->submit($formNode->form());
 
         // Expect row appears in schedule table and coverage shows 50%
