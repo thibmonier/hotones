@@ -68,11 +68,38 @@ Application: http://localhost:8080
 - Projets: type (forfait/régie), statut, achats, technos, catégorie de service
 - Devis: sections + lignes (jours/TJM/achats), contingence
 - Timesheet: saisie hebdo, historique, vue globale
+- **Planning Resource Timeline**: vue planning avec FullCalendar Scheduler, gestion des congés
+- **Optimisation du planning**: analyse TACE, recommandations intelligentes avec IA (OpenAI/Anthropic)
+- **Workflow de congés**: demandes avec validation hiérarchique, notifications
+- **Niveaux de service client**: VIP, Prioritaire, Standard, Basse priorité (auto/manuel)
 - Analytics: `/analytics/dashboard` (KPIs, filtres, graphiques)
 
 ## Dernières mises à jour
+
+### 🤖 Optimisation IA du planning (Novembre 2024)
+- **Analyse TACE intelligente**: détection automatique des surcharges et sous-utilisations
+- **Recommandations IA**: intégration OpenAI (GPT-4o-mini) et Anthropic (Claude 3.5 Haiku)
+- **Dashboard d'optimisation**: `/planning/optimization` avec recommandations actionnables
+- **Alertes intégrées**: bannières dans le planning pour les situations critiques
+- **Prise en compte des niveaux de service**: priorisation VIP/Priority dans les recommandations
+
+### 🏖️ Workflow de congés complet
+- **Demandes de congés**: interface dédiée pour les intervenants
+- **Validation hiérarchique**: rattachement contributeur → manager
+- **Notifications en temps réel**: via Symfony Messenger (email + interface)
+- **Affichage dans le planning**: congés approuvés visibles en lecture seule
+- **Dashboard manager**: widget dédié sur la page d'accueil
+
+### 👥 Niveaux de service client
+- **4 niveaux**: VIP, Prioritaire, Standard, Basse priorité
+- **Calcul automatique**: basé sur le CA annuel (Top 20 = VIP, Top 50 = Prioritaire)
+- **Mode manuel**: possibilité de forcer un niveau spécifique
+- **Commande de recalcul**: `app:client:recalculate-service-level`
+- **Badges visuels**: affichage dans toute l'application
+
+### Autres mises à jour
 - Compteur de temps: start/stop depuis la saisie hebdo (un seul actif), imputation auto (min 0,125j)
-- Création automatique des tâches par défaut (AVV, Non-vendu) à la création d’un projet
+- Création automatique des tâches par défaut (AVV, Non-vendu) à la création d'un projet
 - Prise en compte du type et du statut de projet à la création/édition
 - Ajout de la relation optionnelle Timesheet → ProjectTask (modèle)
 - Devis: modification rapide du statut depuis la page devis et la liste des devis (POST CSRF → route order_update_status)
@@ -106,7 +133,12 @@ export PANTHER_NO_SANDBOX=1
 - App: http://localhost:8080
 - Admin config: /admin/technologies, /admin/service-categories, /admin/job-profiles
 - Périodes d'emploi: /employment-periods
+- **Planning**: /planning (resource timeline avec gestion des congés)
+- **Optimisation planning**: /planning/optimization (recommandations IA)
+- **Demande de congés**: /vacation-request (pour intervenants)
+- **Validation congés**: /vacation-approval (pour managers)
 - Analytics: /analytics/dashboard
+- Staffing & TACE: /staffing/dashboard
 - /api/documentation pour avoir la documentation swagger de l'API
 
 ## Accès Base de données (clients externes)

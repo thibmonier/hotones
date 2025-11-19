@@ -6,6 +6,7 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 - Aperçu du projet: docs/overview.md
 - Fonctionnalités: docs/features.md
 - Temps, planning, congés: docs/time-planning.md
+- **Optimisation IA du planning: docs/planning-ai.md**
 - Architecture technique: docs/architecture.md
 - Repositories: docs/repositories.md
 - Entités: docs/entities.md
