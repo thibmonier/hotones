@@ -30,3 +30,4 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 - Rôles de l'application: docs/roles.md
 - Arborescence du menu: docs/arborescence.md
 - Dashboard commercial: docs/sales-dashboard.md
+- **Intégration Planning → Staffing: docs/planning-staffing-integration.md**

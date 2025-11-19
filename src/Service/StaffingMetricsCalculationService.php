@@ -62,10 +62,6 @@ class StaffingMetricsCalculationService
                 // Récupérer la période d'emploi active pour ce contributeur
                 $employmentPeriod = $this->getActiveEmploymentPeriod($contributor, $period);
 
-                if (!$employmentPeriod) {
-                    continue; // Pas de période d'emploi active
-                }
-
                 // Calculer les métriques pour ce contributeur sur cette période
                 $metrics = $this->calculateMetricsForContributor($contributor, $periodStart, $periodEnd, $employmentPeriod);
 
@@ -82,10 +78,12 @@ class StaffingMetricsCalculationService
                 $fact->setGranularity($granularity);
                 $fact->calculateMetrics(); // Calcule staffingRate et TACE
 
-                // Associer le profil si disponible
-                $dimProfile = $this->getOrCreateDimProfile($employmentPeriod);
-                if ($dimProfile) {
-                    $fact->setDimProfile($dimProfile);
+                // Associer le profil si disponible (seulement si periode d'emploi existe)
+                if ($employmentPeriod) {
+                    $dimProfile = $this->getOrCreateDimProfile($employmentPeriod);
+                    if ($dimProfile) {
+                        $fact->setDimProfile($dimProfile);
+                    }
                 }
 
                 $this->entityManager->persist($fact);
@@ -107,10 +105,10 @@ class StaffingMetricsCalculationService
     /**
      * Calcule les métriques pour un contributeur sur une période donnée.
      *
-     * @param Contributor       $contributor      Contributeur
-     * @param DateTimeInterface $periodStart      Début de la période
-     * @param DateTimeInterface $periodEnd        Fin de la période
-     * @param EmploymentPeriod  $employmentPeriod Période d'emploi
+     * @param Contributor           $contributor      Contributeur
+     * @param DateTimeInterface     $periodStart      Début de la période
+     * @param DateTimeInterface     $periodEnd        Fin de la période
+     * @param EmploymentPeriod|null $employmentPeriod Période d'emploi (null si aucune)
      *
      * @return array{availableDays: float, workedDays: float, staffedDays: float, vacationDays: float, plannedDays: float}
      */
@@ -118,7 +116,7 @@ class StaffingMetricsCalculationService
         Contributor $contributor,
         DateTimeInterface $periodStart,
         DateTimeInterface $periodEnd,
-        EmploymentPeriod $employmentPeriod
+        ?EmploymentPeriod $employmentPeriod
     ): array {
         // 1. Calculer les jours ouvrés disponibles dans la période (hors week-ends)
         $totalWorkingDays = $this->calculateWorkingDays($periodStart, $periodEnd);
@@ -136,7 +134,7 @@ class StaffingMetricsCalculationService
         $staffedDays = $this->calculateStaffedDays($contributor, $periodStart, $periodEnd);
 
         // 6. Calculer les jours planifiés (pour le futur)
-        $plannedDays = 0.0; // TODO: Implémenter avec l'entité Planning si nécessaire
+        $plannedDays = $this->calculatePlannedDays($contributor, $periodStart, $periodEnd);
 
         return [
             'availableDays' => max(0, $availableDays),
@@ -220,6 +218,51 @@ class StaffingMetricsCalculationService
 
         // Convertir les heures en jours (1 jour = 8 heures)
         return $totalHours / 8.0;
+    }
+
+    /**
+     * Calcule les jours planifiés (planification future) pour un contributeur.
+     */
+    private function calculatePlannedDays(
+        Contributor $contributor,
+        DateTimeInterface $start,
+        DateTimeInterface $end
+    ): float {
+        // Récupérer les planifications du contributeur sur la période (statut planned ou confirmed)
+        $plannings = $this->entityManager->getRepository(\App\Entity\Planning::class)
+            ->createQueryBuilder('p')
+            ->where('p.contributor = :contributor')
+            ->andWhere('p.startDate <= :end')
+            ->andWhere('p.endDate >= :start')
+            ->andWhere('p.status IN (:statuses)')
+            ->setParameter('contributor', $contributor)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('statuses', ['planned', 'confirmed'])
+            ->getQuery()
+            ->getResult();
+
+        $totalPlannedDays = 0.0;
+
+        foreach ($plannings as $planning) {
+            /** @var \App\Entity\Planning $planning */
+            // Calculer l'intersection entre la planification et la période
+            $planStart = max($planning->getStartDate(), $start);
+            $planEnd   = min($planning->getEndDate(), $end);
+
+            // Compter les jours ouvrés dans cette intersection
+            $workingDays = $this->calculateWorkingDays($planStart, $planEnd);
+
+            // Calculer le nombre de jours planifiés selon les heures quotidiennes
+            // Si dailyHours = 8, on compte 1 jour par jour ouvré
+            // Si dailyHours = 4, on compte 0.5 jour par jour ouvré
+            $dailyHours  = (float) $planning->getDailyHours();
+            $plannedDays = $workingDays * ($dailyHours / 8.0);
+
+            $totalPlannedDays += $plannedDays;
+        }
+
+        return $totalPlannedDays;
     }
 
     /**

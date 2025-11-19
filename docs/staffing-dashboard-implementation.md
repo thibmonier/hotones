@@ -43,10 +43,12 @@ Le dashboard est accessible via :
 
 **`StaffingMetricsCalculationService`** (`src/Service/StaffingMetricsCalculationService.php`)
 - Calcul et enregistrement des métriques pour une période donnée
+- **Traite tous les contributeurs actifs**, même sans période d'emploi
 - Génération des périodes selon la granularité (weekly/monthly/quarterly)
 - Calcul des jours ouvrés (hors week-ends)
 - Calcul des jours de congés approuvés
 - Calcul des jours staffés (temps passé sur missions)
+- Calcul des jours planifiés (depuis l'entité Planning)
 - Création automatique des dimensions (DimTime, DimProfile)
 
 #### Formules implémentées
@@ -146,7 +148,7 @@ Mise à jour des documents suivants :
 
 #### Fonctionnalités additionnelles
 - [ ] Ajouter un filtre par Business Unit (BU)
-- [ ] Implémenter l'entité Planning pour les jours planifiés futurs
+- [x] **Implémenté** : Intégration de l'entité Planning pour les jours planifiés futurs (voir [docs/planning-staffing-integration.md](./planning-staffing-integration.md))
 - [ ] Ajouter un export PDF/Excel du dashboard
 - [ ] Créer des alertes automatiques quand le taux de staffing est < 70%
 - [ ] Ajouter un graphique de comparaison entre différents profils

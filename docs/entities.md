@@ -74,8 +74,11 @@ Timesheet (temps passés)
 Planning (planification future)
 ├── contributor → Contributor
 ├── project → Project
-├── startDate, endDate, estimatedHours
-└── notes, status
+├── profile → Profile (profil planifié)
+├── startDate, endDate, dailyHours (heures/jour)
+├── status (planned|confirmed|cancelled)
+├── notes
+└── Utilisé dans FactStaffingMetrics pour calculer plannedDays
 
 Vacation (congés)
 ├── contributor → Contributor

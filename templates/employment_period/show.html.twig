@@ -59,7 +59,7 @@
                                     <br><small class="text-muted">{{ period.startDate.diff(period.endDate).days }} jours</small>
                                 {% else %}
                                     → <span class="badge bg-success">En cours</span>
-                                    <br><small class="text-muted">{{ period.startDate.diff(date()) |abs.days }} jours</small>
+                                    <br><small class="text-muted">{{ period.startDate.diff(date()).days |abs }} jours</small>
                                 {% endif %}
                             </p>
                         </div>
