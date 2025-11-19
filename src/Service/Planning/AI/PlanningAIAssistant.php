@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service\Planning\AI;
 
+use Anthropic\Client as AnthropicClient;
+use Anthropic\Messages\MessageParam;
+
 use function count;
 
 use Exception;
@@ -158,7 +161,7 @@ class PlanningAIAssistant
         }
 
         if ($this->provider === 'anthropic') {
-            throw new RuntimeException('Anthropic integration not yet implemented. Please install anthropic-php/sdk and implement the callAnthropic() method.');
+            return $this->callAnthropic($prompt);
         }
 
         throw new RuntimeException('No AI provider configured.');
@@ -182,6 +185,43 @@ class PlanningAIAssistant
         ]);
 
         $content = $response->choices[0]->message->content;
+
+        // Parser la réponse JSON
+        $data = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Failed to parse AI response as JSON: '.json_last_error_msg());
+        }
+
+        return $data;
+    }
+
+    /**
+     * Appelle l'API Anthropic Claude pour générer des recommandations.
+     */
+    private function callAnthropic(string $prompt): array
+    {
+        $client = new AnthropicClient($this->apiKey);
+
+        $response = $client->messages->create(
+            model: 'claude-3-5-haiku-20241022', // Modèle rapide et économique
+            maxTokens: 2000,
+            messages: [
+                MessageParam::with(
+                    role: 'user',
+                    content: $prompt,
+                ),
+            ],
+            system: 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.',
+        );
+
+        // Extraire le contenu textuel de la réponse
+        $content = '';
+        foreach ($response->content as $block) {
+            if ($block->type === 'text') {
+                $content .= $block->text;
+            }
+        }
 
         // Parser la réponse JSON
         $data = json_decode($content, true);

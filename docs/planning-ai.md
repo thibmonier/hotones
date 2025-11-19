@@ -12,14 +12,16 @@ Le système d'optimisation du planning intègre l'IA pour :
 
 ## Configuration
 
-### 1. Obtenir une clé API OpenAI
+### Option 1 : OpenAI (GPT-4)
+
+#### 1.1. Obtenir une clé API OpenAI
 
 1. Créez un compte sur [OpenAI Platform](https://platform.openai.com/)
 2. Accédez à [API Keys](https://platform.openai.com/api-keys)
 3. Créez une nouvelle clé API
 4. Copiez la clé (elle ne sera affichée qu'une seule fois)
 
-### 2. Configurer l'application
+#### 1.2. Configurer l'application
 
 Ajoutez votre clé API dans le fichier `.env.local` :
 
@@ -29,15 +31,38 @@ OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ###< AI Configuration ###
 ```
 
+### Option 2 : Anthropic (Claude)
+
+#### 2.1. Obtenir une clé API Anthropic
+
+1. Créez un compte sur [Anthropic Console](https://console.anthropic.com/)
+2. Accédez à [API Keys](https://console.anthropic.com/settings/keys)
+3. Créez une nouvelle clé API
+4. Copiez la clé (elle ne sera affichée qu'une seule fois)
+
+#### 2.2. Configurer l'application
+
+Ajoutez votre clé API dans le fichier `.env.local` :
+
+```bash
+###> AI Configuration ###
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+###< AI Configuration ###
+```
+
+### Configuration générale
+
 **Important :**
 - Ne commitez JAMAIS vos clés API dans le repository
 - Utilisez `.env.local` pour les configurations locales
 - En production, utilisez les variables d'environnement du serveur
+- Si les deux clés sont configurées, **OpenAI sera utilisé en priorité**
+- Pour forcer l'utilisation d'Anthropic, laissez `OPENAI_API_KEY` vide
 
-### 3. Vérifier l'activation
+### Vérifier l'activation
 
 L'IA s'active automatiquement dès qu'une clé API valide est configurée.
-Une bannière verte apparaîtra sur la page `/planning/optimization` indiquant que l'IA est active.
+Une bannière verte apparaîtra sur la page `/planning/optimization` indiquant que l'IA est active et quel provider est utilisé (OpenAI ou Anthropic).
 
 ## Utilisation
 
@@ -64,23 +89,45 @@ Une bannière verte apparaîtra sur la page `/planning/optimization` indiquant q
 - Insights sur les tendances d'équipe
 - Suggestions d'optimisation à moyen terme
 
-## Modèle utilisé
+## Modèles utilisés
+
+### OpenAI
 
 Par défaut, le système utilise **GPT-4o-mini** :
 - Modèle rapide et économique
 - Excellente qualité de réponse
 - Coût : ~0,15 $ par million de tokens d'entrée
+- Limite : 2000 tokens par réponse
 
-Pour changer de modèle, modifiez le code dans `src/Service/Planning/AI/PlanningAIAssistant.php` :
+Pour changer de modèle OpenAI, modifiez le code dans `src/Service/Planning/AI/PlanningAIAssistant.php` :
 
 ```php
 $response = $client->chat()->create([
-    'model' => 'gpt-4o', // ou 'gpt-4', 'gpt-3.5-turbo', etc.
+    'model' => 'gpt-4o', // ou 'gpt-4', 'gpt-4o-mini', etc.
     // ...
 ]);
 ```
 
+### Anthropic Claude
+
+Le système utilise **Claude 3.5 Haiku** :
+- Modèle le plus rapide et économique de la famille Claude 3.5
+- Excellente qualité de réponse avec un prix compétitif
+- Coût : ~0,80 $ par million de tokens d'entrée / ~4,00 $ par million de tokens de sortie
+- Limite : 2000 tokens par réponse
+
+Pour changer de modèle Claude, modifiez le code dans `src/Service/Planning/AI/PlanningAIAssistant.php` :
+
+```php
+$response = $client->messages->create(
+    model: 'claude-3-5-sonnet-20241022', // ou 'claude-3-opus-20240229', etc.
+    // ...
+);
+```
+
 ## Coûts estimés
+
+### OpenAI (GPT-4o-mini)
 
 Estimation pour un usage typique :
 
@@ -90,23 +137,33 @@ Estimation pour un usage typique :
 | Génération de 5 recommandations | ~2000 | $0.0003 |
 | Usage mensuel (100 analyses) | ~350k | $0.05 |
 
-**Note :** Les coûts réels dépendent de la taille de votre équipe et de la fréquence d'utilisation.
+### Anthropic (Claude 3.5 Haiku)
 
-## Support Anthropic Claude (à venir)
+Estimation pour un usage typique :
 
-Le système est préparé pour supporter Anthropic Claude :
+| Action | Tokens entrée/sortie | Coût approximatif |
+|--------|---------------------|------------------|
+| Analyse d'une équipe de 10 personnes | 1500/500 | $0.003 |
+| Génération de 5 recommandations | 2000/500 | $0.004 |
+| Usage mensuel (100 analyses) | 350k/50k | $0.48 |
 
-1. Installez le SDK Anthropic :
-```bash
-composer require anthropic/sdk
-```
+**Note :** Les coûts réels dépendent de la taille de votre équipe et de la fréquence d'utilisation. Claude est environ 10x plus cher que GPT-4o-mini, mais offre une qualité de réponse excellente.
 
-2. Configurez la clé API :
-```bash
-ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
+## Choix du provider
 
-3. Implémentez la méthode `callAnthropic()` dans `PlanningAIAssistant.php`
+Les deux providers sont entièrement fonctionnels et prêts à l'emploi :
+
+### Quand utiliser OpenAI (GPT-4o-mini) ?
+- ✅ Budget limité (~10x moins cher que Claude)
+- ✅ Rapidité importante
+- ✅ Bon pour des analyses fréquentes
+- ✅ Recommandations qualitatives suffisantes
+
+### Quand utiliser Anthropic (Claude 3.5 Haiku) ?
+- ✅ Besoin de réponses plus nuancées
+- ✅ Analyses complexes nécessitant plus de contexte
+- ✅ Budget plus flexible
+- ✅ Préférence pour l'éthique et la transparence d'Anthropic
 
 ## Dépannage
 
@@ -200,10 +257,17 @@ $assistant = new PlanningAIAssistant(
 
 ## Ressources
 
+### OpenAI
 - [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
 - [OpenAI PHP Client](https://github.com/openai-php/client)
 - [Pricing OpenAI](https://openai.com/pricing)
 - [Best Practices OpenAI](https://platform.openai.com/docs/guides/production-best-practices)
+
+### Anthropic
+- [Anthropic API Documentation](https://docs.anthropic.com/en/api/getting-started)
+- [Anthropic PHP SDK](https://github.com/anthropic-ai/anthropic-sdk-php)
+- [Pricing Anthropic](https://www.anthropic.com/pricing#anthropic-api)
+- [Claude Model Comparison](https://docs.anthropic.com/en/docs/about-claude/models)
 
 ## Support
 
