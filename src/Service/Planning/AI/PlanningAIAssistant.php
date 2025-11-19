@@ -7,35 +7,34 @@ namespace App\Service\Planning\AI;
 use function count;
 
 use Exception;
+use OpenAI;
 use RuntimeException;
 
 /**
  * Assistant IA pour générer des recommandations avancées de planning.
  *
- * Cette classe sert d'interface pour intégrer différents services d'IA
- * (OpenAI, Claude, modèles locaux, etc.) pour améliorer les recommandations.
- *
- * Pour activer l'IA :
- * 1. Configurer une clé API dans .env (ex: OPENAI_API_KEY)
- * 2. Installer le client correspondant (ex: composer require openai-php/client)
- * 3. Implémenter la méthode generateRecommendations() avec l'API choisie
+ * Utilise OpenAI GPT-4 ou Anthropic Claude pour analyser les situations de charge
+ * et générer des recommandations intelligentes basées sur le contexte du projet.
  */
 class PlanningAIAssistant
 {
     private bool $enabled     = false;
     private ?string $provider = null;
+    private ?string $apiKey   = null;
 
     public function __construct(
         ?string $openaiApiKey = null,
         ?string $anthropicApiKey = null
     ) {
         // Déterminer quel provider est disponible
-        if ($openaiApiKey) {
+        if ($openaiApiKey !== null && $openaiApiKey !== '') {
             $this->enabled  = true;
             $this->provider = 'openai';
-        } elseif ($anthropicApiKey) {
+            $this->apiKey   = $openaiApiKey;
+        } elseif ($anthropicApiKey !== null && $anthropicApiKey !== '') {
             $this->enabled  = true;
             $this->provider = 'anthropic';
+            $this->apiKey   = $anthropicApiKey;
         }
     }
 
@@ -150,28 +149,48 @@ class PlanningAIAssistant
     }
 
     /**
-     * Appelle l'API IA (à implémenter selon le provider).
+     * Appelle l'API IA selon le provider configuré.
      */
     private function callAI(string $prompt): array
     {
-        // TODO: Implémenter selon le provider
-        // Exemple pour OpenAI:
-        /*
         if ($this->provider === 'openai') {
-            $client = OpenAI::client($this->apiKey);
-            $response = $client->chat()->create([
-                'model' => 'gpt-4',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a project planning expert.'],
-                    ['role' => 'user', 'content' => $prompt],
-                ],
-            ]);
-            return json_decode($response->choices[0]->message->content, true);
+            return $this->callOpenAI($prompt);
         }
-        */
 
-        // Pour l'instant, retourner un message indiquant que l'implémentation est nécessaire
-        throw new RuntimeException('AI integration not yet implemented. To enable: 1) Install openai-php/client or anthropic-sdk 2) Implement the callAI() method in PlanningAIAssistant');
+        if ($this->provider === 'anthropic') {
+            throw new RuntimeException('Anthropic integration not yet implemented. Please install anthropic-php/sdk and implement the callAnthropic() method.');
+        }
+
+        throw new RuntimeException('No AI provider configured.');
+    }
+
+    /**
+     * Appelle l'API OpenAI pour générer des recommandations.
+     */
+    private function callOpenAI(string $prompt): array
+    {
+        $client = OpenAI::client($this->apiKey);
+
+        $response = $client->chat()->create([
+            'model'    => 'gpt-4o-mini', // Modèle plus rapide et moins cher que gpt-4
+            'messages' => [
+                ['role' => 'system', 'content' => 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.'],
+                ['role' => 'user', 'content' => $prompt],
+            ],
+            'temperature' => 0.7,
+            'max_tokens'  => 2000,
+        ]);
+
+        $content = $response->choices[0]->message->content;
+
+        // Parser la réponse JSON
+        $data = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Failed to parse AI response as JSON: '.json_last_error_msg());
+        }
+
+        return $data;
     }
 
     /**
