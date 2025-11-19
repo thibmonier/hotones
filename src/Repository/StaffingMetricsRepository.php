@@ -333,7 +333,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->select(
                 'c.id as contributorId',
                 'CONCAT(c.firstName, \' \', c.lastName) as contributorName',
-                'CONCAT(:year, \'-S\', LPAD(WEEK(dt.date, 1), 2, \'0\')) as weekNumber',
+                'dt.date as weekDate',
                 'fsm.availableDays',
                 'fsm.staffedDays',
                 'fsm.plannedDays',
@@ -358,8 +358,20 @@ class StaffingMetricsRepository extends ServiceEntityRepository
 
         $results = $qb->getQuery()->getResult();
 
-        // Calculer le taux d'occupation et la capacité restante
+        // Calculer le taux d'occupation et la capacité restante, formater le numéro de semaine
         foreach ($results as &$result) {
+            // Calculer le numéro de semaine à partir de la date
+            $date = $result['weekDate'];
+            if ($date instanceof DateTimeInterface) {
+                $weekNum = (int) $date->format('W');
+            } else {
+                $weekNum = 0;
+            }
+
+            // Formater le numéro de semaine comme 'YYYY-S##'
+            $result['weekNumber'] = sprintf('%d-S%02d', $year, $weekNum);
+            unset($result['weekDate']);
+
             $available = (float) $result['availableDays'];
             $staffed   = (float) $result['staffedDays'];
             $planned   = (float) $result['plannedDays'];
@@ -391,7 +403,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('fsm')
             ->select(
-                'CONCAT(:year, \'-S\', LPAD(WEEK(dt.date, 1), 2, \'0\')) as weekNumber',
+                'dt.date as weekDate',
                 'AVG(fsm.tace) as tace',
                 'SUM(fsm.contributorCount) as contributorCount',
                 'SUM(fsm.staffedDays) as staffedDays',
@@ -403,7 +415,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->andWhere('fsm.granularity = :granularity')
             ->setParameter('year', $year)
             ->setParameter('granularity', 'weekly')
-            ->groupBy('WEEK(dt.date, 1)')
+            ->groupBy('dt.date')
             ->orderBy('dt.date', 'ASC');
 
         if ($profile) {
@@ -414,6 +426,22 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             $qb->andWhere('dp.id IS NULL OR dp.isProductive = true');
         }
 
-        return $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult();
+
+        // Formater le numéro de semaine comme 'YYYY-S##'
+        foreach ($results as &$result) {
+            // Calculer le numéro de semaine à partir de la date
+            $date = $result['weekDate'];
+            if ($date instanceof DateTimeInterface) {
+                $weekNum = (int) $date->format('W');
+            } else {
+                $weekNum = 0;
+            }
+
+            $result['weekNumber'] = sprintf('%d-S%02d', $year, $weekNum);
+            unset($result['weekDate']);
+        }
+
+        return $results;
     }
 }

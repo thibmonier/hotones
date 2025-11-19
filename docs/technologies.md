@@ -1,0 +1,16 @@
+# les technologies (et leur type) de l'application
+
+- Php (langage)
+- Symfony (framework)
+- Laravel (framework)
+- Java (langage)
+- React (framework)
+- VueJS (framework)
+- Angular (framework)
+- NextJS (framework)
+- NuxtJS (framework)
+- MariaDB (Base de données relationnelle)
+- MongoDB (Base de données noSQL)
+- ElasticSearch (Moteur de recherche)
+- Algolia (Moteur de recherche)
+- Javascript (langage)

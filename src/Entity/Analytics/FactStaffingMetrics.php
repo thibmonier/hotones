@@ -41,11 +41,11 @@ class FactStaffingMetrics
     private ?int $id = null;
 
     // Clés étrangères vers les dimensions
-    #[ORM\ManyToOne(targetEntity: DimTime::class)]
+    #[ORM\ManyToOne(targetEntity: DimTime::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private DimTime $dimTime;
 
-    #[ORM\ManyToOne(targetEntity: DimProfile::class)]
+    #[ORM\ManyToOne(targetEntity: DimProfile::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
     private ?DimProfile $dimProfile = null;
 
