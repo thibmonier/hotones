@@ -1,0 +1,130 @@
+# Simple Dockerfile pour Render - PHP-FPM uniquement
+# Render fournit son propre proxy HTTP
+
+FROM php:8.4-fpm-alpine
+
+# Install system dependencies et extensions PHP
+RUN apk add --no-cache \
+    bash \
+    nginx \
+    git \
+    unzip \
+    libzip-dev \
+    icu-dev \
+    oniguruma-dev \
+    mariadb-client \
+    tzdata \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+  && docker-php-ext-configure intl \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && pecl install apcu \
+  && docker-php-ext-enable apcu \
+  && pecl install redis \
+  && docker-php-ext-enable redis \
+  && docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    intl \
+    opcache \
+    gd \
+    bcmath \
+    zip \
+  && rm -rf /var/cache/apk/*
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Configure PHP for production
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/custom.ini \
+    && echo "upload_max_filesize=20M" >> /usr/local/etc/php/conf.d/custom.ini \
+    && echo "post_max_size=21M" >> /usr/local/etc/php/conf.d/custom.ini \
+    && echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/custom.ini \
+    && echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/custom.ini
+
+# Configure Nginx
+COPY <<'EOF' /etc/nginx/http.d/default.conf
+server {
+    listen 8080;
+    server_name _;
+    root /var/www/html/public;
+    index index.php;
+
+    location / {
+        try_files $uri /index.php$is_args$args;
+    }
+
+    location ~ ^/index\.php(/|$) {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $document_root;
+        internal;
+    }
+
+    location ~ \.php$ {
+        return 404;
+    }
+}
+EOF
+
+WORKDIR /var/www/html
+
+# Copy application
+COPY --chown=www-data:www-data . .
+
+# Build assets
+RUN apk add --no-cache nodejs yarn \
+    && yarn install --frozen-lockfile \
+    && yarn build \
+    && apk del nodejs yarn \
+    && rm -rf node_modules
+
+# Install dependencies
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --classmap-authoritative \
+    --apcu-autoloader
+
+# Generate JWT keys
+RUN mkdir -p config/jwt && php bin/console lexik:jwt:generate-keypair --skip-if-exists || true
+
+# Permissions
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var/ public/
+
+# Startup script
+COPY <<'EOF' /start.sh
+#!/bin/sh
+set -e
+
+echo "Starting HotOnes..."
+
+# Wait for database
+until php bin/console dbal:run-sql "SELECT 1" 2>/dev/null; do
+    echo "Waiting for database..."
+    sleep 2
+done
+
+# Run migrations
+php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+# Clear cache
+php bin/console cache:clear
+
+# Start PHP-FPM in background
+php-fpm &
+
+# Start Nginx in foreground
+exec nginx -g 'daemon off;'
+EOF
+
+RUN chmod +x /start.sh
+
+EXPOSE 8080
+
+CMD ["/start.sh"]

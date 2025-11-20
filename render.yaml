@@ -6,7 +6,7 @@ services:
   - type: web
     name: hotones-app
     runtime: docker
-    dockerfilePath: ./Dockerfile.render
+    # dockerfilePath par défaut: ./Dockerfile
     region: frankfurt  # Changez selon votre préférence (oregon, frankfurt, singapore)
     plan: starter  # free, starter, standard, pro
     branch: main
