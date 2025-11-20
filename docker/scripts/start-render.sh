@@ -21,21 +21,32 @@ sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/conf.d/default.conf
 # Configure PHP sessions to use Redis from REDIS_URL environment variable
 if [ -n "$REDIS_URL" ]; then
     echo "Configuring PHP sessions to use Redis..."
+    echo "  REDIS_URL: ${REDIS_URL:0:30}..."
 
     # Check if Redis extension is loaded
+    echo "  Checking for Redis extension..."
+    php -m | grep redis || echo "  Redis extension NOT found!"
+
     if php -m | grep -q "^redis$"; then
         # Parse REDIS_URL (format: redis://hostname:port or redis://user:pass@hostname:port)
         REDIS_HOST=$(echo "$REDIS_URL" | sed -E 's#redis://([^:@]+:)?([^@]+@)?([^:]+):.*#\3#')
         REDIS_PORT=$(echo "$REDIS_URL" | sed -E 's#.*:([0-9]+)/?.*#\1#')
 
-        # Add session configuration to PHP (without quotes around the value)
-        cat >> /usr/local/etc/php/conf.d/php.ini <<EOF
+        echo "  Parsed: ${REDIS_HOST}:${REDIS_PORT}"
+
+        # Create dedicated session config file
+        cat > /usr/local/etc/php/conf.d/99-session-redis.ini <<EOF
 session.save_handler = redis
 session.save_path = tcp://${REDIS_HOST}:${REDIS_PORT}
 EOF
-        echo "  Redis session configured: ${REDIS_HOST}:${REDIS_PORT}"
+
+        echo "  ✓ Redis session configured"
+        echo "  Config written to: /usr/local/etc/php/conf.d/99-session-redis.ini"
+        cat /usr/local/etc/php/conf.d/99-session-redis.ini
     else
-        echo "  Warning: Redis extension not loaded, sessions will use files"
+        echo "  ✗ Redis extension not loaded, sessions will use files"
+        echo "  Available PHP modules:"
+        php -m | head -20
     fi
 else
     echo "Warning: REDIS_URL not set, sessions will use files"
