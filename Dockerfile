@@ -84,6 +84,7 @@ RUN composer install \
     --optimize-autoloader \
     --no-interaction \
     --no-progress \
+    --no-scripts \
     --classmap-authoritative \
     --apcu-autoloader \
     && composer clear-cache
