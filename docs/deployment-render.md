@@ -31,13 +31,13 @@ Render propose nativement PostgreSQL mais pas MySQL/MariaDB. Voici vos options :
 
 ### Tableau comparatif
 
-| Solution | Type | Gratuit | Payant | Recommandation |
-|----------|------|---------|--------|----------------|
-| **PostgreSQL Render** | PostgreSQL | 90 jours | $7/mois | ⭐⭐⭐ Meilleur rapport qualité/prix |
-| **Supabase** | PostgreSQL | ✅ 500MB permanent | $25/mois | ⭐⭐⭐ Excellent gratuit |
-| **Neon** | PostgreSQL | ✅ 512MB permanent | $19/mois | ⭐⭐ Serverless innovant |
-| **Railway** | MySQL | $5 crédit/mois | ~$10/mois | ⭐⭐ Si vous tenez à MySQL |
-| **DigitalOcean** | MySQL/PostgreSQL | ❌ | $15/mois | ⭐ Production sérieuse |
+| Solution              | Type             | Gratuit           | Payant    | Recommandation                    |
+|-----------------------|------------------|-------------------|-----------|-----------------------------------|
+| **PostgreSQL Render** | PostgreSQL       | 90 jours          | $7/mois   | ⭐⭐⭐ Meilleur rapport qualité/prix |
+| **Supabase**          | PostgreSQL       | ✅ 500MB permanent | $25/mois  | ⭐⭐⭐ Excellent gratuit             |
+| **Neon**              | PostgreSQL       | ✅ 512MB permanent | $19/mois  | ⭐⭐ Serverless innovant            |
+| **Railway**           | MySQL            | $5 crédit/mois    | ~$10/mois | ⭐⭐ Si vous tenez à MySQL          |
+| **DigitalOcean**      | MySQL/PostgreSQL | ❌                 | $15/mois  | ⭐ Production sérieuse             |
 
 ### Option A : PostgreSQL Render (Recommandé) ⭐
 

@@ -16,18 +16,27 @@ sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/conf.d/default.conf
 
 # Wait for database to be ready
 echo "Waiting for database connection..."
+echo "DATABASE_URL: ${DATABASE_URL:0:30}..." # Show first 30 chars only for security
+
 max_attempts=30
 attempt=0
 
 until php bin/console dbal:run-sql "SELECT 1" > /dev/null 2>&1 || [ $attempt -eq $max_attempts ]; do
     attempt=$((attempt + 1))
     echo "  Attempt $attempt/$max_attempts - Database not ready, waiting..."
+    if [ $attempt -eq 5 ]; then
+        echo "  Debug: Testing database connection..."
+        php bin/console dbal:run-sql "SELECT 1" 2>&1 || true
+    fi
     sleep 2
 done
 
 if [ $attempt -eq $max_attempts ]; then
     echo "ERROR: Database connection timeout after $max_attempts attempts"
-    exit 1
+    echo "Last error output:"
+    php bin/console dbal:run-sql "SELECT 1" 2>&1 || true
+    echo "Continuing anyway to start services (for debugging)..."
+    # Don't exit, let's see what happens
 fi
 
 echo "Database connection established!"
@@ -62,5 +71,9 @@ echo "========================================="
 php bin/console about
 
 # Start supervisord (Nginx + PHP-FPM + Messenger workers)
-echo "Starting services..."
-exec /usr/bin/supervisord -c /etc/supervisord.conf
+echo "Starting services with supervisord..."
+echo "Port: $PORT"
+echo "Working directory: $(pwd)"
+
+# Make sure supervisord runs in foreground
+exec /usr/bin/supervisord -n -c /etc/supervisord.conf
