@@ -20,8 +20,10 @@ final class Version20251108093424 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+
+        // Create messenger_messages table only if it doesn't exist
         $this->addSql(<<<'SQL'
-            CREATE TABLE messenger_messages (
+            CREATE TABLE IF NOT EXISTS messenger_messages (
               id BIGINT AUTO_INCREMENT NOT NULL,
               body LONGTEXT NOT NULL,
               headers LONGTEXT NOT NULL,
@@ -35,7 +37,28 @@ final class Version20251108093424 extends AbstractMigration
               PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
-        $this->addSql('ALTER TABLE billing_markers RENAME INDEX idx_marker_order TO IDX_2AA754E78D9F6D38');
+
+        // Rename index on billing_markers if old name exists
+        // Check if old index exists before attempting rename
+        $this->addSql(<<<'SQL'
+            SET @index_exists = (
+                SELECT COUNT(*)
+                FROM information_schema.statistics
+                WHERE table_schema = DATABASE()
+                AND table_name = 'billing_markers'
+                AND index_name = 'idx_marker_order'
+            )
+        SQL);
+        $this->addSql(<<<'SQL'
+            SET @sql = IF(@index_exists > 0,
+                'ALTER TABLE billing_markers RENAME INDEX idx_marker_order TO IDX_2AA754E78D9F6D38',
+                'SELECT "Index already renamed or does not exist" as notice'
+            )
+        SQL);
+        $this->addSql('PREPARE stmt FROM @sql');
+        $this->addSql('EXECUTE stmt');
+        $this->addSql('DEALLOCATE PREPARE stmt');
+
         $this->addSql(<<<'SQL'
             ALTER TABLE
               employment_periods
@@ -44,8 +67,10 @@ final class Version20251108093424 extends AbstractMigration
             CHANGE
               work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT '100' NOT NULL
         SQL);
+
+        // Create unique index only if it doesn't exist
         $this->addSql(<<<'SQL'
-            CREATE UNIQUE INDEX unique_fact_metrics ON fact_project_metrics (
+            CREATE UNIQUE INDEX IF NOT EXISTS unique_fact_metrics ON fact_project_metrics (
               dim_time_id, dim_project_type_id,
               dim_project_manager_id, dim_sales_person_id,
               dim_project_director_id, granularity,
