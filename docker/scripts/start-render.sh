@@ -52,9 +52,46 @@ if [ ! -f config/jwt/private.pem ] || [ ! -f config/jwt/public.pem ]; then
     php bin/console lexik:jwt:generate-keypair --skip-if-exists
 fi
 
-# Run database migrations
+# Run database migrations with error handling
 echo "Running database migrations..."
-php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+# First, ensure migration metadata storage is synced
+php bin/console doctrine:migrations:sync-metadata-storage --no-interaction 2>/dev/null || true
+
+# Try to run migrations
+if ! php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration 2>&1 | tee /tmp/migration.log; then
+    echo "  Migration failed, checking if it's due to existing tables..."
+
+    # If the error is about tables already existing, try to recover
+    if grep -q "Base table or view already exists" /tmp/migration.log; then
+        echo "  Tables already exist, syncing migration versions..."
+
+        # Get list of all migrations
+        migrations=$(php bin/console doctrine:migrations:list --no-interaction 2>/dev/null | grep -oP "Version\d+" || true)
+
+        if [ -n "$migrations" ]; then
+            # Mark each migration that failed as executed
+            for version in $migrations; do
+                # Try to add the version, ignore if already added
+                php bin/console doctrine:migrations:version "$version" --add --no-interaction 2>/dev/null || true
+            done
+
+            echo "  Migration versions synced, trying migrations again..."
+            # Try migrations one more time (should only run new ones)
+            php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || {
+                echo "  Warning: Some migrations still failed, but continuing startup..."
+                echo "  You may need to manually review migrations later."
+            }
+        fi
+    else
+        echo "  Migration failed with unexpected error:"
+        cat /tmp/migration.log
+        echo "  Continuing anyway, but database may be in inconsistent state."
+    fi
+fi
+
+echo "Checking migration status..."
+php bin/console doctrine:migrations:status --no-interaction || true
 
 # Clear and warm up cache
 echo "Clearing cache..."
