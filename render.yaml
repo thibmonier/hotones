@@ -16,15 +16,14 @@ services:
         value: prod
       - key: APP_SECRET
         generateValue: true  # Génère un secret aléatoire
-      # DATABASE_URL: Choisir une des options ci-dessous
-      # Option A - PostgreSQL Render (recommandé, voir databases: section en bas)
+      # DATABASE_URL: Option MySQL externe (Railway)
       - key: DATABASE_URL
-        fromDatabase:
-          name: hotones-db
-          property: connectionString
-      # Option B - MySQL externe (Railway, commentez la section ci-dessus et utilisez sync: false)
+        sync: false  # À définir manuellement avec l'URL Railway dans le dashboard Render
+      # Option PostgreSQL Render (si vous migrez plus tard, décommentez ci-dessous)
       # - key: DATABASE_URL
-      #   sync: false  # Définir manuellement avec l'URL Railway/autre provider
+      #   fromDatabase:
+      #     name: hotones-db
+      #     property: connectionString
       - key: REDIS_URL
         fromService:
           name: hotones-redis
@@ -80,12 +79,14 @@ services:
 # - Nécessite migration MySQL → PostgreSQL (facile, voir docs)
 # - Guide: docs/deployment-render-postgres.md
 #
-databases:
-  - name: hotones-db
-    databaseName: hotones
-    region: frankfurt
-    plan: starter  # free (90j) ou starter ($7/mois)
-    # PostgreSQL 15+ par défaut
+# Base PostgreSQL Render désactivée (on utilise MySQL Railway)
+# Décommentez si vous migrez vers PostgreSQL plus tard
+# databases:
+#   - name: hotones-db
+#     databaseName: hotones
+#     region: frankfurt
+#     plan: starter  # free (90j) ou starter ($7/mois)
+#     # PostgreSQL 15+ par défaut
 
 # ===============================================
 # Option B: MySQL externe (Railway, Supabase, etc.)
