@@ -18,39 +18,19 @@ PORT=${PORT:-8080}
 echo "Configuring Nginx to listen on port $PORT..."
 sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/conf.d/default.conf
 
-# Configure PHP sessions to use Redis from REDIS_URL environment variable
-if [ -n "$REDIS_URL" ]; then
-    echo "Configuring PHP sessions to use Redis..."
-    echo "  REDIS_URL: ${REDIS_URL:0:30}..."
-
-    # Check if Redis extension is loaded
-    echo "  Checking for Redis extension..."
-    php -m | grep redis || echo "  Redis extension NOT found!"
-
-    if php -m | grep -q "^redis$"; then
-        # Parse REDIS_URL (format: redis://hostname:port or redis://user:pass@hostname:port)
-        REDIS_HOST=$(echo "$REDIS_URL" | sed -E 's#redis://([^:@]+:)?([^@]+@)?([^:]+):.*#\3#')
-        REDIS_PORT=$(echo "$REDIS_URL" | sed -E 's#.*:([0-9]+)/?.*#\1#')
-
-        echo "  Parsed: ${REDIS_HOST}:${REDIS_PORT}"
-
-        # Create dedicated session config file
-        cat > /usr/local/etc/php/conf.d/99-session-redis.ini <<EOF
-session.save_handler = redis
-session.save_path = tcp://${REDIS_HOST}:${REDIS_PORT}
+# Configure PHP sessions - Use files instead of Redis for now
+# TODO: Debug Redis connectivity issues (messenger workers timing out)
+echo "Configuring PHP sessions to use files (Redis connectivity issues)..."
+cat > /usr/local/etc/php/conf.d/99-session.ini <<EOF
+session.save_handler = files
+session.save_path = /var/www/html/var/sessions
 EOF
+echo "  ✓ File-based sessions configured"
 
-        echo "  ✓ Redis session configured"
-        echo "  Config written to: /usr/local/etc/php/conf.d/99-session-redis.ini"
-        cat /usr/local/etc/php/conf.d/99-session-redis.ini
-    else
-        echo "  ✗ Redis extension not loaded, sessions will use files"
-        echo "  Available PHP modules:"
-        php -m | head -20
-    fi
-else
-    echo "Warning: REDIS_URL not set, sessions will use files"
-fi
+# Ensure session directory exists with proper permissions
+mkdir -p /var/www/html/var/sessions
+chown -R www-data:www-data /var/www/html/var/sessions
+chmod -R 770 /var/www/html/var/sessions
 
 # Wait for database to be ready
 echo "Waiting for database connection..."
