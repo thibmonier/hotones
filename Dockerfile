@@ -114,5 +114,6 @@ RUN echo '<?php http_response_code(200); echo "OK";' > /var/www/html/public/heal
 # Expose port (Render uses PORT environment variable)
 EXPOSE 8080
 
-# Use Supervisor as entrypoint (runs Nginx + PHP-FPM)
+# Reset base image entrypoint and use our startup script
+ENTRYPOINT []
 CMD ["/usr/local/bin/start-render.sh"]
