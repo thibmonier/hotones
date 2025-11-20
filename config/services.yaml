@@ -23,6 +23,9 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # Doctrine Migrations DependencyFactory alias for autowiring
+    Doctrine\Migrations\DependencyFactory: '@doctrine.migrations.dependency_factory'
+
     # AI Assistant Configuration
     App\Service\Planning\AI\PlanningAIAssistant:
         arguments:
