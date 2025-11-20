@@ -18,6 +18,21 @@ PORT=${PORT:-8080}
 echo "Configuring Nginx to listen on port $PORT..."
 sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/conf.d/default.conf
 
+# Configure PHP sessions to use Redis from REDIS_URL environment variable
+if [ -n "$REDIS_URL" ]; then
+    echo "Configuring PHP sessions to use Redis..."
+    # Parse REDIS_URL (format: redis://hostname:port or redis://user:pass@hostname:port)
+    REDIS_HOST=$(echo "$REDIS_URL" | sed -E 's#redis://([^:@]+:)?([^@]+@)?([^:]+):.*#\3#')
+    REDIS_PORT=$(echo "$REDIS_URL" | sed -E 's#.*:([0-9]+)/?.*#\1#')
+
+    # Add session configuration to PHP
+    echo "session.save_handler=redis" >> /usr/local/etc/php/conf.d/php.ini
+    echo "session.save_path=\"tcp://${REDIS_HOST}:${REDIS_PORT}\"" >> /usr/local/etc/php/conf.d/php.ini
+    echo "  Redis session configured: ${REDIS_HOST}:${REDIS_PORT}"
+else
+    echo "Warning: REDIS_URL not set, sessions will use files"
+fi
+
 # Wait for database to be ready
 echo "Waiting for database connection..."
 echo "DATABASE_URL: ${DATABASE_URL:0:30}..." # Show first 30 chars only for security
