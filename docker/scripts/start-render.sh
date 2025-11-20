@@ -1,12 +1,16 @@
 #!/bin/bash
 set -e
 
+# Force production environment for all Symfony console commands
+export APP_ENV=prod
+export APP_DEBUG=0
+
 echo "========================================="
 echo "Starting HotOnes on Render"
 echo "========================================="
 
 # Environment check
-echo "Environment: ${APP_ENV:-prod}"
+echo "Environment: ${APP_ENV}"
 echo "PHP Version: $(php -v | head -n 1)"
 
 # Configure Nginx port from Render's PORT environment variable
