@@ -204,7 +204,10 @@ HELP
     {
         $projectDir = $this->getApplication()->getKernel()->getProjectDir();
 
-        return $projectDir.'/migrations/'.basename($versionString).'.php';
+        // Extract class name from fully qualified class name (e.g., "DoctrineMigrations\Version20251108151552" -> "Version20251108151552")
+        $className = substr(strrchr($versionString, '\\'), 1) ?: $versionString;
+
+        return $projectDir.'/migrations/'.$className.'.php';
     }
 
     private function extractDescription(string $content): ?string
