@@ -9,6 +9,11 @@ echo "========================================="
 echo "Environment: ${APP_ENV:-prod}"
 echo "PHP Version: $(php -v | head -n 1)"
 
+# Configure Nginx port from Render's PORT environment variable
+PORT=${PORT:-8080}
+echo "Configuring Nginx to listen on port $PORT..."
+sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/conf.d/default.conf
+
 # Wait for database to be ready
 echo "Waiting for database connection..."
 max_attempts=30
