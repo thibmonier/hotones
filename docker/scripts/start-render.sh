@@ -116,5 +116,8 @@ echo "Starting services with supervisord..."
 echo "Port: $PORT"
 echo "Working directory: $(pwd)"
 
+# Create supervisor log directory
+mkdir -p /var/log/supervisor
+
 # Make sure supervisord runs in foreground
 exec /usr/bin/supervisord -n -c /etc/supervisord.conf
