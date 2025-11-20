@@ -107,8 +107,7 @@ RUN APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear --no-warmup || true \
 COPY ./docker/scripts/start-render.sh /usr/local/bin/start-render.sh
 RUN chmod +x /usr/local/bin/start-render.sh
 
-# Health check
-COPY ./docker/scripts/healthcheck.php /var/www/html/public/health.php
+# Create simple health check endpoint
 RUN echo '<?php http_response_code(200); echo "OK";' > /var/www/html/public/health
 
 # Expose port (Render uses PORT environment variable)
