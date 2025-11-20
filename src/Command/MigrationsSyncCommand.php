@@ -60,11 +60,6 @@ HELP
         $io->title('Migration Synchronization Tool');
 
         // Get pending migrations
-        $planCalculator = $this->dependencyFactory->getMigrationPlanCalculator();
-        $plan           = $planCalculator->getPlanForVersions(
-            $this->dependencyFactory->getMigrationRepository()->getMigrations()->getItems(),
-        );
-
         $statusCalculator    = $this->dependencyFactory->getMigrationStatusCalculator();
         $executedMigrations  = $statusCalculator->getExecutedMigrations();
         $availableMigrations = $statusCalculator->getAvailableMigrations();
