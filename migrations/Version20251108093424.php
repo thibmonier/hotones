@@ -14,7 +14,13 @@ final class Version20251108093424 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Create messenger_messages table, rename billing_markers index, update employment_periods defaults, add unique index to fact_project_metrics';
+    }
+
+    public function isTransactional(): bool
+    {
+        // DDL statements cause implicit commits in MySQL/MariaDB
+        return false;
     }
 
     public function up(Schema $schema): void
@@ -70,13 +76,28 @@ final class Version20251108093424 extends AbstractMigration
 
         // Create unique index only if it doesn't exist
         $this->addSql(<<<'SQL'
-            CREATE UNIQUE INDEX IF NOT EXISTS unique_fact_metrics ON fact_project_metrics (
-              dim_time_id, dim_project_type_id,
-              dim_project_manager_id, dim_sales_person_id,
-              dim_project_director_id, granularity,
-              project_id, order_id
+            SET @index_exists = (
+                SELECT COUNT(*)
+                FROM information_schema.statistics
+                WHERE table_schema = DATABASE()
+                AND table_name = 'fact_project_metrics'
+                AND index_name = 'unique_fact_metrics'
             )
         SQL);
+        $this->addSql(<<<'SQL'
+            SET @sql = IF(@index_exists > 0,
+                'SELECT "Index unique_fact_metrics already exists" as notice',
+                'CREATE UNIQUE INDEX unique_fact_metrics ON fact_project_metrics (
+                  dim_time_id, dim_project_type_id,
+                  dim_project_manager_id, dim_sales_person_id,
+                  dim_project_director_id, granularity,
+                  project_id, order_id
+                )'
+            )
+        SQL);
+        $this->addSql('PREPARE stmt FROM @sql');
+        $this->addSql('EXECUTE stmt');
+        $this->addSql('DEALLOCATE PREPARE stmt');
     }
 
     public function down(Schema $schema): void
