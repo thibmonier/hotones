@@ -89,11 +89,8 @@ RUN composer install \
     --apcu-autoloader \
     && composer clear-cache
 
-# Generate JWT keys if they don't exist
-RUN mkdir -p config/jwt \
-    && if [ ! -f config/jwt/private.pem ]; then \
-        php bin/console lexik:jwt:generate-keypair --skip-if-exists; \
-    fi
+# Create JWT directory (keys will be generated on first startup)
+RUN mkdir -p config/jwt
 
 # Create necessary directories and set permissions
 RUN mkdir -p var/cache var/log var/sessions \
