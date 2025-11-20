@@ -12,6 +12,7 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 - Entités: docs/entities.md
 - État d'avancement: docs/status.md
 - Installation: docs/installation.md
+- **Déploiement sur Render: docs/deployment-render.md**
 - Tests: docs/tests.md
 - Assets: docs/assets.md
 - URLs: docs/urls.md

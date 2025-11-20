@@ -1,0 +1,114 @@
+# Render Blueprint pour HotOnes
+# Documentation: https://docs.render.com/blueprint-spec
+
+services:
+  # Service web principal (PHP + Nginx)
+  - type: web
+    name: hotones-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile.render
+    region: frankfurt  # Changez selon votre préférence (oregon, frankfurt, singapore)
+    plan: starter  # free, starter, standard, pro
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_SECRET
+        generateValue: true  # Génère un secret aléatoire
+      # DATABASE_URL: Choisir une des options ci-dessous
+      # Option A - PostgreSQL Render (recommandé, voir databases: section en bas)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hotones-db
+          property: connectionString
+      # Option B - MySQL externe (Railway, commentez la section ci-dessus et utilisez sync: false)
+      # - key: DATABASE_URL
+      #   sync: false  # Définir manuellement avec l'URL Railway/autre provider
+      - key: REDIS_URL
+        fromService:
+          name: hotones-redis
+          type: redis
+          property: connectionString
+      - key: MESSENGER_TRANSPORT_DSN
+        fromService:
+          name: hotones-redis
+          type: redis
+          property: connectionString
+      # JWT Configuration
+      - key: JWT_SECRET_KEY
+        value: "%kernel.project_dir%/config/jwt/private.pem"
+      - key: JWT_PUBLIC_KEY
+        value: "%kernel.project_dir%/config/jwt/public.pem"
+      - key: JWT_PASSPHRASE
+        sync: false  # À définir manuellement dans le dashboard
+      # Mailer (exemple avec Mailgun, adaptez selon votre provider)
+      - key: MAILER_DSN
+        sync: false  # À définir manuellement (ex: smtp://user:pass@smtp.example.com:587)
+      # AI APIs (optionnel)
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      # Timezone
+      - key: TZ
+        value: Europe/Paris
+      # Default URI for CLI commands
+      - key: DEFAULT_URI
+        value: https://hotones-app.onrender.com  # Remplacez par votre domaine Render
+    # Persistent disk pour les uploads et fichiers générés
+    disk:
+      name: hotones-storage
+      mountPath: /var/www/html/var
+      sizeGB: 1
+
+  # Service Redis pour cache et message queue
+  - type: redis
+    name: hotones-redis
+    plan: starter  # free ou starter
+    region: frankfurt
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []  # Vide = accessible uniquement par vos services Render
+
+# ===============================================
+# BASE DE DONNÉES - Choisir une option
+# ===============================================
+#
+# Option A: PostgreSQL Render (Recommandé) ⭐
+# - Plan free (90 jours) puis starter ($7/mois)
+# - Intégré à votre infrastructure
+# - Nécessite migration MySQL → PostgreSQL (facile, voir docs)
+# - Guide: docs/deployment-render-postgres.md
+#
+databases:
+  - name: hotones-db
+    databaseName: hotones
+    region: frankfurt
+    plan: starter  # free (90j) ou starter ($7/mois)
+    # PostgreSQL 15+ par défaut
+
+# ===============================================
+# Option B: MySQL externe (Railway, Supabase, etc.)
+# ===============================================
+#
+# Si vous préférez MySQL sans migration de code:
+# 1. Commentez la section databases: ci-dessus
+# 2. Décommentez la ligne DATABASE_URL sync: false dans envVars (ligne ~23)
+# 3. Créez une DB MySQL sur:
+#    - Railway: https://railway.app ($5 crédit gratuit/mois)
+#      Guide: docs/deployment-railway-mysql.md
+#    - DigitalOcean: https://cloud.digitalocean.com ($15/mois)
+# 4. Ajoutez l'URL MySQL manuellement dans Render dashboard
+#
+# ===============================================
+# Comparaison des options
+# ===============================================
+#
+# | Solution            | Type       | Gratuit          | Payant   |
+# |---------------------|------------|------------------|----------|
+# | PostgreSQL Render   | PostgreSQL | 90j              | $7/mois  |
+# | Supabase            | PostgreSQL | ✅ Permanent     | $25/mois |
+# | Railway             | MySQL      | $5 crédit/mois   | ~$10/mois|
+# | DigitalOcean        | MySQL/PG   | ❌               | $15/mois |
+#
+# Documentation complète: docs/deployment-render.md

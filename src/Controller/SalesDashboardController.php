@@ -124,8 +124,16 @@ class SalesDashboardController extends AbstractController
      */
     private function getAvailableYears(EntityManagerInterface $em): array
     {
-        $conn   = $em->getConnection();
-        $sql    = 'SELECT DISTINCT YEAR(created_at) as year FROM orders ORDER BY year DESC';
+        $conn = $em->getConnection();
+
+        // Support both MySQL and PostgreSQL
+        $platform    = $conn->getDatabasePlatform()->getName();
+        $yearExtract = match ($platform) {
+            'postgresql' => 'EXTRACT(YEAR FROM created_at)',
+            default      => 'YEAR(created_at)', // MySQL/MariaDB
+        };
+
+        $sql    = "SELECT DISTINCT {$yearExtract} as year FROM orders ORDER BY year DESC";
         $result = $conn->executeQuery($sql)->fetchAllAssociative();
 
         $years = array_map(fn ($row) => (int) $row['year'], $result);

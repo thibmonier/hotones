@@ -275,7 +275,7 @@ class TimesheetRepository extends ServiceEntityRepository
     public function getMonthlyHoursForProject(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
     {
         $qb = $this->createQueryBuilder('t')
-            ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours) as totalHours')
+            ->select('EXTRACT(YEAR FROM t.date) as year, EXTRACT(MONTH FROM t.date) as month, SUM(t.hours) as totalHours')
             ->where('t.project = :project')
             ->setParameter('project', $project)
             ->groupBy('year, month')
@@ -298,7 +298,7 @@ class TimesheetRepository extends ServiceEntityRepository
     public function getMonthlyRevenueForProjectUsingContributorTjm(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
     {
         $qb = $this->createQueryBuilder('t')
-            ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours * (c.tjm/8)) as revenue')
+            ->select('EXTRACT(YEAR FROM t.date) as year, EXTRACT(MONTH FROM t.date) as month, SUM(t.hours * (c.tjm/8)) as revenue')
             ->join('t.contributor', 'c')
             ->where('t.project = :project')
             ->setParameter('project', $project)

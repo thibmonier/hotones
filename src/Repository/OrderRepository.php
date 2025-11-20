@@ -275,16 +275,23 @@ class OrderRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        $sql = '
-            SELECT 
-                DATE_FORMAT(validated_at, "%Y-%m") as month, 
+        // Support both MySQL and PostgreSQL
+        $platform   = $conn->getDatabasePlatform()->getName();
+        $dateFormat = match ($platform) {
+            'postgresql' => "TO_CHAR(validated_at, 'YYYY-MM')",
+            default      => "DATE_FORMAT(validated_at, '%Y-%m')", // MySQL/MariaDB
+        };
+
+        $sql = "
+            SELECT
+                {$dateFormat} as month,
                 SUM(total_amount) as total
             FROM orders
             WHERE status IN (:statuses)
             AND validated_at BETWEEN :start AND :end
             GROUP BY month
             ORDER BY month ASC
-        ';
+        ";
 
         $results = $conn->executeQuery(
             $sql,
