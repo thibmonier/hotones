@@ -59,15 +59,26 @@ HELP
 
         $io->title('Migration Synchronization Tool');
 
-        // Get pending migrations
-        $statusCalculator    = $this->dependencyFactory->getMigrationStatusCalculator();
-        $executedMigrations  = $statusCalculator->getExecutedMigrations();
-        $availableMigrations = $statusCalculator->getAvailableMigrations();
+        // Get all available migrations
+        $migrationRepository = $this->dependencyFactory->getMigrationRepository();
+        $availableMigrations = $migrationRepository->getMigrations();
 
-        $pendingMigrations = array_diff(
-            array_map(fn ($v) => (string) $v, $availableMigrations->getItems()),
-            array_map(fn ($v) => (string) $v, $executedMigrations->getItems()),
+        // Get executed migrations from metadata storage
+        $metadataStorage  = $this->dependencyFactory->getMetadataStorage();
+        $executedVersions = $metadataStorage->getExecutedMigrations();
+
+        // Calculate pending migrations
+        $executedVersionStrings = array_map(
+            fn ($executionResult) => (string) $executionResult->getVersion(),
+            iterator_to_array($executedVersions),
         );
+
+        $availableVersionStrings = array_map(
+            fn ($version) => (string) $version->getVersion(),
+            $availableMigrations->getItems(),
+        );
+
+        $pendingMigrations = array_diff($availableVersionStrings, $executedVersionStrings);
 
         if (empty($pendingMigrations)) {
             $io->success('No pending migrations found. Database is up to date!');
