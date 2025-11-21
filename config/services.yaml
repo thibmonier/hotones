@@ -31,3 +31,8 @@ services:
         arguments:
             $openaiApiKey: '%env(OPENAI_API_KEY)%'
             $anthropicApiKey: '%env(ANTHROPIC_API_KEY)%'
+
+    # Migrations Sync Command
+    App\Command\MigrationsSyncCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'

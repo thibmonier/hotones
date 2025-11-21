@@ -25,7 +25,8 @@ class MigrationsSyncCommand extends Command
 {
     public function __construct(
         private readonly DependencyFactory $dependencyFactory,
-        private readonly Connection $connection
+        private readonly Connection $connection,
+        private readonly string $projectDir
     ) {
         parent::__construct();
     }
@@ -215,12 +216,10 @@ HELP
 
     private function getMigrationPath(string $versionString): string
     {
-        $projectDir = $this->getApplication()->getKernel()->getProjectDir();
-
         // Extract class name from fully qualified class name (e.g., "DoctrineMigrations\Version20251108151552" -> "Version20251108151552")
         $className = substr(strrchr($versionString, '\\'), 1) ?: $versionString;
 
-        return $projectDir.'/migrations/'.$className.'.php';
+        return $this->projectDir.'/migrations/'.$className.'.php';
     }
 
     private function extractDescription(string $content): ?string
