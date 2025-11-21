@@ -39,9 +39,9 @@ class ProjectCreationE2ETest extends PantherTestCase
 
         // Minimal form submission: only name (others optional)
         $form = $crawler->filter('form')->form([
-            'name'         => 'E2E Demo Project',
-            'status'       => 'active',
-            'project_type' => 'forfait',
+            'project[name]'        => 'E2E Demo Project',
+            'project[status]'      => 'active',
+            'project[projectType]' => 'forfait',
         ]);
         $client->submit($form);
 

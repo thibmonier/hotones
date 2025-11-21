@@ -35,15 +35,20 @@ class LoginAndNavigationE2ETest extends PantherTestCase
 
         // Wait for navigation after login (either to / or to 2FA page)
         $client->waitFor('body');
-        sleep(2); // Give time for any redirects to complete
+        sleep(1); // Give time for any redirects to complete
 
         $currentPath = parse_url($client->getCurrentURL(), PHP_URL_PATH);
 
-        // After successful login, should be on homepage (/)
-        // If 2FA is enabled, user would be on /2fa instead
-        $this->assertStringEndsWith('/', $currentPath,
-            sprintf('Expected to be on homepage (/), but currently on: %s', $currentPath),
+        // After successful login, should be on homepage (/) or 2FA page
+        // Check that we're not still on /login (which would indicate failed auth)
+        $this->assertStringNotContainsString('/login', $currentPath,
+            sprintf('Should not be redirected back to login page, currently on: %s', $currentPath),
         );
+
+        // If not on 2FA, verify we can see homepage content
+        if (!str_contains($currentPath, '/2fa')) {
+            $client->waitFor('.page-title-box, .card, h4');
+        }
     }
 
     public function testNavigateToProjectsIndex(): void
@@ -62,11 +67,12 @@ class LoginAndNavigationE2ETest extends PantherTestCase
             '_password' => 'password',
         ]);
         $client->submit($form);
-        $client->waitForElementToContain('h4', '');
+        $client->waitFor('body');
+        sleep(1); // Wait for login redirect
 
         // Go to projects index
         $client->request('GET', '/projects');
-        $client->waitFor('h4');
-        $this->assertSelectorTextContains('h4', 'Projets');
+        $client->waitFor('.page-title-box, h4, .card');
+        $this->assertSelectorTextContains('.page-title-box, h1, h2, h4', 'Projets');
     }
 }
