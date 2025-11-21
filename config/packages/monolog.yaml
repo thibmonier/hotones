@@ -59,4 +59,7 @@ when@prod:
                 type: stream
                 channels: [deprecation]
                 path: php://stderr
+                # Only log warning and error level deprecations to reduce noise
+                # The Doctrine Proxy Autoloader deprecation is INFO level and harmless
+                level: warning
                 formatter: monolog.formatter.json

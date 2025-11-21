@@ -41,8 +41,9 @@ when@test:
 when@prod:
     doctrine:
         orm:
+            # With lazy ghost objects enabled, proxy classes are not used
+            # The deprecation warning from DoctrineBundle is harmless and will be fixed in future bundle versions
             auto_generate_proxy_classes: false
-            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool
