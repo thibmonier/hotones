@@ -377,6 +377,79 @@ class OrderController extends AbstractController
         return $this->redirectToRoute('order_sections', ['id' => $orderId]);
     }
 
+    #[Route('/{orderId}/section/{sectionId}/line/{lineId}/edit', name: 'order_edit_line', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function editLine(Request $request, int $orderId, int $sectionId, int $lineId, EntityManagerInterface $em): Response
+    {
+        $order   = $em->getRepository(Order::class)->find($orderId);
+        $section = $em->getRepository(OrderSection::class)->find($sectionId);
+        $line    = $em->getRepository(OrderLine::class)->find($lineId);
+
+        if (!$order || !$section || !$line || $section->getOrder() !== $order || $line->getSection() !== $section) {
+            throw $this->createNotFoundException();
+        }
+
+        $line->setDescription($request->request->get('line_description'));
+
+        if ($profileId = $request->request->get('profile_id')) {
+            $profile = $em->getRepository(Profile::class)->find($profileId);
+            if ($profile) {
+                $line->setProfile($profile);
+            }
+        } else {
+            $line->setProfile(null);
+        }
+
+        $tjm = $request->request->get('tjm');
+        $line->setTjm($tjm !== '' ? (string) $tjm : null);
+
+        $days = $request->request->get('days');
+        $line->setDays($days !== '' ? (string) $days : '0');
+
+        $purchaseAmount = $request->request->get('purchase_amount');
+        $line->setPurchaseAmount($purchaseAmount !== '' ? (string) $purchaseAmount : null);
+
+        // Recalculer le total du devis
+        $this->updateOrderTotals($order, $em);
+
+        $em->flush();
+
+        $this->addFlash('success', 'Ligne modifiée avec succès');
+
+        return $this->redirectToRoute('order_sections', ['id' => $orderId]);
+    }
+
+    #[Route('/{orderId}/section/{sectionId}/line/{lineId}/delete', name: 'order_delete_line', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function deleteLine(Request $request, int $orderId, int $sectionId, int $lineId, EntityManagerInterface $em): Response
+    {
+        $order   = $em->getRepository(Order::class)->find($orderId);
+        $section = $em->getRepository(OrderSection::class)->find($sectionId);
+        $line    = $em->getRepository(OrderLine::class)->find($lineId);
+
+        if (!$order || !$section || !$line || $section->getOrder() !== $order || $line->getSection() !== $section) {
+            throw $this->createNotFoundException();
+        }
+
+        // Vérifier le token CSRF
+        if (!$this->isCsrfTokenValid('delete_line_'.$lineId, $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide');
+
+            return $this->redirectToRoute('order_sections', ['id' => $orderId]);
+        }
+
+        $em->remove($line);
+
+        // Recalculer le total du devis
+        $this->updateOrderTotals($order, $em);
+
+        $em->flush();
+
+        $this->addFlash('success', 'Ligne supprimée avec succès');
+
+        return $this->redirectToRoute('order_sections', ['id' => $orderId]);
+    }
+
     #[Route('/{id}/duplicate', name: 'order_duplicate', methods: ['POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function duplicate(Order $originalOrder, EntityManagerInterface $em): Response

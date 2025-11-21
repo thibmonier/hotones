@@ -50,7 +50,7 @@
                                     </thead>
                                     <tbody>
                                         {% for line in section.lines %}
-                                            <tr>
+                                            <tr class="line-row" data-line-id="{{ line.id }}">
                                                 <td>{{ line.description }}</td>
                                                 <td>
                                                     {% if line.profile %}
@@ -79,13 +79,68 @@
                                                 </td>
                                                 <td>
                                                     <div class="btn-group btn-group-sm">
-                                                        <button class="btn btn-outline-primary btn-sm" title="Modifier">
+                                                        <button class="btn btn-outline-primary btn-sm btn-edit-line"
+                                                                data-line-id="{{ line.id }}"
+                                                                data-section-id="{{ section.id }}"
+                                                                title="Modifier">
                                                             <i class="bx bx-edit"></i>
                                                         </button>
-                                                        <button class="btn btn-outline-danger btn-sm" title="Supprimer">
-                                                            <i class="bx bx-trash"></i>
-                                                        </button>
+                                                        <form method="POST"
+                                                              action="{{ path('order_delete_line', {'orderId': order.id, 'sectionId': section.id, 'lineId': line.id}) }}"
+                                                              style="display: inline;"
+                                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette ligne ?');">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_line_' ~ line.id) }}">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                                                <i class="bx bx-trash"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="edit-form-row d-none" data-line-id="{{ line.id }}">
+                                                <td colspan="8">
+                                                    <form method="POST" action="{{ path('order_edit_line', {'orderId': order.id, 'sectionId': section.id, 'lineId': line.id}) }}" class="bg-light p-3 rounded">
+                                                        <div class="row g-2">
+                                                            <div class="col-12">
+                                                                <label class="form-label small">Description</label>
+                                                                <textarea class="form-control form-control-sm" name="line_description" rows="2" required>{{ line.description }}</textarea>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label small">Profil</label>
+                                                                <select class="form-select form-select-sm" name="profile_id">
+                                                                    <option value="">Aucun profil</option>
+                                                                    {% for profile in profiles %}
+                                                                        <option value="{{ profile.id }}"
+                                                                                data-default-rate="{{ profile.defaultDailyRate }}"
+                                                                                {% if line.profile and line.profile.id == profile.id %}selected{% endif %}>
+                                                                            {{ profile.name }}
+                                                                            {% if profile.defaultDailyRate %} - {{ profile.defaultDailyRate|number_format(0, ',', ' ') }}€/j{% endif %}
+                                                                        </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="form-label small">TJM (€)</label>
+                                                                <input type="number" class="form-control form-control-sm" name="tjm" min="0" step="10" value="{{ line.tjm }}">
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="form-label small">Jours</label>
+                                                                <input type="number" class="form-control form-control-sm" name="days" min="0" step="0.5" value="{{ line.days }}">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="form-label small">Achats (€)</label>
+                                                                <input type="number" class="form-control form-control-sm" name="purchase_amount" min="0" step="0.01" value="{{ line.purchaseAmount }}">
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <button type="submit" class="btn btn-success btn-sm me-2">
+                                                                    <i class="bx bx-check"></i> Enregistrer
+                                                                </button>
+                                                                <button type="button" class="btn btn-secondary btn-sm btn-cancel-edit" data-line-id="{{ line.id }}">
+                                                                    <i class="bx bx-x"></i> Annuler
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         {% endfor %}
@@ -305,6 +360,31 @@
                 tjmInput?.addEventListener('input', updateTotal);
                 daysInput?.addEventListener('input', updateTotal);
                 purchaseInput?.addEventListener('input', updateTotal);
+            });
+
+            // Gestion de l'édition en ligne
+            document.querySelectorAll('.btn-edit-line').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const lineId = this.dataset.lineId;
+                    const lineRow = document.querySelector('.line-row[data-line-id="' + lineId + '"]');
+                    const editRow = document.querySelector('.edit-form-row[data-line-id="' + lineId + '"]');
+
+                    // Masquer la ligne normale et afficher le formulaire d'édition
+                    lineRow.classList.add('d-none');
+                    editRow.classList.remove('d-none');
+                });
+            });
+
+            document.querySelectorAll('.btn-cancel-edit').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const lineId = this.dataset.lineId;
+                    const lineRow = document.querySelector('.line-row[data-line-id="' + lineId + '"]');
+                    const editRow = document.querySelector('.edit-form-row[data-line-id="' + lineId + '"]');
+
+                    // Afficher la ligne normale et masquer le formulaire d'édition
+                    lineRow.classList.remove('d-none');
+                    editRow.classList.add('d-none');
+                });
             });
         });
     </script>
