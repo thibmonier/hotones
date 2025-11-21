@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Metadata\ExecutedMigration;
+use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -106,8 +108,12 @@ HELP
                 if ($dryRun) {
                     $io->writeln("Would mark: {$versionString}");
                 } else {
-                    $executedMigration = new ExecutedMigration($version);
-                    $metadataStorage->complete($executedMigration);
+                    $executionResult = new ExecutionResult(
+                        version: $version,
+                        direction: Direction::UP,
+                        executedAt: new DateTimeImmutable(),
+                    );
+                    $metadataStorage->complete($executionResult);
                     $io->writeln("<info>✓</info> Marked as executed: {$versionString}");
                 }
                 ++$marked;
@@ -191,9 +197,13 @@ HELP
         $metadataStorage = $this->dependencyFactory->getMetadataStorage();
 
         foreach ($toMark as $versionString) {
-            $version           = new Version($versionString);
-            $executedMigration = new ExecutedMigration($version);
-            $metadataStorage->complete($executedMigration);
+            $version         = new Version($versionString);
+            $executionResult = new ExecutionResult(
+                version: $version,
+                direction: Direction::UP,
+                executedAt: new DateTimeImmutable(),
+            );
+            $metadataStorage->complete($executionResult);
             $io->writeln("<info>✓</info> Marked: {$versionString}");
         }
 
