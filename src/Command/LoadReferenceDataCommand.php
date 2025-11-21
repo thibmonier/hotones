@@ -8,7 +8,6 @@ use App\Entity\Profile;
 use App\Entity\Technology;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,19 +20,53 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class LoadReferenceDataCommand extends Command
 {
-    private const PROFILES_FILE     = 'docs/profiles.md';
-    private const TECHNOLOGIES_FILE = 'docs/technologies.md';
+    // Données de référence embarquées (source: docs/profiles.md et docs/technologies.md)
+    private const array PROFILES = [
+        'développeur fullstack',
+        'développeur frontend',
+        'développeur backend',
+        'Lead developer',
+        'chef de projet',
+        'product owner',
+        'scrumm master',
+        'directeur de projet',
+        'consultant',
+        'CTO',
+        'expert technique',
+        'Key account manager',
+        'UX designer',
+        'UI designer',
+        'Directeur artistique',
+    ];
+
+    private const array TECHNOLOGIES = [
+        ['name' => 'Php', 'category' => 'langage'],
+        ['name' => 'Symfony', 'category' => 'framework'],
+        ['name' => 'Laravel', 'category' => 'framework'],
+        ['name' => 'Java', 'category' => 'langage'],
+        ['name' => 'React', 'category' => 'framework'],
+        ['name' => 'VueJS', 'category' => 'framework'],
+        ['name' => 'Angular', 'category' => 'framework'],
+        ['name' => 'NextJS', 'category' => 'framework'],
+        ['name' => 'NuxtJS', 'category' => 'framework'],
+        ['name' => 'MariaDB', 'category' => 'Base de données relationnelle'],
+        ['name' => 'MongoDB', 'category' => 'Base de données noSQL'],
+        ['name' => 'ElasticSearch', 'category' => 'Moteur de recherche'],
+        ['name' => 'Algolia', 'category' => 'Moteur de recherche'],
+        ['name' => 'Javascript', 'category' => 'langage'],
+        ['name' => 'Drupal', 'category' => 'CMS'],
+        ['name' => 'Wordpress', 'category' => 'CMS'],
+        ['name' => 'Ibexa', 'category' => 'CMS'],
+        ['name' => 'APIPlatform', 'category' => 'framework'],
+        ['name' => 'Bootstrap', 'category' => 'framework'],
+        ['name' => 'Tailwind', 'category' => 'framework'],
+    ];
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        ?string $projectDir = null
+        private readonly EntityManagerInterface $entityManager
     ) {
         parent::__construct();
-        // If not provided, use the default project directory
-        $this->projectDir = $projectDir ?? dirname(__DIR__, 2);
     }
-
-    private string $projectDir;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -66,14 +99,6 @@ class LoadReferenceDataCommand extends Command
     {
         $io->section('Chargement des profils métier');
 
-        $filePath = $this->projectDir.'/'.self::PROFILES_FILE;
-        if (!file_exists($filePath)) {
-            throw new RuntimeException("Fichier des profils introuvable : $filePath");
-        }
-
-        $content = file_get_contents($filePath);
-        $lines   = explode("\n", $content);
-
         $profilesDescriptions = [
             'développeur fullstack' => 'Développeur maîtrisant frontend et backend',
             'développeur frontend'  => 'Spécialisé en interfaces utilisateur (React, Vue, Angular)',
@@ -95,17 +120,7 @@ class LoadReferenceDataCommand extends Command
         $profiles = [];
         $repo     = $this->entityManager->getRepository(Profile::class);
 
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (empty($line) || !str_starts_with($line, '- ')) {
-                continue;
-            }
-
-            $profileName = trim(substr($line, 2));
-            if (empty($profileName)) {
-                continue;
-            }
-
+        foreach (self::PROFILES as $profileName) {
             $profile = $repo->findOneBy(['name' => $profileName]);
             if (!$profile) {
                 $profile = new Profile();
@@ -131,14 +146,6 @@ class LoadReferenceDataCommand extends Command
     private function loadTechnologies(SymfonyStyle $io): array
     {
         $io->section('Chargement des technologies');
-
-        $filePath = $this->projectDir.'/'.self::TECHNOLOGIES_FILE;
-        if (!file_exists($filePath)) {
-            throw new RuntimeException("Fichier des technologies introuvable : $filePath");
-        }
-
-        $content = file_get_contents($filePath);
-        $lines   = explode("\n", $content);
 
         // Mapping des couleurs par technologie
         $colorsMap = [
@@ -167,23 +174,9 @@ class LoadReferenceDataCommand extends Command
         $technologies = [];
         $repo         = $this->entityManager->getRepository(Technology::class);
 
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (empty($line) || !str_starts_with($line, '- ')) {
-                continue;
-            }
-
-            // Format: "- TechName (type)"
-            if (!preg_match('/^- (.+?) \((.+?)\)$/', $line, $matches)) {
-                continue;
-            }
-
-            $techName = trim($matches[1]);
-            $techType = trim($matches[2]);
-
-            if (empty($techName)) {
-                continue;
-            }
+        foreach (self::TECHNOLOGIES as $techData) {
+            $techName = $techData['name'];
+            $techType = $techData['category'];
 
             $technology = $repo->findOneBy(['name' => $techName]);
             if (!$technology) {
