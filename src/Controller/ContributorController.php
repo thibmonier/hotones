@@ -9,6 +9,8 @@ use App\Form\ContributorType;
 use App\Repository\ContributorRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -159,19 +161,23 @@ class ContributorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle avatar upload
-            /** @var UploadedFile $avatarFile */
-            $avatarFile = $form->get('avatarFile')->getData();
-            if ($avatarFile) {
-                $contributor->setAvatarFilename($this->handleAvatarUpload($avatarFile));
+            try {
+                // Handle avatar upload
+                /** @var UploadedFile $avatarFile */
+                $avatarFile = $form->get('avatarFile')->getData();
+                if ($avatarFile) {
+                    $contributor->setAvatarFilename($this->handleAvatarUpload($avatarFile));
+                }
+
+                $this->entityManager->persist($contributor);
+                $this->entityManager->flush();
+
+                $this->addFlash('success', 'Le contributeur a été créé avec succès.');
+
+                return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
+            } catch (RuntimeException $e) {
+                $this->addFlash('error', $e->getMessage());
             }
-
-            $this->entityManager->persist($contributor);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Le contributeur a été créé avec succès.');
-
-            return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
         }
 
         return $this->render('contributor/new.html.twig', [
@@ -196,18 +202,22 @@ class ContributorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle avatar upload
-            /** @var UploadedFile $avatarFile */
-            $avatarFile = $form->get('avatarFile')->getData();
-            if ($avatarFile) {
-                $contributor->setAvatarFilename($this->handleAvatarUpload($avatarFile));
+            try {
+                // Handle avatar upload
+                /** @var UploadedFile $avatarFile */
+                $avatarFile = $form->get('avatarFile')->getData();
+                if ($avatarFile) {
+                    $contributor->setAvatarFilename($this->handleAvatarUpload($avatarFile));
+                }
+
+                $this->entityManager->flush();
+
+                $this->addFlash('success', 'Le contributeur a été modifié avec succès.');
+
+                return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
+            } catch (RuntimeException $e) {
+                $this->addFlash('error', $e->getMessage());
             }
-
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Le contributeur a été modifié avec succès.');
-
-            return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
         }
 
         return $this->render('contributor/edit.html.twig', [
@@ -269,20 +279,45 @@ class ContributorController extends AbstractController
 
     private function handleAvatarUpload(UploadedFile $file): string
     {
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename     = $this->slugger->slug($originalFilename);
-        $newFilename      = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+        try {
+            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename     = $this->slugger->slug($originalFilename);
+            $newFilename      = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
-        $uploadDirectory = $this->getParameter('avatars_directory');
+            $uploadDirectory = $this->getParameter('avatars_directory');
 
-        // Créer le répertoire s'il n'existe pas
-        if (!is_dir($uploadDirectory)) {
-            mkdir($uploadDirectory, 0777, true);
+            // Vérifier que le paramètre est défini
+            if (!$uploadDirectory || !is_string($uploadDirectory)) {
+                throw new RuntimeException('Le paramètre avatars_directory n\'est pas défini ou invalide');
+            }
+
+            // Créer le répertoire s'il n'existe pas
+            if (!is_dir($uploadDirectory)) {
+                if (!mkdir($uploadDirectory, 0777, true) && !is_dir($uploadDirectory)) {
+                    throw new RuntimeException(sprintf('Impossible de créer le répertoire: %s', $uploadDirectory));
+                }
+            }
+
+            // Vérifier que le répertoire est accessible en écriture
+            if (!is_writable($uploadDirectory)) {
+                throw new RuntimeException(sprintf('Le répertoire n\'est pas accessible en écriture: %s', $uploadDirectory));
+            }
+
+            // Déplacer le fichier
+            $file->move($uploadDirectory, $newFilename);
+
+            return $newFilename;
+        } catch (Exception $e) {
+            // Logger l'erreur pour debugging
+            error_log(sprintf(
+                'Avatar upload error: %s (directory: %s, original: %s)',
+                $e->getMessage(),
+                $uploadDirectory ?? 'undefined',
+                $file->getClientOriginalName(),
+            ));
+
+            throw new RuntimeException(sprintf('Erreur lors de l\'upload de l\'avatar: %s', $e->getMessage()), 0, $e);
         }
-
-        $file->move($uploadDirectory, $newFilename);
-
-        return $newFilename;
     }
 
     #[Route('/export.csv', name: 'contributor_export_csv', methods: ['GET'])]
