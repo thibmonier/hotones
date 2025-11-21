@@ -273,10 +273,14 @@ class ContributorController extends AbstractController
         $safeFilename     = $this->slugger->slug($originalFilename);
         $newFilename      = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
-        $file->move(
-            $this->getParameter('avatars_directory'),
-            $newFilename,
-        );
+        $uploadDirectory = $this->getParameter('avatars_directory');
+
+        // Créer le répertoire s'il n'existe pas
+        if (!is_dir($uploadDirectory)) {
+            mkdir($uploadDirectory, 0777, true);
+        }
+
+        $file->move($uploadDirectory, $newFilename);
 
         return $newFilename;
     }
