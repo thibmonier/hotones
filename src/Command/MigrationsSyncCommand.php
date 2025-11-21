@@ -6,6 +6,7 @@ namespace App\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -105,7 +106,8 @@ HELP
                 if ($dryRun) {
                     $io->writeln("Would mark: {$versionString}");
                 } else {
-                    $metadataStorage->complete($this->dependencyFactory->getVersionExecutionResult($version, 0));
+                    $executedMigration = new ExecutedMigration($version);
+                    $metadataStorage->complete($executedMigration);
                     $io->writeln("<info>✓</info> Marked as executed: {$versionString}");
                 }
                 ++$marked;
@@ -189,8 +191,9 @@ HELP
         $metadataStorage = $this->dependencyFactory->getMetadataStorage();
 
         foreach ($toMark as $versionString) {
-            $version = new Version($versionString);
-            $metadataStorage->complete($this->dependencyFactory->getVersionExecutionResult($version, 0));
+            $version           = new Version($versionString);
+            $executedMigration = new ExecutedMigration($version);
+            $metadataStorage->complete($executedMigration);
             $io->writeln("<info>✓</info> Marked: {$versionString}");
         }
 
