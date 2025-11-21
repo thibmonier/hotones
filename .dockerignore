@@ -7,8 +7,6 @@
 # Documentation
 *.md
 docs/
-!docs/profiles.md
-!docs/technologies.md
 WARP.md
 AGENTS.md
 CLAUDE.md
