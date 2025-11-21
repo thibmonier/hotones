@@ -98,9 +98,9 @@ class SecurityHeadersTest extends WebTestCase
             'projects'     => ['/projects'],
             'contributors' => ['/contributors'],
             'orders'       => ['/orders'],
-            'timesheets'   => ['/timesheets'],
-            'planning'     => ['/planning'],
-            'analytics'    => ['/analytics/dashboard'],
+            // timesheets route doesn't exist at root level (only /contributors/{id}/timesheets)
+            'planning'  => ['/planning'],
+            'analytics' => ['/analytics/dashboard'],
         ];
     }
 }
