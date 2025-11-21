@@ -29,8 +29,10 @@ class OrderType extends AbstractType
                 'class'        => Project::class,
                 'choice_label' => 'name',
                 'label'        => 'Projet associé',
-                'required'     => true,
+                'required'     => false,
+                'placeholder'  => '-- Aucun projet --',
                 'attr'         => ['class' => 'form-control'],
+                'help'         => 'Le projet peut être associé ultérieurement',
             ])
             ->add('description', TextareaType::class, [
                 'label'    => 'Description',

@@ -246,9 +246,13 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ path('project_show', {'id': order.project.id}) }}" class="text-primary">
-                                            {{ order.project.name }}
-                                        </a>
+                                        {% if order.project %}
+                                            <a href="{{ path('project_show', {'id': order.project.id}) }}" class="text-primary">
+                                                {{ order.project.name }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted"><em>Aucun projet</em></span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <form method="post" action="{{ path('order_update_status', {'id': order.id}) }}">

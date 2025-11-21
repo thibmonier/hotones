@@ -87,7 +87,7 @@ class Order
 
     // Relations
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Project $project = null;
     // Montant total HT du devis
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
