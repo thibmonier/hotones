@@ -151,7 +151,13 @@
         "test-functional": "phpunit --testsuite functional",
         "test-integration": "phpunit --testsuite integration",
         "test-api": "phpunit --testsuite api",
-        "test-e2e": "phpunit --testsuite e2e"
+        "test-security": "phpunit --testsuite security",
+        "test-e2e": "phpunit --testsuite e2e",
+        "security-check": "composer audit",
+        "security-test": [
+            "@security-check",
+            "@test-security"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"
