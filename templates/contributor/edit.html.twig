@@ -2,6 +2,11 @@
 
 {% block title %}Modifier contributeur{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-12">
@@ -144,40 +149,53 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/select2/js/i18n/fr.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2 for profiles
+            $('.select2-multiple').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                allowClear: false,
+                language: 'fr'
+            });
+
             const cjmInput = document.getElementById('cjm');
             const tjmInput = document.getElementById('tjm');
             const marginPreview = document.getElementById('margin-preview');
             const marginCalculation = document.getElementById('margin-calculation');
 
-            function updateMarginPreview() {
-                const cjm = parseFloat(cjmInput.value) || 0;
-                const tjm = parseFloat(tjmInput.value) || 0;
+            if (cjmInput && tjmInput && marginPreview && marginCalculation) {
+                function updateMarginPreview() {
+                    const cjm = parseFloat(cjmInput.value) || 0;
+                    const tjm = parseFloat(tjmInput.value) || 0;
 
-                if (cjm > 0 && tjm > 0) {
-                    const margin = tjm - cjm;
-                    const marginRate = (margin / tjm * 100).toFixed(1);
+                    if (cjm > 0 && tjm > 0) {
+                        const margin = tjm - cjm;
+                        const marginRate = (margin / tjm * 100).toFixed(1);
 
-                    let colorClass = 'text-success';
-                    if (marginRate < 10) colorClass = 'text-danger';
-                    else if (marginRate < 20) colorClass = 'text-warning';
+                        let colorClass = 'text-success';
+                        if (marginRate < 10) colorClass = 'text-danger';
+                        else if (marginRate < 20) colorClass = 'text-warning';
 
-                    marginCalculation.innerHTML = `
-                        <div class="d-flex justify-content-between">
-                            <span>Marge :</span>
-                            <span class="${colorClass} fw-bold">${margin}€ (${marginRate}%)</span>
-                        </div>
-                        <small class="text-muted">TJM ${tjm}€ - CJM ${cjm}€</small>
-                    `;
-                    marginPreview.style.display = 'block';
-                } else {
-                    marginPreview.style.display = 'none';
+                        marginCalculation.innerHTML = `
+                            <div class="d-flex justify-content-between">
+                                <span>Marge :</span>
+                                <span class="${colorClass} fw-bold">${margin}€ (${marginRate}%)</span>
+                            </div>
+                            <small class="text-muted">TJM ${tjm}€ - CJM ${cjm}€</small>
+                        `;
+                        marginPreview.style.display = 'block';
+                    } else {
+                        marginPreview.style.display = 'none';
+                    }
                 }
-            }
 
-            cjmInput.addEventListener('input', updateMarginPreview);
-            tjmInput.addEventListener('input', updateMarginPreview);
+                cjmInput.addEventListener('input', updateMarginPreview);
+                tjmInput.addEventListener('input', updateMarginPreview);
+            }
         });
     </script>
 {% endblock %}

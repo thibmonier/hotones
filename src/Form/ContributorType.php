@@ -130,9 +130,18 @@ class ContributorType extends AbstractType
                 'class'        => Profile::class,
                 'choice_label' => 'name',
                 'multiple'     => true,
-                'expanded'     => true,
+                'expanded'     => false,
                 'required'     => false,
-                'attr'         => ['class' => 'form-check-input'],
+                'attr'         => [
+                    'class'            => 'form-select select2-multiple',
+                    'data-placeholder' => 'Sélectionnez un ou plusieurs profils',
+                ],
+                'query_builder' => function ($er) {
+                    return $er->createQueryBuilder('p')
+                        ->where('p.active = :active')
+                        ->setParameter('active', true)
+                        ->orderBy('p.name', 'ASC');
+                },
             ])
             ->add('avatarFile', FileType::class, [
                 'label'       => 'Avatar',
