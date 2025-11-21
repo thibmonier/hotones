@@ -320,7 +320,9 @@ class ProjectRepository extends ServiceEntityRepository
             $qb->andWhere('sc.id = :scId')->setParameter('scId', $serviceCategoryId);
         }
 
-        $qb->groupBy('p.id');
+        // No GROUP BY needed: Doctrine's identity map handles entity deduplication automatically
+        // when hydrating entities from joins. GROUP BY would require listing all selected columns
+        // which is incompatible with ONLY_FULL_GROUP_BY mode.
 
         if ($offset !== null) {
             $qb->setFirstResult($offset);
