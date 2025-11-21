@@ -370,13 +370,14 @@ class ProjectRepository extends ServiceEntityRepository
     public function getDistinctProjectManagersBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
         $rows = $this->createQueryBuilder('p')
-            ->select('DISTINCT pm.id AS id, pm.firstName AS firstName, pm.lastName AS lastName')
+            ->select('pm.id AS id, pm.firstName AS firstName, pm.lastName AS lastName')
             ->leftJoin('p.projectManager', 'pm')
             ->where('pm.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->groupBy('pm.id, pm.firstName, pm.lastName')
             ->orderBy('pm.lastName', 'ASC')
             ->addOrderBy('pm.firstName', 'ASC')
             ->getQuery()
@@ -396,13 +397,14 @@ class ProjectRepository extends ServiceEntityRepository
     public function getDistinctSalesPersonsBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
         $rows = $this->createQueryBuilder('p')
-            ->select('DISTINCT sp.id AS id, sp.firstName AS firstName, sp.lastName AS lastName')
+            ->select('sp.id AS id, sp.firstName AS firstName, sp.lastName AS lastName')
             ->leftJoin('p.salesPerson', 'sp')
             ->where('sp.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->groupBy('sp.id, sp.firstName, sp.lastName')
             ->orderBy('sp.lastName', 'ASC')
             ->addOrderBy('sp.firstName', 'ASC')
             ->getQuery()
@@ -422,13 +424,14 @@ class ProjectRepository extends ServiceEntityRepository
     public function getDistinctTechnologiesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
         $rows = $this->createQueryBuilder('p')
-            ->select('DISTINCT t.id AS id, t.name AS name')
+            ->select('t.id AS id, t.name AS name')
             ->leftJoin('p.technologies', 't')
             ->where('t.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->groupBy('t.id, t.name')
             ->orderBy('t.name', 'ASC')
             ->getQuery()
             ->getArrayResult();
@@ -447,13 +450,14 @@ class ProjectRepository extends ServiceEntityRepository
     public function getDistinctServiceCategoriesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
         $rows = $this->createQueryBuilder('p')
-            ->select('DISTINCT sc.id AS id, sc.name AS name')
+            ->select('sc.id AS id, sc.name AS name')
             ->leftJoin('p.serviceCategory', 'sc')
             ->where('sc.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->groupBy('sc.id, sc.name')
             ->orderBy('sc.name', 'ASC')
             ->getQuery()
             ->getArrayResult();
