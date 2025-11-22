@@ -300,7 +300,9 @@
                     <h5 class="card-title">Répartition du CA</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="revenueBreakdownChart" height="300"></canvas>
+                    <div style="position: relative; height: 250px;">
+                        <canvas id="revenueBreakdownChart"></canvas>
+                    </div>
                     <div class="mt-3" id="sectionLegend"></div>
                 </div>
             </div>
@@ -456,7 +458,8 @@
                         },
                         options: {
                             responsive: true,
-                            maintainAspectRatio: false,
+                            maintainAspectRatio: true,
+                            aspectRatio: 1,
                             plugins: {
                                 legend: {
                                     display: false // We'll create custom legend
