@@ -292,6 +292,19 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Répartition CA par section -->
+            {% if order.sections|length > 0 %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Répartition du CA</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueBreakdownChart" height="300"></canvas>
+                    <div class="mt-3" id="sectionLegend"></div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
@@ -386,6 +399,111 @@
                     editRow.classList.add('d-none');
                 });
             });
+        });
+    </script>
+
+    <!-- Chart.js for revenue breakdown -->
+    <script src="{{ asset('assets/libs/chart.js/chart.umd.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calculate revenue per section
+            const sectionData = [
+                {% for section in order.sections %}
+                    {% set sectionTotal = 0 %}
+                    {% for line in section.lines %}
+                        {% set sectionTotal = sectionTotal + line.totalAmount %}
+                    {% endfor %}
+                    {% if sectionTotal > 0 %}
+                    {
+                        name: {{ section.name|json_encode|raw }},
+                        total: {{ sectionTotal }},
+                        color: null
+                    },
+                    {% endif %}
+                {% endfor %}
+            ];
+
+            if (sectionData.length > 0) {
+                // Generate colors
+                const colors = [
+                    '#556ee6', // Primary blue
+                    '#34c38f', // Success green
+                    '#f46a6a', // Danger red
+                    '#50a5f1', // Info light blue
+                    '#f1b44c', // Warning yellow
+                    '#50a5f1', // Light blue
+                    '#343a40', // Dark gray
+                    '#74788d', // Medium gray
+                ];
+
+                sectionData.forEach((section, index) => {
+                    section.color = colors[index % colors.length];
+                });
+
+                // Prepare chart data
+                const ctx = document.getElementById('revenueBreakdownChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: sectionData.map(s => s.name),
+                            datasets: [{
+                                data: sectionData.map(s => s.total),
+                                backgroundColor: sectionData.map(s => s.color),
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false // We'll create custom legend
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((value / total) * 100).toFixed(1);
+                                            return label + ': ' + new Intl.NumberFormat('fr-FR', {
+                                                style: 'currency',
+                                                currency: 'EUR'
+                                            }).format(value) + ' (' + percentage + '%)';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Create custom legend
+                    const legendContainer = document.getElementById('sectionLegend');
+                    if (legendContainer) {
+                        let legendHTML = '<div class="small">';
+                        const grandTotal = sectionData.reduce((sum, s) => sum + s.total, 0);
+                        sectionData.forEach(section => {
+                            const percentage = ((section.total / grandTotal) * 100).toFixed(1);
+                            legendHTML += `
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge" style="background-color: ${section.color}; width: 12px; height: 12px; border-radius: 2px; margin-right: 8px;"></span>
+                                        <span>${section.name}</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <div>${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(section.total)}</div>
+                                        <small class="text-muted">${percentage}%</small>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        legendHTML += '</div>';
+                        legendContainer.innerHTML = legendHTML;
+                    }
+                }
+            }
         });
     </script>
 {% endblock %}
