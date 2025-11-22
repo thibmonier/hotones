@@ -90,13 +90,19 @@ class ContributorController extends AbstractController
         $page           = max(1, (int) $request->query->get('page', 1));
         $offset         = ($page - 1) * $perPage;
 
+        // For aggregate queries, we must reset ORDER BY to avoid conflicts with ONLY_FULL_GROUP_BY mode
         $countQb = clone $qb;
-        $total   = (int) $countQb->select('COUNT(DISTINCT c.id)')->getQuery()->getSingleScalarResult();
+        $total   = (int) $countQb
+            ->select('COUNT(DISTINCT c.id)')
+            ->resetDQLPart('orderBy')
+            ->getQuery()
+            ->getSingleScalarResult();
 
         // Stats globales (sur l'ensemble filtré)
         $withUserQb = clone $qb;
         $withUser   = (int) $withUserQb
             ->select('COUNT(DISTINCT c.id)')
+            ->resetDQLPart('orderBy')
             ->andWhere('c.user IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
@@ -106,6 +112,7 @@ class ContributorController extends AbstractController
         $avgCjmQb = clone $qb;
         $avgCjm   = $avgCjmQb
             ->select('AVG(DISTINCT c.cjm)')
+            ->resetDQLPart('orderBy')
             ->andWhere('c.cjm IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
@@ -114,6 +121,7 @@ class ContributorController extends AbstractController
         $avgTjmQb = clone $qb;
         $avgTjm   = $avgTjmQb
             ->select('AVG(DISTINCT c.tjm)')
+            ->resetDQLPart('orderBy')
             ->andWhere('c.tjm IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
