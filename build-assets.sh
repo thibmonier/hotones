@@ -15,6 +15,8 @@ case $MODE in
         yarn install
         echo "🔨 Building development assets..."
         yarn dev
+        echo "📋 Copying additional theme files..."
+        cp -f node_modules/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css public/assets/libs/select2/css/ 2>/dev/null || echo "⚠️  Warning: Select2 Bootstrap 5 theme not found"
         echo "✅ Development assets built successfully!"
         ;;
     "prod"|"production")
@@ -22,11 +24,15 @@ case $MODE in
         yarn install
         echo "🔨 Building production assets..."
         yarn build
+        echo "📋 Copying additional theme files..."
+        cp -f node_modules/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css public/assets/libs/select2/css/ 2>/dev/null || echo "⚠️  Warning: Select2 Bootstrap 5 theme not found"
         echo "✅ Production assets built successfully!"
         ;;
     "watch")
         echo "📦 Installing dependencies..."
         yarn install
+        echo "📋 Copying additional theme files..."
+        cp -f node_modules/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css public/assets/libs/select2/css/ 2>/dev/null || echo "⚠️  Warning: Select2 Bootstrap 5 theme not found"
         echo "👀 Starting watch mode..."
         yarn watch
         ;;

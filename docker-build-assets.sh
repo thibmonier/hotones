@@ -28,14 +28,20 @@ case $MODE in
     "dev")
         echo "🔨 Building development assets in container..."
         docker compose exec app yarn dev
+        echo "📋 Copying additional theme files..."
+        docker compose exec app sh -c "cp -f node_modules/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css public/assets/libs/select2/css/ 2>/dev/null || echo '⚠️  Warning: Select2 Bootstrap 5 theme not found'"
         echo "✅ Development assets built successfully!"
         ;;
     "prod"|"production")
         echo "🔨 Building production assets in container..."
         docker compose exec app yarn build
+        echo "📋 Copying additional theme files..."
+        docker compose exec app sh -c "cp -f node_modules/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css public/assets/libs/select2/css/ 2>/dev/null || echo '⚠️  Warning: Select2 Bootstrap 5 theme not found'"
         echo "✅ Production assets built successfully!"
         ;;
     "watch")
+        echo "📋 Copying additional theme files..."
+        docker compose exec app sh -c "cp -f node_modules/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css public/assets/libs/select2/css/ 2>/dev/null || echo '⚠️  Warning: Select2 Bootstrap 5 theme not found'"
         echo "👀 Starting watch mode in container..."
         echo "⚠️  Press Ctrl+C to stop watching"
         docker compose exec app yarn watch
