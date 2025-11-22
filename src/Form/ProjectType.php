@@ -140,9 +140,12 @@ class ProjectType extends AbstractType
                 'choice_label' => 'name',
                 'label'        => 'Technologies',
                 'multiple'     => true,
-                'expanded'     => true,
+                'expanded'     => false,
                 'required'     => false,
-                'attr'         => ['class' => 'form-check-input'],
+                'attr'         => [
+                    'class'            => 'form-control select2-multiple',
+                    'data-placeholder' => 'Sélectionner les technologies',
+                ],
             ])
             ->add('repoLinks', TextareaType::class, [
                 'label'    => 'Liens dépôts (un par ligne)',

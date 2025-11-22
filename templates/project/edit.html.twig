@@ -2,6 +2,11 @@
 
 {% block title %}Modifier {{ project.name }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block content %}
     {{ component('breadcrumb', { title: 'Modifier le projet', pagetitle: 'Projets' }) }}
     <div class="row">
@@ -159,4 +164,24 @@
         </div>
     </div>
     {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/select2/js/i18n/fr.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2 for technologies
+            $('.select2-multiple').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: function() {
+                    return $(this).data('placeholder');
+                },
+                allowClear: false,
+                language: 'fr'
+            });
+        });
+    </script>
 {% endblock %}
