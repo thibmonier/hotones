@@ -101,9 +101,11 @@ class ContributorController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        // For aggregate queries, we need to use DISTINCT or group by c.id to avoid
+        // counting the same contributor multiple times due to the profiles join
         $avgCjmQb = clone $qb;
         $avgCjm   = $avgCjmQb
-            ->select('AVG(c.cjm)')
+            ->select('AVG(DISTINCT c.cjm)')
             ->andWhere('c.cjm IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
@@ -111,7 +113,7 @@ class ContributorController extends AbstractController
 
         $avgTjmQb = clone $qb;
         $avgTjm   = $avgTjmQb
-            ->select('AVG(c.tjm)')
+            ->select('AVG(DISTINCT c.tjm)')
             ->andWhere('c.tjm IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
