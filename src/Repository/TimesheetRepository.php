@@ -216,7 +216,7 @@ class TimesheetRepository extends ServiceEntityRepository
             ->where('t.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->groupBy('c.id')
+            ->groupBy('c.id, c.firstName, c.lastName')
             ->orderBy('totalHours', 'DESC')
             ->getQuery()
             ->getResult();
@@ -240,7 +240,7 @@ class TimesheetRepository extends ServiceEntityRepository
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
             ->setParameter('projectIds', $projectIds)
-            ->groupBy('c.id')
+            ->groupBy('c.id, c.firstName, c.lastName')
             ->orderBy('totalHours', 'DESC')
             ->getQuery()
             ->getResult();
