@@ -296,7 +296,13 @@ class Order
 
     public function setStatus(string $status): self
     {
+        $oldStatus    = $this->status;
         $this->status = $status;
+
+        // Définir automatiquement validated_at lors du passage à un statut validé
+        if ($oldStatus !== $status && in_array($status, ['signe', 'gagne', 'termine'], true) && $this->validatedAt === null) {
+            $this->validatedAt = new DateTime();
+        }
 
         return $this;
     }
