@@ -48,8 +48,8 @@ class SalesDashboardController extends AbstractController
         // KPI 4: Évolution du CA signé (mensuelle)
         $revenueEvolution = $orderRepository->getRevenueEvolution($startDate, $endDate);
 
-        // KPI 4: Somme de CA par statut
-        $statsByStatus = $orderRepository->getStatsByStatus($filterUserId, $filterUserRole);
+        // KPI 4: Somme de CA par statut (filtrée par période)
+        $statsByStatus = $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
 
         // Complément: Enrichir avec les labels et les devis manquants
         $statsWithLabels = [];
@@ -169,7 +169,7 @@ class SalesDashboardController extends AbstractController
         $pendingCount   = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
         $signedRevenue  = $orderRepository->getSignedRevenueForPeriod($startDate, $endDate, $filterUserId, $filterUserRole);
         $conversionRate = $orderRepository->getConversionRate($startDate, $endDate, $filterUserId, $filterUserRole);
-        $statsByStatus  = $orderRepository->getStatsByStatus($filterUserId, $filterUserRole);
+        $statsByStatus  = $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
 
         // Enrichir avec les labels
         $statsWithLabels = [];

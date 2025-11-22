@@ -209,11 +209,17 @@ class OrderRepository extends ServiceEntityRepository
     /**
      * Obtient les statistiques par statut (count + CA).
      */
-    public function getStatsByStatus(?int $userId = null, ?string $userRole = null): array
+    public function getStatsByStatus(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, ?int $userId = null, ?string $userRole = null): array
     {
         $qb = $this->createQueryBuilder('o')
             ->select('o.status, COUNT(o.id) as count, SUM(o.totalAmount) as total')
             ->groupBy('o.status');
+
+        if ($startDate && $endDate) {
+            $qb->andWhere('o.createdAt BETWEEN :start AND :end')
+                ->setParameter('start', $startDate)
+                ->setParameter('end', $endDate);
+        }
 
         if ($userId && $userRole) {
             $qb->leftJoin('o.project', 'p');
