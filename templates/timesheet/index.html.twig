@@ -9,6 +9,9 @@
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">Saisie des temps</h4>
                 <div class="page-title-right d-flex gap-2">
+                    <a href="{{ path('timesheet_export') }}" class="btn btn-outline-success">
+                        <i class="bx bx-download me-1"></i> Exporter Excel
+                    </a>
                     <a href="{{ path('timesheet_calendar') }}" class="btn btn-outline-primary">
                         <i class="bx bx-calendar me-1"></i> Vue Calendrier
                     </a>
@@ -48,6 +51,10 @@
                                 <i class="bx bx-transfer me-1"></i>
                                 <span id="toggle-mode-text">Afficher en jours</span>
                             </button>
+                            <button type="button" id="toggle-weekends-btn" class="btn btn-sm btn-outline-secondary">
+                                <i class="bx bx-calendar-x me-1"></i>
+                                <span id="toggle-weekends-text">Afficher week-ends</span>
+                            </button>
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#duplicateWeekModal">
                                 <i class="bx bx-content-copy me-1"></i> Dupliquer semaine
                             </button>
@@ -82,7 +89,8 @@
                                             {% set current = startDate|date_modify('+' ~ i ~ ' day') %}
                                             {% set dayName = current|date('l')|trans %}
                                             {% set dayDate = current|date('d/m') %}
-                                            <th class="text-center" style="width: {{ (75/7)|round(1) }}%">
+                                            {% set isWeekend = i == 5 or i == 6 %}
+                                            <th class="text-center day-column {% if isWeekend %}weekend-column{% endif %}" data-day-index="{{ i }}" style="width: {{ (75/7)|round(1) }}%">
                                                 {{ dayName }}<br>
                                                 <small class="text-muted">{{ dayDate }}</small>
                                             </th>
@@ -152,7 +160,8 @@
                                                     {% set current = startDate|date_modify('+' ~ i ~ ' day') %}
                                                     {% set dateKey = current|date('Y-m-d') %}
                                                     {% set timesheet = timesheetGrid[project.id][task.id][dateKey] ?? null %}
-                                                    <td class="text-center">
+                                                    {% set isWeekend = i == 5 or i == 6 %}
+                                                    <td class="text-center day-column {% if isWeekend %}weekend-column{% endif %}" data-day-index="{{ i }}">
                                                         <input
                                                             type="number"
                                                             class="form-control time-input text-center"
@@ -192,7 +201,8 @@
                                     <tr>
                                         <th>Total par jour</th>
                                         {% for i in 0..6 %}
-                                            <th class="text-center day-total" data-day="{{ i }}" data-hours="0">
+                                            {% set isWeekend = i == 5 or i == 6 %}
+                                            <th class="text-center day-total day-column {% if isWeekend %}weekend-column{% endif %}" data-day="{{ i }}" data-hours="0">
                                                 <span class="total-value">0</span><span class="total-unit">h</span>
                                             </th>
                                         {% endfor %}
@@ -427,6 +437,36 @@
         // Event listener pour le bouton toggle
         if (toggleModeBtn) {
             toggleModeBtn.addEventListener('click', toggleDisplayMode);
+        }
+
+        // Gestion de l'affichage/masquage des week-ends
+        const toggleWeekendsBtn = document.getElementById('toggle-weekends-btn');
+        const toggleWeekendsText = document.getElementById('toggle-weekends-text');
+        let weekendsHidden = localStorage.getItem('weekendsHidden') === 'true';
+
+        function toggleWeekends() {
+            weekendsHidden = !weekendsHidden;
+            localStorage.setItem('weekendsHidden', weekendsHidden);
+
+            const weekendColumns = document.querySelectorAll('.weekend-column');
+            weekendColumns.forEach(col => {
+                col.style.display = weekendsHidden ? 'none' : '';
+            });
+
+            toggleWeekendsText.textContent = weekendsHidden ? 'Afficher week-ends' : 'Masquer week-ends';
+        }
+
+        // Appliquer l'état initial au chargement
+        if (weekendsHidden) {
+            const weekendColumns = document.querySelectorAll('.weekend-column');
+            weekendColumns.forEach(col => {
+                col.style.display = 'none';
+            });
+            toggleWeekendsText.textContent = 'Afficher week-ends';
+        }
+
+        if (toggleWeekendsBtn) {
+            toggleWeekendsBtn.addEventListener('click', toggleWeekends);
         }
 
         // Debounce function pour éviter trop de requêtes

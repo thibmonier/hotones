@@ -637,4 +637,126 @@ class TimesheetController extends AbstractController
 
         return (float) $hours;
     }
+
+    /**
+     * Exporte les temps du contributeur au format Excel pour une période donnée.
+     */
+    #[Route('/export', name: 'timesheet_export', methods: ['GET'])]
+    public function export(Request $request, EntityManagerInterface $em): Response
+    {
+        $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
+        if (!$contributor) {
+            $this->addFlash('error', 'Contributeur non trouvé');
+
+            return $this->redirectToRoute('timesheet_index');
+        }
+
+        // Récupérer les paramètres de filtrage
+        $startDate = $request->query->get('start_date');
+        $endDate   = $request->query->get('end_date');
+        $projectId = $request->query->get('project_id');
+
+        // Dates par défaut : mois en cours
+        if (!$startDate) {
+            $startDate = (new DateTime('first day of this month'))->format('Y-m-d');
+        }
+        if (!$endDate) {
+            $endDate = (new DateTime('last day of this month'))->format('Y-m-d');
+        }
+
+        $start = new DateTime($startDate);
+        $end   = new DateTime($endDate);
+
+        // Récupérer les temps
+        $timesheetRepo = $em->getRepository(Timesheet::class);
+        $timesheets    = $timesheetRepo->findByContributorAndDateRange($contributor, $start, $end);
+
+        // Filtrer par projet si spécifié
+        if ($projectId) {
+            $timesheets = array_filter($timesheets, fn ($t) => $t->getProject()->getId() == $projectId);
+        }
+
+        // Créer le fichier Excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Temps saisis');
+
+        // En-têtes
+        $sheet->setCellValue('A1', 'Date');
+        $sheet->setCellValue('B1', 'Projet');
+        $sheet->setCellValue('C1', 'Client');
+        $sheet->setCellValue('D1', 'Tâche');
+        $sheet->setCellValue('E1', 'Sous-tâche');
+        $sheet->setCellValue('F1', 'Heures');
+        $sheet->setCellValue('G1', 'Jours');
+        $sheet->setCellValue('H1', 'Notes');
+
+        // Style des en-têtes
+        $headerStyle = [
+            'font'      => ['bold' => true, 'size' => 12],
+            'fill'      => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2E8F0']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ];
+        $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
+
+        // Données
+        $row        = 2;
+        $totalHours = 0;
+        foreach ($timesheets as $ts) {
+            $hours = (float) $ts->getHours();
+            $days  = round($hours / 8, 3);
+
+            $sheet->setCellValue('A'.$row, $ts->getDate()->format('d/m/Y'));
+            $sheet->setCellValue('B'.$row, $ts->getProject()->getName());
+            $sheet->setCellValue('C'.$row, $ts->getProject()->getClient() ? $ts->getProject()->getClient()->getName() : '');
+            $sheet->setCellValue('D'.$row, $ts->getTask() ? $ts->getTask()->getName() : '');
+            $sheet->setCellValue('E'.$row, $ts->getSubTask() ? $ts->getSubTask()->getTitle() : '');
+            $sheet->setCellValue('F'.$row, $hours);
+            $sheet->setCellValue('G'.$row, $days);
+            $sheet->setCellValue('H'.$row, $ts->getNotes() ?: '');
+
+            $totalHours += $hours;
+            ++$row;
+        }
+
+        // Ligne de total
+        $sheet->setCellValue('E'.$row, 'TOTAL:');
+        $sheet->setCellValue('F'.$row, $totalHours);
+        $sheet->setCellValue('G'.$row, round($totalHours / 8, 3));
+        $sheet->getStyle('E'.$row.':G'.$row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FEF3C7']],
+        ]);
+
+        // Ajuster la largeur des colonnes
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Ajouter un filtre sur la première ligne
+        $sheet->setAutoFilter('A1:H'.($row - 1));
+
+        // Générer le fichier
+        $writer   = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = sprintf(
+            'temps_%s_%s_%s.xlsx',
+            $contributor->getFirstName().'_'.$contributor->getLastName(),
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d'),
+        );
+
+        // Créer un fichier temporaire
+        $temp = tmpfile();
+        $path = stream_get_meta_data($temp)['uri'];
+        $writer->save($path);
+
+        // Créer la réponse
+        $response = new Response(file_get_contents($path));
+        fclose($temp);
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+
+        return $response;
+    }
 }

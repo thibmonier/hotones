@@ -9,7 +9,14 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">📅 Calendrier de saisie des temps</h4>
-                <div class="page-title-right">
+                <div class="page-title-right d-flex gap-2">
+                    <a href="{{ path('timesheet_export') }}" class="btn btn-outline-success">
+                        <i class="bx bx-download me-1"></i> Exporter Excel
+                    </a>
+                    <button type="button" id="toggle-weekends-btn" class="btn btn-outline-secondary">
+                        <i class="bx bx-calendar-x me-1"></i>
+                        <span id="toggle-weekends-text">Afficher week-ends</span>
+                    </button>
                     <a href="{{ path('timesheet_index') }}" class="btn btn-outline-secondary">
                         <i class="bx bx-grid-alt me-1"></i> Vue Grille
                     </a>
@@ -120,11 +127,17 @@
         // Données des projets avec tâches (pour la cascade)
         const projectsData = {{ projectsWithTasks|json_encode|raw }};
 
+        // Gestion de l'affichage des week-ends
+        let weekendsHidden = localStorage.getItem('weekendsHidden') === 'true';
+        const toggleWeekendsBtn = document.getElementById('toggle-weekends-btn');
+        const toggleWeekendsText = document.getElementById('toggle-weekends-text');
+
         // Initialiser FullCalendar
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'fr',
             firstDay: 1, // Lundi
+            weekends: !weekendsHidden, // Masquer week-ends par défaut si nécessaire
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -162,6 +175,21 @@
         });
 
         calendar.render();
+
+        // Appliquer l'état initial du bouton
+        if (weekendsHidden) {
+            toggleWeekendsText.textContent = 'Afficher week-ends';
+        }
+
+        // Toggle des week-ends
+        if (toggleWeekendsBtn) {
+            toggleWeekendsBtn.addEventListener('click', function() {
+                weekendsHidden = !weekendsHidden;
+                localStorage.setItem('weekendsHidden', weekendsHidden);
+                calendar.setOption('weekends', !weekendsHidden);
+                toggleWeekendsText.textContent = weekendsHidden ? 'Afficher week-ends' : 'Masquer week-ends';
+            });
+        }
 
         // Fonction pour ouvrir la modal
         function openModal(mode, dateStr, eventData = null) {
