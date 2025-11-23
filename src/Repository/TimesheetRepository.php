@@ -353,4 +353,34 @@ class TimesheetRepository extends ServiceEntityRepository
             'totalRevenue'   => (string) ($row['totalRevenue'] ?? '0'),
         ];
     }
+
+    /**
+     * Calcule le total des heures saisies par un contributeur pour une date donnée.
+     * Utilisé pour valider qu'un contributeur ne dépasse pas 24h/jour.
+     *
+     * @param Contributor       $contributor Le contributeur
+     * @param DateTimeInterface $date        La date
+     * @param Timesheet|null    $exclude     Timesheet à exclure du calcul (pour édition)
+     *
+     * @return float Total des heures
+     */
+    public function getTotalHoursForContributorAndDate(
+        Contributor $contributor,
+        DateTimeInterface $date,
+        ?Timesheet $exclude = null
+    ): float {
+        $qb = $this->createQueryBuilder('t')
+            ->select('COALESCE(SUM(t.hours), 0)')
+            ->where('t.contributor = :contributor')
+            ->andWhere('t.date = :date')
+            ->setParameter('contributor', $contributor)
+            ->setParameter('date', $date);
+
+        if ($exclude && $exclude->getId()) {
+            $qb->andWhere('t.id != :excludeId')
+               ->setParameter('excludeId', $exclude->getId());
+        }
+
+        return (float) $qb->getQuery()->getSingleScalarResult();
+    }
 }

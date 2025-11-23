@@ -1,0 +1,775 @@
+# 🗺️ Roadmap HotOnes 2025
+
+> Roadmap mise à jour le 23 novembre 2025
+>
+> Cette roadmap consolide l'état actuel du projet et présente les évolutions futures organisées par thématiques et priorités.
+
+## Liens
+- **Plan d'Exécution 2025 (Phases 1, 2, 5 prioritaires)** : [docs/execution-plan-2025.md](./execution-plan-2025.md)
+- État d'avancement détaillé : [docs/status.md](./status.md)
+- Roadmap historique (lots) : [docs/roadmap-lots.md](./roadmap-lots.md)
+- Fonctionnalités actuelles : [docs/features.md](./features.md)
+
+---
+
+## 📊 Vue d'ensemble
+
+### Légende
+- ✅ Terminé et en production
+- 🔄 En cours de développement
+- 🎯 Prioritaire (Q1 2025)
+- 📋 Planifié (Q2-Q3 2025)
+- 💡 Idée / Backlog (Q4 2025+)
+
+### Principaux axes stratégiques 2025
+1. **Automatisation** : Réduire les tâches manuelles répétitives
+2. **Analytics & Prédictif** : Anticiper les risques et opportunités
+3. **Expérience Utilisateur** : Simplifier les workflows quotidiens
+4. **Intégration** : Connecter HotOnes avec l'écosystème externe
+5. **Mobile-First** : Accès mobile pour les contributeurs terrain
+
+---
+
+## 🎯 Phase 1 : Consolidation & Professionnalisation (Q1 2025)
+
+### 🔲 Lot 2 : Saisie des Temps - Finalisation
+**Objectif** : Interface complète de saisie et gestion des temps
+
+#### Fonctionnalités restantes
+- 🎯 Grille de saisie hebdomadaire avec auto-save
+- 🎯 Amélioration du compteur de temps (start/stop avec persistance)
+- 🎯 Sélection projet → tâche en cascade (UX optimisée)
+- 🎯 Vue calendrier mensuel avec saisie rapide
+- 🎯 Copie de semaine / duplication de temps
+- 🎯 Workflow de validation hiérarchique (chef de projet → manager)
+- 🎯 Récapitulatif mensuel par contributeur et par projet
+- 🎯 Export Excel/PDF des timesheets
+
+**Tests** : Tests E2E du parcours complet saisie → validation
+**Estimation** : 5-7 jours
+
+---
+
+### 🔲 Lot 3 : Dashboard Analytique - Finalisation
+**Objectif** : Tableau de bord KPIs complet avec worker de calcul
+
+#### Fonctionnalités restantes
+- 🎯 Cartes KPIs principales (CA, Marge, Taux de marge, Projets actifs)
+- 🎯 Graphiques d'évolution temporelle (Chart.js)
+- 🎯 Répartition par type de projet (camembert)
+- 🎯 Top contributeurs (Top 5 par CA/marge)
+- 🎯 Filtres dynamiques (période, type, chef de projet, commercial, technologies)
+- 🎯 Worker de recalcul asynchrone (handler + commande CLI)
+- 🎯 Scheduler automatique quotidien
+- 🎯 Export PDF/Excel du dashboard
+
+**Tests** : Tests de performance des agrégations
+**Estimation** : 7-10 jours
+
+---
+
+### 📋 Lot 1.3 : Projets - Améliorations
+**Objectif** : Compléter les fonctionnalités de gestion de projets
+
+#### Fonctionnalités
+- 📋 Filtres avancés dans le listing (statut, type, technologies, dates, contributeurs)
+- 📋 Recherche full-text sur nom projet / client / description
+- 📋 Actions en masse (export, changement statut, archivage)
+- 📋 Timeline du projet (historique des événements clés)
+
+**Estimation** : 2-3 jours
+
+---
+
+### 📋 Lot 1.4 : Devis - Prévisualisation PDF
+**Objectif** : Générer des devis professionnels au format PDF
+
+#### Fonctionnalités
+- 📋 Template PDF personnalisable (logo, couleurs, mentions légales)
+- 📋 Génération PDF avec sections et lignes détaillées
+- 📋 Calcul automatique des totaux HT/TTC
+- 📋 Prévisualisation avant envoi client
+- 📋 Historique des versions de devis
+
+**Dépendances** : DomPDF ou Snappy
+**Estimation** : 3-4 jours
+
+---
+
+### 💡 Lot 9 : Module de Facturation 🆕
+**Objectif** : Automatiser la génération et le suivi des factures
+
+#### Fonctionnalités
+- 💡 Entité `Invoice` (numéro unique, statut, montants, échéances)
+- 💡 Génération automatique depuis devis signés (forfait) ou temps saisis (régie)
+- 💡 Échéancier de paiement (rappels automatiques)
+- 💡 Statuts : Brouillon, Envoyée, Payée, En retard, Annulée
+- 💡 Template PDF professionnel (mentions légales, TVA, IBAN)
+- 💡 Export comptable (CSV pour import logiciel compta)
+- 💡 Dashboard de trésorerie :
+  - CA facturé vs CA encaissé
+  - Prévisionnel de trésorerie (90j)
+  - Factures en retard (alertes automatiques)
+  - Délai moyen de paiement par client
+- 💡 Relances automatiques par email (J+30, J+45, J+60)
+
+**Tests** : Tests de génération PDF et calculs de trésorerie
+**Estimation** : 10-12 jours
+
+---
+
+## 📊 Phase 2 : Analytics Avancés & Prédictif (Q2 2025)
+
+### 💡 Lot 10 : Analytics Prédictifs 🆕
+**Objectif** : Anticiper les risques et opportunités business
+
+#### Fonctionnalités
+- 💡 **Forecasting CA** :
+  - Prédiction du CA sur 3/6/12 mois basée sur historique
+  - Prise en compte de la saisonnalité
+  - Comparaison prévisionnel vs réalisé
+- 💡 **Analyse des risques projet** :
+  - Détection automatique des projets à risque (dépassement budget, délais)
+  - Score de santé par projet (vert/orange/rouge)
+  - Alertes proactives pour les chefs de projet
+- 💡 **Prédiction de charge** :
+  - Anticipation des périodes de surcharge/sous-charge
+  - Recommandations de recrutement basées sur le pipeline
+  - Optimisation de l'allocation des ressources
+- 💡 **Analyse de rentabilité prédictive** :
+  - Estimation de la marge finale dès 30% de réalisation
+  - Identification des dérives budgétaires précoces
+  - Recommandations de correction (scope, staffing)
+
+**Dépendances** : Données historiques suffisantes (6-12 mois)
+**Technologies** : Machine Learning (scikit-learn ou API externe)
+**Estimation** : 12-15 jours
+
+---
+
+### 💡 Lot 11 : Dashboard RH & Talents 🆕
+**Objectif** : Piloter la gestion des ressources humaines
+
+#### Fonctionnalités
+- 💡 **KPIs RH** :
+  - Turnover (taux de départ annuel)
+  - Absentéisme (taux et évolution)
+  - Ancienneté moyenne par profil
+  - Pyramide des âges et des compétences
+- 💡 **Gestion des compétences** :
+  - Matrice compétences par contributeur (technologies + soft skills)
+  - Niveaux : Débutant, Intermédiaire, Confirmé, Expert
+  - Gap analysis (compétences requises vs disponibles)
+  - Plan de formation automatique
+- 💡 **Revues annuelles** :
+  - Campagne d'évaluation (auto-évaluation + manager)
+  - Objectifs individuels (SMART)
+  - Historique des évaluations
+- 💡 **Onboarding** :
+  - Checklist d'intégration nouveau contributeur
+  - Suivi des tâches d'onboarding
+  - Formation initiale (parcours par profil)
+
+**Estimation** : 8-10 jours
+
+---
+
+### 📋 Lot 7 : Rapports & Exports - Complet
+**Objectif** : Rapports professionnels pour direction et clients
+
+#### Fonctionnalités
+- 📋 Rapport d'activité mensuel (par projet, client, BU)
+- 📋 Rapport financier (CA, marges, coûts, rentabilité)
+- 📋 Rapport contributeur (temps, projets, performance)
+- 📋 Rapport commercial (pipeline, taux de conversion)
+- 📋 Rapport devis actifs entre 2 dates
+- 📋 Templates personnalisables (logo, charte graphique)
+- 📋 Génération planifiée (cron) et envoi automatique
+- 📋 Export multi-format (PDF, Excel, CSV)
+
+**Estimation** : 6-7 jours
+
+---
+
+## 🚀 Phase 3 : Ouverture & Intégrations (Q3 2025)
+
+### 💡 Lot 8 : API REST - Finalisation
+**Objectif** : API complète pour intégrations externes
+
+#### Endpoints
+- 📋 `/api/projects` (CRUD projets)
+- 📋 `/api/timesheets` (saisie/consultation temps)
+- 📋 `/api/contributors` (liste contributeurs)
+- 📋 `/api/orders` (devis)
+- 📋 `/api/metrics` (KPIs lecture seule)
+- 📋 `/api/users` (CRUD utilisateurs)
+- 📋 `/api/running-timer` (timer actif)
+- 💡 `/api/invoices` (factures)
+- 💡 `/api/clients` (clients)
+- 💡 `/api/vacation-requests` (demandes de congés)
+
+#### Sécurité
+- 📋 Authentification JWT (lexik/jwt-authentication-bundle)
+- 📋 Rate limiting (par client API)
+- 📋 Scopes/permissions par endpoint
+- 📋 Documentation OpenAPI/Swagger automatique
+
+#### SDKs
+- 💡 SDK JavaScript/TypeScript (npm package)
+- 💡 SDK Python (pip package)
+
+**Estimation** : 8-10 jours
+
+---
+
+### 💡 Lot 12 : Intégrations Externes 🆕
+**Objectif** : Connecter HotOnes avec l'écosystème d'entreprise
+
+#### Intégrations
+- 💡 **Jira / ClickUp / Notion** :
+  - Import automatique des tâches projet
+  - Synchronisation bidirectionnelle (temps, statuts)
+  - Mapping ProjectTask ↔ Issue
+- 💡 **Slack / Microsoft Teams** :
+  - Notifications d'événements (nouveau devis, validation temps)
+  - Commandes slash (/hotones timesheet, /hotones stats)
+  - Webhooks pour alertes personnalisées
+- 💡 **Google Calendar / Outlook** :
+  - Export planning → calendrier personnel
+  - Import congés depuis calendrier RH
+  - Synchronisation bidirectionnelle
+- 💡 **Logiciels comptables** :
+  - Export factures vers Sage, Cegid, QuickBooks
+  - Format FEC (Fichier des Écritures Comptables)
+  - Réconciliation automatique des paiements
+- 💡 **GitLab / GitHub** :
+  - Intégration commits → temps passés
+  - Statistiques de productivité code
+  - Lien projets HotOnes ↔ repositories
+
+**Estimation** : 15-20 jours (selon nombre d'intégrations)
+
+---
+
+### 💡 Lot 13 : Portail Client 🆕
+**Objectif** : Espace dédié pour les clients avec accès limité
+
+#### Fonctionnalités
+- 💡 **Authentification séparée** :
+  - Compte client distinct des utilisateurs internes
+  - Mot de passe + 2FA optionnel
+  - Multi-utilisateurs par client (admin client)
+- 💡 **Dashboard client** :
+  - Projets en cours et terminés
+  - Temps consommés vs budgetés
+  - Factures et paiements
+  - Documents partagés (livrables, rapports)
+- 💡 **Suivi de projet** :
+  - Avancement en temps réel
+  - Timeline des jalons
+  - Reporting automatique (hebdo/mensuel)
+- 💡 **Support & Tickets** :
+  - Création de tickets support
+  - Suivi du statut (nouveau, en cours, résolu)
+  - Base de connaissances (FAQ)
+- 💡 **Validation de livrables** :
+  - Upload de fichiers
+  - Workflow d'approbation
+  - Historique des versions
+
+**Estimation** : 12-15 jours
+
+---
+
+## 📱 Phase 4 : Mobile & Expérience Terrain (Q4 2025)
+
+### 💡 Lot 14 : Application Mobile 🆕
+**Objectif** : Saisie de temps et consultation en mobilité
+
+#### Fonctionnalités v1.0 (MVP)
+- 💡 **Authentification** :
+  - Login email/password
+  - Biométrie (Face ID, Touch ID, empreinte digitale)
+  - Session persistante
+- 💡 **Saisie de temps** :
+  - Interface simplifiée pour saisie rapide
+  - Timer start/stop avec notifications
+  - Saisie hors-ligne (synchronisation auto)
+  - Historique de la semaine
+- 💡 **Consultation** :
+  - Planning personnel (vue semaine/mois)
+  - Congés (solde, demande, approbation pour managers)
+  - Notifications push (validation temps, nouveau projet)
+- 💡 **Scanner de notes de frais** :
+  - Photo de ticket
+  - OCR pour extraction montant/date
+  - Catégorisation automatique
+
+#### Technologies
+- 💡 React Native (iOS + Android)
+- 💡 Utilisation de l'API REST HotOnes
+- 💡 Stockage local SQLite pour offline
+
+**Estimation** : 20-25 jours
+
+---
+
+### 💡 Lot 15 : PWA & Offline Mode 🆕
+**Objectif** : Version web progressive accessible hors-ligne
+
+#### Fonctionnalités
+- 💡 Service Workers pour cache intelligent
+- 💡 Installation sur écran d'accueil (mobile & desktop)
+- 💡 Synchronisation en arrière-plan
+- 💡 Mode hors-ligne pour saisie de temps
+- 💡 Notifications push web
+- 💡 Responsive design optimisé mobile
+
+**Estimation** : 6-8 jours
+
+---
+
+## 🎨 Phase 5 : UX/UI & Gamification (Q4 2025)
+
+### 📋 Lot 5 : Améliorations UX/UI - Complet
+**Objectif** : Améliorer l'expérience utilisateur globale
+
+#### Fonctionnalités
+- 📋 Menu latéral adapté aux entités
+- 📋 Fil d'ariane sur toutes les pages
+- 📋 Recherche globale (projets, contributeurs, devis, clients)
+- 📋 Tableaux de données :
+  - Pagination côté serveur
+  - Tri multi-colonnes
+  - Filtres avancés persistants
+  - Actions en masse
+  - Export CSV/Excel
+- 📋 Formulaires :
+  - Validation temps réel (AJAX)
+  - Champs dépendants (projet → tâches)
+  - Sauvegarde automatique (brouillon)
+- 📋 Notifications in-app avec centre de notifications
+
+**Tests** : Tests E2E navigation, tests accessibilité WCAG
+**Estimation** : 5-6 jours
+
+---
+
+### 💡 Lot 15.5 : Cohérence UX/UI Globale 🆕
+**Objectif** : Harmoniser l'expérience utilisateur sur toutes les pages
+
+#### Fonctionnalités
+- 💡 **Audit UX/UI complet** :
+  - Recensement de toutes les pages CRUD
+  - Identification des incohérences (titres, boutons, filtres, actions)
+  - Guide de style interne (design system light)
+- 💡 **Standardisation des en-têtes** :
+  - Template réutilisable pour en-têtes de page
+  - Fil d'ariane (breadcrumb) sur toutes les pages
+  - Boutons d'action alignés à droite
+- 💡 **Refonte menu latéral** :
+  - Retrait des entrées "Ajouter projet/contributeur/etc."
+  - Boutons "Nouveau X" uniquement dans les pages de liste
+  - Menu simplifié et logique
+- 💡 **Standardisation listes** :
+  - Filtres cohérents (position, style, sauvegarde session)
+  - Actions par ligne : Voir, Modifier, Supprimer
+  - Actions en masse : checkbox, suppression masse, export CSV
+  - Pagination standardisée (25/50/100 par page)
+- 💡 **Standardisation formulaires** :
+  - Layout cohérent (largeur max 800px)
+  - Labels au-dessus, champs requis marqués (*)
+  - Boutons "Enregistrer" + "Annuler" alignés à droite
+- 💡 **Components Twig réutilisables** :
+  - `page_header.html.twig`
+  - `data_table.html.twig`
+  - `filter_panel.html.twig`
+  - `pagination.html.twig`
+- 💡 **JavaScript actions en masse** :
+  - Script `mass-actions.js`
+  - Sélection checkbox, confirmation suppression
+- 💡 **Documentation Design System** :
+  - Couleurs, typographie, boutons, formulaires
+  - Exemples de code pour développeurs
+
+**Dépendances** : Lot 5 (UX/UI de base)
+**Estimation** : 10 jours
+
+---
+
+### 💡 Lot 16 : Gamification & Engagement 🆕
+**Objectif** : Motiver et engager les contributeurs
+
+#### Fonctionnalités
+- 💡 **Système de badges** :
+  - Early Bird (1er à saisir ses temps de la semaine)
+  - Perfectionist (saisie sans erreur pendant 1 mois)
+  - Marathon Runner (3 mois sans absence)
+  - Knowledge Sharer (5+ formations données)
+  - Bug Hunter (signalement de bugs critiques)
+- 💡 **Classements** :
+  - Top contributeurs du mois (CA généré)
+  - Top formateurs (heures de formation données)
+  - Équipe la plus productive
+- 💡 **Progression de carrière** :
+  - Arbre de compétences visuel
+  - Déblocage de nouveaux profils
+  - Parcours de montée en compétence
+- 💡 **Récompenses** :
+  - Points d'expérience (XP)
+  - Niveaux (Junior → Senior → Lead → Principal)
+  - Récompenses déblocables (jours de télétravail bonus, formation payée)
+
+**Estimation** : 8-10 jours
+
+---
+
+### 💡 Lot 17 : Module Documentaire 🆕
+**Objectif** : Centraliser la documentation projet et entreprise
+
+#### Fonctionnalités
+- 💡 **Bibliothèque documentaire** :
+  - Upload/download de fichiers
+  - Organisation par projet/client
+  - Gestion de versions
+  - Recherche full-text dans les documents (PDF, Word, Excel)
+- 💡 **Templates de documents** :
+  - Cahier des charges type
+  - Spécifications techniques
+  - PV de réunion
+  - Rapport de livraison
+- 💡 **Wiki interne** :
+  - Base de connaissances par technologie
+  - Tutoriels et best practices
+  - Onboarding docs
+  - Changelog produit
+- 💡 **Gestion des accès** :
+  - Permissions par rôle
+  - Documents confidentiels (compta, RH)
+  - Partage externe sécurisé (lien temporaire)
+
+**Technologies** : ElasticSearch pour recherche full-text
+**Estimation** : 10-12 jours
+
+---
+
+## 🏢 Phase 6 : Structuration Entreprise (2026)
+
+### 💡 Lot 18 : Business Units (BU) 🆕
+**Objectif** : Cloisonner plusieurs équipes au sein de la même société
+
+#### Fonctionnalités
+- 💡 **Entité BusinessUnit** :
+  - Nom, manager, objectifs annuels (CA, marge, contributeurs)
+  - Rattachement contributeurs (1 BU par contributeur)
+  - Rattachement devis et clients (optionnel)
+- 💡 **Dashboards isolés** :
+  - Chaque BU voit uniquement ses chiffres
+  - Comparaison inter-BU pour direction
+  - Consolidation globale (vue SUPERADMIN)
+- 💡 **Objectifs et suivi** :
+  - CA signé vs objectif
+  - Marge générée vs objectif
+  - Effectif réel vs prévu
+  - Graphiques d'évolution trimestrielle
+- 💡 **Permissions** :
+  - Manager BU : accès complet à sa BU
+  - Contributeur : accès limité à sa BU
+  - Direction : vue consolidée toutes BU
+
+**Estimation** : 8-10 jours
+
+---
+
+### 💡 Lot 19 : Workflow de Recrutement 🆕
+**Objectif** : Gérer le pipeline de recrutement des talents
+
+#### Fonctionnalités
+- 💡 **Entité Candidate** :
+  - Coordonnées (nom, email, téléphone)
+  - Upload CV et lettre de motivation
+  - Profil métier cible (JobProfile)
+  - Technologies et niveaux (self-assessment)
+  - Prétentions salariales (k€/an)
+  - Type de contrat (CDI, CDD, Alternance, Stage)
+  - BU identifiée
+- 💡 **Pipeline de recrutement** :
+  - Étapes : Candidature, Présélection, Entretien RH, Entretien Technique, Entretien Direction, Offre, Embauché, Refusé
+  - Vue Kanban avec drag & drop
+  - Historique des interactions (appels, emails, entretiens)
+  - Assignation des intervieweurs par étape
+- 💡 **Conversion en contributeur** :
+  - Bouton "Embaucher" crée un Contributor
+  - Pré-remplissage depuis Candidate
+  - Création automatique de la 1ère EmploymentPeriod
+  - Conservation de l'historique de recrutement
+- 💡 **Statistiques recrutement** :
+  - Temps moyen par étape
+  - Taux de conversion par étape
+  - Sources de candidatures (LinkedIn, Cooptation, Indeed)
+  - Coût du recrutement
+
+**Estimation** : 10-12 jours
+
+---
+
+### 💡 Lot 20 : Gestion Achats & Fournisseurs 🆕
+**Objectif** : Centraliser les achats et la relation fournisseurs
+
+#### Fonctionnalités
+- 💡 **Entité Supplier** (Fournisseur) :
+  - Nom, coordonnées, SIRET, IBAN
+  - Catégorie (Hébergement, Licences, Freelance, Matériel, Formation)
+  - Conditions de paiement (30j, 45j, 60j)
+  - Documents (contrats, factures)
+- 💡 **Entité Purchase** (Achat) :
+  - Rattachement projet/client (optionnel)
+  - Fournisseur
+  - Montant HT/TTC
+  - Date achat et date paiement
+  - Statut (À payer, Payé, En retard)
+  - Catégorie et sous-catégorie
+- 💡 **Budgets d'achat** :
+  - Budget annuel par catégorie
+  - Alertes de dépassement
+  - Visualisation consommé vs budgeté
+- 💡 **Dashboard achats** :
+  - Répartition par catégorie (camembert)
+  - Top 5 fournisseurs
+  - Achats par projet
+  - Prévisionnel de paiement (90j)
+
+**Estimation** : 6-8 jours
+
+---
+
+### 💡 Lot 21 : Gestion des Contrats Clients 🆕
+**Objectif** : Suivi avancé des contrats et engagements
+
+#### Fonctionnalités
+- 💡 **Entité Contract** :
+  - Lien vers Order (contrat issu d'un devis signé)
+  - Type : Forfait, Régie, Support, Maintenance, TMA
+  - Dates début/fin, reconduction tacite
+  - Conditions particulières (SLA, pénalités, bonus)
+  - Documents attachés (contrat signé, avenants)
+- 💡 **SLA (Service Level Agreement)** :
+  - Temps de réponse garanti (ex: 4h ouvrées)
+  - Taux de disponibilité (ex: 99.9%)
+  - Pénalités en cas de non-respect
+  - Suivi automatique et alertes
+- 💡 **Renouvellements** :
+  - Alertes avant échéance (J-90, J-60, J-30)
+  - Workflow de renégociation
+  - Historique des versions de contrat
+- 💡 **Dashboard contrats** :
+  - Contrats à renouveler (3 prochains mois)
+  - Revenus récurrents (MRR, ARR)
+  - Taux de rétention client
+  - SLA compliance par client
+
+**Estimation** : 8-10 jours
+
+---
+
+## 🔔 Phase 7 : Notifications & Automatisation (2026)
+
+### 📋 Lot 6 : Notifications & Alertes - Finalisation
+**Objectif** : Système de notifications complet
+
+#### Fonctionnalités
+- ✅ Infrastructure en place (entités, page d'index)
+- 📋 Déclencheurs d'événements :
+  - Nouveau devis à signer
+  - Devis gagné/perdu
+  - Projet proche de son budget (80%, 90%, 100%, 110%)
+  - Temps en attente de validation
+  - ✅ Rappel hebdomadaire de saisie des temps
+  - Échéance de paiement proche
+  - Seuil d'alerte KPI dépassé
+- 📋 Canaux :
+  - Notifications in-app (base de données)
+  - Emails (Symfony Mailer)
+  - Optionnel : Webhook Slack/Discord
+- 📋 Préférences utilisateur (événements, canaux)
+- 📋 Configuration globale admin (seuils d'alerte)
+
+**Estimation** : 4-5 jours
+
+---
+
+### 💡 Lot 22 : Automatisation Avancée 🆕
+**Objectif** : Automatiser les tâches répétitives
+
+#### Fonctionnalités
+- 💡 **Workflows automatisés** :
+  - Si projet > 90% budget → alerte chef de projet + manager
+  - Si devis non signé après 30j → relance automatique
+  - Si timesheet non validé après 7j → escalade manager
+  - Si facture impayée > 45j → relance + alerte compta
+- 💡 **Templates de tâches** :
+  - Création automatique de tâches à la signature d'un devis
+  - Duplication de structure de tâches entre projets similaires
+  - Application de templates par type de projet (refonte, dev from scratch, TMA)
+- 💡 **Rapports automatiques** :
+  - Envoi hebdo du dashboard staffing aux managers
+  - Rapport mensuel au directeur (CA, marge, projets à risque)
+  - Rapport trimestriel aux clients (projets TMA/support)
+- 💡 **Actions planifiées** :
+  - Archivage automatique des projets terminés (après 1 an)
+  - Nettoyage des brouillons non utilisés (après 3 mois)
+  - Backup automatique de la base de données
+
+**Technologies** : Symfony Messenger + Scheduler
+**Estimation** : 6-8 jours
+
+---
+
+## 🧪 Phase 8 : Qualité & Performance (Continue)
+
+### 💡 Lot 23 : Performance & Scalabilité 🆕
+**Objectif** : Optimiser les performances pour grosse volumétrie
+
+#### Actions
+- 💡 **Cache stratégique** :
+  - Redis pour cache applicatif
+  - Cache HTTP (Varnish ou Symfony HTTP Cache)
+  - Cache de requêtes Doctrine
+- 💡 **Optimisation base de données** :
+  - Analyse et création d'index manquants
+  - Partitionnement des tables de métriques
+  - Archivage des données anciennes (> 3 ans)
+- 💡 **Pagination et lazy loading** :
+  - Pagination côté serveur sur tous les listings
+  - Chargement lazy des graphiques (on-demand)
+  - Infinite scroll sur timesheet
+- 💡 **Monitoring** :
+  - APM (Application Performance Monitoring) : Blackfire, New Relic, ou Datadog
+  - Alertes sur temps de réponse > 500ms
+  - Dashboard de métriques techniques (CPU, RAM, queries/s)
+
+**Estimation** : 10-12 jours
+
+---
+
+### 💡 Lot 24 : Tests & Qualité - Renforcement 🆕
+**Objectif** : Augmenter la couverture de tests
+
+#### Actions
+- 💡 Tests unitaires :
+  - Cible : 80% de couverture (actuellement ~60%)
+  - Focus : Services métier, calculs de métriques
+- 💡 Tests d'intégration :
+  - Tous les repositories (requêtes complexes)
+  - Workers et handlers de messages
+- 💡 Tests fonctionnels :
+  - Tous les controllers (CRUD complets)
+  - Workflows métier (signature devis → génération tâches)
+- 💡 Tests E2E :
+  - Parcours critiques (saisie temps, création projet, génération facture)
+  - Tests cross-browser (Chrome, Firefox, Safari)
+- 💡 Tests de charge :
+  - Simulation de 100+ utilisateurs concurrents
+  - Identification des goulots d'étranglement
+
+**Estimation** : 8-10 jours
+
+---
+
+## 📦 Backlog & Idées Futures
+
+### 💡 Module de Formation Interne
+- Catalogue de formations (internes & externes)
+- Inscription et gestion des places
+- Évaluation post-formation
+- Suivi du budget formation par contributeur
+
+### 💡 Gestion des Risques Projet
+- Registre des risques par projet
+- Probabilité × Impact = Criticité
+- Plans de mitigation
+- Suivi de l'évolution des risques
+
+### 💡 Gestion des Incidents & Support
+- Ticketing pour support client
+- SLA tracking (temps de réponse, résolution)
+- Base de connaissances
+- Escalade automatique
+
+### 💡 BI & Data Warehouse
+- Export vers BI externe (Metabase, Tableau, Power BI)
+- Data Warehouse pour analytics cross-applications
+- Tableaux de bord exécutifs (direction générale)
+
+### 💡 Module de Veille Technologique
+- Flux RSS de veille par technologie
+- Curation de ressources (articles, tutos, confs)
+- Partage interne (Slack/Teams)
+- Tableau de bord des tendances tech
+
+### 💡 Certification & Habilitations
+- Suivi des certifications contributeurs (AWS, Google Cloud, Scrum Master)
+- Alertes d'expiration
+- Budget de certification
+- Catalogue de certifications recommandées par profil
+
+---
+
+## 📊 Récapitulatif & Estimation Globale
+
+### Priorités 2025
+
+| Phase | Lots | Priorité | Estimation | Trimestre |
+|-------|------|----------|------------|-----------|
+| Phase 1 : Consolidation | Lots 2, 3, 1.3, 1.4, 9 | 🔴 Haute | 27-36j | Q1 2025 |
+| Phase 2 : Analytics | Lots 10, 11, 7 | 🟡 Moyenne | 26-32j | Q2 2025 |
+| Phase 3 : Ouverture | Lots 8, 12, 13 | 🟡 Moyenne | 35-45j | Q3 2025 |
+| Phase 4 : Mobile | Lots 14, 15 | 🟢 Basse | 26-33j | Q4 2025 |
+| Phase 5 : UX/UI | Lots 5, 16, 17 | 🟡 Moyenne | 23-28j | Q4 2025 |
+| Phase 6 : Structuration | Lots 18, 19, 20, 21 | 🟢 Basse | 32-40j | 2026 |
+| Phase 7 : Automatisation | Lots 6, 22 | 🟢 Basse | 10-13j | 2026 |
+| Phase 8 : Qualité | Lots 23, 24 | 🟡 Continue | 18-22j | Continue |
+
+**Total estimé 2025** : ~150-190 jours (7-9 mois pour 1 développeur full-stack)
+
+---
+
+## 🎯 Recommandations
+
+### Court terme (3 mois)
+1. **Finaliser les fondations** : Lots 2, 3, 1.3, 1.4 (saisie temps + analytics + projets)
+2. **Mettre en place la facturation** : Lot 9 (critique pour le business)
+3. **Renforcer les tests** : Augmenter la couverture pour sécuriser les évolutions
+
+### Moyen terme (6-9 mois)
+1. **Analytics prédictifs** : Lot 10 (différenciation compétitive forte)
+2. **API REST** : Lot 8 (ouvrir l'écosystème)
+3. **Intégrations externes** : Lot 12 (gain de productivité)
+
+### Long terme (12+ mois)
+1. **Mobile App** : Lot 14 (usage terrain)
+2. **Business Units** : Lot 18 (structuration entreprise)
+3. **Portail Client** : Lot 13 (amélioration relation client)
+
+### Axes stratégiques prioritaires
+- **Automatisation** : Réduire le temps passé sur les tâches administratives
+- **Données** : Exploiter la richesse des données pour anticiper et décider
+- **UX** : Simplifier les workflows quotidiens pour améliorer l'adoption
+- **Ouverture** : S'intégrer dans l'écosystème d'outils existant
+
+---
+
+## 📝 Notes importantes
+
+- Les estimations sont données pour **1 développeur full-stack Symfony expérimenté**
+- Les tests sont **inclus** dans les estimations
+- La documentation technique est à **maintenir au fil de l'eau**
+- Prévoir des **revues de code** et QA entre chaque lot
+- Possibilité de **paralléliser** certains lots (ex: Lot 10 + Lot 11)
+- **Prioriser selon le ROI business** : facturation > analytics > mobile
+- Collecter du **feedback utilisateur** après chaque phase pour ajuster
+
+---
+
+**Dernière mise à jour** : 23 novembre 2025
+**Prochaine revue** : Fin Q1 2025 (mars 2025)

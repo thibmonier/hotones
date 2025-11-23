@@ -1,0 +1,288 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Calendrier des temps{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Calendrier des temps', pagetitle: 'Temps' }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">📅 Calendrier de saisie des temps</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('timesheet_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-grid-alt me-1"></i> Vue Grille
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de saisie/édition rapide -->
+    <div class="modal fade" id="timesheetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Saisir du temps</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="quick-timesheet-form">
+                        <input type="hidden" id="modal-timesheet-id" name="timesheet_id">
+                        <input type="hidden" id="modal-date" name="date">
+
+                        <div class="mb-3">
+                            <label for="modal-project" class="form-label">Projet <span class="text-danger">*</span></label>
+                            <select id="modal-project" name="project_id" class="form-select" required>
+                                <option value="">-- Sélectionner un projet --</option>
+                                {% for projectData in projectsWithTasks %}
+                                    <option value="{{ projectData.project.id }}">
+                                        {{ projectData.project.name }}
+                                        {% if projectData.project.client %}({{ projectData.project.client.name }}){% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="modal-task" class="form-label">Tâche</label>
+                            <select id="modal-task" name="task_id" class="form-select">
+                                <option value="">-- Aucune tâche --</option>
+                            </select>
+                            <small class="text-muted">Sélectionnez d'abord un projet</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="modal-hours" class="form-label">Heures <span class="text-danger">*</span></label>
+                            <input type="number"
+                                   id="modal-hours"
+                                   name="hours"
+                                   class="form-control"
+                                   step="0.25"
+                                   min="1"
+                                   max="24"
+                                   required
+                                   placeholder="Ex: 7.5">
+                            <small class="text-muted">Minimum 1h, maximum 24h</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="modal-notes" class="form-label">Notes</label>
+                            <textarea id="modal-notes"
+                                      name="notes"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Décrivez brièvement le travail effectué..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" id="delete-timesheet-btn" style="display: none;">
+                        <i class="bx bx-trash me-1"></i> Supprimer
+                    </button>
+                    <button type="button" class="btn btn-primary" id="save-timesheet-btn">
+                        <i class="bx bx-save me-1"></i> Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {# FullCalendar CDN #}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales/fr.global.min.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const modal = new bootstrap.Modal(document.getElementById('timesheetModal'));
+        const modalTitle = document.getElementById('modalTitle');
+        const projectSelect = document.getElementById('modal-project');
+        const taskSelect = document.getElementById('modal-task');
+        const deleteBtn = document.getElementById('delete-timesheet-btn');
+
+        // Données des projets avec tâches (pour la cascade)
+        const projectsData = {{ projectsWithTasks|json_encode|raw }};
+
+        // Initialiser FullCalendar
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            firstDay: 1, // Lundi
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek'
+            },
+            buttonText: {
+                today: "Aujourd'hui",
+                month: 'Mois',
+                week: 'Semaine'
+            },
+            events: {{ events|json_encode|raw }},
+
+            // Clic sur une date vide : créer un temps
+            dateClick: function(info) {
+                openModal('create', info.dateStr);
+            },
+
+            // Clic sur un événement : éditer
+            eventClick: function(info) {
+                const event = info.event;
+                const props = event.extendedProps;
+                openModal('edit', event.startStr, props);
+            },
+
+            // Style des événements
+            eventDidMount: function(info) {
+                // Ajouter tooltip
+                info.el.setAttribute('title',
+                    info.event.extendedProps.projectName +
+                    (info.event.extendedProps.taskName ? ' - ' + info.event.extendedProps.taskName : '') +
+                    '\n' + info.event.extendedProps.hours + 'h' +
+                    (info.event.extendedProps.notes ? '\n' + info.event.extendedProps.notes : '')
+                );
+            }
+        });
+
+        calendar.render();
+
+        // Fonction pour ouvrir la modal
+        function openModal(mode, dateStr, eventData = null) {
+            const form = document.getElementById('quick-timesheet-form');
+            form.reset();
+
+            if (mode === 'create') {
+                modalTitle.textContent = 'Saisir du temps - ' + new Date(dateStr).toLocaleDateString('fr-FR');
+                document.getElementById('modal-timesheet-id').value = '';
+                document.getElementById('modal-date').value = dateStr;
+                deleteBtn.style.display = 'none';
+            } else {
+                modalTitle.textContent = 'Modifier le temps - ' + new Date(dateStr).toLocaleDateString('fr-FR');
+                document.getElementById('modal-timesheet-id').value = eventData.timesheetId;
+                document.getElementById('modal-date').value = dateStr;
+                document.getElementById('modal-project').value = eventData.projectId;
+                document.getElementById('modal-hours').value = eventData.hours;
+                document.getElementById('modal-notes').value = eventData.notes || '';
+
+                // Charger les tâches du projet
+                updateTaskOptions(eventData.projectId, eventData.taskId);
+
+                deleteBtn.style.display = 'inline-block';
+            }
+
+            modal.show();
+        }
+
+        // Cascade projet → tâches
+        projectSelect.addEventListener('change', function() {
+            updateTaskOptions(this.value);
+        });
+
+        function updateTaskOptions(projectId, selectedTaskId = null) {
+            taskSelect.innerHTML = '<option value="">-- Aucune tâche --</option>';
+
+            if (!projectId) return;
+
+            const project = projectsData.find(p => p.project.id == projectId);
+            if (project && project.tasks) {
+                project.tasks.forEach(task => {
+                    const option = document.createElement('option');
+                    option.value = task.id;
+                    option.textContent = task.name;
+                    if (selectedTaskId && task.id == selectedTaskId) {
+                        option.selected = true;
+                    }
+                    taskSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Sauvegarde
+        document.getElementById('save-timesheet-btn').addEventListener('click', function() {
+            const projectId = document.getElementById('modal-project').value;
+            const taskId = document.getElementById('modal-task').value;
+            const date = document.getElementById('modal-date').value;
+            const hours = parseFloat(document.getElementById('modal-hours').value);
+            const notes = document.getElementById('modal-notes').value;
+
+            if (!projectId || !hours) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('project_id', projectId);
+            formData.append('date', date);
+            formData.append('hours', hours);
+            formData.append('notes', notes);
+            if (taskId) formData.append('task_id', taskId);
+
+            fetch('{{ path('timesheet_save') }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modal.hide();
+                    location.reload(); // Recharger le calendrier
+                } else {
+                    alert('Erreur : ' + (data.error || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur de connexion');
+            });
+        });
+
+        // Suppression
+        deleteBtn.addEventListener('click', function() {
+            if (!confirm('Voulez-vous vraiment supprimer cette saisie de temps ?')) {
+                return;
+            }
+
+            const date = document.getElementById('modal-date').value;
+            const projectId = document.getElementById('modal-project').value;
+            const taskId = document.getElementById('modal-task').value;
+
+            const formData = new FormData();
+            formData.append('project_id', projectId);
+            formData.append('date', date);
+            formData.append('hours', 0); // 0 heures = suppression
+            if (taskId) formData.append('task_id', taskId);
+
+            fetch('{{ path('timesheet_save') }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modal.hide();
+                    location.reload();
+                } else {
+                    alert('Erreur : ' + (data.error || 'Erreur inconnue'));
+                }
+            });
+        });
+    });
+    </script>
+{% endblock %}

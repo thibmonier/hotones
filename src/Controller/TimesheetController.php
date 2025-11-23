@@ -123,6 +123,28 @@ class TimesheetController extends AbstractController
         $hours     = (float) $request->request->get('hours');
         $notes     = $request->request->get('notes', '');
 
+        // Validation : minimum 1h (0.125j = 1h/8)
+        if ($hours > 0 && $hours < 1.0) {
+            return new JsonResponse([
+                'error' => 'La saisie minimale est de 1 heure (0.125 jour)',
+            ], 400);
+        }
+
+        // Validation : maximum 24h/jour
+        if ($hours > 0) {
+            $dailyTotal = $timesheetRepo->getTotalHoursForContributorAndDate($contributor, $date);
+            if ($dailyTotal + $hours > 24) {
+                return new JsonResponse([
+                    'error' => sprintf(
+                        'Dépassement du total quotidien : %.2fh déjà saisi(es), +%.2fh demandé = %.2fh/24h maximum',
+                        $dailyTotal,
+                        $hours,
+                        $dailyTotal + $hours,
+                    ),
+                ], 400);
+            }
+        }
+
         $project = $em->getRepository(Project::class)->find($projectId);
         if (!$project) {
             return new JsonResponse(['error' => 'Projet non trouvé'], 400);
@@ -167,6 +189,63 @@ class TimesheetController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/calendar', name: 'timesheet_calendar', methods: ['GET'])]
+    public function calendar(Request $request, EntityManagerInterface $em): Response
+    {
+        $contributorRepo = $em->getRepository(Contributor::class);
+        $timesheetRepo   = $em->getRepository(Timesheet::class);
+        $projectRepo     = $em->getRepository(Project::class);
+
+        $contributor = $contributorRepo->findByUser($this->getUser());
+        if (!$contributor) {
+            $this->addFlash('error', 'Aucun contributeur associé à votre compte.');
+
+            return $this->redirectToRoute('home');
+        }
+
+        $month     = $request->query->get('month', date('Y-m'));
+        $startDate = new DateTime($month.'-01');
+        $endDate   = clone $startDate;
+        $endDate->modify('last day of this month');
+
+        // Récupérer les temps du mois
+        $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
+
+        // Transformer en format FullCalendar
+        $events = [];
+        foreach ($timesheets as $ts) {
+            $events[] = [
+                'id'              => $ts->getId(),
+                'title'           => sprintf('%s - %.2fh', $ts->getProject()->getName(), (float) $ts->getHours()),
+                'start'           => $ts->getDate()->format('Y-m-d'),
+                'allDay'          => true,
+                'backgroundColor' => '#3788d8',
+                'borderColor'     => '#3788d8',
+                'extendedProps'   => [
+                    'timesheetId' => $ts->getId(),
+                    'projectId'   => $ts->getProject()->getId(),
+                    'projectName' => $ts->getProject()->getName(),
+                    'taskId'      => $ts->getTask()?->getId(),
+                    'taskName'    => $ts->getTask()?->getName(),
+                    'hours'       => (float) $ts->getHours(),
+                    'notes'       => $ts->getNotes(),
+                ],
+            ];
+        }
+
+        // Récupérer les projets avec tâches pour le formulaire de saisie
+        $projectsWithTasks = $contributorRepo->findProjectsWithTasksForContributor($contributor);
+
+        return $this->render('timesheet/calendar.html.twig', [
+            'events'            => $events,
+            'month'             => $month,
+            'startDate'         => $startDate,
+            'endDate'           => $endDate,
+            'contributor'       => $contributor,
+            'projectsWithTasks' => $projectsWithTasks,
+        ]);
     }
 
     #[Route('/my-time', name: 'timesheet_my_time', methods: ['GET'])]
@@ -260,6 +339,85 @@ class TimesheetController extends AbstractController
             'startDate'          => $startDate,
             'endDate'            => $endDate,
             'activeFiltersCount' => $activeFiltersCount,
+        ]);
+    }
+
+    #[Route('/duplicate-week', name: 'timesheet_duplicate_week', methods: ['POST'])]
+    public function duplicateWeek(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $contributorRepo = $em->getRepository(Contributor::class);
+        $timesheetRepo   = $em->getRepository(Timesheet::class);
+
+        $contributor = $contributorRepo->findByUser($this->getUser());
+        if (!$contributor) {
+            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+        }
+
+        $sourceWeek = $request->request->get('source_week'); // Format: 2025-W04
+        $targetWeek = $request->request->get('target_week'); // Format: 2025-W05
+
+        if (!$sourceWeek || !$targetWeek) {
+            return new JsonResponse(['error' => 'Semaines source et cible requises'], 400);
+        }
+
+        if ($sourceWeek === $targetWeek) {
+            return new JsonResponse(['error' => 'Les semaines source et cible doivent être différentes'], 400);
+        }
+
+        [$sourceYear, $sourceWeekNum] = explode('-W', $sourceWeek);
+        [$targetYear, $targetWeekNum] = explode('-W', $targetWeek);
+
+        $sourceStart = new DateTime();
+        $sourceStart->setISODate((int) $sourceYear, (int) $sourceWeekNum, 1);
+        $sourceEnd = clone $sourceStart;
+        $sourceEnd->modify('+6 days');
+
+        $targetStart = new DateTime();
+        $targetStart->setISODate((int) $targetYear, (int) $targetWeekNum, 1);
+
+        // Récupérer les temps de la semaine source
+        $sourceTimesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $sourceStart, $sourceEnd);
+
+        if (empty($sourceTimesheets)) {
+            return new JsonResponse(['error' => 'Aucun temps à dupliquer pour cette semaine'], 400);
+        }
+
+        $duplicatedCount = 0;
+        foreach ($sourceTimesheets as $source) {
+            // Calculer le décalage de jours entre source et cible
+            $dayOffset  = $source->getDate()->diff($sourceStart)->days;
+            $targetDate = clone $targetStart;
+            $targetDate->modify("+{$dayOffset} days");
+
+            // Vérifier si un temps existe déjà (même projet, même tâche, même date)
+            $existing = $timesheetRepo->findExistingTimesheetWithTask(
+                $contributor,
+                $source->getProject(),
+                $targetDate,
+                $source->getTask(),
+            );
+
+            if (!$existing) {
+                $duplicate = new Timesheet();
+                $duplicate->setContributor($contributor)
+                    ->setProject($source->getProject())
+                    ->setTask($source->getTask())
+                    ->setSubTask($source->getSubTask())
+                    ->setDate($targetDate)
+                    ->setHours($source->getHours());
+                // Notes non dupliquées volontairement
+
+                $em->persist($duplicate);
+                ++$duplicatedCount;
+            }
+        }
+
+        $em->flush();
+
+        return new JsonResponse([
+            'success'          => true,
+            'message'          => sprintf('%d entrée(s) dupliquée(s)', $duplicatedCount),
+            'duplicated_count' => $duplicatedCount,
         ]);
     }
 

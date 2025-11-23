@@ -5,12 +5,16 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 ## Sommaire des documents
 - Aperçu du projet: docs/overview.md
 - Fonctionnalités: docs/features.md
+- **Roadmap 2025 🗺️: docs/roadmap-2025.md**
+- **Plan d'Exécution 2025 🎯: docs/execution-plan-2025.md**
+- **Sprint 1 - Saisie Temps 🏃: docs/sprint-1-timesheet.md**
+- Roadmap & Lots (historique): docs/roadmap-lots.md
+- État d'avancement: docs/status.md
 - Temps, planning, congés: docs/time-planning.md
 - **Optimisation IA du planning: docs/planning-ai.md**
 - Architecture technique: docs/architecture.md
 - Repositories: docs/repositories.md
 - Entités: docs/entities.md
-- État d'avancement: docs/status.md
 - Installation: docs/installation.md
 - **Déploiement sur Render: docs/deployment-render.md**
 - Tests: docs/tests.md
@@ -26,7 +30,6 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 - Spécifications détaillées: docs/specs.md
 - Guide agents: AGENTS.md
 - Opérations Worker: docs/worker-operations.md
-- Roadmap & Lots: docs/roadmap-lots.md
 - **Sprint 1 - Récapitulatif ✅: docs/sprint-1-recap.md**
 - **Sprint 3 - Lancement 🚀: docs/sprint-3-launch.md**
 - Rôles de l'application: docs/roles.md

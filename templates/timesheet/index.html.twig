@@ -8,7 +8,10 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">Saisie des temps</h4>
-                <div class="page-title-right">
+                <div class="page-title-right d-flex gap-2">
+                    <a href="{{ path('timesheet_calendar') }}" class="btn btn-outline-primary">
+                        <i class="bx bx-calendar me-1"></i> Vue Calendrier
+                    </a>
                     <div class="btn-group">
                         <a href="?week={{ previousWeek }}" class="btn btn-outline-secondary">
                             <i class="bx bx-left-arrow-alt me-1"></i> Semaine précédente
@@ -35,11 +38,20 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">
                             Semaine du {{ startDate|date('d/m/Y') }} au {{ endDate|date('d/m/Y') }}
                             <small class="text-muted">- {{ contributor.name }}</small>
                         </h4>
+                        <div class="btn-group">
+                            <button type="button" id="toggle-mode-btn" class="btn btn-sm btn-outline-primary">
+                                <i class="bx bx-transfer me-1"></i>
+                                <span id="toggle-mode-text">Afficher en jours</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#duplicateWeekModal">
+                                <i class="bx bx-content-copy me-1"></i> Dupliquer semaine
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         {# Bandeau compteur en cours #}
@@ -180,7 +192,9 @@
                                     <tr>
                                         <th>Total par jour</th>
                                         {% for i in 0..6 %}
-                                            <th class="text-center day-total" data-day="{{ i }}">0h</th>
+                                            <th class="text-center day-total" data-day="{{ i }}" data-hours="0">
+                                                <span class="total-value">0</span><span class="total-unit">h</span>
+                                            </th>
                                         {% endfor %}
                                     </tr>
                                 </tfoot>
@@ -194,8 +208,8 @@
                                     <ul class="mb-0">
                                         <li>Saisissez vos heures au format décimal (ex: 7.5 pour 7h30)</li>
                                         <li>Les modifications sont enregistrées automatiquement</li>
-                                        <li>Maximum 12h par jour</li>
-                                        <li>Incrément minimum : 0.25h (15 minutes)</li>
+                                        <li>Minimum 1h par saisie (0.125j)</li>
+                                        <li>Maximum 24h par jour</li>
                                     </ul>
                                 </div>
                             </div>
@@ -205,11 +219,15 @@
                                         <h6 class="card-title">Résumé de la semaine</h6>
                                         <div class="d-flex justify-content-between">
                                             <span>Total saisi :</span>
-                                            <span class="fw-bold" id="week-total">0h</span>
+                                            <span class="fw-bold">
+                                                <span id="week-total-value">0</span><span id="week-total-unit">h</span>
+                                            </span>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <span>Objectif :</span>
-                                            <span class="text-muted">{{ contributor.weeklyHours ?? 35 }}h</span>
+                                            <span class="text-muted">
+                                                <span id="week-target-value">{{ contributor.weeklyHours ?? 35 }}</span><span id="week-target-unit">h</span>
+                                            </span>
                                         </div>
                                         <div class="progress mt-2">
                                             <div class="progress-bar" role="progressbar" id="week-progress" style="width: 0%"></div>
@@ -246,6 +264,41 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal de duplication de semaine -->
+        <div class="modal fade" id="duplicateWeekModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Dupliquer une semaine</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Semaine source (à copier)</label>
+                            <input type="week" id="source-week" class="form-control" value="{{ currentWeek }}">
+                            <small class="text-muted">La semaine dont vous voulez copier les temps</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Semaine cible (destination)</label>
+                            <input type="week" id="target-week" class="form-control">
+                            <small class="text-muted">La semaine où les temps seront dupliqués</small>
+                        </div>
+                        <div class="alert alert-info mb-0">
+                            <i class="bx bx-info-circle me-1"></i>
+                            Les projets, tâches et heures seront copiés. Les notes ne seront pas dupliquées.
+                            Les temps déjà existants ne seront pas écrasés.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="confirm-duplicate-btn">
+                            <i class="bx bx-content-copy me-1"></i> Dupliquer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}
 
@@ -266,6 +319,116 @@
         const weekProgress = document.getElementById('week-progress');
         const weeklyTarget = {{ contributor.weeklyHours ?? 35 }};
 
+        // Fonction pour afficher un toast de notification
+        function showToast(type, message, duration = 4000) {
+            const toastContainer = document.getElementById('toast-container') || createToastContainer();
+            const toastId = 'toast-' + Date.now();
+
+            const bgClass = type === 'error' ? 'bg-danger' : type === 'success' ? 'bg-success' : 'bg-info';
+            const icon = type === 'error' ? 'bx-x-circle' : type === 'success' ? 'bx-check-circle' : 'bx-info-circle';
+
+            const toastHTML = `
+                <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bx ${icon} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: duration });
+            toast.show();
+
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // Gestion du mode d'affichage (heures ou jours)
+        let displayMode = 'hours'; // 'hours' ou 'days'
+        const toggleModeBtn = document.getElementById('toggle-mode-btn');
+        const toggleModeText = document.getElementById('toggle-mode-text');
+
+        function toggleDisplayMode() {
+            displayMode = displayMode === 'hours' ? 'days' : 'hours';
+            updateAllCellsDisplay();
+            updateTotalsDisplay();
+
+            // Mettre à jour le texte du bouton
+            toggleModeText.textContent = displayMode === 'hours' ? 'Afficher en jours' : 'Afficher en heures';
+        }
+
+        function updateAllCellsDisplay() {
+            timeInputs.forEach(input => {
+                const hours = parseFloat(input.dataset.hours || input.value) || 0;
+                // Sauvegarder les heures réelles
+                if (!input.dataset.hours) {
+                    input.dataset.hours = input.value || '0';
+                }
+
+                if (displayMode === 'days') {
+                    const days = hours / 8;
+                    input.value = days > 0 ? days.toFixed(3) : '';
+                    input.step = '0.125'; // 1h en jours
+                } else {
+                    input.value = hours > 0 ? hours : '';
+                    input.step = '0.25'; // 15 minutes
+                }
+            });
+        }
+
+        function updateTotalsDisplay() {
+            const weekTotalValue = document.getElementById('week-total-value');
+            const weekTotalUnit = document.getElementById('week-total-unit');
+            const weekTargetValue = document.getElementById('week-target-value');
+            const weekTargetUnit = document.getElementById('week-target-unit');
+
+            // Mettre à jour les unités
+            const unit = displayMode === 'days' ? 'j' : 'h';
+            weekTotalUnit.textContent = unit;
+            weekTargetUnit.textContent = unit;
+
+            // Mettre à jour la valeur de l'objectif
+            const targetDisplay = displayMode === 'days' ? (weeklyTarget / 8).toFixed(3) : weeklyTarget;
+            weekTargetValue.textContent = targetDisplay;
+
+            document.querySelectorAll('.total-unit').forEach(el => {
+                el.textContent = unit;
+            });
+
+            // Recalculer et afficher les totaux
+            calculateTotals();
+        }
+
+        function convertToHours(value, input) {
+            if (!value || value === '') return 0;
+            const numValue = parseFloat(value);
+
+            if (displayMode === 'days') {
+                return numValue * 8;
+            }
+            return numValue;
+        }
+
+        // Event listener pour le bouton toggle
+        if (toggleModeBtn) {
+            toggleModeBtn.addEventListener('click', toggleDisplayMode);
+        }
+
         // Debounce function pour éviter trop de requêtes
         function debounce(func, wait) {
             let timeout;
@@ -285,8 +448,12 @@
             let weekTotalHours = 0;
 
             timeInputs.forEach(input => {
-                const hours = parseFloat(input.value) || 0;
-                if (hours > 0) { // Ne compter que les heures réellement saisies
+                // Toujours convertir en heures pour les calculs
+                const hours = convertToHours(input.value, input);
+                // Mettre à jour dataset
+                input.dataset.hours = hours > 0 ? hours.toString() : '0';
+
+                if (hours > 0) {
                     const date = new Date(input.dataset.date);
                     const dayIndex = (date.getDay() + 6) % 7; // Lundi = 0
                     dayTotalsArray[dayIndex] += hours;
@@ -296,10 +463,16 @@
 
             // Mettre à jour l'affichage des totaux quotidiens
             dayTotals.forEach((total, index) => {
-                total.textContent = dayTotalsArray[index].toFixed(1) + 'h';
+                const hoursValue = dayTotalsArray[index];
+                total.dataset.hours = hoursValue.toFixed(1);
 
-                // Colorer en rouge si > 8h
-                if (dayTotalsArray[index] > 8) {
+                const displayValue = displayMode === 'days' ? (hoursValue / 8).toFixed(3) : hoursValue.toFixed(1);
+                total.querySelector('.total-value').textContent = displayValue;
+
+                // Colorer en rouge si > 8h (ou > 1j)
+                const threshold = displayMode === 'days' ? 1 : 8;
+                const compareValue = displayMode === 'days' ? hoursValue / 8 : hoursValue;
+                if (compareValue > threshold) {
                     total.classList.add('text-danger');
                 } else {
                     total.classList.remove('text-danger');
@@ -307,9 +480,10 @@
             });
 
             // Mettre à jour le total hebdomadaire
-            weekTotal.textContent = weekTotalHours.toFixed(1) + 'h';
+            const displayTotal = displayMode === 'days' ? (weekTotalHours / 8).toFixed(3) : weekTotalHours.toFixed(1);
+            document.getElementById('week-total-value').textContent = displayTotal;
 
-            // Mettre à jour la barre de progression
+            // Mettre à jour la barre de progression (toujours en heures)
             const progressPercent = (weekTotalHours / weeklyTarget) * 100;
             weekProgress.style.width = Math.min(progressPercent, 100) + '%';
 
@@ -347,12 +521,14 @@
             .then(response => response.json())
             .then(data => {
                 if (!data.success) {
-                    alert('Erreur lors de la sauvegarde: ' + (data.error || 'Erreur inconnue'));
+                    showToast('error', data.error || 'Erreur inconnue');
+                } else {
+                    showToast('success', 'Temps enregistré', 2000);
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('Erreur de connexion');
+                showToast('error', 'Erreur de connexion');
             });
         }, 1000);
 
@@ -425,7 +601,8 @@
         timeInputs.forEach(input => {
             input.addEventListener('input', function() {
                 calculateTotals();
-                const hours = parseFloat(this.value) || 0;
+                // Convertir en heures avant de sauvegarder
+                const hours = convertToHours(this.value, this);
                 saveTime(this.dataset.projectId, this.dataset.date, hours, '', this.dataset.taskId);
             });
 
@@ -444,7 +621,8 @@
                 }
 
                 saveBtn.onclick = () => {
-                    const hours = parseFloat(this.value) || 0;
+                    // Convertir en heures avant de sauvegarder
+                    const hours = convertToHours(this.value, this);
                     saveTime(this.dataset.projectId, this.dataset.date, hours, notesText.value, this.dataset.taskId);
                     modal.hide();
 
@@ -476,6 +654,62 @@
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+
+        // Gestion de la duplication de semaine
+        const confirmDuplicateBtn = document.getElementById('confirm-duplicate-btn');
+        if (confirmDuplicateBtn) {
+            confirmDuplicateBtn.addEventListener('click', function() {
+                const sourceWeek = document.getElementById('source-week').value;
+                const targetWeek = document.getElementById('target-week').value;
+
+                if (!sourceWeek || !targetWeek) {
+                    showToast('error', 'Veuillez sélectionner les deux semaines');
+                    return;
+                }
+
+                if (sourceWeek === targetWeek) {
+                    showToast('error', 'Les semaines source et cible doivent être différentes');
+                    return;
+                }
+
+                // Désactiver le bouton pendant le traitement
+                confirmDuplicateBtn.disabled = true;
+                const originalText = confirmDuplicateBtn.innerHTML;
+                confirmDuplicateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Duplication...';
+
+                const formData = new FormData();
+                formData.append('source_week', sourceWeek);
+                formData.append('target_week', targetWeek);
+
+                fetch('{{ path('timesheet_duplicate_week') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('success', data.message || 'Semaine dupliquée avec succès');
+                        // Fermer la modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateWeekModal'));
+                        if (modal) modal.hide();
+                        // Recharger la page après un court délai
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showToast('error', data.error || 'Erreur lors de la duplication');
+                        confirmDuplicateBtn.disabled = false;
+                        confirmDuplicateBtn.innerHTML = originalText;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    showToast('error', 'Erreur de connexion');
+                    confirmDuplicateBtn.disabled = false;
+                    confirmDuplicateBtn.innerHTML = originalText;
+                });
+            });
+        }
     });
     </script>
 {% endblock %}
