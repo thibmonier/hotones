@@ -154,7 +154,7 @@ class TimesheetControllerTest extends WebTestCase
         $project     = ProjectFactory::createOne();
         $task        = ProjectTaskFactory::createOne([
             'project'             => $project,
-            'requiredProfile'     => null,
+            'requiredProfile'     => ProfileFactory::createOne(),
             'assignedContributor' => null,
         ]);
 
