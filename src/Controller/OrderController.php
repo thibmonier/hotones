@@ -749,7 +749,7 @@ class OrderController extends AbstractController
         $filename = sprintf(
             'devis_%s_%s.pdf',
             $order->getReference(),
-            (new DateTime())->format('Y-m-d')
+            (new DateTime())->format('Y-m-d'),
         );
 
         // Générer et retourner le PDF
@@ -757,7 +757,7 @@ class OrderController extends AbstractController
             'order/pdf.html.twig',
             $data,
             $filename,
-            inline: false  // Force le téléchargement
+            inline: false,  // Force le téléchargement
         );
     }
 
@@ -786,7 +786,7 @@ class OrderController extends AbstractController
             'order/pdf.html.twig',
             $data,
             $filename,
-            inline: true  // Affichage dans le navigateur
+            inline: true,  // Affichage dans le navigateur
         );
     }
 }

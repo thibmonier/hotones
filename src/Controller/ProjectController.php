@@ -207,8 +207,12 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/{id}', name: 'project_show', methods: ['GET'])]
-    public function show(Request $request, int $id, EntityManagerInterface $em): Response
-    {
+    public function show(
+        Request $request,
+        int $id,
+        EntityManagerInterface $em,
+        \App\Service\ProjectRiskAnalyzer $riskAnalyzer
+    ): Response {
         $project = $em->getRepository(Project::class)->findOneWithRelations($id);
 
         if (!$project) {
@@ -217,6 +221,9 @@ class ProjectController extends AbstractController
 
         // Calculer les métriques des devis
         $projectMetrics = $this->calculateProjectMetrics($project);
+
+        // Analyser les risques du projet
+        $riskAnalysis = $riskAnalyzer->analyzeProject($project);
 
         // Devis du projet: tri + pagination
         $orderRepo      = $em->getRepository(\App\Entity\Order::class);
@@ -245,6 +252,7 @@ class ProjectController extends AbstractController
         return $this->render('project/show.html.twig', [
             'project'           => $project,
             'metrics'           => $projectMetrics,
+            'riskAnalysis'      => $riskAnalysis,
             'orders'            => $orders,
             'orders_pagination' => $oPagination,
             'orders_sort'       => $oSort,

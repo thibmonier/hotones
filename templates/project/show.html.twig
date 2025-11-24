@@ -29,6 +29,37 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Santé du projet</span>
+                            <h4 class="mb-3">
+                                {% set healthScore = riskAnalysis.healthScore %}
+                                {% set riskLevel = riskAnalysis.riskLevel %}
+                                <span class="counter-value text-{{ riskLevel == 'low' ? 'success' : (riskLevel == 'medium' ? 'warning' : 'danger') }}">
+                                    {{ healthScore }}%
+                                </span>
+                            </h4>
+                            {% if riskAnalysis.risks|length > 0 %}
+                                <small class="text-muted">
+                                    {{ riskAnalysis.risks|length }} risque(s) détecté(s)
+                                </small>
+                            {% endif %}
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-{{ riskLevel == 'low' ? 'success' : (riskLevel == 'medium' ? 'warning' : 'danger') }} rounded">
+                                <span class="avatar-title bg-soft-{{ riskLevel == 'low' ? 'success' : (riskLevel == 'medium' ? 'warning' : 'danger') }} text-{{ riskLevel == 'low' ? 'success' : (riskLevel == 'medium' ? 'warning' : 'danger') }} font-size-24">
+                                    <i class="bx bx-{{ riskLevel == 'critical' ? 'error' : (riskLevel == 'high' ? 'error-circle' : (riskLevel == 'medium' ? 'info-circle' : 'check-circle')) }}"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
                             <span class="text-muted mb-3 lh-1 d-block text-truncate">CA signé</span>
                             <h4 class="mb-3">
                                 <span class="counter-value text-success">{{ project.totalSoldAmount|number_format(0, ',', ' ') }}€</span>

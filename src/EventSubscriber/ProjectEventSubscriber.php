@@ -33,7 +33,7 @@ class ProjectEventSubscriber
         $this->createEvent(
             $entity,
             'project_created',
-            sprintf('Projet "%s" créé', $entity->getName())
+            sprintf('Projet "%s" créé', $entity->getName()),
         );
     }
 
@@ -48,13 +48,14 @@ class ProjectEventSubscriber
         $changeSet = $this->em->getUnitOfWork()->getEntityChangeSet($entity);
 
         // Tracer les changements de statut
-        if (isset($changeSet['status'])) {
-            [$oldStatus, $newStatus] = $changeSet['status'];
+        if (isset($changeSet['status']) && is_array($changeSet['status'])) {
+            $oldStatus = $changeSet['status'][0];
+            $newStatus = $changeSet['status'][1];
             $this->createEvent(
                 $entity,
                 'status_changed',
                 sprintf('Statut changé de "%s" à "%s"', $oldStatus, $newStatus),
-                ['old' => $oldStatus, 'new' => $newStatus]
+                ['old' => $oldStatus, 'new' => $newStatus],
             );
         }
 
@@ -63,31 +64,33 @@ class ProjectEventSubscriber
             $this->createEvent(
                 $entity,
                 'dates_updated',
-                'Dates du projet modifiées'
+                'Dates du projet modifiées',
             );
         }
 
         // Tracer les changements de budget
-        if (isset($changeSet['estimatedBudget'])) {
-            [$oldBudget, $newBudget] = $changeSet['estimatedBudget'];
+        if (isset($changeSet['estimatedBudget']) && is_array($changeSet['estimatedBudget'])) {
+            $oldBudget = $changeSet['estimatedBudget'][0];
+            $newBudget = $changeSet['estimatedBudget'][1];
             $this->createEvent(
                 $entity,
                 'budget_updated',
                 sprintf('Budget modifié de %s€ à %s€', $oldBudget ?? '0', $newBudget ?? '0'),
-                ['old' => $oldBudget, 'new' => $newBudget]
+                ['old' => $oldBudget, 'new' => $newBudget],
             );
         }
 
         // Tracer les changements de chef de projet
-        if (isset($changeSet['projectManager'])) {
-            [$oldPm, $newPm] = $changeSet['projectManager'];
+        if (isset($changeSet['projectManager']) && is_array($changeSet['projectManager'])) {
+            $oldPm   = $changeSet['projectManager'][0];
+            $newPm   = $changeSet['projectManager'][1];
             $oldName = $oldPm ? $oldPm->getFullName() : 'Aucun';
             $newName = $newPm ? $newPm->getFullName() : 'Aucun';
             $this->createEvent(
                 $entity,
                 'manager_changed',
                 sprintf('Chef de projet changé de "%s" à "%s"', $oldName, $newName),
-                ['old' => $oldName, 'new' => $newName]
+                ['old' => $oldName, 'new' => $newName],
             );
         }
     }

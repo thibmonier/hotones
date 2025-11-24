@@ -18,10 +18,10 @@ class PdfGeneratorService
     /**
      * Génère un PDF à partir d'un template Twig.
      *
-     * @param string $template     Le chemin du template Twig
-     * @param array  $data         Les données à passer au template
-     * @param array  $pdfOptions   Options DomPDF (format, orientation, etc.)
-     * @param bool   $inline       Si true, affiche le PDF dans le navigateur. Si false, force le téléchargement
+     * @param string $template   Le chemin du template Twig
+     * @param array  $data       Les données à passer au template
+     * @param array  $pdfOptions Options DomPDF (format, orientation, etc.)
+     * @param bool   $inline     Si true, affiche le PDF dans le navigateur. Si false, force le téléchargement
      *
      * @return string Le contenu PDF généré
      */
@@ -59,8 +59,6 @@ class PdfGeneratorService
      * @param string $filename   Le nom du fichier PDF
      * @param bool   $inline     Si true, affiche le PDF dans le navigateur
      * @param array  $pdfOptions Options DomPDF
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createPdfResponse(
         string $template,

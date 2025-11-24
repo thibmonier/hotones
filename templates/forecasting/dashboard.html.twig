@@ -1,0 +1,383 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Prévisions CA{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Prévisions CA', pagetitle: 'Analytics' }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Prévisions de Chiffre d'Affaires</h4>
+                <div class="page-title-right">
+                    <div class="btn-group" role="group">
+                        <a href="{{ path('forecasting_dashboard', {horizon: 3}) }}"
+                           class="btn btn-sm {{ horizon == 3 ? 'btn-primary' : 'btn-outline-primary' }}">
+                            3 mois
+                        </a>
+                        <a href="{{ path('forecasting_dashboard', {horizon: 6}) }}"
+                           class="btn btn-sm {{ horizon == 6 ? 'btn-primary' : 'btn-outline-primary' }}">
+                            6 mois
+                        </a>
+                        <a href="{{ path('forecasting_dashboard', {horizon: 12}) }}"
+                           class="btn btn-sm {{ horizon == 12 ? 'btn-primary' : 'btn-outline-primary' }}">
+                            12 mois
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if error is defined %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <i class="bx bx-error-circle me-2"></i>
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+    {% elseif forecast %}
+        <!-- KPI Cards -->
+        <div class="row">
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <span class="text-muted mb-3 lh-1 d-block text-truncate">Tendance</span>
+                                <h4 class="mb-3">
+                                    {% if forecast.trend == 'growth' %}
+                                        <span class="text-success">
+                                            <i class="bx bx-trending-up"></i> Croissance
+                                        </span>
+                                    {% elseif forecast.trend == 'decline' %}
+                                        <span class="text-danger">
+                                            <i class="bx bx-trending-down"></i> Décroissance
+                                        </span>
+                                    {% else %}
+                                        <span class="text-info">
+                                            <i class="bx bx-minus"></i> Stable
+                                        </span>
+                                    {% endif %}
+                                </h4>
+                            </div>
+                            <div class="flex-shrink-0 text-end">
+                                <div class="avatar-sm bg-soft-{{ forecast.trend == 'growth' ? 'success' : (forecast.trend == 'decline' ? 'danger' : 'info') }} rounded">
+                                    <span class="avatar-title bg-soft-{{ forecast.trend == 'growth' ? 'success' : (forecast.trend == 'decline' ? 'danger' : 'info') }} text-{{ forecast.trend == 'growth' ? 'success' : (forecast.trend == 'decline' ? 'danger' : 'info') }} font-size-24">
+                                        <i class="bx bx-line-chart"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <span class="text-muted mb-3 lh-1 d-block text-truncate">Fiabilité</span>
+                                <h4 class="mb-3">
+                                    <span class="text-primary">{{ forecast.confidence }}%</span>
+                                </h4>
+                            </div>
+                            <div class="flex-shrink-0 text-end">
+                                <div class="avatar-sm bg-soft-primary rounded">
+                                    <span class="avatar-title bg-soft-primary text-primary font-size-24">
+                                        <i class="bx bx-bar-chart-alt-2"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress mt-2" style="height: 6px;">
+                            <div class="progress-bar bg-primary" role="progressbar"
+                                 style="width: {{ forecast.confidence }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <span class="text-muted mb-3 lh-1 d-block text-truncate">CA prévu ({{ horizon }} mois)</span>
+                                <h4 class="mb-3">
+                                    {% set totalPredicted = 0 %}
+                                    {% for prediction in forecast.predictions %}
+                                        {% set totalPredicted = totalPredicted + prediction.predicted %}
+                                    {% endfor %}
+                                    <span class="text-success">{{ totalPredicted|number_format(0, ',', ' ') }}€</span>
+                                </h4>
+                            </div>
+                            <div class="flex-shrink-0 text-end">
+                                <div class="avatar-sm bg-soft-success rounded">
+                                    <span class="avatar-title bg-soft-success text-success font-size-24">
+                                        <i class="bx bx-euro"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bx bx-line-chart me-2"></i>Prévisions de CA - {{ horizon }} mois
+                        </h5>
+                        <canvas id="forecastChart" style="height: 400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bx bx-table me-2"></i>Détail des prévisions
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-centered table-nowrap align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th class="text-end">Prévision</th>
+                                        <th class="text-end">Minimum</th>
+                                        <th class="text-end">Maximum</th>
+                                        <th class="text-center">Intervalle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for prediction in forecast.predictions %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ prediction.month|date('F Y') }}</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="fw-semibold text-primary">
+                                                    {{ prediction.predicted|number_format(0, ',', ' ') }} €
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="text-muted">
+                                                    {{ prediction.min|number_format(0, ',', ' ') }} €
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="text-muted">
+                                                    {{ prediction.max|number_format(0, ',', ' ') }} €
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                {% set variance = ((prediction.max - prediction.min) / prediction.predicted * 100)|round %}
+                                                <span class="badge bg-{{ variance < 30 ? 'success' : (variance < 50 ? 'warning' : 'danger') }}">
+                                                    ±{{ variance }}%
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr class="table-light">
+                                        <td><strong>TOTAL</strong></td>
+                                        <td class="text-end">
+                                            <strong class="text-success">{{ totalPredicted|number_format(0, ',', ' ') }} €</strong>
+                                        </td>
+                                        <td class="text-end">
+                                            {% set totalMin = 0 %}
+                                            {% for prediction in forecast.predictions %}
+                                                {% set totalMin = totalMin + prediction.min %}
+                                            {% endfor %}
+                                            {{ totalMin|number_format(0, ',', ' ') }} €
+                                        </td>
+                                        <td class="text-end">
+                                            {% set totalMax = 0 %}
+                                            {% for prediction in forecast.predictions %}
+                                                {% set totalMax = totalMax + prediction.max %}
+                                            {% endfor %}
+                                            {{ totalMax|number_format(0, ',', ' ') }} €
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historical Data -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bx bx-history me-2"></i>Historique (base de calcul)
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-centered table-nowrap align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th class="text-end">CA réalisé</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for data in forecast.historical|slice(-12) %}
+                                        <tr>
+                                            <td>{{ data.month|date('F Y') }}</td>
+                                            <td class="text-end">{{ data.actual|number_format(0, ',', ' ') }} €</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    {% if forecast %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+
+            // Préparer les données
+            const historical = {{ forecast.historical|json_encode|raw }};
+            const predictions = {{ forecast.predictions|json_encode|raw }};
+
+            // Derniers 12 mois d'historique + prévisions
+            const historicalData = historical.slice(-12);
+            const allMonths = [...historicalData.map(d => d.month), ...predictions.map(d => d.month)];
+
+            const historicalValues = historicalData.map(d => d.actual);
+            const predictedValues = Array(historicalData.length).fill(null).concat(predictions.map(d => d.predicted));
+            const minValues = Array(historicalData.length).fill(null).concat(predictions.map(d => d.min));
+            const maxValues = Array(historicalData.length).fill(null).concat(predictions.map(d => d.max));
+
+            // Ajouter le dernier point historique au début des prévisions pour continuité
+            if (historicalData.length > 0) {
+                predictedValues[historicalData.length] = historicalData[historicalData.length - 1].actual;
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allMonths.map(m => {
+                        const date = new Date(m + '-01');
+                        return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'short' });
+                    }),
+                    datasets: [
+                        {
+                            label: 'CA réalisé',
+                            data: [...historicalValues, ...Array(predictions.length).fill(null)],
+                            borderColor: '#556ee6',
+                            backgroundColor: 'rgba(85, 110, 230, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Prévision',
+                            data: predictedValues,
+                            borderColor: '#34c38f',
+                            backgroundColor: 'rgba(52, 195, 143, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Intervalle max',
+                            data: maxValues,
+                            borderColor: 'rgba(52, 195, 143, 0.3)',
+                            backgroundColor: 'rgba(52, 195, 143, 0.05)',
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            fill: '+1',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Intervalle min',
+                            data: minValues,
+                            borderColor: 'rgba(52, 195, 143, 0.3)',
+                            backgroundColor: 'rgba(52, 195, 143, 0.05)',
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                filter: (item) => item.text !== 'Intervalle max' && item.text !== 'Intervalle min'
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('fr-FR', {
+                                            style: 'currency',
+                                            currency: 'EUR',
+                                            maximumFractionDigits: 0
+                                        }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('fr-FR', {
+                                        style: 'currency',
+                                        currency: 'EUR',
+                                        maximumFractionDigits: 0
+                                    }).format(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    {% endif %}
+{% endblock %}

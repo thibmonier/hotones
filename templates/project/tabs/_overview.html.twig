@@ -1,4 +1,26 @@
 <div class="row">
+    <!-- Analyse des risques -->
+    {% if riskAnalysis.risks|length > 0 %}
+    <div class="col-12 mb-4">
+        <div class="alert alert-{{ riskAnalysis.riskLevel == 'critical' ? 'danger' : (riskAnalysis.riskLevel == 'high' ? 'warning' : 'info') }} border-0">
+            <h6 class="alert-heading">
+                <i class="bx bx-error-circle me-2"></i>
+                Risques identifiés (Score de santé : {{ riskAnalysis.healthScore }}%)
+            </h6>
+            <ul class="mb-0 mt-3">
+                {% for risk in riskAnalysis.risks %}
+                    <li class="mb-2">
+                        <span class="badge bg-{{ risk.severity == 'critical' ? 'danger' : (risk.severity == 'high' ? 'warning' : 'info') }} me-2">
+                            {{ risk.severity == 'critical' ? 'Critique' : (risk.severity == 'high' ? 'Élevé' : 'Moyen') }}
+                        </span>
+                        {{ risk.message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="col-lg-8">
         <h6 class="mb-3">Informations générales</h6>
         <table class="table table-nowrap mb-4">
