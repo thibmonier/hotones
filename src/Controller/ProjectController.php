@@ -239,6 +239,9 @@ class ProjectController extends AbstractController
             'has_next'     => $oPage * $oPerPage < $oTotal,
         ];
 
+        // Charger les événements du projet pour la timeline
+        $events = $em->getRepository(\App\Entity\ProjectEvent::class)->findByProject($id, 50);
+
         return $this->render('project/show.html.twig', [
             'project'           => $project,
             'metrics'           => $projectMetrics,
@@ -247,6 +250,7 @@ class ProjectController extends AbstractController
             'orders_sort'       => $oSort,
             'orders_dir'        => strtoupper($oDir) === 'ASC' ? 'ASC' : 'DESC',
             'orders_per_page'   => $oPerPage,
+            'events'            => $events,
         ]);
     }
 
