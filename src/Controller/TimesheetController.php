@@ -103,6 +103,7 @@ class TimesheetController extends AbstractController
             'previousWeek'      => $year.'-W'.str_pad($week - 1, 2, '0', STR_PAD_LEFT),
             'nextWeek'          => $year.'-W'.str_pad($week + 1, 2, '0', STR_PAD_LEFT),
             'activeTimer'       => $activeTimer,
+            'hoursPerDay'       => $contributor ? $contributor->getHoursPerDay() : 7.0,
         ]);
     }
 
@@ -700,11 +701,12 @@ class TimesheetController extends AbstractController
         $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 
         // Données
-        $row        = 2;
-        $totalHours = 0;
+        $row         = 2;
+        $totalHours  = 0;
+        $hoursPerDay = $contributor->getHoursPerDay();
         foreach ($timesheets as $ts) {
             $hours = (float) $ts->getHours();
-            $days  = round($hours / 8, 3);
+            $days  = round($hours / $hoursPerDay, 3);
 
             $sheet->setCellValue('A'.$row, $ts->getDate()->format('d/m/Y'));
             $sheet->setCellValue('B'.$row, $ts->getProject()->getName());
@@ -722,7 +724,7 @@ class TimesheetController extends AbstractController
         // Ligne de total
         $sheet->setCellValue('E'.$row, 'TOTAL:');
         $sheet->setCellValue('F'.$row, $totalHours);
-        $sheet->setCellValue('G'.$row, round($totalHours / 8, 3));
+        $sheet->setCellValue('G'.$row, round($totalHours / $hoursPerDay, 3));
         $sheet->getStyle('E'.$row.':G'.$row)->applyFromArray([
             'font' => ['bold' => true],
             'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FEF3C7']],

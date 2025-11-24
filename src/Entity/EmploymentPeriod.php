@@ -223,6 +223,27 @@ class EmploymentPeriod
     }
 
     /**
+     * Calcule le nombre d'heures par jour basé sur le temps de travail contractuel.
+     * Formule: heures hebdomadaires / 5 jours (standard du lundi au vendredi).
+     *
+     * Exemples:
+     * - 35h/semaine = 7h/jour
+     * - 32h/semaine (4j) = 8h/jour (si configuré avec weeklyHours=32)
+     * - 28h/semaine (4j) = 7h/jour (si configuré avec weeklyHours=28)
+     * - 39h/semaine = 7.8h/jour
+     */
+    public function getHoursPerDay(): float
+    {
+        $actualHours    = floatval($this->weeklyHours);
+        $workingRatio   = floatval($this->workTimePercentage) / 100;
+        $effectiveHours = $actualHours * $workingRatio;
+
+        // Par défaut, on divise par 5 jours (lundi-vendredi)
+        // Pour un temps partiel sur 4 jours, ajuster weeklyHours en conséquence
+        return $effectiveHours / 5;
+    }
+
+    /**
      * Vérifie si la période est active à une date donnée.
      */
     public function isActiveAt(DateTimeInterface $date): bool

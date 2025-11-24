@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ContributorRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -383,5 +384,50 @@ class Contributor
     public function getProfileNames(): array
     {
         return $this->profiles->map(fn (Profile $profile) => $profile->getName())->toArray();
+    }
+
+    /**
+     * Récupère la période d'emploi active (celle qui contient la date actuelle).
+     * Si plusieurs périodes sont actives, retourne la plus récente.
+     */
+    public function getCurrentEmploymentPeriod(): ?EmploymentPeriod
+    {
+        $now = new DateTime();
+
+        foreach ($this->employmentPeriods as $period) {
+            if ($period->getStartDate() <= $now && ($period->getEndDate() === null || $period->getEndDate() >= $now)) {
+                return $period;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Retourne le nombre d'heures hebdomadaires du contributeur basé sur sa période d'emploi active.
+     */
+    public function getWeeklyHours(): float
+    {
+        $period = $this->getCurrentEmploymentPeriod();
+        if ($period) {
+            return (float) $period->getWeeklyHours();
+        }
+
+        return 35.0; // Valeur par défaut
+    }
+
+    /**
+     * Retourne le nombre d'heures par jour basé sur le temps de travail contractuel.
+     * Calcul: heures hebdomadaires / jours travaillés par semaine
+     * Exemples: 35h/5j = 7h/j, 32h/4j = 8h/j, 28h/4j = 7h/j.
+     */
+    public function getHoursPerDay(): float
+    {
+        $period = $this->getCurrentEmploymentPeriod();
+        if ($period) {
+            return $period->getHoursPerDay();
+        }
+
+        return 7.0; // Valeur par défaut pour 35h/5j
     }
 }

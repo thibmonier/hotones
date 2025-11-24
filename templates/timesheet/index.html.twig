@@ -218,8 +218,9 @@
                                     <ul class="mb-0">
                                         <li>Saisissez vos heures au format décimal (ex: 7.5 pour 7h30)</li>
                                         <li>Les modifications sont enregistrées automatiquement</li>
-                                        <li>Minimum 1h par saisie (0.125j)</li>
+                                        <li>Minimum 1h par saisie</li>
                                         <li>Maximum 24h par jour</li>
+                                        <li>Conversion : {{ hoursPerDay }}h par jour selon votre contrat ({{ contributor.weeklyHours ?? 35 }}h/semaine)</li>
                                     </ul>
                                 </div>
                             </div>
@@ -328,6 +329,7 @@
         const weekTotal = document.getElementById('week-total');
         const weekProgress = document.getElementById('week-progress');
         const weeklyTarget = {{ contributor.weeklyHours ?? 35 }};
+        const hoursPerDay = {{ hoursPerDay }}; // Heures par jour basées sur le contrat (ex: 7h pour 35h/5j)
 
         // Fonction pour afficher un toast de notification
         function showToast(type, message, duration = 4000) {
@@ -391,9 +393,9 @@
                 }
 
                 if (displayMode === 'days') {
-                    const days = hours / 8;
+                    const days = hours / hoursPerDay;
                     input.value = days > 0 ? days.toFixed(3) : '';
-                    input.step = '0.125'; // 1h en jours
+                    input.step = (1 / hoursPerDay).toFixed(3); // 1h converti en jours
                 } else {
                     input.value = hours > 0 ? hours : '';
                     input.step = '0.25'; // 15 minutes
@@ -413,7 +415,7 @@
             weekTargetUnit.textContent = unit;
 
             // Mettre à jour la valeur de l'objectif
-            const targetDisplay = displayMode === 'days' ? (weeklyTarget / 8).toFixed(3) : weeklyTarget;
+            const targetDisplay = displayMode === 'days' ? (weeklyTarget / hoursPerDay).toFixed(3) : weeklyTarget;
             weekTargetValue.textContent = targetDisplay;
 
             document.querySelectorAll('.total-unit').forEach(el => {
@@ -429,7 +431,7 @@
             const numValue = parseFloat(value);
 
             if (displayMode === 'days') {
-                return numValue * 8;
+                return numValue * hoursPerDay;
             }
             return numValue;
         }
@@ -506,12 +508,12 @@
                 const hoursValue = dayTotalsArray[index];
                 total.dataset.hours = hoursValue.toFixed(1);
 
-                const displayValue = displayMode === 'days' ? (hoursValue / 8).toFixed(3) : hoursValue.toFixed(1);
+                const displayValue = displayMode === 'days' ? (hoursValue / hoursPerDay).toFixed(3) : hoursValue.toFixed(1);
                 total.querySelector('.total-value').textContent = displayValue;
 
-                // Colorer en rouge si > 8h (ou > 1j)
-                const threshold = displayMode === 'days' ? 1 : 8;
-                const compareValue = displayMode === 'days' ? hoursValue / 8 : hoursValue;
+                // Colorer en rouge si > hoursPerDay (ex: 7h pour 35h/5j)
+                const threshold = displayMode === 'days' ? 1 : hoursPerDay;
+                const compareValue = displayMode === 'days' ? hoursValue / hoursPerDay : hoursValue;
                 if (compareValue > threshold) {
                     total.classList.add('text-danger');
                 } else {
@@ -520,7 +522,7 @@
             });
 
             // Mettre à jour le total hebdomadaire
-            const displayTotal = displayMode === 'days' ? (weekTotalHours / 8).toFixed(3) : weekTotalHours.toFixed(1);
+            const displayTotal = displayMode === 'days' ? (weekTotalHours / hoursPerDay).toFixed(3) : weekTotalHours.toFixed(1);
             document.getElementById('week-total-value').textContent = displayTotal;
 
             // Mettre à jour la barre de progression (toujours en heures)
