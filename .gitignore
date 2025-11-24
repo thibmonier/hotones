@@ -32,7 +32,6 @@ yarn-error.log
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 /public/uploads/
-/public/uploads/
 
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
