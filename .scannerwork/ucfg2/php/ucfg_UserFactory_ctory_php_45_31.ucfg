@@ -1,0 +1,63 @@
+
+P__sonar_lambda_/Users/tmonier/Projects/hotones/src/Factory/UserFactory.php_45_31E
+;/Users/tmonier/Projects/hotones/src/Factory/UserFactory.php- -('"1*7
+2
+UserFactory.php"
+1 1(
+implicit return*›
+1/ /([S
+Q
+- -('
+$user"__id*6
+
+__unknown_file (
+
+$userapp\entity\usere
+c
+/ /(/
+%1"__id*K
+
+__unknown_file (/*-
+app\factory\userfactory"
+passwordHasherFD
+/E /(Y
+%2*%
+
+__unknown_file (	
+
+$user2getpasswordêç
+/ /(Z
+%3*"
+
+__unknown_file (
+
+%1*%
+
+__unknown_file (	
+
+$user*"
+
+__unknown_file (
+
+%22hashpasswordA
+?
+/ /(Z	
+$hashed"__id*"
+
+__unknown_file (
+
+%3om
+0 0(+
+%4*%
+
+__unknown_file (	
+
+$user*'
+
+__unknown_file (
+	
+$hashed2setpassword*
+2:$
+-) -(3
+$userapp\entity\userB
+app\factory\userfactoryH

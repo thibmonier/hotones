@@ -1,0 +1,238 @@
+
+`__sonar_lambda_/Users/tmonier/Projects/hotones/src/Service/Planning/PlanningOptimizer.php_254_39V
+J/Users/tmonier/Projects/hotones/src/Service/Planning/PlanningOptimizer.php˛' ˛(/"1*Z
+2
+ÄW Ä(aD
+B
+
+Ä0 Ä(a
+%6"__id*(
+
+__unknown_file (
+
+standard*
+3*œ
+3
+Äa Ä(ar
+p
+
+Ä! Ä(b
+%9"__mapGet*.
+
+__unknown_file (
+
+$levelPriority*"
+
+__unknown_file (
+
+%6B
+@
+
+Ä Ä(g
+$aPrio"__id*"
+
+__unknown_file (
+
+%9*
+4
+5*V
+4
+Äf Ä(g@
+>
+
+Ä Ä(g
+$aPrio"__id* 
+
+__unknown_file (2*
+5*Ï
+5
+Äg Ä(gDB
+
+Å0 Å(?
+%11*"
+
+__unknown_file (
+
+$b2	getclientKI
+
+Å0 Å(S
+%12*#
+
+__unknown_file (
+
+%112getservicelevel@
+>
+
+Å0 Å(a
+%10"__id*#
+
+__unknown_file (
+
+%12*
+6
+7*[
+6
+ÅW Å(aE
+C
+
+Å0 Å(a
+%10"__id*(
+
+__unknown_file (
+
+standard*
+7*“
+7
+Åa Å(at
+r
+
+Å! Å(b
+%13"__mapGet*.
+
+__unknown_file (
+
+$levelPriority*#
+
+__unknown_file (
+
+%10C
+A
+
+Å Å(g
+$bPrio"__id*#
+
+__unknown_file (
+
+%13*
+8
+9*V
+8
+Åf Å(g@
+>
+
+Å Å(g
+$bPrio"__id* 
+
+__unknown_file (2*
+9*ø
+9
+Åg Å(gñ
+ì
+
+É É((
+%14"	__compare*#
+
+__unknown_file (
+<=>*&
+
+__unknown_file (
+
+
+$bPrio*&
+
+__unknown_file (
+
+
+$aPrio"
+
+É É()
+
+%14*è
+1
+ˇ ˇ(\
+
+ˇ! ˇ([
+%1"$Arrayä
+á
+
+ˇ! ˇ([
+%2"__mapSet*"
+
+__unknown_file (
+
+%1*#
+
+__unknown_file (
+vip* 
+
+__unknown_file (2è
+å
+
+ˇ! ˇ([
+%3"__mapSet*"
+
+__unknown_file (
+
+%1*(
+
+__unknown_file (
+
+priority* 
+
+__unknown_file (2è
+å
+
+ˇ! ˇ([
+%4"__mapSet*"
+
+__unknown_file (
+
+%1*(
+
+__unknown_file (
+
+standard* 
+
+__unknown_file (2ä
+á
+
+ˇ! ˇ([
+%5"__mapSet*"
+
+__unknown_file (
+
+%1*#
+
+__unknown_file (
+low* 
+
+__unknown_file (2J
+H
+
+ˇ ˇ([
+$levelPriority"__id*"
+
+__unknown_file (
+
+%1CA
+
+Ä0 Ä(?
+%7*"
+
+__unknown_file (
+
+$a2	getclientIG
+
+Ä0 Ä(S
+%8*"
+
+__unknown_file (
+
+%72getservicelevel>
+<
+
+Ä0 Ä(a
+%6"__id*"
+
+__unknown_file (
+
+%8*
+2
+3:
+
+˛1 ˛(3
+$a:
+
+˛5 ˛(7
+$bB*(
+&app\service\planning\planningoptimizerH

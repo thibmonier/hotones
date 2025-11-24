@@ -1,0 +1,26 @@
+
+___sonar_lambda_/Users/tmonier/Projects/hotones/src/Factory/FactStaffingMetricsFactory.php_47_27T
+J/Users/tmonier/Projects/hotones/src/Factory/FactStaffingMetricsFactory.php/ /(#"1*F
+2 
+FactStaffingMetricsFactory.php"
+4 4(
+implicit return*ö
+11 1(6‹
+ˆ
+/ /(#
+$factStaffingMetrics"__id*^
+
+__unknown_file (B
+@
+$factStaffingMetrics(app\entity\analytics\factstaffingmetricsTR
+1 1(6
+%1*4
+
+__unknown_file (
+
+$factStaffingMetrics2
+getdimtime*
+2:L
+/% /(M@
+$factStaffingMetrics(app\entity\analytics\factstaffingmetricsB*(
+&app\factory\factstaffingmetricsfactoryH

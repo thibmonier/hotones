@@ -1,0 +1,35 @@
+
+,doctrinemigrations\version20251020060724::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251020060724.php ("1*A
+2
+Version20251020060724.php"
+ (
+implicit return*Ö
+1	 (Þc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÐÍ
+	 (Ý
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251020060724*ç
+
+__unknown_file (ÊÇ
+ÄALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35\' NOT NULL, CHANGE working_time_percentage working_time_percentage NUMERIC(5, 2) DEFAULT \'100\' NOT NULL2addsqlˆ…
+	 (•
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251020060724*Ÿ
+
+__unknown_file (‚ÿ
+üALTER TABLE orders ADD description LONGTEXT DEFAULT NULL, ADD contingency_percentage NUMERIC(5, 2) DEFAULT NULL, ADD valid_until DATE DEFAULT NULL, CHANGE name name VARCHAR(180) DEFAULT NULL, CHANGE total_amount total_amount NUMERIC(12, 2) DEFAULT NULL2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251020060724H

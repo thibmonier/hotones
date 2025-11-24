@@ -1,0 +1,25 @@
+
+1app\command\loadreferencedatacommand::__constructR
+H/Users/tmonier/Projects/hotones/src/Command/LoadReferenceDataCommand.phpA A("1*D
+2
+LoadReferenceDataCommand.php"
+E E(
+implicit return*¡
+1D D(y
+w
+A A(
+$entityManager"__id*S
+
+__unknown_file (7
+5
+$entityManager#doctrine\orm\entitymanagerinterface‘
+Ž
+D D(
+%1"6symfony\component\console\command\command::__construct*D
+
+__unknown_file ((&
+$app\command\loadreferencedatacommand*
+2:A
+B B(>5
+$entityManager#doctrine\orm\entitymanagerinterfaceB(&
+$app\command\loadreferencedatacommandH

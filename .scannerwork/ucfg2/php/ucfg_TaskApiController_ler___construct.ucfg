@@ -1,0 +1,17 @@
+
+1app\controller\api\taskapicontroller::__constructR
+H/Users/tmonier/Projects/hotones/src/Controller/Api/TaskApiController.php ("1*¢
+1
+TaskApiController.phpc
+a
+ (
+$em"__id*H
+
+__unknown_file (,
+*
+$em#doctrine\orm\entitymanagerinterface"
+ (
+implicit return:6
+  (Y*
+$em#doctrine\orm\entitymanagerinterfaceB(&
+$app\controller\api\taskapicontrollerH

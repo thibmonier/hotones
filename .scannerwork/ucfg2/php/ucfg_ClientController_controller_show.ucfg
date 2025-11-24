@@ -1,0 +1,54 @@
+
+%app\controller\clientcontroller::showM
+C/Users/tmonier/Projects/hotones/src/Controller/ClientController.phpO O("1*˚
+1Q S(Y
+W
+O O(	
+$client"__id*:
+
+__unknown_file (
+
+$clientapp\entity\client
+Q6 S(	
+%1"$Arrayí
+è
+Q6 S(	
+%2"__mapSet*"
+
+__unknown_file (
+
+%1*&
+
+__unknown_file (
+
+client*'
+
+__unknown_file (
+	
+$client∑¥
+Q S(
+
+%3*?
+
+__unknown_file (#!
+app\controller\clientcontroller*5
+
+__unknown_file (
+client/show.html.twig*"
+
+__unknown_file (
+
+%12renderg
+e
+Q S(/
+%4)symfony\component\httpfoundation\response"__id*"
+
+__unknown_file (
+
+%3"=
+Q S(1
+/
+%4)symfony\component\httpfoundation\response:(
+O O('
+$clientapp\entity\clientB#!
+app\controller\clientcontrollerH

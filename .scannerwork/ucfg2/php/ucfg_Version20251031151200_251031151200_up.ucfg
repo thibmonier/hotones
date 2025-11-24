@@ -1,0 +1,43 @@
+
+,doctrinemigrations\version20251031151200::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251031151200.php ("1*A
+2
+Version20251031151200.php"
+ (
+implicit return*û
+1 (Mc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaº·
+ (L
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031151200*S
+
+__unknown_file (75
+3ALTER TABLE projects ADD client_id INT DEFAULT NULL2addsql‚ÿ
+	 (’
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031151200*™
+
+__unknown_file (}{
+yALTER TABLE projects ADD CONSTRAINT FK_projects_client FOREIGN KEY (client_id) REFERENCES clients (id) ON DELETE SET NULL2addsql¿¼
+ (Q
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031151200*X
+
+__unknown_file (<:
+8CREATE INDEX IDX_projects_client ON projects (client_id)2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251031151200H

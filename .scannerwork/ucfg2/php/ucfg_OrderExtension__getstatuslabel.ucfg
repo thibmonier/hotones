@@ -1,0 +1,59 @@
+
+'app\twig\orderextension::getstatuslabelE
+;/Users/tmonier/Projects/hotones/src/Twig/OrderExtension.php (""1*U
+2", "(3A
+?
+" "(3
+%2"__id*'
+
+__unknown_file (
+	
+$status*
+3*!
+3"3 "(3"
+" "(4
+
+%2*Î
+1   (8N
+L
+ ("	
+$status"__id*/
+
+__unknown_file (
+
+$statusstring”
+‘
+   (7
+%1" app\enum\orderstatus::fromstring*4
+
+__unknown_file ("
+app\enum\orderstatus*'
+
+__unknown_file (
+	
+$statusF
+D
+   (7
+$orderStatus"__id*"
+
+__unknown_file (
+
+%1JH
+" "((
+%3*,
+
+__unknown_file (
+
+$orderStatus2getlabel<
+:
+" "(3
+%2"__id*"
+
+__unknown_file (
+
+%3*
+2
+3:
+# (1
+$statusstringB
+app\twig\orderextensionH

@@ -1,0 +1,152 @@
+
+'app\controller\clientcontroller::deleteO
+C/Users/tmonier/Projects/hotones/src/Controller/ClientController.phpÖ Ö("1*ç
+2
+à à(!jh
+
+à à( 
+%6*#
+
+__unknown_file (
+
+$em*'
+
+__unknown_file (
+	
+$client2remove@>
+
+â â(
+%7*#
+
+__unknown_file (
+
+$em2flush»≈
+
+ä ä(E
+%8*?
+
+__unknown_file (#!
+app\controller\clientcontroller*'
+
+__unknown_file (	
+success*=
+
+__unknown_file (!
+Client supprim√© avec succ√®s2addflash*
+3*’
+3
+ç ç(6ïí
+
+ç ç(5
+%9*?
+
+__unknown_file (#!
+app\controller\clientcontroller*,
+
+__unknown_file (
+client_index2redirecttoroutej
+h
+
+ç ç(60
+%10)symfony\component\httpfoundation\response"__id*"
+
+__unknown_file (
+
+%9"@
+
+ç ç(62
+0
+%10)symfony\component\httpfoundation\response*‘
+1
+á á(`t
+r
+
+Ö Ö(
+
+$request"__id*R
+
+__unknown_file (6
+4
+$request(symfony\component\httpfoundation\request[
+Y
+
+Ö Ö(	
+$client"__id*:
+
+__unknown_file (
+
+$clientapp\entity\cliente
+c
+
+Ö Ö(
+$em"__id*H
+
+__unknown_file (,
+*
+$em#doctrine\orm\entitymanagerinterfaceDB
+
+á- á(=
+%1*'
+
+__unknown_file (
+	
+$client2getidN
+L
+
+á$ á(=
+%2"__concat*
+
+á$ á(,
+
+delete*
+
+á- á(=
+
+%1Q
+O
+
+á? á(P
+%3"__id*5
+
+__unknown_file (*
+
+
+$request"	
+requestec
+
+á? á(_
+%4*"
+
+__unknown_file (
+
+%3*&
+
+__unknown_file (
+
+_token2get∞≠
+
+á á(`
+%5*?
+
+__unknown_file (#!
+app\controller\clientcontroller*"
+
+__unknown_file (
+
+%2*"
+
+__unknown_file (
+
+%42iscsrftokenvalid*
+2
+3:B
+
+Ö Ö(+4
+$request(symfony\component\httpfoundation\request:*
+
+Ö- Ö(;
+$clientapp\entity\client:8
+
+Ö= Ö(W*
+$em#doctrine\orm\entitymanagerinterfaceB#!
+app\controller\clientcontrollerH

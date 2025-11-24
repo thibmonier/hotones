@@ -1,0 +1,25 @@
+
+3app\command\debugtaskassignmentcommand::__constructT
+J/Users/tmonier/Projects/hotones/src/Command/DebugTaskAssignmentCommand.php ("1*F
+2 
+DebugTaskAssignmentCommand.php"
+ (
+implicit return*ç
+1 (c
+a
+ (
+$em"__id*H
+
+__unknown_file (,
+*
+$em#doctrine\orm\entitymanagerinterfaceì
+ê
+ (
+%1"6symfony\component\console\command\command::__construct*F
+
+__unknown_file (*(
+&app\command\debugtaskassignmentcommand*
+2:6
+ (3*
+$em#doctrine\orm\entitymanagerinterfaceB*(
+&app\command\debugtaskassignmentcommandH

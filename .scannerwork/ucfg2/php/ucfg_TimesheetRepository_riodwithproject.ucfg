@@ -1,0 +1,202 @@
+
+<app\repository\timesheetrepository::findforperiodwithprojectP
+F/Users/tmonier/Projects/hotones/src/Repository/TimesheetRepository.php= =(,"1*é
+2J K(>us
+J J(.
+%10*#
+
+__unknown_file (
+
+$qb*1
+
+__unknown_file (
+p.id = :projectId2andwhereDB
+K+ K(<
+%11*(
+
+__unknown_file (
+
+
+$project2getid—”
+J K(=
+%12*#
+
+__unknown_file (
+
+%10*)
+
+__unknown_file (
+	projectId*#
+
+__unknown_file (
+
+%112setparameter*
+3*«
+3N N(,B@
+N N(
+%13*#
+
+__unknown_file (
+
+$qb2getqueryCA
+N N(+
+%14*#
+
+__unknown_file (
+
+%132	getresult"
+N N(,
+
+%14*š
+1? G(/_
+]
+= =(,
+
+$startDate"__id*=
+
+__unknown_file (!
+
+
+$startDatedatetimeinterface[
+Y
+= =(,
+
+$endDate"__id*;
+
+__unknown_file (
+
+$endDatedatetimeinterface\
+Z
+= =(,
+
+$project"__id*<
+
+__unknown_file ( 
+
+$projectapp\entity\projectŽ‹
+? ?(,
+%1*B
+
+__unknown_file (&$
+"app\repository\timesheetrepository*!
+
+__unknown_file (
+t2createquerybuilderŒ
+? @((
+%2*"
+
+__unknown_file (
+
+%1*)
+
+__unknown_file (
+	t.project*!
+
+__unknown_file (
+p2leftjoin“
+? A(,
+%3*"
+
+__unknown_file (
+
+%2*-
+
+__unknown_file (
+t.contributor*!
+
+__unknown_file (
+c2leftjoin}{
+? B(5
+%4*"
+
+__unknown_file (
+
+%3*>
+
+__unknown_file (" 
+t.date BETWEEN :start AND :end2where˜•
+? C(/
+%5*"
+
+__unknown_file (
+
+%4*%
+
+__unknown_file (	
+start**
+
+__unknown_file (
+
+
+$startDate2setparameter”‘
+? D(+
+%6*"
+
+__unknown_file (
+
+%5*#
+
+__unknown_file (
+end*(
+
+__unknown_file (
+
+
+$endDate2setparameterŽ‹
+? E('
+%7*"
+
+__unknown_file (
+
+%6*&
+
+__unknown_file (
+
+t.date*$
+
+__unknown_file (
+DESC2orderby”‘
+? F(-
+%8*"
+
+__unknown_file (
+
+%7**
+
+__unknown_file (
+
+c.lastName*#
+
+__unknown_file (
+ASC2
+addorderby•’
+? G(.
+%9*"
+
+__unknown_file (
+
+%8*+
+
+__unknown_file (
+c.firstName*#
+
+__unknown_file (
+ASC2
+addorderby=
+;
+? G(.
+$qb"__id*"
+
+__unknown_file (
+
+%9*
+2
+3:+
+=- =(I
+
+$startDatedatetimeinterface:)
+=K =(e
+$endDatedatetimeinterface:*
+=g =(
+$projectapp\entity\projectB&$
+"app\repository\timesheetrepositoryH

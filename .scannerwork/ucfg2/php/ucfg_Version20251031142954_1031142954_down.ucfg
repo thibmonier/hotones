@@ -1,0 +1,83 @@
+
+.doctrinemigrations\version20251031142954::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251031142954.php! !("1*A
+2
+Version20251031142954.php"
+, ,(
+implicit return*Å
+1$ $(Uc
+a
+! !(	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schema¬ø
+$ $(T
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*[
+
+__unknown_file (?=
+;ALTER TABLE timesheets DROP FOREIGN KEY FK_9AC77D2EF26E5D722addsql…∆
+% %([
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*b
+
+__unknown_file (FD
+BALTER TABLE project_sub_tasks DROP FOREIGN KEY FK_AD2044F9166D1F9C2addsql…∆
+& &([
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*b
+
+__unknown_file (FD
+BALTER TABLE project_sub_tasks DROP FOREIGN KEY FK_AD2044F98DB601862addsql…∆
+' '([
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*b
+
+__unknown_file (FD
+BALTER TABLE project_sub_tasks DROP FOREIGN KEY FK_AD2044F959EC7D602addsql£†
+( ((5
+%5*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*<
+
+__unknown_file ( 
+DROP TABLE project_sub_tasks2addsql¥±
+) )(F
+%6*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*M
+
+__unknown_file (1/
+-DROP INDEX IDX_9AC77D2EF26E5D72 ON timesheets2addsqlÆ´
+* *(@
+%7*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*G
+
+__unknown_file (+)
+'ALTER TABLE timesheets DROP sub_task_id2addsql–Õ
+	+ +(›
+%8*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*Á
+
+__unknown_file ( «
+ƒALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100.00\' NOT NULL2addsql*
+2:2
+! !('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251031142954H

@@ -1,0 +1,145 @@
+
+:app\repository\timesheetrepository::getstatspercontributorR
+F/Users/tmonier/Projects/hotones/src/Repository/TimesheetRepository.phpÓ Ó(*"1*È
+1
+Õ Þ(a
+_
+
+Ó Ó(*
+
+$startDate"__id*=
+
+__unknown_file (!
+
+
+$startDatedatetimeinterface]
+[
+
+Ó Ó(*
+
+$endDate"__id*;
+
+__unknown_file (
+
+$endDatedatetimeinterface
+
+Õ Õ(-
+%1*B
+
+__unknown_file (&$
+"app\repository\timesheetrepository*!
+
+__unknown_file (
+t2createquerybuilder×Ô
+Õ Ö(Š
+%2*"
+
+__unknown_file (
+
+%1*’
+
+__unknown_file (vt
+rCONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries2select•’
+
+Õ ×(,
+%3*"
+
+__unknown_file (
+
+%2*-
+
+__unknown_file (
+t.contributor*!
+
+__unknown_file (
+c2leftjoin}
+
+Õ Ø(5
+%4*"
+
+__unknown_file (
+
+%3*>
+
+__unknown_file (" 
+t.date BETWEEN :start AND :end2whereš—
+
+Õ Ù(/
+%5*"
+
+__unknown_file (
+
+%4*%
+
+__unknown_file (	
+start**
+
+__unknown_file (
+
+
+$startDate2setparameter–“
+
+Õ Ú(+
+%6*"
+
+__unknown_file (
+
+%5*#
+
+__unknown_file (
+end*(
+
+__unknown_file (
+
+
+$endDate2setparameter€~
+
+Õ Û(6
+%7*"
+
+__unknown_file (
+
+%6*=
+
+__unknown_file (!
+c.id, c.firstName, c.lastName2groupby”‘
+
+Õ Ü(+
+%8*"
+
+__unknown_file (
+
+%7**
+
+__unknown_file (
+
+totalHours*$
+
+__unknown_file (
+DESC2orderbyB@
+
+Õ Ý(
+%9*"
+
+__unknown_file (
+
+%82getqueryDB
+
+Õ Þ(
+%10*"
+
+__unknown_file (
+
+%92	getresult"
+
+Õ Þ(
+
+%10:-
+
+Ó+ Ó(G
+
+$startDatedatetimeinterface:+
+
+ÓI Ó(c
+$endDatedatetimeinterfaceB&$
+"app\repository\timesheetrepositoryH

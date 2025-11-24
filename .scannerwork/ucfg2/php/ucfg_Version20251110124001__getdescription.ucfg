@@ -1,0 +1,7 @@
+
+8doctrinemigrations\version20251110124001::getdescriptionN
+D/Users/tmonier/Projects/hotones/migrations/Version20251110124001.php (""1*™
+1	 (‰"ˆ
+	 (‰{y
+wCreate running_timers table to support per-contributor active time tracking (project/task/subtask, startedAt/stoppedAt)B,*
+(doctrinemigrations\version20251110124001H

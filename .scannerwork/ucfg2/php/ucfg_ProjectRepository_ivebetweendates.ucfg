@@ -1,0 +1,143 @@
+
+8app\repository\projectrepository::findactivebetweendatesP
+D/Users/tmonier/Projects/hotones/src/Repository/ProjectRepository.phpğ ğ(*"1*ä
+1
+ò û(Y
+W
+
+ğ ğ(*
+$start"__id*9
+
+__unknown_file (
+
+$startdatetimeinterfaceU
+S
+
+ğ ğ(*
+$end"__id*7
+
+__unknown_file (
+
+$enddatetimeinterface‹
+
+ò ò(-
+%1*@
+
+__unknown_file ($"
+ app\repository\projectrepository*!
+
+__unknown_file (
+p2createquerybuildersq
+
+ò ó()
+%2*"
+
+__unknown_file (
+
+%1*2
+
+__unknown_file (
+p.status = :status2whereŒ
+
+ò ô(D
+%3*"
+
+__unknown_file (
+
+%2*J
+
+__unknown_file (.,
+*p.startDate IS NULL OR p.startDate <= :end2andwhereŠ
+
+ò õ(B
+%4*"
+
+__unknown_file (
+
+%3*H
+
+__unknown_file (,*
+(p.endDate IS NULL OR p.endDate >= :start2andwhere—”
+
+ò ö(.
+%5*"
+
+__unknown_file (
+
+%4*&
+
+__unknown_file (
+
+status*&
+
+__unknown_file (
+
+active2setparameter–“
+
+ò ÷(+
+%6*"
+
+__unknown_file (
+
+%5*%
+
+__unknown_file (	
+start*&
+
+__unknown_file (
+
+
+$start2setparameter’
+
+ò ø('
+%7*"
+
+__unknown_file (
+
+%6*#
+
+__unknown_file (
+end*$
+
+__unknown_file (
+
+$end2setparameterŒ
+
+ò ù(&
+%8*"
+
+__unknown_file (
+
+%7*&
+
+__unknown_file (
+
+p.name*#
+
+__unknown_file (
+ASC2orderbyB@
+
+ò ú(
+%9*"
+
+__unknown_file (
+
+%82getqueryDB
+
+ò û(
+%10*"
+
+__unknown_file (
+
+%92	getresult"
+
+ò û(
+
+%10:)
+
+ğ+ ğ(C
+$startdatetimeinterface:'
+
+ğE ğ([
+$enddatetimeinterfaceB$"
+ app\repository\projectrepositoryH

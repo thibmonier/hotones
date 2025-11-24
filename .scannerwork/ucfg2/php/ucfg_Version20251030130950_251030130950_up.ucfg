@@ -1,0 +1,35 @@
+
+,doctrinemigrations\version20251030130950::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251030130950.php ("1*A
+2
+Version20251030130950.php"
+ (
+implicit return*þ
+1	 (Øc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÊÇ
+	 (×
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251030130950*á
+
+__unknown_file (ÄÁ
+¾ALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100\' NOT NULL2addsql¶³
+	 (Ã
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251030130950*Í
+
+__unknown_file (°­
+ªALTER TABLE users ADD created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', ADD updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251030130950H

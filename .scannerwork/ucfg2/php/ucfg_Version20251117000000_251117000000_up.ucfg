@@ -1,0 +1,27 @@
+
+,doctrinemigrations\version20251117000000::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251117000000.php ("1*A
+2
+Version20251117000000.php"
+ (
+implicit return*½
+1 (Vc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÃÀ
+ (U
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251117000000*\
+
+__unknown_file (@>
+<CREATE INDEX idx_order_validated_at ON orders (validated_at)2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251117000000H

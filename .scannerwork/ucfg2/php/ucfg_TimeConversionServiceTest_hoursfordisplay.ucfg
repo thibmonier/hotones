@@ -1,0 +1,76 @@
+
+Kapp\tests\unit\service\timeconversionservicetest::testformathoursfordisplayZ
+P/Users/tmonier/Projects/hotones/tests/Unit/Service/TimeConversionServiceTest.php (-"1*E
+2
+TimeConversionServiceTest.php"
+ (
+implicit return*ö
+1 (Wµ
+²
+" (U
+%1"8app\service\timeconversionservice::formathoursfordisplay*A
+
+__unknown_file (%"#
+!app\service\timeconversionservice*#
+
+__unknown_file (
+7.5»¸
+ (V
+%2*P
+
+__unknown_file (42
+0app\tests\unit\service\timeconversionservicetest*$
+
+__unknown_file (
+7,5h*"
+
+__unknown_file (
+
+%12
+assertsame³
+°
+" (S
+%3"8app\service\timeconversionservice::formathoursfordisplay*A
+
+__unknown_file (%"#
+!app\service\timeconversionservice*!
+
+__unknown_file (
+8»¸
+ (T
+%4*P
+
+__unknown_file (42
+0app\tests\unit\service\timeconversionservicetest*$
+
+__unknown_file (
+1,0j*"
+
+__unknown_file (
+
+%32
+assertsame´
+±
+' (Y
+%5"8app\service\timeconversionservice::formathoursfordisplay*A
+
+__unknown_file (%"#
+!app\service\timeconversionservice*"
+
+__unknown_file (
+10À½
+ (Z
+%6*P
+
+__unknown_file (42
+0app\tests\unit\service\timeconversionservicetest*)
+
+__unknown_file (
+	1,2j 2,0h*"
+
+__unknown_file (
+
+%52
+assertsame*
+2B42
+0app\tests\unit\service\timeconversionservicetestH

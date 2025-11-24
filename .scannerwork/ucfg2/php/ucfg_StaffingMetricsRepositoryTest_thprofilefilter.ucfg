@@ -1,0 +1,320 @@
+
+tapp\tests\integration\repository\staffingmetricsrepositorytest::testgetweeklyoccupancybycontributorwithprofilefilterh
+^/Users/tmonier/Projects/hotones/tests/Integration/Repository/StaffingMetricsRepositoryTest.phpE E(H"1*I
+2#
+!StaffingMetricsRepositoryTest.php"
+[ [(
+implicit return*‚
+1H H(L
+H1 H(J
+%1"$Array•
+’
+H1 H(J
+%2"__mapSet*"
+
+__unknown_file (
+
+%1*$
+
+__unknown_file (
+name*,
+
+__unknown_file (
+DÃ©veloppeurš
+—
+H H(K
+%3"%app\factory\profilefactory::createone*:
+
+__unknown_file ("
+app\factory\profilefactory*"
+
+__unknown_file (
+
+%1B
+@
+H H(K
+
+$profile"__id*"
+
+__unknown_file (
+
+%3
+I5 I(a
+%4"$Array’
+
+I5 I(a
+%5"__mapSet*"
+
+__unknown_file (
+
+%4*)
+
+__unknown_file (
+	firstName*$
+
+__unknown_file (
+John
+
+I5 I(a
+%6"__mapSet*"
+
+__unknown_file (
+
+%4*(
+
+__unknown_file (
+
+lastName*#
+
+__unknown_file (
+Doe¢
+Ÿ
+I I(b
+%7")app\factory\contributorfactory::createone*>
+
+__unknown_file ("" 
+app\factory\contributorfactory*"
+
+__unknown_file (
+
+%4F
+D
+I I(b
+$contributor"__id*"
+
+__unknown_file (
+
+%7
+J4 J(d
+%8"$Array”
+‘
+J4 J(d
+%9"__mapSet*"
+
+__unknown_file (
+
+%8*'
+
+__unknown_file (	
+profile*(
+
+__unknown_file (
+
+
+$profile–
+“
+J4 J(d
+%10"__mapSet*"
+
+__unknown_file (
+
+%8*$
+
+__unknown_file (
+name*,
+
+__unknown_file (
+DÃ©veloppeur¡
+ž
+J J(e
+%11"(app\factory\dimprofilefactory::createone*=
+
+__unknown_file (!"
+app\factory\dimprofilefactory*"
+
+__unknown_file (
+
+%8F
+D
+J J(e
+$dimProfile"__id*#
+
+__unknown_file (
+
+%11
+K1 K(W
+%12"$Array
+K< K(V
+%13"datetime{
+y
+K< K(V
+%14"datetime::__construct*#
+
+__unknown_file (
+
+%13**
+
+__unknown_file (
+
+2024-01-01Ž
+‹
+K1 K(W
+%15"__mapSet*#
+
+__unknown_file (
+
+%12*$
+
+__unknown_file (
+date*#
+
+__unknown_file (
+
+%13œ
+™
+K K(X
+%16"%app\factory\dimtimefactory::createone*:
+
+__unknown_file ("
+app\factory\dimtimefactory*#
+
+__unknown_file (
+
+%12A
+?
+K K(X
+$week1"__id*#
+
+__unknown_file (
+
+%16
+M. T(	
+%17"$Array”
+‘
+M. T(	
+%18"__mapSet*#
+
+__unknown_file (
+
+%17*'
+
+__unknown_file (	
+dimTime*&
+
+__unknown_file (
+
+
+$week1œ
+™
+M. T(	
+%19"__mapSet*#
+
+__unknown_file (
+
+%17**
+
+__unknown_file (
+
+dimProfile*+
+
+__unknown_file (
+
+$dimProfilež
+›
+M. T(	
+%20"__mapSet*#
+
+__unknown_file (
+
+%17*+
+
+__unknown_file (
+contributor*,
+
+__unknown_file (
+
+$contributor˜
+•
+M. T(	
+%21"__mapSet*#
+
+__unknown_file (
+
+%17*+
+
+__unknown_file (
+granularity*&
+
+__unknown_file (
+
+weekly˜
+•
+M. T(	
+%22"__mapSet*#
+
+__unknown_file (
+
+%17*-
+
+__unknown_file (
+availableDays*$
+
+__unknown_file (
+5.00–
+“
+M. T(	
+%23"__mapSet*#
+
+__unknown_file (
+
+%17*+
+
+__unknown_file (
+staffedDays*$
+
+__unknown_file (
+4.00´
+±
+M T(
+
+%24"1app\factory\factstaffingmetricsfactory::createone*F
+
+__unknown_file (*"(
+&app\factory\factstaffingmetricsfactory*#
+
+__unknown_file (
+
+%17Š
+‡
+W W($
+%25"__id*n
+
+__unknown_file (R*P@
+>app\tests\integration\repository\staffingmetricsrepositorytest"
+
+repository§¤
+W W(U
+%26*#
+
+__unknown_file (
+
+%25*!
+
+__unknown_file (2è*(
+
+__unknown_file (
+
+
+$profile2getweeklyoccupancybycontributorC
+A
+W W(U
+
+$results"__id*#
+
+__unknown_file (
+
+%26ÍÊ
+Z Z('
+%27*^
+
+__unknown_file (B@
+>app\tests\integration\repository\staffingmetricsrepositorytest* 
+
+__unknown_file (2*(
+
+__unknown_file (
+
+
+$results2assertcount*
+2BB@
+>app\tests\integration\repository\staffingmetricsrepositorytestH

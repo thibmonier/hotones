@@ -1,0 +1,34 @@
+
+8app\command\calculatestaffingmetricscommand::__constructY
+O/Users/tmonier/Projects/hotones/src/Command/CalculateStaffingMetricsCommand.php ("1*K
+2%
+#CalculateStaffingMetricsCommand.php"
+ (
+implicit return*¶
+1 (ˆ
+…
+ (
+$staffingService"__id*_
+
+__unknown_file (C
+A
+$staffingService-app\service\staffingmetricscalculationservice|
+z
+ (
+$staffingRepo"__id*W
+
+__unknown_file (;
+9
+$staffingRepo(app\repository\staffingmetricsrepository˜
+•
+ (
+%1"6symfony\component\console\command\command::__construct*K
+
+__unknown_file (/-
++app\command\calculatestaffingmetricscommand*
+2:M
+ (KA
+$staffingService-app\service\staffingmetricscalculationservice:E
+ (@9
+$staffingRepo(app\repository\staffingmetricsrepositoryB/-
++app\command\calculatestaffingmetricscommandH

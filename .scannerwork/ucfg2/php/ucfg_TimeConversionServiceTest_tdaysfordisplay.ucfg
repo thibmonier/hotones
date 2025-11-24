@@ -1,0 +1,32 @@
+
+Japp\tests\unit\service\timeconversionservicetest::testformatdaysfordisplayZ
+P/Users/tmonier/Projects/hotones/tests/Unit/Service/TimeConversionServiceTest.php (,"1*E
+2
+TimeConversionServiceTest.php"
+! !(
+implicit return*‡
+1   (V´
+±
+ "  (T
+%1"7app\service\timeconversionservice::formatdaysfordisplay*A
+
+__unknown_file (%"#
+!app\service\timeconversionservice*#
+
+__unknown_file (
+2.5»¸
+   (U
+%2*P
+
+__unknown_file (42
+0app\tests\unit\service\timeconversionservicetest*$
+
+__unknown_file (
+2,5j*"
+
+__unknown_file (
+
+%12
+assertsame*
+2B42
+0app\tests\unit\service\timeconversionservicetestH

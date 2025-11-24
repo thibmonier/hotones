@@ -1,0 +1,98 @@
+
+Rapp\tests\unit\service\staffingmetricscalculationservicetest::testcalculatemetricsf
+\/Users/tmonier/Projects/hotones/tests/Unit/Service/StaffingMetricsCalculationServiceTest.php (("1*Q
+2+
+)StaffingMetricsCalculationServiceTest.php"
+! !(
+implicit return*†
+
+1 (*?=
+ ()
+$fact"(app\entity\analytics\factstaffingmetricsp
+n
+ ()
+%1"5app\entity\analytics\factstaffingmetrics::__construct*%
+
+__unknown_file (	
+
+$factrp
+ ((
+%2*%
+
+__unknown_file (	
+
+$fact*%
+
+__unknown_file (	
+20.002setavailabledaysom
+ (%
+%3*%
+
+__unknown_file (	
+
+$fact*%
+
+__unknown_file (	
+20.002setworkeddayspn
+ (&
+%4*%
+
+__unknown_file (	
+
+$fact*%
+
+__unknown_file (	
+17.002setstaffeddayspn
+ (&
+%5*%
+
+__unknown_file (	
+
+$fact*$
+
+__unknown_file (
+0.002setvacationdaysKI
+ (!
+%6*%
+
+__unknown_file (	
+
+$fact2calculatemetricsJH
+% (=
+%7*%
+
+__unknown_file (	
+
+$fact2getstaffingrateÊÇ
+ (>
+%8*\
+
+__unknown_file (@>
+<app\tests\unit\service\staffingmetricscalculationservicetest*%
+
+__unknown_file (	
+85.00*"
+
+__unknown_file (
+
+%72assertequalsB@
+ %  (5
+%9*%
+
+__unknown_file (	
+
+$fact2gettaceËÈ
+   (6
+%10*\
+
+__unknown_file (@>
+<app\tests\unit\service\staffingmetricscalculationservicetest*%
+
+__unknown_file (	
+85.00*"
+
+__unknown_file (
+
+%92assertequals*
+2B@>
+<app\tests\unit\service\staffingmetricscalculationservicetestH

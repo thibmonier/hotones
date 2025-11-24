@@ -1,0 +1,198 @@
+
+/app\tests\api\projectapitest::testupdateprojectF
+</Users/tmonier/Projects/hotones/tests/Api/ProjectApiTest.phpZ Z(%"1*:
+2
+ProjectApiTest.php"
+k k(
+implicit return*È
+1\ \(*_]
+\ \()
+%1*<
+
+__unknown_file ( 
+app\tests\api\projectapitest2createprojectB
+@
+\ \()
+
+$project"__id*"
+
+__unknown_file (
+
+%1P
+N
+^ ^(
+%2"static::createclient*&
+
+__unknown_file (
+"
+staticCA
+^@ ^(Q
+%3*(
+
+__unknown_file (
+
+
+$project2getidP
+N
+^/ ^(Q
+%4"__concat*
+^/ ^(?
+/api/projects/*
+^@ ^(Q
+
+%3
+^S d(	
+%5"$Array
+_ _(c
+%6"$Array•’
+_7 _(b
+%7*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*0
+
+__unknown_file (
+ROLE_CHEF_PROJET2gettokenwithroleI
+G
+_- _(b
+%8"__concat*
+_- _(6	
+Bearer *
+_7 _(b
+
+%7”
+‘
+_ _(c
+%9"__mapSet*"
+
+__unknown_file (
+
+%6*-
+
+__unknown_file (
+Authorization*"
+
+__unknown_file (
+
+%8
+Œ
+^S d(	
+%10"__mapSet*"
+
+__unknown_file (
+
+%5*'
+
+__unknown_file (	
+headers*"
+
+__unknown_file (
+
+%6
+` c(
+%11"$Arrayš
+—
+` c(
+%12"__mapSet*#
+
+__unknown_file (
+
+%11*$
+
+__unknown_file (
+name*/
+
+__unknown_file (
+Projet modifiÃ©–
+“
+` c(
+%13"__mapSet*#
+
+__unknown_file (
+
+%11*&
+
+__unknown_file (
+
+status*)
+
+__unknown_file (
+	completed
+Š
+^S d(	
+%14"__mapSet*"
+
+__unknown_file (
+
+%5*$
+
+__unknown_file (
+json*#
+
+__unknown_file (
+
+%11®«
+^ d(
+
+%15*"
+
+__unknown_file (
+
+%2*#
+
+__unknown_file (
+PUT*"
+
+__unknown_file (
+
+%4*"
+
+__unknown_file (
+
+%52requestmk
+f f(+
+%16*<
+
+__unknown_file ( 
+app\tests\api\projectapitest2assertresponseissuccessful
+g" j(	
+%17"$Arrayš
+—
+g" j(	
+%18"__mapSet*#
+
+__unknown_file (
+
+%17*$
+
+__unknown_file (
+name*/
+
+__unknown_file (
+Projet modifiÃ©–
+“
+g" j(	
+%19"__mapSet*#
+
+__unknown_file (
+
+%17*&
+
+__unknown_file (
+
+status*)
+
+__unknown_file (
+	completed‹ˆ
+g j(
+
+%20*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*#
+
+__unknown_file (
+
+%172assertjsoncontains*
+2B 
+app\tests\api\projectapitestH

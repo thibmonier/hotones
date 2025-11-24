@@ -1,0 +1,132 @@
+
+Eapp\tests\api\projectapitest::testcreateprojectwithinsufficientrightsH
+</Users/tmonier/Projects/hotones/tests/Api/ProjectApiTest.php„ „(;"1*<
+2
+ProjectApiTest.php"!
+
+ (
+implicit return*§
+
+1
+‡ Œ(R
+P
+
+‡ ‡(
+%1"static::createclient*&
+
+__unknown_file (
+"
+static
+
+‡A Œ(	
+%2"$Array
+
+ˆ ˆ(I
+%3"$Array\Z
+
+ˆ7 ˆ(H
+%4*<
+
+__unknown_file ( 
+app\tests\api\projectapitest2gettokenO
+M
+
+ˆ- ˆ(H
+%5"__concat*
+
+ˆ- ˆ(6	
+Bearer *
+
+ˆ7 ˆ(H
+
+%4–
+“
+
+ˆ ˆ(I
+%6"__mapSet*"
+
+__unknown_file (
+
+%3*-
+
+__unknown_file (
+Authorization*"
+
+__unknown_file (
+
+%5
+
+
+‡A Œ(	
+%7"__mapSet*"
+
+__unknown_file (
+
+%2*'
+
+__unknown_file (	
+headers*"
+
+__unknown_file (
+
+%3
+
+‰ ‹(
+%8"$ArrayŸ
+œ
+
+‰ ‹(
+%9"__mapSet*"
+
+__unknown_file (
+
+%8*$
+
+__unknown_file (
+name*4
+
+__unknown_file (
+Projet non autorisÃ©Ž
+‹
+
+‡A Œ(	
+%10"__mapSet*"
+
+__unknown_file (
+
+%2*$
+
+__unknown_file (
+json*"
+
+__unknown_file (
+
+%8¼¹
+
+‡ Œ(
+
+%11*"
+
+__unknown_file (
+
+%1*$
+
+__unknown_file (
+POST*-
+
+__unknown_file (
+/api/projects*"
+
+__unknown_file (
+
+%22request•’
+
+Ž Ž(0
+%12*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*!
+
+__unknown_file (2“2assertresponsestatuscodesame*
+2B 
+app\tests\api\projectapitestH

@@ -1,0 +1,108 @@
+
+@app\tests\unit\entity\orderlinetest::testestimatedcostandmarginsM
+C/Users/tmonier/Projects/hotones/tests/Unit/Entity/OrderLineTest.php2 2(/"1*9
+2
+OrderLineTest.php"
+: :(
+implicit return*«
+
+14 4(PØÕ
+4 4(O
+%1*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*!
+
+__unknown_file (
+4*#
+
+__unknown_file (
+900*#
+
+__unknown_file (
+6002createserviceline?
+=
+4 4(O
+$line"__id*"
+
+__unknown_file (
+
+%1KI
+6% 6(>
+%2*%
+
+__unknown_file (	
+
+$line2getestimatedcost±®
+6 6(?
+%3*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*'
+
+__unknown_file (	
+1680.00*"
+
+__unknown_file (
+
+%22
+assertsameKI
+7% 7(>
+%4*%
+
+__unknown_file (	
+
+$line2getserviceamount±®
+7 7(?
+%5*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*'
+
+__unknown_file (	
+3600.00*"
+
+__unknown_file (
+
+%42
+assertsameIG
+8% 8(<
+%6*%
+
+__unknown_file (	
+
+$line2getgrossmargin±®
+8 8(=
+%7*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*'
+
+__unknown_file (	
+1920.00*"
+
+__unknown_file (
+
+%62
+assertsameHF
+9# 9(9
+%8*%
+
+__unknown_file (	
+
+$line2getmarginrate¯¬
+9 9(:
+%9*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*%
+
+__unknown_file (	
+53.33*"
+
+__unknown_file (
+
+%82
+assertsame*
+2B'%
+#app\tests\unit\entity\orderlinetestH

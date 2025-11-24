@@ -1,0 +1,25 @@
+
+0app\command\calculatemetricscommand::__constructQ
+G/Users/tmonier/Projects/hotones/src/Command/CalculateMetricsCommand.php ("1*C
+2
+CalculateMetricsCommand.php"
+ (
+implicit return*∞
+1 (à
+Ö
+ (
+$metricsService"__id*`
+
+__unknown_file (D
+B
+$metricsService/app\service\analytics\metricscalculationserviceê
+ç
+ (
+%1"6symfony\component\console\command\command::__construct*C
+
+__unknown_file ('%
+#app\command\calculatemetricscommand*
+2:N
+ (BB
+$metricsService/app\service\analytics\metricscalculationserviceB'%
+#app\command\calculatemetricscommandH

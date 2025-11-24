@@ -1,0 +1,33 @@
+
+(app\controller\twofactorcontroller::formP
+F/Users/tmonier/Projects/hotones/src/Controller/TwoFactorController.php ("1*È
+1 (<r
+p
+ (
+
+$request"__id*R
+
+__unknown_file (6
+4
+$request(symfony\component\httpfoundation\requestœ™
+ (;
+%1*B
+
+__unknown_file (&$
+"app\controller\twofactorcontroller*;
+
+__unknown_file (
+security/2fa_form.html.twig2renderg
+e
+ (</
+%2)symfony\component\httpfoundation\response"__id*"
+
+__unknown_file (
+
+%1"=
+ (<1
+/
+%2)symfony\component\httpfoundation\response:@
+ ()4
+$request(symfony\component\httpfoundation\requestB&$
+"app\controller\twofactorcontrollerH

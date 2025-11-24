@@ -1,0 +1,171 @@
+
+5app\tests\unit\entity\orderlinetest::testpurchaselineM
+C/Users/tmonier/Projects/hotones/tests/Unit/Entity/OrderLineTest.php< <($"1*9
+2
+OrderLineTest.php"
+I I(
+implicit return*É
+1> >(?+)
+> >('
+%1"app\entity\ordersection\
+Z
+> >('
+%2"$app\entity\ordersection::__construct*"
+
+__unknown_file (
+
+%1ki
+> >(>
+%3*"
+
+__unknown_file (
+
+%1*)
+
+__unknown_file (
+	Section 12settitleB
+@
+> >(>
+
+$section"__id*"
+
+__unknown_file (
+
+%3(&
+? ?($
+%4"app\entity\orderlineY
+W
+? ?($
+%5"!app\entity\orderline::__construct*"
+
+__unknown_file (
+
+%4lj
+? @("
+%6*"
+
+__unknown_file (
+
+%4*(
+
+__unknown_file (
+
+
+$section2
+setsectionpn
+? A((
+%7*"
+
+__unknown_file (
+
+%6*(
+
+__unknown_file (
+
+Purchase2setdescriptionig
+? B(!
+%8*"
+
+__unknown_file (
+
+%7*(
+
+__unknown_file (
+
+purchase2settypeom
+? C('
+%9*"
+
+__unknown_file (
+
+%8*&
+
+__unknown_file (
+
+250.002setdirectamount?
+=
+? C('
+$line"__id*"
+
+__unknown_file (
+
+%9JH
+E$ E(;
+%10*%
+
+__unknown_file (	
+
+$line2gettotalamount²¯
+E E(<
+%11*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*&
+
+__unknown_file (
+
+250.00*#
+
+__unknown_file (
+
+%102
+assertsameLJ
+F F(8
+%12*%
+
+__unknown_file (	
+
+$line2getserviceamount­ª
+F F(9
+%13*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*!
+
+__unknown_file (
+0*#
+
+__unknown_file (
+
+%122
+assertsameLJ
+G G(8
+%14*%
+
+__unknown_file (	
+
+$line2getestimatedcost­ª
+G G(9
+%15*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*!
+
+__unknown_file (
+0*#
+
+__unknown_file (
+
+%142
+assertsameJH
+H H(6
+%16*%
+
+__unknown_file (	
+
+$line2getgrossmargin­ª
+H H(7
+%17*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*!
+
+__unknown_file (
+0*#
+
+__unknown_file (
+
+%162
+assertsame*
+2B'%
+#app\tests\unit\entity\orderlinetestH

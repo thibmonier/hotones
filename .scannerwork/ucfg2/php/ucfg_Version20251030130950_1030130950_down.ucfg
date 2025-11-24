@@ -1,0 +1,35 @@
+
+.doctrinemigrations\version20251030130950::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251030130950.php ("1*A
+2
+Version20251030130950.php"
+   (
+implicit return*†
+1 (Lc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schema¹¶
+ (K
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251030130950*R
+
+__unknown_file (64
+2ALTER TABLE users DROP created_at, DROP updated_at2addsqlÐÍ
+	 (Ý
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251030130950*ç
+
+__unknown_file (ÊÇ
+ÄALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100.00\' NOT NULL2addsql*
+2:2
+ ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251030130950H

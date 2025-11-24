@@ -1,0 +1,35 @@
+
+@app\controller\staffing\staffingdashboardcontroller::__constructa
+W/Users/tmonier/Projects/hotones/src/Controller/Staffing/StaffingDashboardController.php ("1*·
+1!
+StaffingDashboardController.php|
+z
+ (
+$staffingRepo"__id*W
+
+__unknown_file (;
+9
+$staffingRepo(app\repository\staffingmetricsrepository~
+|
+ (
+$contributorRepo"__id*V
+
+__unknown_file (:
+8
+$contributorRepo$app\repository\contributorrepositoryp
+n
+ (
+	$doctrine"__id*O
+
+__unknown_file (3
+1
+	$doctrine$doctrine\persistence\managerregistry"
+ (
+implicit return:E
+ (79
+$staffingRepo(app\repository\staffingmetricsrepository:D
+ (68
+$contributorRepo$app\repository\contributorrepository:=
+ ()1
+	$doctrine$doctrine\persistence\managerregistryB75
+3app\controller\staffing\staffingdashboardcontrollerH

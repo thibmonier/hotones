@@ -1,0 +1,51 @@
+
+.doctrinemigrations\version20251020145307::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251020145307.php ("1*A
+2
+Version20251020145307.php"
+$ $(
+implicit return*‰	
+1   (ec
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÒÏ
+   (d
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251020145307*k
+
+__unknown_file (OM
+KALTER TABLE employment_period_profiles DROP FOREIGN KEY FK_A643DBB15A1286082addsqlÒÏ
+! !(d
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251020145307*k
+
+__unknown_file (OM
+KALTER TABLE employment_period_profiles DROP FOREIGN KEY FK_A643DBB1CCFA12B82addsql¬©
+" "(>
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251020145307*E
+
+__unknown_file ()'
+%DROP TABLE employment_period_profiles2addsql¶³
+	# #(Ã
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251020145307*Í
+
+__unknown_file (°­
+ªALTER TABLE employment_periods ADD working_time_percentage NUMERIC(5, 2) DEFAULT \'100.00\' NOT NULL, DROP tjm, DROP work_time_percentage, CHANGE salary salary NUMERIC(10, 2) NOT NULL, CHANGE cjm cjm NUMERIC(10, 2) NOT NULL, CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL2addsql*
+2:2
+ ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251020145307H

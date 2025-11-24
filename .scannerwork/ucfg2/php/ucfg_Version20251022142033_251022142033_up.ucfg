@@ -1,0 +1,51 @@
+
+,doctrinemigrations\version20251022142033::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251022142033.php ("1*A
+2
+Version20251022142033.php"
+ (
+implicit return*Ô
+1	 (Øc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÊÇ
+	 (×
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*á
+
+__unknown_file (ÄÁ
+¾ALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100\' NOT NULL2addsqlº·
+ (L
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*S
+
+__unknown_file (75
+3ALTER TABLE timesheets ADD task_id INT DEFAULT NULL2addsqlŒ‰
+	 (™
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*£
+
+__unknown_file (†ƒ
+€ALTER TABLE timesheets ADD CONSTRAINT FK_9AC77D2E8DB60186 FOREIGN KEY (task_id) REFERENCES project_tasks (id) ON DELETE SET NULL2addsqlÀ½
+ (R
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*Y
+
+__unknown_file (=;
+9CREATE INDEX IDX_9AC77D2E8DB60186 ON timesheets (task_id)2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251022142033H

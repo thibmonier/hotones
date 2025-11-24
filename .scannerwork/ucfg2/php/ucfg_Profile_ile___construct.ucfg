@@ -1,0 +1,45 @@
+
+app\entity\profile::__construct@
+6/Users/tmonier/Projects/hotones/src/Entity/Profile.php+ +("1*3
+2
+Profile.php"
+/ /(
+implicit return*¶
+1- -(4?=
+- -(3
+%1"+doctrine\common\collections\arraycollectionp
+n
+- -(3
+%2"8doctrine\common\collections\arraycollection::__construct*"
+
+__unknown_file (
+
+%1^
+\
+- -(3&
+app\entity\profile"
+contributors"__id*"
+
+__unknown_file (
+
+%1?=
+. .(3
+%3"+doctrine\common\collections\arraycollectionp
+n
+. .(3
+%4"8doctrine\common\collections\arraycollection::__construct*"
+
+__unknown_file (
+
+%3\
+Z
+. .(3$
+app\entity\profile"
+
+orderTasks"__id*"
+
+__unknown_file (
+
+%3*
+2B
+app\entity\profileH

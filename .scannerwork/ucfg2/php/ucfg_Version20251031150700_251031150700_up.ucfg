@@ -1,0 +1,62 @@
+
+,doctrinemigrations\version20251031150700::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251031150700.php ("1*A
+2
+Version20251031150700.php"
+0 0(
+implicit return*Â
+1 (Wc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaıÚ
+ (V
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031150700*ç
+
+__unknown_file (Ì
+ÍCREATE TABLE clients (
+            id INT AUTO_INCREMENT NOT NULL,
+            name VARCHAR(180) NOT NULL,
+            logo_path VARCHAR(255) DEFAULT NULL,
+            website VARCHAR(255) DEFAULT NULL,
+            description LONGTEXT DEFAULT NULL,
+            PRIMARY KEY(id)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsqlÛ
+! -(V
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031150700*ã
+
+__unknown_file (ÓÎ
+ËCREATE TABLE client_contacts (
+            id INT AUTO_INCREMENT NOT NULL,
+            client_id INT NOT NULL,
+            last_name VARCHAR(100) NOT NULL,
+            first_name VARCHAR(100) NOT NULL,
+            email VARCHAR(180) DEFAULT NULL,
+            phone VARCHAR(50) DEFAULT NULL,
+            mobile_phone VARCHAR(50) DEFAULT NULL,
+            position_title VARCHAR(120) DEFAULT NULL,
+            active TINYINT(1) NOT NULL DEFAULT 1,
+            INDEX IDX_client_contacts_client (client_id),
+            PRIMARY KEY(id)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsql˝˙
+	/ /(ç
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031150700*î
+
+__unknown_file (xv
+tALTER TABLE client_contacts ADD CONSTRAINT FK_client_contacts_client FOREIGN KEY (client_id) REFERENCES clients (id)2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251031150700H

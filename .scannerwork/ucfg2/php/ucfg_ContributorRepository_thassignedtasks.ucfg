@@ -1,0 +1,172 @@
+
+Capp\repository\contributorrepository::findprojectswithassignedtasksT
+H/Users/tmonier/Projects/hotones/src/Repository/ContributorRepository.phpÑ Ñ(1"1*„
+1
+Ü ì(j
+h
+
+Ñ Ñ(1
+$contributor"__id*D
+
+__unknown_file ((
+&
+$contributorapp\entity\contributorlj
+
+Ü Ü((
+%1*D
+
+__unknown_file ((&
+$app\repository\contributorrepository2getentitymanagerLJ
+
+Ü á("
+%2*"
+
+__unknown_file (
+
+%12createquerybuilderlj
+
+Ü à("
+%3*"
+
+__unknown_file (
+
+%2**
+
+__unknown_file (
+
+DISTINCT p2selectñì
+
+Ü â(-
+%4*"
+
+__unknown_file (
+
+%3*2
+
+__unknown_file (
+App\Entity\Project*!
+
+__unknown_file (
+p2fromêç
+
+Ü ä('
+%5*"
+
+__unknown_file (
+
+%4*'
+
+__unknown_file (	
+p.tasks*!
+
+__unknown_file (
+t2	innerjoinÜÉ
+
+Ü ã(;
+%6*"
+
+__unknown_file (
+
+%5*D
+
+__unknown_file ((&
+$t.assignedContributor = :contributor2whereyw
+
+Ü å(/
+%7*"
+
+__unknown_file (
+
+%6*5
+
+__unknown_file (
+p.status != :archived2andwherevt
+
+Ü ç(,
+%8*"
+
+__unknown_file (
+
+%7*2
+
+__unknown_file (
+t.active = :active2andwhere¢ü
+
+Ü é(7
+%9*"
+
+__unknown_file (
+
+%8*+
+
+__unknown_file (
+contributor*,
+
+__unknown_file (
+
+$contributor2setparameterúô
+
+Ü è(2
+%10*"
+
+__unknown_file (
+
+%9*(
+
+__unknown_file (
+
+archived*(
+
+__unknown_file (
+
+archived2setparameteróî
+
+Ü ê(*
+%11*#
+
+__unknown_file (
+
+%10*&
+
+__unknown_file (
+
+active*$
+
+__unknown_file (
+true2setparameterëé
+
+Ü ë(&
+%12*#
+
+__unknown_file (
+
+%11*&
+
+__unknown_file (
+
+p.name*#
+
+__unknown_file (
+ASC2orderbyDB
+
+Ü í(
+%13*#
+
+__unknown_file (
+
+%122getqueryEC
+
+Ü ì(
+%14*#
+
+__unknown_file (
+
+%132	getresult"
+
+Ü ì(
+
+%14:4
+
+Ñ2 Ñ(J&
+$contributorapp\entity\contributorB(&
+$app\repository\contributorrepositoryH

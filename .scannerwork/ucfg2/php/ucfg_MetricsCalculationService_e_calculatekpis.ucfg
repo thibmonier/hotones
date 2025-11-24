@@ -1,0 +1,318 @@
+
+4app\service\metricscalculationservice::calculatekpisS
+I/Users/tmonier/Projects/hotones/src/Service/MetricsCalculationService.php (!"1* 
+2# (J$"
+ (J
+
+$startDate"datetimeè
+å
+ (J
+%1"datetime::__construct**
+
+__unknown_file (
+
+
+$startDate*7
+
+__unknown_file (
+first day of this month*
+3*_
+3J (JH
+F
+ (I
+
+$endDate"__id*(
+
+__unknown_file (
+
+
+$endDate*
+4
+5*≈
+4# (I" 
+ (I
+
+$endDate"datetimeå
+â
+ (I
+%2"datetime::__construct*(
+
+__unknown_file (
+
+
+$endDate*6
+
+__unknown_file (
+last day of this month*
+5*º
+5I (I
+  *(	
+%3"$Array
+! $(
+%4"$Arrayî
+ë
+! $(
+%5"__mapSet*"
+
+__unknown_file (
+
+%4*%
+
+__unknown_file (	
+start**
+
+__unknown_file (
+
+
+$startDateê
+ç
+! $(
+%6"__mapSet*"
+
+__unknown_file (
+
+%4*#
+
+__unknown_file (
+end*(
+
+__unknown_file (
+
+
+$endDateç
+ä
+  *(	
+%7"__mapSet*"
+
+__unknown_file (
+
+%3*&
+
+__unknown_file (
+
+period*"
+
+__unknown_file (
+
+%4ÏÈ
+% %(U
+%8*E
+
+__unknown_file ()'
+%app\service\metricscalculationservice**
+
+__unknown_file (
+
+
+$startDate*(
+
+__unknown_file (
+
+
+$endDate*(
+
+__unknown_file (
+
+
+$filters2calculaterevenueé
+ã
+  *(	
+%9"__mapSet*"
+
+__unknown_file (
+
+%3*'
+
+__unknown_file (	
+revenue*"
+
+__unknown_file (
+
+%8ÙÒ
+& &(\
+%10*E
+
+__unknown_file ()'
+%app\service\metricscalculationservice**
+
+__unknown_file (
+
+
+$startDate*(
+
+__unknown_file (
+
+
+$endDate*(
+
+__unknown_file (
+
+
+$filters2calculateprojectmetricsë
+é
+  *(	
+%11"__mapSet*"
+
+__unknown_file (
+
+%3*(
+
+__unknown_file (
+
+projects*#
+
+__unknown_file (
+
+%10ÚÔ
+' '(Z
+%12*E
+
+__unknown_file ()'
+%app\service\metricscalculationservice**
+
+__unknown_file (
+
+
+$startDate*(
+
+__unknown_file (
+
+
+$endDate*(
+
+__unknown_file (
+
+
+$filters2calculateordermetricsè
+å
+  *(	
+%13"__mapSet*"
+
+__unknown_file (
+
+%3*&
+
+__unknown_file (
+
+orders*#
+
+__unknown_file (
+
+%12¯ı
+( ((`
+%14*E
+
+__unknown_file ()'
+%app\service\metricscalculationservice**
+
+__unknown_file (
+
+
+$startDate*(
+
+__unknown_file (
+
+
+$endDate*(
+
+__unknown_file (
+
+
+$filters2calculatecontributormetricsï
+í
+  *(	
+%15"__mapSet*"
+
+__unknown_file (
+
+%3*,
+
+__unknown_file (
+contributors*#
+
+__unknown_file (
+
+%14ÒÓ
+) )(Y
+%16*E
+
+__unknown_file ()'
+%app\service\metricscalculationservice**
+
+__unknown_file (
+
+
+$startDate*(
+
+__unknown_file (
+
+
+$endDate*(
+
+__unknown_file (
+
+
+$filters2calculatetimemetricsç
+ä
+  *(	
+%17"__mapSet*"
+
+__unknown_file (
+
+%3*$
+
+__unknown_file (
+time*#
+
+__unknown_file (
+
+%16"
+  *(
+
+
+%3*Ú
+1 (K_
+]
+ (!
+
+$startDate"__id*=
+
+__unknown_file (!
+
+
+$startDatedatetimeinterface[
+Y
+ (!
+
+$endDate"__id*;
+
+__unknown_file (
+
+$endDatedatetimeinterfaceO
+M
+ (!
+
+$filters"__id*/
+
+__unknown_file (
+
+$filtersarrayL
+J
+ (J
+
+$startDate"__id**
+
+__unknown_file (
+
+
+$startDate*
+2
+3:+
+" (F
+
+$startDatedatetimeinterface:)
+H (j
+$endDatedatetimeinterface:
+l (
+$filtersarrayB)'
+%app\service\metricscalculationserviceH

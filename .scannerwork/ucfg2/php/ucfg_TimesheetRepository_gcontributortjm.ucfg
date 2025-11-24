@@ -1,0 +1,225 @@
+
+Rapp\repository\timesheetrepository::getmonthlyrevenueforprojectusingcontributortjmR
+F/Users/tmonier/Projects/hotones/src/Repository/TimesheetRepository.phpª ª(B"1*¬
+2
+¶ ¶(Qus
+
+¶ ¶(-
+%9*#
+
+__unknown_file (
+
+$qb*0
+
+__unknown_file (
+t.date >= :start2andwhere›˜
+
+¶ ¶(P
+%10*"
+
+__unknown_file (
+
+%9*%
+
+__unknown_file (	
+start**
+
+__unknown_file (
+
+
+$startDate2setparameter*
+4
+5*¥
+4
+¹ ¹(Ktr
+
+¹ ¹(+
+%11*#
+
+__unknown_file (
+
+$qb*.
+
+__unknown_file (
+t.date <= :end2andwhere˜•
+
+¹ ¹(J
+%12*#
+
+__unknown_file (
+
+%11*#
+
+__unknown_file (
+end*(
+
+__unknown_file (
+
+
+$endDate2setparameter*
+5*¸
+5
+¼ ¼(1DB
+
+¼ ¼(
+%13*#
+
+__unknown_file (
+
+$qb2getqueryJH
+
+¼ ¼(0
+%14*#
+
+__unknown_file (
+
+%132getarrayresult"
+
+¼ ¼(1
+
+%14*ƒ
+1
+¬ ³()^
+\
+
+ª ª(B
+
+$project"__id*<
+
+__unknown_file ( 
+
+$projectapp\entity\projecta
+_
+
+ª ª(B
+
+$startDate"__id*=
+
+__unknown_file (!
+
+
+$startDatedatetimeinterface]
+[
+
+ª ª(B
+
+$endDate"__id*;
+
+__unknown_file (
+
+$endDatedatetimeinterface
+
+¬ ¬(,
+%1*B
+
+__unknown_file (&$
+"app\repository\timesheetrepository*!
+
+__unknown_file (
+t2createquerybuilder´±
+
+¬ ­(i
+%2*"
+
+__unknown_file (
+
+%1*q
+
+__unknown_file (US
+QYEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours * (c.tjm/8)) as revenue2select‘Ž
+
+¬ ®((
+%3*"
+
+__unknown_file (
+
+%2*-
+
+__unknown_file (
+t.contributor*!
+
+__unknown_file (
+c2joinus
+
+¬ ¯(+
+%4*"
+
+__unknown_file (
+
+%3*4
+
+__unknown_file (
+t.project = :project2whereš—
+
+¬ °(/
+%5*"
+
+__unknown_file (
+
+%4*'
+
+__unknown_file (	
+project*(
+
+__unknown_file (
+
+
+$project2setparameternl
+
+¬ ±($
+%6*"
+
+__unknown_file (
+
+%5*+
+
+__unknown_file (
+year, month2groupbyŠ
+
+¬ ²($
+%7*"
+
+__unknown_file (
+
+%6*$
+
+__unknown_file (
+year*#
+
+__unknown_file (
+ASC2orderby‘Ž
+
+¬ ³((
+%8*"
+
+__unknown_file (
+
+%7*%
+
+__unknown_file (	
+month*#
+
+__unknown_file (
+ASC2
+addorderby?
+=
+
+¬ ³((
+$qb"__id*"
+
+__unknown_file (
+
+%8*	
+2
+4
+5:,
+
+ªC ª(S
+$projectapp\entity\project:-
+
+ªU ª(y
+
+$startDatedatetimeinterface:,
+ª{ ª(
+$endDatedatetimeinterfaceB&$
+"app\repository\timesheetrepositoryH

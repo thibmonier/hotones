@@ -1,0 +1,59 @@
+
+.doctrinemigrations\version20251109084500::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251109084500.phpJ J("1*A
+2
+Version20251109084500.php"
+R R(
+implicit return*‹
+1L L(Xc
+a
+J J(	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÅÂ
+L L(W
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109084500*^
+
+__unknown_file (B@
+>ALTER TABLE notifications DROP FOREIGN KEY FK_6000B0D3E92F8F782addsqlÐÍ
+M M(b
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109084500*i
+
+__unknown_file (MK
+IALTER TABLE notification_preferences DROP FOREIGN KEY FK_857AEBAEA76ED3952addsqlŸœ
+O O(1
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109084500*8
+
+__unknown_file (
+DROP TABLE notifications2addsqlª§
+P P(<
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109084500*C
+
+__unknown_file ('%
+#DROP TABLE notification_preferences2addsql§¤
+Q Q(9
+%5*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109084500*@
+
+__unknown_file ($"
+ DROP TABLE notification_settings2addsql*
+2:2
+J J('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251109084500H

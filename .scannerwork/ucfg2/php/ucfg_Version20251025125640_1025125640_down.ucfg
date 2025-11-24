@@ -1,0 +1,51 @@
+
+.doctrinemigrations\version20251025125640::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251025125640.php ("1*A
+2
+Version20251025125640.php"
+$ $(
+implicit return*œ
+1	   (Þc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÐÍ
+	   (Ý
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251025125640*ç
+
+__unknown_file (ÊÇ
+ÄALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100.00\' NOT NULL2addsqlÃÀ
+! !(U
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251025125640*\
+
+__unknown_file (@>
+<ALTER TABLE order_tasks DROP FOREIGN KEY FK_D3C6116ACCFA12B82addsqlµ²
+" "(G
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251025125640*N
+
+__unknown_file (20
+.DROP INDEX IDX_D3C6116ACCFA12B8 ON order_tasks2addsqlÐÍ
+# #(b
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251025125640*i
+
+__unknown_file (MK
+IALTER TABLE order_tasks ADD profile VARCHAR(50) NOT NULL, DROP profile_id2addsql*
+2:2
+ ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251025125640H

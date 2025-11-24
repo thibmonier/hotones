@@ -1,0 +1,63 @@
+
+Kapp\service\analytics\metricscalculationservice::getperiodboundsfromdimtime_
+S/Users/tmonier/Projects/hotones/src/Service/Analytics/MetricsCalculationService.phpÜ Ü(/"1*Æ
+1
+Þ Þ($h
+f
+
+Ü Ü(/
+
+$dimTime"__id*F
+
+__unknown_file (*
+(
+$dimTimeapp\entity\analytics\dimtimeZ
+X
+
+Ü Ü(/
+$granularity"__id*4
+
+__unknown_file (
+
+$granularitystringGE
+
+Þ Þ(#
+%1*(
+
+__unknown_file (
+
+
+$dimTime2getdateA
+?
+
+Þ Þ(#
+$date"__id*"
+
+__unknown_file (
+
+%1ÌÉ
+
+à à(:
+%2*O
+
+__unknown_file (31
+/app\service\analytics\metricscalculationservice*%
+
+__unknown_file (	
+
+$date*,
+
+__unknown_file (
+
+$granularity2getperiodbounds"
+
+à à(;
+
+%2:6
+
+Ü0 Ü(@(
+$dimTimeapp\entity\analytics\dimtime:$
+
+ÜB Ü(U
+$granularitystringB31
+/app\service\analytics\metricscalculationserviceH

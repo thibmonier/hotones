@@ -1,0 +1,51 @@
+
+,doctrinemigrations\version20251119151207::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251119151207.php ("1*A
+2
+Version20251119151207.php"
+ (
+implicit return*á
+1 (Rc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schema¿¼
+ (Q
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251119151207*X
+
+__unknown_file (<:
+8ALTER TABLE contributors ADD manager_id INT DEFAULT NULL2addsql
+	 (
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251119151207*§
+
+__unknown_file (Š‡
+„ALTER TABLE contributors ADD CONSTRAINT FK_72D26262783E3463 FOREIGN KEY (manager_id) REFERENCES contributors (id) ON DELETE SET NULL2addsqlÅÂ
+ (W
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251119151207*^
+
+__unknown_file (B@
+>CREATE INDEX IDX_72D26262783E3463 ON contributors (manager_id)2addsqlÊÇ
+	 (×
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251119151207*á
+
+__unknown_file (ÄÁ
+¾ALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100\' NOT NULL2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251119151207H

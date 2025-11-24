@@ -1,0 +1,259 @@
+
+/app\tests\api\projectapitest::testcreateprojectF
+</Users/tmonier/Projects/hotones/tests/Api/ProjectApiTest.php0 0(%"1*:
+2
+ProjectApiTest.php"
+F F(
+implicit return*ø
+13 <(P
+N
+3 3(*
+%1"static::createclient*&
+
+__unknown_file (
+"
+static
+3M <(	
+%2"$Array
+4 4(c
+%3"$Array•’
+47 4(b
+%4*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*0
+
+__unknown_file (
+ROLE_CHEF_PROJET2gettokenwithroleI
+G
+4- 4(b
+%5"__concat*
+4- 4(6	
+Bearer *
+47 4(b
+
+%4”
+‘
+4 4(c
+%6"__mapSet*"
+
+__unknown_file (
+
+%3*-
+
+__unknown_file (
+Authorization*"
+
+__unknown_file (
+
+%5
+‹
+3M <(	
+%7"__mapSet*"
+
+__unknown_file (
+
+%2*'
+
+__unknown_file (	
+headers*"
+
+__unknown_file (
+
+%3
+5 ;(
+%8"$Array˜
+•
+5 ;(
+%9"__mapSet*"
+
+__unknown_file (
+
+%8*$
+
+__unknown_file (
+name*/
+
+__unknown_file (
+Projet Test API«
+¨
+5 ;(
+%10"__mapSet*"
+
+__unknown_file (
+
+%8*+
+
+__unknown_file (
+description*:
+
+__unknown_file (
+Description du projet test’
+
+5 ;(
+%11"__mapSet*"
+
+__unknown_file (
+
+%8*&
+
+__unknown_file (
+
+status*&
+
+__unknown_file (
+
+active˜
+•
+5 ;(
+%12"__mapSet*"
+
+__unknown_file (
+
+%8*+
+
+__unknown_file (
+projectType*'
+
+__unknown_file (	
+forfait•
+’
+5 ;(
+%13"__mapSet*"
+
+__unknown_file (
+
+%8**
+
+__unknown_file (
+
+isInternal*%
+
+__unknown_file (	
+falseŒ
+‰
+3M <(	
+%14"__mapSet*"
+
+__unknown_file (
+
+%2*$
+
+__unknown_file (
+json*"
+
+__unknown_file (
+
+%8º·
+3 <(
+
+%15*"
+
+__unknown_file (
+
+%1*$
+
+__unknown_file (
+POST*-
+
+__unknown_file (
+/api/projects*"
+
+__unknown_file (
+
+%22requestD
+B
+3 <(
+
+	$response"__id*#
+
+__unknown_file (
+
+%15“
+> >(0
+%16*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*!
+
+__unknown_file (2É2assertresponsestatuscodesameŞÛ
+? ?(]
+%17*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*,
+
+__unknown_file (
+content-type*B
+
+__unknown_file (&$
+"application/ld+json; charset=utf-82assertresponseheadersame
+@" E(	
+%18"$Array¤
+¡
+@" E(	
+%19"__mapSet*#
+
+__unknown_file (
+
+%18*(
+
+__unknown_file (
+
+@context*5
+
+__unknown_file (
+/api/contexts/Project“
+
+@" E(	
+%20"__mapSet*#
+
+__unknown_file (
+
+%18*%
+
+__unknown_file (	
+@type*'
+
+__unknown_file (	
+Projectš
+—
+@" E(	
+%21"__mapSet*#
+
+__unknown_file (
+
+%18*$
+
+__unknown_file (
+name*/
+
+__unknown_file (
+Projet Test API“
+
+@" E(	
+%22"__mapSet*#
+
+__unknown_file (
+
+%18*&
+
+__unknown_file (
+
+status*&
+
+__unknown_file (
+
+active‹ˆ
+@ E(
+
+%23*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*#
+
+__unknown_file (
+
+%182assertjsoncontains*
+2B 
+app\tests\api\projectapitestH

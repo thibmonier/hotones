@@ -1,0 +1,235 @@
+
++app\controller\profilecontroller::enable2faN
+D/Users/tmonier/Projects/hotones/src/Controller/ProfileController.phpZ Z("1*É
+2_ _(7‘Ž
+_ _(6
+%2*@
+
+__unknown_file ($"
+ app\controller\profilecontroller*)
+
+__unknown_file (
+	app_login2redirecttorouteg
+e
+_ _(7/
+%3)symfony\component\httpfoundation\response"__id*"
+
+__unknown_file (
+
+%2"=
+_ _(71
+/
+%3)symfony\component\httpfoundation\response*_
+3b b(#HF
+b b(#
+%4*%
+
+__unknown_file (	
+
+$user2gettotpsecret*
+4
+5*º
+4c c(#R
+P
+c c("
+%5"otphp\totp::create**
+
+__unknown_file ("
+
+otphp\totp?
+=
+c c("
+$totp"__id*"
+
+__unknown_file (
+
+%5CA
+d d(-
+%6*%
+
+__unknown_file (	
+
+$user2getemailge
+d d(.
+%7*%
+
+__unknown_file (	
+
+$totp*"
+
+__unknown_file (
+
+%62setlabelmk
+e e('
+%8*%
+
+__unknown_file (	
+
+$totp*'
+
+__unknown_file (	
+hotones2	setissuerDB
+f! f(3
+%9*%
+
+__unknown_file (	
+
+$totp2	getsecretmk
+f f(4
+%10*%
+
+__unknown_file (	
+
+$user*"
+
+__unknown_file (
+
+%92settotpsecret?=
+g g(
+%11*#
+
+__unknown_file (
+
+$em2flush*
+5*†
+5j j(5IG
+j j(3
+%12*%
+
+__unknown_file (	
+
+$user2gettotpsecretx
+v
+j j(4
+%13"otphp\totp::create**
+
+__unknown_file ("
+
+otphp\totp*#
+
+__unknown_file (
+
+%12@
+>
+j j(4
+$totp"__id*#
+
+__unknown_file (
+
+%13DB
+k k()
+%14*%
+
+__unknown_file (	
+
+$user2getemailig
+k k(*
+%15*%
+
+__unknown_file (	
+
+$totp*#
+
+__unknown_file (
+
+%142setlabelnl
+l l(#
+%16*%
+
+__unknown_file (	
+
+$totp*'
+
+__unknown_file (	
+hotones2	setissuer
+n< q(	
+%17"$ArrayNL
+o o(8
+%18*%
+
+__unknown_file (	
+
+$totp2getprovisioninguri•
+’
+n< q(	
+%19"__mapSet*#
+
+__unknown_file (
+
+%17*+
+
+__unknown_file (
+otpauth_uri*#
+
+__unknown_file (
+
+%18IG
+p p(3
+%20*%
+
+__unknown_file (	
+
+$user2gettotpsecret
+
+n< q(	
+%21"__mapSet*#
+
+__unknown_file (
+
+%17*&
+
+__unknown_file (
+
+secret*#
+
+__unknown_file (
+
+%20À½
+n q(
+
+%22*@
+
+__unknown_file ($"
+ app\controller\profilecontroller*;
+
+__unknown_file (
+profile/2fa_setup.html.twig*#
+
+__unknown_file (
+
+%172renderi
+g
+n q(0
+%23)symfony\component\httpfoundation\response"__id*#
+
+__unknown_file (
+
+%22">
+n q(2
+0
+%23)symfony\component\httpfoundation\response*š
+1] ](!c
+a
+Z Z(
+$em"__id*H
+
+__unknown_file (,
+*
+$em#doctrine\orm\entitymanagerinterface][
+] ]( 
+%1*@
+
+__unknown_file ($"
+ app\controller\profilecontroller2getuser?
+=
+] ]( 
+$user"__id*"
+
+__unknown_file (
+
+%1*
+2
+3:6
+Z Z(8*
+$em#doctrine\orm\entitymanagerinterfaceB$"
+ app\controller\profilecontrollerH

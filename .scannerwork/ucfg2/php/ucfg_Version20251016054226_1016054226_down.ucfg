@@ -1,0 +1,75 @@
+
+.doctrinemigrations\version20251016054226::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251016054226.php   ("1*A
+2
+Version20251016054226.php"
+* *(
+implicit return*š
+1# #(Vc
+a
+   (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÃÀ
+# #(U
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251016054226*\
+
+__unknown_file (@>
+<ALTER TABLE order_tasks DROP FOREIGN KEY FK_D3C6116A8D9F6D382addsql¾»
+$ $(P
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251016054226*W
+
+__unknown_file (;9
+7ALTER TABLE orders DROP FOREIGN KEY FK_E52FFDEE166D1F9C2addsqlš
+% %(/
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251016054226*6
+
+__unknown_file (
+DROP TABLE order_tasks2addsql˜•
+& &(*
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251016054226*1
+
+__unknown_file (
+DROP TABLE orders2addsqlš—
+' '(,
+%5*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251016054226*3
+
+__unknown_file (
+DROP TABLE profiles2addsqlÍÊ
+	( ((Ú
+%6*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251016054226*ä
+
+__unknown_file (ÇÄ
+ÁALTER TABLE projects ADD sold_days NUMERIC(10, 2) DEFAULT NULL, ADD sold_daily_rate NUMERIC(10, 2) DEFAULT NULL, DROP description, DROP purchases_amount, DROP purchases_description, DROP status2addsqlñî
+	) )(
+%7*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251016054226*ˆ
+
+__unknown_file (lj
+hALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL2addsql*
+2:2
+   ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251016054226H

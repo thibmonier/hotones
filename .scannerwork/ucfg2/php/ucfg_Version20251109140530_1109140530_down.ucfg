@@ -1,0 +1,43 @@
+
+.doctrinemigrations\version20251109140530::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251109140530.php4 4("1*A
+2
+Version20251109140530.php"
+9 9(
+implicit return*¿
+1	6 6(€c
+a
+4 4(	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaîë
+6 6(
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109140530*†
+
+__unknown_file (jh
+fALTER TABLE projects DROP repo_links, DROP env_links, DROP db_access, DROP ssh_access, DROP ftp_access2addsql­ª
+7 7(?
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109140530*F
+
+__unknown_file (*(
+&DROP TABLE project_technology_versions2addsql£ 
+8 8(5
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251109140530*<
+
+__unknown_file ( 
+DROP TABLE scheduler_entries2addsql*
+2:2
+4 4('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251109140530H

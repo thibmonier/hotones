@@ -1,0 +1,35 @@
+
+.doctrinemigrations\version20251108090122::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251108090122.php ("1*A
+2
+Version20251108090122.php"
+ (
+implicit return*õ
+1 (Mc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaº·
+ (L
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251108090122*S
+
+__unknown_file (75
+3DROP INDEX idx_timesheet_project_date ON timesheets2addsql¾»
+ (P
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251108090122*W
+
+__unknown_file (;9
+7DROP INDEX idx_timesheet_contributor_date ON timesheets2addsql*
+2:2
+ ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251108090122H

@@ -1,0 +1,22 @@
+
++app\event\quotestatuschangedevent::getorderO
+E/Users/tmonier/Projects/hotones/src/Event/QuoteStatusChangedEvent.phpD D("1*ë
+1F F(f
+d
+F F(
+%1"__id*L
+
+__unknown_file (0*.#
+!app\event\quotestatuschangedevent"
+orderN
+L
+F F(
+%2app\entity\order"__id*"
+
+__unknown_file (
+
+%1"$
+F F(
+
+%2app\entity\orderB%#
+!app\event\quotestatuschangedeventH

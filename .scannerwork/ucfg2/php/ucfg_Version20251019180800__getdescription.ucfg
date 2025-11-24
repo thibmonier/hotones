@@ -1,0 +1,7 @@
+
+8doctrinemigrations\version20251019180800::getdescriptionN
+D/Users/tmonier/Projects/hotones/migrations/Version20251019180800.php (""1*¶
+1	 (í"ï
+	 (íáÑ
+ÅAjoute les colonnes estimated_hours_sold, estimated_hours_revised, progress_percentage et assigned_contributor_id √† project_taskB,*
+(doctrinemigrations\version20251019180800H

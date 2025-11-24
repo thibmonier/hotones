@@ -1,0 +1,149 @@
+
+<app\repository\contributorrepository::findwithhoursforperiodR
+H/Users/tmonier/Projects/hotones/src/Repository/ContributorRepository.phpr r(*"1*ª
+1t ~(_
+]
+r r(*
+
+$startDate"__id*=
+
+__unknown_file (!
+
+
+$startDatedatetimeinterface[
+Y
+r r(*
+
+$endDate"__id*;
+
+__unknown_file (
+
+$endDatedatetimeinterfaceêç
+t t(-
+%1*D
+
+__unknown_file ((&
+$app\repository\contributorrepository*!
+
+__unknown_file (
+c2createquerybuilder¯ı
+t u(U
+%2*"
+
+__unknown_file (
+
+%1*,
+
+__unknown_file (
+c.timesheets*!
+
+__unknown_file (
+t*$
+
+__unknown_file (
+WITH*>
+
+__unknown_file (" 
+t.date BETWEEN :start AND :end2leftjoinãà
+t v(B
+%3*"
+
+__unknown_file (
+
+%2*G
+
+__unknown_file (+)
+'COALESCE(SUM(t.hours), 0) as totalHours2	addselectqo
+t w()
+%4*"
+
+__unknown_file (
+
+%3*2
+
+__unknown_file (
+c.active = :active2whereìê
+t x(*
+%5*"
+
+__unknown_file (
+
+%4*&
+
+__unknown_file (
+
+active*$
+
+__unknown_file (
+true2setparameteròï
+t y(/
+%6*"
+
+__unknown_file (
+
+%5*%
+
+__unknown_file (	
+start**
+
+__unknown_file (
+
+
+$startDate2setparameterîë
+t z(+
+%7*"
+
+__unknown_file (
+
+%6*#
+
+__unknown_file (
+end*(
+
+__unknown_file (
+
+
+$endDate2setparameterec
+t {(
+%8*"
+
+__unknown_file (
+
+%7*$
+
+__unknown_file (
+c.id2groupbyíè
+t |(+
+%9*"
+
+__unknown_file (
+
+%8**
+
+__unknown_file (
+
+totalHours*$
+
+__unknown_file (
+DESC2orderbyA?
+t }(
+%10*"
+
+__unknown_file (
+
+%92getqueryCA
+t ~(
+%11*#
+
+__unknown_file (
+
+%102	getresult"
+t ~(
+
+%11:+
+r+ r(G
+
+$startDatedatetimeinterface:)
+rI r(c
+$endDatedatetimeinterfaceB(&
+$app\repository\contributorrepositoryH

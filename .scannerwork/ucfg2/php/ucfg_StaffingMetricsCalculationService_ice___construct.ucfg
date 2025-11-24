@@ -1,0 +1,35 @@
+
+:app\service\staffingmetricscalculationservice::__construct[
+Q/Users/tmonier/Projects/hotones/src/Service/StaffingMetricsCalculationService.php ("1*Â
+1'
+%StaffingMetricsCalculationService.phpy
+w
+ (
+$entityManager"__id*S
+
+__unknown_file (7
+5
+$entityManager#doctrine\orm\entitymanagerinterface~
+|
+ (
+$contributorRepo"__id*V
+
+__unknown_file (:
+8
+$contributorRepo$app\repository\contributorrepositoryx
+v
+ (
+$timesheetRepo"__id*R
+
+__unknown_file (6
+4
+$timesheetRepo"app\repository\timesheetrepository"
+ (
+implicit return:A
+ (55
+$entityManager#doctrine\orm\entitymanagerinterface:D
+ (68
+$contributorRepo$app\repository\contributorrepository:@
+ (24
+$timesheetRepo"app\repository\timesheetrepositoryB1/
+-app\service\staffingmetricscalculationserviceH

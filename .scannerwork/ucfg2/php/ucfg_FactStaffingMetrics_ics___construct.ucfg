@@ -1,0 +1,27 @@
+
+5app\entity\analytics\factstaffingmetrics::__constructV
+L/Users/tmonier/Projects/hotones/src/Entity/Analytics/FactStaffingMetrics.phpd d("1*?
+2
+FactStaffingMetrics.php"
+g g(
+implicit return*õ
+1f f(-
+f f(,
+%1"datetimeM
+K
+f f(,
+%2"datetime::__construct*"
+
+__unknown_file (
+
+%1t
+r
+f f(,<*
+(app\entity\analytics\factstaffingmetrics"
+calculatedAt"__id*"
+
+__unknown_file (
+
+%1*
+2B,*
+(app\entity\analytics\factstaffingmetricsH

@@ -1,0 +1,38 @@
+
+:app\controller\planningoptimizationcontroller::__construct[
+Q/Users/tmonier/Projects/hotones/src/Controller/PlanningOptimizationController.php ("1*¶
+1$
+"PlanningOptimizationController.phpt
+r
+ (
+
+$optimizer"__id*R
+
+__unknown_file (6
+4
+
+$optimizer&app\service\planning\planningoptimizeru
+s
+ (
+$taceAnalyzer"__id*P
+
+__unknown_file (4
+2
+$taceAnalyzer!app\service\planning\taceanalyzer}
+{
+ (
+$aiAssistant"__id*Y
+
+__unknown_file (=
+;
+$aiAssistant+app\service\planning\ai\planningaiassistant"
+ (
+implicit return:@
+ (54
+
+$optimizer&app\service\planning\planningoptimizer:>
+ (32
+$taceAnalyzer!app\service\planning\taceanalyzer:G
+ (9;
+$aiAssistant+app\service\planning\ai\planningaiassistantB1/
+-app\controller\planningoptimizationcontrollerH

@@ -1,0 +1,72 @@
+
+=app\messagehandler\recalculatemetricsmessagehandler::__invokea
+W/Users/tmonier/Projects/hotones/src/MessageHandler/RecalculateMetricsMessageHandler.php ("1*L
+2&
+$RecalculateMetricsMessageHandler.php"
+ (
+implicit return*Ÿ
+1 (-o
+m
+ (
+
+$message"__id*O
+
+__unknown_file (3
+1
+$message%app\message\recalculatemetricsmessageL
+J
+ (+
+%1"__id*2
+
+__unknown_file (*
+
+
+$message"
+date
+ (,
+$date"datetimet
+r
+ (,
+%2"datetime::__construct*%
+
+__unknown_file (	
+
+$date*"
+
+__unknown_file (
+
+%1z
+x
+ (
+%3"__id*`
+
+__unknown_file (D*B5
+3app\messagehandler\recalculatemetricsmessagehandler"	
+serviceS
+Q
+9 (N
+%4"__id*9
+
+__unknown_file (*
+
+
+$message"
+granularityùö
+ (O
+%5*"
+
+__unknown_file (
+
+%3*%
+
+__unknown_file (	
+
+$date*"
+
+__unknown_file (
+
+%42calculatemetricsforperiod*
+2:=
+ (?1
+$message%app\message\recalculatemetricsmessageB75
+3app\messagehandler\recalculatemetricsmessagehandlerH

@@ -1,0 +1,35 @@
+
+5app\service\clientservicelevelcalculator::__constructV
+L/Users/tmonier/Projects/hotones/src/Service/ClientServiceLevelCalculator.php ("1*º
+1"
+ ClientServiceLevelCalculator.phpy
+w
+ (
+$entityManager"__id*S
+
+__unknown_file (7
+5
+$entityManager#doctrine\orm\entitymanagerinterface{
+y
+ (
+$clientRepository"__id*R
+
+__unknown_file (6
+4
+$clientRepositoryapp\repository\clientrepositoryx
+v
+ (
+$orderRepository"__id*P
+
+__unknown_file (4
+2
+$orderRepositoryapp\repository\orderrepository"
+ (
+implicit return:A
+ (>5
+$entityManager#doctrine\orm\entitymanagerinterface:@
+ (;4
+$clientRepositoryapp\repository\clientrepository:>
+ (92
+$orderRepositoryapp\repository\orderrepositoryB,*
+(app\service\clientservicelevelcalculatorH

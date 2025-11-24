@@ -1,0 +1,35 @@
+
+3app\service\planning\planningoptimizer::__constructT
+J/Users/tmonier/Projects/hotones/src/Service/Planning/PlanningOptimizer.php ("1*¯
+1
+PlanningOptimizer.phpu
+s
+ (
+$taceAnalyzer"__id*P
+
+__unknown_file (4
+2
+$taceAnalyzer!app\service\planning\taceanalyzery
+w
+ (
+$entityManager"__id*S
+
+__unknown_file (7
+5
+$entityManager#doctrine\orm\entitymanagerinterface~
+|
+ (
+$projectRepository"__id*T
+
+__unknown_file (8
+6
+$projectRepository app\repository\projectrepository"
+ (
+implicit return:>
+ (32
+$taceAnalyzer!app\service\planning\taceanalyzer:A
+ (>5
+$entityManager#doctrine\orm\entitymanagerinterface:B
+ (=6
+$projectRepository app\repository\projectrepositoryB*(
+&app\service\planning\planningoptimizerH

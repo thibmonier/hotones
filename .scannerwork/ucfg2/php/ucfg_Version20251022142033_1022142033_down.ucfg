@@ -1,0 +1,51 @@
+
+.doctrinemigrations\version20251022142033::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251022142033.php ("1*A
+2
+Version20251022142033.php"
+$ $(
+implicit return*ó
+1   (Uc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÂ¿
+   (T
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*[
+
+__unknown_file (?=
+;ALTER TABLE timesheets DROP FOREIGN KEY FK_9AC77D2E8DB601862addsql´±
+! !(F
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*M
+
+__unknown_file (1/
+-DROP INDEX IDX_9AC77D2E8DB60186 ON timesheets2addsqlª§
+" "(<
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*C
+
+__unknown_file ('%
+#ALTER TABLE timesheets DROP task_id2addsqlÐÍ
+	# #(Ý
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251022142033*ç
+
+__unknown_file (ÊÇ
+ÄALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100.00\' NOT NULL2addsql*
+2:2
+ ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251022142033H

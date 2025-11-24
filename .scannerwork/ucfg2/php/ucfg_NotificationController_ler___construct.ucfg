@@ -1,0 +1,35 @@
+
+2app\controller\notificationcontroller::__constructS
+I/Users/tmonier/Projects/hotones/src/Controller/NotificationController.php ("1*º
+1
+NotificationController.phpÅ
+
+ (
+$notificationService"__id*U
+
+__unknown_file (9
+7
+$notificationServiceapp\service\notificationserviceé
+ã
+ (
+$notificationRepository"__id*^
+
+__unknown_file (B
+@
+$notificationRepository%app\repository\notificationrepositoryc
+a
+ (
+$em"__id*H
+
+__unknown_file (,
+*
+$em#doctrine\orm\entitymanagerinterface"
+ (
+implicit return:C
+ (A7
+$notificationServiceapp\service\notificationservice:L
+ (G@
+$notificationRepository%app\repository\notificationrepository:6
+ (3*
+$em#doctrine\orm\entitymanagerinterfaceB)'
+%app\controller\notificationcontrollerH

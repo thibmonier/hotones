@@ -1,0 +1,70 @@
+
+Happ\tests\unit\entity\orderlinetest::testservicelinewithattachedpurchaseM
+C/Users/tmonier/Projects/hotones/tests/Unit/Entity/OrderLineTest.php+ +(7"1*9
+2
+OrderLineTest.php"
+0 0(
+implicit return*²
+1- -(JÜÙ
+- -(I
+%1*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*!
+
+__unknown_file (
+5*$
+
+__unknown_file (
+1000*&
+
+__unknown_file (
+
+300.002createserviceline?
+=
+- -(I
+$line"__id*"
+
+__unknown_file (
+
+%1KI
+.% .(>
+%2*%
+
+__unknown_file (	
+
+$line2getserviceamount±®
+. .(?
+%3*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*'
+
+__unknown_file (	
+5000.00*"
+
+__unknown_file (
+
+%22
+assertsameIG
+/% /(<
+%4*%
+
+__unknown_file (	
+
+$line2gettotalamount±®
+/ /(=
+%5*C
+
+__unknown_file ('%
+#app\tests\unit\entity\orderlinetest*'
+
+__unknown_file (	
+5300.00*"
+
+__unknown_file (
+
+%42
+assertsame*
+2B'%
+#app\tests\unit\entity\orderlinetestH

@@ -1,0 +1,126 @@
+
+Japp\repository\employmentperiodrepository::findcurrentperiodforcontributorW
+M/Users/tmonier/Projects/hotones/src/Repository/EmploymentPeriodRepository.phpr r(3"1*€
+1t t(h
+f
+r r(3
+$contributor"__id*D
+
+__unknown_file ((
+&
+$contributorapp\entity\contributor
+t t(
+$now"datetimeO
+M
+t t(
+%1"datetime::__construct*$
+
+__unknown_file (
+
+$nowñì
+v v(.
+%2*I
+
+__unknown_file (-+
+)app\repository\employmentperiodrepository*"
+
+__unknown_file (
+ep2createquerybuilder|z
+v w(4
+%3*"
+
+__unknown_file (
+
+%2*=
+
+__unknown_file (!
+ep.contributor = :contributor2wherevt
+v x(.
+%4*"
+
+__unknown_file (
+
+%3*4
+
+__unknown_file (
+ep.startDate <= :now2andwhereãà
+v y(B
+%5*"
+
+__unknown_file (
+
+%4*H
+
+__unknown_file (,*
+(ep.endDate IS NULL OR ep.endDate >= :now2andwhere†ù
+v z(7
+%6*"
+
+__unknown_file (
+
+%5*+
+
+__unknown_file (
+contributor*,
+
+__unknown_file (
+
+$contributor2setparameterêç
+v {('
+%7*"
+
+__unknown_file (
+
+%6*#
+
+__unknown_file (
+now*$
+
+__unknown_file (
+
+$now2setparameterîë
+v |(-
+%8*"
+
+__unknown_file (
+
+%7*,
+
+__unknown_file (
+ep.startDate*$
+
+__unknown_file (
+DESC2orderbyge
+v }(
+%9*"
+
+__unknown_file (
+
+%8* 
+
+__unknown_file (22setmaxresultsA?
+v ~(
+%10*"
+
+__unknown_file (
+
+%92getqueryLJ
+v ("
+%11*#
+
+__unknown_file (
+
+%102getoneornullresult[
+Y
+v (#"
+%12app\entity\employmentperiod"__id*#
+
+__unknown_file (
+
+%11"0
+v (#$
+"
+%12app\entity\employmentperiod:2
+r4 r(L&
+$contributorapp\entity\contributorB-+
+)app\repository\employmentperiodrepositoryH

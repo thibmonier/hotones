@@ -1,0 +1,47 @@
+
+2app\service\metricscalculationservice::__constructS
+I/Users/tmonier/Projects/hotones/src/Service/MetricsCalculationService.php ("1*¡
+1
+MetricsCalculationService.phpr
+p
+ (
+$projectRepo"__id*N
+
+__unknown_file (2
+0
+$projectRepo app\repository\projectrepositoryl
+j
+ (
+
+$orderRepo"__id*J
+
+__unknown_file (.
+,
+
+$orderRepoapp\repository\orderrepositoryx
+v
+ (
+$timesheetRepo"__id*R
+
+__unknown_file (6
+4
+$timesheetRepo"app\repository\timesheetrepository~
+|
+ (
+$contributorRepo"__id*V
+
+__unknown_file (:
+8
+$contributorRepo$app\repository\contributorrepository"
+ (
+implicit return:<
+ (.0
+$projectRepo app\repository\projectrepository:8
+ (*,
+
+$orderRepoapp\repository\orderrepository:@
+ (24
+$timesheetRepo"app\repository\timesheetrepository:D
+ (68
+$contributorRepo$app\repository\contributorrepositoryB)'
+%app\service\metricscalculationserviceH

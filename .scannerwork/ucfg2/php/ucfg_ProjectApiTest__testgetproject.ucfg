@@ -1,0 +1,190 @@
+
+,app\tests\api\projectapitest::testgetprojectF
+</Users/tmonier/Projects/hotones/tests/Api/ProjectApiTest.phpH H(""1*:
+2
+ProjectApiTest.php"
+X X(
+implicit return*„
+1K K(*P
+N
+K K()
+%1"static::createclient*&
+
+__unknown_file (
+"
+staticA
+?
+K K()	
+$client"__id*"
+
+__unknown_file (
+
+%1_]
+L L()
+%2*<
+
+__unknown_file ( 
+app\tests\api\projectapitest2createprojectB
+@
+L L()
+
+$project"__id*"
+
+__unknown_file (
+
+%2CA
+O= O(N
+%3*(
+
+__unknown_file (
+
+
+$project2getidP
+N
+O, O(N
+%4"__concat*
+O, O(<
+/api/projects/*
+O= O(N
+
+%3
+OP Q(	
+%5"$Array
+P P(I
+%6"$ArrayZX
+P7 P(H
+%7*<
+
+__unknown_file ( 
+app\tests\api\projectapitest2gettokenI
+G
+P- P(H
+%8"__concat*
+P- P(6	
+Bearer *
+P7 P(H
+
+%7”
+‘
+P P(I
+%9"__mapSet*"
+
+__unknown_file (
+
+%6*-
+
+__unknown_file (
+Authorization*"
+
+__unknown_file (
+
+%8
+Œ
+OP Q(	
+%10"__mapSet*"
+
+__unknown_file (
+
+%5*'
+
+__unknown_file (	
+headers*"
+
+__unknown_file (
+
+%6³°
+O Q(
+
+%11*'
+
+__unknown_file (
+	
+$client*#
+
+__unknown_file (
+GET*"
+
+__unknown_file (
+
+%4*"
+
+__unknown_file (
+
+%52requestD
+B
+O Q(
+
+	$response"__id*#
+
+__unknown_file (
+
+%11mk
+S S(+
+%12*<
+
+__unknown_file ( 
+app\tests\api\projectapitest2assertresponseissuccessful
+T" W(	
+%13"$ArrayDB
+U' U(8
+%14*(
+
+__unknown_file (
+
+
+$project2getidR
+P
+U U(8
+%15"__concat*
+U U(&
+/api/projects/*
+U' U(8
+
+%14
+Š
+T" W(	
+%16"__mapSet*#
+
+__unknown_file (
+
+%13*#
+
+__unknown_file (
+@id*#
+
+__unknown_file (
+
+%15FD
+V V()
+%17*(
+
+__unknown_file (
+
+
+$project2getnameŽ
+‹
+T" W(	
+%18"__mapSet*#
+
+__unknown_file (
+
+%13*$
+
+__unknown_file (
+name*#
+
+__unknown_file (
+
+%17‹ˆ
+T W(
+
+%19*<
+
+__unknown_file ( 
+app\tests\api\projectapitest*#
+
+__unknown_file (
+
+%132assertjsoncontains*
+2B 
+app\tests\api\projectapitestH

@@ -1,0 +1,25 @@
+
+$app\factory\userfactory::__constructE
+;/Users/tmonier/Projects/hotones/src/Factory/UserFactory.php ("1*7
+2
+UserFactory.php"
+ (
+implicit return*ƒ
+1 (ú
+ô
+ (
+$passwordHasher"__id*t
+
+__unknown_file (X
+V
+$passwordHasherCsymfony\component\passwordhasher\hasher\userpasswordhasherinterfaceê
+ç
+ (
+%1"Bzenstruck\foundry\persistence\persistentobjectfactory::__construct*7
+
+__unknown_file (
+app\factory\userfactory*
+2:b
+  (\V
+$passwordHasherCsymfony\component\passwordhasher\hasher\userpasswordhasherinterfaceB
+app\factory\userfactoryH

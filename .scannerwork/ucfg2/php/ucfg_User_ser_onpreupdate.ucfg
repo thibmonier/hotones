@@ -1,0 +1,33 @@
+
+app\entity\user::onpreupdate?
+3/Users/tmonier/Projects/hotones/src/Entity/User.php¶ ¶("1*2
+2
+
+User.php"!
+
+¹ ¹(
+implicit return*ó
+1
+¸ ¸(3'%
+
+¸ ¸(2
+%1"datetimeimmutableX
+V
+
+¸ ¸(2
+%2"datetimeimmutable::__construct*"
+
+__unknown_file (
+
+%1Z
+X
+
+¸ ¸(2 
+app\entity\user"
+	updatedAt"__id*"
+
+__unknown_file (
+
+%1*
+2B
+app\entity\userH

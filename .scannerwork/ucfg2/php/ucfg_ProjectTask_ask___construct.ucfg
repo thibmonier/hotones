@@ -1,0 +1,28 @@
+
+#app\entity\projecttask::__constructD
+:/Users/tmonier/Projects/hotones/src/Entity/ProjectTask.php` `("1*7
+2
+ProjectTask.php"
+c c(
+implicit return*¥
+1b b(M?=
+b b(L
+%1"+doctrine\common\collections\arraycollectionp
+n
+b b(L
+%2"8doctrine\common\collections\arraycollection::__construct*"
+
+__unknown_file (
+
+%1^
+\
+b b(L&
+app\entity\projecttask"
+
+subTasks"__id*"
+
+__unknown_file (
+
+%1*
+2B
+app\entity\projecttaskH

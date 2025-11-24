@@ -1,0 +1,43 @@
+
+.doctrinemigrations\version20251015140457::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251015140457.php ("1*A
+2
+Version20251015140457.php"
+" "(
+implicit return*…
+1 (]c
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÊÇ
+ (\
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015140457*c
+
+__unknown_file (GE
+CALTER TABLE employment_periods DROP FOREIGN KEY FK_B996D77BA76ED3952addsql¤¡
+   (6
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015140457*=
+
+__unknown_file (!
+DROP TABLE employment_periods2addsql—”
+! !()
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015140457*0
+
+__unknown_file (
+DROP TABLE users2addsql*
+2:2
+ ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251015140457H

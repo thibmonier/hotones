@@ -1,0 +1,43 @@
+
+.doctrinemigrations\version20251031150700::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251031150700.php2 2("1*A
+2
+Version20251031150700.php"
+7 7(
+implicit return*‡
+14 4(`c
+a
+2 2(	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÍÊ
+4 4(_
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031150700*f
+
+__unknown_file (JH
+FALTER TABLE client_contacts DROP FOREIGN KEY FK_client_contacts_client2addsql¡ž
+5 5(3
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031150700*:
+
+__unknown_file (
+DROP TABLE client_contacts2addsql™–
+6 6(+
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031150700*2
+
+__unknown_file (
+DROP TABLE clients2addsql*
+2:2
+2 2('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251031150700H

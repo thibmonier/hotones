@@ -1,0 +1,51 @@
+
+U__sonar_lambda_/Users/tmonier/Projects/hotones/src/Factory/OrderTaskFactory.php_35_39J
+@/Users/tmonier/Projects/hotones/src/Factory/OrderTaskFactory.php#' #(/"1*<
+2
+OrderTaskFactory.php"
+' '(	
+implicit return*Þ
+1% %(5X
+V
+#' #(/
+$task"__id*;
+
+__unknown_file (
+
+$taskapp\entity\ordertaskFD
+% %(3
+%1*%
+
+__unknown_file (	
+
+$task2getsolddaysjh
+% %(4
+%2*%
+
+__unknown_file (	
+
+$task*"
+
+__unknown_file (
+
+%12setsolddaysKI
+&$ &(=
+%3*%
+
+__unknown_file (	
+
+$task2getsolddailyrateom
+& &(>
+%4*%
+
+__unknown_file (	
+
+$task*"
+
+__unknown_file (
+
+%32setsolddailyrate*
+2:)
+#1 #(@
+$taskapp\entity\ordertaskB 
+app\factory\ordertaskfactoryH

@@ -1,0 +1,27 @@
+
+.doctrinemigrations\version20251015140742::downN
+D/Users/tmonier/Projects/hotones/migrations/Version20251015140742.php ("1*A
+2
+Version20251015140742.php"
+ (
+implicit return*Ï
+1	 (Çc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÒÓ
+	 (Å
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015140742*à
+
+__unknown_file (lj
+hALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL2addsql*
+2:2
+ ('&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251015140742H

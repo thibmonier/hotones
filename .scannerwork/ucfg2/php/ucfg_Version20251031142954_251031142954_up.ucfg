@@ -1,0 +1,83 @@
+
+,doctrinemigrations\version20251031142954::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251031142954.php ("1*A
+2
+Version20251031142954.php"
+ (
+implicit return*Ã
+1	 (≤c
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schema§°
+	 (±
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*ª
+
+__unknown_file (ûõ
+òCREATE TABLE project_sub_tasks (id INT AUTO_INCREMENT NOT NULL, project_id INT NOT NULL, task_id INT NOT NULL, assignee_id INT DEFAULT NULL, title VARCHAR(255) NOT NULL, initial_estimated_hours NUMERIC(6, 2) NOT NULL, remaining_hours NUMERIC(6, 2) NOT NULL, status VARCHAR(20) NOT NULL, position INT NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_AD2044F9166D1F9C (project_id), INDEX IDX_AD2044F98DB60186 (task_id), INDEX IDX_AD2044F959EC7D60 (assignee_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsqlêç
+	 (ù
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*ß
+
+__unknown_file (äá
+ÑALTER TABLE project_sub_tasks ADD CONSTRAINT FK_AD2044F9166D1F9C FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE2addsqlíè
+	 (ü
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*©
+
+__unknown_file (åâ
+ÜALTER TABLE project_sub_tasks ADD CONSTRAINT FK_AD2044F98DB60186 FOREIGN KEY (task_id) REFERENCES project_tasks (id) ON DELETE CASCADE2addsqlñì
+	 (£
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*≠
+
+__unknown_file (êç
+äALTER TABLE project_sub_tasks ADD CONSTRAINT FK_AD2044F959EC7D60 FOREIGN KEY (assignee_id) REFERENCES contributors (id) ON DELETE SET NULL2addsql «
+	 (◊
+%5*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*·
+
+__unknown_file (ƒ¡
+æALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100\' NOT NULL2addsqlæª
+ (P
+%6*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*W
+
+__unknown_file (;9
+7ALTER TABLE timesheets ADD sub_task_id INT DEFAULT NULL2addsqlîë
+	 (°
+%7*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*´
+
+__unknown_file (éã
+àALTER TABLE timesheets ADD CONSTRAINT FK_9AC77D2EF26E5D72 FOREIGN KEY (sub_task_id) REFERENCES project_sub_tasks (id) ON DELETE SET NULL2addsqlƒ¡
+ (V
+%8*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251031142954*]
+
+__unknown_file (A?
+=CREATE INDEX IDX_9AC77D2EF26E5D72 ON timesheets (sub_task_id)2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251031142954H

@@ -1,0 +1,7 @@
+
+8doctrinemigrations\version20251106095000::getdescriptionN
+D/Users/tmonier/Projects/hotones/migrations/Version20251106095000.php (""1*œ
+1	 (Œ"‹
+	 (Œ~|
+zCreate billing_markers table to track issued/paid/comment for billing entries (forfait schedules or regie monthly periods)B,*
+(doctrinemigrations\version20251106095000H

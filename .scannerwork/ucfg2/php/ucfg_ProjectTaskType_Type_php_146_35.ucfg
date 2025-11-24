@@ -1,0 +1,83 @@
+
+R__sonar_lambda_/Users/tmonier/Projects/hotones/src/Form/ProjectTaskType.php_146_35H
+</Users/tmonier/Projects/hotones/src/Form/ProjectTaskType.php’# ’(+"1*µ
+1
+“ —(;_
+]
+
+’# ’(+
+$er"__id*B
+
+__unknown_file (&
+$
+$erdoctrine\orm\entityrepositorypn
+
+“ “(7
+%1*#
+
+__unknown_file (
+
+$er*!
+
+__unknown_file (
+c2createquerybuildersq
+
+“ ”(5
+%2*"
+
+__unknown_file (
+
+%1*2
+
+__unknown_file (
+c.active = :active2where•’
+
+“ •(6
+%3*"
+
+__unknown_file (
+
+%2*&
+
+__unknown_file (
+
+active*$
+
+__unknown_file (
+true2setparameter“
+
+“ –(6
+%4*"
+
+__unknown_file (
+
+%3**
+
+__unknown_file (
+
+c.lastName*#
+
+__unknown_file (
+ASC2orderby—”
+
+“ —(:
+%5*"
+
+__unknown_file (
+
+%4*+
+
+__unknown_file (
+c.firstName*#
+
+__unknown_file (
+ASC2
+addorderby"
+
+“ —(;
+
+%5:2
+
+’- ’(A$
+$erdoctrine\orm\entityrepositoryB
+app\form\projecttasktypeH

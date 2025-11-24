@@ -1,0 +1,26 @@
+
+3app\controller\projectdetailcontroller::__constructT
+J/Users/tmonier/Projects/hotones/src/Controller/ProjectDetailController.php ("1*Æ
+1
+ProjectDetailController.phpy
+w
+ (
+$entityManager"__id*S
+
+__unknown_file (7
+5
+$entityManager#doctrine\orm\entitymanagerinterface…
+‚
+ (
+$profitabilityService"__id*W
+
+__unknown_file (;
+9
+$profitabilityService app\service\profitabilityservice"
+ (
+implicit return:A
+ (55
+$entityManager#doctrine\orm\entitymanagerinterface:E
+ (G9
+$profitabilityService app\service\profitabilityserviceB*(
+&app\controller\projectdetailcontrollerH

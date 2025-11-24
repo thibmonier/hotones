@@ -1,0 +1,44 @@
+
+5app\controller\vacationrequestcontroller::__constructV
+L/Users/tmonier/Projects/hotones/src/Controller/VacationRequestController.php ("1*Ó
+1
+VacationRequestController.phpy
+w
+ (
+$entityManager"__id*S
+
+__unknown_file (7
+5
+$entityManager#doctrine\orm\entitymanagerinterface
+
+ (
+$vacationRepository"__id*V
+
+__unknown_file (:
+8
+$vacationRepository!app\repository\vacationrepository‹
+ˆ
+ (
+$contributorRepository"__id*\
+
+__unknown_file (@
+>
+$contributorRepository$app\repository\contributorrepository
+}
+ (
+$messageBus"__id*\
+
+__unknown_file (@
+>
+$messageBus/symfony\component\messenger\messagebusinterface"
+ (
+implicit return:A
+ (>5
+$entityManager#doctrine\orm\entitymanagerinterface:D
+ (?8
+$vacationRepository!app\repository\vacationrepository:J
+ (E>
+$contributorRepository$app\repository\contributorrepository:J
+ (8>
+$messageBus/symfony\component\messenger\messagebusinterfaceB,*
+(app\controller\vacationrequestcontrollerH

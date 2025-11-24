@@ -1,0 +1,59 @@
+
+,doctrinemigrations\version20251015134957::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251015134957.php ("1*A
+2
+Version20251015134957.php"
+ (
+implicit return*ò
+1	 (¢c
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaîë
+	 (°
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015134957*´
+
+__unknown_file (éã
+àCREATE TABLE contributors (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(180) NOT NULL, cjm NUMERIC(10, 2) NOT NULL, tjm NUMERIC(10, 2) NOT NULL, active TINYINT(1) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsqlÍÁ
+	 (˜
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015134957*Å
+
+__unknown_file (‰·
+ﬁCREATE TABLE projects (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(180) NOT NULL, client VARCHAR(180) DEFAULT NULL, sold_days NUMERIC(10, 2) DEFAULT NULL, sold_daily_rate NUMERIC(10, 2) DEFAULT NULL, start_date DATE DEFAULT NULL, end_date DATE DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsql˚¯
+	 (à
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015134957*í
+
+__unknown_file (ıÚ
+ÔCREATE TABLE timesheets (id INT AUTO_INCREMENT NOT NULL, contributor_id INT NOT NULL, project_id INT NOT NULL, date DATE NOT NULL, hours NUMERIC(5, 2) NOT NULL, notes LONGTEXT DEFAULT NULL, INDEX IDX_9AC77D2E7A19A357 (contributor_id), INDEX IDX_9AC77D2E166D1F9C (project_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsqlëé
+	 (û
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015134957*®
+
+__unknown_file (ãà
+ÖALTER TABLE timesheets ADD CONSTRAINT FK_9AC77D2E7A19A357 FOREIGN KEY (contributor_id) REFERENCES contributors (id) ON DELETE CASCADE2addsqláÑ
+	 (ñ
+%5*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251015134957*û
+
+__unknown_file (Å
+}ALTER TABLE timesheets ADD CONSTRAINT FK_9AC77D2E166D1F9C FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251015134957H

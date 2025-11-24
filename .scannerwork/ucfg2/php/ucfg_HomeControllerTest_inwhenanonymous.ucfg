@@ -1,0 +1,45 @@
+
+Uapp\tests\functional\controller\homecontrollertest::testredirectstologinwhenanonymous\
+R/Users/tmonier/Projects/hotones/tests/Functional/Controller/HomeControllerTest.php (5"1*>
+2
+HomeControllerTest.php"
+ (
+implicit return*‚
+1 ()P
+N
+ ((
+%1"static::createclient*&
+
+__unknown_file (
+"
+staticA
+?
+ ((	
+$client"__id*"
+
+__unknown_file (
+
+%1çä
+ ($
+%2*'
+
+__unknown_file (
+	
+$client*#
+
+__unknown_file (
+GET*!
+
+__unknown_file (
+/2request®•
+ (0
+%3*R
+
+__unknown_file (64
+2app\tests\functional\controller\homecontrollertest*&
+
+__unknown_file (
+
+/login2assertresponseredirects*
+2B64
+2app\tests\functional\controller\homecontrollertestH

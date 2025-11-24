@@ -1,0 +1,35 @@
+
+,doctrinemigrations\version20251030132639::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251030132639.php ("1*A
+2
+Version20251030132639.php"
+ (
+implicit return*¶
+1	 (Øc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÊÇ
+	 (×
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251030132639*á
+
+__unknown_file (ÄÁ
+¾ALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100\' NOT NULL2addsqlîë
+ (
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251030132639*†
+
+__unknown_file (jh
+fALTER TABLE users ADD phone_work VARCHAR(32) DEFAULT NULL, ADD phone_personal VARCHAR(32) DEFAULT NULL2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251030132639H

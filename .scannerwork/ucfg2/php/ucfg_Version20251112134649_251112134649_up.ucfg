@@ -1,0 +1,195 @@
+
+,doctrinemigrations\version20251112134649::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251112134649.php ("1*A
+2
+Version20251112134649.php"
+- -(
+implicit return*û0
+1	 (≤c
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schema§°
+	 (±
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*ª
+
+__unknown_file (ûõ
+òCREATE TABLE dim_profile (id INT AUTO_INCREMENT NOT NULL, profile_id INT DEFAULT NULL, name_value VARCHAR(100) NOT NULL, is_productive TINYINT(1) NOT NULL, is_active TINYINT(1) NOT NULL, composite_key VARCHAR(150) NOT NULL, UNIQUE INDEX UNIQ_9B69890413775659 (composite_key), INDEX IDX_9B698904CCFA12B8 (profile_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsql“œ
+	 (ﬂ
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*È
+
+__unknown_file (Ã…
+∆CREATE TABLE fact_staffing_metrics (id INT AUTO_INCREMENT NOT NULL, dim_time_id INT NOT NULL, dim_profile_id INT DEFAULT NULL, contributor_id INT DEFAULT NULL, available_days NUMERIC(10, 2) NOT NULL, worked_days NUMERIC(10, 2) NOT NULL, staffed_days NUMERIC(10, 2) NOT NULL, vacation_days NUMERIC(10, 2) NOT NULL, planned_days NUMERIC(10, 2) NOT NULL, staffing_rate NUMERIC(5, 2) NOT NULL, tace NUMERIC(5, 2) NOT NULL, calculated_at DATETIME NOT NULL, granularity VARCHAR(50) NOT NULL, contributor_count INT NOT NULL, INDEX IDX_F58C0D4844D4FE30 (dim_time_id), INDEX IDX_F58C0D48BF679789 (dim_profile_id), INDEX IDX_F58C0D487A19A357 (contributor_id), UNIQUE INDEX unique_staffing_metrics (dim_time_id, dim_profile_id, contributor_id, granularity), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB2addsqlıÚ
+	 (Ö
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*å
+
+__unknown_file (pn
+lALTER TABLE dim_profile ADD CONSTRAINT FK_9B698904CCFA12B8 FOREIGN KEY (profile_id) REFERENCES profiles (id)2addsqlÄ˝
+	 (ê
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*ó
+
+__unknown_file ({y
+wALTER TABLE fact_staffing_metrics ADD CONSTRAINT FK_F58C0D4844D4FE30 FOREIGN KEY (dim_time_id) REFERENCES dim_time (id)2addsqláÑ
+	 (ñ
+%5*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*û
+
+__unknown_file (Å
+}ALTER TABLE fact_staffing_metrics ADD CONSTRAINT FK_F58C0D48BF679789 FOREIGN KEY (dim_profile_id) REFERENCES dim_profile (id)2addsqlâÜ
+	 (ó
+%6*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*†
+
+__unknown_file (ÉÄ
+~ALTER TABLE fact_staffing_metrics ADD CONSTRAINT FK_F58C0D487A19A357 FOREIGN KEY (contributor_id) REFERENCES contributors (id)2addsql «
+	 (◊
+%7*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*·
+
+__unknown_file (ƒ¡
+æALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35\' NOT NULL, CHANGE work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT \'100\' NOT NULL2addsqlÂ‚
+ (w
+%8*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*~
+
+__unknown_file (b`
+^ALTER TABLE notification_preferences RENAME INDEX idx_857aebaea76ed395 TO IDX_3CAA95B4A76ED3952addsql‰·
+ (v
+%9*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*}
+
+__unknown_file (a_
+]ALTER TABLE notification_settings RENAME INDEX uniq_b27ba8419646419b TO UNIQ_B05598605FA1E6972addsql∏µ
+   (I
+%10*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*P
+
+__unknown_file (42
+0DROP INDEX IDX_6000B0D38B8E8428 ON notifications2addsql∏µ
+! !(I
+%11*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*P
+
+__unknown_file (42
+0DROP INDEX IDX_6000B0D37C69D773 ON notifications2addsql∏µ
+" "(I
+%12*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*P
+
+__unknown_file (42
+0DROP INDEX IDX_6000B0D3C54C8C93 ON notifications2addsqlŸ÷
+# #(j
+%13*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*q
+
+__unknown_file (US
+QALTER TABLE project_tasks RENAME INDEX idx_da05c8b3cc4b3e TO IDX_430D6C09BB01DC092addsql„‡
+$ $(t
+%14*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*{
+
+__unknown_file (_]
+[ALTER TABLE project_technology_versions RENAME INDEX idx_ptv_project TO IDX_19C1B1E166D1F9C2addsql‡›
+% %(q
+%15*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*x
+
+__unknown_file (\Z
+XALTER TABLE project_technology_versions RENAME INDEX idx_ptv_tech TO IDX_19C1B1E4235D4632addsqlæª
+& &(O
+%16*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*V
+
+__unknown_file (:8
+6DROP INDEX IDX_RT_CONTRIBUTOR_ACTIVE ON running_timers2addsql⁄◊
+' '(k
+%17*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*r
+
+__unknown_file (VT
+RALTER TABLE running_timers RENAME INDEX idx_rt_contributor TO IDX_5F84C1EC7A19A3572addsql÷”
+( ((g
+%18*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*n
+
+__unknown_file (RP
+NALTER TABLE running_timers RENAME INDEX idx_rt_project TO IDX_5F84C1EC166D1F9C2addsql”–
+) )(d
+%19*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*k
+
+__unknown_file (OM
+KALTER TABLE running_timers RENAME INDEX idx_rt_task TO IDX_5F84C1EC8DB601862addsql◊‘
+* *(h
+%20*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*o
+
+__unknown_file (SQ
+OALTER TABLE running_timers RENAME INDEX idx_rt_sub_task TO IDX_5F84C1ECF26E5D722addsqlª∏
++ +(L
+%21*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*S
+
+__unknown_file (75
+3DROP INDEX idx_timesheet_project_date ON timesheets2addsqløº
+, ,(P
+%22*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251112134649*W
+
+__unknown_file (;9
+7DROP INDEX idx_timesheet_contributor_date ON timesheets2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251112134649H

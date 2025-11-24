@@ -1,0 +1,35 @@
+
+9app\controller\analytics\dashboardcontroller::__constructZ
+P/Users/tmonier/Projects/hotones/src/Controller/Analytics/DashboardController.php ("1*¿
+1
+DashboardController.php}
+{
+ (
+$metricsService"__id*V
+
+__unknown_file (:
+8
+$metricsService%app\service\metricscalculationservice
+}
+ (
+$messageBus"__id*\
+
+__unknown_file (@
+>
+$messageBus/symfony\component\messenger\messagebusinterface~
+|
+ (
+$projectRepository"__id*T
+
+__unknown_file (8
+6
+$projectRepository app\repository\projectrepository"
+ (
+implicit return:D
+ (98
+$metricsService%app\service\metricscalculationservice:J
+ (/>
+$messageBus/symfony\component\messenger\messagebusinterface:B
+ (D6
+$projectRepository app\repository\projectrepositoryB0.
+,app\controller\analytics\dashboardcontrollerH

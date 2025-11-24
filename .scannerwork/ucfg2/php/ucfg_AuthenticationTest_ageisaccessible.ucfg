@@ -1,0 +1,50 @@
+
+@app\tests\security\authenticationtest::testloginpageisaccessibleO
+E/Users/tmonier/Projects/hotones/tests/Security/AuthenticationTest.php (-"1*>
+2
+AuthenticationTest.php"
+ (
+implicit return*Ã
+1 ()P
+N
+ ((
+%1"static::createclient*&
+
+__unknown_file (
+"
+staticA
+?
+ ((	
+$client"__id*"
+
+__unknown_file (
+
+%1íè
+ ()
+%2*'
+
+__unknown_file (
+	
+$client*#
+
+__unknown_file (
+GET*&
+
+__unknown_file (
+
+/login2requestus
+ (+
+%3*E
+
+__unknown_file ()'
+%app\tests\security\authenticationtest2assertresponseissuccessfulñì
+ (+
+%4*E
+
+__unknown_file ()'
+%app\tests\security\authenticationtest*$
+
+__unknown_file (
+form2assertselectorexists*
+2B)'
+%app\tests\security\authenticationtestH

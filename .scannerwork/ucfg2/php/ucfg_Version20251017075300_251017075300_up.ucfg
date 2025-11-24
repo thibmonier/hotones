@@ -1,0 +1,59 @@
+
+,doctrinemigrations\version20251017075300::upN
+D/Users/tmonier/Projects/hotones/migrations/Version20251017075300.php ("1*A
+2
+Version20251017075300.php"
+ (
+implicit return*Þ
+1 (Vc
+a
+ (	
+$schema"__id*D
+
+__unknown_file ((
+&
+$schemadoctrine\dbal\schema\schemaÃÀ
+ (U
+%1*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251017075300*\
+
+__unknown_file (@>
+<ALTER TABLE contributors ADD email VARCHAR(255) DEFAULT NULL2addsqlÂ¿
+ (T
+%2*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251017075300*[
+
+__unknown_file (?=
+;ALTER TABLE contributors ADD phone VARCHAR(20) DEFAULT NULL2addsql¿¼
+ (Q
+%3*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251017075300*X
+
+__unknown_file (<:
+8ALTER TABLE contributors ADD notes LONGTEXT DEFAULT NULL2addsqlÊÇ
+ (\
+%4*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251017075300*c
+
+__unknown_file (GE
+CALTER TABLE contributors CHANGE cjm cjm NUMERIC(10, 2) DEFAULT NULL2addsqlÊÇ
+ (\
+%5*H
+
+__unknown_file (,*
+(doctrinemigrations\version20251017075300*c
+
+__unknown_file (GE
+CALTER TABLE contributors CHANGE tjm tjm NUMERIC(10, 2) DEFAULT NULL2addsql*
+2:2
+ (%&
+$schemadoctrine\dbal\schema\schemaB,*
+(doctrinemigrations\version20251017075300H

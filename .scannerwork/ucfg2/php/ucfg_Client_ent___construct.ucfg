@@ -1,0 +1,29 @@
+
+app\entity\client::__construct?
+5/Users/tmonier/Projects/hotones/src/Entity/Client.php* *("1*2
+2
+
+Client.php"
+- -(
+implicit return* 
+1, ,(0?=
+, ,(/
+%1"+doctrine\common\collections\arraycollectionp
+n
+, ,(/
+%2"8doctrine\common\collections\arraycollection::__construct*"
+
+__unknown_file (
+
+%1Y
+W
+, ,(/!
+app\entity\client"
+
+contacts"__id*"
+
+__unknown_file (
+
+%1*
+2B
+app\entity\clientH

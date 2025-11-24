@@ -1,0 +1,97 @@
+
+%app\entity\order::generateordernumber@
+4/Users/tmonier/Projects/hotones/src/Entity/Order.php£ £(."1*è
+1
+• •($W
+U
+
+£ £(.
+$date"__id*8
+
+__unknown_file (
+
+$datedatetimeinterfacefd
+
+• •(#
+%1*%
+
+__unknown_file (	
+
+$date*!
+
+__unknown_file (
+Y2formatA
+?
+
+• •(#
+$year"__id*"
+
+__unknown_file (
+
+%1fd
+
+¶ ¶(#
+%2*%
+
+__unknown_file (	
+
+$date*!
+
+__unknown_file (
+m2formatB
+@
+
+¶ ¶(#
+$month"__id*"
+
+__unknown_file (
+
+%2hf
+
+™ ™()
+%3*%
+
+__unknown_file (	
+
+$date*#
+
+__unknown_file (
+His2formatF
+D
+
+™ ™()
+
+$increment"__id*"
+
+__unknown_file (
+
+%3Ö
+Ç
+
+¨ ¨(-
+%4"__concat*
+
+¨ ¨(
+D*
+
+¨ ¨(	
+
+$year*
+
+¨ ¨( 
+
+
+$month*
+
+¨  ¨(,
+
+
+$increment"
+
+¨ ¨(.
+
+%4:(
+
+£/ £(F
+$datedatetimeinterfaceB
+app\entity\orderH
