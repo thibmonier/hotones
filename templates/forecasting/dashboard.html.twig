@@ -136,7 +136,9 @@
                         <h5 class="card-title mb-4">
                             <i class="bx bx-line-chart me-2"></i>Prévisions de CA - {{ horizon }} mois
                         </h5>
-                        <canvas id="forecastChart" style="height: 400px;"></canvas>
+                        <div style="height: 400px; position: relative;">
+                            <canvas id="forecastChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -332,6 +334,9 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 750
+                    },
                     plugins: {
                         legend: {
                             display: true,

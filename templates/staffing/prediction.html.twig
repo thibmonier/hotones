@@ -1,0 +1,315 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Prédiction de charge{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Prédiction de charge', pagetitle: 'Staffing' }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Prédiction de charge future</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertes -->
+    {% if alerts|length > 0 %}
+    <div class="row">
+        <div class="col-12">
+            {% for alert in alerts %}
+                <div class="alert alert-{{ alert.severity == 'critical' ? 'danger' : (alert.severity == 'high' ? 'warning' : 'info') }} alert-dismissible fade show" role="alert">
+                    <i class="bx bx-error-circle me-2"></i>
+                    <strong>{{ alert.type == 'overload' ? '⚠️ Surcharge détectée' : 'ℹ️ Sous-charge détectée' }}</strong>
+                    {{ alert.message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- KPI Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Devis en attente</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-primary">{{ pipeline|length }}</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-primary rounded">
+                                <span class="avatar-title bg-soft-primary text-primary font-size-24">
+                                    <i class="bx bx-receipt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Charge potentielle</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-success">{{ totalPotentialDays|number_format(1, ',', ' ') }}j</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-success rounded">
+                                <span class="avatar-title bg-soft-success text-success font-size-24">
+                                    <i class="bx bx-time"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Alertes</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-{{ alerts|length > 0 ? 'danger' : 'success' }}">{{ alerts|length }}</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-{{ alerts|length > 0 ? 'danger' : 'success' }} rounded">
+                                <span class="avatar-title bg-soft-{{ alerts|length > 0 ? 'danger' : 'success' }} text-{{ alerts|length > 0 ? 'danger' : 'success' }} font-size-24">
+                                    <i class="bx bx-{{ alerts|length > 0 ? 'error' : 'check' }}-circle"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">CA potentiel pipeline</span>
+                            <h4 class="mb-3">
+                                {% set totalCA = 0 %}
+                                {% for item in pipeline %}
+                                    {% set totalCA = totalCA + (item.amount * item.winProbability / 100) %}
+                                {% endfor %}
+                                <span class="counter-value text-info">{{ totalCA|number_format(0, ',', ' ') }}€</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-info rounded">
+                                <span class="avatar-title bg-soft-info text-info font-size-24">
+                                    <i class="bx bx-euro"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charge par mois -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="bx bx-calendar me-2"></i>Charge prévue par mois (3 prochains mois)
+                    </h5>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="workloadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline de devis -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="bx bx-list-ul me-2"></i>Pipeline de devis en attente
+                    </h5>
+
+                    {% if pipeline|length == 0 %}
+                        <div class="alert alert-info">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Aucun devis en attente de signature.
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-centered table-nowrap align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 80px;">Probabilité</th>
+                                        <th>Devis</th>
+                                        <th>Client</th>
+                                        <th>Projet</th>
+                                        <th class="text-end">Montant</th>
+                                        <th class="text-end">Charge</th>
+                                        <th class="text-center">Ancienneté</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in pipeline %}
+                                        <tr>
+                                            <td>
+                                                <div class="avatar-sm mx-auto">
+                                                    <span class="avatar-title rounded-circle bg-soft-{{ item.winProbability > 70 ? 'success' : (item.winProbability > 40 ? 'warning' : 'danger') }} text-{{ item.winProbability > 70 ? 'success' : (item.winProbability > 40 ? 'warning' : 'danger') }} font-size-14">
+                                                        {{ item.winProbability|number_format(0) }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a href="{{ path('order_show', {'id': item.order.id}) }}" class="fw-bold text-dark">
+                                                    {{ item.order.orderNumber }}
+                                                </a>
+                                            </td>
+                                            <td>{{ item.client }}</td>
+                                            <td>
+                                                <div class="text-truncate" style="max-width: 200px;">
+                                                    {{ item.project }}
+                                                </div>
+                                            </td>
+                                            <td class="text-end">{{ item.amount|number_format(0, ',', ' ') }}€</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-info">{{ item.totalDays|number_format(1, ',', ' ') }}j</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-{{ item.daysOld > 60 ? 'danger' : (item.daysOld > 30 ? 'warning' : 'success') }}">
+                                                    {{ item.daysOld }}j
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{ path('order_show', {'id': item.order.id}) }}"
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   title="Voir le devis">
+                                                    <i class="bx bx-show"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const workloadData = {{ workloadByMonth|json_encode|raw }};
+
+            // Préparer les données pour le graphique
+            const months = Object.keys(workloadData).sort();
+            const potentialData = months.map(m => workloadData[m].potential);
+            const confirmedData = months.map(m => workloadData[m].confirmed);
+
+            // Capacité de l'équipe (à paramétrer)
+            const teamCapacity = 20;
+            const capacityData = Array(months.length).fill(teamCapacity);
+
+            const ctx = document.getElementById('workloadChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months.map(m => {
+                        const date = new Date(m + '-01');
+                        return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'short' });
+                    }),
+                    datasets: [
+                        {
+                            label: 'Charge confirmée',
+                            data: confirmedData,
+                            backgroundColor: 'rgba(52, 195, 143, 0.8)',
+                            borderColor: '#34c38f',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Charge potentielle',
+                            data: potentialData,
+                            backgroundColor: 'rgba(85, 110, 230, 0.5)',
+                            borderColor: '#556ee6',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Capacité équipe',
+                            data: capacityData,
+                            type: 'line',
+                            borderColor: '#f46a6a',
+                            backgroundColor: 'rgba(244, 106, 106, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 750
+                    },
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Jours'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y.toFixed(1) + 'j';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

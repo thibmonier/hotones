@@ -211,7 +211,8 @@ class ProjectController extends AbstractController
         Request $request,
         int $id,
         EntityManagerInterface $em,
-        \App\Service\ProjectRiskAnalyzer $riskAnalyzer
+        \App\Service\ProjectRiskAnalyzer $riskAnalyzer,
+        \App\Service\ProfitabilityPredictor $profitabilityPredictor
     ): Response {
         $project = $em->getRepository(Project::class)->findOneWithRelations($id);
 
@@ -224,6 +225,9 @@ class ProjectController extends AbstractController
 
         // Analyser les risques du projet
         $riskAnalysis = $riskAnalyzer->analyzeProject($project);
+
+        // Prédire la rentabilité du projet
+        $profitabilityPrediction = $profitabilityPredictor->predictProfitability($project);
 
         // Devis du projet: tri + pagination
         $orderRepo      = $em->getRepository(\App\Entity\Order::class);
@@ -250,15 +254,16 @@ class ProjectController extends AbstractController
         $events = $em->getRepository(\App\Entity\ProjectEvent::class)->findByProject($id, 50);
 
         return $this->render('project/show.html.twig', [
-            'project'           => $project,
-            'metrics'           => $projectMetrics,
-            'riskAnalysis'      => $riskAnalysis,
-            'orders'            => $orders,
-            'orders_pagination' => $oPagination,
-            'orders_sort'       => $oSort,
-            'orders_dir'        => strtoupper($oDir) === 'ASC' ? 'ASC' : 'DESC',
-            'orders_per_page'   => $oPerPage,
-            'events'            => $events,
+            'project'                 => $project,
+            'metrics'                 => $projectMetrics,
+            'riskAnalysis'            => $riskAnalysis,
+            'profitabilityPrediction' => $profitabilityPrediction,
+            'orders'                  => $orders,
+            'orders_pagination'       => $oPagination,
+            'orders_sort'             => $oSort,
+            'orders_dir'              => strtoupper($oDir) === 'ASC' ? 'ASC' : 'DESC',
+            'orders_per_page'         => $oPerPage,
+            'events'                  => $events,
         ]);
     }
 

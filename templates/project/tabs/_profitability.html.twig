@@ -54,3 +54,207 @@
     <i class="bx bx-info-circle me-2"></i>
     <strong>Note :</strong> Les calculs de rentabilité sont basés sur les tâches marquées comme "Compte dans la rentabilité" et de type "Tâche vendue".
 </div>
+
+<!-- Prédiction de rentabilité -->
+{% if profitabilityPrediction.canPredict %}
+<hr class="my-4">
+<h6 class="mb-3">
+    <i class="bx bx-trending-up me-2"></i>Prédiction de rentabilité finale
+</h6>
+
+<!-- KPIs Prédiction -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card border-primary">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Progression actuelle</h6>
+                <h3 class="mb-0 text-primary">{{ profitabilityPrediction.currentProgress|number_format(0) }}%</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-info">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Marge actuelle</h6>
+                <h3 class="mb-0 text-{% if profitabilityPrediction.currentMargin >= 20 %}success{% elseif profitabilityPrediction.currentMargin >= 10 %}warning{% else %}danger{% endif %}">
+                    {{ profitabilityPrediction.currentMargin|number_format(1) }}%
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-{{ profitabilityPrediction.predictedMargin.projected >= 20 ? 'success' : (profitabilityPrediction.predictedMargin.projected >= 10 ? 'warning' : 'danger') }}">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Marge finale prédite</h6>
+                <h3 class="mb-0 text-{{ profitabilityPrediction.predictedMargin.projected >= 20 ? 'success' : (profitabilityPrediction.predictedMargin.projected >= 10 ? 'warning' : 'danger') }}">
+                    {{ profitabilityPrediction.predictedMargin.projected|number_format(1) }}%
+                </h3>
+                <small class="text-muted">
+                    Objectif: {{ profitabilityPrediction.predictedMargin.budgeted|number_format(1) }}%
+                    <span class="badge bg-{{ profitabilityPrediction.predictedMargin.difference >= 0 ? 'success' : 'danger' }} ms-1">
+                        {{ profitabilityPrediction.predictedMargin.difference >= 0 ? '+' : '' }}{{ profitabilityPrediction.predictedMargin.difference|number_format(1) }}%
+                    </span>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dérive budgétaire -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bx bx-error-circle me-2"></i>Analyse de dérive budgétaire
+                </h6>
+                <table class="table table-sm table-nowrap mb-0">
+                    <tr>
+                        <td>Heures attendues à {{ profitabilityPrediction.currentProgress|number_format(0) }}%</td>
+                        <td class="text-end">{{ profitabilityPrediction.budgetDrift.expectedHours|number_format(1) }}h</td>
+                    </tr>
+                    <tr>
+                        <td>Heures réelles passées</td>
+                        <td class="text-end fw-bold">{{ profitabilityPrediction.budgetDrift.actualHours|number_format(1) }}h</td>
+                    </tr>
+                    <tr class="table-{{ profitabilityPrediction.budgetDrift.severity == 'critical' ? 'danger' : (profitabilityPrediction.budgetDrift.severity == 'high' ? 'warning' : (profitabilityPrediction.budgetDrift.severity == 'medium' ? 'info' : 'light')) }}">
+                        <td><strong>Dérive</strong></td>
+                        <td class="text-end fw-bold">
+                            {{ profitabilityPrediction.budgetDrift.overrunHours >= 0 ? '+' : '' }}{{ profitabilityPrediction.budgetDrift.overrunHours|number_format(1) }}h
+                            <span class="badge bg-{{ profitabilityPrediction.budgetDrift.severity == 'critical' ? 'danger' : (profitabilityPrediction.budgetDrift.severity == 'high' ? 'warning' : (profitabilityPrediction.budgetDrift.severity == 'medium' ? 'info' : 'success')) }} ms-1">
+                                {{ profitabilityPrediction.budgetDrift.overrunPercentage >= 0 ? '+' : '' }}{{ profitabilityPrediction.budgetDrift.overrunPercentage|number_format(0) }}%
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bx bx-calculator me-2"></i>Projection finale
+                </h6>
+                <table class="table table-sm table-nowrap mb-0">
+                    <tr>
+                        <td>Heures totales prédites</td>
+                        <td class="text-end">{{ profitabilityPrediction.predictedMargin.projectedTotalHours|number_format(1) }}h</td>
+                    </tr>
+                    <tr>
+                        <td>Coût total prédit</td>
+                        <td class="text-end fw-bold">{{ profitabilityPrediction.predictedMargin.projectedTotalCost|number_format(0, ',', ' ') }} €</td>
+                    </tr>
+                    <tr class="table-light">
+                        <td><strong>Marge finale prédite</strong></td>
+                        <td class="text-end fw-bold text-{{ profitabilityPrediction.predictedMargin.projected >= 20 ? 'success' : (profitabilityPrediction.predictedMargin.projected >= 10 ? 'warning' : 'danger') }}">
+                            {{ profitabilityPrediction.predictedMargin.projected|number_format(1) }}%
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scénarios -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="card-title">
+            <i class="bx bx-stats me-2"></i>Scénarios de rentabilité
+        </h6>
+        <div class="table-responsive">
+            <table class="table table-hover table-nowrap align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Scénario</th>
+                        <th class="text-end">Heures totales</th>
+                        <th class="text-end">Coût total</th>
+                        <th class="text-end">Marge</th>
+                        <th class="text-end">Profit estimé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-success">
+                        <td>
+                            <i class="bx bx-up-arrow-alt me-1"></i>
+                            <strong>{{ profitabilityPrediction.scenarios.optimistic.label }}</strong>
+                        </td>
+                        <td class="text-end">{{ profitabilityPrediction.scenarios.optimistic.totalHours|number_format(1) }}h</td>
+                        <td class="text-end">{{ profitabilityPrediction.scenarios.optimistic.totalCost|number_format(0, ',', ' ') }} €</td>
+                        <td class="text-end">
+                            <span class="badge bg-success">{{ profitabilityPrediction.scenarios.optimistic.margin|number_format(1) }}%</span>
+                        </td>
+                        <td class="text-end fw-bold text-success">{{ profitabilityPrediction.scenarios.optimistic.profit|number_format(0, ',', ' ') }} €</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="bx bx-right-arrow-alt me-1"></i>
+                            <strong>{{ profitabilityPrediction.scenarios.realistic.label }}</strong>
+                        </td>
+                        <td class="text-end">{{ profitabilityPrediction.scenarios.realistic.totalHours|number_format(1) }}h</td>
+                        <td class="text-end">{{ profitabilityPrediction.scenarios.realistic.totalCost|number_format(0, ',', ' ') }} €</td>
+                        <td class="text-end">
+                            <span class="badge bg-{{ profitabilityPrediction.scenarios.realistic.margin >= 20 ? 'success' : (profitabilityPrediction.scenarios.realistic.margin >= 10 ? 'warning' : 'danger') }}">
+                                {{ profitabilityPrediction.scenarios.realistic.margin|number_format(1) }}%
+                            </span>
+                        </td>
+                        <td class="text-end fw-bold text-{{ profitabilityPrediction.scenarios.realistic.profit >= 0 ? 'success' : 'danger' }}">
+                            {{ profitabilityPrediction.scenarios.realistic.profit|number_format(0, ',', ' ') }} €
+                        </td>
+                    </tr>
+                    <tr class="table-danger">
+                        <td>
+                            <i class="bx bx-down-arrow-alt me-1"></i>
+                            <strong>{{ profitabilityPrediction.scenarios.pessimistic.label }}</strong>
+                        </td>
+                        <td class="text-end">{{ profitabilityPrediction.scenarios.pessimistic.totalHours|number_format(1) }}h</td>
+                        <td class="text-end">{{ profitabilityPrediction.scenarios.pessimistic.totalCost|number_format(0, ',', ' ') }} €</td>
+                        <td class="text-end">
+                            <span class="badge bg-danger">{{ profitabilityPrediction.scenarios.pessimistic.margin|number_format(1) }}%</span>
+                        </td>
+                        <td class="text-end fw-bold text-danger">{{ profitabilityPrediction.scenarios.pessimistic.profit|number_format(0, ',', ' ') }} €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Recommandations -->
+{% if profitabilityPrediction.recommendations|length > 0 %}
+<div class="card">
+    <div class="card-body">
+        <h6 class="card-title">
+            <i class="bx bx-bulb me-2"></i>Recommandations
+        </h6>
+        {% for recommendation in profitabilityPrediction.recommendations %}
+            <div class="alert alert-{{ recommendation.priority == 'high' ? 'danger' : (recommendation.priority == 'medium' ? 'warning' : 'info') }} mb-3" role="alert">
+                <h6 class="alert-heading">
+                    <i class="bx bx-{{ recommendation.type == 'positive' ? 'check-circle' : 'info-circle' }} me-2"></i>
+                    {{ recommendation.title }}
+                </h6>
+                <p class="mb-2">{{ recommendation.message }}</p>
+                {% if recommendation.actions|length > 0 %}
+                    <hr>
+                    <p class="mb-2"><strong>Actions recommandées :</strong></p>
+                    <ul class="mb-0">
+                        {% for action in recommendation.actions %}
+                            <li>{{ action }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<hr class="my-4">
+<div class="alert alert-info">
+    <i class="bx bx-info-circle me-2"></i>
+    <strong>{{ profitabilityPrediction.message|default('Prédiction non disponible') }}</strong>
+    <p class="mb-0 mt-2">La prédiction de rentabilité nécessite au moins 30% d'avancement du projet pour fournir des estimations fiables.</p>
+</div>
+{% endif %}
