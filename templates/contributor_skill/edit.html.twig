@@ -1,0 +1,144 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Modifier compétence{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Modifier {{ contributorSkill.skill.name }}</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('contributor_skill_index', {contributorId: contributor.id}) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bx bx-arrow-back me-1"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        Modifier la compétence pour {{ contributor.fullName }}
+                    </h5>
+
+                    {{ form_start(form) }}
+
+                    <div class="mb-3">
+                        {{ form_label(form.skill) }}
+                        {{ form_widget(form.skill) }}
+                        {{ form_errors(form.skill) }}
+                        <div class="form-text">
+                            <i class="bx bx-info-circle me-1"></i>
+                            Vous pouvez changer la compétence si nécessaire
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.selfAssessmentLevel) }}
+                        {{ form_widget(form.selfAssessmentLevel) }}
+                        {{ form_errors(form.selfAssessmentLevel) }}
+                        {{ form_help(form.selfAssessmentLevel) }}
+                    </div>
+
+                    {% if is_granted('ROLE_MANAGER') %}
+                    <div class="mb-3">
+                        {{ form_label(form.managerAssessmentLevel) }}
+                        {{ form_widget(form.managerAssessmentLevel) }}
+                        {{ form_errors(form.managerAssessmentLevel) }}
+                        {{ form_help(form.managerAssessmentLevel) }}
+                        {% if contributorSkill.hasAssessmentGap %}
+                        <div class="alert alert-warning mt-2 small">
+                            <i class="bx bx-error-circle me-1"></i>
+                            Écart détecté : {{ contributorSkill.assessmentGap > 0 ? '+' : '' }}{{ contributorSkill.assessmentGap }}
+                            entre l'auto-évaluation et votre évaluation.
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        {{ form_label(form.dateAcquired) }}
+                        {{ form_widget(form.dateAcquired) }}
+                        {{ form_errors(form.dateAcquired) }}
+                        {{ form_help(form.dateAcquired) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.notes) }}
+                        {{ form_widget(form.notes) }}
+                        {{ form_errors(form.notes) }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i>Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('contributor_skill_index', {contributorId: contributor.id}) }}" class="btn btn-light">Annuler</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-info-circle me-2"></i>Informations
+                    </h5>
+                    <div class="mb-3">
+                        <span class="text-muted">Compétence</span>
+                        <div class="mt-1">
+                            <strong>{{ contributorSkill.skill.name }}</strong>
+                            <span class="badge bg-secondary ms-2">{{ contributorSkill.skill.categoryLabel }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted">Niveau effectif actuel</span>
+                        <div class="mt-1">
+                            <span class="badge {{ contributorSkill.levelBadgeClass }}">
+                                {{ contributorSkill.effectiveLevel }}
+                            </span>
+                        </div>
+                    </div>
+                    {% if contributorSkill.createdAt %}
+                    <div class="mb-3">
+                        <span class="text-muted">Ajoutée le</span>
+                        <div class="mt-1">{{ contributorSkill.createdAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                    {% endif %}
+                    {% if contributorSkill.updatedAt %}
+                    <div>
+                        <span class="text-muted">Mise à jour le</span>
+                        <div class="mt-1">{{ contributorSkill.updatedAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Guide des niveaux</h6>
+                    <div class="mb-2">
+                        <span class="badge bg-secondary">1</span> Débutant
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-info">2</span> Intermédiaire
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-primary">3</span> Confirmé
+                    </div>
+                    <div class="mb-0">
+                        <span class="badge bg-success">4</span> Expert
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

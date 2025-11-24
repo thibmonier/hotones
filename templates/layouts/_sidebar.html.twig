@@ -112,6 +112,7 @@
                         <li><a href="{{ path('technology_index') }}">Technologies</a></li>
                         <li><a href="{{ path('service_category_index') }}">Catégories de service</a></li>
                         <li><a href="{{ path('job_profile_index') }}">Profils métier</a></li>
+                        <li><a href="{{ path('skill_index') }}">Compétences</a></li>
                         <li><a href="#" class="text-muted">Paramètres généraux</a></li>
                         <li><a href="{{ path('admin_scheduler_index') }}">Scheduler</a></li>
                         <li><a href="{{ path('admin_notification_settings') }}">Notifications</a></li>
@@ -134,6 +135,7 @@
                         <li><a href="{{ path('forecasting_dashboard') }}">Prévisions CA</a></li>
                         <li><a href="{{ path('risk_projects_dashboard') }}">Projets à risque</a></li>
                         <li><a href="{{ path('staffing_prediction') }}">Prédiction de charge</a></li>
+                        <li><a href="{{ path('hr_dashboard') }}">Dashboard RH</a></li>
                         {% endif %}
                         {% if is_granted('ROLE_ADMIN') %}
                         <li><a href="{{ path('staffing_dashboard') }}">Staffing & TACE</a></li>

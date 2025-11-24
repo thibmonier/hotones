@@ -1,0 +1,397 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Dashboard RH{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Dashboard RH</h4>
+                <div class="page-title-right">
+                    <div class="btn-group me-2">
+                        {% set currentYear = 'now'|date('Y')|number_format(0, '', '') %}
+                        {% for y in range(currentYear - 2, currentYear) %}
+                            <a href="{{ path('hr_dashboard', {year: y}) }}" class="btn btn-sm btn-outline-primary {% if period.year == y %}active{% endif %}">{{ y }}</a>
+                        {% endfor %}
+                    </div>
+                    <form method="get" action="{{ path('hr_dashboard') }}" class="d-inline-flex gap-2 align-items-center">
+                        <input type="date" name="start_date" class="form-control form-control-sm" value="{{ period.startDate|date('Y-m-d') }}" />
+                        <span>au</span>
+                        <input type="date" name="end_date" class="form-control form-control-sm" value="{{ period.endDate|date('Y-m-d') }}" />
+                        <button type="submit" class="btn btn-sm btn-primary">Filtrer</button>
+                    </form>
+                    <a href="{{ path('hr_skills_matrix') }}" class="btn btn-sm btn-info ms-2">
+                        <i class="bx bx-grid-alt me-1"></i>Matrice des compétences
+                    </a>
+                    <a href="{{ path('hr_gap_analysis') }}" class="btn btn-sm btn-warning ms-2">
+                        <i class="bx bx-analyse me-1"></i>Analyse des écarts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info mb-0">
+                <i class="bx bx-calendar me-2"></i>
+                Période analysée : <strong>{{ period.startDate|date('d/m/Y') }}</strong> au <strong>{{ period.endDate|date('d/m/Y') }}</strong>
+            </div>
+        </div>
+    </div>
+
+    {# KPI Cards #}
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block">Turnover</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value {% if metrics.turnover.turnoverRate < 10 %}text-success{% elseif metrics.turnover.turnoverRate < 15 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ metrics.turnover.turnoverRate }}%
+                                </span>
+                            </h4>
+                            <div class="text-muted">
+                                <small>{{ metrics.turnover.departures }} départ(s) / {{ metrics.turnover.averageHeadcount }} effectif moyen</small>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-primary rounded">
+                                <span class="avatar-title bg-soft-primary text-primary font-size-24">
+                                    <i class="bx bx-user-x"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block">Absentéisme</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value {% if metrics.absenteeism.absenteeismRate < 5 %}text-success{% elseif metrics.absenteeism.absenteeismRate < 8 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ metrics.absenteeism.absenteeismRate }}%
+                                </span>
+                            </h4>
+                            <div class="text-muted">
+                                <small>{{ metrics.absenteeism.absentDays }} jours / {{ metrics.absenteeism.theoreticalDays|number_format(0) }} jours théoriques</small>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-warning rounded">
+                                <span class="avatar-title bg-soft-warning text-warning font-size-24">
+                                    <i class="bx bx-calendar-x"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block">Ancienneté Moyenne</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-info">{{ metrics.seniority.averageSeniority }} ans</span>
+                            </h4>
+                            <div class="text-muted">
+                                <small>{{ metrics.seniority.totalActive }} collaborateurs actifs</small>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-info rounded">
+                                <span class="avatar-title bg-soft-info text-info font-size-24">
+                                    <i class="bx bx-time"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block">Âge Moyen</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value text-success">{{ metrics.agePyramid.averageAge }} ans</span>
+                            </h4>
+                            <div class="text-muted">
+                                <small>{{ metrics.agePyramid.totalActive }} collaborateurs</small>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-success rounded">
+                                <span class="avatar-title bg-soft-success text-success font-size-24">
+                                    <i class="bx bx-cake"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# Pyramide des âges #}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Pyramide des âges</h4>
+                    <canvas id="agePyramidChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Répartition ancienneté #}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Répartition par ancienneté</h4>
+                    <canvas id="seniorityChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# Répartition par profil #}
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Répartition des profils</h4>
+                    <canvas id="profilesPyramidChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Résumé écarts de compétences #}
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Écarts de compétences</h4>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Compétences en déficit</span>
+                            <span class="badge bg-danger font-size-14">{{ skillGaps.summary.totalGaps }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ skillGaps.summary.totalGaps > 0 ? 100 : 0 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Compétences critiques</span>
+                            <span class="badge bg-warning font-size-14">{{ skillGaps.summary.criticalGaps }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ skillGaps.summary.criticalGaps > 0 ? 100 : 0 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Compétences équilibrées</span>
+                            <span class="badge bg-success font-size-14">{{ skillGaps.summary.totalBalanced }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ skillGaps.summary.totalBalanced > 0 ? 100 : 0 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Compétences en surplus</span>
+                            <span class="badge bg-info font-size-14">{{ skillGaps.summary.totalSurplus }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ skillGaps.summary.totalSurplus > 0 ? 100 : 0 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{{ path('hr_gap_analysis') }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bx bx-analyse me-1"></i>Voir l'analyse détaillée
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if skillGaps.gaps|length > 0 %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Top 10 : Compétences en déficit</h4>
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Compétence</th>
+                                    <th>Catégorie</th>
+                                    <th class="text-center">Disponible</th>
+                                    <th class="text-center">Demande</th>
+                                    <th class="text-center">Écart</th>
+                                    <th class="text-center">Sévérité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for gap in skillGaps.gaps|slice(0, 10) %}
+                                <tr>
+                                    <td><strong>{{ gap.skill.name }}</strong></td>
+                                    <td><span class="badge bg-secondary">{{ gap.skill.categoryLabel }}</span></td>
+                                    <td class="text-center">{{ gap.available }}</td>
+                                    <td class="text-center">{{ gap.demand }}</td>
+                                    <td class="text-center"><span class="badge bg-danger">-{{ gap.gap }}</span></td>
+                                    <td class="text-center">
+                                        {% if gap.severity == 'critical' %}
+                                            <span class="badge bg-danger">Critique</span>
+                                        {% elseif gap.severity == 'high' %}
+                                            <span class="badge bg-warning">Élevé</span>
+                                        {% elseif gap.severity == 'medium' %}
+                                            <span class="badge bg-info">Moyen</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Faible</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Age Pyramid Chart
+    const agePyramidCtx = document.getElementById('agePyramidChart');
+    if (agePyramidCtx) {
+        const ageData = {{ metrics.agePyramid.ageRanges|json_encode|raw }};
+        new Chart(agePyramidCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(ageData),
+                datasets: [{
+                    label: 'Nombre de collaborateurs',
+                    data: Object.values(ageData),
+                    backgroundColor: 'rgba(52, 143, 226, 0.8)',
+                    borderColor: 'rgba(52, 143, 226, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Seniority Chart
+    const seniorityCtx = document.getElementById('seniorityChart');
+    if (seniorityCtx) {
+        const seniorityData = {{ metrics.seniority.bySeniority|json_encode|raw }};
+        new Chart(seniorityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(seniorityData),
+                datasets: [{
+                    data: Object.values(seniorityData),
+                    backgroundColor: [
+                        'rgba(52, 143, 226, 0.8)',
+                        'rgba(80, 165, 241, 0.8)',
+                        'rgba(108, 187, 255, 0.8)',
+                        'rgba(136, 209, 255, 0.8)',
+                        'rgba(164, 231, 255, 0.8)'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Profiles Pyramid Chart
+    const profilesCtx = document.getElementById('profilesPyramidChart');
+    if (profilesCtx) {
+        const profileData = {{ metrics.skillsPyramid.byProfile|json_encode|raw }};
+        new Chart(profilesCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(profileData),
+                datasets: [{
+                    label: 'Nombre de collaborateurs',
+                    data: Object.values(profileData),
+                    backgroundColor: 'rgba(80, 165, 241, 0.8)',
+                    borderColor: 'rgba(80, 165, 241, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

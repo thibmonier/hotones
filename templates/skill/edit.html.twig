@@ -1,0 +1,98 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Modifier {{ skill.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Modifier {{ skill.name }}</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('skill_show', {id: skill.id}) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bx bx-arrow-back me-1"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form) }}
+
+                    <div class="mb-3">
+                        {{ form_label(form.name) }}
+                        {{ form_widget(form.name) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.category) }}
+                        {{ form_widget(form.category) }}
+                        {{ form_errors(form.category) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form_widget(form.active) }}
+                        {{ form_label(form.active) }}
+                        {{ form_errors(form.active) }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i>Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('skill_show', {id: skill.id}) }}" class="btn btn-light">Annuler</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-info-circle me-2"></i>Statistiques
+                    </h5>
+                    <div class="mb-3">
+                        <span class="text-muted">Nombre de contributeurs</span>
+                        <h4 class="mb-0 mt-1">{{ skill.contributorCount }}</h4>
+                    </div>
+                    {% if skill.contributorCount > 0 %}
+                    <div class="alert alert-warning small mb-0">
+                        <i class="bx bx-error-circle me-1"></i>
+                        Cette compétence est utilisée par {{ skill.contributorCount }} contributeur(s).
+                        Si vous la désactivez, elle restera visible dans les profils mais ne pourra plus être ajoutée.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Métadonnées</h5>
+                    <div class="mb-2">
+                        <small class="text-muted">Créée le</small>
+                        <div>{{ skill.createdAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Mise à jour le</small>
+                        <div>{{ skill.updatedAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

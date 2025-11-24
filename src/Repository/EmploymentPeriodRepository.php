@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Contributor;
 use App\Entity\EmploymentPeriod;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -209,5 +210,49 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             'active_periods' => $activePeriods,
             'average_cjm'    => $avgCjm ? round($avgCjm, 2) : null,
         ];
+    }
+
+    /**
+     * Compte le nombre de départs (périodes qui se terminent) dans une plage de dates.
+     */
+    public function countDepartures(DateTimeInterface $startDate, DateTimeInterface $endDate): int
+    {
+        return (int) $this->createQueryBuilder('ep')
+            ->select('COUNT(ep.id)')
+            ->where('ep.endDate IS NOT NULL')
+            ->andWhere('ep.endDate >= :startDate')
+            ->andWhere('ep.endDate <= :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Compte le nombre de périodes actives à une date donnée.
+     */
+    public function countActiveAt(DateTimeInterface $date): int
+    {
+        return (int) $this->createQueryBuilder('ep')
+            ->select('COUNT(ep.id)')
+            ->where('ep.startDate <= :date')
+            ->andWhere('ep.endDate IS NULL OR ep.endDate >= :date')
+            ->setParameter('date', $date)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Trouve la première période d'emploi d'un contributeur (par ordre chronologique).
+     */
+    public function findFirstByContributor(Contributor $contributor): ?EmploymentPeriod
+    {
+        return $this->createQueryBuilder('ep')
+            ->where('ep.contributor = :contributor')
+            ->setParameter('contributor', $contributor)
+            ->orderBy('ep.startDate', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

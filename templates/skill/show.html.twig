@@ -1,0 +1,209 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}{{ skill.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">{{ skill.name }}</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('skill_index') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bx bx-arrow-back me-1"></i>Retour à la liste
+                    </a>
+                    <a href="{{ path('skill_edit', {id: skill.id}) }}" class="btn btn-primary btn-sm ms-2">
+                        <i class="bx bx-edit me-1"></i>Modifier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Informations générales</h5>
+
+                    <div class="mb-3">
+                        <span class="text-muted">Nom</span>
+                        <h5 class="mb-0">{{ skill.name }}</h5>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted">Catégorie</span>
+                        <div class="mt-1">
+                            <span class="badge bg-secondary">{{ skill.categoryLabel }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted">Statut</span>
+                        <div class="mt-1">
+                            {% if skill.active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if skill.description %}
+                    <div class="mb-3">
+                        <span class="text-muted">Description</span>
+                        <p class="mt-1 mb-0">{{ skill.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <span class="text-muted">Créée le</span>
+                        <div class="mt-1">{{ skill.createdAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+
+                    <div class="mb-0">
+                        <span class="text-muted">Mise à jour le</span>
+                        <div class="mt-1">{{ skill.updatedAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        Contributeurs possédant cette compétence
+                        <span class="badge bg-primary ms-2">{{ contributorSkills|length }}</span>
+                    </h5>
+
+                    {% if contributorSkills|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Contributeur</th>
+                                    <th class="text-center">Niveau auto-évalué</th>
+                                    <th class="text-center">Niveau manager</th>
+                                    <th class="text-center">Niveau effectif</th>
+                                    <th>Date d'acquisition</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contributorSkill in contributorSkills %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ contributorSkill.contributor.fullName }}</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ contributorSkill.selfAssessmentLevel }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if contributorSkill.managerAssessmentLevel %}
+                                            <span class="badge bg-info">{{ contributorSkill.managerAssessmentLevel }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge {{ contributorSkill.levelBadgeClass }}">
+                                            {{ contributorSkill.effectiveLevel }}
+                                        </span>
+                                        {% if contributorSkill.hasAssessmentGap %}
+                                            <i class="bx bx-error-circle text-warning ms-1" title="Écart entre auto-évaluation et évaluation manager"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if contributorSkill.dateAcquired %}
+                                            {{ contributorSkill.dateAcquired|date('d/m/Y') }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if contributorSkill.notes %}
+                                            {{ contributorSkill.notes|u.truncate(50, '...') }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Aucun contributeur n'a encore déclaré posséder cette compétence.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if levelDistribution|length > 0 %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Distribution des niveaux</h5>
+                    <canvas id="levelDistributionChart" height="80"></canvas>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{% if levelDistribution|length > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('levelDistributionChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Débutant', 'Intermédiaire', 'Confirmé', 'Expert'],
+                datasets: [{
+                    label: 'Nombre de contributeurs',
+                    data: [
+                        {{ levelDistribution[1] ?? 0 }},
+                        {{ levelDistribution[2] ?? 0 }},
+                        {{ levelDistribution[3] ?? 0 }},
+                        {{ levelDistribution[4] ?? 0 }}
+                    ],
+                    backgroundColor: [
+                        'rgba(108, 117, 125, 0.8)',
+                        'rgba(52, 143, 226, 0.8)',
+                        'rgba(13, 110, 253, 0.8)',
+                        'rgba(25, 135, 84, 0.8)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

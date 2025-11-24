@@ -1,0 +1,84 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouvelle compétence{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouvelle compétence</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('skill_index') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bx bx-arrow-back me-1"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form) }}
+
+                    <div class="mb-3">
+                        {{ form_label(form.name) }}
+                        {{ form_widget(form.name) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.category) }}
+                        {{ form_widget(form.category) }}
+                        {{ form_errors(form.category) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form_widget(form.active) }}
+                        {{ form_label(form.active) }}
+                        {{ form_errors(form.active) }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i>Créer la compétence
+                        </button>
+                        <a href="{{ path('skill_index') }}" class="btn btn-light">Annuler</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-info-circle me-2"></i>Information
+                    </h5>
+                    <p class="text-muted">
+                        Les compétences permettent de suivre les expertises de vos contributeurs et d'identifier les écarts de compétences.
+                    </p>
+                    <hr>
+                    <h6>Catégories :</h6>
+                    <ul class="text-muted small">
+                        <li><strong>Technique</strong> : Langages, frameworks, outils</li>
+                        <li><strong>Soft Skill</strong> : Communication, leadership, etc.</li>
+                        <li><strong>Méthodologie</strong> : Agile, Scrum, etc.</li>
+                        <li><strong>Langue</strong> : Anglais, Français, etc.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -96,12 +96,17 @@ class Contributor
     #[ORM\OneToMany(targetEntity: Timesheet::class, mappedBy: 'contributor')]
     private Collection $timesheets;
 
+    // Compétences du contributeur avec niveaux
+    #[ORM\OneToMany(targetEntity: ContributorSkill::class, mappedBy: 'contributor', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $contributorSkills;
+
     public function __construct()
     {
         $this->profiles            = new ArrayCollection();
         $this->employmentPeriods   = new ArrayCollection();
         $this->timesheets          = new ArrayCollection();
         $this->managedContributors = new ArrayCollection();
+        $this->contributorSkills   = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -429,5 +434,61 @@ class Contributor
         }
 
         return 7.0; // Valeur par défaut pour 35h/5j
+    }
+
+    /**
+     * @return Collection<int, ContributorSkill>
+     */
+    public function getContributorSkills(): Collection
+    {
+        return $this->contributorSkills;
+    }
+
+    public function addContributorSkill(ContributorSkill $contributorSkill): self
+    {
+        if (!$this->contributorSkills->contains($contributorSkill)) {
+            $this->contributorSkills->add($contributorSkill);
+            $contributorSkill->setContributor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContributorSkill(ContributorSkill $contributorSkill): self
+    {
+        if ($this->contributorSkills->removeElement($contributorSkill)) {
+            if ($contributorSkill->getContributor() === $this) {
+                $contributorSkill->setContributor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retourne les compétences par catégorie.
+     *
+     * @return array<string, Collection<int, ContributorSkill>>
+     */
+    public function getSkillsByCategory(): array
+    {
+        $byCategory = [];
+        foreach ($this->contributorSkills as $contributorSkill) {
+            $category = $contributorSkill->getSkill()->getCategory();
+            if (!isset($byCategory[$category])) {
+                $byCategory[$category] = new ArrayCollection();
+            }
+            $byCategory[$category]->add($contributorSkill);
+        }
+
+        return $byCategory;
+    }
+
+    /**
+     * Retourne le nombre total de compétences du contributeur.
+     */
+    public function getSkillsCount(): int
+    {
+        return $this->contributorSkills->count();
     }
 }
