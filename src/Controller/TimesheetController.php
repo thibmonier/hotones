@@ -131,21 +131,6 @@ class TimesheetController extends AbstractController
             ], 400);
         }
 
-        // Validation : maximum 24h/jour
-        if ($hours > 0) {
-            $dailyTotal = $timesheetRepo->getTotalHoursForContributorAndDate($contributor, $date);
-            if ($dailyTotal + $hours > 24) {
-                return new JsonResponse([
-                    'error' => sprintf(
-                        'Dépassement du total quotidien : %.2fh déjà saisi(es), +%.2fh demandé = %.2fh/24h maximum',
-                        $dailyTotal,
-                        $hours,
-                        $dailyTotal + $hours,
-                    ),
-                ], 400);
-            }
-        }
-
         $project = $em->getRepository(Project::class)->find($projectId);
         if (!$project) {
             return new JsonResponse(['error' => 'Projet non trouvé'], 400);
@@ -165,6 +150,21 @@ class TimesheetController extends AbstractController
 
         // Chercher un timesheet existant via repository (avec tâche si spécifiée)
         $timesheet = $timesheetRepo->findExistingTimesheetWithTask($contributor, $project, $date, $task);
+
+        // Validation : maximum 24h/jour (exclure le timesheet en cours d'édition du calcul)
+        if ($hours > 0) {
+            $dailyTotal = $timesheetRepo->getTotalHoursForContributorAndDate($contributor, $date, $timesheet);
+            if ($dailyTotal + $hours > 24) {
+                return new JsonResponse([
+                    'error' => sprintf(
+                        'Dépassement du total quotidien : %.2fh déjà saisi(es), +%.2fh demandé = %.2fh/24h maximum',
+                        $dailyTotal,
+                        $hours,
+                        $dailyTotal + $hours,
+                    ),
+                ], 400);
+            }
+        }
 
         if (!$timesheet) {
             $timesheet = new Timesheet();
@@ -389,6 +389,8 @@ class TimesheetController extends AbstractController
             $dayOffset  = $source->getDate()->diff($sourceStart)->days;
             $targetDate = clone $targetStart;
             $targetDate->modify("+{$dayOffset} days");
+            // Normaliser à minuit pour éviter les problèmes de comparaison
+            $targetDate->setTime(0, 0, 0);
 
             // Vérifier si un temps existe déjà (même projet, même tâche, même date)
             $existing = $timesheetRepo->findExistingTimesheetWithTask(
