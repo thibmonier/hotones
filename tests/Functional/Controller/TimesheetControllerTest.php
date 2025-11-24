@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Factory\ContributorFactory;
+use App\Factory\ProfileFactory;
 use App\Factory\ProjectFactory;
 use App\Factory\ProjectTaskFactory;
 use App\Factory\TimesheetFactory;
