@@ -1,281 +1,0 @@
-
-Fapp\repository\staffingmetricsrepository::getaggregatedmetricsbyperiodV
-L/Users/tmonier/Projects/hotones/src/Repository/StaffingMetricsRepository.phpM M(0"1*≠
-2g h(3yw
-g g(2
-%11*#
-
-__unknown_file (
-
-$qb*5
-
-__unknown_file (
-dp.profile = :profile2andwhereöó
-g h(2
-%12*#
-
-__unknown_file (
-
-%11*'
-
-__unknown_file (	
-profile*(
-
-__unknown_file (
-
-
-$profile2setparameter*
-5
-6*§
-3k k(Eåâ
-k k(D
-%13*#
-
-__unknown_file (
-
-$qb*G
-
-__unknown_file (+)
-'dp.id IS NULL OR dp.isProductive = true2andwhere*
-5
-6*Ω
-5o p(;ÉÄ
-o o(;
-%14*#
-
-__unknown_file (
-
-$qb*>
-
-__unknown_file (" 
-fsm.contributor = :contributor2andwhere¢ü
-o p(:
-%15*#
-
-__unknown_file (
-
-%14*+
-
-__unknown_file (
-contributor*,
-
-__unknown_file (
-
-$contributor2setparameter*
-6*¥
-6s t(,om
-s s($
-%16*#
-
-__unknown_file (
-
-$qb*,
-
-__unknown_file (
-dt.yearMonth2groupbyïí
-s t(+
-%17*#
-
-__unknown_file (
-
-%16*,
-
-__unknown_file (
-dt.yearMonth*#
-
-__unknown_file (
-ASC2orderbyB@
-v v(
-%18*#
-
-__unknown_file (
-
-$qb2getqueryCA
-v v(+
-%19*#
-
-__unknown_file (
-
-%182	getresult"
-v v(,
-
-%19*è
-1T b(8_
-]
-M M(0
-
-$startDate"__id*=
-
-__unknown_file (!
-
-
-$startDatedatetimeinterface[
-Y
-M M(0
-
-$endDate"__id*;
-
-__unknown_file (
-
-$endDatedatetimeinterfaceX
-V
-M M(0
-$granularity"__id*4
-
-__unknown_file (
-
-$granularitystring\
-Z
-M M(0
-
-$profile"__id*<
-
-__unknown_file ( 
-
-$profileapp\entity\profileh
-f
-M M(0
-$contributor"__id*D
-
-__unknown_file ((
-&
-$contributorapp\entity\contributorñì
-T T(.
-%1*H
-
-__unknown_file (,*
-(app\repository\staffingmetricsrepository*#
-
-__unknown_file (
-fsm2createquerybuilder«ƒ
-T Z(
-%2*"
-
-__unknown_file (
-
-%1*9
-
-__unknown_file (
-dt.yearMonth as yearMonth*E
-
-__unknown_file ()'
-%AVG(fsm.staffingRate) as staffingRate*5
-
-__unknown_file (
-AVG(fsm.tace) as tace*M
-
-__unknown_file (1/
--SUM(fsm.contributorCount) as contributorCount2selectéã
-T [('
-%3*"
-
-__unknown_file (
-
-%2*+
-
-__unknown_file (
-fsm.dimTime*"
-
-__unknown_file (
-dt2joinïí
-T \(.
-%4*"
-
-__unknown_file (
-
-%3*.
-
-__unknown_file (
-fsm.dimProfile*"
-
-__unknown_file (
-dp2leftjointr
-T ](,
-%5*"
-
-__unknown_file (
-
-%4*5
-
-__unknown_file (
-dt.date >= :startDate2whereus
-T ^(-
-%6*"
-
-__unknown_file (
-
-%5*3
-
-__unknown_file (
-dt.date <= :endDate2andwhereÄ~
-T _(8
-%7*"
-
-__unknown_file (
-
-%6*>
-
-__unknown_file (" 
-fsm.granularity = :granularity2andwhereúô
-T `(3
-%8*"
-
-__unknown_file (
-
-%7*)
-
-__unknown_file (
-	startDate**
-
-__unknown_file (
-
-
-$startDate2setparameteròï
-T a(/
-%9*"
-
-__unknown_file (
-
-%8*'
-
-__unknown_file (	
-endDate*(
-
-__unknown_file (
-
-
-$endDate2setparameter°û
-T b(7
-%10*"
-
-__unknown_file (
-
-%9*+
-
-__unknown_file (
-granularity*,
-
-__unknown_file (
-
-$granularity2setparameter>
-<
-T b(7
-$qb"__id*#
-
-__unknown_file (
-
-%10*
-2
-3:+
-N N($
-
-$startDatedatetimeinterface:)
-O O("
-$endDatedatetimeinterface:"
-P P('
-$granularitystring:*
-Q Q( 
-$profileapp\entity\profile:2
-R R((&
-$contributorapp\entity\contributorB,*
-(app\repository\staffingmetricsrepositoryH

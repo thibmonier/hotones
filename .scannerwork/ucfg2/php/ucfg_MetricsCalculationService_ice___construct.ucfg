@@ -1,26 +1,0 @@
-
-<app\service\analytics\metricscalculationservice::__construct]
-S/Users/tmonier/Projects/hotones/src/Service/Analytics/MetricsCalculationService.php ("1*¡
-1
-MetricsCalculationService.phpy
-w
- (
-$entityManager"__id*S
-
-__unknown_file (7
-5
-$entityManager#doctrine\orm\entitymanagerinterface_
-]
- (	
-$logger"__id*@
-
-__unknown_file ($
-"
-$loggerpsr\log\loggerinterface"
- (
-implicit return:A
- (55
-$entityManager#doctrine\orm\entitymanagerinterface:.
- ('"
-$loggerpsr\log\loggerinterfaceB31
-/app\service\analytics\metricscalculationserviceH

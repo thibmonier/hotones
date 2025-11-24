@@ -1,22 +1,0 @@
-
-/app\event\quotestatuschangedevent::getnewstatusO
-E/Users/tmonier/Projects/hotones/src/Event/QuoteStatusChangedEvent.phpI I( "1*÷
-1K K( j
-h
-K K(
-%1"__id*P
-
-__unknown_file (4*2#
-!app\event\quotestatuschangedevent"
-	newStatusR
-P
-K K( 
-%2app\enum\orderstatus"__id*"
-
-__unknown_file (
-
-%1"(
-K K( 
-
-%2app\enum\orderstatusB%#
-!app\event\quotestatuschangedeventH

@@ -1,27 +1,0 @@
-
-$app\entity\notification::__constructE
-;/Users/tmonier/Projects/hotones/src/Entity/Notification.php1 1("1*8
-2
-Notification.php"
-4 4(
-implicit return*ó
-13 3(3%#
-3 3(2
-%1"datetimeimmutableV
-T
-3 3(2
-%2"datetimeimmutable::__construct*"
-
-__unknown_file (
-
-%1`
-^
-3 3(2(
-app\entity\notification"
-	createdAt"__id*"
-
-__unknown_file (
-
-%1*
-2B
-app\entity\notificationH

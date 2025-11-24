@@ -1,44 +1,0 @@
-
-6app\controller\vacationapprovalcontroller::__constructW
-M/Users/tmonier/Projects/hotones/src/Controller/VacationApprovalController.php ("1*Ô
-1 
-VacationApprovalController.phpy
-w
- (
-$entityManager"__id*S
-
-__unknown_file (7
-5
-$entityManager#doctrine\orm\entitymanagerinterface
-
- (
-$vacationRepository"__id*V
-
-__unknown_file (:
-8
-$vacationRepository!app\repository\vacationrepository‹
-ˆ
- (
-$contributorRepository"__id*\
-
-__unknown_file (@
->
-$contributorRepository$app\repository\contributorrepository
-}
- (
-$messageBus"__id*\
-
-__unknown_file (@
->
-$messageBus/symfony\component\messenger\messagebusinterface"
- (
-implicit return:A
- (>5
-$entityManager#doctrine\orm\entitymanagerinterface:D
- (?8
-$vacationRepository!app\repository\vacationrepository:J
- (E>
-$contributorRepository$app\repository\contributorrepository:J
- (8>
-$messageBus/symfony\component\messenger\messagebusinterfaceB-+
-)app\controller\vacationapprovalcontrollerH

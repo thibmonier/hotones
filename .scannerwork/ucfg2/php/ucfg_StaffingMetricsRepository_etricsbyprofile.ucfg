@@ -1,311 +1,0 @@
-
-=app\repository\staffingmetricsrepository::getmetricsbyprofileX
-L/Users/tmonier/Projects/hotones/src/Repository/StaffingMetricsRepository.phpÜ Ü('"1*≥
-2
-û ü(3{y
-
-û û(2
-%12*#
-
-__unknown_file (
-
-$qb*5
-
-__unknown_file (
-dp.profile = :profile2andwhereúô
-
-û ü(2
-%13*#
-
-__unknown_file (
-
-%12*'
-
-__unknown_file (	
-profile*(
-
-__unknown_file (
-
-
-$profile2setparameter*
-4
-5*√
-4
-£ §(;ÖÇ
-
-£ £(;
-%14*#
-
-__unknown_file (
-
-$qb*>
-
-__unknown_file (" 
-fsm.contributor = :contributor2andwhere§°
-
-£ §(:
-%15*#
-
-__unknown_file (
-
-%14*+
-
-__unknown_file (
-contributor*,
-
-__unknown_file (
-
-$contributor2setparameter*
-5*º
-5
-ß ®(-lj
-
-ß ß(
-%16*#
-
-__unknown_file (
-
-$qb*'
-
-__unknown_file (	
-dp.name2groupbyòï
-
-ß ®(,
-%17*#
-
-__unknown_file (
-
-%16*,
-
-__unknown_file (
-staffingRate*$
-
-__unknown_file (
-DESC2orderbyDB
-
-™ ™(
-%18*#
-
-__unknown_file (
-
-$qb2getqueryEC
-
-™ ™(+
-%19*#
-
-__unknown_file (
-
-%182	getresult"
-
-™ ™(,
-
-%19*›
-1
-ç õ(8a
-_
-
-Ü Ü('
-
-$startDate"__id*=
-
-__unknown_file (!
-
-
-$startDatedatetimeinterface]
-[
-
-Ü Ü('
-
-$endDate"__id*;
-
-__unknown_file (
-
-$endDatedatetimeinterfaceZ
-X
-
-Ü Ü('
-$granularity"__id*4
-
-__unknown_file (
-
-$granularitystring^
-\
-
-Ü Ü('
-
-$profile"__id*<
-
-__unknown_file ( 
-
-$profileapp\entity\profilej
-h
-
-Ü Ü('
-$contributor"__id*D
-
-__unknown_file ((
-&
-$contributorapp\entity\contributoròï
-
-ç ç(.
-%1*H
-
-__unknown_file (,*
-(app\repository\staffingmetricsrepository*#
-
-__unknown_file (
-fsm2createquerybuilder˜Ù
-
-ç í(
-%2*"
-
-__unknown_file (
-
-%1*6
-
-__unknown_file (
-dp.name as profileName*E
-
-__unknown_file ()'
-%AVG(fsm.staffingRate) as staffingRate*5
-
-__unknown_file (
-AVG(fsm.tace) as tace2selectêç
-
-ç ì('
-%3*"
-
-__unknown_file (
-
-%2*+
-
-__unknown_file (
-fsm.dimTime*"
-
-__unknown_file (
-dt2joinìê
-
-ç î(*
-%4*"
-
-__unknown_file (
-
-%3*.
-
-__unknown_file (
-fsm.dimProfile*"
-
-__unknown_file (
-dp2joinvt
-
-ç ï(,
-%5*"
-
-__unknown_file (
-
-%4*5
-
-__unknown_file (
-dt.date >= :startDate2wherewu
-
-ç ñ(-
-%6*"
-
-__unknown_file (
-
-%5*3
-
-__unknown_file (
-dt.date <= :endDate2andwhereÉÄ
-
-ç ó(8
-%7*"
-
-__unknown_file (
-
-%6*>
-
-__unknown_file (" 
-fsm.granularity = :granularity2andwherezx
-
-ç ò(0
-%8*"
-
-__unknown_file (
-
-%7*6
-
-__unknown_file (
-dp.isProductive = true2andwhereûõ
-
-ç ô(3
-%9*"
-
-__unknown_file (
-
-%8*)
-
-__unknown_file (
-	startDate**
-
-__unknown_file (
-
-
-$startDate2setparameterõò
-
-ç ö(/
-%10*"
-
-__unknown_file (
-
-%9*'
-
-__unknown_file (	
-endDate*(
-
-__unknown_file (
-
-
-$endDate2setparameter§°
-
-ç õ(7
-%11*#
-
-__unknown_file (
-
-%10*+
-
-__unknown_file (
-granularity*,
-
-__unknown_file (
-
-$granularity2setparameter@
->
-
-ç õ(7
-$qb"__id*#
-
-__unknown_file (
-
-%11*	
-2
-4
-5:-
-
-á á($
-
-$startDatedatetimeinterface:+
-
-à à("
-$endDatedatetimeinterface:$
-
-â â('
-$granularitystring:,
-
-ä ä( 
-$profileapp\entity\profile:4
-
-ã ã((&
-$contributorapp\entity\contributorB,*
-(app\repository\staffingmetricsrepositoryH

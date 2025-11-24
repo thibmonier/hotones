@@ -1,7 +1,0 @@
-organization=thibmonier
-projectKey=thibmonier_hotones
-serverUrl=https://sonarcloud.io
-serverVersion=8.0.0.76733
-dashboardUrl=https://sonarcloud.io/dashboard?id=thibmonier_hotones
-ceTaskId=AZq0vWxUCaV_j4Mn-3Mf
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZq0vWxUCaV_j4Mn-3Mf

@@ -1,24 +1,0 @@
-
- app\entity\notification::settypeE
-;/Users/tmonier/Projects/hotones/src/Entity/Notification.php@ @("1*õ
-1B B(]
-[
-@ @(
-$type"__id*@
-
-__unknown_file ($
-"
-$typeapp\enum\notificationtype^
-\
-B B(#
-app\entity\notification"
-type"__id*%
-
-__unknown_file (	
-
-$type"'
-D D(
-app\entity\notification:.
-@ @(2"
-$typeapp\enum\notificationtypeB
-app\entity\notificationH

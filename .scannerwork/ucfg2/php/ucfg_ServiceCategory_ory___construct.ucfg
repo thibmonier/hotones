@@ -1,28 +1,0 @@
-
-'app\entity\servicecategory::__constructH
->/Users/tmonier/Projects/hotones/src/Entity/ServiceCategory.php" "("1*;
-2
-ServiceCategory.php"
-% %(
-implicit return*©
-1$ $(0?=
-$ $(/
-%1"+doctrine\common\collections\arraycollectionp
-n
-$ $(/
-%2"8doctrine\common\collections\arraycollection::__construct*"
-
-__unknown_file (
-
-%1b
-`
-$ $(/*
-app\entity\servicecategory"
-
-projects"__id*"
-
-__unknown_file (
-
-%1*
-2B
-app\entity\servicecategoryH

@@ -1,51 +1,0 @@
-
- app\entity\order::settotalamount@
-4/Users/tmonier/Projects/hotones/src/Entity/Order.phpù ù(""1*V
-2
-û- û(3@
->
-
-û û(3
-%1"__id*$
-
-__unknown_file (
-0.00*
-3*’
-3
-û3 û(3]
-[
-
-û û(3#
-app\entity\order"
-totalAmount"__id*"
-
-__unknown_file (
-
-%1""
-
-ý ý(
-app\entity\order*½
-1
-û û(4Z
-X
-
-ù ù("
-$totalAmount"__id*4
-
-__unknown_file (
-
-$totalAmountstringH
-F
-
-û û(3
-%1"__id*,
-
-__unknown_file (
-
-$totalAmount*
-2
-3:$
-
-ù# ù(7
-$totalAmountstringB
-app\entity\orderH

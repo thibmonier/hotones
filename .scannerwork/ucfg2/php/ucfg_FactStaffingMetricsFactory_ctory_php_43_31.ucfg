@@ -1,25 +1,0 @@
-
-___sonar_lambda_/Users/tmonier/Projects/hotones/src/Factory/FactStaffingMetricsFactory.php_43_31T
-J/Users/tmonier/Projects/hotones/src/Factory/FactStaffingMetricsFactory.php+ +('"1*F
-2 
-FactStaffingMetricsFactory.php"
-. .(
-implicit return*ü
-1- -(9‹
-ˆ
-+ +('
-$factStaffingMetrics"__id*^
-
-__unknown_file (B
-@
-$factStaffingMetrics(app\entity\analytics\factstaffingmetricsZX
-- -(8
-%1*4
-
-__unknown_file (
-
-$factStaffingMetrics2calculatemetrics*
-2:L
-+) +(Q@
-$factStaffingMetrics(app\entity\analytics\factstaffingmetricsB*(
-&app\factory\factstaffingmetricsfactoryH

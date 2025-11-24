@@ -1,73 +1,0 @@
-
-,app\entity\projecttask::getavailablestatusesF
-:/Users/tmonier/Projects/hotones/src/Entity/ProjectTask.phpø ø(/"1*∫
-1
-¡ ∆(
-
-
-¡ ∆(	
-%1"$Array†
-ù
-
-¡ ∆(	
-%2"__mapSet*"
-
-__unknown_file (
-
-%1*+
-
-__unknown_file (
-not_started*.
-
-__unknown_file (
-Non d√©marr√©eö
-ó
-
-¡ ∆(	
-%3"__mapSet*"
-
-__unknown_file (
-
-%1*+
-
-__unknown_file (
-in_progress*(
-
-__unknown_file (
-
-En coursô
-ñ
-
-¡ ∆(	
-%4"__mapSet*"
-
-__unknown_file (
-
-%1*)
-
-__unknown_file (
-	completed*)
-
-__unknown_file (
-	Termin√©eò
-ï
-
-¡ ∆(	
-%5"__mapSet*"
-
-__unknown_file (
-
-%1*'
-
-__unknown_file (	
-on_hold**
-
-__unknown_file (
-
-En attente"
-
-¡ ∆(
-
-
-%1B
-app\entity\projecttaskH

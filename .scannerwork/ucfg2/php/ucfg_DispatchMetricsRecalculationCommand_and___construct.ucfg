@@ -1,25 +1,0 @@
-
-<app\command\dispatchmetricsrecalculationcommand::__construct]
-S/Users/tmonier/Projects/hotones/src/Command/DispatchMetricsRecalculationCommand.php ("1*O
-2)
-'DispatchMetricsRecalculationCommand.php"
- (
-implicit return*¤
-1 (q
-o
- (
-$bus"__id*U
-
-__unknown_file (9
-7
-$bus/symfony\component\messenger\messagebusinterfaceœ
-™
- (
-%1"6symfony\component\console\command\command::__construct*O
-
-__unknown_file (31
-/app\command\dispatchmetricsrecalculationcommand*
-2:C
-  (I7
-$bus/symfony\component\messenger\messagebusinterfaceB31
-/app\command\dispatchmetricsrecalculationcommandH

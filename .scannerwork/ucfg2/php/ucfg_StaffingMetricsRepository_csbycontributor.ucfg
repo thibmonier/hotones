@@ -1,347 +1,0 @@
-
-Aapp\repository\staffingmetricsrepository::getmetricsbycontributorX
-L/Users/tmonier/Projects/hotones/src/Repository/StaffingMetricsRepository.php» »(+"1*³
-2
-Õ Ö(3{y
-
-Õ Õ(2
-%13*#
-
-__unknown_file (
-
-$qb*5
-
-__unknown_file (
-dp.profile = :profile2andwhereœ™
-
-Õ Ö(2
-%14*#
-
-__unknown_file (
-
-%13*'
-
-__unknown_file (	
-profile*(
-
-__unknown_file (
-
-
-$profile2setparameter*
-5
-6*¨
-3
-Ù Ù(EŽ‹
-
-Ù Ù(D
-%15*#
-
-__unknown_file (
-
-$qb*G
-
-__unknown_file (+)
-'dp.id IS NULL OR dp.isProductive = true2andwhere*
-5
-6*Ã
-5
-Ý Þ(;…‚
-
-Ý Ý(;
-%16*#
-
-__unknown_file (
-
-$qb*>
-
-__unknown_file (" 
-fsm.contributor = :contributor2andwhere¤¡
-
-Ý Þ(:
-%17*#
-
-__unknown_file (
-
-%16*+
-
-__unknown_file (
-contributor*,
-
-__unknown_file (
-
-$contributor2setparameter*
-6*”
-6
-á â(-ÃÀ
-
-á á(9
-%18*#
-
-__unknown_file (
-
-$qb*$
-
-__unknown_file (
-c.id*+
-
-__unknown_file (
-c.firstName**
-
-__unknown_file (
-
-c.lastName2groupby˜•
-
-á â(,
-%19*#
-
-__unknown_file (
-
-%18*,
-
-__unknown_file (
-staffingRate*$
-
-__unknown_file (
-DESC2orderbyDB
-
-ä ä(
-%20*#
-
-__unknown_file (
-
-$qb2getqueryEC
-
-ä ä(+
-%21*#
-
-__unknown_file (
-
-%202	getresult"
-
-ä ä(,
-
-%21*Ö
-1
-Â Ò(8a
-_
-
-» »(+
-
-$startDate"__id*=
-
-__unknown_file (!
-
-
-$startDatedatetimeinterface]
-[
-
-» »(+
-
-$endDate"__id*;
-
-__unknown_file (
-
-$endDatedatetimeinterfaceZ
-X
-
-» »(+
-$granularity"__id*4
-
-__unknown_file (
-
-$granularitystring^
-\
-
-» »(+
-
-$profile"__id*<
-
-__unknown_file ( 
-
-$profileapp\entity\profilej
-h
-
-» »(+
-$contributor"__id*D
-
-__unknown_file ((
-&
-$contributorapp\entity\contributor˜•
-
-Â Â(.
-%1*H
-
-__unknown_file (,*
-(app\repository\staffingmetricsrepository*#
-
-__unknown_file (
-fsm2createquerybuilderÒÏ
-
-Â È(
-%2*"
-
-__unknown_file (
-
-%1*5
-
-__unknown_file (
-c.id as contributorId*Z
-
-__unknown_file (><
-:CONCAT(c.firstName, \' \' , c.lastName) as contributorName*E
-
-__unknown_file ()'
-%AVG(fsm.staffingRate) as staffingRate*5
-
-__unknown_file (
-AVG(fsm.tace) as tace2select
-
-Â É('
-%3*"
-
-__unknown_file (
-
-%2*+
-
-__unknown_file (
-fsm.dimTime*"
-
-__unknown_file (
-dt2join“
-
-Â Ê(*
-%4*"
-
-__unknown_file (
-
-%3*/
-
-__unknown_file (
-fsm.contributor*!
-
-__unknown_file (
-c2join—”
-
-Â Ë(.
-%5*"
-
-__unknown_file (
-
-%4*.
-
-__unknown_file (
-fsm.dimProfile*"
-
-__unknown_file (
-dp2leftjoinvt
-
-Â Ì(,
-%6*"
-
-__unknown_file (
-
-%5*5
-
-__unknown_file (
-dt.date >= :startDate2wherewu
-
-Â Í(-
-%7*"
-
-__unknown_file (
-
-%6*3
-
-__unknown_file (
-dt.date <= :endDate2andwhereƒ€
-
-Â Î(8
-%8*"
-
-__unknown_file (
-
-%7*>
-
-__unknown_file (" 
-fsm.granularity = :granularity2andwhere}
-
-Â Ï(5
-%9*"
-
-__unknown_file (
-
-%8*;
-
-__unknown_file (
-fsm.contributor IS NOT NULL2andwhereŸœ
-
-Â Ð(3
-%10*"
-
-__unknown_file (
-
-%9*)
-
-__unknown_file (
-	startDate**
-
-__unknown_file (
-
-
-$startDate2setparameterœ™
-
-Â Ñ(/
-%11*#
-
-__unknown_file (
-
-%10*'
-
-__unknown_file (	
-endDate*(
-
-__unknown_file (
-
-
-$endDate2setparameter¤¡
-
-Â Ò(7
-%12*#
-
-__unknown_file (
-
-%11*+
-
-__unknown_file (
-granularity*,
-
-__unknown_file (
-
-$granularity2setparameter@
->
-
-Â Ò(7
-$qb"__id*#
-
-__unknown_file (
-
-%12*
-2
-3:-
-
-¼ ¼($
-
-$startDatedatetimeinterface:+
-
-½ ½("
-$endDatedatetimeinterface:$
-
-¾ ¾('
-$granularitystring:,
-
-¿ ¿( 
-$profileapp\entity\profile:4
-
-À À((&
-$contributorapp\entity\contributorB,*
-(app\repository\staffingmetricsrepositoryH
