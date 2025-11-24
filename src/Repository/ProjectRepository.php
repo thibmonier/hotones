@@ -267,7 +267,8 @@ class ProjectRepository extends ServiceEntityRepository
         ?bool $isInternal = null,
         ?int $projectManagerId = null,
         ?int $salesPersonId = null,
-        ?int $serviceCategoryId = null
+        ?int $serviceCategoryId = null,
+        ?string $search = null
     ): array {
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.technologies', 't')
@@ -319,6 +320,10 @@ class ProjectRepository extends ServiceEntityRepository
         if ($serviceCategoryId) {
             $qb->andWhere('sc.id = :scId')->setParameter('scId', $serviceCategoryId);
         }
+        if ($search) {
+            $qb->andWhere('p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
+        }
 
         // No GROUP BY needed: Doctrine's identity map handles entity deduplication automatically
         // when hydrating entities from joins. GROUP BY would require listing all selected columns
@@ -342,11 +347,13 @@ class ProjectRepository extends ServiceEntityRepository
         DateTimeInterface $end,
         ?string $status = null,
         ?string $projectType = null,
-        ?int $technologyId = null
+        ?int $technologyId = null,
+        ?string $search = null
     ): int {
         $qb = $this->createQueryBuilder('p')
             ->select('COUNT(DISTINCT p.id)')
             ->leftJoin('p.technologies', 't')
+            ->leftJoin('p.client', 'c')
             ->where('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
@@ -360,6 +367,10 @@ class ProjectRepository extends ServiceEntityRepository
         }
         if ($technologyId) {
             $qb->andWhere('t.id = :tech')->setParameter('tech', $technologyId);
+        }
+        if ($search) {
+            $qb->andWhere('p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();

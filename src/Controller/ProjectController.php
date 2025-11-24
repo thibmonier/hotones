@@ -8,6 +8,7 @@ use App\Entity\Technology;
 use App\Form\ProjectType as ProjectFormType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,7 @@ class ProjectController extends AbstractController
 
         // Charger filtres depuis la session si aucun filtre explicite n'est fourni
         $queryAll   = $request->query->all();
-        $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'per_page', 'sort', 'dir'];
+        $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'per_page', 'sort', 'dir', 'search'];
         $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
         $saved      = ($session && $session->has('project_filters')) ? (array) $session->get('project_filters') : [];
 
@@ -50,6 +51,7 @@ class ProjectController extends AbstractController
         $filterProjectType = $hasFilter ? ($request->query->get('project_type') ?: null) : ($saved['project_type'] ?? null);
         $filterStatus      = $hasFilter ? ($request->query->get('status') ?: null) : ($saved['status'] ?? 'active');
         $filterTechnology  = $hasFilter ? ($request->query->get('technology') ? (int) $request->query->get('technology') : null) : (isset($saved['technology']) ? (int) $saved['technology'] : null);
+        $filterSearch      = $hasFilter ? ($request->query->get('search') ?: null) : ($saved['search'] ?? null);
 
         // Tri
         $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'name')) : ($saved['sort'] ?? 'name');
@@ -63,10 +65,10 @@ class ProjectController extends AbstractController
         $offset         = ($page - 1) * $perPage;
 
         // Total
-        $total = $projectRepo->countBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology);
+        $total = $projectRepo->countBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $filterSearch);
 
         // Projets sur la période avec filtres (paginés)
-        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset);
+        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset, null, null, null, null, $filterSearch);
 
         // Agrégats SQL en batch pour éviter le parcours objet
         $projectIds = array_map(fn ($p) => $p->getId(), $projects);
@@ -108,7 +110,7 @@ class ProjectController extends AbstractController
         }
 
         // KPIs période (réel basé sur timesheets) - doivent refléter TOUT l'ensemble filtré (pas seulement la page)
-        $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, null, null);
+        $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, null, null, null, null, null, null, null, null, $filterSearch);
         $periodKpis         = $profitabilityService->calculatePeriodMetricsForProjects($allProjectsForKpis, $startDate, $endDate);
 
         $pagination = [
@@ -136,6 +138,7 @@ class ProjectController extends AbstractController
                 'project_type' => $filterProjectType,
                 'status'       => $filterStatus,
                 'technology'   => $filterTechnology,
+                'search'       => $filterSearch,
                 'per_page'     => $perPage,
                 'sort'         => $sort,
                 'dir'          => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
@@ -151,6 +154,7 @@ class ProjectController extends AbstractController
                 'project_type' => $filterProjectType,
                 'status'       => $filterStatus,
                 'technology'   => $filterTechnology,
+                'search'       => $filterSearch,
             ],
             'filter_options' => $filterOptions,
             'period_kpis'    => $periodKpis,
@@ -413,5 +417,92 @@ class ProjectController extends AbstractController
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
 
         return $response;
+    }
+
+    #[Route('/bulk-delete', name: 'project_bulk_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function bulkDelete(Request $request, EntityManagerInterface $em): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Validation CSRF
+        if (!$this->isCsrfTokenValid('bulk_delete', $data['_token'] ?? '')) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 400);
+        }
+
+        $ids = $data['ids'] ?? [];
+        if (empty($ids) || !is_array($ids)) {
+            return $this->json(['success' => false, 'message' => 'Aucun projet sélectionné'], 400);
+        }
+
+        try {
+            $projectRepo = $em->getRepository(Project::class);
+            $deleted     = 0;
+
+            foreach ($ids as $id) {
+                $project = $projectRepo->find((int) $id);
+                if ($project) {
+                    // Vérifier les permissions (seul le chef de projet ou admin peut supprimer)
+                    if (!$this->isGranted('ROLE_ADMIN') && $project->getProjectManager() !== $this->getUser()) {
+                        continue; // Skip si pas autorisé
+                    }
+
+                    $em->remove($project);
+                    ++$deleted;
+                }
+            }
+
+            $em->flush();
+
+            $this->addFlash('success', sprintf('%d projet(s) supprimé(s) avec succès', $deleted));
+
+            return $this->json(['success' => true, 'deleted' => $deleted]);
+        } catch (Exception $e) {
+            return $this->json(['success' => false, 'message' => 'Erreur lors de la suppression: '.$e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/bulk-archive', name: 'project_bulk_archive', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function bulkArchive(Request $request, EntityManagerInterface $em): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Validation CSRF
+        if (!$this->isCsrfTokenValid('bulk_archive', $data['_token'] ?? '')) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 400);
+        }
+
+        $ids = $data['ids'] ?? [];
+        if (empty($ids) || !is_array($ids)) {
+            return $this->json(['success' => false, 'message' => 'Aucun projet sélectionné'], 400);
+        }
+
+        try {
+            $projectRepo = $em->getRepository(Project::class);
+            $archived    = 0;
+
+            foreach ($ids as $id) {
+                $project = $projectRepo->find((int) $id);
+                if ($project) {
+                    // Vérifier les permissions
+                    if (!$this->isGranted('ROLE_ADMIN') && $project->getProjectManager() !== $this->getUser()) {
+                        continue; // Skip si pas autorisé
+                    }
+
+                    // Archiver = mettre le statut à "archived"
+                    $project->setStatus('archived');
+                    ++$archived;
+                }
+            }
+
+            $em->flush();
+
+            $this->addFlash('success', sprintf('%d projet(s) archivé(s) avec succès', $archived));
+
+            return $this->json(['success' => true, 'archived' => $archived]);
+        } catch (Exception $e) {
+            return $this->json(['success' => false, 'message' => 'Erreur lors de l\'archivage: '.$e->getMessage()], 500);
+        }
     }
 }

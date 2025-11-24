@@ -29,6 +29,7 @@
                         + (filters.project_type ? 1 : 0)
                         + (filters.status ? 1 : 0)
                         + (filters.technology ? 1 : 0)
+                        + (filters.search ? 1 : 0)
                         + (filters.start_date|date('Y-m-d') != (filters.year ~ '-01-01') ? 1 : 0)
                         + (filters.end_date|date('Y-m-d') != (filters.year ~ '-12-31') ? 1 : 0)
                         + (sort != 'name' ? 1 : 0)
@@ -72,6 +73,9 @@
                     {% if pagination.per_page != 10 %}
                         {% set chips = chips|merge(['Par page: ' ~ pagination.per_page]) %}
                     {% endif %}
+                    {% if filters.search %}
+                        {% set chips = chips|merge(['Recherche: ' ~ filters.search]) %}
+                    {% endif %}
                     {% if chips|length > 0 %}
                         <div class="mb-2 small text-muted">
                             {% for c in chips %}
@@ -87,6 +91,17 @@
                         <script>try { window.__ACTIVE_FILTERS = []; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}</script>
                         {% endif %}
                         <form method="get" class="row g-2 align-items-end">
+                        <div class="col-12 mb-2">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bx bx-search"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="Rechercher un projet, client ou description...">
+                                {% if filters.search %}
+                                    <a href="{{ path('project_index', filters_query|merge({search: null})) }}" class="btn btn-outline-secondary" title="Effacer la recherche">
+                                        <i class="bx bx-x"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
                         <div class="col-md-2">
                             <label class="form-label">Année</label>
                             <select name="year" class="form-select">
@@ -242,10 +257,32 @@
                             <noscript><button type="submit" class="btn btn-sm btn-outline-secondary">Appliquer</button></noscript>
                         </form>
                     </div>
+                    <!-- Barre d'actions en masse -->
+                    <div id="bulk-actions-bar" class="alert alert-info d-none mb-3" role="alert">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong id="selected-count">0</strong> projet(s) sélectionné(s)
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-danger" id="bulk-delete-btn">
+                                    <i class="bx bx-trash me-1"></i>Supprimer
+                                </button>
+                                <button type="button" class="btn btn-sm btn-warning" id="bulk-archive-btn">
+                                    <i class="bx bx-archive me-1"></i>Archiver
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-centered table-nowrap mb-0">
+                        <table class="table table-centered table-nowrap mb-0" id="projects-table">
                             <thead class="table-light">
                                 <tr>
+                                    <th style="width: 40px;">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="select-all">
+                                        </div>
+                                    </th>
                                     <th>
                                         <a href="{{ path('project_index', filters_query|merge({ sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
                                             Nom
@@ -291,7 +328,12 @@
                                 {% for item in projects_with_metrics %}
                                 {% set project = item.project %}
                                 {% set metrics = item.metrics %}
-                                <tr>
+                                <tr data-project-id="{{ project.id }}">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input project-checkbox" type="checkbox" value="{{ project.id }}">
+                                        </div>
+                                    </td>
                                     <td>
                                         <h5 class="font-size-14 mb-1">
                                             <a href="{{ path('project_show', {'id': project.id}) }}" class="text-dark">{{ project.name }}</a>
@@ -391,7 +433,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="11" class="text-center text-muted">
+                                    <td colspan="12" class="text-center text-muted">
                                         <div class="py-4">
                                             <i class="bx bx-folder-open font-size-24 mb-2"></i>
                                             <p>Aucun projet trouvé</p>
@@ -432,4 +474,135 @@
         </div>
     </div>
     {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('select-all');
+        const projectCheckboxes = document.querySelectorAll('.project-checkbox');
+        const bulkActionsBar = document.getElementById('bulk-actions-bar');
+        const selectedCountEl = document.getElementById('selected-count');
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        const bulkArchiveBtn = document.getElementById('bulk-archive-btn');
+
+        // Fonction pour mettre à jour l'affichage de la barre d'actions
+        function updateBulkActionsBar() {
+            const selectedIds = getSelectedIds();
+            const count = selectedIds.length;
+
+            if (count > 0) {
+                bulkActionsBar.classList.remove('d-none');
+                selectedCountEl.textContent = count;
+            } else {
+                bulkActionsBar.classList.add('d-none');
+            }
+
+            // Mettre à jour l'état de la checkbox "Tout sélectionner"
+            const allChecked = projectCheckboxes.length > 0 && selectedIds.length === projectCheckboxes.length;
+            const someChecked = selectedIds.length > 0 && selectedIds.length < projectCheckboxes.length;
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = someChecked;
+        }
+
+        // Fonction pour récupérer les IDs sélectionnés
+        function getSelectedIds() {
+            return Array.from(projectCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+        }
+
+        // Gestionnaire "Tout sélectionner"
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                projectCheckboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                });
+                updateBulkActionsBar();
+            });
+        }
+
+        // Gestionnaire checkboxes individuelles
+        projectCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateBulkActionsBar);
+        });
+
+        // Gestionnaire suppression en masse
+        if (bulkDeleteBtn) {
+            bulkDeleteBtn.addEventListener('click', function() {
+                const selectedIds = getSelectedIds();
+                if (selectedIds.length === 0) return;
+
+                if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedIds.length} projet(s) ?`)) {
+                    return;
+                }
+
+                // Envoyer la requête de suppression
+                fetch('{{ path('project_bulk_delete') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        ids: selectedIds,
+                        _token: '{{ csrf_token('bulk_delete') }}'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Recharger la page
+                        window.location.reload();
+                    } else {
+                        alert('Erreur : ' + (data.message || 'Une erreur est survenue'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de la suppression');
+                });
+            });
+        }
+
+        // Gestionnaire archivage en masse
+        if (bulkArchiveBtn) {
+            bulkArchiveBtn.addEventListener('click', function() {
+                const selectedIds = getSelectedIds();
+                if (selectedIds.length === 0) return;
+
+                if (!confirm(`Êtes-vous sûr de vouloir archiver ${selectedIds.length} projet(s) ?`)) {
+                    return;
+                }
+
+                // Envoyer la requête d'archivage
+                fetch('{{ path('project_bulk_archive') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        ids: selectedIds,
+                        _token: '{{ csrf_token('bulk_archive') }}'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Recharger la page
+                        window.location.reload();
+                    } else {
+                        alert('Erreur : ' + (data.message || 'Une erreur est survenue'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de l\'archivage');
+                });
+            });
+        }
+    });
+    </script>
 {% endblock %}
