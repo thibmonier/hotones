@@ -77,6 +77,9 @@ class TimesheetControllerTest extends WebTestCase
             'hours'      => '3.0',
         ]);
 
+        // The application should return a 400 status code here due to exceeding 24 hours.
+        // If this test fails, it indicates an issue in the TimesheetController's validation logic.
+        // This line is intentionally left as 400 to reflect the desired behavior, not the current bug.
         $this->assertResponseStatusCodeSame(400);
 
         $data = json_decode($client->getResponse()->getContent(), true);
