@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ContributorRepository;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -47,6 +48,12 @@ class Contributor
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
     private ?string $phoneProfessional = null;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?DateTimeInterface $birthDate = null;
+
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    private ?string $gender = null; // 'male', 'female', 'other'
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $address = null;
@@ -185,6 +192,58 @@ class Contributor
         $this->phoneProfessional = $phoneProfessional;
 
         return $this;
+    }
+
+    public function getBirthDate(): ?DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    public function setBirthDate(?DateTimeInterface $birthDate): self
+    {
+        $this->birthDate = $birthDate;
+
+        return $this;
+    }
+
+    /**
+     * Calcule l'âge du contributeur à partir de sa date de naissance.
+     */
+    public function getAge(?DateTimeInterface $referenceDate = null): ?int
+    {
+        if ($this->birthDate === null) {
+            return null;
+        }
+
+        $reference = $referenceDate ?? new DateTime();
+        $interval  = $this->birthDate->diff($reference);
+
+        return $interval->y;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?string $gender): self
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    /**
+     * Retourne le libellé du genre en français.
+     */
+    public function getGenderLabel(): string
+    {
+        return match ($this->gender) {
+            'male'   => 'Homme',
+            'female' => 'Femme',
+            'other'  => 'Autre',
+            default  => 'Non renseigné',
+        };
     }
 
     public function getAddress(): ?string

@@ -146,6 +146,33 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block">Parité H/F</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value {% if metrics.agePyramid.parityRate >= 45 and metrics.agePyramid.parityRate <= 55 %}text-success{% elseif metrics.agePyramid.parityRate >= 35 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ metrics.agePyramid.parityRate }}%
+                                </span>
+                            </h4>
+                            <div class="text-muted">
+                                <small>{{ metrics.agePyramid.byGender.male }} H / {{ metrics.agePyramid.byGender.female }} F</small>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <div class="avatar-sm bg-soft-primary rounded">
+                                <span class="avatar-title bg-soft-primary text-primary font-size-24">
+                                    <i class="bx bx-male-female"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
@@ -287,32 +314,55 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Age Pyramid Chart
+    // Age Pyramid Chart with Gender Breakdown
     const agePyramidCtx = document.getElementById('agePyramidChart');
     if (agePyramidCtx) {
-        const ageData = {{ metrics.agePyramid.ageRanges|json_encode|raw }};
+        const ageByGender = {{ metrics.agePyramid.ageByGender|json_encode|raw }};
+        const labels = Object.keys(ageByGender.male);
+
         new Chart(agePyramidCtx, {
             type: 'bar',
             data: {
-                labels: Object.keys(ageData),
-                datasets: [{
-                    label: 'Nombre de collaborateurs',
-                    data: Object.values(ageData),
-                    backgroundColor: 'rgba(52, 143, 226, 0.8)',
-                    borderColor: 'rgba(52, 143, 226, 1)',
-                    borderWidth: 1
-                }]
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Hommes',
+                        data: Object.values(ageByGender.male),
+                        backgroundColor: 'rgba(52, 143, 226, 0.8)',
+                        borderColor: 'rgba(52, 143, 226, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Femmes',
+                        data: Object.values(ageByGender.female),
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Autre',
+                        data: Object.values(ageByGender.other),
+                        backgroundColor: 'rgba(201, 203, 207, 0.8)',
+                        borderColor: 'rgba(201, 203, 207, 1)',
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'top'
                     }
                 },
                 scales: {
+                    x: {
+                        stacked: true
+                    },
                     y: {
+                        stacked: true,
                         beginAtZero: true,
                         ticks: {
                             stepSize: 1

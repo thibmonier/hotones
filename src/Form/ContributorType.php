@@ -9,7 +9,9 @@ use App\Entity\Profile;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -61,6 +63,25 @@ class ContributorType extends AbstractType
                 'label'    => 'Téléphone personnel',
                 'required' => false,
                 'attr'     => ['class' => 'form-control'],
+            ])
+            ->add('birthDate', BirthdayType::class, [
+                'label'    => 'Date de naissance',
+                'required' => false,
+                'widget'   => 'single_text',
+                'attr'     => ['class' => 'form-control'],
+                'help'     => 'Permet de calculer l\'âge et la pyramide des âges dans le dashboard RH',
+            ])
+            ->add('gender', ChoiceType::class, [
+                'label'       => 'Genre',
+                'required'    => false,
+                'placeholder' => '-- Non renseigné --',
+                'choices'     => [
+                    'Homme' => 'male',
+                    'Femme' => 'female',
+                    'Autre' => 'other',
+                ],
+                'attr' => ['class' => 'form-select'],
+                'help' => 'Permet d\'analyser la parité homme/femme dans le dashboard RH',
             ])
             ->add('address', TextareaType::class, [
                 'label'    => 'Adresse',

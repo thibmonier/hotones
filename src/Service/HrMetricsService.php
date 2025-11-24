@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\Contributor;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
 use App\Repository\TimesheetRepository;
@@ -137,9 +136,9 @@ class HrMetricsService
     }
 
     /**
-     * Génère la pyramide des âges.
+     * Génère la pyramide des âges avec répartition par genre.
      *
-     * @return array{ageRanges: array, averageAge: float}
+     * @return array{ageRanges: array, averageAge: float, byGender: array, parityRate: float}
      */
     public function getAgePyramid(): array
     {
@@ -150,6 +149,8 @@ class HrMetricsService
                 'ageRanges'   => [],
                 'averageAge'  => 0,
                 'totalActive' => 0,
+                'byGender'    => ['male' => 0, 'female' => 0, 'other' => 0],
+                'parityRate'  => 0,
             ];
         }
 
@@ -162,24 +163,66 @@ class HrMetricsService
             '> 60 ans'  => 0,
         ];
 
-        $totalAge = 0;
-        $count    = 0;
-        $now      = new DateTime();
+        // Structure pour la pyramide par genre
+        $ageRangesByGender = [
+            'male'   => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+            'female' => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+            'other'  => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+        ];
 
-        // Note: Birth date information is not currently stored in the data model
-        // This feature would require adding a birthDate field to Contributor or EmploymentPeriod entity
+        $genderCounts = ['male' => 0, 'female' => 0, 'other' => 0];
+        $totalAge     = 0;
+        $count        = 0;
+        $now          = new DateTime();
+
         foreach ($activeContributors as $contributor) {
-            // Skip age calculation as birthDate is not available in current data model
-            // TODO: Add birthDate field to enable age pyramid calculation
-            continue;
+            $age = $contributor->getAge($now);
+            if ($age === null) {
+                continue; // Skip contributors without birthDate
+            }
+
+            $totalAge += $age;
+            ++$count;
+
+            // Déterminer la tranche d'âge
+            if ($age < 25) {
+                $range = '< 25 ans';
+            } elseif ($age < 30) {
+                $range = '25-30 ans';
+            } elseif ($age < 40) {
+                $range = '30-40 ans';
+            } elseif ($age < 50) {
+                $range = '40-50 ans';
+            } elseif ($age < 60) {
+                $range = '50-60 ans';
+            } else {
+                $range = '> 60 ans';
+            }
+
+            ++$ageRanges[$range];
+
+            // Compter par genre
+            $gender = $contributor->getGender() ?? 'other';
+            if (isset($genderCounts[$gender])) {
+                ++$genderCounts[$gender];
+                ++$ageRangesByGender[$gender][$range];
+            }
         }
 
         $averageAge = $count > 0 ? $totalAge / $count : 0;
 
+        // Calcul du taux de parité (% femmes parmi homme + femme)
+        $totalGendered = $genderCounts['male'] + $genderCounts['female'];
+        $parityRate    = $totalGendered > 0 ? ($genderCounts['female'] / $totalGendered) * 100 : 0;
+
         return [
-            'ageRanges'   => $ageRanges,
-            'averageAge'  => round($averageAge, 1),
-            'totalActive' => count($activeContributors),
+            'ageRanges'          => $ageRanges,
+            'averageAge'         => round($averageAge, 1),
+            'totalActive'        => count($activeContributors),
+            'byGender'           => $genderCounts,
+            'ageByGender'        => $ageRangesByGender,
+            'parityRate'         => round($parityRate, 1),
+            'countWithBirthDate' => $count,
         ];
     }
 
