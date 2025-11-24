@@ -139,6 +139,12 @@
                                 <a href="{{ path('order_show', {'id': order.id}) }}" class="btn btn-outline-primary" title="Voir">
                                     <i class="bx bx-show"></i>
                                 </a>
+                                <a href="{{ path('order_pdf_preview', {'id': order.id}) }}" class="btn btn-outline-info" title="Prévisualiser PDF" target="_blank">
+                                    <i class="bx bx-file-find"></i>
+                                </a>
+                                <a href="{{ path('order_pdf', {'id': order.id}) }}" class="btn btn-outline-success" title="Télécharger PDF">
+                                    <i class="bx bx-download"></i>
+                                </a>
                                 {% if is_granted('ROLE_CHEF_PROJET') %}
                                     <a href="{{ path('order_edit', {'id': order.id}) }}" class="btn btn-outline-secondary" title="Modifier">
                                         <i class="bx bx-edit"></i>
