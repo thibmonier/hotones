@@ -1,7 +1,0 @@
-
-8doctrinemigrations\version20251017075300::getdescriptionN
-D/Users/tmonier/Projects/hotones/migrations/Version20251017075300.php (""1*p
-1 (c"a
- (cUS
-QAdd email, phone and notes fields to Contributor entity and make cjm/tjm nullableB,*
-(doctrinemigrations\version20251017075300H

@@ -1,35 +1,0 @@
-
-.doctrinemigrations\version20251020060724::downN
-D/Users/tmonier/Projects/hotones/migrations/Version20251020060724.php ("1*A
-2
-Version20251020060724.php"
-   (
-implicit return*”
-1	 (Îc
-a
- (	
-$schema"__id*D
-
-__unknown_file ((
-&
-$schemadoctrine\dbal\schema\schemaÀ½
-	 (Í
-%1*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251020060724*×
-
-__unknown_file (º·
-´ALTER TABLE orders DROP description, DROP contingency_percentage, DROP valid_until, CHANGE name name VARCHAR(180) NOT NULL, CHANGE total_amount total_amount NUMERIC(12, 2) NOT NULL2addsqlÖÓ
-	 (ã
-%2*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251020060724*í
-
-__unknown_file (ÐÍ
-ÊALTER TABLE employment_periods CHANGE weekly_hours weekly_hours NUMERIC(5, 2) DEFAULT \'35.00\' NOT NULL, CHANGE working_time_percentage working_time_percentage NUMERIC(5, 2) DEFAULT \'100.00\' NOT NULL2addsql*
-2:2
- ('&
-$schemadoctrine\dbal\schema\schemaB,*
-(doctrinemigrations\version20251020060724H

@@ -1,27 +1,0 @@
-
-.doctrinemigrations\version20251117000000::downN
-D/Users/tmonier/Projects/hotones/migrations/Version20251117000000.php ("1*A
-2
-Version20251117000000.php"
- (
-implicit return*¬
-1 (Ec
-a
- (	
-$schema"__id*D
-
-__unknown_file ((
-&
-$schemadoctrine\dbal\schema\schema²¯
- (D
-%1*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251117000000*K
-
-__unknown_file (/-
-+DROP INDEX idx_order_validated_at ON orders2addsql*
-2:2
- ('&
-$schemadoctrine\dbal\schema\schemaB,*
-(doctrinemigrations\version20251117000000H

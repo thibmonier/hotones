@@ -1,59 +1,0 @@
-
-.doctrinemigrations\version20251015134957::downN
-D/Users/tmonier/Projects/hotones/migrations/Version20251015134957.php ("1*A
-2
-Version20251015134957.php"
-& &(
-implicit return*Þ
-1! !(Uc
-a
- (	
-$schema"__id*D
-
-__unknown_file ((
-&
-$schemadoctrine\dbal\schema\schemaÂ¿
-! !(T
-%1*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251015134957*[
-
-__unknown_file (?=
-;ALTER TABLE timesheets DROP FOREIGN KEY FK_9AC77D2E7A19A3572addsqlÂ¿
-" "(T
-%2*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251015134957*[
-
-__unknown_file (?=
-;ALTER TABLE timesheets DROP FOREIGN KEY FK_9AC77D2E166D1F9C2addsqlž›
-# #(0
-%3*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251015134957*7
-
-__unknown_file (
-DROP TABLE contributors2addsqlš—
-$ $(,
-%4*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251015134957*3
-
-__unknown_file (
-DROP TABLE projects2addsqlœ™
-% %(.
-%5*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251015134957*5
-
-__unknown_file (
-DROP TABLE timesheets2addsql*
-2:2
- ('&
-$schemadoctrine\dbal\schema\schemaB,*
-(doctrinemigrations\version20251015134957H

@@ -1,59 +1,0 @@
-
-.doctrinemigrations\version20251017075300::downN
-D/Users/tmonier/Projects/hotones/migrations/Version20251017075300.php ("1*A
-2
-Version20251017075300.php"
-& &(
-implicit return*ê
-1! !(=c
-a
- (	
-$schema"__id*D
-
-__unknown_file ((
-&
-$schemadoctrine\dbal\schema\schema™ß
-! !(<
-%1*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251017075300*C
-
-__unknown_file ('%
-#ALTER TABLE contributors DROP email2addsql™ß
-" "(<
-%2*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251017075300*C
-
-__unknown_file ('%
-#ALTER TABLE contributors DROP phone2addsql™ß
-# #(<
-%3*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251017075300*C
-
-__unknown_file ('%
-#ALTER TABLE contributors DROP notes2addsql∆√
-$ $(X
-%4*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251017075300*_
-
-__unknown_file (CA
-?ALTER TABLE contributors CHANGE cjm cjm NUMERIC(10, 2) NOT NULL2addsql∆√
-% %(X
-%5*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251017075300*_
-
-__unknown_file (CA
-?ALTER TABLE contributors CHANGE tjm tjm NUMERIC(10, 2) NOT NULL2addsql*
-2:2
- ('&
-$schemadoctrine\dbal\schema\schemaB,*
-(doctrinemigrations\version20251017075300H

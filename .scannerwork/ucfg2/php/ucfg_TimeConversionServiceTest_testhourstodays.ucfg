@@ -1,54 +1,0 @@
-
-Aapp\tests\unit\service\timeconversionservicetest::testhourstodaysZ
-P/Users/tmonier/Projects/hotones/tests/Unit/Service/TimeConversionServiceTest.php (#"1*E
-2
-TimeConversionServiceTest.php"
- (
-implicit return*è
-1 (Lª
-§
-" (J
-%1".app\service\timeconversionservice::hourstodays*A
-
-__unknown_file (%"#
-!app\service\timeconversionservice*"
-
-__unknown_file (
-16»¸
- (K
-%2*P
-
-__unknown_file (42
-0app\tests\unit\service\timeconversionservicetest*$
-
-__unknown_file (
-2.00*"
-
-__unknown_file (
-
-%12
-assertsameª
-§
-" (J
-%3".app\service\timeconversionservice::hourstodays*A
-
-__unknown_file (%"#
-!app\service\timeconversionservice*"
-
-__unknown_file (
-10»¸
- (K
-%4*P
-
-__unknown_file (42
-0app\tests\unit\service\timeconversionservicetest*$
-
-__unknown_file (
-1.25*"
-
-__unknown_file (
-
-%32
-assertsame*
-2B42
-0app\tests\unit\service\timeconversionservicetestH

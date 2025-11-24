@@ -1,7 +1,0 @@
-
-8doctrinemigrations\version20251031150700::getdescriptionN
-D/Users/tmonier/Projects/hotones/migrations/Version20251031150700.php (""1*y
-1 (k"j
- (k^\
-ZCréation des tables clients et client_contacts (gestion des clients et de leurs contacts)B,*
-(doctrinemigrations\version20251031150700H

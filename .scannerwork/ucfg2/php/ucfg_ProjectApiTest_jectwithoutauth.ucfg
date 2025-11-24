@@ -1,74 +1,0 @@
-
-:app\tests\api\projectapitest::testcreateprojectwithoutauthF
-</Users/tmonier/Projects/hotones/tests/Api/ProjectApiTest.phpx x(0"1*<
-2
-ProjectApiTest.php"!
-
-‚ ‚(
-implicit return*
-1{ (P
-N
-{ {(
-%1"static::createclient*&
-
-__unknown_file (
-"
-static
-{A (	
-%2"$Array
-| ~(
-%3"$Array
-š
-| ~(
-%4"__mapSet*"
-
-__unknown_file (
-
-%3*$
-
-__unknown_file (
-name*4
-
-__unknown_file (
-Projet non autorisÃ©‹
-ˆ
-{A (	
-%5"__mapSet*"
-
-__unknown_file (
-
-%2*$
-
-__unknown_file (
-json*"
-
-__unknown_file (
-
-%3¹¶
-{ (
-
-%6*"
-
-__unknown_file (
-
-%1*$
-
-__unknown_file (
-POST*-
-
-__unknown_file (
-/api/projects*"
-
-__unknown_file (
-
-%22request”‘
-
- (0
-%7*<
-
-__unknown_file ( 
-app\tests\api\projectapitest*!
-
-__unknown_file (2‘2assertresponsestatuscodesame*
-2B 
-app\tests\api\projectapitestH

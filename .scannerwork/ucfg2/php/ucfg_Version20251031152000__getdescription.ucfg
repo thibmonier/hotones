@@ -1,7 +1,0 @@
-
-8doctrinemigrations\version20251031152000::getdescriptionN
-D/Users/tmonier/Projects/hotones/migrations/Version20251031152000.php (""1*‰
-1 (|"z
- (|nl
-jMigration des valeurs textuelles projects.client vers la FK client_id + suppression de l\'ancienne colonneB,*
-(doctrinemigrations\version20251031152000H

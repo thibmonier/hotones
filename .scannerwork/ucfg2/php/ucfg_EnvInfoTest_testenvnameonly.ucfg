@@ -1,42 +1,0 @@
-
-1app\tests\functional\envinfotest::testenvnameonlyJ
-@/Users/tmonier/Projects/hotones/tests/Functional/EnvInfoTest.php	 	(#"1*7
-2
-EnvInfoTest.php"
- (
-implicit return*÷
-1 (ƒ
-€
- (
-%1",app\tests\functional\envinfotest::bootkernel*@
-
-__unknown_file ($""
- app\tests\functional\envinfotestg
-e
-" (/
-%2"__id*M
-
-__unknown_file (1*/"
- app\tests\functional\envinfotest"	
-$kernelFD
-" (A
-%3*"
-
-__unknown_file (
-
-%22getenvironment«¨
- (B
-%4*@
-
-__unknown_file ($"
- app\tests\functional\envinfotest*$
-
-__unknown_file (
-test*"
-
-__unknown_file (
-
-%32
-assertsame*
-2B$"
- app\tests\functional\envinfotestH

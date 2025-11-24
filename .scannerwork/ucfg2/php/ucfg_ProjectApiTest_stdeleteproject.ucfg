@@ -1,120 +1,0 @@
-
-/app\tests\api\projectapitest::testdeleteprojectF
-</Users/tmonier/Projects/hotones/tests/Api/ProjectApiTest.phpm m(%"1*:
-2
-ProjectApiTest.php"
-v v(
-implicit return*ª
-
-1o o(*_]
-o o()
-%1*<
-
-__unknown_file ( 
-app\tests\api\projectapitest2createprojectB
-@
-o o()
-
-$project"__id*"
-
-__unknown_file (
-
-%1P
-N
-q q(
-%2"static::createclient*&
-
-__unknown_file (
-"
-staticCA
-qC q(T
-%3*(
-
-__unknown_file (
-
-
-$project2getidP
-N
-q2 q(T
-%4"__concat*
-q2 q(B
-/api/projects/*
-qC q(T
-
-%3
-qV s(	
-%5"$Array
-r r(_
-%6"$Array‘Ž
-r7 r(^
-%7*<
-
-__unknown_file ( 
-app\tests\api\projectapitest*,
-
-__unknown_file (
-ROLE_MANAGER2gettokenwithroleI
-G
-r- r(^
-%8"__concat*
-r- r(6	
-Bearer *
-r7 r(^
-
-%7”
-‘
-r r(_
-%9"__mapSet*"
-
-__unknown_file (
-
-%6*-
-
-__unknown_file (
-Authorization*"
-
-__unknown_file (
-
-%8
-Œ
-qV s(	
-%10"__mapSet*"
-
-__unknown_file (
-
-%5*'
-
-__unknown_file (	
-headers*"
-
-__unknown_file (
-
-%6±®
-q s(
-
-%11*"
-
-__unknown_file (
-
-%2*&
-
-__unknown_file (
-
-DELETE*"
-
-__unknown_file (
-
-%4*"
-
-__unknown_file (
-
-%52request“
-u u(0
-%12*<
-
-__unknown_file ( 
-app\tests\api\projectapitest*!
-
-__unknown_file (2Ì2assertresponsestatuscodesame*
-2B 
-app\tests\api\projectapitestH

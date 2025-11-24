@@ -1,43 +1,0 @@
-
-,doctrinemigrations\version20251108151552::upN
-D/Users/tmonier/Projects/hotones/migrations/Version20251108151552.php ("1*A
-2
-Version20251108151552.php"
- (
-implicit return*¢
-1 (]c
-a
- (	
-$schema"__id*D
-
-__unknown_file ((
-&
-$schemadoctrine\dbal\schema\schemaÊÇ
- (\
-%1*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251108151552*c
-
-__unknown_file (GE
-CALTER TABLE project_tasks ADD COLUMN order_line_id INT DEFAULT NULL2addsql‘Ž
-	 (ž
-%2*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251108151552*¨
-
-__unknown_file (‹ˆ
-…ALTER TABLE project_tasks ADD CONSTRAINT FK_DA05C8B3CC4B3E FOREIGN KEY (order_line_id) REFERENCES order_lines (id) ON DELETE SET NULL2addsqlÇÄ
- (Y
-%3*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251108151552*`
-
-__unknown_file (DB
-@CREATE INDEX IDX_DA05C8B3CC4B3E ON project_tasks (order_line_id)2addsql*
-2:2
- (%&
-$schemadoctrine\dbal\schema\schemaB,*
-(doctrinemigrations\version20251108151552H

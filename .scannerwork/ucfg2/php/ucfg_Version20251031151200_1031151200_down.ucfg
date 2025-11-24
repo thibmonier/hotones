@@ -1,43 +1,0 @@
-
-.doctrinemigrations\version20251031151200::downN
-D/Users/tmonier/Projects/hotones/migrations/Version20251031151200.php ("1*A
-2
-Version20251031151200.php"
-! !(
-implicit return*š
-1 (Rc
-a
- (	
-$schema"__id*D
-
-__unknown_file ((
-&
-$schemadoctrine\dbal\schema\schema¿¼
- (Q
-%1*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251031151200*X
-
-__unknown_file (<:
-8ALTER TABLE projects DROP FOREIGN KEY FK_projects_client2addsql±®
- (C
-%2*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251031151200*J
-
-__unknown_file (.,
-*DROP INDEX IDX_projects_client ON projects2addsqlª§
-   (<
-%3*H
-
-__unknown_file (,*
-(doctrinemigrations\version20251031151200*C
-
-__unknown_file ('%
-#ALTER TABLE projects DROP client_id2addsql*
-2:2
- ('&
-$schemadoctrine\dbal\schema\schemaB,*
-(doctrinemigrations\version20251031151200H
