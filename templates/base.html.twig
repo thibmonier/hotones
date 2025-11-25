@@ -264,9 +264,15 @@
                         </li>
                         {% if is_granted('ROLE_MANAGER') %}
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/staffing' ? 'active' : '' }}" href="{{ path('staffing_dashboard') }}">
+                            <a class="nav-link {{ app.request.pathinfo == '/staffing/dashboard' ? 'active' : '' }}" href="{{ path('staffing_dashboard') }}">
                                 <i class="bx bx-group me-2"></i>
-                                Dashboard Staffing
+                                Staffing Standard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/staffing/dashboard/annual' ? 'active' : '' }}" href="{{ path('staffing_dashboard_annual') }}">
+                                <i class="bx bx-calendar-alt me-2"></i>
+                                Staffing Annuel
                             </a>
                         </li>
                         <li class="nav-item">

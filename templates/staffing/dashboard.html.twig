@@ -8,54 +8,155 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">Dashboard de Staffing</h4>
-                <div class="page-title-right">
-                    <form method="get" action="{{ path('staffing_dashboard') }}" class="d-flex gap-2">
-                        <select name="view" class="form-select form-select-sm" style="width: 150px;" id="viewModeSelect">
-                            <option value="standard" {% if selected_view_mode == 'standard' %}selected{% endif %}>Vue standard</option>
-                            <option value="annual" {% if selected_view_mode == 'annual' %}selected{% endif %}>Vue annuelle</option>
-                        </select>
-                        <select name="year" class="form-select form-select-sm" style="width: 120px;" id="yearSelect" {% if selected_view_mode != 'annual' %}style="display:none;"{% endif %}>
-                            {% for year in available_years %}
-                                <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
-                            {% endfor %}
-                        </select>
-                        <select name="profile" class="form-select form-select-sm" style="width: 200px;">
-                            <option value="">Tous les profils</option>
-                            {% for profile in profiles %}
-                                <option value="{{ profile.id }}" {% if selected_profile == profile.id %}selected{% endif %}>
-                                    {{ profile.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <select name="contributor" class="form-select form-select-sm" style="width: 220px;">
-                            <option value="">Tous les contributeurs</option>
-                            {% for contributor in contributors %}
-                                <option
-                                    value="{{ contributor.id }}"
-                                    data-profiles="{% for profile in contributor.profiles %}{{ profile.id }}{% if not loop.last %},{% endif %}{% endfor %}"
-                                    {% if selected_contributor == contributor.id %}selected{% endif %}
-                                >
-                                    {{ contributor.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <select name="granularity" class="form-select form-select-sm" style="width: 150px;" id="granularitySelect" {% if selected_view_mode == 'annual' %}disabled{% endif %}>
-                            <option value="monthly" {% if selected_granularity == 'monthly' %}selected{% endif %}>Mensuel</option>
-                            <option value="quarterly" {% if selected_granularity == 'quarterly' %}selected{% endif %}>Trimestriel</option>
-                            <option value="weekly" {% if selected_granularity == 'weekly' %}selected{% endif %}>Hebdomadaire</option>
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-primary">Filtrer</button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
 
+    {# Filtres uniformisés #}
+    {% set activeFilters = [] %}
+    {% if selected_view_mode == 'annual' %}
+        {% set activeFilters = activeFilters|merge(['Vue: Annuelle ' ~ selected_year]) %}
+    {% endif %}
+    {% if selected_profile %}
+        {% set profileName = (profiles|filter(p => p.id == selected_profile)|first).name|default('#' ~ selected_profile) %}
+        {% set activeFilters = activeFilters|merge(['Profil: ' ~ profileName]) %}
+    {% endif %}
+    {% if selected_contributor %}
+        {% set contribName = (contributors|filter(c => c.id == selected_contributor)|first).name|default('#' ~ selected_contributor) %}
+        {% set activeFilters = activeFilters|merge(['Contributeur: ' ~ contribName]) %}
+    {% endif %}
+    {% if selected_granularity != 'monthly' and selected_view_mode != 'annual' %}
+        {% set granLabel = selected_granularity == 'weekly' ? 'Hebdomadaire' : 'Trimestriel' %}
+        {% set activeFilters = activeFilters|merge(['Granularité: ' ~ granLabel]) %}
+    {% endif %}
+
     <div class="row mb-3">
         <div class="col-12">
-            <div class="alert alert-info mb-0">
-                <i class="bx bx-calendar me-2"></i>
-                Période analysée : <strong>{{ start_date|date('d/m/Y') }}</strong> au <strong>{{ end_date|date('d/m/Y') }}</strong>
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">
+                            <i class="bx bx-filter-alt me-2"></i>Filtres
+                            {% if activeFilters|length > 0 %}
+                                <span class="badge bg-info ms-2">{{ activeFilters|length }}</span>
+                            {% endif %}
+                        </h5>
+                        <div class="btn-group">
+                            {# Vues rapides #}
+                            <div class="btn-group me-2">
+                                <a href="{{ path('staffing_dashboard') }}" class="btn btn-sm btn-outline-primary {% if selected_view_mode == 'standard' %}active{% endif %}">Standard</a>
+                                <a href="{{ path('staffing_dashboard_annual', {year: selected_year}) }}" class="btn btn-sm btn-outline-primary {% if selected_view_mode == 'annual' %}active{% endif %}">Annuel</a>
+                            </div>
+                            <a href="{{ selected_view_mode == 'annual' ? path('staffing_dashboard_annual') : path('staffing_dashboard') }}" class="btn btn-sm btn-outline-secondary" title="Réinitialiser">
+                                <i class="bx bx-reset"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-staffing" aria-expanded="true" id="filters-toggle-staffing">
+                                <i class="bx bx-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="filters-staffing" class="collapse show">
+                        {# Chips des filtres actifs #}
+                        {% if activeFilters|length > 0 %}
+                            <div class="mb-3">
+                                {% for chip in activeFilters %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ chip }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {# Période analysée #}
+                        <div class="alert alert-info py-2 mb-3">
+                            <i class="bx bx-calendar me-2"></i>
+                            Période analysée : <strong>{{ start_date|date('d/m/Y') }}</strong> au <strong>{{ end_date|date('d/m/Y') }}</strong>
+                        </div>
+
+                        <form method="get" action="{{ selected_view_mode == 'annual' ? path('staffing_dashboard_annual') : path('staffing_dashboard') }}" class="row g-2 align-items-end">
+                            {% if selected_view_mode == 'annual' %}
+                            <div class="col-md-2">
+                                <label class="form-label">Année</label>
+                                <select name="year" class="form-select form-select-sm" id="yearSelect">
+                                    {% for year in available_years %}
+                                        <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+                            <div class="col-md-2">
+                                <label class="form-label">Profil</label>
+                                <select name="profile" class="form-select form-select-sm">
+                                    <option value="">Tous les profils</option>
+                                    {% for profile in profiles %}
+                                        <option value="{{ profile.id }}" {% if selected_profile == profile.id %}selected{% endif %}>
+                                            {{ profile.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Contributeur</label>
+                                <select name="contributor" class="form-select form-select-sm">
+                                    <option value="">Tous les contributeurs</option>
+                                    {% for contributor in contributors %}
+                                        <option
+                                            value="{{ contributor.id }}"
+                                            data-profiles="{% for profile in contributor.profiles %}{{ profile.id }}{% if not loop.last %},{% endif %}{% endfor %}"
+                                            {% if selected_contributor == contributor.id %}selected{% endif %}
+                                        >
+                                            {{ contributor.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if selected_view_mode == 'standard' %}
+                            <div class="col-md-2">
+                                <label class="form-label">Granularité</label>
+                                <select name="granularity" class="form-select form-select-sm" id="granularitySelect">
+                                    <option value="monthly" {% if selected_granularity == 'monthly' %}selected{% endif %}>Mensuel</option>
+                                    <option value="quarterly" {% if selected_granularity == 'quarterly' %}selected{% endif %}>Trimestriel</option>
+                                    <option value="weekly" {% if selected_granularity == 'weekly' %}selected{% endif %}>Hebdomadaire</option>
+                                </select>
+                            </div>
+                            {% endif %}
+                            <div class="col-12 mt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                                <a href="{{ selected_view_mode == 'annual' ? path('staffing_dashboard_annual') : path('staffing_dashboard') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <script>
+                        (function(){
+                            var key = 'filters:staffing:collapsed';
+                            var el = document.getElementById('filters-staffing');
+                            var btn = document.getElementById('filters-toggle-staffing');
+                            if (!el || !btn) return;
+                            try {
+                                var hasActive = {{ activeFilters|length > 0 ? 'true' : 'false' }};
+                                var isSmall = window.matchMedia('(max-width: 767.98px)').matches;
+                                var collapsed = localStorage.getItem(key) === '1' || (isSmall && !hasActive);
+                                if (collapsed) { el.classList.remove('show'); btn.setAttribute('aria-expanded', 'false'); }
+                                var updateIcon = function() {
+                                    var i = btn.querySelector('i');
+                                    if (!i) return;
+                                    if (el.classList.contains('show')) {
+                                        i.className = 'bx bx-chevron-up';
+                                        localStorage.setItem(key, '0');
+                                        btn.setAttribute('aria-expanded', 'true');
+                                    } else {
+                                        i.className = 'bx bx-chevron-down';
+                                        localStorage.setItem(key, '1');
+                                        btn.setAttribute('aria-expanded', 'false');
+                                    }
+                                };
+                                el.addEventListener('shown.bs.collapse', updateIcon);
+                                el.addEventListener('hidden.bs.collapse', updateIcon);
+                                updateIcon();
+                            } catch(e) {}
+                        })();
+                    </script>
+                </div>
             </div>
         </div>
     </div>

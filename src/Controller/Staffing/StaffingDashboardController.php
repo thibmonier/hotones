@@ -30,12 +30,22 @@ class StaffingDashboardController extends AbstractController
     #[Route('/dashboard', name: 'staffing_dashboard', methods: ['GET'])]
     public function index(Request $request): Response
     {
+        return $this->renderDashboard($request, 'standard');
+    }
+
+    #[Route('/dashboard/annual', name: 'staffing_dashboard_annual', methods: ['GET'])]
+    public function annual(Request $request): Response
+    {
+        return $this->renderDashboard($request, 'annual');
+    }
+
+    private function renderDashboard(Request $request, string $viewMode): Response
+    {
         // Filtres depuis la requête
         $profileId     = $request->query->get('profile');
         $contributorId = $request->query->get('contributor');
         $granularity   = $request->query->get('granularity', 'monthly');
         $year          = (int) $request->query->get('year', date('Y'));
-        $viewMode      = $request->query->get('view', 'standard'); // 'standard' ou 'annual'
 
         // Période selon le mode de vue
         if ($viewMode === 'annual') {
