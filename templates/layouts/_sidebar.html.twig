@@ -28,9 +28,7 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ path('sales_dashboard_index') }}">KPIs commerce</a></li>
                         <li><a href="{{ path('client_index') }}">Clients</a></li>
-                        <li><a href="{{ path('client_new') }}">Nouveau client</a></li>
                         <li><a href="{{ path('order_index') }}">Devis</a></li>
-                        <li><a href="{{ path('order_new') }}">Nouveau devis</a></li>
                     </ul>
                 </li>
                 {% endif %}
@@ -47,7 +45,6 @@
                     <ul class="sub-menu" aria-expanded="false">
                         {% if is_granted('ROLE_CHEF_PROJET') %}
                         <li><a href="{{ path('project_index') }}">Projets</a></li>
-                        <li><a href="{{ path('project_new') }}">Nouveau Projet</a></li>
                         <li><a href="{{ path('planning_index') }}">Planning</a></li>
                         {% endif %}
                         {% if is_granted('ROLE_MANAGER') %}
@@ -92,7 +89,6 @@
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ path('contributor_index') }}">Contributeurs</a></li>
-                        <li><a href="{{ path('contributor_new') }}">Nouveau contributeur</a></li>
                         <li><a href="{{ path('admin_users') }}">Utilisateurs et rôles</a></li>
                         <li><a href="{{ path('employment_period_index') }}">Périodes d'emploi</a></li>
                     </ul>

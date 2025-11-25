@@ -20,6 +20,7 @@
         "dragonmantank/cron-expression": "^3.6",
         "endroid/qr-code-bundle": ">=6",
         "gedmo/doctrine-extensions": ">=3.21",
+        "knplabs/knp-paginator-bundle": "^6.9",
         "league/commonmark": "^2.7.1",
         "lexik/jwt-authentication-bundle": "^3.1.1",
         "nyholm/psr7": "^1.8.2",
