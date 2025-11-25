@@ -104,7 +104,31 @@
                 </div>
             </form>
         </div>
-        <div class="navbar-nav">
+        <div class="navbar-nav d-flex flex-row">
+            <div class="nav-item dropdown">
+                <a class="nav-link px-3 position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bx bx-bell font-size-20"></i>
+                    <span class="badge bg-danger rounded-pill notification-badge position-absolute top-0 start-100 translate-middle d-none" style="font-size: 0.65rem;">
+                        0
+                    </span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-lg p-0" style="width: 350px;">
+                    <div class="p-3 bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="m-0">Notifications</h6>
+                            <button type="button" class="btn btn-sm btn-light" onclick="markAllNotificationsAsRead()">
+                                <i class="bx bx-check-double"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-2" id="notificationDropdown" style="max-height: 400px; overflow-y: auto;">
+                        <div class="text-center text-muted py-4">
+                            <i class="bx bx-bell font-size-24 mb-2"></i>
+                            <div>Aucune nouvelle notification</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="nav-item text-nowrap">
                 <a class="nav-link px-3" href="{{ path('app_logout') }}">
                     <i class="bx bx-log-out me-1"></i> Déconnexion
@@ -377,6 +401,8 @@
     <script src="{{ asset('assets/js/mass-actions.js') }}"></script>
     <!-- Form Validation JS -->
     <script src="{{ asset('assets/js/form-validation.js') }}"></script>
+    <!-- Notifications JS -->
+    <script src="{{ asset('assets/js/notifications.js') }}"></script>
     <script>
         // Raccourci clavier Ctrl+K ou Cmd+K pour la recherche
         document.addEventListener('DOMContentLoaded', function() {

@@ -434,6 +434,7 @@
   "assets/libs/toastr/nuget/toastr.1.0.1.nupkg": "/assets/libs/toastr/nuget/toastr.1.0.1.nupkg",
   "assets/libs/tinymce/plugins/help/js/i18n/keynav/el.js": "/assets/libs/tinymce/plugins/help/js/i18n/keynav/el.js",
   "assets/libs/tinymce/plugins/help/js/i18n/keynav/uk.js": "/assets/libs/tinymce/plugins/help/js/i18n/keynav/uk.js",
+  "assets/js/notifications.js": "/assets/js/notifications.js",
   "assets/js/pages/sweet-alerts.init.js": "/assets/js/pages/sweet-alerts.init.js",
   "assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css": "/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css",
   "assets/images/companies/img-6.png": "/assets/images/companies/img-6.png",
