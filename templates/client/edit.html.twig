@@ -1,8 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}Modifier {{ client.name }}{% endblock %}
 
-{% block body %}
+{% block content %}
 {% include 'components/page_header.html.twig' with {
     title: 'Modifier le client',
     breadcrumb: [
@@ -248,7 +248,7 @@
     </div>
 </div>
 {% endif %}
-{% endblock %}
+{% endblock content %}
 
 {% block javascripts %}
 {{ parent() }}

@@ -22,11 +22,11 @@
     {% endblock %}
 #}
 
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}{{ crud_config.entity_label_plural }}{% endblock %}
 
-{% block body %}
+{% block content %}
 {# Header avec breadcrumb et bouton créer #}
 {% set headerActions = [] %}
 {% if crud_config.can_create|default(true) %}
@@ -99,4 +99,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}

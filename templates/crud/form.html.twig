@@ -24,13 +24,13 @@
     {% endblock %}
 #}
 
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}
     {{ crud_config.is_edit ? 'Modifier' : 'Nouveau' }} {{ crud_config.entity_label|lower }}
 {% endblock %}
 
-{% block body %}
+{% block content %}
 {# Header avec breadcrumb #}
 {% include 'components/page_header.html.twig' with {
     title: (crud_config.is_edit ? 'Modifier' : 'Nouveau') ~ ' ' ~ crud_config.entity_label|lower,
@@ -138,4 +138,4 @@
     </div>
 </div>
 {% endif %}
-{% endblock %}
+{% endblock content %}

@@ -28,11 +28,11 @@
     {% endblock %}
 #}
 
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}{{ crud_config.entity_label }} - {{ crud_config.entity.name|default(crud_config.entity.id) }}{% endblock %}
 
-{% block body %}
+{% block content %}
 {# Header avec breadcrumb et actions #}
 {% set headerActions = [] %}
 
@@ -198,4 +198,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endif %}
-{% endblock %}
+{% endblock content %}

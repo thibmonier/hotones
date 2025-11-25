@@ -1,8 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}Nouveau client{% endblock %}
 
-{% block body %}
+{% block content %}
 {% include 'components/page_header.html.twig' with {
     title: 'Nouveau client',
     breadcrumb: [
@@ -163,7 +163,7 @@
         </div>
     </div>
 </form>
-{% endblock %}
+{% endblock content %}
 
 {% block javascripts %}
 {{ parent() }}
