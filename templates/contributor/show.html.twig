@@ -299,7 +299,9 @@
                     <h5 class="card-title mb-0">Évaluation des compétences</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="skillsRadarChart" height="300"></canvas>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="skillsRadarChart"></canvas>
+                    </div>
                     <div class="mt-3">
                         <small class="text-muted">
                             <i class="bx bx-info-circle me-1"></i>
@@ -317,7 +319,9 @@
                     <h5 class="card-title mb-0">Ressources disponibles par compétence</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="skillsResourcesChart" height="400"></canvas>
+                    <div style="height: 400px; position: relative;">
+                        <canvas id="skillsResourcesChart"></canvas>
+                    </div>
                     <div class="mt-3">
                         <small class="text-muted">
                             <i class="bx bx-info-circle me-1"></i>
@@ -504,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     scales: {
                         r: {
                             min: 0,
@@ -573,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: true,
