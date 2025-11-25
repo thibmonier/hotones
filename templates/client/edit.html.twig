@@ -161,25 +161,6 @@
                 </div>
             </div>
 
-            {# Métadonnées #}
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        <i class="bx bx-calendar me-2"></i>
-                        Métadonnées
-                    </h6>
-                    <dl class="mb-0">
-                        <dt class="text-muted small">Créé le</dt>
-                        <dd class="mb-2">{{ client.createdAt|date('d/m/Y à H:i') }}</dd>
-
-                        {% if client.updatedAt %}
-                        <dt class="text-muted small">Modifié le</dt>
-                        <dd class="mb-0">{{ client.updatedAt|date('d/m/Y à H:i') }}</dd>
-                        {% endif %}
-                    </dl>
-                </div>
-            </div>
-
             {# Zone dangereuse #}
             {% if is_granted('ROLE_MANAGER') %}
             <div class="card border-danger">
