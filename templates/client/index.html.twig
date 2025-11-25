@@ -8,7 +8,6 @@
     breadcrumb: [{label: 'Clients', path: null}],
     can_create: is_granted('ROLE_CHEF_PROJET'),
     create_route: 'client_new',
-    export_route: 'client_export',
     columns: [
         {key: 'name', label: 'Client', sortable: true, template: 'client/_name_column.html.twig'},
         {key: 'website', label: 'Site web', sortable: false, template: 'client/_website_column.html.twig'},
