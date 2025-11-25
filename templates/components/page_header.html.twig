@@ -1,0 +1,37 @@
+{# Component Page Header
+   Usage:
+   {% include 'components/page_header.html.twig' with {
+       title: 'Liste des projets',
+       breadcrumb: [
+           {label: 'Projets', path: 'project_index'}
+       ],
+       actions: [
+           {label: 'Nouveau projet', path: 'project_new', icon: 'bx-plus', class: 'btn-primary'}
+       ]
+   } %}
+#}
+
+<div class="page-title-box">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h4 class="page-title mb-1">{{ title }}</h4>
+            {% if breadcrumb is defined %}
+                {% include 'components/breadcrumb.html.twig' with {items: breadcrumb} %}
+            {% endif %}
+        </div>
+        {% if actions is defined and actions|length > 0 %}
+        <div class="col-md-4">
+            <div class="float-end d-none d-md-block">
+                {% for action in actions %}
+                    <a href="{{ path(action.path) }}" class="btn {{ action.class|default('btn-primary') }} btn-sm">
+                        {% if action.icon is defined %}
+                            <i class="bx {{ action.icon }} me-1"></i>
+                        {% endif %}
+                        {{ action.label }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>

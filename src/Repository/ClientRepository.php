@@ -26,4 +26,21 @@ class ClientRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Recherche full-text dans les clients.
+     *
+     * @return Client[]
+     */
+    public function search(string $query, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.name LIKE :query')
+            ->orWhere('c.siret LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('c.name', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -433,4 +433,22 @@ class OrderRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * Recherche full-text dans les devis.
+     *
+     * @return Order[]
+     */
+    public function search(string $query, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.client', 'c')
+            ->where('o.reference LIKE :query')
+            ->orWhere('c.name LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('o.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

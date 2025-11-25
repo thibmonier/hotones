@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche : {{ query }}{% endblock %}
+
+{% block body %}
+{% include 'components/page_header.html.twig' with {
+    title: 'Résultats de recherche',
+    breadcrumb: [
+        {label: 'Recherche', path: null}
+    ]
+} %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" action="{{ path('global_search') }}" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Rechercher un projet, contributeur, devis, client..." value="{{ query }}" autofocus>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-search"></i> Rechercher
+                        </button>
+                    </div>
+                </form>
+
+                {% if query|length >= 2 %}
+                    {% if results|length > 0 %}
+                        {% if results.projects is defined %}
+                            <h5 class="mb-3"><i class="bx bx-folder-open me-2"></i>Projets ({{ results.projects|length }})</h5>
+                            <div class="list-group mb-4">
+                                {% for project in results.projects %}
+                                    <a href="{{ path('project_show', {id: project.id}) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ project.name }}</h6>
+                                            <small>{{ project.client.name }}</small>
+                                        </div>
+                                        {% if project.description %}
+                                            <p class="mb-1 text-muted">{{ project.description|u.truncate(100) }}</p>
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if results.contributors is defined %}
+                            <h5 class="mb-3"><i class="bx bx-user me-2"></i>Contributeurs ({{ results.contributors|length }})</h5>
+                            <div class="list-group mb-4">
+                                {% for contributor in results.contributors %}
+                                    <a href="{{ path('contributor_show', {id: contributor.id}) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ contributor.fullName }}</h6>
+                                            {% if contributor.currentProfile %}
+                                                <small>{{ contributor.currentProfile.name }}</small>
+                                            {% endif %}
+                                        </div>
+                                        {% if contributor.user %}
+                                            <small class="text-muted">{{ contributor.user.email }}</small>
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if results.orders is defined %}
+                            <h5 class="mb-3"><i class="bx bx-file me-2"></i>Devis ({{ results.orders|length }})</h5>
+                            <div class="list-group mb-4">
+                                {% for order in results.orders %}
+                                    <a href="{{ path('order_show', {id: order.id}) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ order.reference }}</h6>
+                                            <small>{{ order.totalHt|number_format(2, ',', ' ') }} €</small>
+                                        </div>
+                                        <p class="mb-1">{{ order.client.name }}</p>
+                                        <small class="text-muted">{{ order.status }}</small>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if results.clients is defined %}
+                            <h5 class="mb-3"><i class="bx bx-buildings me-2"></i>Clients ({{ results.clients|length }})</h5>
+                            <div class="list-group mb-4">
+                                {% for client in results.clients %}
+                                    <a href="{{ path('client_show', {id: client.id}) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ client.name }}</h6>
+                                        </div>
+                                        {% if client.siret %}
+                                            <small class="text-muted">SIRET: {{ client.siret }}</small>
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Aucun résultat trouvé pour "{{ query }}"
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bx bx-error me-2"></i>
+                        Veuillez saisir au moins 2 caractères pour lancer une recherche
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

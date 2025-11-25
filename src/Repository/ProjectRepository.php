@@ -512,4 +512,23 @@ class ProjectRepository extends ServiceEntityRepository
 
         return array_values(array_filter(array_map(fn ($r) => $r['status'], $rows)));
     }
+
+    /**
+     * Recherche full-text dans les projets.
+     *
+     * @return Project[]
+     */
+    public function search(string $query, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.client', 'c')
+            ->where('p.name LIKE :query')
+            ->orWhere('p.description LIKE :query')
+            ->orWhere('c.name LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

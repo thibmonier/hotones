@@ -182,4 +182,24 @@ class ContributorRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /**
+     * Recherche full-text dans les contributeurs.
+     *
+     * @return Contributor[]
+     */
+    public function search(string $query, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.user', 'u')
+            ->where('c.firstName LIKE :query')
+            ->orWhere('c.lastName LIKE :query')
+            ->orWhere('u.email LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

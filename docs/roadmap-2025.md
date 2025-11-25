@@ -627,6 +627,62 @@
 
 ## 🧪 Phase 8 : Qualité & Performance (Continue)
 
+### 💡 Lot 22.5 : Migration PHP 8.5 / Symfony 8 🆕
+**Objectif** : Anticiper et préparer la migration vers les versions majeures
+
+#### Contexte
+- **PHP 8.5** : Sortie prévue novembre 2025
+- **Symfony 8.0** : Sortie stable prévue novembre 2025
+- Nécessité d'anticiper ces migrations dans les développements futurs
+
+#### Actions de préparation (en continu)
+- 💡 **Audit de compatibilité** :
+  - Revue des dépendances Composer et compatibilité avec PHP 8.5 / Symfony 8
+  - Identification des features dépréciées dans Symfony 7.x
+  - Test de l'application avec PHP 8.5 (mode strict_types)
+  - Liste des breaking changes à anticiper
+
+- 💡 **Bonnes pratiques dès maintenant** :
+  - Éviter l'usage de fonctionnalités dépréciées de Symfony 7.x
+  - Respecter les nouvelles conventions PHP 8.4+ (typed properties, readonly, etc.)
+  - Tester régulièrement avec `composer outdated` et `symfony check:requirements`
+  - Documenter les dépendances critiques à surveiller
+
+- 💡 **Migration PHP 8.5** (Q4 2025 / Q1 2026) :
+  - Mise à jour de l'image Docker (PHP 8.5-fpm)
+  - Tests de régression complets
+  - Revue des extensions PHP (éventuelles incompatibilités)
+  - Mise à jour de PHPStan, PHP CS Fixer, PHPUnit vers versions compatibles
+  - Benchmark de performance (comparaison 8.4 vs 8.5)
+
+- 💡 **Migration Symfony 8.0** (Q1 2026) :
+  - Mise à jour progressive : Symfony 7.3 → 7.4 (LTS) → 8.0 (stable)
+  - Utilisation de l'outil `symfony upgrade` pour identifier les changements
+  - Refactoring des deprecations Symfony 7.x
+  - Mise à jour des bundles tiers (Doctrine, Twig, etc.)
+  - Tests fonctionnels et E2E complets post-migration
+  - Documentation des breaking changes rencontrés
+
+#### Planning recommandé
+1. **Maintenant - Q3 2025** : Veille et préparation (éviter les deprecations)
+2. **Q4 2025** : Tests avec versions RC de PHP 8.5 et Symfony 8
+3. **Q1 2026** : Migration effective après stabilisation des releases
+4. **Q2 2026** : Optimisations post-migration (nouvelles features PHP/Symfony)
+
+#### Risques identifiés
+- ⚠️ Bundles tiers non compatibles immédiatement
+- ⚠️ Breaking changes non documentés
+- ⚠️ Régression de performance (rare mais possible)
+- ⚠️ Incompatibilités d'extensions PHP (ex: Redis, APCu)
+
+**Estimation** :
+- Préparation continue : 1-2j répartis sur Q2-Q3 2025
+- Migration PHP 8.5 : 2-3j (tests inclus)
+- Migration Symfony 8.0 : 5-7j (tests et refactoring)
+- **Total : 8-12j** (selon complexité des breaking changes)
+
+---
+
 ### 💡 Lot 23 : Performance & Scalabilité 🆕
 **Objectif** : Optimiser les performances pour grosse volumétrie
 
@@ -728,9 +784,10 @@
 | Phase 5 : UX/UI | Lots 5, 16, 17 | 🟡 Moyenne | 23-28j | Q4 2025 |
 | Phase 6 : Structuration | Lots 18, 19, 20, 21 | 🟢 Basse | 32-40j | 2026 |
 | Phase 7 : Automatisation | Lots 6, 22 | 🟢 Basse | 10-13j | 2026 |
-| Phase 8 : Qualité | Lots 23, 24 | 🟡 Continue | 18-22j | Continue |
+| Phase 8 : Qualité | Lots 22.5, 23, 24 | 🟡 Continue | 26-34j | Continue |
 
 **Total estimé 2025** : ~150-190 jours (7-9 mois pour 1 développeur full-stack)
+**Total estimé 2026** : ~80-100 jours supplémentaires (incluant migration PHP 8.5/Symfony 8)
 
 ---
 
@@ -756,6 +813,7 @@
 - **Données** : Exploiter la richesse des données pour anticiper et décider
 - **UX** : Simplifier les workflows quotidiens pour améliorer l'adoption
 - **Ouverture** : S'intégrer dans l'écosystème d'outils existant
+- **Modernisation technique** : Anticiper les migrations PHP 8.5 / Symfony 8 dès maintenant en évitant les deprecations
 
 ---
 
@@ -771,5 +829,5 @@
 
 ---
 
-**Dernière mise à jour** : 23 novembre 2025
+**Dernière mise à jour** : 25 novembre 2025
 **Prochaine revue** : Fin Q1 2025 (mars 2025)
