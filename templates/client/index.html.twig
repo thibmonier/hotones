@@ -69,7 +69,6 @@
                                     <th>Site web</th>
                                     <th>Niveau de service</th>
                                     <th>Contacts</th>
-                                    <th>Projets</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -89,12 +88,6 @@
                                         {% include 'client/_contacts_column.html.twig' with {item: client} %}
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-dark">
-                                            <i class="bx bx-briefcase me-1"></i>
-                                            {{ client.projects|length }}
-                                        </span>
-                                    </td>
-                                    <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ path('client_show', {'id': client.id}) }}" class="btn btn-outline-secondary btn-sm" title="Voir">
                                                 <i class="bx bx-show"></i>
@@ -109,7 +102,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
+                                    <td colspan="5" class="text-center text-muted">
                                         <div class="py-4">
                                             <i class="bx bx-briefcase font-size-24 mb-2"></i>
                                             <p>Aucun client trouvé</p>

@@ -79,15 +79,14 @@ class ClientController extends AbstractController
         $clients = $qb->getQuery()->getResult();
 
         // Génération CSV
-        $csv = "Nom;Site web;Niveau de service;Contacts;Projets\n";
+        $csv = "Nom;Site web;Niveau de service;Contacts\n";
         foreach ($clients as $client) {
             $csv .= sprintf(
-                "%s;%s;%s;%d;%d\n",
+                "%s;%s;%s;%d\n",
                 $client->getName(),
                 $client->getWebsite()      ?? '',
                 $client->getServiceLevel() ?? '',
                 $client->getContacts()->count(),
-                $client->getProjects()->count(),
             );
         }
 
