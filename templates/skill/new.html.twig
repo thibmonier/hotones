@@ -3,23 +3,31 @@
 {% block title %}Nouvelle compétence{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Nouvelle compétence</h4>
-                <div class="page-title-right">
-                    <a href="{{ path('skill_index') }}" class="btn btn-outline-secondary btn-sm">
-                        <i class="bx bx-arrow-back me-1"></i>Retour à la liste
-                    </a>
-                </div>
-            </div>
+            {% include 'components/page_header.html.twig' with {
+                title: 'Nouvelle compétence',
+                breadcrumb: [
+                    {label: 'Configuration', path: null},
+                    {label: 'Compétences', path: 'skill_index'},
+                    {label: 'Nouvelle', path: null}
+                ],
+                actions: [
+                    {label: 'Retour à la liste', path: 'skill_index', icon: 'bx-arrow-back', class: 'btn-outline-secondary'}
+                ]
+            } %}
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-star me-2"></i>
+                        Informations de la compétence
+                    </h5>
+                </div>
                 <div class="card-body">
                     {{ form_start(form) }}
 
@@ -47,11 +55,13 @@
                         {{ form_errors(form.active) }}
                     </div>
 
-                    <div class="d-flex gap-2">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ path('skill_index') }}" class="btn btn-outline-secondary">
+                            <i class="bx bx-x me-1"></i> Annuler
+                        </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="bx bx-save me-1"></i>Créer la compétence
+                            <i class="bx bx-save me-1"></i> Créer
                         </button>
-                        <a href="{{ path('skill_index') }}" class="btn btn-light">Annuler</a>
                     </div>
 
                     {{ form_end(form) }}
@@ -61,10 +71,13 @@
 
         <div class="col-lg-4">
             <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bx bx-info-circle me-2"></i>Information
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Information
                     </h5>
+                </div>
+                <div class="card-body">
                     <p class="text-muted">
                         Les compétences permettent de suivre les expertises de vos contributeurs et d'identifier les écarts de compétences.
                     </p>
@@ -80,5 +93,4 @@
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
