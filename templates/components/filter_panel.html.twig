@@ -1,0 +1,119 @@
+{# Component Filter Panel
+   Usage:
+   {% include 'components/filter_panel.html.twig' with {
+       filters: [
+           {type: 'text', name: 'search', label: 'Recherche', value: app.request.query.get('search')},
+           {type: 'select', name: 'status', label: 'Statut', options: statuses, value: app.request.query.get('status')},
+           {type: 'date', name: 'date_from', label: 'Date début', value: app.request.query.get('date_from')}
+       ],
+       activeCount: activeFilterCount
+   } %}
+#}
+
+{% set activeCount = activeCount|default(0) %}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">
+                <i class="bx bx-filter-alt me-2"></i>
+                Filtres
+                {% if activeCount > 0 %}
+                    <span class="badge bg-primary ms-2">{{ activeCount }}</span>
+                {% endif %}
+            </h5>
+            <button type="button" class="btn btn-sm btn-link" id="toggleFilters">
+                <i class="bx bx-chevron-down" id="filterIcon"></i>
+            </button>
+        </div>
+
+        <div id="filterForm" {% if activeCount == 0 %}class="collapse"{% endif %}>
+            <form method="get" action="">
+                <div class="row g-3">
+                    {% for filter in filters %}
+                        <div class="col-md-{% if filter.width is defined %}{{ filter.width }}{% else %}4{% endif %}">
+                            <label for="filter_{{ filter.name }}" class="form-label">{{ filter.label }}</label>
+                            
+                            {% if filter.type == 'text' %}
+                                <input type="text" 
+                                       class="form-control form-control-sm" 
+                                       id="filter_{{ filter.name }}" 
+                                       name="{{ filter.name }}" 
+                                       value="{{ filter.value|default('') }}"
+                                       placeholder="{{ filter.placeholder|default('') }}">
+                            
+                            {% elseif filter.type == 'select' %}
+                                <select class="form-select form-select-sm" 
+                                        id="filter_{{ filter.name }}" 
+                                        name="{{ filter.name }}">
+                                    <option value="">Tous</option>
+                                    {% for option in filter.options %}
+                                        <option value="{{ option.value }}" 
+                                                {% if filter.value == option.value %}selected{% endif %}>
+                                            {{ option.label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            
+                            {% elseif filter.type == 'date' %}
+                                <input type="date" 
+                                       class="form-control form-control-sm" 
+                                       id="filter_{{ filter.name }}" 
+                                       name="{{ filter.name }}" 
+                                       value="{{ filter.value|default('') }}">
+                            
+                            {% elseif filter.type == 'checkbox' %}
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="filter_{{ filter.name }}" 
+                                           name="{{ filter.name }}" 
+                                           value="1"
+                                           {% if filter.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="filter_{{ filter.name }}">
+                                        {{ filter.checkboxLabel|default('Oui') }}
+                                    </label>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bx bx-filter me-1"></i> Filtrer
+                        </button>
+                        <a href="{{ app.request.pathinfo }}" class="btn btn-secondary btn-sm">
+                            <i class="bx bx-reset me-1"></i> Réinitialiser
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggleFilters');
+    const filterForm = document.getElementById('filterForm');
+    const filterIcon = document.getElementById('filterIcon');
+    
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            if (filterForm.classList.contains('show') || !filterForm.classList.contains('collapse')) {
+                filterForm.classList.add('collapse');
+                filterForm.classList.remove('show');
+                filterIcon.classList.remove('bx-chevron-up');
+                filterIcon.classList.add('bx-chevron-down');
+            } else {
+                filterForm.classList.remove('collapse');
+                filterForm.classList.add('show');
+                filterIcon.classList.remove('bx-chevron-down');
+                filterIcon.classList.add('bx-chevron-up');
+            }
+        });
+    }
+});
+</script>

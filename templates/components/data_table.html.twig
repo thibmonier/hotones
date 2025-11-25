@@ -1,0 +1,129 @@
+{# Component DataTable
+   Usage:
+   {% include 'components/data_table.html.twig' with {
+       columns: [
+           {key: 'name', label: 'Nom', sortable: true},
+           {key: 'status', label: 'Statut', sortable: true},
+           {key: 'actions', label: 'Actions', sortable: false}
+       ],
+       data: projects,
+       actions: {
+           show: {route: 'project_show', icon: 'bx-show', label: 'Voir'},
+           edit: {route: 'project_edit', icon: 'bx-edit', label: 'Modifier'},
+           delete: {route: 'project_delete', icon: 'bx-trash', label: 'Supprimer', confirm: true}
+       },
+       massActions: true,
+       currentPage: page,
+       totalPages: totalPages,
+       itemsPerPage: limit,
+       totalItems: total
+   } %}
+#}
+
+{% set showMassActions = massActions is defined and massActions %}
+{% set showPagination = totalPages is defined and totalPages > 1 %}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle" id="dataTable">
+        <thead>
+            <tr>
+                {% if showMassActions %}
+                <th style="width: 40px;">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="selectAll">
+                    </div>
+                </th>
+                {% endif %}
+                
+                {% for column in columns %}
+                <th>
+                    {% if column.sortable is defined and column.sortable %}
+                        <a href="#" class="text-decoration-none text-dark sortable" data-column="{{ column.key }}">
+                            {{ column.label }}
+                            <i class="bx bx-sort-alt-2 ms-1"></i>
+                        </a>
+                    {% else %}
+                        {{ column.label }}
+                    {% endif %}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% if data is empty %}
+                <tr>
+                    <td colspan="{{ columns|length + (showMassActions ? 1 : 0) }}" class="text-center text-muted py-4">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Aucune donnée à afficher
+                    </td>
+                </tr>
+            {% else %}
+                {% for item in data %}
+                <tr>
+                    {% if showMassActions %}
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input row-checkbox" type="checkbox" value="{{ item.id }}">
+                        </div>
+                    </td>
+                    {% endif %}
+                    
+                    {% for column in columns %}
+                    <td>
+                        {% if column.key == 'actions' and actions is defined %}
+                            <div class="btn-group btn-group-sm" role="group">
+                                {% for actionKey, action in actions %}
+                                    {% if action.permission is not defined or is_granted(action.permission) %}
+                                        {% if action.route is defined %}
+                                            <a href="{{ path(action.route, {id: item.id}) }}" 
+                                               class="btn btn-outline-secondary {% if action.confirm is defined and action.confirm %}delete-confirm{% endif %}"
+                                               title="{{ action.label }}">
+                                                <i class="bx {{ action.icon }}"></i>
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {% if column.template is defined %}
+                                {{ include(column.template, {item: item}) }}
+                            {% else %}
+                                {% set value = attribute(item, column.key) %}
+                                {{ value ?? '-' }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+{% if showMassActions %}
+<div id="massActionBar" class="alert alert-info d-none" role="alert">
+    <div class="d-flex justify-content-between align-items-center">
+        <span>
+            <strong id="selectedCount">0</strong> élément(s) sélectionné(s)
+        </span>
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-danger" id="massDeleteBtn">
+                <i class="bx bx-trash me-1"></i> Supprimer
+            </button>
+            <button type="button" class="btn btn-secondary" id="massExportBtn">
+                <i class="bx bx-download me-1"></i> Exporter
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if showPagination %}
+    {% include 'components/pagination.html.twig' with {
+        currentPage: currentPage,
+        totalPages: totalPages,
+        itemsPerPage: itemsPerPage,
+        totalItems: totalItems
+    } %}
+{% endif %}

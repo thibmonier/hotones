@@ -1,0 +1,91 @@
+{# Component Pagination
+   Usage:
+   {% include 'components/pagination.html.twig' with {
+       currentPage: page,
+       totalPages: totalPages,
+       itemsPerPage: limit,
+       totalItems: total
+   } %}
+#}
+
+{% set currentPage = currentPage|default(1) %}
+{% set totalPages = totalPages|default(1) %}
+{% set itemsPerPage = itemsPerPage|default(25) %}
+{% set totalItems = totalItems|default(0) %}
+
+{% if totalPages > 1 %}
+<div class="row mt-3">
+    <div class="col-md-6">
+        <div class="dataTables_info">
+            Affichage de {{ ((currentPage - 1) * itemsPerPage) + 1 }} 
+            à {{ min(currentPage * itemsPerPage, totalItems) }} 
+            sur {{ totalItems }} éléments
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dataTables_paginate float-end">
+            <ul class="pagination pagination-sm mb-0">
+                {# Bouton Précédent #}
+                <li class="page-item {% if currentPage <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ currentPage - 1 }}&limit={{ itemsPerPage }}" tabindex="-1">
+                        <i class="bx bx-chevron-left"></i>
+                    </a>
+                </li>
+
+                {# Première page #}
+                {% if currentPage > 3 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1&limit={{ itemsPerPage }}">1</a>
+                    </li>
+                    {% if currentPage > 4 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endif %}
+
+                {# Pages autour de la page courante #}
+                {% for i in range(max(1, currentPage - 2), min(totalPages, currentPage + 2)) %}
+                    <li class="page-item {% if i == currentPage %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}&limit={{ itemsPerPage }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+
+                {# Dernière page #}
+                {% if currentPage < totalPages - 2 %}
+                    {% if currentPage < totalPages - 3 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ totalPages }}&limit={{ itemsPerPage }}">{{ totalPages }}</a>
+                    </li>
+                {% endif %}
+
+                {# Bouton Suivant #}
+                <li class="page-item {% if currentPage >= totalPages %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ currentPage + 1 }}&limit={{ itemsPerPage }}">
+                        <i class="bx bx-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-12">
+        <form method="get" class="d-inline">
+            <label class="d-inline me-2">Éléments par page :</label>
+            <select name="limit" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                <option value="25" {% if itemsPerPage == 25 %}selected{% endif %}>25</option>
+                <option value="50" {% if itemsPerPage == 50 %}selected{% endif %}>50</option>
+                <option value="100" {% if itemsPerPage == 100 %}selected{% endif %}>100</option>
+                <option value="200" {% if itemsPerPage == 200 %}selected{% endif %}>200</option>
+            </select>
+            <input type="hidden" name="page" value="1">
+        </form>
+    </div>
+</div>
+{% endif %}

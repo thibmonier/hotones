@@ -480,6 +480,7 @@
   "assets/libs/tinymce/plugins/visualchars/plugin.min.js": "/assets/libs/tinymce/plugins/visualchars/plugin.min.js",
   "assets/libs/tinymce/plugins/help/js/i18n/keynav/fa.js": "/assets/libs/tinymce/plugins/help/js/i18n/keynav/fa.js",
   "assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-map.js": "/assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-map.js",
+  "assets/js/mass-actions.js": "/assets/js/mass-actions.js",
   "assets/libs/echarts/extension/bmap.min.js": "/assets/libs/echarts/extension/bmap.min.js",
   "assets/libs/jquery-validation/localization/messages_pt_BR.min.js": "/assets/libs/jquery-validation/localization/messages_pt_BR.min.js",
   "assets/libs/moment/locale/be.js": "/assets/libs/moment/locale/be.js",

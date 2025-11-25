@@ -373,6 +373,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block javascripts %}{% endblock %}
     {% if app.user %}
+    <!-- Mass Actions JS -->
+    <script src="{{ asset('assets/js/mass-actions.js') }}"></script>
     <script>
         // Raccourci clavier Ctrl+K ou Cmd+K pour la recherche
         document.addEventListener('DOMContentLoaded', function() {
