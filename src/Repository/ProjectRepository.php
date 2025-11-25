@@ -526,7 +526,7 @@ class ProjectRepository extends ServiceEntityRepository
             ->orWhere('p.description LIKE :query')
             ->orWhere('c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
-            ->orderBy('p.createdAt', 'DESC')
+            ->orderBy('p.id', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

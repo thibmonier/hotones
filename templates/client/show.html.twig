@@ -1,116 +1,308 @@
-{% extends 'layouts/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}{{ client.name }}{% endblock %}
 
-{% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-      <h4 class="mb-sm-0 font-size-18">{{ client.name }}</h4>
-      <div class="page-title-right">
-        <a href="{{ path('client_index') }}" class="btn btn-secondary me-2"><i class="bx bx-arrow-back me-1"></i> Retour</a>
-        {% if is_granted('ROLE_CHEF_PROJET') %}
-          <a href="{{ path('client_edit', {id: client.id}) }}" class="btn btn-primary"><i class="bx bx-edit me-1"></i> Modifier</a>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
+{% block body %}
+{% include 'components/page_header.html.twig' with {
+    title: client.name,
+    breadcrumb: [
+        {label: 'Clients', path: 'client_index'},
+        {label: client.name, path: null}
+    ],
+    actions: [
+        {label: 'Modifier', path: 'client_edit', params: {id: client.id}, icon: 'bx-edit', class: 'btn-primary', permission: 'ROLE_CHEF_PROJET'}
+    ]
+} %}
 
 <div class="row">
-  <div class="col-lg-8">
-    <div class="card">
-      <div class="card-header"><h4 class="card-title">Informations</h4></div>
-      <div class="card-body">
-        <div class="row align-items-center">
-          <div class="col-auto">
-            {% if client.logoPath %}
-              <img src="{{ client.logoPath }}" class="rounded" style="width:64px;height:64px;object-fit:cover;" alt="logo">
-            {% else %}
-              <div class="avatar-xs"><span class="avatar-title rounded font-size-24">{{ client.name|first|upper }}</span></div>
-            {% endif %}
-          </div>
-          <div class="col">
-            <div class="mb-1"><strong>{{ client.name }}</strong></div>
-            {% if client.website %}<div><a href="{{ client.website }}" target="_blank" rel="noopener">{{ client.website }}</a></div>{% endif %}
+    <div class="col-lg-8">
+        {# Informations principales #}
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0 me-3">
+                        {% if client.logoPath %}
+                            <img src="{{ client.logoPath }}"
+                                 alt="Logo {{ client.name }}"
+                                 class="rounded"
+                                 style="width: 80px; height: 80px; object-fit: contain;">
+                        {% else %}
+                            <div class="avatar-lg">
+                                <span class="avatar-title rounded-circle bg-primary font-size-24">
+                                    {{ client.name|first|upper }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-2">{{ client.name }}</h4>
 
-            {% if client.serviceLevel %}
-            <div class="mt-2">
-              <strong>Niveau de service :</strong>
-              <span class="badge {{ client.serviceLevelBadgeClass }} ms-1">{{ client.serviceLevelLabel }}</span>
-              {% if client.serviceLevelMode == 'auto' %}
-                <small class="text-muted">(calculé automatiquement)</small>
-              {% else %}
-                <small class="text-muted">(défini manuellement)</small>
-              {% endif %}
+                        {% if client.website %}
+                        <p class="text-muted mb-2">
+                            <i class="bx bx-link-external me-1"></i>
+                            <a href="{{ client.website }}" target="_blank" rel="noopener noreferrer">
+                                {{ client.website|replace({'https://': '', 'http://': '', 'www.': ''}) }}
+                            </a>
+                        </p>
+                        {% endif %}
+
+                        {% if client.serviceLevel %}
+                        <div class="mb-2">
+                            <span class="text-muted me-2">
+                                <i class="bx bx-star me-1"></i>
+                                Niveau de service :
+                            </span>
+                            <span class="badge {{ client.serviceLevelBadgeClass }}">
+                                {{ client.serviceLevelLabel }}
+                            </span>
+                            {% if client.serviceLevelMode == 'auto' %}
+                                <small class="text-muted ms-1">
+                                    <i class="bx bx-bot"></i> Automatique
+                                </small>
+                            {% else %}
+                                <small class="text-muted ms-1">Manuel</small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        {% if client.description %}
+                        <div class="mt-3">
+                            <p class="text-muted mb-0">{{ client.description|nl2br }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            {% endif %}
-
-            {% if client.description %}<div class="text-muted mt-2">{{ client.description|nl2br }}</div>{% endif %}
-          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="card-title mb-0">Contacts</h4>
-        {% if is_granted('ROLE_CHEF_PROJET') %}
-          <a href="{{ path('client_contact_new', {id: client.id}) }}" class="btn btn-sm btn-primary"><i class="bx bx-plus"></i> Ajouter</a>
-        {% endif %}
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-nowrap mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Mobile</th>
-                <th>Poste</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for contact in client.contacts %}
-              <tr>
-                <td>{{ contact.firstName }} {{ contact.lastName|upper }}</td>
-                <td>{% if contact.email %}<a href="mailto:{{ contact.email }}">{{ contact.email }}</a>{% else %}<small class="text-muted">-</small>{% endif %}</td>
-                <td>{{ contact.phone ?? '-' }}</td>
-                <td>{{ contact.mobilePhone ?? '-' }}</td>
-                <td>{{ contact.positionTitle ?? '-' }}</td>
-                <td>
-                  <div class="btn-group">
-                    <a href="{{ path('client_contact_edit', {id: contact.id}) }}" class="btn btn-outline-primary btn-sm"><i class="bx bx-edit"></i></a>
-                    <form method="post" action="{{ path('client_contact_delete', {id: contact.id}) }}" onsubmit="return confirm('Supprimer ce contact ?')" class="d-inline">
-                      <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ contact.id) }}">
-                      <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bx bx-trash"></i></button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-              {% else %}
-              <tr>
-                <td colspan="6" class="text-center text-muted py-3">Aucun contact</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        {# Contacts #}
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-user me-2"></i>
+                        Contacts
+                        <span class="badge bg-light text-dark ms-2">{{ client.contacts|length }}</span>
+                    </h5>
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <a href="{{ path('client_contact_new', {id: client.id}) }}" class="btn btn-sm btn-primary">
+                            <i class="bx bx-plus me-1"></i>
+                            Ajouter un contact
+                        </a>
+                    {% endif %}
+                </div>
+
+                {% if client.contacts|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-nowrap align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Mobile</th>
+                                <th>Poste</th>
+                                {% if is_granted('ROLE_CHEF_PROJET') %}
+                                <th class="text-end">Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in client.contacts %}
+                            <tr>
+                                <td>
+                                    <strong>{{ contact.firstName }} {{ contact.lastName|upper }}</strong>
+                                </td>
+                                <td>
+                                    {% if contact.email %}
+                                        <a href="mailto:{{ contact.email }}" class="text-decoration-none">
+                                            <i class="bx bx-envelope me-1"></i>
+                                            {{ contact.email }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.phone %}
+                                        <a href="tel:{{ contact.phone }}" class="text-decoration-none">
+                                            <i class="bx bx-phone me-1"></i>
+                                            {{ contact.phone }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.mobilePhone %}
+                                        <a href="tel:{{ contact.mobilePhone }}" class="text-decoration-none">
+                                            <i class="bx bx-mobile me-1"></i>
+                                            {{ contact.mobilePhone }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.positionTitle %}
+                                        <span class="badge bg-light text-dark">{{ contact.positionTitle }}</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                {% if is_granted('ROLE_CHEF_PROJET') %}
+                                <td class="text-end">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ path('client_contact_edit', {id: contact.id}) }}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Modifier">
+                                            <i class="bx bx-edit"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteContactModal{{ contact.id }}"
+                                                title="Supprimer">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    {# Modal de confirmation de suppression #}
+                                    <div class="modal fade" id="deleteContactModal{{ contact.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title">
+                                                        <i class="bx bx-error-circle me-2"></i>
+                                                        Supprimer le contact
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Êtes-vous sûr de vouloir supprimer le contact <strong>{{ contact.firstName }} {{ contact.lastName }}</strong> ?</p>
+                                                    <p class="text-muted mb-0">Cette action est irréversible.</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                                        <i class="bx bx-x me-1"></i>
+                                                        Annuler
+                                                    </button>
+                                                    <form method="post" action="{{ path('client_contact_delete', {id: contact.id}) }}" class="d-inline">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ contact.id) }}">
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <i class="bx bx-trash me-1"></i>
+                                                            Confirmer la suppression
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bx bx-user-x font-size-48 text-muted mb-3"></i>
+                    <p class="text-muted mb-3">Aucun contact enregistré pour ce client</p>
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                        <a href="{{ path('client_contact_new', {id: client.id}) }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i>
+                            Ajouter le premier contact
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="font-size-14">Résumé</h5>
-        <ul class="list-unstyled mb-0">
-          <li class="d-flex justify-content-between"><span>Contacts</span><span class="badge bg-light text-dark">{{ client.contacts|length }}</span></li>
-        </ul>
-      </div>
+    {# Sidebar #}
+    <div class="col-lg-4">
+        {# Actions rapides #}
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bx bx-zap me-2"></i>
+                    Actions rapides
+                </h6>
+                <div class="d-grid gap-2">
+                    {% if is_granted('ROLE_CHEF_PROJET') %}
+                    <a href="{{ path('client_contact_new', {id: client.id}) }}" class="btn btn-outline-primary">
+                        <i class="bx bx-user-plus me-1"></i>
+                        Nouveau contact
+                    </a>
+                    <a href="{{ path('client_edit', {id: client.id}) }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-edit me-1"></i>
+                        Modifier le client
+                    </a>
+                    {% endif %}
+                    <a href="{{ path('client_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-list-ul me-1"></i>
+                        Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {# Statistiques #}
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bx bx-bar-chart me-2"></i>
+                    Statistiques
+                </h6>
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted">
+                        <i class="bx bx-user me-1"></i>
+                        Contacts
+                    </span>
+                    <span class="badge bg-primary">{{ client.contacts|length }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center py-2">
+                    <span class="text-muted">
+                        <i class="bx bx-star me-1"></i>
+                        Niveau de service
+                    </span>
+                    {% if client.serviceLevel %}
+                        <span class="badge {{ client.serviceLevelBadgeClass }}">
+                            {{ client.serviceLevelLabel }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted">Non défini</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Métadonnées #}
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bx bx-info-circle me-2"></i>
+                    Informations
+                </h6>
+                <dl class="mb-0">
+                    <dt class="text-muted small">Créé le</dt>
+                    <dd class="mb-3">
+                        <i class="bx bx-calendar me-1"></i>
+                        {{ client.createdAt|date('d/m/Y à H:i') }}
+                    </dd>
+
+                    {% if client.updatedAt %}
+                    <dt class="text-muted small">Dernière modification</dt>
+                    <dd class="mb-0">
+                        <i class="bx bx-time me-1"></i>
+                        {{ client.updatedAt|date('d/m/Y à H:i') }}
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

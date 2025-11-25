@@ -1,0 +1,25 @@
+{# Template personnalisé pour la colonne nom du client #}
+<div class="d-flex align-items-center">
+    {% if item.logoPath %}
+        <img src="{{ item.logoPath }}"
+             alt="logo {{ item.name }}"
+             class="rounded me-2"
+             style="width:32px;height:32px;object-fit:cover;">
+    {% else %}
+        <div class="avatar-xs me-2">
+            <span class="avatar-title rounded bg-primary">
+                {{ item.name|first|upper }}
+            </span>
+        </div>
+    {% endif %}
+    <div>
+        <a class="text-dark fw-medium" href="{{ path('client_show', {id: item.id}) }}">
+            {{ item.name }}
+        </a>
+        {% if item.description %}
+            <div class="text-muted small">
+                {{ item.description|length > 60 ? item.description|slice(0,60) ~ '...' : item.description }}
+            </div>
+        {% endif %}
+    </div>
+</div>

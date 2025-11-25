@@ -1,96 +1,33 @@
-{% extends 'layouts/base.html.twig' %}
+{% extends 'crud/list.html.twig' %}
 
-{% block title %}Clients{% endblock %}
+{% set crud_config = {
+    entity_name: 'client',
+    entity_name_plural: 'clients',
+    entity_label: 'Client',
+    entity_label_plural: 'Clients',
+    breadcrumb: [{label: 'Clients', path: null}],
+    can_create: is_granted('ROLE_CHEF_PROJET'),
+    create_route: 'client_new',
+    export_route: 'client_export',
+    columns: [
+        {key: 'name', label: 'Client', sortable: true, template: 'client/_name_column.html.twig'},
+        {key: 'website', label: 'Site web', sortable: false, template: 'client/_website_column.html.twig'},
+        {key: 'serviceLevel', label: 'Niveau de service', sortable: true, template: 'client/_service_level_column.html.twig'},
+        {key: 'contacts', label: 'Contacts', sortable: false, template: 'client/_contacts_column.html.twig'},
+        {key: 'actions', label: 'Actions', sortable: false}
+    ],
+    actions: {
+        show: {route: 'client_show', icon: 'bx-show', label: 'Voir'},
+        edit: {route: 'client_edit', icon: 'bx-edit', label: 'Modifier', permission: 'ROLE_CHEF_PROJET'}
+    },
+    mass_actions: false,
+    show_stats: true
+} %}
 
-{% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-      <h4 class="mb-sm-0 font-size-18">Clients</h4>
-      <div class="page-title-right">
-        {% if is_granted('ROLE_CHEF_PROJET') %}
-          <a href="{{ path('client_new') }}" class="btn btn-primary">
-            <i class="bx bx-plus me-1"></i> Nouveau client
-          </a>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-centered table-nowrap mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Client</th>
-                <th>Site web</th>
-                <th>Niveau de service</th>
-                <th>Contacts</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% for client in clients %}
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    {% if client.logoPath %}
-                      <img src="{{ client.logoPath }}" alt="logo {{ client.name }}" class="rounded me-2" style="width:32px;height:32px;object-fit:cover;">
-                    {% else %}
-                      <div class="avatar-xs me-2"><span class="avatar-title rounded">{{ client.name|first|upper }}</span></div>
-                    {% endif %}
-                    <div>
-                      <a class="text-dark" href="{{ path('client_show', {id: client.id}) }}">{{ client.name }}</a>
-                      {% if client.description %}<div class="text-muted small">{{ client.description|length > 60 ? client.description|slice(0,60) ~ '...' : client.description }}</div>{% endif %}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  {% if client.website %}
-                    <a href="{{ client.website }}" target="_blank" rel="noopener">{{ client.website }}</a>
-                  {% else %}
-                    <small class="text-muted">-</small>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if client.serviceLevel %}
-                    <span class="badge {{ client.serviceLevelBadgeClass }}">{{ client.serviceLevelLabel }}</span>
-                    {% if client.serviceLevelMode == 'auto' %}
-                      <small class="text-muted d-block mt-1">Auto</small>
-                    {% endif %}
-                  {% else %}
-                    <small class="text-muted">Non défini</small>
-                  {% endif %}
-                </td>
-                <td>
-                  <span class="badge bg-light text-dark">{{ client.contacts|length }}</span>
-                </td>
-                <td>
-                  <div class="btn-group">
-                    <a href="{{ path('client_show', {id: client.id}) }}" class="btn btn-outline-secondary btn-sm"><i class="bx bx-show"></i></a>
-                    {% if is_granted('ROLE_CHEF_PROJET') %}
-                      <a href="{{ path('client_edit', {id: client.id}) }}" class="btn btn-outline-primary btn-sm"><i class="bx bx-edit"></i></a>
-                    {% endif %}
-                  </div>
-                </td>
-              </tr>
-            {% else %}
-              <tr>
-                <td colspan="5" class="text-center text-muted py-4">
-                  <i class="bx bx-user font-size-24 mb-2"></i>
-                  <div>Aucun client</div>
-                </td>
-              </tr>
-            {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
+{% set items = clients %}
+{% set pagination = {
+    current_page: 1,
+    total_pages: 1,
+    per_page: clients|length,
+    total: clients|length
+} %}

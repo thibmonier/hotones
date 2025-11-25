@@ -442,11 +442,13 @@ class OrderRepository extends ServiceEntityRepository
     public function search(string $query, int $limit = 5): array
     {
         return $this->createQueryBuilder('o')
-            ->leftJoin('o.client', 'c')
-            ->where('o.reference LIKE :query')
+            ->leftJoin('o.project', 'p')
+            ->leftJoin('p.client', 'c')
+            ->where('o.orderNumber LIKE :query')
+            ->orWhere('o.name LIKE :query')
             ->orWhere('c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
-            ->orderBy('o.createdAt', 'DESC')
+            ->orderBy('o.id', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

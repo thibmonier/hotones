@@ -1,84 +1,167 @@
-{% extends 'layouts/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Nouveau client{% endblock %}
 
-{% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-      <h4 class="mb-sm-0 font-size-18">Nouveau client</h4>
-      <div class="page-title-right">
-        <a href="{{ path('client_index') }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
-      </div>
-    </div>
-  </div>
-</div>
+{% block body %}
+{% include 'components/page_header.html.twig' with {
+    title: 'Nouveau client',
+    breadcrumb: [
+        {label: 'Clients', path: 'client_index'},
+        {label: 'Nouveau', path: null}
+    ]
+} %}
 
-<form method="post" enctype="multipart/form-data">
-  <div class="row">
-    <div class="col-lg-8">
-      <div class="card">
-        <div class="card-header"><h4 class="card-title">Informations</h4></div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label class="form-label" for="name">Nom *</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="website">Site web</label>
-            <input type="url" class="form-control" id="website" name="website">
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-          </div>
-        </div>
-      </div>
+<form method="post" enctype="multipart/form-data" data-validate-on-submit>
+    <div class="row">
+        <div class="col-lg-8">
+            {# Informations principales #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Informations principales
+                    </h5>
 
-      <div class="card">
-        <div class="card-header">
-          <h4 class="card-title">Niveau de service</h4>
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label class="form-label">Mode de définition</label>
-            <select class="form-select" id="service_level_mode" name="service_level_mode">
-              <option value="auto" selected>Automatique (basé sur le CA)</option>
-              <option value="manual">Manuel</option>
-            </select>
-            <div class="form-text">
-              En mode auto, le niveau est calculé selon le CA annuel
+                    <div class="mb-3">
+                        <label class="form-label" for="name">Nom du client *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="name"
+                               name="name"
+                               data-validation-url="{{ path('api_validate') }}"
+                               data-validation-type="client_name_unique"
+                               required
+                               value="{{ client.name|default('') }}">
+                        <div class="form-text">Nom commercial de l'entreprise</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="website">Site web</label>
+                        <input type="url"
+                               class="form-control"
+                               id="website"
+                               name="website"
+                               data-validation-url="{{ path('api_validate') }}"
+                               data-validation-type="url"
+                               placeholder="https://example.com"
+                               value="{{ client.website|default('') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea class="form-control"
+                                  id="description"
+                                  name="description"
+                                  rows="3"
+                                  placeholder="Description courte du client et de son activité">{{ client.description|default('') }}</textarea>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div class="mb-3" id="manual_level_container" style="display: none;">
-            <label class="form-label">Niveau de service</label>
-            <select class="form-select" name="service_level">
-              <option value="">-- Sélectionner --</option>
-              <option value="vip">VIP</option>
-              <option value="priority">Prioritaire</option>
-              <option value="standard" selected>Standard</option>
-              <option value="low">Basse priorité</option>
-            </select>
-          </div>
+            {# Niveau de service #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-star me-2"></i>
+                        Niveau de service
+                    </h5>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mode de définition</label>
+                        <select class="form-select" id="service_level_mode" name="service_level_mode">
+                            <option value="auto" {{ client.serviceLevelMode == 'auto' ? 'selected' : '' }}>
+                                Automatique (basé sur le CA)
+                            </option>
+                            <option value="manual" {{ client.serviceLevelMode == 'manual' ? 'selected' : '' }}>
+                                Manuel
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            <i class="bx bx-info-circle me-1"></i>
+                            En mode auto, le niveau est calculé automatiquement selon le CA annuel
+                        </div>
+                    </div>
+
+                    <div class="mb-0" id="manual_level_container" style="display: {{ client.serviceLevelMode == 'manual' ? 'block' : 'none' }};">
+                        <label class="form-label">Niveau de service</label>
+                        <select class="form-select" name="service_level">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="vip" {{ client.serviceLevel == 'vip' ? 'selected' : '' }}>
+                                🌟 VIP
+                            </option>
+                            <option value="priority" {{ client.serviceLevel == 'priority' ? 'selected' : '' }}>
+                                ⚡ Prioritaire
+                            </option>
+                            <option value="standard" {{ client.serviceLevel == 'standard' or not client.serviceLevel ? 'selected' : '' }}>
+                                Standard
+                            </option>
+                            <option value="low" {{ client.serviceLevel == 'low' ? 'selected' : '' }}>
+                                Basse priorité
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        {# Sidebar #}
+        <div class="col-lg-4">
+            {# Logo #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-image me-2"></i>
+                        Logo
+                    </h5>
+
+                    {% if client.logoPath %}
+                        <div class="mb-3 text-center">
+                            <img src="{{ client.logoPath }}"
+                                 alt="Logo actuel"
+                                 class="img-thumbnail"
+                                 style="max-height: 150px;">
+                        </div>
+                    {% endif %}
+
+                    <input type="file"
+                           class="form-control"
+                           name="logo"
+                           accept="image/*"
+                           id="logo_upload">
+                    <div class="form-text">
+                        PNG, JPG, SVG — 1 Mo max
+                    </div>
+                </div>
+            </div>
+
+            {# Actions #}
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        <i class="bx bx-save me-1"></i>
+                        Créer le client
+                    </button>
+                    <a href="{{ path('client_index') }}" class="btn btn-light w-100">
+                        <i class="bx bx-x me-1"></i>
+                        Annuler
+                    </a>
+                </div>
+            </div>
+
+            {# Aide #}
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bx bx-help-circle me-2"></i>
+                        Aide
+                    </h6>
+                    <p class="card-text small text-muted mb-0">
+                        Les champs marqués d'un astérisque (*) sont obligatoires.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-lg-4">
-      <div class="card">
-        <div class="card-header"><h4 class="card-title">Logo</h4></div>
-        <div class="card-body">
-          <input type="file" class="form-control" name="logo" accept="image/*">
-          <small class="text-muted">PNG, JPG, SVG — 1 Mo max</small>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <button type="submit" class="btn btn-primary w-100"><i class="bx bx-save me-1"></i> Créer</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </form>
 {% endblock %}
 
@@ -86,12 +169,28 @@
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle manual service level
     const modeSelect = document.getElementById('service_level_mode');
     const manualContainer = document.getElementById('manual_level_container');
 
     if (modeSelect && manualContainer) {
         modeSelect.addEventListener('change', function() {
             manualContainer.style.display = this.value === 'manual' ? 'block' : 'none';
+        });
+    }
+
+    // Preview logo
+    const logoUpload = document.getElementById('logo_upload');
+    if (logoUpload) {
+        logoUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && file.type.startsWith('image/')) {
+                // Validation taille
+                if (file.size > 1024 * 1024) {
+                    alert('Le fichier est trop volumineux (max 1 Mo)');
+                    this.value = '';
+                }
+            }
         });
     }
 });

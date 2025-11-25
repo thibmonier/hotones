@@ -1,118 +1,281 @@
-{% extends 'layouts/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Modifier {{ client.name }}{% endblock %}
 
-{% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-      <h4 class="mb-sm-0 font-size-18">Modifier le client</h4>
-      <div class="page-title-right">
-        <a href="{{ path('client_show', {id: client.id}) }}" class="btn btn-secondary me-2"><i class="bx bx-arrow-back me-1"></i> Retour</a>
-        <a href="{{ path('client_index') }}" class="btn btn-outline-secondary"><i class="bx bx-list-ul me-1"></i> Liste</a>
-      </div>
-    </div>
-  </div>
-</div>
+{% block body %}
+{% include 'components/page_header.html.twig' with {
+    title: 'Modifier le client',
+    breadcrumb: [
+        {label: 'Clients', path: 'client_index'},
+        {label: client.name, path: 'client_show', params: {id: client.id}},
+        {label: 'Modifier', path: null}
+    ],
+    actions: [
+        {label: 'Retour au client', path: 'client_show', params: {id: client.id}, icon: 'bx-arrow-back', class: 'btn-secondary'}
+    ]
+} %}
 
-<form method="post" enctype="multipart/form-data">
-  <div class="row">
-    <div class="col-lg-8">
-      <div class="card">
-        <div class="card-header"><h4 class="card-title">Informations</h4></div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label class="form-label" for="name">Nom *</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ client.name }}" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="website">Site web</label>
-            <input type="url" class="form-control" id="website" name="website" value="{{ client.website }}">
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3">{{ client.description }}</textarea>
-          </div>
-        </div>
-      </div>
+<form method="post" enctype="multipart/form-data" data-validate-on-submit>
+    <div class="row">
+        <div class="col-lg-8">
+            {# Informations principales #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Informations principales
+                    </h5>
 
-      <div class="card">
-        <div class="card-header">
-          <h4 class="card-title">Niveau de service</h4>
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label class="form-label">Mode de définition</label>
-            <select class="form-select" id="service_level_mode" name="service_level_mode">
-              <option value="auto" {{ client.serviceLevelMode == 'auto' ? 'selected' : '' }}>Automatique (basé sur le CA)</option>
-              <option value="manual" {{ client.serviceLevelMode == 'manual' ? 'selected' : '' }}>Manuel</option>
-            </select>
-            <div class="form-text">
-              En mode auto, le niveau est calculé selon le CA annuel
+                    <div class="mb-3">
+                        <label class="form-label" for="name">Nom du client *</label>
+                        <input type="text"
+                               class="form-control"
+                               id="name"
+                               name="name"
+                               data-validation-url="{{ path('api_validate') }}"
+                               data-validation-type="client_name_unique"
+                               data-validation-exclude-id="{{ client.id }}"
+                               required
+                               value="{{ client.name }}">
+                        <div class="form-text">Nom commercial de l'entreprise</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="website">Site web</label>
+                        <input type="url"
+                               class="form-control"
+                               id="website"
+                               name="website"
+                               data-validation-url="{{ path('api_validate') }}"
+                               data-validation-type="url"
+                               placeholder="https://example.com"
+                               value="{{ client.website|default('') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea class="form-control"
+                                  id="description"
+                                  name="description"
+                                  rows="3"
+                                  placeholder="Description courte du client et de son activité">{{ client.description|default('') }}</textarea>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div class="mb-3" id="manual_level_container" style="display: {{ client.serviceLevelMode == 'manual' ? 'block' : 'none' }};">
-            <label class="form-label">Niveau de service</label>
-            <select class="form-select" name="service_level">
-              <option value="">-- Sélectionner --</option>
-              <option value="vip" {{ client.serviceLevel == 'vip' ? 'selected' : '' }}>VIP</option>
-              <option value="priority" {{ client.serviceLevel == 'priority' ? 'selected' : '' }}>Prioritaire</option>
-              <option value="standard" {{ client.serviceLevel == 'standard' ? 'selected' : '' }}>Standard</option>
-              <option value="low" {{ client.serviceLevel == 'low' ? 'selected' : '' }}>Basse priorité</option>
-            </select>
-          </div>
+            {# Niveau de service #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-star me-2"></i>
+                        Niveau de service
+                    </h5>
 
-          {% if client.serviceLevelMode == 'auto' and client.serviceLevel %}
-            <div class="alert alert-info">
-              <strong>Niveau actuel (calculé) :</strong>
-              <span class="badge {{ client.serviceLevelBadgeClass }} ms-2">{{ client.serviceLevelLabel }}</span>
+                    <div class="mb-3">
+                        <label class="form-label">Mode de définition</label>
+                        <select class="form-select" id="service_level_mode" name="service_level_mode">
+                            <option value="auto" {{ client.serviceLevelMode == 'auto' ? 'selected' : '' }}>
+                                Automatique (basé sur le CA)
+                            </option>
+                            <option value="manual" {{ client.serviceLevelMode == 'manual' ? 'selected' : '' }}>
+                                Manuel
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            <i class="bx bx-info-circle me-1"></i>
+                            En mode auto, le niveau est calculé automatiquement selon le CA annuel
+                        </div>
+                    </div>
+
+                    <div class="mb-0" id="manual_level_container" style="display: {{ client.serviceLevelMode == 'manual' ? 'block' : 'none' }};">
+                        <label class="form-label">Niveau de service</label>
+                        <select class="form-select" name="service_level">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="vip" {{ client.serviceLevel == 'vip' ? 'selected' : '' }}>
+                                🌟 VIP
+                            </option>
+                            <option value="priority" {{ client.serviceLevel == 'priority' ? 'selected' : '' }}>
+                                ⚡ Prioritaire
+                            </option>
+                            <option value="standard" {{ client.serviceLevel == 'standard' ? 'selected' : '' }}>
+                                Standard
+                            </option>
+                            <option value="low" {{ client.serviceLevel == 'low' ? 'selected' : '' }}>
+                                Basse priorité
+                            </option>
+                        </select>
+                    </div>
+
+                    {% if client.serviceLevelMode == 'auto' and client.serviceLevel %}
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="bx bx-info-circle me-2"></i>
+                            <strong>Niveau actuel (calculé automatiquement) :</strong>
+                            <span class="badge {{ client.serviceLevelBadgeClass }} ms-2">{{ client.serviceLevelLabel }}</span>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-          {% endif %}
         </div>
-      </div>
+
+        {# Sidebar #}
+        <div class="col-lg-4">
+            {# Logo #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-image me-2"></i>
+                        Logo
+                    </h5>
+
+                    {% if client.logoPath %}
+                        <div class="mb-3 text-center">
+                            <img src="{{ client.logoPath }}"
+                                 alt="Logo {{ client.name }}"
+                                 class="img-thumbnail"
+                                 style="max-height: 150px;">
+                        </div>
+                    {% endif %}
+
+                    <input type="file"
+                           class="form-control"
+                           name="logo"
+                           accept="image/*"
+                           id="logo_upload">
+                    <div class="form-text">
+                        PNG, JPG, SVG — 1 Mo max
+                    </div>
+                </div>
+            </div>
+
+            {# Actions #}
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        <i class="bx bx-save me-1"></i>
+                        Enregistrer les modifications
+                    </button>
+                    <a href="{{ path('client_show', {id: client.id}) }}" class="btn btn-light w-100">
+                        <i class="bx bx-x me-1"></i>
+                        Annuler
+                    </a>
+                </div>
+            </div>
+
+            {# Métadonnées #}
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bx bx-calendar me-2"></i>
+                        Métadonnées
+                    </h6>
+                    <dl class="mb-0">
+                        <dt class="text-muted small">Créé le</dt>
+                        <dd class="mb-2">{{ client.createdAt|date('d/m/Y à H:i') }}</dd>
+
+                        {% if client.updatedAt %}
+                        <dt class="text-muted small">Modifié le</dt>
+                        <dd class="mb-0">{{ client.updatedAt|date('d/m/Y à H:i') }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+
+            {# Zone dangereuse #}
+            {% if is_granted('ROLE_MANAGER') %}
+            <div class="card border-danger">
+                <div class="card-body">
+                    <h6 class="card-title text-danger">
+                        <i class="bx bx-error-circle me-2"></i>
+                        Zone dangereuse
+                    </h6>
+                    <p class="card-text small text-muted mb-3">
+                        La suppression d'un client est définitive et irréversible.
+                    </p>
+                    <button type="button"
+                            class="btn btn-danger w-100"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
+                        <i class="bx bx-trash me-1"></i>
+                        Supprimer le client
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    <div class="col-lg-4">
-      <div class="card">
-        <div class="card-header"><h4 class="card-title">Logo</h4></div>
-        <div class="card-body">
-          {% if client.logoPath %}
-            <img src="{{ client.logoPath }}" class="img-fluid rounded mb-2" alt="logo {{ client.name }}">
-          {% endif %}
-          <input type="file" class="form-control" name="logo" accept="image/*">
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <button type="submit" class="btn btn-primary w-100"><i class="bx bx-save me-1"></i> Enregistrer</button>
-        </div>
-      </div>
-      {% if is_granted('ROLE_MANAGER') %}
-      <div class="card">
-        <div class="card-header bg-danger text-white"><h4 class="card-title mb-0">Zone dangereuse</h4></div>
-        <div class="card-body">
-          <form method="post" action="{{ path('client_delete', {id: client.id}) }}" onsubmit="return confirm('Supprimer ce client ?')">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ client.id) }}">
-            <button type="submit" class="btn btn-danger w-100"><i class="bx bx-trash me-1"></i> Supprimer</button>
-          </form>
-        </div>
-      </div>
-      {% endif %}
-    </div>
-  </div>
 </form>
+
+{# Modal de confirmation de suppression #}
+{% if is_granted('ROLE_MANAGER') %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bx bx-error-circle me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    Êtes-vous sûr de vouloir supprimer le client <strong>{{ client.name }}</strong> ?
+                </p>
+                <div class="alert alert-warning mb-0">
+                    <i class="bx bx-error me-2"></i>
+                    <strong>Attention :</strong> Cette action est définitive et supprimera également :
+                    <ul class="mb-0 mt-2">
+                        <li>Tous les projets associés</li>
+                        <li>Tous les devis et commandes</li>
+                        <li>Toutes les données liées</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <i class="bx bx-x me-1"></i>
+                    Annuler
+                </button>
+                <form method="post" action="{{ path('client_delete', {id: client.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ client.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bx bx-trash me-1"></i>
+                        Confirmer la suppression
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle manual service level
     const modeSelect = document.getElementById('service_level_mode');
     const manualContainer = document.getElementById('manual_level_container');
 
     if (modeSelect && manualContainer) {
         modeSelect.addEventListener('change', function() {
             manualContainer.style.display = this.value === 'manual' ? 'block' : 'none';
+        });
+    }
+
+    // Preview logo
+    const logoUpload = document.getElementById('logo_upload');
+    if (logoUpload) {
+        logoUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && file.type.startsWith('image/')) {
+                // Validation taille
+                if (file.size > 1024 * 1024) {
+                    alert('Le fichier est trop volumineux (max 1 Mo)');
+                    this.value = '';
+                }
+            }
         });
     }
 });

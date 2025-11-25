@@ -44,43 +44,12 @@ class ValidationController extends AbstractController
         $excludeId = $data['exclude_id'] ?? null;
 
         return match ($type) {
-            'siret_unique'       => $this->validateSiretUnique($value, $excludeId),
             'client_name_unique' => $this->validateClientNameUnique($value, $excludeId),
             default              => new JsonResponse([
                 'valid'   => false,
                 'message' => 'Type de validation inconnu',
             ], Response::HTTP_BAD_REQUEST),
         };
-    }
-
-    /**
-     * Valide l'unicité d'un SIRET client.
-     */
-    private function validateSiretUnique(string $siret, ?int $excludeId): JsonResponse
-    {
-        // Nettoyer le SIRET
-        $siret = preg_replace('/\s+/', '', $siret);
-
-        if (strlen($siret) !== 14) {
-            return new JsonResponse([
-                'valid'   => false,
-                'message' => 'Le SIRET doit contenir exactement 14 chiffres',
-            ]);
-        }
-
-        $client = $this->clientRepository->findOneBy(['siret' => $siret]);
-
-        if ($client && $client->getId() !== $excludeId) {
-            return new JsonResponse([
-                'valid'   => false,
-                'message' => 'Ce SIRET est déjà utilisé par un autre client',
-            ]);
-        }
-
-        return new JsonResponse([
-            'valid'   => true,
-            'message' => '✓ SIRET disponible',
-        ]);
     }
 
     /**

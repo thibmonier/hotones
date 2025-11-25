@@ -36,7 +36,7 @@ class ClientRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('c')
             ->where('c.name LIKE :query')
-            ->orWhere('c.siret LIKE :query')
+            ->orWhere('c.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('c.name', 'ASC')
             ->setMaxResults($limit)

@@ -1,0 +1,8 @@
+{% if item.website %}
+    <a href="{{ item.website }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+        <i class="bx bx-link-external me-1"></i>
+        {{ item.website|replace({'https://': '', 'http://': '', 'www.': ''})|slice(0, 30) }}
+    </a>
+{% else %}
+    <span class="text-muted">—</span>
+{% endif %}

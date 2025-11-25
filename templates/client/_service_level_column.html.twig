@@ -1,0 +1,12 @@
+{% if item.serviceLevel %}
+    <span class="badge {{ item.serviceLevelBadgeClass }}">
+        {{ item.serviceLevelLabel }}
+    </span>
+    {% if item.serviceLevelMode == 'auto' %}
+        <small class="text-muted d-block mt-1">
+            <i class="bx bx-bot"></i> Auto
+        </small>
+    {% endif %}
+{% else %}
+    <span class="text-muted">Non défini</span>
+{% endif %}
