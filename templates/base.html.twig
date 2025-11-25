@@ -163,7 +163,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/tasks' ? 'active' : '' }}" href="{{ path('my_tasks') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/my-tasks' ? 'active' : '' }}" href="{{ path('my_tasks_index') }}">
                                 <i class="bx bx-list-check me-2"></i>
                                 Mes tâches
                             </a>
@@ -206,12 +206,6 @@
                             <a class="nav-link {{ app.request.pathinfo starts with '/orders' ? 'active' : '' }}" href="{{ path('order_index') }}">
                                 <i class="bx bx-file me-2"></i>
                                 Devis
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/invoices' ? 'active' : '' }}" href="{{ path('invoice_index') }}">
-                                <i class="bx bx-receipt me-2"></i>
-                                Factures
                             </a>
                         </li>
                     </ul>
@@ -263,7 +257,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/sales-dashboard' ? 'active' : '' }}" href="{{ path('sales_dashboard') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/sales-dashboard' ? 'active' : '' }}" href="{{ path('sales_dashboard_index') }}">
                                 <i class="bx bx-trending-up me-2"></i>
                                 Dashboard Commercial
                             </a>
@@ -288,13 +282,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/workload-prediction' ? 'active' : '' }}" href="{{ path('workload_prediction') }}">
-                                <i class="bx bx-pulse me-2"></i>
-                                Prédiction Charge
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/risks' ? 'active' : '' }}" href="{{ path('project_risks') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/risks' ? 'active' : '' }}" href="{{ path('risk_projects_dashboard') }}">
                                 <i class="bx bx-error-circle me-2"></i>
                                 Projets à Risque
                             </a>
@@ -333,7 +321,7 @@
                     </h6>
                     <ul class="nav flex-column mb-2">
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/users' ? 'active' : '' }}" href="{{ path('admin_user_index') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/users' ? 'active' : '' }}" href="{{ path('admin_users') }}">
                                 <i class="bx bx-user-circle me-2"></i>
                                 Utilisateurs
                             </a>
@@ -357,7 +345,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/scheduler' ? 'active' : '' }}" href="{{ path('admin_scheduler') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/scheduler' ? 'active' : '' }}" href="{{ path('admin_scheduler_index') }}">
                                 <i class="bx bx-time-five me-2"></i>
                                 Tâches planifiées
                             </a>
