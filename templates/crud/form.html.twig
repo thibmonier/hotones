@@ -1,0 +1,141 @@
+{#
+    Template standard pour formulaires CRUD (new/edit)
+
+    Usage:
+    {% extends 'crud/form.html.twig' %}
+
+    {% set crud_config = {
+        entity_name: 'client',
+        entity_label: 'Client',
+        is_edit: entity.id is defined,
+        breadcrumb: [
+            {label: 'Clients', path: 'client_index'},
+            {label: entity.id is defined ? 'Modifier' : 'Nouveau', path: null}
+        ],
+        list_route: 'client_index',
+        show_route: 'client_show',
+        form: form
+    } %}
+
+    {% block form_content %}
+        <!-- Contenu du formulaire -->
+        {{ form_row(form.name) }}
+        {{ form_row(form.email) }}
+    {% endblock %}
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ crud_config.is_edit ? 'Modifier' : 'Nouveau' }} {{ crud_config.entity_label|lower }}
+{% endblock %}
+
+{% block body %}
+{# Header avec breadcrumb #}
+{% include 'components/page_header.html.twig' with {
+    title: (crud_config.is_edit ? 'Modifier' : 'Nouveau') ~ ' ' ~ crud_config.entity_label|lower,
+    breadcrumb: crud_config.breadcrumb
+} %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(crud_config.form, {
+                    'attr': {
+                        'data-validate-on-submit': crud_config.validate_on_submit|default(true),
+                        'novalidate': 'novalidate'
+                    }
+                }) }}
+
+                {# Contenu du formulaire (à définir dans le template enfant) #}
+                {% block form_content %}
+                    {# Affichage par défaut de tous les champs #}
+                    {{ form_widget(crud_config.form) }}
+                {% endblock %}
+
+                {# Boutons d'action #}
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save me-1"></i>
+                        {{ crud_config.is_edit ? 'Enregistrer les modifications' : 'Créer' }}
+                    </button>
+
+                    {% if crud_config.is_edit and crud_config.show_route is defined %}
+                        <a href="{{ path(crud_config.show_route, {id: crud_config.form.vars.data.id}) }}" class="btn btn-light">
+                            <i class="bx bx-x me-1"></i>
+                            Annuler
+                        </a>
+                    {% else %}
+                        <a href="{{ path(crud_config.list_route) }}" class="btn btn-light">
+                            <i class="bx bx-x me-1"></i>
+                            Annuler
+                        </a>
+                    {% endif %}
+
+                    {% if crud_config.is_edit and crud_config.delete_route is defined %}
+                        <button type="button" class="btn btn-danger float-end" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bx bx-trash me-1"></i>
+                            Supprimer
+                        </button>
+                    {% endif %}
+                </div>
+
+                {{ form_end(crud_config.form) }}
+            </div>
+        </div>
+    </div>
+
+    {# Sidebar optionnelle #}
+    {% block sidebar %}
+        {% if crud_config.show_help|default(false) %}
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Aide
+                    </h5>
+                    {% block help_content %}
+                        <p class="text-muted">
+                            Remplissez les champs obligatoires marqués d'un astérisque (*).
+                        </p>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endblock %}
+</div>
+
+{# Modal de confirmation de suppression #}
+{% if crud_config.is_edit and crud_config.delete_route is defined %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce {{ crud_config.entity_label|lower }} ?</p>
+                <p class="text-danger">
+                    <i class="bx bx-error-circle me-1"></i>
+                    Cette action est irréversible.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path(crud_config.delete_route, {id: crud_config.form.vars.data.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ crud_config.form.vars.data.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bx bx-trash me-1"></i>
+                        Supprimer définitivement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

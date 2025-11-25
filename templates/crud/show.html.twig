@@ -1,0 +1,201 @@
+{#
+    Template standard pour page détails CRUD
+
+    Usage:
+    {% extends 'crud/show.html.twig' %}
+
+    {% set crud_config = {
+        entity_name: 'client',
+        entity_label: 'Client',
+        entity: client,
+        breadcrumb: [
+            {label: 'Clients', path: 'client_index'},
+            {label: client.name, path: null}
+        ],
+        list_route: 'client_index',
+        edit_route: 'client_edit',
+        delete_route: 'client_delete',
+        can_edit: is_granted('ROLE_CHEF_PROJET'),
+        can_delete: is_granted('ROLE_ADMIN')
+    } %}
+
+    {% block entity_details %}
+        <!-- Détails de l'entité -->
+        <dl class="row">
+            <dt class="col-sm-3">Nom</dt>
+            <dd class="col-sm-9">{{ client.name }}</dd>
+        </dl>
+    {% endblock %}
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ crud_config.entity_label }} - {{ crud_config.entity.name|default(crud_config.entity.id) }}{% endblock %}
+
+{% block body %}
+{# Header avec breadcrumb et actions #}
+{% set headerActions = [] %}
+
+{% if crud_config.can_edit|default(true) and crud_config.edit_route is defined %}
+    {% set headerActions = headerActions|merge([{
+        label: 'Modifier',
+        path: crud_config.edit_route,
+        icon: 'bx-edit',
+        class: 'btn-primary',
+        params: {id: crud_config.entity.id}
+    }]) %}
+{% endif %}
+
+{% if crud_config.custom_actions is defined %}
+    {% set headerActions = headerActions|merge(crud_config.custom_actions) %}
+{% endif %}
+
+{% if crud_config.can_delete|default(false) and crud_config.delete_route is defined %}
+    {% set headerActions = headerActions|merge([{
+        label: 'Supprimer',
+        path: null,
+        icon: 'bx-trash',
+        class: 'btn-danger',
+        id: 'delete-btn'
+    }]) %}
+{% endif %}
+
+{% include 'components/page_header.html.twig' with {
+    title: crud_config.entity_label ~ ' : ' ~ (crud_config.entity.name|default(crud_config.entity.id)),
+    breadcrumb: crud_config.breadcrumb,
+    actions: headerActions
+} %}
+
+<div class="row">
+    {# Colonne principale #}
+    <div class="col-lg-8">
+        {# Informations principales #}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bx bx-info-circle me-2"></i>
+                    Informations {{ crud_config.entity_label|lower }}
+                </h5>
+
+                {% block entity_details %}
+                    {# À définir dans le template enfant #}
+                    <p class="text-muted">Aucun détail à afficher</p>
+                {% endblock %}
+            </div>
+        </div>
+
+        {# Sections additionnelles #}
+        {% block additional_sections %}{% endblock %}
+    </div>
+
+    {# Sidebar #}
+    <div class="col-lg-4">
+        {# Métadonnées #}
+        {% if crud_config.show_metadata|default(true) %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bx bx-calendar me-2"></i>
+                    Métadonnées
+                </h5>
+
+                <dl class="row mb-0">
+                    {% if crud_config.entity.createdAt is defined %}
+                    <dt class="col-sm-5 text-muted small">Créé le</dt>
+                    <dd class="col-sm-7 small">
+                        {{ crud_config.entity.createdAt|date('d/m/Y à H:i') }}
+                    </dd>
+                    {% endif %}
+
+                    {% if crud_config.entity.updatedAt is defined %}
+                    <dt class="col-sm-5 text-muted small">Modifié le</dt>
+                    <dd class="col-sm-7 small">
+                        {{ crud_config.entity.updatedAt|date('d/m/Y à H:i') }}
+                    </dd>
+                    {% endif %}
+
+                    {% if crud_config.entity.id is defined %}
+                    <dt class="col-sm-5 text-muted small">ID</dt>
+                    <dd class="col-sm-7 small font-monospace">
+                        #{{ crud_config.entity.id }}
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        {% endif %}
+
+        {# Sidebar additionnelle #}
+        {% block sidebar %}{% endblock %}
+
+        {# Actions rapides #}
+        {% if crud_config.quick_actions is defined %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bx bx-zap me-2"></i>
+                    Actions rapides
+                </h5>
+
+                <div class="d-grid gap-2">
+                    {% for action in crud_config.quick_actions %}
+                        <a href="{{ path(action.route, action.params|default({})) }}"
+                           class="btn btn-{{ action.variant|default('outline-secondary') }} btn-sm">
+                            <i class="bx {{ action.icon }} me-1"></i>
+                            {{ action.label }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# Modal de confirmation de suppression #}
+{% if crud_config.can_delete|default(false) and crud_config.delete_route is defined %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce {{ crud_config.entity_label|lower }} ?</p>
+                {% if crud_config.entity.name is defined %}
+                    <p class="mb-0"><strong>{{ crud_config.entity.name }}</strong></p>
+                {% endif %}
+                <p class="text-danger mt-3">
+                    <i class="bx bx-error-circle me-1"></i>
+                    Cette action est irréversible.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path(crud_config.delete_route, {id: crud_config.entity.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ crud_config.entity.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bx bx-trash me-1"></i>
+                        Supprimer définitivement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBtn = document.getElementById('delete-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        });
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

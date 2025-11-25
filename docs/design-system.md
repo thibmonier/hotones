@@ -1,0 +1,673 @@
+# Design System HotOnes
+
+Ce document définit le design system de l'application HotOnes, incluant les composants réutilisables, les patterns CRUD standardisés, et les bonnes pratiques d'interface.
+
+## Table des matières
+
+- [Composants de base](#composants-de-base)
+- [Templates CRUD](#templates-crud)
+- [Iconographie](#iconographie)
+- [Couleurs et thèmes](#couleurs-et-thèmes)
+- [Typographie](#typographie)
+- [Patterns communs](#patterns-communs)
+- [Accessibilité](#accessibilité)
+
+---
+
+## Composants de base
+
+### Page Header
+
+**Fichier** : `templates/components/page_header.html.twig`
+
+Affiche un en-tête de page standardisé avec titre, breadcrumb et boutons d'action.
+
+```twig
+{% include 'components/page_header.html.twig' with {
+    title: 'Liste des clients',
+    breadcrumb: [
+        {label: 'Clients', path: null}
+    ],
+    actions: [
+        {label: 'Nouveau client', path: 'client_new', icon: 'bx-plus', class: 'btn-primary'}
+    ]
+} %}
+```
+
+**Paramètres** :
+- `title` (string, requis) : Titre de la page
+- `breadcrumb` (array, optionnel) : Fil d'ariane
+- `actions` (array, optionnel) : Boutons d'action
+
+### Breadcrumb
+
+**Fichier** : `templates/components/breadcrumb.html.twig`
+
+Fil d'ariane pour la navigation.
+
+```twig
+{% include 'components/breadcrumb.html.twig' with {
+    items: [
+        {label: 'Clients', path: 'client_index'},
+        {label: 'Détails', path: null}
+    ]
+} %}
+```
+
+### DataTable
+
+**Fichier** : `templates/components/data_table.html.twig`
+
+Tableau de données avec tri, pagination, et actions en masse.
+
+```twig
+{% include 'components/data_table.html.twig' with {
+    columns: [
+        {key: 'name', label: 'Nom', sortable: true},
+        {key: 'email', label: 'Email', sortable: false},
+        {key: 'actions', label: 'Actions', sortable: false}
+    ],
+    data: clients,
+    actions: {
+        show: {route: 'client_show', icon: 'bx-show', label: 'Voir'},
+        edit: {route: 'client_edit', icon: 'bx-edit', label: 'Modifier'},
+        delete: {route: 'client_delete', icon: 'bx-trash', label: 'Supprimer', confirm: true}
+    },
+    massActions: true,
+    currentPage: page,
+    totalPages: totalPages,
+    itemsPerPage: 25,
+    totalItems: total
+} %}
+```
+
+### Pagination
+
+**Fichier** : `templates/components/pagination.html.twig`
+
+Pagination intelligente avec sélecteur d'éléments par page.
+
+```twig
+{% include 'components/pagination.html.twig' with {
+    currentPage: page,
+    totalPages: totalPages,
+    itemsPerPage: 25,
+    totalItems: total
+} %}
+```
+
+### Filter Panel
+
+**Fichier** : `templates/components/filter_panel.html.twig`
+
+Panneau de filtres collapsible avec compteur de filtres actifs.
+
+```twig
+{% include 'components/filter_panel.html.twig' with {
+    filters: [
+        {type: 'text', name: 'search', label: 'Recherche', value: search},
+        {type: 'select', name: 'status', label: 'Statut', options: statuses, value: status},
+        {type: 'date', name: 'date_from', label: 'Date début', value: dateFrom}
+    ],
+    activeCount: activeFilterCount
+} %}
+```
+
+**Types de filtres supportés** :
+- `text` : Champ texte
+- `select` : Liste déroulante
+- `date` : Sélecteur de date
+- `checkbox` : Case à cocher
+
+---
+
+## Templates CRUD
+
+### Liste (Index)
+
+**Fichier** : `templates/crud/list.html.twig`
+
+Template standard pour les pages de liste.
+
+```twig
+{% extends 'crud/list.html.twig' %}
+
+{% set crud_config = {
+    entity_name: 'client',
+    entity_name_plural: 'clients',
+    entity_label: 'Client',
+    entity_label_plural: 'Clients',
+    breadcrumb: [{label: 'Clients', path: null}],
+    can_create: is_granted('ROLE_CHEF_PROJET'),
+    create_route: 'client_new',
+    filters: [
+        {type: 'text', name: 'search', label: 'Recherche', value: app.request.query.get('search')},
+        {type: 'select', name: 'status', label: 'Statut', options: statuses, value: app.request.query.get('status')}
+    ],
+    columns: [
+        {key: 'name', label: 'Nom', sortable: true},
+        {key: 'email', label: 'Email', sortable: false},
+        {key: 'actions', label: 'Actions', sortable: false}
+    ],
+    actions: {
+        show: {route: 'client_show', icon: 'bx-show', label: 'Voir'},
+        edit: {route: 'client_edit', icon: 'bx-edit', label: 'Modifier', permission: 'ROLE_CHEF_PROJET'},
+        delete: {route: 'client_delete', icon: 'bx-trash', label: 'Supprimer', confirm: true, permission: 'ROLE_ADMIN'}
+    },
+    mass_actions: true,
+    show_stats: true
+} %}
+
+{% set items = clients %}
+{% set pagination = {
+    current_page: page,
+    total_pages: totalPages,
+    per_page: 25,
+    total: total
+} %}
+```
+
+### Formulaire (New/Edit)
+
+**Fichier** : `templates/crud/form.html.twig`
+
+Template standard pour les formulaires de création/édition.
+
+```twig
+{% extends 'crud/form.html.twig' %}
+
+{% set crud_config = {
+    entity_name: 'client',
+    entity_label: 'Client',
+    is_edit: client.id is defined,
+    breadcrumb: [
+        {label: 'Clients', path: 'client_index'},
+        {label: client.id is defined ? 'Modifier' : 'Nouveau', path: null}
+    ],
+    list_route: 'client_index',
+    show_route: 'client_show',
+    delete_route: 'client_delete',
+    form: form,
+    validate_on_submit: true,
+    show_help: true
+} %}
+
+{% block form_content %}
+    <div class="mb-3">
+        {{ form_label(form.name) }}
+        {{ form_widget(form.name, {
+            'attr': {
+                'data-validation-url': path('api_validate'),
+                'data-validation-type': 'client_name_unique',
+                'class': 'form-control'
+            }
+        }) }}
+        {{ form_errors(form.name) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email, {
+            'attr': {
+                'data-validation-url': path('api_validate'),
+                'data-validation-type': 'email',
+                'class': 'form-control'
+            }
+        }) }}
+        {{ form_errors(form.email) }}
+    </div>
+
+    {{ form_rest(form) }}
+{% endblock %}
+
+{% block help_content %}
+    <p class="text-muted small">
+        <strong>Nom du client</strong> : Nom commercial de l'entreprise
+    </p>
+    <p class="text-muted small">
+        <strong>Email</strong> : Adresse email principale de contact
+    </p>
+{% endblock %}
+```
+
+### Détails (Show)
+
+**Fichier** : `templates/crud/show.html.twig`
+
+Template standard pour les pages de détails.
+
+```twig
+{% extends 'crud/show.html.twig' %}
+
+{% set crud_config = {
+    entity_name: 'client',
+    entity_label: 'Client',
+    entity: client,
+    breadcrumb: [
+        {label: 'Clients', path: 'client_index'},
+        {label: client.name, path: null}
+    ],
+    list_route: 'client_index',
+    edit_route: 'client_edit',
+    delete_route: 'client_delete',
+    can_edit: is_granted('ROLE_CHEF_PROJET'),
+    can_delete: is_granted('ROLE_ADMIN'),
+    show_metadata: true,
+    custom_actions: [
+        {label: 'Voir les projets', path: 'project_index', icon: 'bx-folder', class: 'btn-outline-primary', params: {client: client.id}}
+    ]
+} %}
+
+{% block entity_details %}
+    <dl class="row">
+        <dt class="col-sm-3">Nom</dt>
+        <dd class="col-sm-9">{{ client.name }}</dd>
+
+        <dt class="col-sm-3">SIRET</dt>
+        <dd class="col-sm-9">{{ client.siret|default('—') }}</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">
+            {% if client.email %}
+                <a href="mailto:{{ client.email }}">{{ client.email }}</a>
+            {% else %}
+                —
+            {% endif %}
+        </dd>
+
+        <dt class="col-sm-3">Adresse</dt>
+        <dd class="col-sm-9">{{ client.address|nl2br|default('—') }}</dd>
+    </dl>
+{% endblock %}
+
+{% block additional_sections %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="bx bx-folder-open me-2"></i>
+                Projets associés ({{ client.projects|length }})
+            </h5>
+
+            {% if client.projects|length > 0 %}
+                <div class="list-group">
+                    {% for project in client.projects|slice(0, 5) %}
+                        <a href="{{ path('project_show', {id: project.id}) }}" class="list-group-item list-group-item-action">
+                            {{ project.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                {% if client.projects|length > 5 %}
+                    <a href="{{ path('project_index', {client: client.id}) }}" class="btn btn-sm btn-link mt-2">
+                        Voir tous les projets ({{ client.projects|length }})
+                    </a>
+                {% endif %}
+            {% else %}
+                <p class="text-muted">Aucun projet associé</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="bx bx-bar-chart me-2"></i>
+                Statistiques
+            </h5>
+
+            <dl class="row mb-0">
+                <dt class="col-sm-6 text-muted small">Projets actifs</dt>
+                <dd class="col-sm-6 small text-end">
+                    <strong>{{ client.activeProjects|length }}</strong>
+                </dd>
+
+                <dt class="col-sm-6 text-muted small">CA total</dt>
+                <dd class="col-sm-6 small text-end">
+                    <strong>{{ client.totalRevenue|number_format(0, ',', ' ') }} €</strong>
+                </dd>
+            </dl>
+        </div>
+    </div>
+{% endblock %}
+```
+
+---
+
+## Iconographie
+
+### Boxicons
+
+L'application utilise la bibliothèque **Boxicons** pour tous les icônes.
+
+**CDN** : `https://cdn.jsdelivr.net/npm/boxicons@2.0.9/css/boxicons.min.css`
+
+### Icônes standards par contexte
+
+| Contexte | Icône | Classe |
+|----------|-------|--------|
+| **Navigation** | | |
+| Accueil | 🏠 | `bx-home` |
+| Retour | ← | `bx-arrow-back` |
+| Recherche | 🔍 | `bx-search` |
+| Menu | ☰ | `bx-menu` |
+| **Actions** | | |
+| Créer/Ajouter | ➕ | `bx-plus` |
+| Modifier/Éditer | ✏️ | `bx-edit` |
+| Supprimer | 🗑️ | `bx-trash` |
+| Enregistrer | 💾 | `bx-save` |
+| Annuler | ✖️ | `bx-x` |
+| Voir/Afficher | 👁️ | `bx-show` |
+| Télécharger | ⬇️ | `bx-download` |
+| Importer | ⬆️ | `bx-upload` |
+| Exporter | 📤 | `bx-export` |
+| Paramètres | ⚙️ | `bx-cog` |
+| **Entités** | | |
+| Utilisateur | 👤 | `bx-user` |
+| Utilisateurs | 👥 | `bx-group` |
+| Client | 🏢 | `bx-buildings` |
+| Projet | 📁 | `bx-folder-open` |
+| Tâche | ✓ | `bx-task` |
+| Liste | 📋 | `bx-list-ul` |
+| Calendrier | 📅 | `bx-calendar` |
+| Temps | ⏱️ | `bx-time` |
+| Graphique | 📊 | `bx-bar-chart` |
+| Statistiques | 📈 | `bx-trending-up` |
+| **États** | | |
+| Succès | ✓ | `bx-check` |
+| Erreur | ⚠️ | `bx-error` |
+| Info | ℹ️ | `bx-info-circle` |
+| Alerte | ⚡ | `bx-error-circle` |
+| **Notifications** | | |
+| Cloche | 🔔 | `bx-bell` |
+| Message | 💬 | `bx-message` |
+| Email | ✉️ | `bx-envelope` |
+
+---
+
+## Couleurs et thèmes
+
+### Palette principale
+
+L'application utilise Bootstrap 5 avec le thème **Skote**.
+
+| Couleur | Hex | Usage |
+|---------|-----|-------|
+| **Primary** | `#556ee6` | Actions principales, liens |
+| **Success** | `#34c38f` | Succès, validation |
+| **Danger** | `#f46a6a` | Erreurs, suppressions |
+| **Warning** | `#f1b44c` | Alertes, avertissements |
+| **Info** | `#50a5f1` | Informations |
+| **Dark** | `#343a40` | Texte, header |
+| **Light** | `#f8f9fa` | Backgrounds, sidebar |
+
+### Classes utilitaires
+
+```html
+<!-- Backgrounds -->
+<div class="bg-primary text-white">...</div>
+<div class="bg-success text-white">...</div>
+<div class="bg-danger text-white">...</div>
+
+<!-- Texte -->
+<p class="text-primary">...</p>
+<p class="text-muted">...</p>
+
+<!-- Badges -->
+<span class="badge bg-primary">Actif</span>
+<span class="badge bg-success">Validé</span>
+<span class="badge bg-danger">Urgent</span>
+```
+
+---
+
+## Typographie
+
+### Hiérarchie des titres
+
+```html
+<h1 class="display-4">Titre principal</h1>
+<h2 class="h2">Titre section</h2>
+<h3 class="h3">Titre sous-section</h3>
+<h4 class="h4">Titre carte</h4>
+<h5 class="h5">Titre petit</h5>
+```
+
+### Classes utilitaires
+
+```html
+<!-- Tailles -->
+<p class="font-size-12">Petit texte</p>
+<p class="font-size-14">Texte normal</p>
+<p class="font-size-18">Grand texte</p>
+<p class="font-size-24">Très grand</p>
+
+<!-- Poids -->
+<p class="fw-light">Léger</p>
+<p class="fw-normal">Normal</p>
+<p class="fw-bold">Gras</p>
+
+<!-- Couleurs -->
+<p class="text-muted">Texte discret</p>
+<p class="text-primary">Texte primaire</p>
+```
+
+---
+
+## Patterns communs
+
+### Cards
+
+```html
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">
+            <i class="bx bx-info-circle me-2"></i>
+            Titre de la carte
+        </h5>
+        <p class="card-text">Contenu de la carte</p>
+    </div>
+</div>
+```
+
+### Listes de définitions
+
+```html
+<dl class="row">
+    <dt class="col-sm-3">Label</dt>
+    <dd class="col-sm-9">Valeur</dd>
+
+    <dt class="col-sm-3">Autre label</dt>
+    <dd class="col-sm-9">Autre valeur</dd>
+</dl>
+```
+
+### Boutons
+
+```html
+<!-- Primaire -->
+<button class="btn btn-primary">
+    <i class="bx bx-save me-1"></i>
+    Enregistrer
+</button>
+
+<!-- Secondaire -->
+<button class="btn btn-light">
+    <i class="bx bx-x me-1"></i>
+    Annuler
+</button>
+
+<!-- Danger -->
+<button class="btn btn-danger">
+    <i class="bx bx-trash me-1"></i>
+    Supprimer
+</button>
+
+<!-- Outline -->
+<button class="btn btn-outline-secondary">
+    <i class="bx bx-download me-1"></i>
+    Exporter
+</button>
+
+<!-- Tailles -->
+<button class="btn btn-primary btn-sm">Petit</button>
+<button class="btn btn-primary">Normal</button>
+<button class="btn btn-primary btn-lg">Grand</button>
+```
+
+### Messages flash
+
+Les messages flash sont affichés automatiquement dans `base.html.twig` :
+
+```php
+// Dans le contrôleur
+$this->addFlash('success', 'Client créé avec succès');
+$this->addFlash('error', 'Une erreur est survenue');
+$this->addFlash('warning', 'Attention : données incomplètes');
+$this->addFlash('info', 'Information importante');
+```
+
+### États vides
+
+```html
+<div class="text-center text-muted py-5">
+    <i class="bx bx-info-circle font-size-24 mb-2"></i>
+    <div>Aucune donnée à afficher</div>
+</div>
+```
+
+---
+
+## Accessibilité
+
+### Principes
+
+1. **Contraste** : Ratio minimum 4.5:1 pour le texte
+2. **Navigation au clavier** : Tous les éléments interactifs doivent être accessibles
+3. **Labels** : Tous les champs de formulaire doivent avoir un label
+4. **ARIA** : Utiliser les attributs ARIA pour les composants complexes
+
+### Bonnes pratiques
+
+```html
+<!-- Boutons avec aria-label -->
+<button type="button" aria-label="Supprimer" class="btn btn-danger">
+    <i class="bx bx-trash"></i>
+</button>
+
+<!-- Images avec alt -->
+<img src="..." alt="Description de l'image">
+
+<!-- Liens explicites -->
+<a href="...">Voir les détails du client</a>
+<!-- Éviter: <a href="...">Cliquez ici</a> -->
+
+<!-- Focus visible -->
+<button class="btn btn-primary">Je suis focusable</button>
+```
+
+### Navigation au clavier
+
+- `Tab` : Navigation entre les éléments
+- `Shift + Tab` : Navigation inverse
+- `Enter` : Activer un lien ou bouton
+- `Space` : Activer une checkbox
+- `Esc` : Fermer un modal
+- `Ctrl+K` : Ouvrir la recherche globale
+
+---
+
+## Conventions de nommage
+
+### Routes
+
+```
+entity_index    # Liste
+entity_show     # Détails
+entity_new      # Création
+entity_edit     # Édition
+entity_delete   # Suppression
+```
+
+### Templates
+
+```
+entity/index.html.twig
+entity/show.html.twig
+entity/new.html.twig
+entity/edit.html.twig
+```
+
+### Classes CSS custom
+
+Préfixer avec `app-` pour éviter les conflits :
+
+```css
+.app-header-action { ... }
+.app-sidebar-item { ... }
+```
+
+---
+
+## Responsive Design
+
+### Breakpoints Bootstrap 5
+
+- `xs` : < 576px
+- `sm` : ≥ 576px
+- `md` : ≥ 768px
+- `lg` : ≥ 992px
+- `xl` : ≥ 1200px
+- `xxl` : ≥ 1400px
+
+### Classes utilitaires responsive
+
+```html
+<!-- Affichage conditionnel -->
+<div class="d-none d-md-block">Visible sur desktop uniquement</div>
+<div class="d-block d-md-none">Visible sur mobile uniquement</div>
+
+<!-- Colonnes responsive -->
+<div class="col-12 col-md-6 col-lg-4">Responsive column</div>
+```
+
+---
+
+## Performance
+
+### Images
+
+- Toujours définir `width` et `height`
+- Utiliser lazy loading : `loading="lazy"`
+- Formats modernes : WebP avec fallback
+
+### JavaScript
+
+- Modules chargés de manière asynchrone
+- Debounce pour validation AJAX (500ms)
+- Polling notifications intelligent (pause si page cachée)
+
+### CSS
+
+- Utiliser les classes utilitaires Bootstrap plutôt que custom CSS
+- Éviter les `!important`
+- Minification en production
+
+---
+
+## Ressources
+
+- **Bootstrap 5 Docs** : https://getbootstrap.com/docs/5.3/
+- **Boxicons** : https://boxicons.com/
+- **Skote Theme** : Template de base utilisé
+- **Symfony UX** : https://ux.symfony.com/
+
+---
+
+## Changelog
+
+- **v1.0.0** (2025-11-25) : Création du design system initial
+  - Composants de base
+  - Templates CRUD
+  - Documentation complète

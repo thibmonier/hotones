@@ -1,0 +1,102 @@
+{#
+    Template standard pour liste CRUD
+
+    Usage:
+    {% extends 'crud/list.html.twig' %}
+
+    {% set crud_config = {
+        entity_name: 'client',
+        entity_name_plural: 'clients',
+        entity_label: 'Client',
+        entity_label_plural: 'Clients',
+        breadcrumb: [{label: 'Clients', path: null}],
+        can_create: is_granted('ROLE_CHEF_PROJET'),
+        create_route: 'client_new',
+        filters: [...],
+        columns: [...],
+        actions: {...}
+    } %}
+
+    {% block extra_content %}
+        <!-- Contenu additionnel avant le tableau -->
+    {% endblock %}
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ crud_config.entity_label_plural }}{% endblock %}
+
+{% block body %}
+{# Header avec breadcrumb et bouton créer #}
+{% set headerActions = [] %}
+{% if crud_config.can_create|default(true) %}
+    {% set headerActions = headerActions|merge([{
+        label: 'Nouveau ' ~ crud_config.entity_label|lower,
+        path: crud_config.create_route,
+        icon: 'bx-plus',
+        class: 'btn-primary'
+    }]) %}
+{% endif %}
+
+{% if crud_config.export_route is defined %}
+    {% set headerActions = headerActions|merge([{
+        label: 'Exporter',
+        path: crud_config.export_route,
+        icon: 'bx-download',
+        class: 'btn-outline-secondary'
+    }]) %}
+{% endif %}
+
+{% include 'components/page_header.html.twig' with {
+    title: crud_config.entity_label_plural,
+    breadcrumb: crud_config.breadcrumb|default([{label: crud_config.entity_label_plural, path: null}]),
+    actions: headerActions
+} %}
+
+{# Contenu additionnel (KPIs, stats, etc.) #}
+{% block extra_content %}{% endblock %}
+
+<div class="row">
+    <div class="col-12">
+        {# Filtres si définis #}
+        {% if crud_config.filters is defined and crud_config.filters|length > 0 %}
+            {% set activeFilterCount = 0 %}
+            {% for filter in crud_config.filters %}
+                {% if filter.value %}
+                    {% set activeFilterCount = activeFilterCount + 1 %}
+                {% endif %}
+            {% endfor %}
+
+            {% include 'components/filter_panel.html.twig' with {
+                filters: crud_config.filters,
+                activeCount: activeFilterCount
+            } %}
+        {% endif %}
+
+        {# Tableau de données #}
+        <div class="card">
+            <div class="card-body">
+                {% if crud_config.show_stats|default(false) %}
+                    <div class="mb-3">
+                        <p class="text-muted mb-0">
+                            <strong>{{ pagination.total|default(items|length) }}</strong>
+                            {{ crud_config.entity_label_plural|lower }} trouvé{{ pagination.total > 1 ? 's' : '' }}
+                        </p>
+                    </div>
+                {% endif %}
+
+                {% include 'components/data_table.html.twig' with {
+                    columns: crud_config.columns,
+                    data: items,
+                    actions: crud_config.actions|default({}),
+                    massActions: crud_config.mass_actions|default(false),
+                    currentPage: pagination.current_page|default(1),
+                    totalPages: pagination.total_pages|default(1),
+                    itemsPerPage: pagination.per_page|default(25),
+                    totalItems: pagination.total|default(items|length)
+                } %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
