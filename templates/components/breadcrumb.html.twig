@@ -22,7 +22,7 @@
             {% else %}
                 <li class="breadcrumb-item">
                     {% if item.path %}
-                        <a href="{{ path(item.path) }}">{{ item.label }}</a>
+                        <a href="{{ path(item.path, item.params|default({})) }}">{{ item.label }}</a>
                     {% else %}
                         {{ item.label }}
                     {% endif %}

@@ -23,12 +23,23 @@
         <div class="col-md-4">
             <div class="float-end d-none d-md-block">
                 {% for action in actions %}
-                    <a href="{{ path(action.path) }}" class="btn {{ action.class|default('btn-primary') }} btn-sm">
-                        {% if action.icon is defined %}
-                            <i class="bx {{ action.icon }} me-1"></i>
+                    {% if action.permission is not defined or is_granted(action.permission) %}
+                        {% if action.path %}
+                            <a href="{{ path(action.path, action.params|default({})) }}" class="btn {{ action.class|default('btn-primary') }} btn-sm">
+                                {% if action.icon is defined %}
+                                    <i class="bx {{ action.icon }} me-1"></i>
+                                {% endif %}
+                                {{ action.label }}
+                            </a>
+                        {% else %}
+                            <button type="button" class="btn {{ action.class|default('btn-primary') }} btn-sm" {% if action.id is defined %}id="{{ action.id }}"{% endif %} {% if action.data_toggle is defined %}data-bs-toggle="{{ action.data_toggle }}" data-bs-target="{{ action.data_target }}"{% endif %}>
+                                {% if action.icon is defined %}
+                                    <i class="bx {{ action.icon }} me-1"></i>
+                                {% endif %}
+                                {{ action.label }}
+                            </button>
                         {% endif %}
-                        {{ action.label }}
-                    </a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
