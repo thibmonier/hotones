@@ -9,9 +9,11 @@ use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -20,18 +22,108 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class EmploymentPeriodController extends AbstractController
 {
     #[Route('', name: 'employment_period_index', methods: ['GET'])]
-    public function index(Request $request, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository): Response
+    public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator, ContributorRepository $contributorRepository): Response
     {
-        $contributorId = $request->query->get('contributor');
+        // Filtres
+        $contributorId = $request->query->get('contributor', '');
+        $status        = $request->query->get('status', '');
 
-        $periods      = $employmentPeriodRepository->findWithOptionalContributorFilter($contributorId);
+        // Query builder avec filtres
+        $qb = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
+            ->leftJoin('ep.contributor', 'c')
+            ->addSelect('c')
+            ->orderBy('ep.startDate', 'DESC');
+
+        if ($contributorId) {
+            $qb->andWhere('ep.contributor = :contributor')
+                ->setParameter('contributor', $contributorId);
+        }
+
+        if ($status === 'active') {
+            $qb->andWhere('ep.endDate IS NULL OR ep.endDate >= :today')
+                ->setParameter('today', new DateTime());
+        } elseif ($status === 'ended') {
+            $qb->andWhere('ep.endDate < :today')
+                ->setParameter('today', new DateTime());
+        }
+
+        // Pagination
+        $pagination = $paginator->paginate(
+            $qb->getQuery(),
+            $request->query->getInt('page', 1),
+            $request->query->getInt('per_page', 25),
+        );
+
         $contributors = $contributorRepository->findActiveContributors();
 
         return $this->render('employment_period/index.html.twig', [
-            'periods'             => $periods,
-            'contributors'        => $contributors,
-            'selectedContributor' => $contributorId,
+            'periods'      => $pagination,
+            'contributors' => $contributors,
+            'filters'      => [
+                'contributor' => $contributorId,
+                'status'      => $status,
+            ],
         ]);
+    }
+
+    #[Route('/export', name: 'employment_period_export_csv', methods: ['GET'])]
+    public function exportCsv(Request $request, EntityManagerInterface $em): Response
+    {
+        // Mêmes filtres que l'index
+        $contributorId = $request->query->get('contributor', '');
+        $status        = $request->query->get('status', '');
+
+        $qb = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
+            ->leftJoin('ep.contributor', 'c')
+            ->addSelect('c')
+            ->orderBy('ep.startDate', 'DESC');
+
+        if ($contributorId) {
+            $qb->andWhere('ep.contributor = :contributor')
+                ->setParameter('contributor', $contributorId);
+        }
+
+        if ($status === 'active') {
+            $qb->andWhere('ep.endDate IS NULL OR ep.endDate >= :today')
+                ->setParameter('today', new DateTime());
+        } elseif ($status === 'ended') {
+            $qb->andWhere('ep.endDate < :today')
+                ->setParameter('today', new DateTime());
+        }
+
+        $periods = $qb->getQuery()->getResult();
+
+        // Génération CSV
+        $csv = "Contributeur;Date début;Date fin;Profils;Salaire;CJM;TJM;Heures/semaine;Temps de travail;Statut\n";
+        foreach ($periods as $period) {
+            $profiles = [];
+            foreach ($period->getProfiles() as $profile) {
+                $profiles[] = $profile->getName();
+            }
+
+            $csv .= sprintf(
+                "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n",
+                $period->getContributor()->getName(),
+                $period->getStartDate()->format('d/m/Y'),
+                $period->getEndDate() ? $period->getEndDate()->format('d/m/Y') : 'En cours',
+                implode(', ', $profiles),
+                $period->getSalary() ? number_format($period->getSalary(), 0, ',', ' ').' €' : '',
+                $period->getCjm() ? number_format($period->getCjm(), 0, ',', ' ').' €' : '',
+                $period->getTjm() ? number_format($period->getTjm(), 0, ',', ' ').' €' : '',
+                $period->getWeeklyHours().'h',
+                $period->getWorkTimePercentage().'%',
+                $period->getEndDate() === null || $period->getEndDate() >= new DateTime() ? 'Actif' : 'Terminé',
+            );
+        }
+
+        $response = new Response($csv);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'periodes_emploi_'.date('Y-m-d').'.csv',
+        ));
+
+        return $response;
     }
 
     #[Route('/new', name: 'employment_period_new', methods: ['GET', 'POST'])]
