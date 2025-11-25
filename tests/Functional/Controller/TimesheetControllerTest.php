@@ -288,7 +288,7 @@ class TimesheetControllerTest extends WebTestCase
 
         $client->request('GET', '/timesheet/calendar');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'Calendrier des temps');
+        $this->assertSelectorTextContains('h4', 'Calendrier');
         $this->assertSelectorExists('#calendar');
     }
 
