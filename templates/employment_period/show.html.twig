@@ -5,16 +5,18 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Période d'emploi - {{ period.contributor.name }}</h4>
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-                        <li class="breadcrumb-item"><a href="{{ path('employment_period_index') }}">Périodes d'emploi</a></li>
-                        <li class="breadcrumb-item active">{{ period.contributor.name }}</li>
-                    </ol>
-                </div>
-            </div>
+            {% include 'components/page_header.html.twig' with {
+                title: 'Période d\'emploi - ' ~ period.contributor.name,
+                breadcrumb: [
+                    {label: 'Administration', path: null},
+                    {label: 'Périodes d\'emploi', path: 'employment_period_index'},
+                    {label: period.contributor.name, path: null}
+                ],
+                actions: [
+                    {label: 'Retour à la liste', path: 'employment_period_index', icon: 'bx-arrow-back', class: 'btn-outline-secondary'},
+                    {label: 'Modifier', path: 'employment_period_edit', params: {id: period.id}, icon: 'bx-edit', class: 'btn-primary', permission: 'ROLE_COMPTA'}
+                ]
+            } %}
         </div>
     </div>
 

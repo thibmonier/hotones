@@ -5,14 +5,17 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Nouveau profil métier</h4>
-                <div class="page-title-right">
-                    <a href="{{ path('job_profile_index') }}" class="btn btn-outline-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Retour à la liste
-                    </a>
-                </div>
-            </div>
+            {% include 'components/page_header.html.twig' with {
+                title: 'Nouveau profil métier',
+                breadcrumb: [
+                    {label: 'Configuration', path: null},
+                    {label: 'Profils métier', path: 'job_profile_index'},
+                    {label: 'Nouveau', path: null}
+                ],
+                actions: [
+                    {label: 'Retour à la liste', path: 'job_profile_index', icon: 'bx-arrow-back', class: 'btn-outline-secondary'}
+                ]
+            } %}
         </div>
     </div>
 

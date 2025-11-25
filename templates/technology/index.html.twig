@@ -5,14 +5,16 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Technologies</h4>
-                <div class="page-title-right">
-                    <a href="{{ path('technology_new') }}" class="btn btn-primary">
-                        <i class="bx bx-plus me-1"></i> Nouvelle technologie
-                    </a>
-                </div>
-            </div>
+            {% include 'components/page_header.html.twig' with {
+                title: 'Technologies',
+                breadcrumb: [
+                    {label: 'Configuration', path: null},
+                    {label: 'Technologies', path: null}
+                ],
+                actions: [
+                    {label: 'Nouvelle technologie', path: 'technology_new', icon: 'bx-plus', class: 'btn-primary', permission: 'ROLE_ADMIN'}
+                ]
+            } %}
         </div>
     </div>
 
