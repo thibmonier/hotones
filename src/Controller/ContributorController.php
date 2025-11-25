@@ -197,10 +197,38 @@ class ContributorController extends AbstractController
     }
 
     #[Route('/{id}', name: 'contributor_show', methods: ['GET'])]
-    public function show(Contributor $contributor): Response
+    public function show(Contributor $contributor, EntityManagerInterface $em): Response
     {
+        // Agréger les ressources disponibles par compétence et niveau
+        $skillsData = $em->createQueryBuilder()
+            ->select('s.id', 's.name', 'cs.managerAssessmentLevel as level', 'COUNT(cs.id) as count')
+            ->from('App\Entity\ContributorSkill', 'cs')
+            ->join('cs.skill', 's')
+            ->join('cs.contributor', 'c')
+            ->where('c.active = true')
+            ->andWhere('cs.managerAssessmentLevel IS NOT NULL')
+            ->groupBy('s.id', 's.name', 'cs.managerAssessmentLevel')
+            ->orderBy('s.name', 'ASC')
+            ->addOrderBy('cs.managerAssessmentLevel', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        // Regrouper les données par compétence
+        $skillsByName = [];
+        foreach ($skillsData as $row) {
+            $skillName = $row['name'];
+            if (!isset($skillsByName[$skillName])) {
+                $skillsByName[$skillName] = [
+                    'name'   => $skillName,
+                    'levels' => [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0],
+                ];
+            }
+            $skillsByName[$skillName]['levels'][$row['level']] = (int) $row['count'];
+        }
+
         return $this->render('contributor/show.html.twig', [
-            'contributor' => $contributor,
+            'contributor'     => $contributor,
+            'skillsResources' => array_values($skillsByName),
         ]);
     }
 
