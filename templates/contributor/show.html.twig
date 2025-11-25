@@ -256,16 +256,16 @@
                                             <div>
                                                 <h6 class="mb-0">{{ contributorSkill.skill.name }}</h6>
                                                 {% if contributorSkill.skill.category %}
-                                                    <small class="text-muted">{{ contributorSkill.skill.category.name }}</small>
+                                                    <small class="text-muted">{{ contributorSkill.skill.categoryLabel }}</small>
                                                 {% endif %}
                                             </div>
                                         </div>
                                         <div>
-                                            {% if contributorSkill.level is not null %}
-                                                {% set levelClass = contributorSkill.level >= 4 ? 'success' : (contributorSkill.level >= 2 ? 'warning' : 'secondary') %}
+                                            {% if contributorSkill.selfAssessmentLevel is not null %}
+                                                {% set levelClass = contributorSkill.selfAssessmentLevel >= 4 ? 'success' : (contributorSkill.selfAssessmentLevel >= 2 ? 'warning' : 'secondary') %}
                                                 <span class="badge bg-{{ levelClass }}">
                                                     {% for i in 1..5 %}
-                                                        <i class="bx {{ i <= contributorSkill.level ? 'bxs-star' : 'bx-star' }}"></i>
+                                                        <i class="bx {{ i <= contributorSkill.selfAssessmentLevel ? 'bxs-star' : 'bx-star' }}"></i>
                                                     {% endfor %}
                                                 </span>
                                             {% endif %}
