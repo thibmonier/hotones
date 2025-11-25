@@ -176,6 +176,9 @@
                             <i class="bx bx-time me-1"></i> Voir les temps passés
                         </a>
                         {% if is_granted('ROLE_MANAGER') %}
+                            <a href="{{ path('contributor_skill_index', {'contributorId': contributor.id}) }}" class="btn btn-outline-success">
+                                <i class="bx bx-star me-1"></i> Gérer les compétences
+                            </a>
                             <a href="{{ path('contributor_employment_periods', {'id': contributor.id}) }}" class="btn btn-outline-info">
                                 <i class="bx bx-briefcase me-1"></i> Périodes d'emploi
                             </a>
@@ -186,10 +189,10 @@
         </div>
 
         <div class="col-lg-8">
-            <!-- Profils et compétences -->
+            <!-- Profils métier -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Profils et compétences</h5>
+                    <h5 class="card-title mb-0">Profils métier</h5>
                 </div>
                 <div class="card-body">
                     {% if contributor.profiles|length > 0 %}
@@ -222,6 +225,67 @@
                             <p class="text-muted mb-0">Aucun profil défini</p>
                             {% if is_granted('ROLE_MANAGER') %}
                                 <small class="text-muted">Modifiez le contributeur pour ajouter des profils</small>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Compétences techniques -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Compétences techniques</h5>
+                    {% if is_granted('ROLE_MANAGER') %}
+                        <a href="{{ path('contributor_skill_index', {'contributorId': contributor.id}) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bx bx-cog me-1"></i> Gérer
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if contributor.contributorSkills|length > 0 %}
+                        <div class="row">
+                            {% for contributorSkill in contributor.contributorSkills %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-xs me-3">
+                                                <div class="avatar-title bg-success text-white rounded-circle">
+                                                    <i class="bx bx-star"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ contributorSkill.skill.name }}</h6>
+                                                {% if contributorSkill.skill.category %}
+                                                    <small class="text-muted">{{ contributorSkill.skill.category.name }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {% if contributorSkill.level is not null %}
+                                                {% set levelClass = contributorSkill.level >= 4 ? 'success' : (contributorSkill.level >= 2 ? 'warning' : 'secondary') %}
+                                                <span class="badge bg-{{ levelClass }}">
+                                                    {% for i in 1..5 %}
+                                                        <i class="bx {{ i <= contributorSkill.level ? 'bxs-star' : 'bx-star' }}"></i>
+                                                    {% endfor %}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="avatar-sm mx-auto mb-3">
+                                <div class="avatar-title bg-light text-muted rounded-circle">
+                                    <i class="bx bx-star"></i>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0">Aucune compétence technique définie</p>
+                            {% if is_granted('ROLE_MANAGER') %}
+                                <a href="{{ path('contributor_skill_new', {'contributorId': contributor.id}) }}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="bx bx-plus me-1"></i> Ajouter une compétence
+                                </a>
                             {% endif %}
                         </div>
                     {% endif %}
