@@ -123,7 +123,7 @@
                                     </td>
                                     <td>
                                         {% if contributorSkill.notes %}
-                                            {{ contributorSkill.notes|u.truncate(50, '...') }}
+                                            {{ contributorSkill.notes|length > 50 ? contributorSkill.notes|slice(0, 50) ~ '...' : contributorSkill.notes }}
                                         {% else %}
                                             <span class="text-muted">-</span>
                                         {% endif %}

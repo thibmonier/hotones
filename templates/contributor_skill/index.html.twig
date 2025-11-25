@@ -106,7 +106,7 @@
                                         </td>
                                         <td>
                                             {% if contributorSkill.notes %}
-                                                {{ contributorSkill.notes|u.truncate(40, '...') }}
+                                                {{ contributorSkill.notes|length > 40 ? contributorSkill.notes|slice(0, 40) ~ '...' : contributorSkill.notes }}
                                             {% else %}
                                                 <span class="text-muted">-</span>
                                             {% endif %}

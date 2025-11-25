@@ -95,7 +95,8 @@
                                         <span class="badge bg-secondary">{{ skill.categoryLabel }}</span>
                                     </td>
                                     <td>
-                                        {{ skill.description|default('Aucune description')|u.truncate(60, '...') }}
+                                        {% set desc = skill.description|default('Aucune description') %}
+                                        {{ desc|length > 60 ? desc|slice(0, 60) ~ '...' : desc }}
                                     </td>
                                     <td class="text-center">
                                         {% set skillWithCount = skillsWithCount|filter(s => s.skill.id == skill.id)|first %}

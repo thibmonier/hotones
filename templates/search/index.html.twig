@@ -35,7 +35,7 @@
                                             <small>{{ project.client.name }}</small>
                                         </div>
                                         {% if project.description %}
-                                            <p class="mb-1 text-muted">{{ project.description|u.truncate(100) }}</p>
+                                            <p class="mb-1 text-muted">{{ project.description|length > 100 ? project.description|slice(0, 100) ~ '...' : project.description }}</p>
                                         {% endif %}
                                     </a>
                                 {% endfor %}
