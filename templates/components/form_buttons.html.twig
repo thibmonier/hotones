@@ -1,0 +1,71 @@
+{#
+    Component pour créer des boutons de formulaire standardisés
+
+    Paramètres:
+    - cancel_route (requis): Route pour le bouton annuler
+    - cancel_params (optionnel): Paramètres pour la route d'annulation
+    - submit_label (optionnel): Label du bouton submit (défaut: 'Enregistrer')
+    - layout (optionnel): 'horizontal' (défaut) ou 'vertical'
+    - show_delete (optionnel): Afficher bouton supprimer (défaut: false)
+    - delete_route (optionnel): Route pour la suppression
+    - delete_params (optionnel): Paramètres pour la route de suppression
+    - delete_confirm (optionnel): Message de confirmation pour la suppression
+
+    Exemple d'utilisation:
+    {% include 'components/form_buttons.html.twig' with {
+        cancel_route: 'project_index',
+        submit_label: 'Créer',
+        layout: 'horizontal'
+    } %}
+#}
+
+{% set layout = layout|default('horizontal') %}
+{% set submit_label = submit_label|default('Enregistrer') %}
+
+{% if layout == 'vertical' %}
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bx bx-save me-1"></i> {{ submit_label }}
+        </button>
+        <a href="{{ path(cancel_route, cancel_params|default({})) }}" class="btn btn-outline-secondary">
+            <i class="bx bx-x me-1"></i> Annuler
+        </a>
+        {% if show_delete|default(false) and delete_route is defined %}
+            <button type="button" class="btn btn-outline-danger"
+                    onclick="if(confirm('{{ delete_confirm|default('Êtes-vous sûr de vouloir supprimer cet élément ?') }}')) {
+                        document.getElementById('delete-form').submit();
+                    }">
+                <i class="bx bx-trash me-1"></i> Supprimer
+            </button>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="d-flex {% if show_delete|default(false) %}justify-content-between{% else %}justify-content-end{% endif %} gap-2">
+        {% if show_delete|default(false) and delete_route is defined %}
+            <button type="button" class="btn btn-outline-danger"
+                    onclick="if(confirm('{{ delete_confirm|default('Êtes-vous sûr de vouloir supprimer cet élément ?') }}')) {
+                        document.getElementById('delete-form').submit();
+                    }">
+                <i class="bx bx-trash me-1"></i> Supprimer
+            </button>
+            <div class="d-flex gap-2">
+        {% endif %}
+
+        <a href="{{ path(cancel_route, cancel_params|default({})) }}" class="btn btn-outline-secondary">
+            <i class="bx bx-x me-1"></i> Annuler
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="bx bx-save me-1"></i> {{ submit_label }}
+        </button>
+
+        {% if show_delete|default(false) and delete_route is defined %}
+            </div>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% if show_delete|default(false) and delete_route is defined %}
+    <form id="delete-form" method="post" action="{{ path(delete_route, delete_params|default({})) }}" style="display: none;">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ (delete_params.id|default(''))) }}">
+    </form>
+{% endif %}

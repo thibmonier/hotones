@@ -1,0 +1,32 @@
+{#
+    Component pour créer une section de carte standardisée avec en-tête
+
+    Paramètres:
+    - title (requis): Titre de la section
+    - icon (optionnel): Classe d'icône Boxicons (ex: 'bx-user', 'bx-info-circle')
+    - content (requis via block): Contenu de la carte
+
+    Exemple d'utilisation:
+    {% embed 'components/card_section.html.twig' with {
+        title: 'Informations générales',
+        icon: 'bx-user'
+    } %}
+        {% block content %}
+            <p>Contenu de la carte...</p>
+        {% endblock %}
+    {% endembed %}
+#}
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            {% if icon is defined %}
+                <i class="bx {{ icon }} me-2"></i>
+            {% endif %}
+            {{ title }}
+        </h5>
+    </div>
+    <div class="card-body">
+        {% block content %}{% endblock %}
+    </div>
+</div>
