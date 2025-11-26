@@ -113,7 +113,7 @@
                                             {% if period.endDate %}
                                                 {{ period.startDate.diff(period.endDate).days }} jours
                                             {% else %}
-                                                {{ period.startDate.diff(date()) |abs.days }} jours
+                                                {{ period.startDate.diff(date()).days |abs }} jours
                                             {% endif %}
                                         </small>
                                     </td>
