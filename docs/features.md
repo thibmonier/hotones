@@ -48,6 +48,10 @@ Le CJM est calculé automatiquement à partir du salaire mensuel brut selon la f
   - Champ CJM en lecture seule avec indicateur de calcul automatique
   - Affichage du détail du calcul (salaire annuel, coût total, jours ouvrés)
   - Prise en compte de l'année de début de la période pour le calcul des jours ouvrés
+  - **Calcul de la marge nette** : Affichage en temps réel de la marge (TJM - CJM) / TJM × 100
+    - Code couleur selon le niveau de marge (vert ≥30%, orange 10-20%, rouge <10%)
+    - Indicateur visuel de la qualité de la marge (Excellente, Bonne, Acceptable, Faible, Perte)
+    - Mise à jour automatique lors de la modification du TJM ou du CJM
 
 ## 📊 Gestion des projets
 - Project : Projets client

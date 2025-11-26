@@ -78,13 +78,13 @@
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="salary" class="form-label">Salaire mensuel brut (€)</label>
                                 <input type="number" class="form-control" id="salary" name="salary"
                                        step="0.01" min="0" value="{{ period.salary }}"
                                        placeholder="3500.00">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="cjm" class="form-label">
                                     CJM - Coût Journalier Moyen (€)
                                     <i class="bx bx-calculator text-muted" data-bs-toggle="tooltip" title="Calculé automatiquement"></i>
@@ -96,11 +96,25 @@
                                     <i class="bx bx-check-circle"></i> Calculé automatiquement
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="tjm" class="form-label">TJM - Taux Journalier Moyen (€)</label>
                                 <input type="number" class="form-control" id="tjm" name="tjm"
                                        step="0.01" min="0" value="{{ period.tjm }}"
                                        placeholder="550.00">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="margin" class="form-label">
+                                    Marge nette
+                                    <i class="bx bx-info-circle text-muted" data-bs-toggle="tooltip" title="(TJM - CJM) / TJM × 100"></i>
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light fw-bold" id="margin"
+                                           readonly value="-" style="text-align: right;">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-text small" id="margin-indicator" style="display: none;">
+                                    <i class="bx bx-trending-up"></i> <span id="margin-text"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -299,12 +313,65 @@
                 calculationBox.style.display = 'none';
                 autoCalcText.style.display = 'none';
             }
+
+            // Recalculer la marge après le CJM
+            calculateMargin();
         }
 
-        // Événement sur le champ salaire
-        document.getElementById('salary').addEventListener('input', calculateCjm);
+        // Calcul de la marge nette (TJM - CJM) / TJM × 100
+        function calculateMargin() {
+            const cjmInput = document.getElementById('cjm');
+            const tjmInput = document.getElementById('tjm');
+            const marginInput = document.getElementById('margin');
+            const marginIndicator = document.getElementById('margin-indicator');
+            const marginText = document.getElementById('margin-text');
 
-        // Calculer au chargement si un salaire est déjà renseigné
+            const cjm = parseFloat(cjmInput.value) || 0;
+            const tjm = parseFloat(tjmInput.value) || 0;
+
+            if (cjm > 0 && tjm > 0) {
+                // Calculer la marge : (TJM - CJM) / TJM × 100
+                const margin = ((tjm - cjm) / tjm) * 100;
+
+                // Mettre à jour l'affichage
+                marginInput.value = margin.toFixed(2);
+
+                // Appliquer une couleur selon la marge
+                if (margin >= 30) {
+                    marginInput.style.color = '#28a745'; // Vert foncé
+                    marginText.textContent = 'Excellente marge';
+                    marginText.style.color = '#28a745';
+                } else if (margin >= 20) {
+                    marginInput.style.color = '#5cb85c'; // Vert
+                    marginText.textContent = 'Bonne marge';
+                    marginText.style.color = '#5cb85c';
+                } else if (margin >= 10) {
+                    marginInput.style.color = '#f0ad4e'; // Orange
+                    marginText.textContent = 'Marge acceptable';
+                    marginText.style.color = '#f0ad4e';
+                } else if (margin >= 0) {
+                    marginInput.style.color = '#d9534f'; // Rouge
+                    marginText.textContent = 'Marge faible';
+                    marginText.style.color = '#d9534f';
+                } else {
+                    marginInput.style.color = '#c9302c'; // Rouge foncé
+                    marginText.textContent = 'Perte (CJM > TJM)';
+                    marginText.style.color = '#c9302c';
+                }
+
+                marginIndicator.style.display = 'block';
+            } else {
+                marginInput.value = '-';
+                marginInput.style.color = '';
+                marginIndicator.style.display = 'none';
+            }
+        }
+
+        // Événements
+        document.getElementById('salary').addEventListener('input', calculateCjm);
+        document.getElementById('tjm').addEventListener('input', calculateMargin);
+
+        // Calculer au chargement si des valeurs sont déjà renseignées
         calculateCjm();
 
         // Validation côté client
