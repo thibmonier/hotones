@@ -19,6 +19,8 @@ Référence: Roadmap — Lot 4 (Gestion de Compte Utilisateur) → [docs/roadmap
 ## 👥 Gestion des utilisateurs & intervenants
 - User : Compte utilisateur avec authentification 2FA
 - Contributor : Intervenants sur les projets (peut être lié à un User)
+  - **Les données financières (CJM, TJM, salaire) proviennent de la période d'emploi active ou de la plus récente**
+  - Méthodes dynamiques : `getCjm()`, `getTjm()`, `getSalary()` → récupérées depuis `EmploymentPeriod`
 - EmploymentPeriod : Historique RH (salaire, CJM, TJM, heures hebdo, temps partiel, dates, profils)
 
 ### Calcul automatique du CJM (Coût Journalier Moyen)

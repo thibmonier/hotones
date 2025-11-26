@@ -14,10 +14,12 @@ EmploymentPeriod (historique RH)
 └── profiles[] → Profile (ManyToMany)
 
 Contributor (intervenants)
-├── name, email, phone, cjm, tjm, active
+├── name, email, phone, active
 ├── user_id → User (optionnel)
 ├── profiles[] → Profile (dev, lead, chef projet...)
-└── employmentPeriods[], timesheets[]
+├── employmentPeriods[] → EmploymentPeriod
+├── timesheets[]
+└── getCjm(), getTjm(), getSalary() → proviennent de la période d'emploi active/récente
 
 Profile (profils métier)
 ├── name, description, defaultTjm

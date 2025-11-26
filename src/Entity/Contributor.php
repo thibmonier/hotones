@@ -64,14 +64,6 @@ class Contributor
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $notes = null;
 
-    // Coût Journalier Moyen (coût réel)
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $cjm = null;
-
-    // Tarif Journalier Moyen (prix de vente)
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $tjm = null;
-
     #[ORM\Column(type: 'boolean')]
     private bool $active = true;
 
@@ -282,28 +274,34 @@ class Contributor
         return $this;
     }
 
+    /**
+     * Récupère le CJM depuis la période d'emploi active ou la plus récente.
+     */
     public function getCjm(): ?string
     {
-        return $this->cjm;
+        $period = $this->getRelevantEmploymentPeriod();
+
+        return $period?->getCjm();
     }
 
-    public function setCjm(?string $cjm): self
-    {
-        $this->cjm = $cjm;
-
-        return $this;
-    }
-
+    /**
+     * Récupère le TJM depuis la période d'emploi active ou la plus récente.
+     */
     public function getTjm(): ?string
     {
-        return $this->tjm;
+        $period = $this->getRelevantEmploymentPeriod();
+
+        return $period?->getTjm();
     }
 
-    public function setTjm(?string $tjm): self
+    /**
+     * Récupère le salaire mensuel depuis la période d'emploi active ou la plus récente.
+     */
+    public function getSalary(): ?string
     {
-        $this->tjm = $tjm;
+        $period = $this->getRelevantEmploymentPeriod();
 
-        return $this;
+        return $period?->getSalary();
     }
 
     public function isActive(): bool
@@ -465,6 +463,23 @@ class Contributor
         }
 
         return null;
+    }
+
+    /**
+     * Récupère la période d'emploi la plus récente (active ou passée).
+     * Les périodes sont déjà triées par startDate DESC grâce à l'OrderBy.
+     */
+    public function getMostRecentEmploymentPeriod(): ?EmploymentPeriod
+    {
+        return $this->employmentPeriods->first() ?: null;
+    }
+
+    /**
+     * Récupère la période d'emploi pertinente : active en priorité, sinon la plus récente.
+     */
+    public function getRelevantEmploymentPeriod(): ?EmploymentPeriod
+    {
+        return $this->getCurrentEmploymentPeriod() ?? $this->getMostRecentEmploymentPeriod();
     }
 
     /**
