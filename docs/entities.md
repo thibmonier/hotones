@@ -94,6 +94,14 @@ ServiceCategory (catégories service)
 ├── name, description
 └── projects[]
 
+CompanySettings (paramètres entreprise - Singleton)
+├── structureCostCoefficient (défaut: 1.35)
+├── employerChargesCoefficient (défaut: 1.45)
+├── annualPaidLeaveDays (défaut: 25)
+├── annualRttDays (défaut: 10)
+├── updatedAt
+└── getGlobalChargeCoefficient() → structureCost × employerCharges
+
 ProjectTask (tâches de réalisation)
 ├── project → Project
 ├── orderLine → OrderLine (ligne budgétaire source, nullable)

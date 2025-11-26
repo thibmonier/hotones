@@ -21,6 +21,34 @@ Référence: Roadmap — Lot 4 (Gestion de Compte Utilisateur) → [docs/roadmap
 - Contributor : Intervenants sur les projets (peut être lié à un User)
 - EmploymentPeriod : Historique RH (salaire, CJM, TJM, heures hebdo, temps partiel, dates, profils)
 
+### Calcul automatique du CJM (Coût Journalier Moyen)
+Le CJM est calculé automatiquement à partir du salaire mensuel brut selon la formule :
+
+**CJM = (Salaire mensuel × 12 × Coefficient global) / Nombre de jours ouvrés**
+
+- **Coefficient global** = Coefficient de coûts de structure × Coefficient de charges patronales
+  - Coûts de structure : Typiquement 1.35 (locaux, équipements, frais généraux)
+  - Charges patronales : Typiquement 1.45 (charges sociales)
+  - Coefficient global par défaut : 1.35 × 1.45 = 1.9575
+
+- **Jours ouvrés annuels** = Jours de l'année - Weekends - Jours fériés - Congés payés - RTT
+  - 365 jours dans l'année (366 pour les années bissextiles)
+  - ~104 jours de weekends
+  - 11 jours fériés français (incluant Pâques et ses dépendants : Lundi de Pâques, Ascension, Pentecôte)
+  - 25 jours de congés payés (configurable)
+  - 10 jours de RTT (configurable)
+  - **Résultat typique : ~217 jours ouvrés par an**
+
+- **Configuration** : Paramètres administrables via `/admin/company-settings` (ROLE_ADMIN requis)
+  - Coefficients de coûts de structure et charges patronales
+  - Nombre de jours de congés payés et RTT
+  - Vue en temps réel du calcul avec exemple
+
+- **Formulaires EmploymentPeriod** : Le CJM est calculé automatiquement en temps réel lors de la saisie du salaire
+  - Champ CJM en lecture seule avec indicateur de calcul automatique
+  - Affichage du détail du calcul (salaire annuel, coût total, jours ouvrés)
+  - Prise en compte de l'année de début de la période pour le calcul des jours ouvrés
+
 ## 📊 Gestion des projets
 - Project : Projets client
   - Nom du projet et client, jours vendus, TJM de vente, dates, achats

@@ -315,7 +315,7 @@ docker compose exec app php bin/console doctrine:migrations:migrate
 
 - Application: http://localhost:8080
 - API Documentation: http://localhost:8080/api/documentation
-- Admin config: `/admin/technologies`, `/admin/service-categories`, `/admin/job-profiles`
+- Admin config: `/admin/technologies`, `/admin/service-categories`, `/admin/job-profiles`, `/admin/company-settings`
 - Analytics Dashboard: `/analytics/dashboard`
 - Profitability Dashboard: `/profitability/dashboard`
 - Sales Dashboard: `/sales/dashboard`
