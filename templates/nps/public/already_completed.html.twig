@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquête déjà complétée</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card shadow-lg border-0" style="max-width: 600px; width: 100%;">
+        <div class="card-body p-5 text-center">
+            <div class="text-info mb-4" style="font-size: 4rem;">ℹ</div>
+            <h2 class="fw-bold mb-3">Enquête déjà complétée</h2>
+            <p class="text-muted mb-4">
+                Vous avez déjà répondu à cette enquête le {{ survey.respondedAt|date('d/m/Y à H:i') }}.
+            </p>
+            {% if survey.score is not null %}
+                <div class="alert alert-light">
+                    <strong>Votre score :</strong>
+                    <span class="badge {% if survey.category == 'promoter' %}bg-success{% elseif survey.category == 'passive' %}bg-warning{% else %}bg-danger{% endif %} font-size-16 ms-2">
+                        {{ survey.score }}/10
+                    </span>
+                </div>
+            {% endif %}
+            <p class="text-muted small mt-4">
+                Merci pour votre participation !
+            </p>
+        </div>
+    </div>
+</body>
+</html>

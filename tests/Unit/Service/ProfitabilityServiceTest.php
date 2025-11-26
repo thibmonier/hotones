@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Contributor;
+use App\Entity\EmploymentPeriod;
 use App\Entity\Order;
 use App\Entity\OrderLine;
 use App\Entity\OrderSection;
@@ -52,9 +53,14 @@ class ProfitabilityServiceTest extends TestCase
         // Timesheets: 2 days total (16h) with CJM 400
         $contributor = (new Contributor())
             ->setFirstName('Alice')
-            ->setLastName('Test')
-            ->setCjm('400')
-            ->setTjm('800');
+            ->setLastName('Test');
+
+        $employmentPeriod = (new EmploymentPeriod())
+            ->setContributor($contributor)
+            ->setStartDate(new DateTime('-6 months'))
+            ->setCjm(400)
+            ->setTjm(800);
+        $contributor->addEmploymentPeriod($employmentPeriod);
 
         $regularTask = (new ProjectTask())
             ->setProject($project)
@@ -120,8 +126,13 @@ class ProfitabilityServiceTest extends TestCase
 
         $contributor = (new Contributor())
             ->setFirstName('Bob')
-            ->setLastName('Test')
-            ->setCjm('400');
+            ->setLastName('Test');
+
+        $employmentPeriod = (new EmploymentPeriod())
+            ->setContributor($contributor)
+            ->setStartDate(new DateTime('-6 months'))
+            ->setCjm(400);
+        $contributor->addEmploymentPeriod($employmentPeriod);
 
         $ts = (new Timesheet())
             ->setContributor($contributor)

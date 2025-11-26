@@ -1,0 +1,141 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Détail satisfaction{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Détail satisfaction', pagetitle: 'RH' }) }}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        Satisfaction de {{ satisfaction.contributor.fullName }} - {{ satisfaction.periodLabel }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Collaborateur</dt>
+                        <dd class="col-sm-8">{{ satisfaction.contributor.fullName }}</dd>
+
+                        <dt class="col-sm-4">Période</dt>
+                        <dd class="col-sm-8">{{ satisfaction.periodLabel }}</dd>
+
+                        <dt class="col-sm-4">Saisi le</dt>
+                        <dd class="col-sm-8">{{ satisfaction.submittedAt|date('d/m/Y à H:i') }}</dd>
+
+                        <dt class="col-sm-4">Score global</dt>
+                        <dd class="col-sm-8">
+                            <h4>
+                                <span class="badge {% if satisfaction.overallScore >= 4 %}bg-success{% elseif satisfaction.overallScore >= 3 %}bg-warning{% else %}bg-danger{% endif %} font-size-16">
+                                    {{ satisfaction.overallScore }}/5
+                                </span>
+                            </h4>
+                            <p class="text-muted mb-0">{{ satisfaction.overallScoreLabel }}</p>
+                        </dd>
+                    </dl>
+
+                    {% if satisfaction.projectsScore or satisfaction.teamScore or satisfaction.workEnvironmentScore or satisfaction.workLifeBalanceScore %}
+                        <hr>
+                        <h6 class="mb-3">Évaluations détaillées</h6>
+                        <dl class="row">
+                            {% if satisfaction.projectsScore %}
+                                <dt class="col-sm-4">Projets / Missions</dt>
+                                <dd class="col-sm-8">
+                                    {{ satisfaction.projectsScore }}/5
+                                    <span class="text-muted">({{ satisfaction.getScoreLabel(satisfaction.projectsScore) }})</span>
+                                </dd>
+                            {% endif %}
+
+                            {% if satisfaction.teamScore %}
+                                <dt class="col-sm-4">Équipe / Management</dt>
+                                <dd class="col-sm-8">
+                                    {{ satisfaction.teamScore }}/5
+                                    <span class="text-muted">({{ satisfaction.getScoreLabel(satisfaction.teamScore) }})</span>
+                                </dd>
+                            {% endif %}
+
+                            {% if satisfaction.workEnvironmentScore %}
+                                <dt class="col-sm-4">Environnement de travail</dt>
+                                <dd class="col-sm-8">
+                                    {{ satisfaction.workEnvironmentScore }}/5
+                                    <span class="text-muted">({{ satisfaction.getScoreLabel(satisfaction.workEnvironmentScore) }})</span>
+                                </dd>
+                            {% endif %}
+
+                            {% if satisfaction.workLifeBalanceScore %}
+                                <dt class="col-sm-4">Équilibre vie pro/perso</dt>
+                                <dd class="col-sm-8">
+                                    {{ satisfaction.workLifeBalanceScore }}/5
+                                    <span class="text-muted">({{ satisfaction.getScoreLabel(satisfaction.workLifeBalanceScore) }})</span>
+                                </dd>
+                            {% endif %}
+                        </dl>
+                    {% endif %}
+
+                    {% if satisfaction.positivePoints or satisfaction.improvementPoints or satisfaction.comment %}
+                        <hr>
+                        <h6 class="mb-3">Commentaires</h6>
+
+                        {% if satisfaction.positivePoints %}
+                            <div class="mb-3">
+                                <strong class="d-block mb-1 text-success">
+                                    <i class="bx bx-plus-circle me-1"></i>Points positifs
+                                </strong>
+                                <div class="alert alert-success bg-soft-success border-0">
+                                    {{ satisfaction.positivePoints|nl2br }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if satisfaction.improvementPoints %}
+                            <div class="mb-3">
+                                <strong class="d-block mb-1 text-warning">
+                                    <i class="bx bx-info-circle me-1"></i>Points d'amélioration
+                                </strong>
+                                <div class="alert alert-warning bg-soft-warning border-0">
+                                    {{ satisfaction.improvementPoints|nl2br }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if satisfaction.comment %}
+                            <div class="mb-3">
+                                <strong class="d-block mb-1">
+                                    <i class="bx bx-message-square-detail me-1"></i>Commentaire libre
+                                </strong>
+                                <div class="alert alert-light">
+                                    {{ satisfaction.comment|nl2br }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('satisfaction_index') }}" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Retour
+                        </a>
+                        {% if is_granted('ROLE_MANAGER') %}
+                            <form method="post" action="{{ path('satisfaction_delete', {id: satisfaction.id}) }}" style="display:inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette satisfaction ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('satisfaction_delete' ~ satisfaction.id) }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bx bx-trash me-1"></i> Supprimer
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Score moyen</h6>
+                    <h3 class="mb-0">{{ satisfaction.averageScore|number_format(1) }}/5</h3>
+                    <p class="text-muted small mb-0">Moyenne de toutes les dimensions évaluées</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

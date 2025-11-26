@@ -95,6 +95,55 @@
                 </li>
                 {% endif %}
 
+                {# RH & Satisfaction - Accessible selon les rôles #}
+                {% if is_granted('ROLE_USER') %}
+                <li class="menu-title">RH & Satisfaction</li>
+
+                {# Satisfaction collaborateur - accessible à tous les utilisateurs #}
+                <li>
+                    <a href="{{ path('satisfaction_index') }}" class="waves-effect">
+                        <i class="bx bx-smile"></i>
+                        <span>Ma satisfaction</span>
+                    </a>
+                </li>
+
+                {# NPS Client - accessible aux managers #}
+                {% if is_granted('ROLE_MANAGER') %}
+                <li>
+                    <a href="{{ path('nps_index') }}" class="waves-effect">
+                        <i class="bx bx-bar-chart-alt"></i>
+                        <span>Satisfaction client (NPS)</span>
+                    </a>
+                </li>
+
+                {# Statistiques satisfaction collaborateur - accessible aux managers #}
+                <li>
+                    <a href="{{ path('satisfaction_stats') }}" class="waves-effect">
+                        <i class="bx bx-stats"></i>
+                        <span>Stats satisfaction équipe</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {# Gamification - Classement accessible à tous #}
+                <li>
+                    <a href="{{ path('leaderboard_index') }}" class="waves-effect">
+                        <i class="bx bx-trophy"></i>
+                        <span>Classement & XP</span>
+                    </a>
+                </li>
+
+                {# Gestion des badges - accessible aux admins #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <li>
+                    <a href="{{ path('badge_index') }}" class="waves-effect">
+                        <i class="bx bx-award"></i>
+                        <span>Gestion des badges</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% endif %}
+
                 {# Configuration - Accessible aux administrateurs #}
                 {% if is_granted('ROLE_ADMIN') %}
                 <li class="menu-title">Configuration</li>

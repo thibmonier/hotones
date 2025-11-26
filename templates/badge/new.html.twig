@@ -1,0 +1,77 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouveau Badge{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Badges', pagetitle: 'Nouveau' }) }}
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Créer un nouveau badge</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom du badge <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="icon" class="form-label">Icône (Boxicons) <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="icon" name="icon" placeholder="bx-trophy" required>
+                                    <small class="text-muted">Voir: <a href="https://boxicons.com/" target="_blank">boxicons.com</a></small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="xp_reward" class="form-label">Récompense XP <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="xp_reward" name="xp_reward" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Catégorie <span class="text-danger">*</span></label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Sélectionner...</option>
+                                {% for key, label in categories %}
+                                    <option value="{{ key }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="criteria" class="form-label">Critères (JSON) - Optionnel</label>
+                            <textarea class="form-control font-monospace" id="criteria" name="criteria" rows="5" placeholder='{"level": 5, "total_xp": 1000}'></textarea>
+                            <small class="text-muted">Exemples de critères:</small>
+                            <ul class="small text-muted">
+                                <li><code>{"level": 5}</code> - Niveau minimum requis</li>
+                                <li><code>{"total_xp": 1000}</code> - XP total minimum</li>
+                                <li><code>{"xp_from_source": {"satisfaction": 500}}</code> - XP minimum d'une source</li>
+                                <li><code>{"action_count": {"satisfaction": 10}}</code> - Nombre d'actions minimum</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('badge_index') }}" class="btn btn-secondary">
+                                <i class="bx bx-arrow-back"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-save"></i> Créer le badge
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

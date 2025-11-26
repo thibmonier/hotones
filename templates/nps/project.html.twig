@@ -1,0 +1,170 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}NPS - {{ project.name }}{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'NPS du projet', pagetitle: 'Satisfaction Client' }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">
+                    Enquêtes NPS - {{ project.name }}
+                </h4>
+                <div class="page-title-right">
+                    <a href="{{ path('nps_new') }}" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Nouvelle enquête
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques du projet -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">Total enquêtes</h6>
+                    <h3 class="mb-0">{{ surveys|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">Réponses complètes</h6>
+                    <h3 class="mb-0">{{ stats.total }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">Score NPS</h6>
+                    <h3 class="mb-0">
+                        {% if stats.nps_score is not null %}
+                            <span class="{% if stats.nps_score >= 50 %}text-success{% elseif stats.nps_score >= 0 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ stats.nps_score }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">Score moyen</h6>
+                    <h3 class="mb-0">
+                        {% if stats.average_score %}
+                            {{ stats.average_score }}/10
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if stats.total > 0 %}
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-success">Promoteurs (9-10)</h6>
+                        <h3 class="mb-0">{{ stats.promoters }}</h3>
+                        <p class="text-muted small mb-0">{{ (stats.promoters / stats.total * 100)|round }}%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-warning">Passifs (7-8)</h6>
+                        <h3 class="mb-0">{{ stats.passives }}</h3>
+                        <p class="text-muted small mb-0">{{ (stats.passives / stats.total * 100)|round }}%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-danger">Détracteurs (0-6)</h6>
+                        <h3 class="mb-0">{{ stats.detractors }}</h3>
+                        <p class="text-muted small mb-0">{{ (stats.detractors / stats.total * 100)|round }}%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Liste des enquêtes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Historique des enquêtes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Destinataire</th>
+                                    <th>Envoyé le</th>
+                                    <th>Statut</th>
+                                    <th>Score</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for survey in surveys %}
+                                    <tr>
+                                        <td>
+                                            {% if survey.recipientName %}
+                                                <strong>{{ survey.recipientName }}</strong><br>
+                                            {% endif %}
+                                            <small class="text-muted">{{ survey.recipientEmail }}</small>
+                                        </td>
+                                        <td>{{ survey.sentAt|date('d/m/Y') }}</td>
+                                        <td>
+                                            {% if survey.status == 'completed' %}
+                                                <span class="badge bg-success">Complétée</span>
+                                            {% elseif survey.status == 'expired' %}
+                                                <span class="badge bg-danger">Expirée</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">En attente</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if survey.score is not null %}
+                                                <span class="badge {% if survey.category == 'promoter' %}bg-success{% elseif survey.category == 'passive' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    {{ survey.score }}/10
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ path('nps_show', {id: survey.id}) }}" class="btn btn-sm btn-outline-info">
+                                                <i class="bx bx-show"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Aucune enquête pour ce projet</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

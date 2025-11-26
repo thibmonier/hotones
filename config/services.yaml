@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    app.mail.from_email: '%env(MAIL_FROM_ADDRESS)%'
+    app.mail.from_name: '%env(MAIL_FROM_NAME)%'
 
 services:
     # default configuration for services in *this* file
@@ -36,3 +38,15 @@ services:
     App\Command\MigrationsSyncCommand:
         arguments:
             $projectDir: '%kernel.project_dir%'
+
+    # NPS Mailer Service
+    App\Service\NpsMailerService:
+        arguments:
+            $fromEmail: '%app.mail.from_email%'
+            $fromName: '%app.mail.from_name%'
+
+    # Contributor Satisfaction Reminder Command
+    App\Command\ContributorSatisfactionReminderCommand:
+        arguments:
+            $fromEmail: '%app.mail.from_email%'
+            $fromName: '%app.mail.from_name%'

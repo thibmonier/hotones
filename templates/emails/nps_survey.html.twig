@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquête de satisfaction</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #667eea;
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .content p {
+            margin: 15px 0;
+            font-size: 16px;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .cta-button:hover {
+            opacity: 0.9;
+        }
+        .cta-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .project-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .expires-note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Votre avis compte !</h1>
+        </div>
+
+        <div class="content">
+            <p>
+                {% if recipientName %}
+                    Bonjour {{ recipientName }},
+                {% else %}
+                    Bonjour,
+                {% endif %}
+            </p>
+
+            <p>
+                Nous espérons que vous êtes satisfait(e) de notre collaboration sur le projet ci-dessous.
+                Votre retour est précieux pour nous et nous aide à nous améliorer continuellement.
+            </p>
+
+            <div class="project-info">
+                <strong>📁 Projet concerné :</strong> {{ projectName }}
+            </div>
+
+            <p>
+                Nous vous invitons à prendre quelques instants pour répondre à notre enquête de satisfaction.
+                Une seule question vous sera posée :
+            </p>
+
+            <p style="font-style: italic; color: #555; padding-left: 20px; border-left: 3px solid #667eea;">
+                "Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez nos services ?"
+            </p>
+
+            <div class="cta-container">
+                <a href="{{ surveyUrl }}" class="cta-button">
+                    Répondre à l'enquête (2 min)
+                </a>
+            </div>
+
+            <div class="expires-note">
+                ⏱️ <strong>Note :</strong> Ce lien est valable jusqu'au {{ expiresAt|date('d/m/Y') }}.
+            </div>
+
+            <p>
+                Votre réponse est confidentielle et nous permettra d'améliorer la qualité de nos services.
+            </p>
+
+            <p>
+                Merci pour votre temps et votre confiance !
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><strong>L'équipe</strong></p>
+            <p style="font-size: 12px; color: #999;">
+                Si le bouton ne fonctionne pas, vous pouvez copier ce lien dans votre navigateur :<br>
+                <a href="{{ surveyUrl }}" style="color: #667eea; word-break: break-all;">{{ surveyUrl }}</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

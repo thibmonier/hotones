@@ -1,0 +1,68 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouvelle enquête NPS{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Nouvelle enquête NPS', pagetitle: 'Satisfaction Client' }) }}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Créer une nouvelle enquête de satisfaction</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="mb-3">
+                            {{ form_row(form.project) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.recipientEmail) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.recipientName) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.expiresAt) }}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('nps_index') }}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-send me-1"></i> Créer et envoyer l'enquête
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Information</h5>
+                    <p class="text-muted">
+                        L'enquête NPS (Net Promoter Score) permet de mesurer la satisfaction et la fidélité de vos clients.
+                    </p>
+                    <p class="text-muted">
+                        Le client recevra un email avec un lien pour répondre à la question :
+                        <em>"Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez nos services ?"</em>
+                    </p>
+                    <hr>
+                    <h6>Interprétation du score :</h6>
+                    <ul class="text-muted small">
+                        <li><strong>9-10</strong> : Promoteurs</li>
+                        <li><strong>7-8</strong> : Passifs</li>
+                        <li><strong>0-6</strong> : Détracteurs</li>
+                    </ul>
+                    <p class="text-muted small">
+                        <strong>NPS = % Promoteurs - % Détracteurs</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

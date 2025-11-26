@@ -1,0 +1,338 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Statistiques Satisfaction Collaborateur{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Statistiques', pagetitle: 'Satisfaction Collaborateur' }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">{{ title }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Année</label>
+                            <select name="year" class="form-select">
+                                {% for y in range('now'|date('Y') - 3, 'now'|date('Y') + 1) %}
+                                    <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Mois (optionnel)</label>
+                            <select name="month" class="form-select">
+                                <option value="">Toute l'année</option>
+                                {% for m in 1..12 %}
+                                    <option value="{{ m }}" {% if m == month %}selected{% endif %}>
+                                        {{ ('2024-' ~ m ~ '-01')|date('F') }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary d-block">Filtrer</button>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <a href="{{ path('satisfaction_export_csv', {year: year, month: month}) }}" class="btn btn-outline-success d-block">
+                                <i class="bx bx-download"></i> Export CSV
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Total réponses</p>
+                            <h4 class="mb-0">{{ stats.total }}</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                <span class="avatar-title">
+                                    <i class="bx bx-user font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Taux de participation</p>
+                            <h4 class="mb-0">{{ response_rate }}%</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-info">
+                                <span class="avatar-title">
+                                    <i class="bx bx-stats font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Score moyen global</p>
+                            <h4 class="mb-0">
+                                {% if stats.average_overall %}
+                                    <span class="{% if stats.average_overall >= 4 %}text-success{% elseif stats.average_overall >= 3 %}text-warning{% else %}text-danger{% endif %}">
+                                        {{ stats.average_overall }}
+                                    </span>/5
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle
+                                {% if stats.average_overall and stats.average_overall >= 4 %}bg-success
+                                {% elseif stats.average_overall and stats.average_overall >= 3 %}bg-warning
+                                {% else %}bg-danger{% endif %}">
+                                <span class="avatar-title">
+                                    <i class="bx bx-happy font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Projets</p>
+                            <h4 class="mb-0">
+                                {% if stats.average_projects %}
+                                    {{ stats.average_projects }}/5
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-secondary">
+                                <span class="avatar-title">
+                                    <i class="bx bx-briefcase font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Détails -->
+    {% if stats.average_team or stats.average_work_environment or stats.average_work_life_balance %}
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-muted">Équipe / Management</h6>
+                        <h3 class="mb-0">
+                            {% if stats.average_team %}
+                                {{ stats.average_team }}/5
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-muted">Environnement de travail</h6>
+                        <h3 class="mb-0">
+                            {% if stats.average_work_environment %}
+                                {{ stats.average_work_environment }}/5
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-muted">Équilibre vie pro/perso</h6>
+                        <h3 class="mb-0">
+                            {% if stats.average_work_life_balance %}
+                                {{ stats.average_work_life_balance }}/5
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Graphique d'évolution -->
+    {% if stats.monthly_averages is defined and stats.monthly_averages is not empty %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Évolution mensuelle de la satisfaction</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="satisfactionEvolutionChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Liste des satisfactions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Détail des réponses</h5>
+                </div>
+                <div class="card-body">
+                    {% if satisfactions|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Collaborateur</th>
+                                        {% if not month %}<th>Période</th>{% endif %}
+                                        <th>Score global</th>
+                                        <th>Projets</th>
+                                        <th>Équipe</th>
+                                        <th>Environnement</th>
+                                        <th>Équilibre</th>
+                                        <th>Saisi le</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for satisfaction in satisfactions %}
+                                        <tr>
+                                            <td>{{ satisfaction.contributor.fullName }}</td>
+                                            {% if not month %}<td>{{ satisfaction.periodLabel }}</td>{% endif %}
+                                            <td>
+                                                <span class="badge {% if satisfaction.overallScore >= 4 %}bg-success{% elseif satisfaction.overallScore >= 3 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    {{ satisfaction.overallScore }}/5
+                                                </span>
+                                            </td>
+                                            <td>{{ satisfaction.projectsScore ?? '—' }}</td>
+                                            <td>{{ satisfaction.teamScore ?? '—' }}</td>
+                                            <td>{{ satisfaction.workEnvironmentScore ?? '—' }}</td>
+                                            <td>{{ satisfaction.workLifeBalanceScore ?? '—' }}</td>
+                                            <td>{{ satisfaction.submittedAt|date('d/m/Y') }}</td>
+                                            <td class="text-end">
+                                                <a href="{{ path('satisfaction_show', {id: satisfaction.id}) }}" class="btn btn-sm btn-outline-info" title="Voir">
+                                                    <i class="bx bx-show"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center my-4">Aucune satisfaction saisie pour cette période.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ asset('assets/libs/chart.js/chart.umd.js') }}"></script>
+    {% if stats.monthly_averages is defined and stats.monthly_averages is not empty %}
+    <script>
+        // Graphique d'évolution mensuelle
+        const ctx = document.getElementById('satisfactionEvolutionChart');
+        if (ctx) {
+            const monthLabels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+            const monthlyData = {{ stats.monthly_averages|json_encode|raw }};
+
+            // Convertir l'objet en tableau ordonné
+            const data = [];
+            for (let i = 1; i <= 12; i++) {
+                data.push(monthlyData[i] || null);
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Score moyen',
+                        data: data,
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        spanGaps: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Score: ' + context.parsed.y + '/5';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    {% endif %}
+{% endblock %}

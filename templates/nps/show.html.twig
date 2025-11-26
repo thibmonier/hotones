@@ -1,0 +1,149 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Enquête NPS #{{ survey.id }}{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Détail enquête NPS', pagetitle: 'Satisfaction Client' }) }}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Enquête NPS #{{ survey.id }}</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Projet</dt>
+                        <dd class="col-sm-8">
+                            <a href="{{ path('project_show', {id: survey.project.id}) }}">
+                                {{ survey.project.name }}
+                            </a>
+                        </dd>
+
+                        <dt class="col-sm-4">Destinataire</dt>
+                        <dd class="col-sm-8">
+                            {% if survey.recipientName %}
+                                <strong>{{ survey.recipientName }}</strong><br>
+                            {% endif %}
+                            {{ survey.recipientEmail }}
+                        </dd>
+
+                        <dt class="col-sm-4">Statut</dt>
+                        <dd class="col-sm-8">
+                            {% if survey.status == 'completed' %}
+                                <span class="badge bg-success">Complétée</span>
+                            {% elseif survey.status == 'expired' %}
+                                <span class="badge bg-danger">Expirée</span>
+                            {% else %}
+                                <span class="badge bg-warning">En attente</span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4">Envoyée le</dt>
+                        <dd class="col-sm-8">{{ survey.sentAt|date('d/m/Y à H:i') }}</dd>
+
+                        <dt class="col-sm-4">Expire le</dt>
+                        <dd class="col-sm-8">{{ survey.expiresAt|date('d/m/Y') }}</dd>
+
+                        {% if survey.respondedAt %}
+                            <dt class="col-sm-4">Répondu le</dt>
+                            <dd class="col-sm-8">{{ survey.respondedAt|date('d/m/Y à H:i') }}</dd>
+                        {% endif %}
+
+                        {% if survey.score is not null %}
+                            <dt class="col-sm-4">Score</dt>
+                            <dd class="col-sm-8">
+                                <h4>
+                                    <span class="badge {% if survey.category == 'promoter' %}bg-success{% elseif survey.category == 'passive' %}bg-warning{% else %}bg-danger{% endif %} font-size-16">
+                                        {{ survey.score }}/10
+                                    </span>
+                                </h4>
+                                <p class="text-muted mb-0">{{ survey.categoryLabel }}</p>
+                            </dd>
+
+                            {% if survey.comment %}
+                                <dt class="col-sm-4">Commentaire</dt>
+                                <dd class="col-sm-8">
+                                    <div class="alert alert-light">
+                                        {{ survey.comment }}
+                                    </div>
+                                </dd>
+                            {% endif %}
+                        {% endif %}
+
+                        <dt class="col-sm-4">Lien de réponse</dt>
+                        <dd class="col-sm-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="{{ url('nps_public_respond', {token: survey.token}) }}" id="survey-link" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('survey-link').value); alert('Lien copié !');">
+                                    <i class="bx bx-copy"></i>
+                                </button>
+                            </div>
+                        </dd>
+                    </dl>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('nps_index') }}" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                        </a>
+                        <div>
+                            {% if survey.status == 'pending' %}
+                                <form method="post" action="{{ path('nps_resend', {id: survey.id}) }}" style="display:inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('nps_resend' ~ survey.id) }}">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-envelope me-1"></i> Renvoyer l'email
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <form method="post" action="{{ path('nps_delete', {id: survey.id}) }}" style="display:inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette enquête ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('nps_delete' ~ survey.id) }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bx bx-trash me-1"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Statistiques du projet</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>{{ survey.project.name }}</strong></p>
+
+                    {% if stats.total > 0 %}
+                        <dl class="row mb-0">
+                            <dt class="col-6">Total réponses :</dt>
+                            <dd class="col-6">{{ stats.total }}</dd>
+
+                            <dt class="col-6">Promoteurs :</dt>
+                            <dd class="col-6 text-success">{{ stats.promoters }}</dd>
+
+                            <dt class="col-6">Passifs :</dt>
+                            <dd class="col-6 text-warning">{{ stats.passives }}</dd>
+
+                            <dt class="col-6">Détracteurs :</dt>
+                            <dd class="col-6 text-danger">{{ stats.detractors }}</dd>
+
+                            <dt class="col-6"><strong>Score NPS :</strong></dt>
+                            <dd class="col-6">
+                                <strong class="{% if stats.nps_score >= 50 %}text-success{% elseif stats.nps_score >= 0 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ stats.nps_score }}
+                                </strong>
+                            </dd>
+
+                            <dt class="col-6">Score moyen :</dt>
+                            <dd class="col-6">{{ stats.average_score }}/10</dd>
+                        </dl>
+                    {% else %}
+                        <p class="text-muted">Aucune réponse pour ce projet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

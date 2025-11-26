@@ -1,0 +1,192 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Profil: {{ contributor.fullName }}{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Classement', pagetitle: contributor.fullName }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Profil de {{ contributor.fullName }}</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('leaderboard_index') }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back"></i> Retour au classement
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Rang</p>
+                            <h4 class="mb-0">#{{ rank }}</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                <span class="avatar-title">
+                                    <i class="bx bx-medal font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Niveau</p>
+                            <h4 class="mb-0">{{ progress.level }}</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-success">
+                                <span class="avatar-title">
+                                    <i class="bx bx-trending-up font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">XP Total</p>
+                            <h4 class="mb-0">{{ progress.totalXp }}</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-warning">
+                                <span class="avatar-title">
+                                    <i class="bx bx-star font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Badges</p>
+                            <h4 class="mb-0">{{ achievements|length }}</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-info">
+                                <span class="avatar-title">
+                                    <i class="bx bx-trophy font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progression -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Progression vers le niveau {{ progress.level + 1 }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="progress" style="height: 40px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar"
+                             style="width: {{ progress.progressPercentage }}%">
+                            {{ progress.currentLevelXp }} / {{ progress.nextLevelXp }} XP ({{ progress.progressPercentage }}%)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Badges débloqués -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Badges débloqués ({{ achievements|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if achievements|length > 0 %}
+                        <div class="row g-3">
+                            {% for achievement in achievements %}
+                                <div class="col-md-6">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body text-center">
+                                            <i class="bx {{ achievement.badge.icon }} font-size-48 text-primary mb-2"></i>
+                                            <h6 class="mb-1">{{ achievement.badge.name }}</h6>
+                                            <p class="text-muted small mb-2">{{ achievement.badge.description|slice(0, 60) }}...</p>
+                                            <span class="badge bg-success">+{{ achievement.badge.xpReward }} XP</span>
+                                            <br>
+                                            <small class="text-muted">{{ achievement.unlockedAt|date('d/m/Y') }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">Aucun badge débloqué pour le moment</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique XP -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Historique XP (dernières activités)</h5>
+                </div>
+                <div class="card-body">
+                    {% if xp_history|length > 0 %}
+                        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Source</th>
+                                        <th>XP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for history in xp_history %}
+                                        <tr>
+                                            <td><small>{{ history.gainedAt|date('d/m H:i') }}</small></td>
+                                            <td>
+                                                <small>{{ history.description ?? history.source }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">+{{ history.xpAmount }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">Aucun historique XP</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

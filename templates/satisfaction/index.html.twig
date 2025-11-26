@@ -1,0 +1,132 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Ma Satisfaction{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Ma Satisfaction', pagetitle: 'RH' }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Satisfaction Collaborateur</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Saisie du mois en cours -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Satisfaction pour {{ 'now'|date('F Y')|capitalize }}
+                    </h5>
+
+                    {% if current_satisfaction %}
+                        <div class="alert alert-success">
+                            <i class="bx bx-check-circle me-2"></i>
+                            Vous avez déjà saisi votre satisfaction pour ce mois (score : {{ current_satisfaction.overallScore }}/5)
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('satisfaction_submit', {year: current_year, month: current_month}) }}" class="btn btn-outline-primary">
+                                <i class="bx bx-edit me-1"></i> Modifier ma réponse
+                            </a>
+                            <a href="{{ path('satisfaction_show', {id: current_satisfaction.id}) }}" class="btn btn-outline-info">
+                                <i class="bx bx-show me-1"></i> Voir le détail
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">
+                            Prenez quelques minutes pour nous faire part de votre ressenti ce mois-ci.
+                        </p>
+                        <a href="{{ path('satisfaction_submit', {year: current_year, month: current_month}) }}" class="btn btn-primary">
+                            <i class="bx bx-edit me-1"></i> Saisir ma satisfaction
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historique -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Mon historique</h5>
+                </div>
+                <div class="card-body">
+                    {% if satisfactions|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Période</th>
+                                        <th>Score global</th>
+                                        <th>Projets</th>
+                                        <th>Équipe</th>
+                                        <th>Environnement</th>
+                                        <th>Équilibre vie pro/perso</th>
+                                        <th>Saisi le</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for satisfaction in satisfactions %}
+                                        <tr>
+                                            <td><strong>{{ satisfaction.periodLabel }}</strong></td>
+                                            <td>
+                                                <span class="badge
+                                                    {% if satisfaction.overallScore >= 4 %}bg-success
+                                                    {% elseif satisfaction.overallScore >= 3 %}bg-warning
+                                                    {% else %}bg-danger{% endif %}">
+                                                    {{ satisfaction.overallScore }}/5
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if satisfaction.projectsScore %}
+                                                    {{ satisfaction.projectsScore }}/5
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if satisfaction.teamScore %}
+                                                    {{ satisfaction.teamScore }}/5
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if satisfaction.workEnvironmentScore %}
+                                                    {{ satisfaction.workEnvironmentScore }}/5
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if satisfaction.workLifeBalanceScore %}
+                                                    {{ satisfaction.workLifeBalanceScore }}/5
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ satisfaction.submittedAt|date('d/m/Y') }}</td>
+                                            <td class="text-end">
+                                                <a href="{{ path('satisfaction_show', {id: satisfaction.id}) }}" class="btn btn-sm btn-outline-info" title="Voir">
+                                                    <i class="bx bx-show"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center my-4">Vous n'avez pas encore saisi de satisfaction.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

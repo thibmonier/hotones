@@ -1,0 +1,114 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}{% if is_edit %}Modifier{% else %}Saisir{% endif %} ma satisfaction{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: (is_edit ? 'Modifier' : 'Saisir') ~ ' ma satisfaction', pagetitle: 'RH' }) }}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        {% if is_edit %}Modifier{% else %}Saisir{% endif %} ma satisfaction - {{ satisfaction.periodLabel }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        Vos réponses sont confidentielles et nous aident à améliorer votre expérience au sein de l'équipe.
+                    </p>
+
+                    {{ form_start(form) }}
+
+                        <div class="mb-4">
+                            {{ form_row(form.overallScore) }}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="mb-3">Évaluations détaillées (optionnel)</h6>
+
+                        <div class="mb-3">
+                            {{ form_row(form.projectsScore) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.teamScore) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.workEnvironmentScore) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.workLifeBalanceScore) }}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="mb-3">Vos commentaires (optionnel)</h6>
+
+                        <div class="mb-3">
+                            {{ form_row(form.positivePoints) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.improvementPoints) }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form_row(form.comment) }}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('satisfaction_index') }}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-save me-1"></i> Enregistrer
+                            </button>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Pourquoi votre avis compte ?</h5>
+                    <p class="text-muted small">
+                        Votre satisfaction est essentielle pour nous. Ces retours mensuels nous permettent de :
+                    </p>
+                    <ul class="text-muted small">
+                        <li>Identifier rapidement les problèmes</li>
+                        <li>Valoriser ce qui fonctionne bien</li>
+                        <li>Adapter nos pratiques à vos besoins</li>
+                        <li>Créer un meilleur environnement de travail</li>
+                    </ul>
+                    <hr>
+                    <h6>Échelle de notation</h6>
+                    <ul class="text-muted small mb-0">
+                        <li><strong>5</strong> : Très satisfait</li>
+                        <li><strong>4</strong> : Satisfait</li>
+                        <li><strong>3</strong> : Neutre</li>
+                        <li><strong>2</strong> : Insatisfait</li>
+                        <li><strong>1</strong> : Très insatisfait</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bx bx-lock text-success me-1"></i>
+                        Confidentialité
+                    </h6>
+                    <p class="text-muted small mb-0">
+                        Vos réponses individuelles sont visibles uniquement par la direction RH et votre manager.
+                        Les statistiques agrégées sont anonymes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

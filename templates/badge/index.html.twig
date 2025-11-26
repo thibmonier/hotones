@@ -1,0 +1,119 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Gestion des Badges{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Administration', pagetitle: 'Badges' }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Gestion des Badges</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('badge_new') }}" class="btn btn-primary">
+                        <i class="bx bx-plus"></i> Nouveau badge
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Total badges</p>
+                            <h4 class="mb-0">{{ stats.total }}</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                <span class="avatar-title">
+                                    <i class="bx bx-award font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des badges -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Icône</th>
+                                    <th>Nom</th>
+                                    <th>Catégorie</th>
+                                    <th>XP</th>
+                                    <th>Statut</th>
+                                    <th>Débloqué</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for badge in badges %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <i class="bx {{ badge.icon }} font-size-24"></i>
+                                        </td>
+                                        <td>
+                                            <strong>{{ badge.name }}</strong><br>
+                                            <small class="text-muted">{{ badge.description|slice(0, 60) }}{% if badge.description|length > 60 %}...{% endif %}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ badge.category }}</span>
+                                        </td>
+                                        <td>{{ badge.xpReward }} XP</td>
+                                        <td>
+                                            {% if badge.active %}
+                                                <span class="badge bg-success">Actif</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactif</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ badge.achievements|length }} fois</td>
+                                        <td class="text-end">
+                                            <a href="{{ path('badge_show', {id: badge.id}) }}" class="btn btn-sm btn-outline-info" title="Voir">
+                                                <i class="bx bx-show"></i>
+                                            </a>
+                                            <a href="{{ path('badge_edit', {id: badge.id}) }}" class="btn btn-sm btn-outline-primary" title="Éditer">
+                                                <i class="bx bx-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('badge_toggle', {id: badge.id}) }}" class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('badge_toggle' ~ badge.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Activer/Désactiver">
+                                                    <i class="bx bx-toggle-{{ badge.active ? 'right' : 'left' }}"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{{ path('badge_delete', {id: badge.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce badge ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('badge_delete' ~ badge.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            Aucun badge créé pour le moment.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
