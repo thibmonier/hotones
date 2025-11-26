@@ -1,0 +1,217 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres de l'entreprise{% endblock %}
+
+{% block body %}
+    {% include 'components/page_header.html.twig' with {
+        title: 'Paramètres de l\'entreprise',
+        subtitle: 'Configuration des coefficients pour le calcul du CJM',
+        breadcrumb: [
+            {label: 'Administration', url: path('admin_dashboard')},
+            {label: 'Paramètres entreprise', active: true}
+        ]
+    } %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="post">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-cog me-2"></i>Coefficients de calcul
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="structure_cost_coefficient" class="form-label">
+                                    Coefficient de coûts de structure
+                                    <span class="text-muted" data-bs-toggle="tooltip" title="Représente les coûts fixes de l'entreprise (locaux, équipements, etc.)">
+                                        <i class="bx bx-info-circle"></i>
+                                    </span>
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="structure_cost_coefficient"
+                                       name="structure_cost_coefficient"
+                                       value="{{ settings.structureCostCoefficient }}"
+                                       step="0.01"
+                                       min="1"
+                                       max="3"
+                                       required>
+                                <div class="form-text">Généralement entre 1.3 et 1.4</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="employer_charges_coefficient" class="form-label">
+                                    Coefficient de charges patronales
+                                    <span class="text-muted" data-bs-toggle="tooltip" title="Représente les charges sociales patronales">
+                                        <i class="bx bx-info-circle"></i>
+                                    </span>
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="employer_charges_coefficient"
+                                       name="employer_charges_coefficient"
+                                       value="{{ settings.employerChargesCoefficient }}"
+                                       step="0.01"
+                                       min="1"
+                                       max="3"
+                                       required>
+                                <div class="form-text">Généralement autour de 1.45</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="annual_paid_leave_days" class="form-label">
+                                    Jours de congés payés annuels
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="annual_paid_leave_days"
+                                       name="annual_paid_leave_days"
+                                       value="{{ settings.annualPaidLeaveDays }}"
+                                       min="0"
+                                       max="60"
+                                       required>
+                                <div class="form-text">Légal en France : 25 jours</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="annual_rtt_days" class="form-label">
+                                    Jours de RTT annuels
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="annual_rtt_days"
+                                       name="annual_rtt_days"
+                                       value="{{ settings.annualRttDays }}"
+                                       min="0"
+                                       max="30"
+                                       required>
+                                <div class="form-text">Standard : 10 jours</div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="bx bx-calculator me-1"></i>Coefficient global
+                            </h6>
+                            <p class="mb-0">
+                                Coefficient global = {{ settings.structureCostCoefficient }} × {{ settings.employerChargesCoefficient }} =
+                                <strong>{{ settings.globalChargeCoefficient }}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save me-1"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-calendar me-2"></i>Calcul pour {{ calculationReport.year }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td>Jours dans l'année</td>
+                                <td class="text-end"><strong>{{ calculationReport.total_days }}</strong></td>
+                            </tr>
+                            <tr class="text-danger">
+                                <td>- Weekends</td>
+                                <td class="text-end">{{ calculationReport.weekends }}</td>
+                            </tr>
+                            <tr class="text-danger">
+                                <td>- Jours fériés</td>
+                                <td class="text-end">{{ calculationReport.public_holidays }}</td>
+                            </tr>
+                            <tr class="text-danger">
+                                <td>- Congés payés</td>
+                                <td class="text-end">{{ calculationReport.paid_leave }}</td>
+                            </tr>
+                            <tr class="text-danger">
+                                <td>- RTT</td>
+                                <td class="text-end">{{ calculationReport.rtt }}</td>
+                            </tr>
+                            <tr class="border-top fw-bold">
+                                <td>= Jours ouvrés</td>
+                                <td class="text-end text-success">{{ calculationReport.working_days }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-money me-2"></i>Exemple de calcul
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Pour un salaire mensuel brut de <strong>{{ exampleSalary|number_format(0, ',', ' ') }} €</strong> :</p>
+
+                    <div class="mb-2">
+                        <small class="text-muted">Salaire annuel</small>
+                        <div>{{ exampleSalary|number_format(0, ',', ' ') }} × 12 = <strong>{{ (exampleSalary * 12)|number_format(0, ',', ' ') }} €</strong></div>
+                    </div>
+
+                    <div class="mb-2">
+                        <small class="text-muted">Coût annuel entreprise</small>
+                        <div>{{ (exampleSalary * 12)|number_format(0, ',', ' ') }} × {{ settings.globalChargeCoefficient }} = <strong>{{ (exampleSalary * 12 * settings.globalChargeCoefficient)|number_format(0, ',', ' ') }} €</strong></div>
+                    </div>
+
+                    <div class="alert alert-success mb-0">
+                        <small class="text-muted d-block">CJM calculé</small>
+                        <h4 class="mb-0">{{ exampleCjm|number_format(2, ',', ' ') }} €/jour</h4>
+                    </div>
+
+                    <div class="mt-2">
+                        <small class="text-muted">Formule : (Salaire × 12 × {{ settings.globalChargeCoefficient }}) / {{ calculationReport.working_days }} jours ouvrés</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Initialiser les tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Recalculer le coefficient global en temps réel
+        const structureInput = document.getElementById('structure_cost_coefficient');
+        const employerInput = document.getElementById('employer_charges_coefficient');
+
+        function updateGlobalCoefficient() {
+            const structure = parseFloat(structureInput.value) || 0;
+            const employer = parseFloat(employerInput.value) || 0;
+            const global = (structure * employer).toFixed(4);
+
+            // Update display (if you want real-time update)
+            const globalDisplay = document.querySelector('.alert-info strong');
+            if (globalDisplay) {
+                globalDisplay.textContent = global;
+            }
+        }
+
+        structureInput.addEventListener('input', updateGlobalCoefficient);
+        employerInput.addEventListener('input', updateGlobalCoefficient);
+    </script>
+{% endblock %}

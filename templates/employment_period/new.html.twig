@@ -67,27 +67,57 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-0">Données financières</h4>
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-euro me-2"></i>
+                            Données financières
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label for="salary" class="form-label">Salaire mensuel (€)</label>
-                                <input type="number" class="form-control" id="salary" name="salary" 
-                                       step="0.01" min="0" value="{{ period.salary }}" 
+                                <label for="salary" class="form-label">Salaire mensuel brut (€)</label>
+                                <input type="number" class="form-control" id="salary" name="salary"
+                                       step="0.01" min="0" value="{{ period.salary }}"
                                        placeholder="3500.00">
                             </div>
                             <div class="col-md-4">
-                                <label for="cjm" class="form-label">CJM - Coût Journalier Moyen (€)</label>
-                                <input type="number" class="form-control" id="cjm" name="cjm" 
-                                       step="0.01" min="0" value="{{ period.cjm }}" 
-                                       placeholder="450.00">
+                                <label for="cjm" class="form-label">
+                                    CJM - Coût Journalier Moyen (€)
+                                    <i class="bx bx-calculator text-muted" data-bs-toggle="tooltip" title="Calculé automatiquement"></i>
+                                </label>
+                                <input type="number" class="form-control bg-light" id="cjm" name="cjm"
+                                       step="0.01" min="0" value="{{ period.cjm }}"
+                                       placeholder="Auto" readonly>
+                                <div class="form-text small text-success" id="cjm-auto-calc" style="display: none;">
+                                    <i class="bx bx-check-circle"></i> Calculé automatiquement
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="tjm" class="form-label">TJM - Taux Journalier Moyen (€)</label>
-                                <input type="number" class="form-control" id="tjm" name="tjm" 
-                                       step="0.01" min="0" value="{{ period.tjm }}" 
+                                <input type="number" class="form-control" id="tjm" name="tjm"
+                                       step="0.01" min="0" value="{{ period.tjm }}"
                                        placeholder="550.00">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info" id="cjm-calculation-box" style="display: none;">
+                            <h6 class="alert-heading mb-2">
+                                <i class="bx bx-calculator me-1"></i>Détail du calcul CJM
+                            </h6>
+                            <div class="small">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-1">Salaire annuel brut : <strong><span id="calc-annual-salary">-</span> €</strong></div>
+                                        <div class="mb-1">Coefficient global : <strong>{{ calculationReport.global_coefficient }}</strong></div>
+                                        <div class="mb-1">Coût annuel entreprise : <strong><span id="calc-annual-cost">-</span> €</strong></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-1">Jours ouvrés ({{ calculationReport.year }}) : <strong>{{ calculationReport.working_days }} jours</strong></div>
+                                        <div class="mb-1">
+                                            <small class="text-muted d-block">365j - {{ calculationReport.weekends }} weekends - {{ calculationReport.public_holidays }} fériés - {{ calculationReport.paid_leave }} CP - {{ calculationReport.rtt }} RTT</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -173,11 +203,62 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        // Paramètres de calcul CJM
+        const globalCoefficient = {{ calculationReport.global_coefficient }};
+        const workingDays = {{ calculationReport.working_days }};
+
+        // Initialiser les tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Calcul automatique du CJM
+        function calculateCjm() {
+            const salaryInput = document.getElementById('salary');
+            const cjmInput = document.getElementById('cjm');
+            const calculationBox = document.getElementById('cjm-calculation-box');
+            const autoCalcText = document.getElementById('cjm-auto-calc');
+
+            const salary = parseFloat(salaryInput.value) || 0;
+
+            if (salary > 0) {
+                // Salaire annuel
+                const annualSalary = salary * 12;
+
+                // Coût annuel avec charges
+                const annualCost = annualSalary * globalCoefficient;
+
+                // CJM
+                const cjm = annualCost / workingDays;
+
+                // Mettre à jour l'affichage
+                cjmInput.value = cjm.toFixed(2);
+
+                // Afficher les détails du calcul
+                document.getElementById('calc-annual-salary').textContent = annualSalary.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('calc-annual-cost').textContent = annualCost.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+                calculationBox.style.display = 'block';
+                autoCalcText.style.display = 'block';
+            } else {
+                cjmInput.value = '';
+                calculationBox.style.display = 'none';
+                autoCalcText.style.display = 'none';
+            }
+        }
+
+        // Événement sur le champ salaire
+        document.getElementById('salary').addEventListener('input', calculateCjm);
+
+        // Calculer au chargement si un salaire est déjà renseigné
+        calculateCjm();
+
         // Validation côté client
         document.querySelector('form').addEventListener('submit', function(e) {
             const startDate = document.getElementById('start_date').value;
             const endDate = document.getElementById('end_date').value;
-            
+
             if (endDate && endDate < startDate) {
                 e.preventDefault();
                 alert('La date de fin ne peut pas être antérieure à la date de début.');

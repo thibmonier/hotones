@@ -7,6 +7,7 @@ use App\Entity\EmploymentPeriod;
 use App\Entity\Profile;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
+use App\Service\CjmCalculatorService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -127,7 +128,7 @@ class EmploymentPeriodController extends AbstractController
     }
 
     #[Route('/new', name: 'employment_period_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository): Response
+    public function new(Request $request, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository, CjmCalculatorService $cjmCalculatorService): Response
     {
         $period = new EmploymentPeriod();
 
@@ -160,8 +161,16 @@ class EmploymentPeriodController extends AbstractController
             $salary = $request->request->get('salary');
             $period->setSalary($salary !== '' ? (float) $salary : null);
 
-            $cjm = $request->request->get('cjm');
-            $period->setCjm($cjm !== '' ? (float) $cjm : null);
+            // Calculer automatiquement le CJM si un salaire est fourni
+            if ($period->getSalary() && $period->getStartDate()) {
+                $year          = (int) $period->getStartDate()->format('Y');
+                $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
+                $period->setCjm((float) $calculatedCjm);
+            } else {
+                // Autoriser la saisie manuelle si pas de salaire
+                $cjm = $request->request->get('cjm');
+                $period->setCjm($cjm !== '' ? (float) $cjm : null);
+            }
 
             $tjm = $request->request->get('tjm');
             $period->setTjm($tjm !== '' ? (float) $tjm : null);
@@ -192,11 +201,16 @@ class EmploymentPeriodController extends AbstractController
                 $contributors = $contributorRepository->findActiveContributors();
                 $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
+                // Obtenir les informations de calcul CJM
+                $year              = $period->getStartDate() ? (int) $period->getStartDate()->format('Y') : (int) date('Y');
+                $calculationReport = $cjmCalculatorService->getCalculationReport($year);
+
                 return $this->render('employment_period/new.html.twig', [
                     'period'                => $period,
                     'contributors'          => $contributors,
                     'profiles'              => $profiles,
                     'selectedContributorId' => $period->getContributor() ? $period->getContributor()->getId() : null,
+                    'calculationReport'     => $calculationReport,
                 ]);
             }
 
@@ -211,11 +225,16 @@ class EmploymentPeriodController extends AbstractController
         $contributors = $contributorRepository->findActiveContributors();
         $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
+        // Obtenir les informations de calcul CJM pour l'année en cours
+        $year              = (int) date('Y');
+        $calculationReport = $cjmCalculatorService->getCalculationReport($year);
+
         return $this->render('employment_period/new.html.twig', [
             'period'                => $period,
             'contributors'          => $contributors,
             'profiles'              => $profiles,
             'selectedContributorId' => $period->getContributor() ? $period->getContributor()->getId() : null,
+            'calculationReport'     => $calculationReport,
         ]);
     }
 
@@ -240,7 +259,7 @@ class EmploymentPeriodController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'employment_period_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EmploymentPeriod $period, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository): Response
+    public function edit(Request $request, EmploymentPeriod $period, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository, CjmCalculatorService $cjmCalculatorService): Response
     {
         if ($request->isMethod('POST')) {
             // Contributeur
@@ -263,8 +282,16 @@ class EmploymentPeriodController extends AbstractController
             $salary = $request->request->get('salary');
             $period->setSalary($salary !== '' ? (float) $salary : null);
 
-            $cjm = $request->request->get('cjm');
-            $period->setCjm($cjm !== '' ? (float) $cjm : null);
+            // Calculer automatiquement le CJM si un salaire est fourni
+            if ($period->getSalary() && $period->getStartDate()) {
+                $year          = (int) $period->getStartDate()->format('Y');
+                $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
+                $period->setCjm((float) $calculatedCjm);
+            } else {
+                // Autoriser la saisie manuelle si pas de salaire
+                $cjm = $request->request->get('cjm');
+                $period->setCjm($cjm !== '' ? (float) $cjm : null);
+            }
 
             $tjm = $request->request->get('tjm');
             $period->setTjm($tjm !== '' ? (float) $tjm : null);
@@ -296,10 +323,15 @@ class EmploymentPeriodController extends AbstractController
                 $contributors = $contributorRepository->findActiveContributors();
                 $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
+                // Obtenir les informations de calcul CJM
+                $year              = $period->getStartDate() ? (int) $period->getStartDate()->format('Y') : (int) date('Y');
+                $calculationReport = $cjmCalculatorService->getCalculationReport($year);
+
                 return $this->render('employment_period/edit.html.twig', [
-                    'period'       => $period,
-                    'contributors' => $contributors,
-                    'profiles'     => $profiles,
+                    'period'            => $period,
+                    'contributors'      => $contributors,
+                    'profiles'          => $profiles,
+                    'calculationReport' => $calculationReport,
                 ]);
             }
 
@@ -313,10 +345,15 @@ class EmploymentPeriodController extends AbstractController
         $contributors = $contributorRepository->findActiveContributors();
         $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
+        // Obtenir les informations de calcul CJM pour l'année de la période
+        $year              = (int) $period->getStartDate()->format('Y');
+        $calculationReport = $cjmCalculatorService->getCalculationReport($year);
+
         return $this->render('employment_period/edit.html.twig', [
-            'period'       => $period,
-            'contributors' => $contributors,
-            'profiles'     => $profiles,
+            'period'            => $period,
+            'contributors'      => $contributors,
+            'profiles'          => $profiles,
+            'calculationReport' => $calculationReport,
         ]);
     }
 
