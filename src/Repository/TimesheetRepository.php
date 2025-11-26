@@ -294,12 +294,14 @@ class TimesheetRepository extends ServiceEntityRepository
 
     /**
      * Chiffre d'affaires mensuel en régie (TJM contributeur): Σ(hours * (tjm/8)).
+     * Le TJM provient de la période d'emploi active à la date du timesheet.
      */
     public function getMonthlyRevenueForProjectUsingContributorTjm(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
     {
         $qb = $this->createQueryBuilder('t')
-            ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours * (c.tjm/8)) as revenue')
-            ->join('t.contributor', 'c')
+            ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours * (COALESCE(ep.tjm, 0)/8)) as revenue')
+            ->leftJoin('t.contributor', 'c')
+            ->leftJoin('App\\Entity\\EmploymentPeriod', 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
             ->where('t.project = :project')
             ->setParameter('project', $project)
             ->groupBy('year, month')
@@ -318,8 +320,9 @@ class TimesheetRepository extends ServiceEntityRepository
 
     /**
      * Agrégats période pour un ensemble de projets: totalHours, totalHumanCost, totalRevenue.
-     * - Coût humain: Σ(hours × (effectiveCJM)/8), effectiveCJM = COALESCE(ep.cjm, c.cjm) × (COALESCE(ep.workTimePercentage, 100)/100)
-     * - Revenu: Σ(hours × (effectiveTJM)/8), effectiveTJM = COALESCE(ep.tjm, c.tjm).
+     * - Coût humain: Σ(hours × (effectiveCJM)/8), effectiveCJM = ep.cjm × (COALESCE(ep.workTimePercentage, 100)/100)
+     * - Revenu: Σ(hours × (effectiveTJM)/8), effectiveTJM = ep.tjm.
+     * Les données financières proviennent uniquement de la période d'emploi active à la date du timesheet.
      */
     public function getPeriodAggregatesForProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
     {
@@ -333,8 +336,8 @@ class TimesheetRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('t')
             ->select('COALESCE(SUM(t.hours), 0) AS totalHours')
-            ->addSelect('COALESCE(SUM(t.hours * ((COALESCE(ep.cjm, c.cjm, 0) * (COALESCE(ep.workTimePercentage, 100)/100)) / 8)), 0) AS totalHumanCost')
-            ->addSelect('COALESCE(SUM(t.hours * (COALESCE(ep.tjm, c.tjm, 0) / 8)), 0) AS totalRevenue')
+            ->addSelect('COALESCE(SUM(t.hours * ((COALESCE(ep.cjm, 0) * (COALESCE(ep.workTimePercentage, 100)/100)) / 8)), 0) AS totalHumanCost')
+            ->addSelect('COALESCE(SUM(t.hours * (COALESCE(ep.tjm, 0) / 8)), 0) AS totalRevenue')
             ->leftJoin('t.contributor', 'c')
             ->leftJoin('t.project', 'p')
             ->leftJoin('App\\Entity\\EmploymentPeriod', 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')

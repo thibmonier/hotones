@@ -107,28 +107,30 @@ class ContributorController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
-        // For aggregate queries, we need to use DISTINCT or group by c.id to avoid
-        // counting the same contributor multiple times due to the profiles join
-        $avgCjmQb = clone $qb;
-        $avgCjm   = $avgCjmQb
-            ->select('AVG(DISTINCT c.cjm)')
-            ->resetDQLPart('orderBy')
-            ->andWhere('c.cjm IS NOT NULL')
-            ->getQuery()
-            ->getSingleScalarResult();
-        $avgCjm = $avgCjm !== null ? (float) $avgCjm : null;
-
-        $avgTjmQb = clone $qb;
-        $avgTjm   = $avgTjmQb
-            ->select('AVG(DISTINCT c.tjm)')
-            ->resetDQLPart('orderBy')
-            ->andWhere('c.tjm IS NOT NULL')
-            ->getQuery()
-            ->getSingleScalarResult();
-        $avgTjm = $avgTjm !== null ? (float) $avgTjm : null;
-
         $qb->setFirstResult($offset)->setMaxResults($perPage);
         $contributors = $qb->getQuery()->getResult();
+
+        // Calculer les moyennes CJM/TJM à partir des périodes d'emploi des contributeurs
+        // Note: On récupère tous les contributeurs (sans pagination) pour calculer les stats globales
+        $allContributorsQb = clone $qb;
+        $allContributorsQb->setFirstResult(0)->setMaxResults(null);
+        $allContributors = $allContributorsQb->getQuery()->getResult();
+
+        $cjmValues = [];
+        $tjmValues = [];
+        foreach ($allContributors as $contributor) {
+            $cjm = $contributor->getCjm();
+            $tjm = $contributor->getTjm();
+            if ($cjm !== null) {
+                $cjmValues[] = (float) $cjm;
+            }
+            if ($tjm !== null) {
+                $tjmValues[] = (float) $tjm;
+            }
+        }
+
+        $avgCjm = !empty($cjmValues) ? array_sum($cjmValues) / count($cjmValues) : null;
+        $avgTjm = !empty($tjmValues) ? array_sum($tjmValues) / count($tjmValues) : null;
 
         $pagination = [
             'current_page' => $page,
