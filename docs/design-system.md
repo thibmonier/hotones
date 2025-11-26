@@ -665,7 +665,337 @@ Préfixer avec `app-` pour éviter les conflits :
 
 ---
 
+---
+
+## Phase 5 - Standards 2025 (Lot 15.5)
+
+Cette section documente les standardisations établies lors de la Phase 5 (novembre 2025).
+
+### Nouveaux components
+
+#### card_section.html.twig
+
+Component pour sections de formulaires standardisées.
+
+```twig
+{% embed 'components/card_section.html.twig' with {
+    title: 'Informations générales',
+    icon: 'bx-user'
+} %}
+    {% block content %}
+        <div class="mb-3">
+            <label class="form-label">Nom <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" required>
+        </div>
+    {% endblock %}
+{% endembed %}
+```
+
+#### form_buttons.html.twig
+
+Boutons de formulaire standardisés avec layouts horizontal/vertical.
+
+```twig
+{# Layout horizontal (défaut) #}
+{% include 'components/form_buttons.html.twig' with {
+    cancel_route: 'entity_index',
+    submit_label: 'Créer',
+    layout: 'horizontal'
+} %}
+
+{# Layout vertical (sidebar) #}
+{% include 'components/form_buttons.html.twig' with {
+    cancel_route: 'entity_index',
+    submit_label: 'Enregistrer',
+    layout: 'vertical',
+    show_delete: true,
+    delete_route: 'entity_delete',
+    delete_params: {id: entity.id}
+} %}
+```
+
+### Standards de formulaires (2025)
+
+#### Titres de cartes OBLIGATOIRES
+
+**Règle stricte** : Toujours `<h5>` avec `mb-0` et icône optionnelle dans un `<div class="card-header">`.
+
+```html
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bx bx-user me-2"></i>
+            Informations générales
+        </h5>
+    </div>
+    <div class="card-body">
+        <!-- Contenu -->
+    </div>
+</div>
+```
+
+❌ **À éviter** :
+```html
+<!-- PAS de h4 -->
+<h4 class="card-title">Titre</h4>
+
+<!-- PAS sans mb-0 -->
+<h5 class="card-title">Titre</h5>
+
+<!-- PAS dans card-body directement sans header -->
+<div class="card-body">
+    <h5>Titre</h5>
+</div>
+```
+
+#### Icônes standards par section
+
+| Section | Icône Boxicons |
+|---------|----------------|
+| Informations générales | `bx-user` ou `bx-info-circle` |
+| Informations financières | `bx-euro` |
+| Profils métier / Compétences professionnelles | `bx-briefcase` |
+| Compétences techniques | `bx-star` |
+| Technologies | `bx-code-alt` |
+| Catégories | `bx-category` |
+| Aide / Information | `bx-help-circle` |
+| Métadonnées / Dates | `bx-time` ou `bx-calendar` |
+| Statistiques | `bx-bar-chart` ou `bx-info-circle` |
+
+#### Boutons d'action standardisés
+
+**Classes** :
+- `btn-primary` : Action principale (Enregistrer, Créer)
+- `btn-outline-secondary` : Annuler
+- `btn-outline-danger` ou `btn-danger` : Supprimer
+
+**Icônes** :
+- `bx-save` : Enregistrer
+- `bx-x` : Annuler
+- `bx-trash` : Supprimer
+- `bx-arrow-back` : Retour
+- `bx-plus` : Nouveau/Créer
+
+**Labels simplifiés** :
+- Création : "Créer" (non "Créer le XXX")
+- Modification : "Enregistrer" (non "Enregistrer les modifications")
+- Annulation : "Annuler"
+
+**Espacement** : Toujours utiliser `gap-2` au lieu de `me-2` entre boutons.
+
+```html
+<!-- Horizontal -->
+<div class="d-flex justify-content-end gap-2">
+    <a href="..." class="btn btn-outline-secondary">
+        <i class="bx bx-x me-1"></i> Annuler
+    </a>
+    <button type="submit" class="btn btn-primary">
+        <i class="bx bx-save me-1"></i> Enregistrer
+    </button>
+</div>
+
+<!-- Vertical (sidebar) -->
+<div class="d-grid gap-2">
+    <button type="submit" class="btn btn-primary">
+        <i class="bx bx-save me-1"></i> Créer
+    </button>
+    <a href="..." class="btn btn-outline-secondary">
+        <i class="bx bx-x me-1"></i> Annuler
+    </a>
+</div>
+```
+
+### Standards de listes (2025)
+
+#### Pagination KnpPaginator
+
+**Propriétés à utiliser** :
+- `currentPageNumber` : Numéro de page actuelle
+- `pageCount` : Nombre total de pages
+- `totalItemCount` : Nombre total d'items
+
+❌ **Ne PAS utiliser** : `currentPageOffsetStart`, `currentPageOffsetEnd` (n'existent pas)
+
+**Format standard** :
+```twig
+{% if items.pageCount > 1 %}
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div class="text-muted">
+        Page {{ items.currentPageNumber }} sur {{ items.pageCount }}
+        ({{ items.totalItemCount }} items au total)
+    </div>
+    <div>
+        {{ knp_pagination_render(items) }}
+    </div>
+</div>
+{% endif %}
+```
+
+#### Filtres standard
+
+Tous les index doivent inclure :
+1. Recherche textuelle (nom, description)
+2. Filtre statut/catégorie
+3. Sélecteur "Par page" (10, 25, 50, 100)
+4. Boutons Filtrer + Réinitialiser
+
+```twig
+<div class="col-md-2">
+    <label class="form-label">Par page</label>
+    <select class="form-select form-select-sm" name="per_page">
+        <option value="10" {% if app.request.query.get('per_page') == '10' %}selected{% endif %}>10</option>
+        <option value="25" {% if app.request.query.get('per_page', '25') == '25' %}selected{% endif %}>25</option>
+        <option value="50" {% if app.request.query.get('per_page') == '50' %}selected{% endif %}>50</option>
+        <option value="100" {% if app.request.query.get('per_page') == '100' %}selected{% endif %}>100</option>
+    </select>
+</div>
+```
+
+### Standards dashboards & Chart.js (2025)
+
+#### Conteneurs de graphiques OBLIGATOIRES
+
+**Règle stricte** : Toujours wrapper les canvas dans un div avec `height` fixe et `position: relative`.
+
+```twig
+<div style="height: 200px; position: relative;">
+    <canvas id="myChart"></canvas>
+</div>
+```
+
+**Hauteurs recommandées** :
+- Graphiques simples : 200px
+- Graphiques avec légende détaillée : 300px
+- Graphiques complexes/multi-séries : 400px
+- Maximum : 400px
+
+#### Configuration Chart.js standard
+
+```javascript
+new Chart(ctx, {
+    type: 'bar',
+    data: { ... },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,  // ← OBLIGATOIRE
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+```
+
+❌ **Erreur courante** : Oublier `maintainAspectRatio: false` + conteneur fixe = graphique qui grandit infiniment.
+
+#### Palette de couleurs Chart.js
+
+```javascript
+const chartColors = {
+    primary: 'rgba(52, 143, 226, 0.8)',
+    success: 'rgba(40, 167, 69, 0.8)',
+    danger: 'rgba(220, 53, 69, 0.8)',
+    warning: 'rgba(255, 193, 7, 0.8)',
+    info: 'rgba(23, 162, 184, 0.8)',
+    purple: 'rgba(153, 102, 255, 0.8)',
+    gray: 'rgba(201, 203, 207, 0.8)'
+};
+
+// Niveaux de compétences (exemple)
+const levelColors = {
+    1: 'rgba(201, 203, 207, 0.8)',   // Débutant - Gris
+    2: 'rgba(255, 205, 86, 0.8)',    // Intermédiaire - Jaune
+    3: 'rgba(54, 162, 235, 0.8)',    // Confirmé - Bleu
+    4: 'rgba(75, 192, 192, 0.8)',    // Expert - Vert
+    5: 'rgba(153, 102, 255, 0.8)'    // Maître - Violet
+};
+```
+
+### Checklists standardisées
+
+#### ✅ Checklist nouvelle page de liste
+
+- [ ] Utiliser `page_header` component avec breadcrumb complète
+- [ ] Panel de filtres avec recherche + statut + per_page
+- [ ] Appliquer filtres dans QueryBuilder (controller)
+- [ ] Utiliser KnpPaginator avec config par défaut 25/page
+- [ ] Afficher pagination avec format "Page X sur Y (Z total)"
+- [ ] Bouton Export CSV dans actions (permission ROLE_MANAGER minimum)
+- [ ] Méthode `exportCsv()` avec filtres identiques à `index()`
+- [ ] Bouton "Nouveau" dans actions (avec permission appropriée)
+
+#### ✅ Checklist nouveau formulaire
+
+- [ ] Utiliser `page_header` component avec breadcrumb complète
+- [ ] Choisir layout : simple (col-lg-8) ou sidebar (col-lg-8 + col-lg-4)
+- [ ] Tous les titres de section en `<h5 class="card-title mb-0">` dans `card-header`
+- [ ] Icônes appropriées pour chaque section (voir tableau ci-dessus)
+- [ ] Champs requis avec `<span class="text-danger">*</span>` dans le label
+- [ ] Aides contextuelles avec `<div class="form-text">` si nécessaire
+- [ ] Boutons avec classes standard (primary/outline-secondary)
+- [ ] Labels de boutons simplifiés ("Créer", "Enregistrer", "Annuler")
+- [ ] Espacement avec `gap-2` sur conteneurs de boutons
+- [ ] Token CSRF pour toute action POST
+
+#### ✅ Checklist nouveau dashboard
+
+- [ ] Wrapper tous les canvas dans `<div style="height: Xpx; position: relative;">`
+- [ ] Configurer `maintainAspectRatio: false` dans options Chart.js
+- [ ] Respecter hauteurs max (200-400px)
+- [ ] Utiliser palette de couleurs standardisée
+- [ ] Légendes en position `bottom`
+- [ ] Tester responsive sur mobile
+
+### JavaScript modules
+
+#### mass-actions.js
+
+**Fichier** : `assets/js/mass-actions.js`
+
+Module pour gestion des actions en masse sur tableaux.
+
+**Fonctionnalités** :
+- Sélection multiple avec "Tout sélectionner"
+- État indeterminate si sélection partielle
+- Barre d'actions avec compteur
+- Suppression en masse avec confirmation
+- Export en masse
+- Tri de colonnes
+
+**Auto-activation** : Si table avec ID `#dataTable` et checkbox `#selectAll`.
+
+#### form-validation.js
+
+**Fichier** : `assets/js/form-validation.js`
+
+Module pour validation temps réel des formulaires.
+
+**Fonctionnalités** :
+- Validation locale (email, téléphone, URL, SIRET, date, etc.)
+- Validation AJAX serveur
+- Debouncing 500ms
+- Messages d'erreur contextuels
+- Indicateur de chargement
+
+**Activation** :
+```html
+<input type="text"
+       data-validation-url="{{ path('api_validate') }}"
+       data-validation-type="email">
+```
+
+---
+
 ## Changelog
+
+- **v1.1.0** (2025-11-26) : Phase 5 - Lot 15.5 Cohérence UX/UI
+  - Nouveaux components : card_section, form_buttons
+  - Standards formulaires stricts (titres h5 mb-0, boutons, icônes)
+  - Standards listes (pagination KnpPaginator, filtres)
+  - Standards dashboards (Chart.js avec conteneurs fixes)
+  - Checklists de validation
+  - Documentation JavaScript modules
 
 - **v1.0.0** (2025-11-25) : Création du design system initial
   - Composants de base
