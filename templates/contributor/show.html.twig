@@ -31,8 +31,8 @@
                     <div class="text-center mb-4">
                         <div class="avatar-lg mx-auto mb-3">
                             {% if contributor.avatarFilename %}
-                                <img src="{{ asset('uploads/avatars/' ~ contributor.avatarFilename) }}" 
-                                     alt="{{ contributor.name }}" 
+                                <img src="{{ path('avatar_show', {'filename': contributor.avatarFilename}) }}"
+                                     alt="{{ contributor.name }}"
                                      class="rounded-circle" style="width: 72px; height: 72px; object-fit: cover;">
                             {% else %}
                                 <div class="avatar-title bg-primary text-white rounded-circle font-size-24">

@@ -55,6 +55,9 @@ services:
       # Default URI for CLI commands
       - key: DEFAULT_URI
         value: https://hotones-app.onrender.com  # Remplacez par votre domaine Render
+      # Avatar storage path (on persistent disk)
+      - key: AVATARS_DIRECTORY
+        value: /var/www/html/var/uploads/avatars
     # Persistent disk pour les uploads et fichiers générés
     disk:
       name: hotones-storage
