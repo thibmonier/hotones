@@ -17,7 +17,7 @@ class Client
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 180)]
-    private string $name;
+    private string $name = '';
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $logoPath = null;
