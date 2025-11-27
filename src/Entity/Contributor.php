@@ -64,6 +64,12 @@ class Contributor
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $cjm = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $tjm = null;
+
     #[ORM\Column(type: 'boolean')]
     private bool $active = true;
 
@@ -276,22 +282,46 @@ class Contributor
 
     /**
      * Récupère le CJM depuis la période d'emploi active ou la plus récente.
+     * Sinon, retourne la valeur par défaut du contributeur.
      */
     public function getCjm(): ?string
     {
         $period = $this->getRelevantEmploymentPeriod();
 
-        return $period?->getCjm();
+        return $period?->getCjm() ?? $this->cjm;
+    }
+
+    /**
+     * Définit le CJM par défaut du contributeur.
+     * Note: Ce CJM peut être surchargé par les périodes d'emploi.
+     */
+    public function setCjm(?string $cjm): self
+    {
+        $this->cjm = $cjm;
+
+        return $this;
     }
 
     /**
      * Récupère le TJM depuis la période d'emploi active ou la plus récente.
+     * Sinon, retourne la valeur par défaut du contributeur.
      */
     public function getTjm(): ?string
     {
         $period = $this->getRelevantEmploymentPeriod();
 
-        return $period?->getTjm();
+        return $period?->getTjm() ?? $this->tjm;
+    }
+
+    /**
+     * Définit le TJM par défaut du contributeur.
+     * Note: Ce TJM peut être surchargé par les périodes d'emploi.
+     */
+    public function setTjm(?string $tjm): self
+    {
+        $this->tjm = $tjm;
+
+        return $this;
     }
 
     /**
