@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "bootstrap": "5.3.8",
+        "choices.js": "^11.1.0",
         "postcss-rtl": "^2.0.0",
         "rtl-css-loader": "^1.0.1"
     },

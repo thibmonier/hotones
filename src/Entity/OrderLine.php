@@ -273,6 +273,10 @@ class OrderLine
 
     /**
      * Calcule le coût estimé de cette ligne (jours * CJM du profil).
+     *
+     * Priorité 1 : Utilise le CJM (Coût Journalier Moyen) du profil si disponible,
+     *              ajusté par le coefficient de marge.
+     * Priorité 2 : Fallback sur l'ancienne méthode (70% du TJM par défaut).
      */
     public function getEstimatedCost(): string
     {
@@ -280,7 +284,17 @@ class OrderLine
             return '0';
         }
 
-        // Utiliser le TJM par défaut du profil comme base de coût
+        // Priorité 1: Utiliser le CJM du profil si disponible
+        $cjm = $this->profile->getCjm();
+        if ($cjm !== null) {
+            // Appliquer le coefficient de marge (par défaut 1.0)
+            $marginCoefficient = $this->profile->getMarginCoefficient() ?? '1.00';
+            $adjustedCjm       = bcmul($cjm, $marginCoefficient, 2);
+
+            return bcmul($this->days, $adjustedCjm, 2);
+        }
+
+        // Fallback : utiliser l'ancienne méthode (70% du TJM par défaut)
         // TODO: Améliorer en utilisant les périodes d'emploi des contributeurs
         $defaultRate = $this->profile->getDefaultDailyRate();
         if (!$defaultRate) {

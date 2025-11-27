@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Repository\ContributorRepository;
 use App\Repository\OrderRepository;
 use DateTime;
 use DateTimeImmutable;
@@ -12,12 +13,16 @@ use DateTimeImmutable;
 class WorkloadPredictionService
 {
     public function __construct(
-        private OrderRepository $orderRepository
+        private OrderRepository $orderRepository,
+        private ContributorRepository $contributorRepository
     ) {
     }
 
     /**
      * Analyse le pipeline de devis et prédit la charge future.
+     *
+     * @param array $profileIds     IDs des profils à filtrer (vide = tous)
+     * @param array $contributorIds IDs des contributeurs à filtrer (vide = tous)
      *
      * @return array{
      *     pipeline: array,
@@ -26,7 +31,7 @@ class WorkloadPredictionService
      *     totalPotentialDays: float
      * }
      */
-    public function analyzePipeline(): array
+    public function analyzePipeline(array $profileIds = [], array $contributorIds = []): array
     {
         // Récupérer tous les devis en attente de signature
         $pendingOrders = $this->orderRepository->findBy(
@@ -40,13 +45,17 @@ class WorkloadPredictionService
         $totalPotentialDays = 0;
 
         foreach ($pendingOrders as $order) {
-            $analysis   = $this->analyzeOrder($order);
-            $pipeline[] = $analysis;
+            $analysis = $this->analyzeOrder($order, $profileIds, $contributorIds);
 
-            // Accumuler la charge par mois si probabilité > 30%
-            if ($analysis['winProbability'] > 30) {
-                $this->addWorkloadToMonth($workloadByMonth, $order, $analysis['winProbability']);
-                $totalPotentialDays += $analysis['totalDays'] * ($analysis['winProbability'] / 100);
+            // Ne pas inclure les devis qui n'ont aucun jour correspondant aux filtres
+            if ($analysis['totalDays'] > 0) {
+                $pipeline[] = $analysis;
+
+                // Accumuler la charge par mois si probabilité > 30%
+                if ($analysis['winProbability'] > 30) {
+                    $this->addWorkloadToMonth($workloadByMonth, $order, $analysis['winProbability'], $profileIds, $contributorIds);
+                    $totalPotentialDays += $analysis['totalDays'] * ($analysis['winProbability'] / 100);
+                }
             }
         }
 
@@ -67,7 +76,7 @@ class WorkloadPredictionService
     /**
      * Analyse un devis pour calculer sa probabilité de gain.
      */
-    private function analyzeOrder(Order $order): array
+    private function analyzeOrder(Order $order, array $profileIds = [], array $contributorIds = []): array
     {
         $project     = $order->getProject();
         $client      = $project?->getClient();
@@ -111,8 +120,8 @@ class WorkloadPredictionService
         // Borner entre 0 et 100
         $probability = max(0, min(100, $probability));
 
-        // Calculer la charge (jours)
-        $totalDays = $this->calculateOrderDays($order);
+        // Calculer la charge (jours) avec filtres
+        $totalDays = $this->calculateOrderDays($order, $profileIds, $contributorIds);
 
         return [
             'order'          => $order,
@@ -173,14 +182,40 @@ class WorkloadPredictionService
     }
 
     /**
-     * Calcule le nombre de jours d'un devis.
+     * Calcule le nombre de jours d'un devis en fonction des filtres.
      */
-    private function calculateOrderDays(Order $order): float
+    private function calculateOrderDays(Order $order, array $profileIds = [], array $contributorIds = []): float
     {
         $totalDays = 0;
 
+        // Si des contributeurs sont spécifiés, récupérer leurs profils
+        // et les fusionner avec les profils directement spécifiés
+        $effectiveProfileIds = $profileIds;
+        if (!empty($contributorIds)) {
+            $contributorProfileIds = $this->getProfileIdsFromContributors($contributorIds);
+            if (!empty($contributorProfileIds)) {
+                $effectiveProfileIds = empty($effectiveProfileIds)
+                    ? $contributorProfileIds
+                    : array_intersect($effectiveProfileIds, $contributorProfileIds);
+            }
+        }
+
         foreach ($order->getSections() as $section) {
-            $totalDays += (float) $section->getTotalDays();
+            foreach ($section->getLines() as $line) {
+                // Ne compter que les lignes de type "service"
+                if ($line->getType() !== 'service' || !$line->getDays()) {
+                    continue;
+                }
+
+                // Filtrer par profil (incluant les profils des contributeurs sélectionnés)
+                if (!empty($effectiveProfileIds) && $line->getProfile()) {
+                    if (!in_array($line->getProfile()->getId(), $effectiveProfileIds, true)) {
+                        continue;
+                    }
+                }
+
+                $totalDays += (float) $line->getDays();
+            }
         }
 
         return $totalDays;
@@ -189,7 +224,7 @@ class WorkloadPredictionService
     /**
      * Ajoute la charge d'un devis à la répartition mensuelle.
      */
-    private function addWorkloadToMonth(array &$workloadByMonth, Order $order, float $probability): void
+    private function addWorkloadToMonth(array &$workloadByMonth, Order $order, float $probability, array $profileIds = [], array $contributorIds = []): void
     {
         $project = $order->getProject();
         if (!$project || !$project->getStartDate()) {
@@ -201,7 +236,7 @@ class WorkloadPredictionService
             ? $startDate->diff($project->getEndDate())->days
             : 90; // Par défaut 3 mois
 
-        $totalDays    = $this->calculateOrderDays($order);
+        $totalDays    = $this->calculateOrderDays($order, $profileIds, $contributorIds);
         $daysPerMonth = $duration > 0 ? $totalDays / (max(1, $duration / 30)) : $totalDays;
 
         // Répartir sur 3 mois max
@@ -283,5 +318,26 @@ class WorkloadPredictionService
         }
 
         return $alerts;
+    }
+
+    /**
+     * Récupère les IDs des profils associés aux contributeurs.
+     */
+    private function getProfileIdsFromContributors(array $contributorIds): array
+    {
+        if (empty($contributorIds)) {
+            return [];
+        }
+
+        $contributors = $this->contributorRepository->findBy(['id' => $contributorIds]);
+        $profileIds   = [];
+
+        foreach ($contributors as $contributor) {
+            foreach ($contributor->getProfiles() as $profile) {
+                $profileIds[] = $profile->getId();
+            }
+        }
+
+        return array_unique($profileIds);
     }
 }

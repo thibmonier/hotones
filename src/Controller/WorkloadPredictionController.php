@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Contributor;
+use App\Entity\Profile;
 use App\Service\WorkloadPredictionService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -15,20 +19,46 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class WorkloadPredictionController extends AbstractController
 {
     public function __construct(
-        private WorkloadPredictionService $predictionService
+        private WorkloadPredictionService $predictionService,
+        private EntityManagerInterface $entityManager
     ) {
     }
 
     #[Route('/prediction', name: 'staffing_prediction', methods: ['GET'])]
-    public function prediction(): Response
+    public function prediction(Request $request): Response
     {
-        $analysis = $this->predictionService->analyzePipeline();
+        // Récupérer les filtres depuis la requête
+        $profileIds     = $request->query->all('profiles')     ?? [];
+        $contributorIds = $request->query->all('contributors') ?? [];
+
+        // Convertir en entiers
+        $profileIds     = array_map('intval', array_filter($profileIds));
+        $contributorIds = array_map('intval', array_filter($contributorIds));
+
+        // Analyser le pipeline avec filtres
+        $analysis = $this->predictionService->analyzePipeline($profileIds, $contributorIds);
+
+        // Récupérer tous les profils actifs pour le filtre
+        $allProfiles = $this->entityManager->getRepository(Profile::class)->findBy(
+            ['active' => true],
+            ['name' => 'ASC'],
+        );
+
+        // Récupérer tous les contributeurs actifs pour le filtre
+        $allContributors = $this->entityManager->getRepository(Contributor::class)->findBy(
+            ['active' => true],
+            ['firstName' => 'ASC'],
+        );
 
         return $this->render('staffing/prediction.html.twig', [
-            'pipeline'           => $analysis['pipeline'],
-            'workloadByMonth'    => $analysis['workloadByMonth'],
-            'alerts'             => $analysis['alerts'],
-            'totalPotentialDays' => $analysis['totalPotentialDays'],
+            'pipeline'             => $analysis['pipeline'],
+            'workloadByMonth'      => $analysis['workloadByMonth'],
+            'alerts'               => $analysis['alerts'],
+            'totalPotentialDays'   => $analysis['totalPotentialDays'],
+            'allProfiles'          => $allProfiles,
+            'allContributors'      => $allContributors,
+            'selectedProfiles'     => $profileIds,
+            'selectedContributors' => $contributorIds,
         ]);
     }
 }

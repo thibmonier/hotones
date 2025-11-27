@@ -4,8 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/select2/css/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 {% endblock %}
 
 {% block content %}
@@ -169,20 +168,22 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/select2/js/i18n/fr.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Select2 for technologies
-            $('.select2-multiple').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                placeholder: function() {
-                    return $(this).data('placeholder');
-                },
-                allowClear: false,
-                language: 'fr'
-            });
+            // Initialize Choices.js for technologies
+            const technologiesSelect = document.querySelector('.select2-multiple');
+            if (technologiesSelect) {
+                new Choices(technologiesSelect, {
+                    removeItemButton: true,
+                    placeholder: true,
+                    placeholderValue: technologiesSelect.getAttribute('data-placeholder') || 'Sélectionner des technologies',
+                    searchPlaceholderValue: 'Rechercher...',
+                    noResultsText: 'Aucune technologie trouvée',
+                    noChoicesText: 'Aucune technologie disponible',
+                    itemSelectText: 'Cliquer pour sélectionner',
+                });
+            }
         });
     </script>
 {% endblock %}

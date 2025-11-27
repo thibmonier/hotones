@@ -5,29 +5,20 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            {% include 'components/page_header.html.twig' with {
-                title: 'Modifier ' ~ profile.name,
-                breadcrumb: [
-                    {label: 'Configuration', path: null},
-                    {label: 'Profils métier', path: 'job_profile_index'},
-                    {label: profile.name, path: null}
-                ],
-                actions: [
-                    {label: 'Retour à la liste', path: 'job_profile_index', icon: 'bx-arrow-back', class: 'btn-outline-secondary'}
-                ]
-            } %}
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Modifier le profil métier</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('job_profile_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bx bx-briefcase me-2"></i>
-                        Informations du profil
-                    </h5>
-                </div>
                 <div class="card-body">
                     <form method="POST">
                         <div class="mb-3">
@@ -43,7 +34,19 @@
                         <div class="mb-3">
                             <label for="default_daily_rate" class="form-label">TJM par défaut (€)</label>
                             <input type="number" class="form-control" id="default_daily_rate" name="default_daily_rate" min="0" step="10" value="{{ profile.defaultDailyRate }}">
-                            <div class="form-text">Taux journalier moyen par défaut pour ce profil</div>
+                            <div class="form-text">Taux journalier moyen par défaut pour ce profil (tarif client)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cjm" class="form-label">CJM - Coût Journalier Moyen (€)</label>
+                            <input type="number" class="form-control" id="cjm" name="cjm" min="0" step="10" value="{{ profile.cjm }}">
+                            <div class="form-text">Coût journalier moyen interne pour ce profil (utilisé pour le calcul de marge)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="margin_coefficient" class="form-label">Coefficient de marge</label>
+                            <input type="number" class="form-control" id="margin_coefficient" name="margin_coefficient" min="0" max="5" step="0.01" value="{{ profile.marginCoefficient ?? '1.00' }}">
+                            <div class="form-text">Coefficient d'ajustement du CJM pour le calcul de marge (par défaut 1.0)</div>
                         </div>
 
                         <div class="mb-3">
@@ -56,10 +59,8 @@
                             <label class="form-check-label" for="active">Actif</label>
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ path('job_profile_index') }}" class="btn btn-outline-secondary">
-                                <i class="bx bx-x me-1"></i> Annuler
-                            </a>
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ path('job_profile_index') }}" class="btn btn-outline-secondary me-2">Annuler</a>
                             <button type="submit" class="btn btn-primary">
                                 <i class="bx bx-save me-1"></i> Enregistrer
                             </button>

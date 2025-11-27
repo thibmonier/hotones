@@ -2,6 +2,11 @@
 
 {% block title %}Prédiction de charge{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+{% endblock %}
+
 {% block content %}
     {{ component('breadcrumb', { title: 'Prédiction de charge', pagetitle: 'Staffing' }) }}
 
@@ -9,6 +14,54 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">Prédiction de charge future</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="{{ path('staffing_prediction') }}" id="filterForm">
+                        <div class="row align-items-end">
+                            <div class="col-md-5">
+                                <label for="profileFilter" class="form-label">
+                                    <i class="bx bx-briefcase me-1"></i>Filtrer par profils
+                                </label>
+                                <select name="profiles[]" id="profileFilter" class="form-control" data-choices data-choices-removeItem multiple data-placeholder="Choisissez un ou plusieurs profils...">
+                                    {% for profile in allProfiles %}
+                                        <option value="{{ profile.id }}" {% if profile.id in selectedProfiles %}selected{% endif %}>
+                                            {{ profile.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">Laissez vide pour afficher tous les profils</small>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="contributorFilter" class="form-label">
+                                    <i class="bx bx-user me-1"></i>Filtrer par contributeurs
+                                </label>
+                                <select name="contributors[]" id="contributorFilter" class="form-control" data-choices data-choices-removeItem multiple data-placeholder="Choisissez un ou plusieurs contributeurs...">
+                                    {% for contributor in allContributors %}
+                                        <option value="{{ contributor.id }}" {% if contributor.id in selectedContributors %}selected{% endif %}>
+                                            {{ contributor.firstName }} {{ contributor.lastName }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">Laissez vide pour afficher tous les contributeurs</small>
+                            </div>
+                            <div class="col-md-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-fill">
+                                    <i class="bx bx-filter me-1"></i>Filtrer
+                                </button>
+                                <a href="{{ path('staffing_prediction') }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                                    <i class="bx bx-reset"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -220,9 +273,38 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser Choices.js pour les filtres
+            const profileFilter = document.getElementById('profileFilter');
+            if (profileFilter) {
+                new Choices(profileFilter, {
+                    removeItemButton: true,
+                    placeholder: true,
+                    placeholderValue: 'Sélectionner un ou plusieurs profils',
+                    searchPlaceholderValue: 'Rechercher...',
+                    noResultsText: 'Aucun profil trouvé',
+                    noChoicesText: 'Aucun profil disponible',
+                    itemSelectText: 'Cliquer pour sélectionner',
+                    maxItemText: (maxItemCount) => `${maxItemCount} éléments maximum`,
+                });
+            }
+
+            const contributorFilter = document.getElementById('contributorFilter');
+            if (contributorFilter) {
+                new Choices(contributorFilter, {
+                    removeItemButton: true,
+                    placeholder: true,
+                    placeholderValue: 'Sélectionner un ou plusieurs contributeurs',
+                    searchPlaceholderValue: 'Rechercher...',
+                    noResultsText: 'Aucun contributeur trouvé',
+                    noChoicesText: 'Aucun contributeur disponible',
+                    itemSelectText: 'Cliquer pour sélectionner',
+                });
+            }
+
             const workloadData = {{ workloadByMonth|json_encode|raw }};
 
             // Préparer les données pour le graphique
@@ -311,5 +393,7 @@
                 }
             });
         });
+
+
     </script>
 {% endblock %}

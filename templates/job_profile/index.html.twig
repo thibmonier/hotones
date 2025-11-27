@@ -5,52 +5,12 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            {% include 'components/page_header.html.twig' with {
-                title: 'Profils métier',
-                breadcrumb: [
-                    {label: 'Configuration', path: null},
-                    {label: 'Profils métier', path: null}
-                ],
-                actions: [
-                    {label: 'Exporter CSV', path: 'job_profile_export_csv', params: filters, icon: 'bx-download', class: 'btn-outline-secondary', permission: 'ROLE_ADMIN'},
-                    {label: 'Nouveau profil', path: 'job_profile_new', icon: 'bx-plus', class: 'btn-primary', permission: 'ROLE_ADMIN'}
-                ]
-            } %}
-        </div>
-    </div>
-
-    {# Filtres #}
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form method="get" action="{{ path('job_profile_index') }}" class="row g-2 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label">Recherche</label>
-                            <input type="text" class="form-control form-control-sm" name="search" value="{{ filters.search }}" placeholder="Nom ou description...">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Statut</label>
-                            <select class="form-select form-select-sm" name="active">
-                                <option value="">Tous</option>
-                                <option value="1" {% if filters.active == '1' %}selected{% endif %}>Actif</option>
-                                <option value="0" {% if filters.active == '0' %}selected{% endif %}>Inactif</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Par page</label>
-                            <select class="form-select form-select-sm" name="per_page">
-                                <option value="10" {% if app.request.query.get('per_page') == '10' %}selected{% endif %}>10</option>
-                                <option value="25" {% if app.request.query.get('per_page', '25') == '25' %}selected{% endif %}>25</option>
-                                <option value="50" {% if app.request.query.get('per_page') == '50' %}selected{% endif %}>50</option>
-                                <option value="100" {% if app.request.query.get('per_page') == '100' %}selected{% endif %}>100</option>
-                            </select>
-                        </div>
-                        <div class="col-12 mt-2">
-                            <button type="submit" class="btn btn-primary btn-sm">Filtrer</button>
-                            <a href="{{ path('job_profile_index') }}" class="btn btn-outline-secondary btn-sm">Réinitialiser</a>
-                        </div>
-                    </form>
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Profils métier</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('job_profile_new') }}" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Nouveau profil
+                    </a>
                 </div>
             </div>
         </div>
@@ -67,6 +27,8 @@
                                     <th>Nom</th>
                                     <th>Description</th>
                                     <th>TJM par défaut</th>
+                                    <th>CJM</th>
+                                    <th>Coeff. marge</th>
                                     <th>Couleur</th>
                                     <th>Contributeurs</th>
                                     <th>Statut</th>
@@ -86,6 +48,8 @@
                                     </td>
                                     <td>{{ profile.description ? profile.description|slice(0, 50) ~ (profile.description|length > 50 ? '...' : '') : '-' }}</td>
                                     <td>{{ profile.defaultDailyRate ? profile.defaultDailyRate|number_format(0, ',', ' ') ~ '€' : '-' }}</td>
+                                    <td>{{ profile.cjm ? profile.cjm|number_format(0, ',', ' ') ~ '€' : '-' }}</td>
+                                    <td>{{ profile.marginCoefficient ? profile.marginCoefficient|number_format(2, ',', ' ') : '-' }}</td>
                                     <td>
                                         {% if profile.color %}
                                             <span class="badge" style="background-color: {{ profile.color }}; color: white;">{{ profile.color }}</span>
@@ -120,7 +84,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">
+                                    <td colspan="9" class="text-center text-muted">
                                         <div class="py-4">
                                             <i class="bx bx-user-circle font-size-24 mb-2"></i>
                                             <p>Aucun profil trouvé</p>
@@ -132,18 +96,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    {# Pagination #}
-                    {% if profiles.pageCount > 1 %}
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted">
-                            Page {{ profiles.currentPageNumber }} sur {{ profiles.pageCount }} ({{ profiles.totalItemCount }} profils au total)
-                        </div>
-                        <div>
-                            {{ knp_pagination_render(profiles) }}
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>

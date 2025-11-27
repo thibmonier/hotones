@@ -25,6 +25,15 @@ class Profile
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?string $defaultDailyRate = null;
 
+    // CJM (Coût Journalier Moyen) pour ce profil
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $cjm = null;
+
+    // Coefficient d'ajustement de marge (par défaut 1.0)
+    // Permet d'ajuster le CJM pour le calcul de coût estimé
+    #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true, options: ['default' => '1.00'])]
+    private ?string $marginCoefficient = '1.00';
+
     // Couleur pour l'affichage dans les graphiques
     #[ORM\Column(type: 'string', length: 7, nullable: true)]
     private ?string $color = null;
@@ -83,6 +92,30 @@ class Profile
     public function setDefaultDailyRate(?string $defaultDailyRate): self
     {
         $this->defaultDailyRate = $defaultDailyRate;
+
+        return $this;
+    }
+
+    public function getCjm(): ?string
+    {
+        return $this->cjm;
+    }
+
+    public function setCjm(?string $cjm): self
+    {
+        $this->cjm = $cjm;
+
+        return $this;
+    }
+
+    public function getMarginCoefficient(): ?string
+    {
+        return $this->marginCoefficient;
+    }
+
+    public function setMarginCoefficient(?string $marginCoefficient): self
+    {
+        $this->marginCoefficient = $marginCoefficient;
 
         return $this;
     }

@@ -350,27 +350,6 @@
             </div>
         </div>
 
-        <div class="col-xl-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bx bx-group me-2"></i>Contributeurs</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Total actifs</span>
-                        <strong>{{ kpis.contributors.total_active }}</strong>
-                    </div>
-                    <h6 class="mb-2">Top 5</h6>
-                    {% for contributor in kpis.contributors.top_contributors|slice(0, 5) %}
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>{{ contributor.contributorName }}</small>
-                            <small class="text-muted">{{ contributor.totalHours|number_format(0) }}h</small>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
 
     {# KPI Devis (cartes principales) #}
     <div class="row">
