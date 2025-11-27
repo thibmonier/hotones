@@ -183,8 +183,8 @@
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar-xs me-3">
                                                         {% if contributor.avatarFilename %}
-                                                            <img src="{{ asset('uploads/avatars/' ~ contributor.avatarFilename) }}" 
-                                                                 alt="{{ contributor.name }}" 
+                                                            <img src="{{ path('avatar_show', {'filename': contributor.avatarFilename}) }}"
+                                                                 alt="{{ contributor.name }}"
                                                                  class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
                                                         {% else %}
                                                             <span class="avatar-title rounded-circle bg-primary text-white font-size-16">

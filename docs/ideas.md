@@ -9,4 +9,10 @@ peut etre fusionner les 2 écrans pour n'avoir qu'un seul avec un onglet de dash
 
 Les résultats d'enquêtes de satisfaction devraient être montrées (au moins l'évolution des notes) dans la vue projet
 
+## affichage mobile
+
+Le logo ne s'adapte pas pour l'affichage mobile.
+
+Il faudrait envisager de faire une application en natif pour faire la saisie des temps et le suivi des dashboards en vue optimisée
+
 
