@@ -688,6 +688,11 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         enabled?: bool, // Default: false
  *     },
  * }
+ * @psalm-type MakerConfig = array{
+ *     root_namespace?: scalar|null, // Default: "App"
+ *     generate_final_classes?: bool, // Default: true
+ *     generate_final_entities?: bool, // Default: false
+ * }
  * @psalm-type DoctrineConfig = array{
  *     dbal?: array{
  *         default_connection?: scalar|null,
@@ -1355,6 +1360,13 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     intercept_redirects?: bool, // Default: false
  *     excluded_ajax_paths?: scalar|null, // Default: "^/((index|app(_[\\w]+)?)\\.php/)?_wdt"
  * }
+ * @psalm-type DebugConfig = array{
+ *     max_items?: int, // Max number of displayed items past the first level, -1 means no limit. // Default: 2500
+ *     min_depth?: int, // Minimum tree depth to clone all the items, 1 is default. // Default: 1
+ *     max_string_length?: int, // Max length of displayed strings, -1 means no limit. // Default: -1
+ *     dump_destination?: scalar|null, // A stream URL where dumps should be written to. // Default: null
+ *     theme?: "dark"|"light", // Changes the color of the dump() output when rendered directly on the templating. "dark" (default) or "light". // Default: "dark"
+ * }
  * @psalm-type MonologConfig = array{
  *     use_microseconds?: scalar|null, // Default: true
  *     channels?: list<scalar|null>,
@@ -1979,12 +1991,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  * @psalm-type LiveComponentConfig = array{
  *     secret?: scalar|null, // The secret used to compute fingerprints and checksums // Default: "%kernel.secret%"
  * }
- * @psalm-type DamaDoctrineTestConfig = array{
- *     enable_static_connection?: mixed, // Default: true
- *     enable_static_meta_data_cache?: bool, // Default: true
- *     enable_static_query_cache?: bool, // Default: true
- *     connection_keys?: list<mixed>,
- * }
  * @psalm-type KnpPaginatorConfig = array{
  *     default_options?: array{
  *         sort_field_name?: scalar|null, // Default: "sort"
@@ -2007,17 +2013,11 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     convert_exception?: bool, // Default: false
  *     remove_first_page_param?: bool, // Default: false
  * }
- * @psalm-type MakerConfig = array{
- *     root_namespace?: scalar|null, // Default: "App"
- *     generate_final_classes?: bool, // Default: true
- *     generate_final_entities?: bool, // Default: false
- * }
- * @psalm-type DebugConfig = array{
- *     max_items?: int, // Max number of displayed items past the first level, -1 means no limit. // Default: 2500
- *     min_depth?: int, // Minimum tree depth to clone all the items, 1 is default. // Default: 1
- *     max_string_length?: int, // Max length of displayed strings, -1 means no limit. // Default: -1
- *     dump_destination?: scalar|null, // A stream URL where dumps should be written to. // Default: null
- *     theme?: "dark"|"light", // Changes the color of the dump() output when rendered directly on the templating. "dark" (default) or "light". // Default: "dark"
+ * @psalm-type DamaDoctrineTestConfig = array{
+ *     enable_static_connection?: mixed, // Default: true
+ *     enable_static_meta_data_cache?: bool, // Default: true
+ *     enable_static_query_cache?: bool, // Default: true
+ *     connection_keys?: list<mixed>,
  * }
  * @psalm-type SentryConfig = array{
  *     dsn?: scalar|null, // If this value is not provided, the SDK will try to read it from the SENTRY_DSN environment variable. If that variable also does not exist, the SDK will not send any events.
