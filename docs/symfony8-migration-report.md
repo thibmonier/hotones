@@ -38,6 +38,9 @@
 1. ✅ **Doctrine Lazy Ghost Error** : Résolu en épinglant symfony/var-exporter à ^7.4
 2. ✅ **Composer Update Conflicts** : Résolu avec `^7.4 || ^8.0` notation
 3. ✅ **Cache Clear Errors** : Résolu après downgrade var-exporter
+4. ✅ **Routing Annotations → Attributes** : 32 contrôleurs migrés vers `Attribute\Route`
+5. ✅ **Platform getName()** : Remplacé par `instanceof PostgreSQLPlatform` (2 fichiers)
+6. ✅ **PARAM_STR_ARRAY** : Remplacé par `ArrayParameterType::STRING` (1 fichier)
 
 ### Problèmes En Attente
 
@@ -65,6 +68,94 @@ L'application est dans un **état hybride Symfony 7.4/8.0** stable :
 - ✅ Application fonctionnelle pour développement
 
 **Recommandation**: Attendre mises à jour bundles tiers (1-3 mois) avant upgrade complet vers Symfony 8.0.
+
+---
+
+## 🔧 Breaking Changes - Guide de Correction
+
+### 1. Routing: Annotation\Route → Attribute\Route
+
+**Symptôme**: Routes non chargées, erreur "route does not exist"
+
+**Cause**: Symfony 8.0 a déprécié les annotations en faveur des attributs PHP 8
+
+**Correction**:
+```php
+// ❌ Avant (Symfony 7.x)
+use Symfony\Component\Routing\Annotation\Route;
+
+// ✅ Après (Symfony 8.0)
+use Symfony\Component\Routing\Attribute\Route;
+```
+
+**Commande de correction automatique**:
+```bash
+find src/Controller -name "*.php" -exec sed -i '' \
+  's/use Symfony\\Component\\Routing\\Annotation\\Route;/use Symfony\\Component\\Routing\\Attribute\\Route;/g' {} \;
+```
+
+### 2. Doctrine DBAL: Platform getName()
+
+**Symptôme**: `Call to undefined method getName() of class MariaDB1010Platform`
+
+**Cause**: DBAL 4.0 a supprimé la méthode `getName()` des classes Platform
+
+**Correction**:
+```php
+// ❌ Avant (DBAL 3.x)
+$platform = $conn->getDatabasePlatform()->getName();
+$sql = match ($platform) {
+    'postgresql' => 'EXTRACT(YEAR FROM date)',
+    default => 'YEAR(date)',
+};
+
+// ✅ Après (DBAL 4.0)
+$platform = $conn->getDatabasePlatform();
+$sql = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform
+    ? 'EXTRACT(YEAR FROM date)'
+    : 'YEAR(date)';
+```
+
+### 3. Doctrine DBAL: PARAM_STR_ARRAY
+
+**Symptôme**: `Undefined constant Connection::PARAM_STR_ARRAY`
+
+**Cause**: DBAL 4.0 a remplacé les constantes PARAM_* par des enums
+
+**Correction**:
+```php
+// ❌ Avant (DBAL 3.x)
+$conn->executeQuery($sql, $params, [
+    'ids' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY,
+]);
+
+// ✅ Après (DBAL 4.0)
+$conn->executeQuery($sql, $params, [
+    'ids' => \Doctrine\DBAL\ArrayParameterType::STRING,
+]);
+```
+
+**Autres types disponibles**:
+- `ArrayParameterType::INTEGER` (remplace `PARAM_INT_ARRAY`)
+- `ArrayParameterType::STRING` (remplace `PARAM_STR_ARRAY`)
+- `ArrayParameterType::ASCII` (remplace `PARAM_ASCII_STR_ARRAY`)
+
+### 4. Doctrine ORM: Lazy Ghost Objects
+
+**Symptôme**: `ORMInvalidArgumentException: Symfony LazyGhost is not available`
+
+**Cause**: Incompatibilité entre Doctrine ORM 3.5.8 et symfony/var-exporter 8.0
+
+**Correction temporaire**: Épingler symfony/var-exporter à 7.4
+```json
+{
+    "require": {
+        "symfony/var-exporter": "^7.4"
+    }
+}
+```
+
+**Note**: Ce sera résolu quand Doctrine ORM 4.0 stable sortira avec support complet Symfony 8.0
 
 ---
 
