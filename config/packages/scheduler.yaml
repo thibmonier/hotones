@@ -1,7 +1,3 @@
 framework:
   scheduler:
     enabled: true
-#    schedules:
-#      default:
-#        timezone: 'Europe/Paris'
-#        tasks: { }
