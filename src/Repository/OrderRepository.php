@@ -306,7 +306,7 @@ class OrderRepository extends ServiceEntityRepository
                 'end'      => $endDate->format('Y-m-d'),
             ],
             [
-                'statuses' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY,
+                'statuses' => \Doctrine\DBAL\ArrayParameterType::STRING,
             ],
         )->fetchAllAssociative();
 
