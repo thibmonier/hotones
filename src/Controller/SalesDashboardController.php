@@ -129,11 +129,10 @@ class SalesDashboardController extends AbstractController
         $conn = $em->getConnection();
 
         // Support both MySQL and PostgreSQL
-        $platform    = $conn->getDatabasePlatform()->getName();
-        $yearExtract = match ($platform) {
-            'postgresql' => 'EXTRACT(YEAR FROM created_at)',
-            default      => 'YEAR(created_at)', // MySQL/MariaDB
-        };
+        $platform    = $conn->getDatabasePlatform();
+        $yearExtract = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform
+            ? 'EXTRACT(YEAR FROM created_at)'
+            : 'YEAR(created_at)'; // MySQL/MariaDB
 
         $sql    = "SELECT DISTINCT {$yearExtract} as year FROM orders ORDER BY year DESC";
         $result = $conn->executeQuery($sql)->fetchAllAssociative();
