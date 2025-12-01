@@ -282,11 +282,10 @@ class OrderRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         // Support both MySQL and PostgreSQL
-        $platform   = $conn->getDatabasePlatform()->getName();
-        $dateFormat = match ($platform) {
-            'postgresql' => "TO_CHAR(validated_at, 'YYYY-MM')",
-            default      => "DATE_FORMAT(validated_at, '%Y-%m')", // MySQL/MariaDB
-        };
+        $platform   = $conn->getDatabasePlatform();
+        $dateFormat = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform
+            ? "TO_CHAR(validated_at, 'YYYY-MM')"
+            : "DATE_FORMAT(validated_at, '%Y-%m')"; // MySQL/MariaDB
 
         $sql = "
             SELECT
