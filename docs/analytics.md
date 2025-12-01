@@ -21,8 +21,16 @@
 
 ## Dashboard Analytics
 - URL : `/analytics/dashboard`
+- Export Excel : `/analytics/export-excel` (5 feuilles : KPIs, Évolution mensuelle, Types, Catégories, Top contributeurs)
 - Filtres : période, année/mois, type de projet, chef de projet, commercial
 - Visualisations : cartes KPIs, graphiques d'évolution, répartition, table détaillée
+
+### Architecture
+- **DashboardReadService** : Lecture depuis le modèle en étoile (FactProjectMetrics)
+  - Fallback automatique vers MetricsCalculationService (temps réel) si données manquantes
+  - Optimisé pour performance avec données pré-agrégées
+- **ExcelExportService** : Export dashboard complet avec PhpSpreadsheet
+- **MetricsCalculationService** : Service temps réel (déprécié, utilisé comme fallback uniquement)
 
 ## Dashboard de Staffing
 - URL : `/staffing/dashboard`
@@ -65,10 +73,28 @@ php bin/console app:generate-test-data --force
 ```
 
 ## Automatisation
+
+### Symfony Scheduler
+Configuré via `AnalyticsScheduleProvider` (`src/Scheduler/AnalyticsScheduleProvider.php`)
+
+**Schedules configurés** :
+- **Quotidien** : 6:00 AM - Recalcul des métriques mensuelles
+- **Trimestriel** : 1er jour de Q1,Q2,Q3,Q4 à 7:00 AM
+- **Annuel** : 1er janvier à 8:00 AM
+
+**Lancement du worker** :
 ```bash
-# Recalcul quotidien à 6h du matin
-0 6 * * * cd /path/to/project && php bin/console app:calculate-metrics
+# Lister les schedules
+php bin/console debug:scheduler
+
+# Lancer le scheduler worker
+php bin/console messenger:consume scheduler_default
+
+# En production (systemd/supervisord)
+php bin/console messenger:consume scheduler_default --time-limit=3600
 ```
+
+**Message dispatch** : Les tâches sont envoyées via `RecalculateMetricsMessage` au message bus Symfony.
 
 ## Performance
 - Index optimisés, données dénormalisées, agrégations pré-calculées, support gros volumes

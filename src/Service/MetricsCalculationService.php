@@ -11,6 +11,13 @@ use App\Repository\TimesheetRepository;
 use DateTime;
 use DateTimeInterface;
 
+/**
+ * Service de calcul des métriques en temps réel.
+ *
+ * @deprecated Utilisez App\Service\Analytics\DashboardReadService à la place.
+ *             Ce service est maintenant utilisé uniquement comme fallback
+ *             quand les données du modèle en étoile ne sont pas disponibles.
+ */
 class MetricsCalculationService
 {
     public function __construct(
@@ -23,6 +30,10 @@ class MetricsCalculationService
 
     /**
      * Calcule tous les KPIs pour une période donnée.
+     *
+     * @deprecated Utilisez DashboardReadService::getKPIs() à la place.
+     *             Cette méthode est conservée uniquement pour le fallback
+     *             quand les données pré-calculées ne sont pas disponibles.
      */
     public function calculateKPIs(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, array $filters = []): array
     {

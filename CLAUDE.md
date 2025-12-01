@@ -44,6 +44,10 @@ php bin/console app:calculate-metrics [year] [--granularity=monthly|quarterly|ye
 php bin/console app:calculate-staffing-metrics [year] [--granularity=weekly|monthly|quarterly]
 php bin/console app:metrics:dispatch --year=2025
 
+# Scheduler
+php bin/console debug:scheduler              # List all scheduled tasks
+php bin/console messenger:consume scheduler_default  # Run the scheduler worker
+
 # Message queue
 php bin/console messenger:consume async -vv
 php bin/console messenger:failed:retry
@@ -148,6 +152,18 @@ FactStaffingMetrics
   ├─► DimTime, DimProfile, DimContributor
   └─► Metrics: availability, workload, TACE
 ```
+
+**Services**:
+- `DashboardReadService`: Reads pre-calculated KPIs from star schema (FactProjectMetrics) with automatic fallback to real-time calculation if data is missing
+- `MetricsCalculationService`: Deprecated real-time service, kept as fallback only
+- `ExcelExportService`: Exports dashboard data to Excel with multiple worksheets (KPIs, monthly evolution, distributions)
+
+**Automation**:
+- Symfony Scheduler configured via `AnalyticsScheduleProvider`
+- Daily recalculation at 6:00 AM (monthly metrics)
+- Quarterly recalculation on 1st day at 7:00 AM (Q1,Q2,Q3,Q4)
+- Annual recalculation on January 1st at 8:00 AM
+- Metrics dispatched via Messenger to `RecalculateMetricsMessage`
 
 ## Important Patterns
 
@@ -316,7 +332,7 @@ docker compose exec app php bin/console doctrine:migrations:migrate
 - Application: http://localhost:8080
 - API Documentation: http://localhost:8080/api/documentation
 - Admin config: `/admin/technologies`, `/admin/service-categories`, `/admin/job-profiles`, `/admin/company-settings`
-- Analytics Dashboard: `/analytics/dashboard`
+- Analytics Dashboard: `/analytics/dashboard` (with Excel export at `/analytics/export-excel`)
 - Profitability Dashboard: `/profitability/dashboard`
 - Sales Dashboard: `/sales/dashboard`
 - Staffing Dashboard: `/staffing/dashboard`
