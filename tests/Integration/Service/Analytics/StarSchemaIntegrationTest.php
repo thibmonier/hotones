@@ -6,6 +6,7 @@ namespace App\Tests\Integration\Service\Analytics;
 
 use App\Entity\Analytics\DimTime;
 use App\Entity\Analytics\FactProjectMetrics;
+use App\Factory\DimProjectTypeFactory;
 use App\Factory\DimTimeFactory;
 use App\Service\Analytics\DashboardReadService;
 use DateTime;
@@ -64,8 +65,14 @@ class StarSchemaIntegrationTest extends KernelTestCase
             'date' => new DateTime('2025-02-01'),
         ]);
 
+        $dimProjectType = DimProjectTypeFactory::createOne([
+            'projectType' => 'forfait',
+            'status' => 'active',
+        ]);
+
         $fact1 = (new FactProjectMetrics())
             ->setDimTime($dimTime1)
+            ->setDimProjectType($dimProjectType)
             ->setGranularity('monthly')
             ->setTotalRevenue('10000.00')
             ->setTotalCosts('7000.00')
@@ -79,6 +86,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         $fact2 = (new FactProjectMetrics())
             ->setDimTime($dimTime2)
+            ->setDimProjectType($dimProjectType)
             ->setGranularity('monthly')
             ->setTotalRevenue('12000.00')
             ->setTotalCosts('8000.00')
@@ -114,8 +122,14 @@ class StarSchemaIntegrationTest extends KernelTestCase
             'date' => new DateTime('2025-01-15'),
         ]);
 
+        $dimProjectType = DimProjectTypeFactory::createOne([
+            'projectType' => 'forfait',
+            'status' => 'active',
+        ]);
+
         $fact = (new FactProjectMetrics())
             ->setDimTime($dimTime)
+            ->setDimProjectType($dimProjectType)
             ->setGranularity('monthly')
             ->setTotalRevenue('15000.00')
             ->setTotalCosts('10000.00')
@@ -157,6 +171,12 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
     public function testMonthlyEvolutionReturnsCorrectData(): void
     {
+        // Create dimension for project type
+        $dimProjectType = DimProjectTypeFactory::createOne([
+            'projectType' => 'forfait',
+            'status' => 'active',
+        ]);
+
         // Create 3 months of data - only set date
         for ($month = 1; $month <= 3; ++$month) {
             $dimTime = DimTimeFactory::createOne([
@@ -165,6 +185,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
             $fact = (new FactProjectMetrics())
                 ->setDimTime($dimTime)
+                ->setDimProjectType($dimProjectType)
                 ->setGranularity('monthly')
                 ->setTotalRevenue((string) ($month * 10000))
                 ->setTotalCosts((string) ($month * 7000))
@@ -188,6 +209,12 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
     public function testQueryPerformanceWithLargeDataset(): void
     {
+        // Create dimension for project type
+        $dimProjectType = DimProjectTypeFactory::createOne([
+            'projectType' => 'forfait',
+            'status' => 'active',
+        ]);
+
         // Create 100 entries to test performance - only set date
         for ($i = 1; $i <= 100; ++$i) {
             $date    = (new DateTime('2025-01-01'))->modify("+{$i} days");
@@ -197,6 +224,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
             $fact = (new FactProjectMetrics())
                 ->setDimTime($dimTime)
+                ->setDimProjectType($dimProjectType)
                 ->setGranularity('daily')
                 ->setTotalRevenue('1000.00')
                 ->setTotalCosts('700.00')
