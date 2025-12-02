@@ -67,7 +67,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status' => 'active',
+            'status'      => 'active',
         ]);
 
         $fact1 = (new FactProjectMetrics())
@@ -124,7 +124,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status' => 'active',
+            'status'      => 'active',
         ]);
 
         $fact = (new FactProjectMetrics())
@@ -174,7 +174,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         // Create dimension for project type
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status' => 'active',
+            'status'      => 'active',
         ]);
 
         // Create 3 months of data - only set date
@@ -212,7 +212,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         // Create dimension for project type
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status' => 'active',
+            'status'      => 'active',
         ]);
 
         // Create 100 entries to test performance - only set date

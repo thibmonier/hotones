@@ -167,6 +167,9 @@ class ProjectApiTest extends ApiTestCase
             return $this->token;
         }
 
+        // Create client to boot kernel and initialize Foundry with service container
+        static::createClient();
+
         // Crée un utilisateur aléatoire et génère un JWT sans appeler /api/login
         $user        = UserFactory::createOne();
         $jwtManager  = static::getContainer()->get('lexik_jwt_authentication.jwt_manager');
@@ -177,6 +180,9 @@ class ProjectApiTest extends ApiTestCase
 
     private function getTokenWithRole(string $role): string
     {
+        // Create client to boot kernel and initialize Foundry with service container
+        static::createClient();
+
         // Crée un utilisateur avec le rôle demandé et génère un JWT
         $user       = UserFactory::createOne(['roles' => [$role]]);
         $jwtManager = static::getContainer()->get('lexik_jwt_authentication.jwt_manager');
