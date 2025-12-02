@@ -49,6 +49,7 @@
                         {% endif %}
                         {% if is_granted('ROLE_MANAGER') %}
                         <li><a href="{{ path('planning_optimization_index') }}"><i class="bx bx-bulb"></i> Optimisation</a></li>
+                        <li><a href="{{ path('risk_projects_dashboard') }}"><i class="bx bx-error-circle"></i> Projets à risque</a></li>
                         {% endif %}
                         {% if is_granted('ROLE_INTERVENANT') %}
                         <li><a href="{{ path('my_tasks_index') }}">Mes tâches <span id="sidebar-overdue-tasks-count" class="badge bg-warning ms-2" style="display:none;">0</span></a></li>
@@ -152,7 +153,6 @@
                         <li><a href="{{ path('analytics_dashboard') }}">Dashboard KPIs</a></li>
                         {% if is_granted('ROLE_MANAGER') %}
                         <li><a href="{{ path('forecasting_dashboard') }}">Prévisions CA</a></li>
-                        <li><a href="{{ path('risk_projects_dashboard') }}">Projets à risque</a></li>
                         <li><a href="{{ path('staffing_prediction') }}">Prédiction de charge</a></li>
                         <li><a href="{{ path('hr_dashboard') }}">Dashboard RH</a></li>
                         {% endif %}

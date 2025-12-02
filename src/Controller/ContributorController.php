@@ -42,12 +42,13 @@ class ContributorController extends AbstractController
         }
 
         $queryAll  = $request->query->all();
-        $keys      = ['search', 'active'];
+        $keys      = ['search', 'active', 'employment_status'];
         $hasFilter = count(array_intersect(array_keys($queryAll), $keys)) > 0;
         $saved     = ($session && $session->has('contributor_filters')) ? (array) $session->get('contributor_filters') : [];
 
-        $search = $hasFilter ? ($request->query->get('search', '')) : ($saved['search'] ?? '');
-        $active = $hasFilter ? ($request->query->get('active', 'all')) : ($saved['active'] ?? 'all');
+        $search           = $hasFilter ? ($request->query->get('search', '')) : ($saved['search'] ?? '');
+        $active           = $hasFilter ? ($request->query->get('active', 'all')) : ($saved['active'] ?? 'all');
+        $employmentStatus = $hasFilter ? ($request->query->get('employment_status', 'all')) : ($saved['employment_status'] ?? 'all');
 
         $qb = $this->contributorRepository->createQueryBuilder('c')
             ->leftJoin('c.profiles', 'p')
@@ -61,6 +62,26 @@ class ContributorController extends AbstractController
         if ($active !== 'all') {
             $qb->andWhere('c.active = :active')
                ->setParameter('active', $active === 'active');
+        }
+
+        // Filtre par statut de période d'emploi
+        if ($employmentStatus === 'current') {
+            $today = new DateTime();
+            $qb->innerJoin('c.employmentPeriods', 'ep')
+               ->andWhere('ep.startDate <= :today')
+               ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :today)')
+               ->setParameter('today', $today);
+        } elseif ($employmentStatus === 'inactive_employment') {
+            $today = new DateTime();
+            // Utiliser une sous-requête pour exclure les contributeurs avec des périodes en cours
+            $subQuery = $this->entityManager->createQueryBuilder()
+                ->select('IDENTITY(ep2.contributor)')
+                ->from('App\Entity\EmploymentPeriod', 'ep2')
+                ->where('ep2.startDate <= :today')
+                ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
+                ->getDQL();
+            $qb->andWhere($qb->expr()->notIn('c.id', $subQuery))
+               ->setParameter('today', $today);
         }
 
         // Tri
@@ -143,11 +164,12 @@ class ContributorController extends AbstractController
 
         if ($session) {
             $session->set('contributor_filters', [
-                'search'   => $search,
-                'active'   => $active,
-                'sort'     => $sort,
-                'dir'      => $direction,
-                'per_page' => $perPage,
+                'search'            => $search,
+                'active'            => $active,
+                'employment_status' => $employmentStatus,
+                'sort'              => $sort,
+                'dir'               => $direction,
+                'per_page'          => $perPage,
             ]);
         }
 
@@ -155,6 +177,7 @@ class ContributorController extends AbstractController
             'contributors'       => $contributors,
             'search'             => $search,
             'active'             => $active,
+            'employment_status'  => $employmentStatus,
             'sort'               => $sort,
             'dir'                => $direction,
             'pagination'         => $pagination,
@@ -363,12 +386,13 @@ class ContributorController extends AbstractController
     #[Route('/export.csv', name: 'contributor_export_csv', methods: ['GET'])]
     public function exportCsv(Request $request): Response
     {
-        $session = $request->getSession();
-        $saved   = ($session && $session->has('contributor_filters')) ? (array) $session->get('contributor_filters') : [];
-        $search  = $request->query->get('search', $saved['search'] ?? '');
-        $active  = $request->query->get('active', $saved['active'] ?? 'all');
-        $sort    = $request->query->get('sort', $saved['sort'] ?? 'name');
-        $dir     = $request->query->get('dir', $saved['dir'] ?? 'ASC');
+        $session          = $request->getSession();
+        $saved            = ($session && $session->has('contributor_filters')) ? (array) $session->get('contributor_filters') : [];
+        $search           = $request->query->get('search', $saved['search'] ?? '');
+        $active           = $request->query->get('active', $saved['active'] ?? 'all');
+        $employmentStatus = $request->query->get('employment_status', $saved['employment_status'] ?? 'all');
+        $sort             = $request->query->get('sort', $saved['sort'] ?? 'name');
+        $dir              = $request->query->get('dir', $saved['dir'] ?? 'ASC');
 
         $qb = $this->contributorRepository->createQueryBuilder('c')
             ->leftJoin('c.profiles', 'p')->addSelect('p');
@@ -377,6 +401,24 @@ class ContributorController extends AbstractController
         }
         if ($active !== 'all') {
             $qb->andWhere('c.active = :a')->setParameter('a', $active === 'active');
+        }
+        if ($employmentStatus === 'current') {
+            $today = new DateTime();
+            $qb->innerJoin('c.employmentPeriods', 'ep')
+               ->andWhere('ep.startDate <= :today')
+               ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :today)')
+               ->setParameter('today', $today);
+        } elseif ($employmentStatus === 'inactive_employment') {
+            $today = new DateTime();
+            // Utiliser une sous-requête pour exclure les contributeurs avec des périodes en cours
+            $subQuery = $this->entityManager->createQueryBuilder()
+                ->select('IDENTITY(ep2.contributor)')
+                ->from('App\Entity\EmploymentPeriod', 'ep2')
+                ->where('ep2.startDate <= :today')
+                ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
+                ->getDQL();
+            $qb->andWhere($qb->expr()->notIn('c.id', $subQuery))
+               ->setParameter('today', $today);
         }
         $map       = ['name' => ['c.lastName', 'c.firstName'], 'email' => ['c.email'], 'active' => ['c.active']];
         $cols      = $map[$sort] ?? ['c.lastName', 'c.firstName'];

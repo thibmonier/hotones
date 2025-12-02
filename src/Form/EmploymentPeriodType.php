@@ -90,11 +90,11 @@ class EmploymentPeriodType extends AbstractType
                 ],
                 'data'        => 35.0,
                 'constraints' => [
-                    new Range([
-                        'min'               => 1,
-                        'max'               => 48,
-                        'notInRangeMessage' => 'Les heures hebdomadaires doivent être entre {{ min }} et {{ max }}',
-                    ]),
+                    new Range(
+                        min: 1,
+                        max: 48,
+                        notInRangeMessage: 'Les heures hebdomadaires doivent être entre {{ min }} et {{ max }}',
+                    ),
                 ],
                 'help' => 'Nombre d\'heures travaillées par semaine (ex: 35, 39)',
             ])
@@ -109,11 +109,11 @@ class EmploymentPeriodType extends AbstractType
                 ],
                 'data'        => 100.0,
                 'constraints' => [
-                    new Range([
-                        'min'               => 1,
-                        'max'               => 100,
-                        'notInRangeMessage' => 'Le pourcentage doit être entre {{ min }} et {{ max }}',
-                    ]),
+                    new Range(
+                        min: 1,
+                        max: 100,
+                        notInRangeMessage: 'Le pourcentage doit être entre {{ min }} et {{ max }}',
+                    ),
                 ],
                 'help' => '100% = temps plein, 80% = 4/5ème, etc.',
             ])

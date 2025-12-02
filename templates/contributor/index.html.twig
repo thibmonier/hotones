@@ -28,6 +28,7 @@
                     {% set activeFiltersCount = activeFiltersCount
                         + ((search and search|length > 0) ? 1 : 0)
                         + (active != 'all' ? 1 : 0)
+                        + (employment_status != 'all' ? 1 : 0)
                         + (sort != 'name' ? 1 : 0)
                         + (dir != 'ASC' ? 1 : 0)
                         + (pagination.per_page != 20 ? 1 : 0)
@@ -39,7 +40,7 @@
                             {% endif %}
                         </h5>
                         <div class="btn-group">
-                            <a href="{{ path('contributor_export_csv', { search: search, active: active, sort: sort, dir: dir }) }}" class="btn btn-sm btn-outline-primary">Exporter CSV</a>
+                            <a href="{{ path('contributor_export_csv', { search: search, active: active, employment_status: employment_status, sort: sort, dir: dir }) }}" class="btn btn-sm btn-outline-primary">Exporter CSV</a>
                             <a href="{{ path('contributor_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
                             <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-contributors" aria-expanded="true" aria-controls="filters-contributors" id="filters-toggle-contributors">
                                 <i class="bx bx-chevron-up"></i>
@@ -53,6 +54,9 @@
                         {% endif %}
                         {% if active != 'all' %}
                             {% set chips = chips|merge(['Statut: ' ~ (active == 'active' ? 'Actifs' : 'Inactifs')]) %}
+                        {% endif %}
+                        {% if employment_status != 'all' %}
+                            {% set chips = chips|merge(['Emploi: ' ~ (employment_status == 'current' ? 'En cours' : 'Inactif')]) %}
                         {% endif %}
                         {% if sort != 'name' or dir != 'ASC' %}
                             {% set chips = chips|merge(['Tri: ' ~ sort ~ ' ' ~ dir]) %}
@@ -74,18 +78,26 @@
                         {% endif %}
                         <form method="get" class="mb-3">
                             <div class="row g-3 align-items-end">
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <label class="form-label">Recherche</label>
-                                    <input type="text" name="search" class="form-control" 
-                                           placeholder="Rechercher par nom, prénom ou email..." 
+                                    <input type="text" name="search" class="form-control"
+                                           placeholder="Rechercher par nom, prénom ou email..."
                                            value="{{ search }}">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Statut</label>
                                     <select name="active" class="form-select">
-                                        <option value="all" {{ active == 'all' ? 'selected' : '' }}>Tous les statuts</option>
-                                        <option value="active" {{ active == 'active' ? 'selected' : '' }}>Actifs uniquement</option>
-                                        <option value="inactive" {{ active == 'inactive' ? 'selected' : '' }}>Inactifs uniquement</option>
+                                        <option value="all" {{ active == 'all' ? 'selected' : '' }}>Tous</option>
+                                        <option value="active" {{ active == 'active' ? 'selected' : '' }}>Actifs</option>
+                                        <option value="inactive" {{ active == 'inactive' ? 'selected' : '' }}>Inactifs</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Emploi</label>
+                                    <select name="employment_status" class="form-select">
+                                        <option value="all" {{ employment_status == 'all' ? 'selected' : '' }}>Tous</option>
+                                        <option value="current" {{ employment_status == 'current' ? 'selected' : '' }}>En cours</option>
+                                        <option value="inactive_employment" {{ employment_status == 'inactive_employment' ? 'selected' : '' }}>Terminé</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -154,7 +166,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>
-                                            <a href="{{ path('contributor_index', { search: search, active: active, sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' }) }}" class="text-decoration-none text-reset">
+                                            <a href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' }) }}" class="text-decoration-none text-reset">
                                                 Nom
                                                 {% if sort == 'name' %}
                                                     <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
@@ -162,7 +174,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="{{ path('contributor_index', { search: search, active: active, sort: 'email', dir: sort == 'email' and dir == 'ASC' ? 'DESC' : 'ASC' }) }}" class="text-decoration-none text-reset">
+                                            <a href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: 'email', dir: sort == 'email' and dir == 'ASC' ? 'DESC' : 'ASC' }) }}" class="text-decoration-none text-reset">
                                                 Contact
                                                 {% if sort == 'email' %}
                                                     <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
@@ -321,15 +333,15 @@
             <nav>
                 <ul class="pagination">
                     <li class="page-item {{ pagination.current_page == 1 ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page - 1 }) }}">Précédent</a>
+                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page - 1 }) }}">Précédent</a>
                     </li>
                     {% for p in 1..pagination.total_pages %}
                         <li class="page-item {{ p == pagination.current_page ? 'active' : '' }}">
-                            <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, sort: sort, dir: dir, per_page: pagination.per_page, page: p }) }}">{{ p }}</a>
+                            <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: sort, dir: dir, per_page: pagination.per_page, page: p }) }}">{{ p }}</a>
                         </li>
                     {% endfor %}
                     <li class="page-item {{ pagination.current_page == pagination.total_pages ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page + 1 }) }}">Suivant</a>
+                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page + 1 }) }}">Suivant</a>
                     </li>
                 </ul>
             </nav>
