@@ -65,16 +65,20 @@ class NpsController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        $npsScore = null;
+        $npsScore   = null;
+        $promoters  = 0;
+        $passives   = 0;
+        $detractors = 0;
+
         if (!empty($allCompleted)) {
-            $promoters  = 0;
-            $detractors = 0;
-            $total      = count($allCompleted);
+            $total = count($allCompleted);
 
             foreach ($allCompleted as $survey) {
                 $category = $survey->getCategory();
                 if ($category === 'promoter') {
                     ++$promoters;
+                } elseif ($category === 'passive') {
+                    ++$passives;
                 } elseif ($category === 'detractor') {
                     ++$detractors;
                 }
@@ -84,13 +88,16 @@ class NpsController extends AbstractController
         }
 
         return $this->render('nps/index.html.twig', [
-            'surveys'         => $surveys,
-            'status'          => $status,
-            'project_id'      => $projectId,
-            'total_surveys'   => $totalSurveys,
-            'completed_count' => $completedCount,
-            'response_rate'   => $responseRate,
-            'nps_score'       => $npsScore !== null ? round($npsScore, 1) : null,
+            'surveys'          => $surveys,
+            'status'           => $status,
+            'project_id'       => $projectId,
+            'total_surveys'    => $totalSurveys,
+            'completed_count'  => $completedCount,
+            'response_rate'    => $responseRate,
+            'nps_score'        => $npsScore !== null ? round($npsScore, 1) : null,
+            'promoters_count'  => $promoters,
+            'passives_count'   => $passives,
+            'detractors_count' => $detractors,
         ]);
     }
 

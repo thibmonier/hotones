@@ -247,10 +247,10 @@
         // Graphique de distribution NPS
         const ctx = document.getElementById('npsDistributionChart');
         if (ctx) {
-            // Calculer la distribution des scores
-            const detractors = {{ surveys|filter(s => s.category == 'detractor')|length }};
-            const passives = {{ surveys|filter(s => s.category == 'passive')|length }};
-            const promoters = {{ surveys|filter(s => s.category == 'promoter')|length }};
+            // Utiliser les données calculées par le contrôleur (toutes les enquêtes complétées)
+            const detractors = {{ detractors_count }};
+            const passives = {{ passives_count }};
+            const promoters = {{ promoters_count }};
 
             new Chart(ctx, {
                 type: 'doughnut',
