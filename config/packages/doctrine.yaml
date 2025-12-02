@@ -44,7 +44,11 @@ when@prod:
     framework:
         cache:
             pools:
+                # Doctrine result cache - query results caching
                 doctrine.result_cache_pool:
-                    adapter: cache.app
+                    adapter: cache.adapter.redis
+                    default_lifetime: 3600  # 1 hour
+                # Doctrine system cache - metadata caching
                 doctrine.system_cache_pool:
-                    adapter: cache.system
+                    adapter: cache.adapter.redis
+                    default_lifetime: 86400  # 24 hours

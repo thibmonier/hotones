@@ -10,18 +10,22 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Service de lecture des métriques depuis le modèle en étoile.
  * Lit les données pré-calculées depuis FactProjectMetrics.
  * Fallback vers calcul temps réel si données manquantes.
+ * Utilise un cache Redis pour améliorer les performances.
  */
 readonly class DashboardReadService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private RealTimeMetricsService $realTimeService,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private CacheInterface $analyticsCache
     ) {
     }
 
@@ -36,20 +40,36 @@ readonly class DashboardReadService
      */
     public function getKPIs(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, array $filters = []): array
     {
-        // Tentative de lecture depuis le modèle en étoile
-        $metrics = $this->readFromStarSchema($startDate, $endDate, $filters);
+        // Dates par défaut pour la clé de cache
+        $start = $startDate ?? new DateTime('first day of January this year');
+        $end   = $endDate   ?? new DateTime();
 
-        // Si pas de données, fallback vers calcul temps réel
-        if (empty($metrics['revenue']['total_revenue']) && empty($metrics['revenue']['total_cost'])) {
-            $this->logger->warning('Aucune donnée dans le modèle en étoile, fallback vers calcul temps réel', [
-                'start' => $startDate?->format('Y-m-d'),
-                'end'   => $endDate?->format('Y-m-d'),
-            ]);
+        // Clé de cache basée sur les dates et filtres
+        $cacheKey = sprintf(
+            'analytics_kpis_%s_%s_%s',
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d'),
+            md5(json_encode($filters)),
+        );
 
-            return $this->realTimeService->calculateKPIs($startDate, $endDate, $filters);
-        }
+        return $this->analyticsCache->get($cacheKey, function (ItemInterface $item) use ($startDate, $endDate, $filters) {
+            $item->expiresAfter(1800); // 30 minutes
 
-        return $metrics;
+            // Tentative de lecture depuis le modèle en étoile
+            $metrics = $this->readFromStarSchema($startDate, $endDate, $filters);
+
+            // Si pas de données, fallback vers calcul temps réel
+            if (empty($metrics['revenue']['total_revenue']) && empty($metrics['revenue']['total_cost'])) {
+                $this->logger->warning('Aucune donnée dans le modèle en étoile, fallback vers calcul temps réel', [
+                    'start' => $startDate?->format('Y-m-d'),
+                    'end'   => $endDate?->format('Y-m-d'),
+                ]);
+
+                return $this->realTimeService->calculateKPIs($startDate, $endDate, $filters);
+            }
+
+            return $metrics;
+        });
     }
 
     /**
@@ -62,53 +82,64 @@ readonly class DashboardReadService
      */
     public function getMonthlyEvolution(int $months = 12, array $filters = []): array
     {
-        $endDate   = new DateTime('last day of this month');
-        $startDate = (clone $endDate)->modify("-{$months} months")->modify('first day of this month');
+        // Clé de cache basée sur le nombre de mois et filtres
+        $cacheKey = sprintf(
+            'analytics_monthly_evolution_%d_%s',
+            $months,
+            md5(json_encode($filters)),
+        );
 
-        // Lire depuis le modèle en étoile
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select(
-            'dt.year',
-            'dt.month',
-            'dt.monthName',
-            'SUM(f.totalRevenue) as totalRevenue',
-            'SUM(f.totalCosts) as totalCosts',
-            'SUM(f.grossMargin) as grossMargin',
-        )
-            ->from(FactProjectMetrics::class, 'f')
-            ->join('f.dimTime', 'dt')
-            ->where('dt.date BETWEEN :start AND :end')
-            ->andWhere('f.granularity = :granularity')
-            ->setParameter('start', $startDate)
-            ->setParameter('end', $endDate)
-            ->setParameter('granularity', 'monthly')
-            ->groupBy('dt.year', 'dt.month', 'dt.monthName')
-            ->orderBy('dt.year', 'ASC')
-            ->addOrderBy('dt.month', 'ASC');
+        return $this->analyticsCache->get($cacheKey, function (ItemInterface $item) use ($months, $filters) {
+            $item->expiresAfter(1800); // 30 minutes
 
-        // Appliquer les filtres si fournis
-        $this->applyFilters($qb, $filters);
+            $endDate   = new DateTime('last day of this month');
+            $startDate = (clone $endDate)->modify("-{$months} months")->modify('first day of this month');
 
-        $results = $qb->getQuery()->getResult();
+            // Lire depuis le modèle en étoile
+            $qb = $this->entityManager->createQueryBuilder();
+            $qb->select(
+                'dt.year',
+                'dt.month',
+                'dt.monthName',
+                'SUM(f.totalRevenue) as totalRevenue',
+                'SUM(f.totalCosts) as totalCosts',
+                'SUM(f.grossMargin) as grossMargin',
+            )
+                ->from(FactProjectMetrics::class, 'f')
+                ->join('f.dimTime', 'dt')
+                ->where('dt.date BETWEEN :start AND :end')
+                ->andWhere('f.granularity = :granularity')
+                ->setParameter('start', $startDate)
+                ->setParameter('end', $endDate)
+                ->setParameter('granularity', 'monthly')
+                ->groupBy('dt.year', 'dt.month', 'dt.monthName')
+                ->orderBy('dt.year', 'ASC')
+                ->addOrderBy('dt.month', 'ASC');
 
-        // Si pas de données, fallback
-        if (empty($results)) {
-            $this->logger->warning('Pas de données d\'évolution dans le modèle, fallback temps réel');
+            // Appliquer les filtres si fournis
+            $this->applyFilters($qb, $filters);
 
-            return $this->realTimeService->calculateMonthlyEvolution($months, $filters);
-        }
+            $results = $qb->getQuery()->getResult();
 
-        // Formatter les résultats
-        return array_map(function ($row) {
-            return [
-                'month'       => $row['monthName'],
-                'month_label' => $row['monthName'], // Pour le graphique Chart.js
-                'revenue'     => (float) $row['totalRevenue'],
-                'cost'        => (float) $row['totalCosts'], // Singulier pour Chart.js
-                'costs'       => (float) $row['totalCosts'], // Pluriel pour compatibilité
-                'margin'      => (float) $row['grossMargin'],
-            ];
-        }, $results);
+            // Si pas de données, fallback
+            if (empty($results)) {
+                $this->logger->warning('Pas de données d\'évolution dans le modèle, fallback temps réel');
+
+                return $this->realTimeService->calculateMonthlyEvolution($months, $filters);
+            }
+
+            // Formatter les résultats
+            return array_map(function ($row) {
+                return [
+                    'month'       => $row['monthName'],
+                    'month_label' => $row['monthName'], // Pour le graphique Chart.js
+                    'revenue'     => (float) $row['totalRevenue'],
+                    'cost'        => (float) $row['totalCosts'], // Singulier pour Chart.js
+                    'costs'       => (float) $row['totalCosts'], // Pluriel pour compatibilité
+                    'margin'      => (float) $row['grossMargin'],
+                ];
+            }, $results);
+        });
     }
 
     /**

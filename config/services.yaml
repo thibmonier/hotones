@@ -55,3 +55,8 @@ services:
         arguments:
             $fromEmail: '%app.mail.from_email%'
             $fromName: '%app.mail.from_name%'
+
+    # Analytics Dashboard Service with Redis cache
+    App\Service\Analytics\DashboardReadService:
+        arguments:
+            $analyticsCache: '@cache.analytics'
