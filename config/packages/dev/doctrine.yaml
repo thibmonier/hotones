@@ -1,0 +1,6 @@
+doctrine:
+    dbal:
+        # Enable profiling in dev to identify slow queries and N+1 issues
+        profiling_collect_backtrace: true
+        logging: true
+        profiling_collect_schema_errors: true
