@@ -53,4 +53,30 @@ class VacationRepository extends ServiceEntityRepository
 
         return $totalDays;
     }
+
+    /**
+     * Récupère les vacations en attente pour une liste de contributeurs.
+     * Optimisé pour éviter les N+1 queries.
+     *
+     * @param array $contributors Array of Contributor entities
+     *
+     * @return Vacation[]
+     */
+    public function findPendingForContributors(array $contributors): array
+    {
+        if (empty($contributors)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('v')
+            ->leftJoin('v.contributor', 'c')
+            ->addSelect('c')
+            ->where('v.contributor IN (:contributors)')
+            ->andWhere('v.status = :status')
+            ->setParameter('contributors', $contributors)
+            ->setParameter('status', 'pending')
+            ->orderBy('v.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

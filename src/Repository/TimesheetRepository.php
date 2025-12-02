@@ -41,12 +41,16 @@ class TimesheetRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les temps récents d'un contributeur.
+     * Récupère les temps récents d'un contributeur avec relations préchargées.
+     * Optimisé pour éviter les N+1 queries.
      */
     public function findRecentByContributor(Contributor $contributor, int $limit = 5): array
     {
         return $this->createQueryBuilder('t')
             ->leftJoin('t.project', 'p')
+            ->addSelect('p')
+            ->leftJoin('t.task', 'ta')
+            ->addSelect('ta')
             ->where('t.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('t.date', 'DESC')

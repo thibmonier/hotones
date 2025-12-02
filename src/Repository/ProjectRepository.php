@@ -120,6 +120,20 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
+     * Calcule le CA total de tous les projets en une seule requête.
+     * Retourne un string (decimal).
+     */
+    public function getTotalRevenue(): string
+    {
+        $result = $this->createQueryBuilder('p')
+            ->select('COALESCE(SUM(p.totalSoldAmount), 0) AS total')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (string) ($result ?? '0');
+    }
+
+    /**
      * Récupère tous les projets triés par nom.
      */
     public function findAllOrderedByName(): array
@@ -144,11 +158,18 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère les projets récents (limité).
+     * Récupère les projets récents (limité) avec leurs relations.
+     * Optimisé pour éviter les N+1 queries.
      */
     public function findRecentProjects(int $limit = 5): array
     {
         return $this->createQueryBuilder('p')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.projectManager', 'pm')
+            ->addSelect('pm')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->addSelect('sc')
             ->orderBy('p.id', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()

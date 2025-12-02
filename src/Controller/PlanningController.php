@@ -268,8 +268,11 @@ class PlanningController extends AbstractController
             ];
         }
 
-        // Get all projects for creation dropdown
-        $allProjects = $em->getRepository(\App\Entity\Project::class)->findAll();
+        // Get all projects for creation dropdown (only active projects with minimal data)
+        $allProjects = $em->getRepository(\App\Entity\Project::class)->findBy(
+            ['status' => 'active'],
+            ['name' => 'ASC'],
+        );
 
         // Quick TACE analysis for optimization alerts (only for managers)
         $taceAnalysis = null;
