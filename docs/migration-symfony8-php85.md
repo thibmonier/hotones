@@ -2,21 +2,32 @@
 
 **Date de création** : 2 décembre 2025
 **Auteur** : Équipe technique HotOnes
-**Statut actuel** : ✅ PHP 8.5.0 | 🔄 Symfony 7.4.0 (LTS) → Symfony 8.0 (migration partielle en cours)
+**Statut actuel** : ❌ Migrations suspendues - Analyse de compatibilité
 
 ---
 
-## 🎯 Objectifs de la Migration
+## ⚠️ DÉCISION : Migrations Suspendues
+
+**PHP 8.5** : ❌ **ANNULÉE** - Incompatibilités Alpine Linux (extension intl)
+**Symfony 8.0** : ❌ **REPORTÉE** - Bundle critique incompatible (scheb/2fa-bundle)
+
+**Recommandation** : ✅ **Rester sur PHP 8.4 + Symfony 7.4 LTS**
+
+**Voir rapport détaillé** : [docs/symfony8-compatibility-analysis.md](./symfony8-compatibility-analysis.md)
+
+---
+
+## 🎯 Objectifs Originaux (Abandonnés)
 
 ### PHP 8.5
-- ✅ **DÉJÀ FAIT** : Migration vers PHP 8.5.0 complétée
-- Environnement local déjà sous PHP 8.5.0
-- Profiter des améliorations de performance et des nouvelles fonctionnalités
+- ❌ **ANNULÉE** : Extension `intl` ne compile pas sur php:8.5-fpm-alpine
+- ❌ Build Docker échoue avec exit code 2
+- ✅ **Solution** : Rester sur PHP 8.4 (stable et éprouvé)
 
 ### Symfony 8.0
-- 🔄 **EN COURS** : Migration progressive de Symfony 7.4 (LTS) vers 8.0
-- Actuellement : **mix de packages 7.4 et 8.0**
-- Objectif : **100% Symfony 8.0** stable
+- ❌ **REPORTÉE** : scheb/2fa-bundle v7.12.2 ne supporte que Symfony ^6.4 || ^7.0
+- ❌ Branche 8.x-dev en développement mais pas encore stable
+- ✅ **Solution** : Rester sur Symfony 7.4 LTS (support jusqu'en novembre 2028)
 
 ---
 
@@ -26,10 +37,14 @@
 
 #### PHP
 ```
-PHP 8.5.0 (cli) (built: Nov 18 2025)
-Zend Engine v4.5.0
-✅ Migration PHP 8.5 : TERMINÉE
+Local (macOS):  PHP 8.5.0 ✅
+Docker (dev):   PHP 8.4.14 → 8.5.0 🔄 (en cours de migration)
+Render (prod):  PHP 8.4 → 8.5 🔄 (à déployer)
 ```
+
+**Note**: La migration PHP 8.5 est complète en local mais nécessite:
+- Rebuild de l'image Docker (Dockerfile: php:8.4-fpm-alpine → php:8.5-fpm-alpine)
+- Redéploiement sur Render avec la nouvelle image
 
 #### Symfony
 ```
