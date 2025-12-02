@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 HotOnes is a project management and profitability tracking system for a web agency. It handles the complete lifecycle from client quotes to time tracking to profitability analysis, with sophisticated analytics and KPI dashboards.
 
-**Stack:** Symfony 7.3, PHP 8.4, MariaDB 11.4, Twig + Bootstrap 5, Webpack Encore
+**Stack:** Symfony 7.4, PHP 8.4, MariaDB 11.4, Twig + Bootstrap 5, Webpack Encore
 
 **Key Features:** Multi-role authentication (2FA), contributor/employment management, project tracking (forfait/régie), quote generation, timesheet entry, profitability analytics, staffing/planning dashboard
 
@@ -29,56 +29,56 @@ docker compose logs -f web
 ### Symfony Console
 ```bash
 # Database
-php bin/console doctrine:migrations:migrate
-php bin/console make:migration
-php bin/console doctrine:schema:validate
+docker compose exec app php bin/console doctrine:migrations:migrate
+docker compose exec app php bin/console make:migration
+docker compose exec app php bin/console doctrine:schema:validate
 
 # User management
-php bin/console app:user:create email password "First" "Last"
+docker compose exec app php bin/console app:user:create email password "First" "Last"
 
 # Test data generation
-php bin/console app:generate-test-data --year=2024
+docker compose exec app php bin/console app:generate-test-data --year=2024
 
 # Analytics/metrics calculation
-php bin/console app:calculate-metrics [year] [--granularity=monthly|quarterly|yearly]
-php bin/console app:calculate-staffing-metrics [year] [--granularity=weekly|monthly|quarterly]
-php bin/console app:metrics:dispatch --year=2025
+docker compose exec app php bin/console app:calculate-metrics [year] [--granularity=monthly|quarterly|yearly]
+docker compose exec app php bin/console app:calculate-staffing-metrics [year] [--granularity=weekly|monthly|quarterly]
+docker compose exec app php bin/console app:metrics:dispatch --year=2025
 
 # Scheduler
-php bin/console debug:scheduler              # List all scheduled tasks
-php bin/console messenger:consume scheduler_default  # Run the scheduler worker
+docker compose exec app php bin/console debug:scheduler              # List all scheduled tasks
+docker compose exec app php bin/console messenger:consume scheduler_default  # Run the scheduler worker
 
 # Message queue
-php bin/console messenger:consume async -vv
-php bin/console messenger:failed:retry
+docker compose exec app php bin/console messenger:consume async -vv
+docker compose exec app php bin/console messenger:failed:retry
 ```
 
 ### Code Quality
 ```bash
 # Run all quality checks
-composer check-code
+docker compose exec app composer check-code
 
 # Individual checks
-composer phpstan              # Static analysis
-composer phpcsfixer           # Code style check (dry-run)
-composer phpcsfixer-fix       # Fix code style
-composer phpmd                # Mess detector
+docker compose exec app composer phpstan              # Static analysis
+docker compose exec app composer phpcsfixer           # Code style check (dry-run)
+docker compose exec app composer phpcsfixer-fix       # Fix code style
+docker compose exec app composer phpmd                # Mess detector
 ```
 
 ### Testing
 ```bash
 # All tests
-composer test
+docker compose exec app composer test
 
 # By suite
-composer test-unit            # Unit tests
-composer test-functional      # Functional tests
-composer test-integration     # Integration tests
-composer test-api             # API tests
-composer test-e2e             # End-to-end (Panther)
+docker compose exec app composer test-unit            # Unit tests
+docker compose exec app composer test-functional      # Functional tests
+docker compose exec app composer test-integration     # Integration tests
+docker compose exec app composer test-api             # API tests
+docker compose exec app composer test-e2e             # End-to-end (Panther)
 
 # Single test file
-./vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
+docker compose exec app ./vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
 ```
 
 ### Assets
@@ -242,15 +242,15 @@ docker compose exec app php bin/console doctrine:migrations:migrate
 
 ### Adding a New Feature
 1. Create/modify entities in `src/Entity/`
-2. Generate migration: `php bin/console make:migration`
+2. Generate migration: `docker compose exec app php bin/console make:migration`
 3. Create repository methods in `src/Repository/`
 4. Implement service logic in `src/Service/` (if complex)
 5. Create controller with routes in `src/Controller/`
 6. Create forms in `src/Form/` (if needed)
 7. Create templates in `templates/`
 8. Write tests in `tests/`
-9. Run quality checks: `composer check-code`
-10. Run tests: `composer test`
+9. Run quality checks: `docker compose exec app composer check-code`
+10. Run tests: `docker compose exec app composer test`
 
 ### Code Style Rules
 - PSR-12 + Symfony standards
@@ -278,13 +278,13 @@ docker compose exec app php bin/console doctrine:migrations:migrate
 ### Running Specific Tests
 ```bash
 # Single test file
-./vendor/bin/phpunit tests/Unit/Service/MyServiceTest.php
+docker compose exec app ./vendor/bin/phpunit tests/Unit/Service/MyServiceTest.php
 
 # Single test method
-./vendor/bin/phpunit --filter testMethodName
+docker compose exec app ./vendor/bin/phpunit --filter testMethodName
 
 # With coverage
-./vendor/bin/phpunit --coverage-html coverage/
+docker compose exec app ./vendor/bin/phpunit --coverage-html coverage/
 ```
 
 ## Documentation
