@@ -120,13 +120,18 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
     /**
-     * Calcule le CA total de tous les projets en une seule requête.
+     * Calcule le CA total de tous les projets (devis signés uniquement) en une seule requête.
      * Retourne un string (decimal).
      */
     public function getTotalRevenue(): string
     {
+        $validStatuses = ['signe', 'gagne', 'termine', 'signed', 'won', 'completed'];
+
         $result = $this->createQueryBuilder('p')
-            ->select('COALESCE(SUM(p.totalSoldAmount), 0) AS total')
+            ->select('COALESCE(SUM(o.totalAmount), 0) AS total')
+            ->leftJoin('p.orders', 'o')
+            ->where('o.status IN (:validStatuses)')
+            ->setParameter('validStatuses', $validStatuses)
             ->getQuery()
             ->getSingleScalarResult();
 
