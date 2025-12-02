@@ -169,15 +169,15 @@ class ContributorType extends AbstractType
                 'mapped'      => false,
                 'required'    => false,
                 'constraints' => [
-                    new File([
-                        'maxSize'   => '2M',
-                        'mimeTypes' => [
+                    new File(
+                        maxSize: '2M',
+                        mimeTypes: [
                             'image/jpeg',
                             'image/png',
                             'image/gif',
                         ],
-                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPG, PNG, GIF)',
-                    ]),
+                        mimeTypesMessage: 'Veuillez uploader une image valide (JPG, PNG, GIF)',
+                    ),
                 ],
                 'attr' => ['class' => 'form-control'],
                 'help' => 'Format acceptés : JPG, PNG, GIF (max 2 Mo)',

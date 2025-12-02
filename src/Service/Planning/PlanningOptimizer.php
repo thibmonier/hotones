@@ -12,6 +12,7 @@ use function count;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 
 /**
  * Génère des recommandations d'optimisation du planning basées sur le TACE.
@@ -373,6 +374,166 @@ class PlanningOptimizer
             'optimal_count'         => count($analysis['optimal']),
             'total_recommendations' => count($recommendations),
             'high_priority_count'   => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high')),
+        ];
+    }
+
+    /**
+     * Applique une recommandation d'optimisation en créant ou modifiant des plannings.
+     *
+     * @return array Résultat de l'application avec succès et message
+     */
+    public function applyRecommendation(array $recommendation, DateTime $startDate, DateTime $endDate): array
+    {
+        $type = $recommendation['type'] ?? null;
+
+        if (!$type) {
+            return [
+                'success' => false,
+                'message' => 'Type de recommandation invalide',
+            ];
+        }
+
+        try {
+            switch ($type) {
+                case 'increase_allocation':
+                    return $this->applyIncreaseAllocation($recommendation, $startDate, $endDate);
+
+                case 'reassign_planning':
+                    return $this->applyReassignPlanning($recommendation, $startDate, $endDate);
+
+                case 'reduce_workload':
+                    return [
+                        'success' => false,
+                        'message' => 'La réduction de charge doit être effectuée manuellement',
+                    ];
+
+                default:
+                    return [
+                        'success' => false,
+                        'message' => 'Type de recommandation non supporté: '.$type,
+                    ];
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Erreur lors de l\'application: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Applique une recommandation d'augmentation d'allocation.
+     */
+    private function applyIncreaseAllocation(array $recommendation, DateTime $startDate, DateTime $endDate): array
+    {
+        $contributor = $recommendation['contributor'] ?? null;
+        $project     = $recommendation['project']     ?? null;
+
+        if (!$contributor || !$project) {
+            return [
+                'success' => false,
+                'message' => 'Données de recommandation incomplètes',
+            ];
+        }
+
+        // Créer un planning de 4h/jour sur la période
+        $planning = new PlanningEntity();
+        $planning->setContributor($contributor);
+        $planning->setProject($project);
+        $planning->setStartDate($startDate);
+        $planning->setEndDate($endDate);
+        $planning->setDailyHours('4.00'); // 50% d'allocation par défaut
+        $planning->setStatus('planned');
+        $planning->setNotes('Planning créé automatiquement depuis les recommandations d\'optimisation');
+
+        $this->entityManager->persist($planning);
+        $this->entityManager->flush();
+
+        return [
+            'success' => true,
+            'message' => sprintf(
+                'Planning créé: %s alloué à %s (4h/jour)',
+                $contributor->getFullName(),
+                $project->getName(),
+            ),
+            'planning_id' => $planning->getId(),
+        ];
+    }
+
+    /**
+     * Applique une recommandation de réaffectation.
+     */
+    private function applyReassignPlanning(array $recommendation, DateTime $startDate, DateTime $endDate): array
+    {
+        $sourceContributor = $recommendation['contributor'] ?? null;
+        $targetContributor = $recommendation['target']      ?? null;
+        $project           = $recommendation['project']     ?? null;
+
+        if (!$sourceContributor || !$targetContributor || !$project) {
+            return [
+                'success' => false,
+                'message' => 'Données de recommandation incomplètes',
+            ];
+        }
+
+        // Récupérer le planning existant du contributeur source
+        $planningRepo      = $this->entityManager->getRepository(PlanningEntity::class);
+        $existingPlannings = $planningRepo->createQueryBuilder('p')
+            ->where('p.contributor = :contributor')
+            ->andWhere('p.project = :project')
+            ->andWhere('p.startDate <= :end')
+            ->andWhere('p.endDate >= :start')
+            ->setParameter('contributor', $sourceContributor)
+            ->setParameter('project', $project)
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->getQuery()
+            ->getResult();
+
+        if (empty($existingPlannings)) {
+            return [
+                'success' => false,
+                'message' => 'Aucun planning trouvé à réaffecter',
+            ];
+        }
+
+        $messages         = [];
+        $planningIds      = [];
+        $existingPlanning = $existingPlannings[0]; // Prendre le premier
+
+        // Réduire l'allocation du contributeur source de 50%
+        $currentHours = (float) $existingPlanning->getDailyHours();
+        $newHours     = $currentHours / 2;
+        $existingPlanning->setDailyHours((string) $newHours);
+        $existingPlanning->setNotes(
+            ($existingPlanning->getNotes() ?? '')
+            ."\n[Optimisation auto] Allocation réduite de {$currentHours}h à {$newHours}h/jour",
+        );
+        $this->entityManager->flush();
+
+        $messages[]    = sprintf('Allocation de %s réduite à %.1fh/jour', $sourceContributor->getFullName(), $newHours);
+        $planningIds[] = $existingPlanning->getId();
+
+        // Créer un planning pour le contributeur cible
+        $newPlanning = new PlanningEntity();
+        $newPlanning->setContributor($targetContributor);
+        $newPlanning->setProject($project);
+        $newPlanning->setStartDate($startDate);
+        $newPlanning->setEndDate($endDate);
+        $newPlanning->setDailyHours((string) $newHours); // Même allocation
+        $newPlanning->setStatus('planned');
+        $newPlanning->setNotes('Planning créé automatiquement par réaffectation depuis '.$sourceContributor->getFullName());
+
+        $this->entityManager->persist($newPlanning);
+        $this->entityManager->flush();
+
+        $messages[]    = sprintf('Planning créé pour %s (%.1fh/jour)', $targetContributor->getFullName(), $newHours);
+        $planningIds[] = $newPlanning->getId();
+
+        return [
+            'success'      => true,
+            'message'      => implode(', ', $messages),
+            'planning_ids' => $planningIds,
         ];
     }
 }

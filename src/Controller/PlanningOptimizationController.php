@@ -114,4 +114,50 @@ class PlanningOptimizationController extends AbstractController
             'summary' => $result['summary'],
         ]);
     }
+
+    #[Route('/apply', name: 'planning_optimization_apply', methods: ['POST'])]
+    public function applyRecommendation(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $index = $data['index'] ?? null;
+        if ($index === null) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Index de recommandation manquant',
+            ], 400);
+        }
+
+        // Récupérer les paramètres de période
+        $startDate = isset($data['start_date'])
+            ? new DateTime($data['start_date'])
+            : new DateTime('first day of this month');
+
+        $endDate = isset($data['end_date'])
+            ? new DateTime($data['end_date'])
+            : new DateTime('last day of next month');
+
+        // Régénérer les recommandations pour obtenir celle à l'index demandé
+        $result = $this->optimizer->generateRecommendations($startDate, $endDate);
+
+        if (!isset($result['recommendations'][$index])) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Recommandation non trouvée à l\'index '.$index,
+            ], 404);
+        }
+
+        $recommendation = $result['recommendations'][$index];
+
+        // Appliquer la recommandation
+        $applyResult = $this->optimizer->applyRecommendation($recommendation, $startDate, $endDate);
+
+        if ($applyResult['success']) {
+            $this->addFlash('success', $applyResult['message']);
+        } else {
+            $this->addFlash('error', $applyResult['message']);
+        }
+
+        return $this->json($applyResult);
+    }
 }

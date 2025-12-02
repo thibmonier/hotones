@@ -335,10 +335,71 @@
 {{ parent() }}
 <script>
 function applyRecommendation(index) {
-    if (confirm('Voulez-vous vraiment appliquer cette recommandation ?')) {
-        alert('Fonctionnalité à venir : application automatique des recommandations');
-        // TODO: Implémenter l'application automatique via API
+    if (!confirm('Voulez-vous vraiment appliquer cette recommandation ?\n\nCela créera ou modifiera automatiquement des plannings.')) {
+        return;
     }
+
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="bx bx-loader bx-spin"></i> Application...';
+
+    fetch('{{ path('planning_optimization_apply') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            index: index,
+            start_date: '{{ period.start.format('Y-m-d') }}',
+            end_date: '{{ period.end.format('Y-m-d') }}'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Afficher un message de succès
+            showAlert('success', data.message);
+
+            // Masquer la ligne de recommandation
+            const row = button.closest('tr');
+            row.style.backgroundColor = '#d4edda';
+            row.style.transition = 'opacity 0.5s';
+            setTimeout(() => {
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 500);
+            }, 1000);
+        } else {
+            showAlert('danger', 'Erreur: ' + data.message);
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('danger', 'Erreur lors de l\'application de la recommandation');
+        button.disabled = false;
+        button.innerHTML = originalText;
+    });
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.setAttribute('role', 'alert');
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    const container = document.querySelector('.page-title-box');
+    container.parentNode.insertBefore(alertDiv, container.nextSibling);
+
+    // Auto-dismiss après 5 secondes
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
 }
 </script>
 {% endblock %}

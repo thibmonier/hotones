@@ -25,11 +25,11 @@ class NpsResponseType extends AbstractType
                 'attr'        => ['class' => 'nps-score-buttons'],
                 'constraints' => [
                     new NotBlank(message: 'Veuillez sélectionner un score'),
-                    new Range([
-                        'min'               => 0,
-                        'max'               => 10,
-                        'notInRangeMessage' => 'Le score doit être entre {{ min }} et {{ max }}',
-                    ]),
+                    new Range(
+                        min: 0,
+                        max: 10,
+                        notInRangeMessage: 'Le score doit être entre {{ min }} et {{ max }}',
+                    ),
                 ],
                 'help' => '0 = Pas du tout probable | 10 = Extrêmement probable',
             ])
