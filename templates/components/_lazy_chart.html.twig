@@ -1,0 +1,54 @@
+{#
+    Composant pour créer un graphique Chart.js avec lazy loading
+
+    Usage:
+    {% include 'components/_lazy_chart.html.twig' with {
+        id: 'myChart',
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar'],
+            datasets: [{
+                label: 'Revenue',
+                data: [100, 200, 300],
+                borderColor: '#28a745'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        },
+        height: 80,
+        lazy: true
+    } %}
+#}
+
+{% set canvas_height = height|default(200) %}
+{% set use_lazy = lazy|default(true) %}
+{% set chart_data = data|json_encode %}
+{% set chart_options = options|json_encode %}
+
+<canvas
+    id="{{ id }}"
+    {% if use_lazy %}
+    data-chart-lazy="true"
+    data-chart-type="{{ type }}"
+    data-chart-data="{{ chart_data|e('html_attr') }}"
+    data-chart-options="{{ chart_options|e('html_attr') }}"
+    {% endif %}
+    height="{{ canvas_height }}"
+></canvas>
+
+{% if not use_lazy %}
+{# Mode immédiat : générer le script inline #}
+<script>
+(function() {
+    const ctx = document.getElementById('{{ id }}').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: '{{ type }}',
+        data: {{ chart_data|raw }},
+        options: {{ chart_options|raw }}
+    });
+    window['chart_{{ id }}'] = chart;
+})();
+</script>
+{% endif %}
