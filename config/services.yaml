@@ -23,6 +23,7 @@ services:
         exclude:
             - '../src/DataFixtures/'
             - '../src/Entity/'
+            - '../src/Factory/'
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
