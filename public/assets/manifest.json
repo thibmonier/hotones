@@ -7,6 +7,7 @@
   "assets/icons.js": "/assets/icons.js",
   "assets/toast.css": "/assets/css/toast-rtl.min.css",
   "assets/toast.js": "/assets/toast.js",
+  "assets/form-validation.js": "/assets/form-validation.js",
   "assets/runtime.js": "/assets/runtime.js",
   "assets/libs/echarts/echarts.esm.mjs": "/assets/libs/echarts/echarts.esm.mjs",
   "assets/images/crypto/blog/img-2.jpg": "/assets/images/crypto/blog/img-2.jpg",

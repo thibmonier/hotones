@@ -39,6 +39,12 @@
         "/assets/css/toast.min.css",
         "/assets/css/toast-rtl.min.css"
       ]
+    },
+    "form-validation": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/form-validation.js"
+      ]
     }
   }
 }
