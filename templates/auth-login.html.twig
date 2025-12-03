@@ -12,37 +12,25 @@
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6 col-xl-5">
                 <div class="card overflow-hidden">
-                    <div class="bg-primary bg-soft">
+                    <div style="background-color: #2a3042;">
                         <div class="row">
                             <div class="col-12">
-                                <div class="text-primary p-4">
-                                    <h5 class="text-primary fw-semibold">Bienvenue !</h5>
-                                    <p class="mb-0">Connectez-vous pour accéder à HotOnes</p>
+                                <div class="text-white p-4">
+                                    <h5 class="text-white fw-semibold">Bienvenue !</h5>
+                                    <p class="mb-0 text-white-50">Connectez-vous pour accéder à HotOnes</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-body pt-0">
                         <div class="auth-logo">
-                            <a href="/" class="auth-logo-light">
-                                <div class="avatar-md profile-user-wid mb-4">
-                                    <span class="avatar-title rounded-circle bg-light">
-                                        <picture>
-                                            <source srcset="{{ asset('assets/images/logo-hotones-dark-24.webp') }}" type="image/webp">
-                                            <img src="{{ asset('assets/images/logo-hotones-dark-24.png') }}" alt="HotOnes" height="32">
-                                        </picture>
-                                    </span>
-                                </div>
-                            </a>
-
-                            <a href="/" class="auth-logo-dark">
-                                <div class="avatar-md profile-user-wid mb-4">
-                                    <span class="avatar-title rounded-circle bg-light">
-                                        <picture>
-                                            <source srcset="{{ asset('assets/images/logo-hotones-dark-24.webp') }}" type="image/webp">
-                                            <img src="{{ asset('assets/images/logo-hotones-dark-24.png') }}" alt="HotOnes" height="32">
-                                        </picture>
-                                    </span>
+                            <a href="/" class="d-block text-center">
+                                <div class="mb-4 mt-n4">
+                                    <picture>
+                                        <source srcset="{{ asset('assets/images/logo-hotones-light.svg') }}" type="image/svg+xml">
+                                        <source srcset="{{ asset('assets/images/logo-hotones-light-250.webp') }}" type="image/webp">
+                                        <img src="{{ asset('assets/images/logo-hotones-light-250.png') }}" alt="HotOnes" style="max-width: 200px; height: auto;">
+                                    </picture>
                                 </div>
                             </a>
                         </div>
