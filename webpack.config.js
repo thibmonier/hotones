@@ -10,6 +10,7 @@ Encore
   .addEntry('icons', './assets/scss/icons.scss')
   .addEntry('toast', './assets/js/toast.js')
   .addEntry('form-validation', './assets/js/form-validation.js')
+  .addEntry('dependent-fields', './assets/js/dependent-fields.js')
   // .addEntry('custom', './assets/scss/custom.scss')
   .enableSingleRuntimeChunk()
   .enableSassLoader()

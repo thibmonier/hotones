@@ -45,6 +45,12 @@
         "/assets/runtime.js",
         "/assets/form-validation.js"
       ]
+    },
+    "dependent-fields": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/dependent-fields.js"
+      ]
     }
   }
 }
