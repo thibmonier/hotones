@@ -45,6 +45,10 @@ class ValidationController extends AbstractController
 
         return match ($type) {
             'client_name_unique' => $this->validateClientNameUnique($value, $excludeId),
+            'email'              => $this->validateEmail($value),
+            'siret'              => $this->validateSiret($value, $excludeId),
+            'phone'              => $this->validatePhone($value),
+            'url'                => $this->validateUrl($value),
             default              => new JsonResponse([
                 'valid'   => false,
                 'message' => 'Type de validation inconnu',
@@ -69,6 +73,104 @@ class ValidationController extends AbstractController
         return new JsonResponse([
             'valid'   => true,
             'message' => '✓ Nom de client disponible',
+        ]);
+    }
+
+    /**
+     * Valide un email.
+     */
+    private function validateEmail(string $email): JsonResponse
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return new JsonResponse([
+                'valid'   => false,
+                'message' => 'Format d\'email invalide',
+            ]);
+        }
+
+        return new JsonResponse([
+            'valid'   => true,
+            'message' => '✓ Email valide',
+        ]);
+    }
+
+    /**
+     * Valide un SIRET.
+     */
+    private function validateSiret(string $siret, ?int $excludeId): JsonResponse
+    {
+        // Remove spaces
+        $siret = str_replace(' ', '', $siret);
+
+        // Check length
+        if (strlen($siret) !== 14) {
+            return new JsonResponse([
+                'valid'   => false,
+                'message' => 'Le SIRET doit contenir 14 chiffres',
+            ]);
+        }
+
+        // Check numeric
+        if (!ctype_digit($siret)) {
+            return new JsonResponse([
+                'valid'   => false,
+                'message' => 'Le SIRET ne doit contenir que des chiffres',
+            ]);
+        }
+
+        // Check uniqueness
+        $client = $this->clientRepository->findOneBy(['siret' => $siret]);
+
+        if ($client && $client->getId() !== $excludeId) {
+            return new JsonResponse([
+                'valid'   => false,
+                'message' => 'Ce SIRET est déjà enregistré',
+            ]);
+        }
+
+        return new JsonResponse([
+            'valid'   => true,
+            'message' => '✓ SIRET valide',
+        ]);
+    }
+
+    /**
+     * Valide un numéro de téléphone.
+     */
+    private function validatePhone(string $phone): JsonResponse
+    {
+        // Remove formatting characters
+        $cleaned = preg_replace('/[\s\-\.\(\)]/', '', $phone);
+
+        // Validate French phone number format
+        if (!preg_match('/^(\+33|0)[1-9]\d{8}$/', $cleaned)) {
+            return new JsonResponse([
+                'valid'   => false,
+                'message' => 'Format de téléphone invalide (ex: 01 23 45 67 89)',
+            ]);
+        }
+
+        return new JsonResponse([
+            'valid'   => true,
+            'message' => '✓ Téléphone valide',
+        ]);
+    }
+
+    /**
+     * Valide une URL.
+     */
+    private function validateUrl(string $url): JsonResponse
+    {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return new JsonResponse([
+                'valid'   => false,
+                'message' => 'Format d\'URL invalide',
+            ]);
+        }
+
+        return new JsonResponse([
+            'valid'   => true,
+            'message' => '✓ URL valide',
         ]);
     }
 }
