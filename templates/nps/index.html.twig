@@ -121,7 +121,9 @@
                     <h5 class="card-title mb-0">Distribution des scores NPS</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="npsDistributionChart" height="80"></canvas>
+                    <div style="max-height: 450px; position: relative;">
+                        <canvas id="npsDistributionChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -240,8 +242,8 @@
     </div>
 {% endblock %}
 
-{% block extra_js %}
-    <script src="{{ asset('assets/libs/chart.js/chart.umd.js') }}"></script>
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     {% if nps_score is not null %}
     <script>
         // Graphique de distribution NPS
@@ -273,7 +275,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             position: 'bottom',
