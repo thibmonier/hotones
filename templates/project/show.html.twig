@@ -151,7 +151,13 @@
                 <div class="card-body">
                     <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#tab-overview" role="tab">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tab-dashboard" role="tab">
+                                <i class="bx bx-line-chart me-1"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab-overview" role="tab">
                                 <i class="bx bx-info-circle me-1"></i>
                                 Aperçu
                             </a>
@@ -201,8 +207,13 @@
                     </ul>
 
                     <div class="tab-content p-3">
+                        <!-- Onglet Dashboard -->
+                        <div class="tab-pane active" id="tab-dashboard" role="tabpanel">
+                            {% include 'project/tabs/_dashboard.html.twig' %}
+                        </div>
+
                         <!-- Onglet Aperçu -->
-                        <div class="tab-pane active" id="tab-overview" role="tabpanel">
+                        <div class="tab-pane" id="tab-overview" role="tabpanel">
                             {% include 'project/tabs/_overview.html.twig' %}
                         </div>
 
@@ -363,6 +374,191 @@
                     new bootstrap.Tab(tab).show();
                 }
             }
+
+            // Initialize dashboard charts if satisfaction data exists
+            {% if satisfactionData is defined and satisfactionData|length > 0 %}
+            initDashboardCharts();
+            {% endif %}
         });
+
+        // Initialize Dashboard Charts
+        function initDashboardCharts() {
+            const satisfactionData = {{ satisfactionData|json_encode|raw }};
+
+            // Graphique Évolution de la Satisfaction
+            const satisfactionCtx = document.getElementById('satisfactionEvolutionChart');
+            if (satisfactionCtx && satisfactionData.length > 0) {
+                const periods = satisfactionData.map(d => d.period);
+                const avgOverall = satisfactionData.map(d => d.avgOverall);
+                const avgProjects = satisfactionData.map(d => d.avgProjects);
+
+                new Chart(satisfactionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: periods,
+                        datasets: [
+                            {
+                                label: 'Satisfaction Globale',
+                                data: avgOverall,
+                                borderColor: 'rgb(75, 192, 192)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Score Projets',
+                                data: avgProjects,
+                                borderColor: 'rgb(54, 162, 235)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y.toFixed(1) + '/5.0';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5,
+                                ticks: {
+                                    stepSize: 1
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Score (1-5)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Période'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Graphique Évolution des Heures (placeholder - données à ajouter plus tard)
+            const hoursCtx = document.getElementById('hoursEvolutionChart');
+            if (hoursCtx) {
+                new Chart(hoursCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                        datasets: [
+                            {
+                                label: 'Heures Vendues',
+                                data: [0, 0, 0, 0, 0, 0],
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                borderColor: 'rgb(54, 162, 235)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Heures Consommées',
+                                data: [0, 0, 0, 0, 0, 0],
+                                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                borderColor: 'rgb(255, 99, 132)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Heures'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Graphique Évolution Financière (placeholder - données à ajouter plus tard)
+            const financialCtx = document.getElementById('financialEvolutionChart');
+            if (financialCtx) {
+                new Chart(financialCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                        datasets: [
+                            {
+                                label: 'CA Cumulé',
+                                data: [0, 0, 0, 0, 0, 0],
+                                borderColor: 'rgb(75, 192, 192)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Marge Cumulée',
+                                data: [0, 0, 0, 0, 0, 0],
+                                borderColor: 'rgb(153, 102, 255)',
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '€';
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Montant (€)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
     </script>
 {% endblock %}
