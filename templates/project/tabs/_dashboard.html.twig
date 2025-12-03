@@ -265,8 +265,8 @@
                         <thead>
                             <tr>
                                 <th style="width: 30px;"></th>
-                                <th>Risque</th>
-                                <th>Impact</th>
+                                <th>Type</th>
+                                <th>Message</th>
                                 <th style="width: 120px;">Niveau</th>
                             </tr>
                         </thead>
@@ -277,10 +277,12 @@
                                     <i class="bx bx-error-circle text-{{ risk.severity == 'critical' ? 'danger' : (risk.severity == 'high' ? 'warning' : 'info') }} font-size-18"></i>
                                 </td>
                                 <td>
-                                    <strong>{{ risk.category }}</strong>
-                                    <br><small class="text-muted">{{ risk.description }}</small>
+                                    <strong>{{ risk.type|replace({'_': ' '})|title }}</strong>
+                                    {% if risk.score is defined %}
+                                        <br><small class="text-muted">Score: {{ risk.score }}</small>
+                                    {% endif %}
                                 </td>
-                                <td>{{ risk.impact }}</td>
+                                <td>{{ risk.message }}</td>
                                 <td>
                                     <span class="badge badge-soft-{{ risk.severity == 'critical' ? 'danger' : (risk.severity == 'high' ? 'warning' : 'info') }}">
                                         {{ risk.severity|upper }}
