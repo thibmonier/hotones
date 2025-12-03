@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Service\ForecastingService;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Basic unit tests for ForecastingService.
@@ -18,7 +20,7 @@ class ForecastingServiceTest extends TestCase
         $projectRepository = $this->createMock(\App\Repository\ProjectRepository::class);
         $service           = new ForecastingService($projectRepository);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Horizon must be 3, 6, or 12 months');
 
         $service->forecastRevenue(15);
@@ -37,7 +39,7 @@ class ForecastingServiceTest extends TestCase
                 // This will fail on insufficient data, but that's expected
                 // We just want to verify the horizon validation passes
                 $service->forecastRevenue($horizon);
-            } catch (\RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 // Expected when no data - horizon validation passed
                 $this->assertStringContainsString('Insufficient historical data', $e->getMessage());
             }

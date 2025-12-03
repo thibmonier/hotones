@@ -29,6 +29,16 @@
         "/assets/css/icons.min.css",
         "/assets/css/icons-rtl.min.css"
       ]
+    },
+    "toast": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/toast.js"
+      ],
+      "css": [
+        "/assets/css/toast.min.css",
+        "/assets/css/toast-rtl.min.css"
+      ]
     }
   }
 }

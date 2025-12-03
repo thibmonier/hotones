@@ -1,1 +1,6 @@
-import"./inputmask.js";const inputmask=window.Inputmask;window.Inputmask=void 0;export default inputmask;
+// eslint-disable-next-line import/no-unresolved
+import "./inputmask.js";
+
+const inputmask = window.Inputmask;
+window.Inputmask = undefined;
+export default inputmask;

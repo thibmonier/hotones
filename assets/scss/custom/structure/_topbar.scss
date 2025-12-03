@@ -69,6 +69,32 @@
         top: 0;
         color: var(--#{$prefix}secondary-color);
     }
+
+    // Search autocomplete dropdown
+    #topbar-search-results {
+        box-shadow: 0 2px 4px rgba(15, 34, 58, 0.12);
+        border: 1px solid var(--#{$prefix}border-color);
+        border-radius: 0.25rem;
+
+        .search-result-item {
+            padding: 0.75rem 1rem;
+            border: 0;
+            transition: background-color 0.15s ease-in-out;
+
+            &:hover,
+            &.active {
+                background-color: var(--#{$prefix}tertiary-bg);
+            }
+
+            strong {
+                color: var(--#{$prefix}body-color);
+            }
+        }
+
+        .bg-light {
+            background-color: var(--#{$prefix}light) !important;
+        }
+    }
 }
 
 // Mega menu

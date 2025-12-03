@@ -16,8 +16,8 @@ class WorkloadPredictionServiceTest extends TestCase
 {
     public function testAnalyzePipelineReturnsCorrectStructure(): void
     {
-        $orderRepository        = $this->createMock(OrderRepository::class);
-        $contributorRepository  = $this->createMock(\App\Repository\ContributorRepository::class);
+        $orderRepository       = $this->createMock(OrderRepository::class);
+        $contributorRepository = $this->createMock(\App\Repository\ContributorRepository::class);
 
         $orderRepository
             ->expects($this->once())
