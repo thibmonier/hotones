@@ -8,6 +8,7 @@ Encore
   .addEntry('app', './assets/scss/app.scss')
   .addEntry('bootstrap', './assets/scss/bootstrap.scss')
   .addEntry('icons', './assets/scss/icons.scss')
+  .addEntry('toast', './assets/js/toast.js')
   // .addEntry('custom', './assets/scss/custom.scss')
   .enableSingleRuntimeChunk()
   .enableSassLoader()

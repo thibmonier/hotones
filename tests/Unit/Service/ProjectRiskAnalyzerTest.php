@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
 use App\Service\ProjectRiskAnalyzer;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 
@@ -24,10 +25,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $project->method('getTotalTasksSoldHours')->willReturn('700'); // 100 days
         $project->method('getTotalTasksSpentHours')->willReturn('350'); // 50 days (good progress)
         $project->method('getTotalSoldAmount')->willReturn('100000');
-        $project->method('getGlobalProgress')->willReturn("50");
+        $project->method('getGlobalProgress')->willReturn('50');
         $project->method('getStatus')->willReturn('in_progress');
-        $project->method('getEndDate')->willReturn(new \DateTime('+2 months'));
-        $project->method('getStartDate')->willReturn(new \DateTime('-1 month'));
+        $project->method('getEndDate')->willReturn(new DateTime('+2 months'));
+        $project->method('getStartDate')->willReturn(new DateTime('-1 month'));
         $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         $result = $this->service->analyzeProject($project);
@@ -48,10 +49,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $project->method('getTotalTasksSoldHours')->willReturn('350'); // 50 days
         $project->method('getTotalTasksSpentHours')->willReturn('490'); // 70 days (40% overrun)
         $project->method('getTotalSoldAmount')->willReturn('50000');
-        $project->method('getGlobalProgress')->willReturn("60");
+        $project->method('getGlobalProgress')->willReturn('60');
         $project->method('getStatus')->willReturn('in_progress');
-        $project->method('getEndDate')->willReturn(new \DateTime('+1 month'));
-        $project->method('getStartDate')->willReturn(new \DateTime('-2 months'));
+        $project->method('getEndDate')->willReturn(new DateTime('+1 month'));
+        $project->method('getStartDate')->willReturn(new DateTime('-2 months'));
         $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         $result = $this->service->analyzeProject($project);
@@ -70,10 +71,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('350');
         $project->method('getTotalSoldAmount')->willReturn('100000');
-        $project->method('getGlobalProgress')->willReturn("50");
+        $project->method('getGlobalProgress')->willReturn('50');
         $project->method('getStatus')->willReturn('in_progress'); // Not completed
-        $project->method('getEndDate')->willReturn(new \DateTime('-15 days')); // Already passed
-        $project->method('getStartDate')->willReturn(new \DateTime('-3 months'));
+        $project->method('getEndDate')->willReturn(new DateTime('-15 days')); // Already passed
+        $project->method('getStartDate')->willReturn(new DateTime('-3 months'));
         $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         $result = $this->service->analyzeProject($project);
@@ -91,10 +92,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $project->method('getTotalTasksSoldHours')->willReturn('350');
         $project->method('getTotalTasksSpentHours')->willReturn('350'); // Full budget used
         $project->method('getTotalSoldAmount')->willReturn('20000'); // Low revenue
-        $project->method('getGlobalProgress')->willReturn("80");
+        $project->method('getGlobalProgress')->willReturn('80');
         $project->method('getStatus')->willReturn('in_progress');
-        $project->method('getEndDate')->willReturn(new \DateTime('+1 month'));
-        $project->method('getStartDate')->willReturn(new \DateTime('-2 months'));
+        $project->method('getEndDate')->willReturn(new DateTime('+1 month'));
+        $project->method('getStartDate')->willReturn(new DateTime('-2 months'));
         $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         $result = $this->service->analyzeProject($project);
@@ -110,10 +111,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('350');
         $project->method('getTotalSoldAmount')->willReturn('100000');
-        $project->method('getGlobalProgress')->willReturn("50");
+        $project->method('getGlobalProgress')->willReturn('50');
         $project->method('getStatus')->willReturn('in_progress');
-        $project->method('getEndDate')->willReturn(new \DateTime('+2 months'));
-        $project->method('getStartDate')->willReturn(new \DateTime('-1 month'));
+        $project->method('getEndDate')->willReturn(new DateTime('+2 months'));
+        $project->method('getStartDate')->willReturn(new DateTime('-1 month'));
         $project->method('getTimesheets')->willReturn(new ArrayCollection()); // No timesheets
 
         $result = $this->service->analyzeProject($project);
@@ -129,10 +130,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('0'); // No hours spent
         $project->method('getTotalSoldAmount')->willReturn('100000');
-        $project->method('getGlobalProgress')->willReturn("0"); // 0% progress
+        $project->method('getGlobalProgress')->willReturn('0'); // 0% progress
         $project->method('getStatus')->willReturn('active');
-        $project->method('getEndDate')->willReturn(new \DateTime('+2 months'));
-        $project->method('getStartDate')->willReturn(new \DateTime('-2 months')); // Started 2 months ago
+        $project->method('getEndDate')->willReturn(new DateTime('+2 months'));
+        $project->method('getStartDate')->willReturn(new DateTime('-2 months')); // Started 2 months ago
         $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         $result = $this->service->analyzeProject($project);
@@ -179,7 +180,7 @@ class ProjectRiskAnalyzerTest extends TestCase
         if (count($result) > 1) {
             $this->assertLessThan(
                 $result[1]['analysis']['healthScore'],
-                $result[0]['analysis']['healthScore']
+                $result[0]['analysis']['healthScore'],
             );
         }
     }
@@ -212,10 +213,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         }
 
         $project->method('getTotalSoldAmount')->willReturn('100000');
-        $project->method('getGlobalProgress')->willReturn("50");
+        $project->method('getGlobalProgress')->willReturn('50');
         $project->method('getStatus')->willReturn('in_progress');
-        $project->method('getEndDate')->willReturn(new \DateTime('+1 month'));
-        $project->method('getStartDate')->willReturn(new \DateTime('-1 month'));
+        $project->method('getEndDate')->willReturn(new DateTime('+1 month'));
+        $project->method('getStartDate')->willReturn(new DateTime('-1 month'));
         $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         return $project;

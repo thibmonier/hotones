@@ -1,2 +1,161 @@
-/*! For license information please see dataTables.bootstrap4.mjs.LICENSE.txt */
-import a from"jquery";import e from"datatables.net";let t=a;t.extend(!0,e.defaults,{dom:"<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",renderer:"bootstrap"}),t.extend(e.ext.classes,{sWrapper:"dataTables_wrapper dt-bootstrap4",sFilterInput:"form-control form-control-sm",sLengthSelect:"custom-select custom-select-sm form-control form-control-sm",sProcessing:"dataTables_processing card",sPageButton:"paginate_button page-item"}),e.ext.renderer.pageButton.bootstrap=function(a,s,r,o,l,i){var n,d,c,p=new e.Api(a),u=a.oClasses,m=a.oLanguage.oPaginate,b=a.oLanguage.oAria.paginate||{},f=function(e,s){var o,c,g,x,v=function(a){a.preventDefault(),t(a.currentTarget).hasClass("disabled")||p.page()==a.data.action||p.page(a.data.action).draw("page")};for(o=0,c=s.length;o<c;o++)if(x=s[o],Array.isArray(x))f(e,x);else{switch(n="",d="",x){case"ellipsis":n="&#x2026;",d="disabled";break;case"first":n=m.sFirst,d=x+(l>0?"":" disabled");break;case"previous":n=m.sPrevious,d=x+(l>0?"":" disabled");break;case"next":n=m.sNext,d=x+(l<i-1?"":" disabled");break;case"last":n=m.sLast,d=x+(l<i-1?"":" disabled");break;default:n=x+1,d=l===x?"active":""}if(n){var h=-1!==d.indexOf("disabled");g=t("<li>",{class:u.sPageButton+" "+d,id:0===r&&"string"==typeof x?a.sTableId+"_"+x:null}).append(t("<a>",{href:h?null:"#","aria-controls":a.sTableId,"aria-disabled":h?"true":null,"aria-label":b[x],role:"link","aria-current":"active"===d?"page":null,"data-dt-idx":x,tabindex:h?-1:a.iTabIndex,class:"page-link"}).html(n)).appendTo(e),a.oApi._fnBindAction(g,{action:x},v)}}};try{c=t(s).find(document.activeElement).data("dt-idx")}catch(a){}f(t(s).empty().html('<ul class="pagination"/>').children("ul"),o),void 0!==c&&t(s).find("[data-dt-idx="+c+"]").trigger("focus")};export default e;
+/*! DataTables Bootstrap 4 integration
+ * ©2011-2017 SpryMedia Ltd - datatables.net/license
+ */
+
+import jQuery from 'jquery';
+import DataTable from 'datatables.net';
+
+// Allow reassignment of the $ variable
+let $ = jQuery;
+
+
+/**
+ * DataTables integration for Bootstrap 4. This requires Bootstrap 4 and
+ * DataTables 1.10 or newer.
+ *
+ * This file sets the defaults and adds options to DataTables to style its
+ * controls using Bootstrap. See https://datatables.net/manual/styling/bootstrap
+ * for further information.
+ */
+
+/* Set the defaults for DataTables initialisation */
+$.extend( true, DataTable.defaults, {
+	dom:
+		"<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+		"<'row'<'col-sm-12'tr>>" +
+		"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+	renderer: 'bootstrap'
+} );
+
+
+/* Default class modification */
+$.extend( DataTable.ext.classes, {
+	sWrapper:      "dataTables_wrapper dt-bootstrap4",
+	sFilterInput:  "form-control form-control-sm",
+	sLengthSelect: "custom-select custom-select-sm form-control form-control-sm",
+	sProcessing:   "dataTables_processing card",
+	sPageButton:   "paginate_button page-item"
+} );
+
+
+/* Bootstrap paging button renderer */
+DataTable.ext.renderer.pageButton.bootstrap = function ( settings, host, idx, buttons, page, pages ) {
+	var api     = new DataTable.Api( settings );
+	var classes = settings.oClasses;
+	var lang    = settings.oLanguage.oPaginate;
+	var aria = settings.oLanguage.oAria.paginate || {};
+	var btnDisplay, btnClass;
+
+	var attach = function( container, buttons ) {
+		var i, ien, node, button;
+		var clickHandler = function ( e ) {
+			e.preventDefault();
+			if ( !$(e.currentTarget).hasClass('disabled') && api.page() != e.data.action ) {
+				api.page( e.data.action ).draw( 'page' );
+			}
+		};
+
+		for ( i=0, ien=buttons.length ; i<ien ; i++ ) {
+			button = buttons[i];
+
+			if ( Array.isArray( button ) ) {
+				attach( container, button );
+			}
+			else {
+				btnDisplay = '';
+				btnClass = '';
+
+				switch ( button ) {
+					case 'ellipsis':
+						btnDisplay = '&#x2026;';
+						btnClass = 'disabled';
+						break;
+
+					case 'first':
+						btnDisplay = lang.sFirst;
+						btnClass = button + (page > 0 ?
+							'' : ' disabled');
+						break;
+
+					case 'previous':
+						btnDisplay = lang.sPrevious;
+						btnClass = button + (page > 0 ?
+							'' : ' disabled');
+						break;
+
+					case 'next':
+						btnDisplay = lang.sNext;
+						btnClass = button + (page < pages-1 ?
+							'' : ' disabled');
+						break;
+
+					case 'last':
+						btnDisplay = lang.sLast;
+						btnClass = button + (page < pages-1 ?
+							'' : ' disabled');
+						break;
+
+					default:
+						btnDisplay = button + 1;
+						btnClass = page === button ?
+							'active' : '';
+						break;
+				}
+
+				if ( btnDisplay ) {
+					var disabled = btnClass.indexOf('disabled') !== -1;
+
+					node = $('<li>', {
+							'class': classes.sPageButton+' '+btnClass,
+							'id': idx === 0 && typeof button === 'string' ?
+								settings.sTableId +'_'+ button :
+								null
+						} )
+						.append( $('<a>', {
+								'href': disabled ? null : '#',
+								'aria-controls': settings.sTableId,
+								'aria-disabled': disabled ? 'true' : null,
+								'aria-label': aria[ button ],
+								'role': 'link',
+								'aria-current': btnClass === 'active' ? 'page' : null,
+								'data-dt-idx': button,
+								'tabindex': disabled ? -1 : settings.iTabIndex,
+								'class': 'page-link'
+							} )
+							.html( btnDisplay )
+						)
+						.appendTo( container );
+
+					settings.oApi._fnBindAction(
+						node, {action: button}, clickHandler
+					);
+				}
+			}
+		}
+	};
+
+	// IE9 throws an 'unknown error' if document.activeElement is used
+	// inside an iframe or frame. 
+	var activeEl;
+
+	try {
+		// Because this approach is destroying and recreating the paging
+		// elements, focus is lost on the select button which is bad for
+		// accessibility. So we want to restore focus once the draw has
+		// completed
+		activeEl = $(host).find(document.activeElement).data('dt-idx');
+	}
+	catch (e) {}
+
+	attach(
+		$(host).empty().html('<ul class="pagination"/>').children('ul'),
+		buttons
+	);
+
+	if ( activeEl !== undefined ) {
+		$(host).find( '[data-dt-idx='+activeEl+']' ).trigger('focus');
+	}
+};
+
+
+export default DataTable;

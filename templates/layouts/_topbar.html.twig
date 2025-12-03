@@ -41,10 +41,11 @@
             </button>
 
             <!-- App Search-->
-            <form class="app-search d-none d-lg-block">
+            <form class="app-search d-none d-lg-block" id="topbar-search-form">
                 <div class="position-relative">
-                    <input type="text" class="form-control" placeholder="Search...">
+                    <input type="text" class="form-control" placeholder="Rechercher... (Ctrl+K)" id="topbar-search-input" autocomplete="off">
                     <span class="bx bx-search-alt"></span>
+                    <div id="topbar-search-results" class="dropdown-menu dropdown-menu-lg" style="display: none; position: absolute; top: 100%; left: 0; width: 500px; max-height: 400px; overflow-y: auto; z-index: 1050;"></div>
                 </div>
             </form>
 
@@ -795,5 +796,155 @@
       updateUnreadBadges();
       startUnreadInterval();
     });
+
+    // ---- Global Search Autocomplete ----
+    (function(){
+      var searchInput = document.getElementById('topbar-search-input');
+      var searchForm = document.getElementById('topbar-search-form');
+      var searchResults = document.getElementById('topbar-search-results');
+      var searchTimeout = null;
+      var currentSelectedIndex = -1;
+
+      if (!searchInput || !searchResults) return;
+
+      // Keyboard shortcut: Ctrl+K
+      document.addEventListener('keydown', function(e){
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.select();
+        }
+        // Escape to close results
+        if (e.key === 'Escape' && searchResults.style.display === 'block') {
+          searchResults.style.display = 'none';
+          currentSelectedIndex = -1;
+        }
+      });
+
+      // Navigate results with arrow keys
+      searchInput.addEventListener('keydown', function(e){
+        if (searchResults.style.display !== 'block') return;
+
+        var items = searchResults.querySelectorAll('.search-result-item');
+        if (items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          currentSelectedIndex = Math.min(currentSelectedIndex + 1, items.length - 1);
+          updateSelection(items);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          currentSelectedIndex = Math.max(currentSelectedIndex - 1, -1);
+          updateSelection(items);
+        } else if (e.key === 'Enter' && currentSelectedIndex >= 0) {
+          e.preventDefault();
+          items[currentSelectedIndex].click();
+        }
+      });
+
+      function updateSelection(items){
+        items.forEach(function(item, idx){
+          if (idx === currentSelectedIndex) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      }
+
+      // Search on input
+      searchInput.addEventListener('input', function(){
+        var query = searchInput.value.trim();
+
+        if (searchTimeout) clearTimeout(searchTimeout);
+
+        if (query.length < 2) {
+          searchResults.style.display = 'none';
+          currentSelectedIndex = -1;
+          return;
+        }
+
+        searchTimeout = setTimeout(function(){
+          fetch('/api/search?q=' + encodeURIComponent(query))
+            .then(r => r.json())
+            .then(data => {
+              displayResults(data, query);
+            })
+            .catch(function(){
+              searchResults.innerHTML = '<div class="p-3 text-muted">Erreur de recherche</div>';
+              searchResults.style.display = 'block';
+            });
+        }, 300);
+      });
+
+      function displayResults(data, query){
+        currentSelectedIndex = -1;
+
+        if (!data || Object.keys(data).length === 0) {
+          searchResults.innerHTML = '<div class="p-3 text-muted"><i class="bx bx-info-circle me-2"></i>Aucun résultat pour "' + escapeHtml(query) + '"</div>';
+          searchResults.style.display = 'block';
+          return;
+        }
+
+        var html = '';
+        var typeIcons = {
+          projects: 'bx-folder-open',
+          contributors: 'bx-user',
+          orders: 'bx-file',
+          clients: 'bx-buildings'
+        };
+        var typeLabels = {
+          projects: 'Projets',
+          contributors: 'Contributeurs',
+          orders: 'Devis',
+          clients: 'Clients'
+        };
+
+        Object.keys(data).forEach(function(type){
+          var items = data[type];
+          if (!items || items.length === 0) return;
+
+          html += '<div class="px-3 py-2 bg-light"><small class="text-muted"><i class="bx ' + typeIcons[type] + ' me-1"></i>' + typeLabels[type] + ' (' + items.length + ')</small></div>';
+          html += '<div class="list-group list-group-flush">';
+
+          items.slice(0, 5).forEach(function(item){
+            html += '<a href="' + item.url + '" class="list-group-item list-group-item-action search-result-item">';
+            html += '<strong>' + escapeHtml(item.name) + '</strong>';
+            html += '</a>';
+          });
+
+          html += '</div>';
+        });
+
+        html += '<div class="p-2 border-top text-center">';
+        html += '<a href="{{ path('global_search') }}?q=' + encodeURIComponent(query) + '" class="small text-muted">Voir tous les résultats</a>';
+        html += '</div>';
+
+        searchResults.innerHTML = html;
+        searchResults.style.display = 'block';
+      }
+
+      function escapeHtml(text){
+        var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(text).replace(/[&<>"']/g, function(m){ return map[m]; });
+      }
+
+      // Close results when clicking outside
+      document.addEventListener('click', function(e){
+        if (!searchForm.contains(e.target)) {
+          searchResults.style.display = 'none';
+          currentSelectedIndex = -1;
+        }
+      });
+
+      // Prevent form submission, redirect to full search page instead
+      searchForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var query = searchInput.value.trim();
+        if (query.length >= 2) {
+          window.location.href = '{{ path('global_search') }}?q=' + encodeURIComponent(query);
+        }
+      });
+    })();
   })();
 </script>
