@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\ContributorSatisfaction;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -288,5 +289,116 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
             ->setParameter('month', $month)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Récupère l'évolution de la satisfaction pour les contributeurs d'un projet.
+     * Retourne les moyennes mensuelles des scores de satisfaction des contributeurs
+     * ayant travaillé sur le projet (basé sur les timesheets).
+     *
+     * @param int $projectId ID du projet
+     * @param int $months    Nombre de mois à récupérer (par défaut 12)
+     *
+     * @return array Format: [['period' => 'YYYY-MM', 'avgOverall' => float, 'avgProjects' => float, ...], ...]
+     */
+    public function getProjectSatisfactionEvolution(int $projectId, int $months = 12): array
+    {
+        $endDate   = new DateTime();
+        $startDate = (clone $endDate)->modify("-{$months} months");
+
+        // Récupérer les contributeurs ayant travaillé sur le projet
+        $contributorIds = $this->createQueryBuilder('cs')
+            ->select('DISTINCT IDENTITY(t.contributor)')
+            ->from(\App\Entity\Timesheet::class, 't')
+            ->where('t.project = :projectId')
+            ->andWhere('t.date BETWEEN :startDate AND :endDate')
+            ->setParameter('projectId', $projectId)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        if (empty($contributorIds)) {
+            return [];
+        }
+
+        // Récupérer les satisfactions de ces contributeurs pour la période
+        $qb = $this->createQueryBuilder('cs');
+        $qb->where($qb->expr()->in('cs.contributor', ':contributorIds'))
+            ->setParameter('contributorIds', $contributorIds)
+            ->orderBy('cs.year', 'ASC')
+            ->addOrderBy('cs.month', 'ASC');
+
+        // Filtrer par période si nécessaire
+        $qb->andWhere('(cs.year > :startYear) OR (cs.year = :startYear AND cs.month >= :startMonth)')
+            ->andWhere('(cs.year < :endYear) OR (cs.year = :endYear AND cs.month <= :endMonth)')
+            ->setParameter('startYear', (int) $startDate->format('Y'))
+            ->setParameter('startMonth', (int) $startDate->format('n'))
+            ->setParameter('endYear', (int) $endDate->format('Y'))
+            ->setParameter('endMonth', (int) $endDate->format('n'));
+
+        $satisfactions = $qb->getQuery()->getResult();
+
+        // Grouper par période et calculer moyennes
+        $grouped = [];
+        foreach ($satisfactions as $satisfaction) {
+            $period = sprintf('%d-%02d', $satisfaction->getYear(), $satisfaction->getMonth());
+
+            if (!isset($grouped[$period])) {
+                $grouped[$period] = [
+                    'period'               => $period,
+                    'responseCount'        => 0,
+                    'sumOverall'           => 0,
+                    'sumProjects'          => 0,
+                    'countProjects'        => 0,
+                    'sumTeam'              => 0,
+                    'countTeam'            => 0,
+                    'sumWorkEnvironment'   => 0,
+                    'countWorkEnvironment' => 0,
+                    'sumWorkLifeBalance'   => 0,
+                    'countWorkLifeBalance' => 0,
+                ];
+            }
+
+            ++$grouped[$period]['responseCount'];
+            $grouped[$period]['sumOverall'] += $satisfaction->getOverallScore();
+
+            if ($satisfaction->getProjectsScore() !== null) {
+                $grouped[$period]['sumProjects'] += $satisfaction->getProjectsScore();
+                ++$grouped[$period]['countProjects'];
+            }
+
+            if ($satisfaction->getTeamScore() !== null) {
+                $grouped[$period]['sumTeam'] += $satisfaction->getTeamScore();
+                ++$grouped[$period]['countTeam'];
+            }
+
+            if ($satisfaction->getWorkEnvironmentScore() !== null) {
+                $grouped[$period]['sumWorkEnvironment'] += $satisfaction->getWorkEnvironmentScore();
+                ++$grouped[$period]['countWorkEnvironment'];
+            }
+
+            if ($satisfaction->getWorkLifeBalanceScore() !== null) {
+                $grouped[$period]['sumWorkLifeBalance'] += $satisfaction->getWorkLifeBalanceScore();
+                ++$grouped[$period]['countWorkLifeBalance'];
+            }
+        }
+
+        // Calculer les moyennes
+        $result = [];
+        foreach ($grouped as $period => $data) {
+            $count    = $data['responseCount'];
+            $result[] = [
+                'period'             => $period,
+                'responseCount'      => $count,
+                'avgOverall'         => $count                        > 0 ? round($data['sumOverall'] / $count, 2) : null,
+                'avgProjects'        => $data['countProjects']        > 0 ? round($data['sumProjects'] / $data['countProjects'], 2) : null,
+                'avgTeam'            => $data['countTeam']            > 0 ? round($data['sumTeam'] / $data['countTeam'], 2) : null,
+                'avgWorkEnvironment' => $data['countWorkEnvironment'] > 0 ? round($data['sumWorkEnvironment'] / $data['countWorkEnvironment'], 2) : null,
+                'avgWorkLifeBalance' => $data['countWorkLifeBalance'] > 0 ? round($data['sumWorkLifeBalance'] / $data['countWorkLifeBalance'], 2) : null,
+            ];
+        }
+
+        return $result;
     }
 }

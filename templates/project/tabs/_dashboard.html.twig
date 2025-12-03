@@ -1,0 +1,298 @@
+{# Onglet Dashboard Projet - Vue d'ensemble avec graphiques et évolution #}
+
+<div class="row">
+    <div class="col-12">
+        <h5 class="mb-4">
+            <i class="bx bx-line-chart me-2"></i>Tableau de bord du projet
+        </h5>
+    </div>
+</div>
+
+{# KPIs Résumé #}
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card mini-stats-wid">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <p class="text-muted fw-medium mb-2">Avancement</p>
+                        <h4 class="mb-0">
+                            {% set progress = project.totalTasksSoldHours > 0 ? (project.totalTasksConsumedHours / project.totalTasksSoldHours * 100) : 0 %}
+                            {{ progress|number_format(1) }}%
+                        </h4>
+                        <p class="text-muted mb-0 mt-2">
+                            <small>{{ project.totalTasksConsumedHours|number_format(0) }}h / {{ project.totalTasksSoldHours|number_format(0) }}h</small>
+                        </p>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
+                        <span class="avatar-title rounded-circle bg-primary">
+                            <i class="bx bx-trending-up font-size-24"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card mini-stats-wid">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <p class="text-muted fw-medium mb-2">Marge Prévue</p>
+                        <h4 class="mb-0">
+                            {% if profitabilityPrediction and profitabilityPrediction.predictedMarginRate is defined %}
+                                {{ profitabilityPrediction.predictedMarginRate|number_format(1) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </h4>
+                        <p class="text-muted mb-0 mt-2">
+                            <small>Projection finale</small>
+                        </p>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-success align-self-center mini-stat-icon">
+                        <span class="avatar-title rounded-circle bg-success">
+                            <i class="bx bx-dollar font-size-24"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card mini-stats-wid">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <p class="text-muted fw-medium mb-2">Santé Projet</p>
+                        <h4 class="mb-0">{{ riskAnalysis.healthScore }}%</h4>
+                        <p class="text-muted mb-0 mt-2">
+                            <small class="text-{{ riskAnalysis.riskLevel == 'low' ? 'success' : (riskAnalysis.riskLevel == 'medium' ? 'warning' : 'danger') }}">
+                                {{ riskAnalysis.riskLevel == 'low' ? 'Bon' : (riskAnalysis.riskLevel == 'medium' ? 'Moyen' : 'Critique') }}
+                            </small>
+                        </p>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-{{ riskAnalysis.riskLevel == 'low' ? 'success' : (riskAnalysis.riskLevel == 'medium' ? 'warning' : 'danger') }} align-self-center mini-stat-icon">
+                        <span class="avatar-title rounded-circle bg-{{ riskAnalysis.riskLevel == 'low' ? 'success' : (riskAnalysis.riskLevel == 'medium' ? 'warning' : 'danger') }}">
+                            <i class="bx bx-pulse font-size-24"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card mini-stats-wid">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <p class="text-muted fw-medium mb-2">Équipe Active</p>
+                        <h4 class="mb-0">{{ project.activeContributorsCount ?? 0 }}</h4>
+                        <p class="text-muted mb-0 mt-2">
+                            <small>Contributeurs</small>
+                        </p>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-info align-self-center mini-stat-icon">
+                        <span class="avatar-title rounded-circle bg-info">
+                            <i class="bx bx-group font-size-24"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Graphiques principaux #}
+<div class="row">
+    {# Évolution Heures #}
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="bx bx-time me-2"></i>Évolution des Heures
+                </h4>
+                <canvas id="hoursEvolutionChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {# Évolution CA / Marge #}
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="bx bx-euro me-2"></i>Évolution Financière
+                </h4>
+                <canvas id="financialEvolutionChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Satisfaction Équipe #}
+{% if satisfactionData is defined and satisfactionData|length > 0 %}
+<div class="row">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="bx bx-happy me-2"></i>Évolution de la Satisfaction Équipe
+                </h4>
+                <p class="text-muted mb-4">
+                    Scores de satisfaction des contributeurs travaillant sur ce projet (échelle 1-5)
+                </p>
+                <canvas id="satisfactionEvolutionChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Satisfaction Actuelle</h4>
+
+                {# Score moyen actuel #}
+                {% set latestAvg = satisfactionData|last %}
+                {% if latestAvg %}
+                <div class="text-center mb-4">
+                    <h1 class="display-4 text-{{ latestAvg.avgOverall >= 4 ? 'success' : (latestAvg.avgOverall >= 3 ? 'warning' : 'danger') }}">
+                        {{ latestAvg.avgOverall|number_format(1) }}
+                    </h1>
+                    <p class="text-muted">/ 5.0</p>
+                    <p class="mb-0">
+                        <small class="text-muted">{{ latestAvg.period }}</small>
+                    </p>
+                </div>
+
+                {# Détail par dimension #}
+                <div class="mt-4">
+                    <h6 class="mb-3">Détail par dimension :</h6>
+
+                    {% if latestAvg.avgProjects %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Projets/Missions</span>
+                            <span class="fw-medium">{{ latestAvg.avgProjects|number_format(1) }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-{{ latestAvg.avgProjects >= 4 ? 'success' : (latestAvg.avgProjects >= 3 ? 'warning' : 'danger') }}"
+                                 style="width: {{ (latestAvg.avgProjects / 5 * 100)|number_format(0) }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if latestAvg.avgTeam %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Équipe/Management</span>
+                            <span class="fw-medium">{{ latestAvg.avgTeam|number_format(1) }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-{{ latestAvg.avgTeam >= 4 ? 'success' : (latestAvg.avgTeam >= 3 ? 'warning' : 'danger') }}"
+                                 style="width: {{ (latestAvg.avgTeam / 5 * 100)|number_format(0) }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if latestAvg.avgWorkEnvironment %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Environnement</span>
+                            <span class="fw-medium">{{ latestAvg.avgWorkEnvironment|number_format(1) }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-{{ latestAvg.avgWorkEnvironment >= 4 ? 'success' : (latestAvg.avgWorkEnvironment >= 3 ? 'warning' : 'danger') }}"
+                                 style="width: {{ (latestAvg.avgWorkEnvironment / 5 * 100)|number_format(0) }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if latestAvg.avgWorkLifeBalance %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Équilibre vie pro/perso</span>
+                            <span class="fw-medium">{{ latestAvg.avgWorkLifeBalance|number_format(1) }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-{{ latestAvg.avgWorkLifeBalance >= 4 ? 'success' : (latestAvg.avgWorkLifeBalance >= 3 ? 'warning' : 'danger') }}"
+                                 style="width: {{ (latestAvg.avgWorkLifeBalance / 5 * 100)|number_format(0) }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {# Nombre de réponses #}
+                <div class="mt-4 pt-3 border-top">
+                    <p class="text-muted mb-0">
+                        <i class="bx bx-user me-1"></i>
+                        Basé sur {{ latestAvg.responseCount ?? 0 }} réponse(s)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bx bx-happy font-size-48 text-muted mb-3"></i>
+                <h5 class="text-muted">Aucune donnée de satisfaction disponible</h5>
+                <p class="text-muted mb-0">Les contributeurs n'ont pas encore rempli d'enquête de satisfaction pour ce projet.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# Risques Identifiés #}
+{% if riskAnalysis.risks|length > 0 %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="bx bx-error me-2"></i>Risques Identifiés
+                </h4>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;"></th>
+                                <th>Risque</th>
+                                <th>Impact</th>
+                                <th style="width: 120px;">Niveau</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for risk in riskAnalysis.risks %}
+                            <tr>
+                                <td>
+                                    <i class="bx bx-error-circle text-{{ risk.severity == 'critical' ? 'danger' : (risk.severity == 'high' ? 'warning' : 'info') }} font-size-18"></i>
+                                </td>
+                                <td>
+                                    <strong>{{ risk.category }}</strong>
+                                    <br><small class="text-muted">{{ risk.description }}</small>
+                                </td>
+                                <td>{{ risk.impact }}</td>
+                                <td>
+                                    <span class="badge badge-soft-{{ risk.severity == 'critical' ? 'danger' : (risk.severity == 'high' ? 'warning' : 'info') }}">
+                                        {{ risk.severity|upper }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

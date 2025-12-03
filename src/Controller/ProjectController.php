@@ -229,6 +229,10 @@ class ProjectController extends AbstractController
         // Prédire la rentabilité du projet
         $profitabilityPrediction = $profitabilityPredictor->predictProfitability($project);
 
+        // Récupérer l'évolution de la satisfaction des contributeurs du projet
+        $satisfactionRepo = $em->getRepository(\App\Entity\ContributorSatisfaction::class);
+        $satisfactionData = $satisfactionRepo->getProjectSatisfactionEvolution($id, 12);
+
         // Devis du projet: tri + pagination
         $orderRepo      = $em->getRepository(\App\Entity\Order::class);
         $allowedPerPage = [5, 10, 20, 50];
@@ -264,6 +268,7 @@ class ProjectController extends AbstractController
             'orders_dir'              => strtoupper($oDir) === 'ASC' ? 'ASC' : 'DESC',
             'orders_per_page'         => $oPerPage,
             'events'                  => $events,
+            'satisfactionData'        => $satisfactionData,
         ]);
     }
 
