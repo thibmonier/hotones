@@ -11,6 +11,7 @@ Encore
   .addEntry('toast', './assets/js/toast.js')
   .addEntry('form-validation', './assets/js/form-validation.js')
   .addEntry('dependent-fields', './assets/js/dependent-fields.js')
+  .addEntry('form-wizard', './assets/js/form-wizard.js')
   // .addEntry('custom', './assets/scss/custom.scss')
   .enableSingleRuntimeChunk()
   .enableSassLoader()

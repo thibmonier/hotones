@@ -51,6 +51,12 @@
         "/assets/runtime.js",
         "/assets/dependent-fields.js"
       ]
+    },
+    "form-wizard": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/form-wizard.js"
+      ]
     }
   }
 }
