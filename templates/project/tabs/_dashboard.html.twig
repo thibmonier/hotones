@@ -17,11 +17,11 @@
                     <div class="flex-grow-1">
                         <p class="text-muted fw-medium mb-2">Avancement</p>
                         <h4 class="mb-0">
-                            {% set progress = project.totalTasksSoldHours > 0 ? (project.totalTasksConsumedHours / project.totalTasksSoldHours * 100) : 0 %}
+                            {% set progress = project.totalTasksSoldHours > 0 ? (project.totalTasksSpentHours / project.totalTasksSoldHours * 100) : 0 %}
                             {{ progress|number_format(1) }}%
                         </h4>
                         <p class="text-muted mb-0 mt-2">
-                            <small>{{ project.totalTasksConsumedHours|number_format(0) }}h / {{ project.totalTasksSoldHours|number_format(0) }}h</small>
+                            <small>{{ project.totalTasksSpentHours|number_format(0) }}h / {{ project.totalTasksSoldHours|number_format(0) }}h</small>
                         </p>
                     </div>
                     <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
@@ -90,7 +90,7 @@
                 <div class="d-flex">
                     <div class="flex-grow-1">
                         <p class="text-muted fw-medium mb-2">Équipe Active</p>
-                        <h4 class="mb-0">{{ project.activeContributorsCount ?? 0 }}</h4>
+                        <h4 class="mb-0">{{ project.projectContributorsWithHours|length }}</h4>
                         <p class="text-muted mb-0 mt-2">
                             <small>Contributeurs</small>
                         </p>
