@@ -113,7 +113,8 @@ class AdminUserController extends AbstractController
 
             // auto-link contributor
             $contributor = new Contributor();
-            $contributor->setName(trim($firstName.' '.$lastName))
+            $contributor->setFirstName($firstName)
+                ->setLastName($lastName)
                 ->setEmail($email)
                 ->setUser($user)
                 ->setActive(true);
