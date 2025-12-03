@@ -13,14 +13,14 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * API endpoints for dependent/cascading form fields
+ * API endpoints for dependent/cascading form fields.
  */
 #[Route('/api')]
 #[IsGranted('ROLE_USER')]
 class DependentFieldsController extends AbstractController
 {
     /**
-     * Get active projects for a client
+     * Get active projects for a client.
      *
      * Used in cascading selects: Client → Projects
      */
@@ -31,7 +31,7 @@ class DependentFieldsController extends AbstractController
     ): JsonResponse {
         $projects = $projectRepository->findBy(
             ['client' => $id, 'active' => true],
-            ['name' => 'ASC']
+            ['name' => 'ASC'],
         );
 
         $data = array_map(fn ($project) => [
@@ -43,7 +43,7 @@ class DependentFieldsController extends AbstractController
     }
 
     /**
-     * Get active tasks for a project
+     * Get active tasks for a project.
      *
      * Used in cascading selects: Project → Tasks
      */
@@ -54,7 +54,7 @@ class DependentFieldsController extends AbstractController
     ): JsonResponse {
         $tasks = $taskRepository->findBy(
             ['project' => $id, 'active' => true],
-            ['position' => 'ASC']
+            ['position' => 'ASC'],
         );
 
         $data = array_map(fn ($task) => [
@@ -67,7 +67,7 @@ class DependentFieldsController extends AbstractController
     }
 
     /**
-     * Get subtasks for a task
+     * Get subtasks for a task.
      *
      * Used in cascading selects: Task → Subtasks
      */
@@ -78,7 +78,7 @@ class DependentFieldsController extends AbstractController
     ): JsonResponse {
         $subTasks = $subTaskRepository->findBy(
             ['task' => $id],
-            ['position' => 'ASC']
+            ['position' => 'ASC'],
         );
 
         $data = array_map(fn ($subTask) => [
