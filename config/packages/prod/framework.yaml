@@ -1,0 +1,7 @@
+framework:
+    # Enable HTTP Cache for potential future public/static pages
+    # Note: Most HotOnes pages require authentication and display personalized data,
+    # so HTTP cache benefits are minimal. This is configured for future use.
+    http_cache:
+        enabled: true
+        default_ttl: 0  # No caching by default (pages are authenticated)

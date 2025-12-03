@@ -1,0 +1,13 @@
+framework:
+    cache:
+        # Redis for application cache (shared across servers)
+        app: cache.adapter.redis
+
+        # APCu for system cache (fast, local, metadata/config)
+        system: cache.adapter.apcu
+
+        # Custom pools remain with Redis for cross-server sharing
+        pools:
+            cache.analytics:
+                adapter: cache.adapter.redis
+                default_lifetime: 1800  # 30 minutes
