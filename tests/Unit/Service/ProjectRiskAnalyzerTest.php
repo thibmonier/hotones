@@ -176,9 +176,9 @@ class ProjectRiskAnalyzerTest extends TestCase
         $this->assertGreaterThanOrEqual(2, count($result)); // At least 2 at-risk projects
         $this->assertLessThanOrEqual(4, count($result));    // At most all 4
 
-        // Should be sorted by health score (ascending) - verify first is lowest
+        // Should be sorted by health score (ascending) - verify first is lowest or equal
         if (count($result) > 1) {
-            $this->assertLessThan(
+            $this->assertLessThanOrEqual(
                 $result[1]['analysis']['healthScore'],
                 $result[0]['analysis']['healthScore'],
             );

@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Tests unitaires pour DashboardReadService.
@@ -22,6 +23,7 @@ class DashboardReadServiceTest extends TestCase
     private EntityManagerInterface|MockObject $entityManager;
     private RealTimeService|MockObject $realTimeService;
     private LoggerInterface|MockObject $logger;
+    private CacheInterface|MockObject $cache;
     private DashboardReadService $service;
 
     protected function setUp(): void
@@ -29,11 +31,13 @@ class DashboardReadServiceTest extends TestCase
         $this->entityManager   = $this->createMock(EntityManagerInterface::class);
         $this->realTimeService = $this->createMock(RealTimeService::class);
         $this->logger          = $this->createMock(LoggerInterface::class);
+        $this->cache           = $this->createMock(CacheInterface::class);
 
         $this->service = new DashboardReadService(
             $this->entityManager,
             $this->realTimeService,
             $this->logger,
+            $this->cache,
         );
     }
 
@@ -74,6 +78,11 @@ class DashboardReadServiceTest extends TestCase
         $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($qb);
+
+        // Mock cache to execute callback immediately
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getKPIs($startDate, $endDate);
 
@@ -137,6 +146,11 @@ class DashboardReadServiceTest extends TestCase
                 $this->anything(),
             );
 
+        // Mock cache to execute callback immediately
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+
         $result = $this->service->getKPIs($startDate, $endDate);
 
         $this->assertEquals($realTimeData, $result);
@@ -150,16 +164,16 @@ class DashboardReadServiceTest extends TestCase
             ->method('getResult')
             ->willReturn([
                 [
-                    'yearValue'    => 2025,
-                    'monthValue'   => 1,
+                    'year'         => 2025,
+                    'month'        => 1,
                     'monthName'    => 'Janvier 2025',
                     'totalRevenue' => '10000.00',
                     'totalCosts'   => '7000.00',
                     'grossMargin'  => '3000.00',
                 ],
                 [
-                    'yearValue'    => 2025,
-                    'monthValue'   => 2,
+                    'year'         => 2025,
+                    'month'        => 2,
                     'monthName'    => 'Février 2025',
                     'totalRevenue' => '12000.00',
                     'totalCosts'   => '8000.00',
@@ -182,6 +196,11 @@ class DashboardReadServiceTest extends TestCase
         $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($qb);
+
+        // Mock cache to execute callback immediately
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getMonthlyEvolution(12);
 
@@ -229,6 +248,11 @@ class DashboardReadServiceTest extends TestCase
         $this->logger->expects($this->once())
             ->method('warning')
             ->with($this->stringContains('Pas de données d\'évolution'));
+
+        // Mock cache to execute callback immediately
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getMonthlyEvolution(12);
 

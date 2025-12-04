@@ -1,0 +1,10 @@
+framework:
+    cache:
+        # Use in-memory cache for tests (no external dependencies)
+        app: cache.adapter.array
+
+        # Define custom cache pools for tests
+        pools:
+            # Cache for Analytics dashboard (in-memory for tests)
+            cache.analytics:
+                adapter: cache.adapter.array
