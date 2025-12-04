@@ -1,0 +1,129 @@
+# Configuration Dependabot pour HotOnes
+# Gère automatiquement les mises à jour de dépendances pour Composer et npm
+# Documentation: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # ===========================
+  # Composer (PHP dependencies)
+  # ===========================
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "thibmonier"
+    labels:
+      - "dependencies"
+      - "composer"
+      - "php"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # Grouper les mises à jour mineures et patches ensemble
+    groups:
+      symfony:
+        patterns:
+          - "symfony/*"
+        update-types:
+          - "minor"
+          - "patch"
+      doctrine:
+        patterns:
+          - "doctrine/*"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignorer certains packages si nécessaire
+    ignore:
+      # Exemple: ignorer les mises à jour majeures de Symfony
+      # - dependency-name: "symfony/*"
+      #   update-types: ["version-update:semver-major"]
+
+  # ===========================
+  # npm (JavaScript dependencies)
+  # ===========================
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "thibmonier"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "javascript"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # Grouper les mises à jour
+    groups:
+      webpack:
+        patterns:
+          - "webpack*"
+          - "@webpack*"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    versioning-strategy: increase
+
+  # ===========================
+  # GitHub Actions
+  # ===========================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "thibmonier"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+
+  # ===========================
+  # Docker
+  # ===========================
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "thibmonier"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(docker)"
+      include: "scope"

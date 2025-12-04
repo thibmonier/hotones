@@ -1,0 +1,71 @@
+# Snyk (https://snyk.io) policy file
+# Configuration pour HotOnes - Version gratuite
+# Documentation: https://docs.snyk.io/snyk-cli/test-for-vulnerabilities/the-.snyk-file
+
+version: v1.25.0
+
+# =============================================================================
+# Exclusions - Fichiers/dossiers à ne pas scanner
+# =============================================================================
+exclude:
+  # Exclure les dépendances et fichiers générés
+  global:
+    - vendor/**
+    - node_modules/**
+    - var/**
+    - public/build/**
+    - public/bundles/**
+    - .git/**
+    - docker/**
+
+  # Exclure spécifiquement pour Composer
+  code:
+    - vendor/**
+    - var/**
+    - public/**
+    - tests/**
+    - migrations/**
+
+# =============================================================================
+# Ignorer certaines vulnérabilités (si nécessaire)
+# Utiliser avec précaution - uniquement pour les faux positifs
+# =============================================================================
+ignore:
+  # Exemple d'ignorage d'une vulnérabilité spécifique
+  # 'SNYK-PHP-SYMFONY-12345':
+  #   - '*':
+  #       reason: 'Pas applicable à notre cas d'usage'
+  #       expires: '2024-12-31T00:00:00.000Z'
+  #       created: '2024-01-01T00:00:00.000Z'
+
+# =============================================================================
+# Patches - Correctifs automatiques (si disponibles)
+# =============================================================================
+patch: {}
+
+# =============================================================================
+# Language Settings
+# =============================================================================
+language-settings:
+  php:
+    # Niveau de sévérité minimum pour les rapports (low, medium, high, critical)
+    # Gratuit: recommandé de garder 'high' pour éviter trop de bruit
+    severityThreshold: high
+
+    # Exclure les dépendances de développement du scan
+    # En version gratuite, cela aide à réduire le nombre de tests
+    ignoreDevDependencies: true
+
+  javascript:
+    severityThreshold: high
+    ignoreDevDependencies: true
+
+# =============================================================================
+# Notes d'utilisation
+# =============================================================================
+# 1. Pour scanner le projet: snyk test
+# 2. Pour monitorer: snyk monitor (nécessite authentification)
+# 3. Pour ignorer une vulnérabilité: snyk ignore --id=SNYK-XXX
+# 4. Version gratuite limitée à:
+#    - 200 tests/mois pour open source
+#    - Scan de dépendances uniquement (pas de SAST)
