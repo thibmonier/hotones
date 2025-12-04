@@ -82,7 +82,7 @@ class DashboardReadServiceTest extends TestCase
         // Mock cache to execute callback immediately
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getKPIs($startDate, $endDate);
 
@@ -149,7 +149,7 @@ class DashboardReadServiceTest extends TestCase
         // Mock cache to execute callback immediately
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getKPIs($startDate, $endDate);
 
@@ -200,7 +200,7 @@ class DashboardReadServiceTest extends TestCase
         // Mock cache to execute callback immediately
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getMonthlyEvolution(12);
 
@@ -252,7 +252,7 @@ class DashboardReadServiceTest extends TestCase
         // Mock cache to execute callback immediately
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getMonthlyEvolution(12);
 
