@@ -60,3 +60,11 @@ services:
     App\Service\Analytics\DashboardReadService:
         arguments:
             $analyticsCache: '@cache.analytics'
+
+when@test:
+    services:
+        # Enable Foundry factories as services in test environment
+        App\Factory\:
+            resource: '../src/Factory/'
+            autowire: true
+            autoconfigure: true
