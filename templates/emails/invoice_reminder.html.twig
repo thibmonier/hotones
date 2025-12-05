@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relance facture {{ invoice.invoiceNumber }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #dc3545;
+            color: #721c24;
+        }
+        .invoice-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-details td {
+            padding: 8px 0;
+        }
+        .invoice-details td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .payment-info {
+            background: #e8f5e9;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+            margin: 20px 0;
+        }
+        .payment-info h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Relance de paiement</h1>
+            <p>Facture {{ invoice.invoiceNumber }}</p>
+        </div>
+
+        <div class="content">
+            {% if reminder_type == 'first' %}
+                <p>Madame, Monsieur,</p>
+                <p>Nous vous contactons concernant la facture <strong>{{ invoice.invoiceNumber }}</strong> dont l'échéance de paiement est dépassée depuis {{ days_late }} jours.</p>
+                <p>Il s'agit peut-être d'un simple oubli de votre part. Nous vous remercions de bien vouloir régulariser cette situation dans les meilleurs délais.</p>
+            {% elseif reminder_type == 'second' %}
+                <div class="alert alert-warning">
+                    <strong>Deuxième relance</strong><br>
+                    Cette facture est en retard de paiement depuis {{ days_late }} jours.
+                </div>
+                <p>Madame, Monsieur,</p>
+                <p>Malgré notre précédent courrier, nous constatons que la facture <strong>{{ invoice.invoiceNumber }}</strong> n'a toujours pas été réglée.</p>
+                <p>Nous vous demandons de procéder au règlement dans un délai de 15 jours à compter de la réception de ce courrier.</p>
+            {% else %}
+                <div class="alert alert-danger">
+                    <strong>Relance finale</strong><br>
+                    Cette facture est en retard de paiement depuis {{ days_late }} jours.
+                </div>
+                <p>Madame, Monsieur,</p>
+                <p>Nous regrettons de constater que malgré nos précédentes relances, la facture <strong>{{ invoice.invoiceNumber }}</strong> demeure impayée.</p>
+                <p><strong>Conformément aux articles L441-6 et D441-5 du Code de commerce, en l'absence de règlement sous 8 jours, nous serons contraints d'appliquer :</strong></p>
+                <ul>
+                    <li>Des pénalités de retard de 10% du montant TTC</li>
+                    <li>Une indemnité forfaitaire pour frais de recouvrement de 40 €</li>
+                </ul>
+                <p>Nous espérons que vous comprendrez la nécessité de régulariser cette situation rapidement afin d'éviter toute procédure supplémentaire.</p>
+            {% endif %}
+
+            <div class="invoice-details">
+                <table>
+                    <tr>
+                        <td>Numéro de facture :</td>
+                        <td>{{ invoice.invoiceNumber }}</td>
+                    </tr>
+                    <tr>
+                        <td>Date d'émission :</td>
+                        <td>{{ invoice.issuedAt|date('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Date d'échéance :</td>
+                        <td>{{ invoice.dueDate|date('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Retard :</td>
+                        <td><strong style="color: #e74c3c;">{{ days_late }} jours</strong></td>
+                    </tr>
+                    {% if invoice.project %}
+                    <tr>
+                        <td>Projet :</td>
+                        <td>{{ invoice.project.name }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+
+            <div class="amount">
+                Montant dû : {{ invoice.amountTtc|number_format(2, ',', ' ') }} € TTC
+            </div>
+
+            <div class="payment-info">
+                <h3>Informations de paiement</h3>
+                <p><strong>Titulaire :</strong> HotOnes Agency</p>
+                <p><strong>IBAN :</strong> FR76 XXXX XXXX XXXX XXXX XXXX XXX</p>
+                <p><strong>BIC :</strong> XXXXFRPPXXX</p>
+                <p><strong>Référence à indiquer :</strong> {{ invoice.invoiceNumber }}</p>
+            </div>
+
+            <p>Si vous avez déjà procédé au règlement de cette facture, nous vous prions de bien vouloir nous excuser pour ce courrier et vous remercions de nous transmettre votre justificatif de paiement.</p>
+
+            <p>Pour toute question concernant cette facture, n'hésitez pas à nous contacter.</p>
+
+            <p>Cordialement,</p>
+            <p><strong>L'équipe comptabilité<br>HotOnes Agency</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>HotOnes Agency - Adresse de l'entreprise<br>
+            Tél: 01 23 45 67 89 - Email: facturation@hotones.com</p>
+            <p>SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX</p>
+            <p style="margin-top: 15px; font-size: 11px; color: #999;">
+                Cet email a été envoyé automatiquement. Merci de ne pas y répondre directement.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
