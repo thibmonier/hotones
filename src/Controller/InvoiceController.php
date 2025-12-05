@@ -323,4 +323,67 @@ class InvoiceController extends AbstractController
 
         return $this->redirectToRoute('invoice_show', ['id' => $invoice->getId()]);
     }
+
+    #[Route('/{id}/pdf', name: 'invoice_pdf', methods: ['GET'])]
+    public function pdf(Invoice $invoice, \App\Service\PdfGeneratorService $pdfGenerator): Response
+    {
+        // Données pour le template PDF
+        $data = [
+            'invoice'         => $invoice,
+            'company_name'    => 'HotOnes Agency',
+            'company_address' => 'Adresse de l\'entreprise',
+            'company_postal'  => 'Code postal',
+            'company_city'    => 'Ville',
+            'company_phone'   => '01 23 45 67 89',
+            'company_email'   => 'contact@hotones.com',
+            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',
+            'company_capital' => 'Capital social: 10 000 € - RCS Paris B XXX XXX XXX',
+            'company_iban'    => 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
+            'company_bic'     => 'XXXXFRPPXXX',
+        ];
+
+        // Générer le nom du fichier
+        $filename = sprintf(
+            'facture_%s_%s.pdf',
+            $invoice->getInvoiceNumber(),
+            (new DateTime())->format('Y-m-d'),
+        );
+
+        // Générer et retourner le PDF
+        return $pdfGenerator->createPdfResponse(
+            'invoice/pdf.html.twig',
+            $data,
+            $filename,
+            inline: false, // Force le téléchargement
+        );
+    }
+
+    #[Route('/{id}/pdf/preview', name: 'invoice_pdf_preview', methods: ['GET'])]
+    public function pdfPreview(Invoice $invoice, \App\Service\PdfGeneratorService $pdfGenerator): Response
+    {
+        // Données pour le template PDF
+        $data = [
+            'invoice'         => $invoice,
+            'company_name'    => 'HotOnes Agency',
+            'company_address' => 'Adresse de l\'entreprise',
+            'company_postal'  => 'Code postal',
+            'company_city'    => 'Ville',
+            'company_phone'   => '01 23 45 67 89',
+            'company_email'   => 'contact@hotones.com',
+            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',
+            'company_capital' => 'Capital social: 10 000 € - RCS Paris B XXX XXX XXX',
+            'company_iban'    => 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
+            'company_bic'     => 'XXXXFRPPXXX',
+        ];
+
+        $filename = sprintf('facture_%s_preview.pdf', $invoice->getInvoiceNumber());
+
+        // Affiche le PDF dans le navigateur
+        return $pdfGenerator->createPdfResponse(
+            'invoice/pdf.html.twig',
+            $data,
+            $filename,
+            inline: true, // Affichage dans le navigateur
+        );
+    }
 }
