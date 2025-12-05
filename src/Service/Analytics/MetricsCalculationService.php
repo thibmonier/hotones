@@ -145,11 +145,20 @@ readonly class MetricsCalculationService
                     );
                     break;
                 case 'gagne':
-                case 'signe':
                     $metrics->setWonOrderCount($metrics->getWonOrderCount() + 1);
                     $metrics->setTotalRevenue(
                         bcadd($metrics->getTotalRevenue(), $order->getTotalAmount(), 2),
                     );
+                    break;
+                case 'signe':
+                    $metrics->setWonOrderCount($metrics->getWonOrderCount() + 1);
+                    $metrics->setSignedOrderCount($metrics->getSignedOrderCount() + 1);
+                    $metrics->setTotalRevenue(
+                        bcadd($metrics->getTotalRevenue(), $order->getTotalAmount(), 2),
+                    );
+                    break;
+                case 'perdu':
+                    $metrics->setLostOrderCount($metrics->getLostOrderCount() + 1);
                     break;
             }
 

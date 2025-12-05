@@ -163,10 +163,13 @@ readonly class DashboardReadService
             'SUM(f.orderCount) as totalOrders',
             'SUM(f.pendingOrderCount) as pendingOrders',
             'SUM(f.wonOrderCount) as wonOrders',
+            'SUM(f.signedOrderCount) as signedOrders',
+            'SUM(f.lostOrderCount) as lostOrders',
             'SUM(f.pendingRevenue) as pendingRevenue',
             'SUM(f.totalWorkedDays) as totalWorkedDays',
             'SUM(f.totalSoldDays) as totalSoldDays',
             'AVG(f.utilizationRate) as avgUtilization',
+            'SUM(f.contributorCount) as contributorCount',
         )
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
@@ -178,6 +181,13 @@ readonly class DashboardReadService
         $this->applyFilters($qb, $filters);
 
         $result = $qb->getQuery()->getSingleResult();
+
+        // Récupérer les répartitions et top contributeurs
+        $byType          = $this->getProjectsByType($startDate, $endDate, $filters);
+        $byClientType    = $this->getProjectsByClientType($startDate, $endDate, $filters);
+        $byCategory      = $this->getProjectsByCategory($startDate, $endDate, $filters);
+        $topContributors = $this->getTopContributors($startDate, $endDate, $filters, 5);
+        $workingDays     = $this->calculateWorkingDays($startDate, $endDate);
 
         // Retourner la même structure que l'ancien service pour compatibilité template
         return [
@@ -192,39 +202,33 @@ readonly class DashboardReadService
                 'margin_rate'   => (float) ($result['avgMarginPercentage'] ?? 0),
             ],
             'projects' => [
-                'total'     => (int) ($result['totalProjects'] ?? 0),
-                'active'    => (int) ($result['activeProjects'] ?? 0),
-                'completed' => (int) ($result['completedProjects'] ?? 0),
-                'in_period' => (int) ($result['totalProjects'] ?? 0),
-                'by_type'   => [
-                    'forfait' => 0, // TODO: récupérer depuis le modèle si nécessaire
-                    'regie'   => 0,
-                ],
-                'by_client_type' => [
-                    'internal' => 0,
-                    'client'   => 0,
-                ],
-                'by_category' => [], // TODO: récupérer depuis le modèle si nécessaire
+                'total'          => (int) ($result['totalProjects'] ?? 0),
+                'active'         => (int) ($result['activeProjects'] ?? 0),
+                'completed'      => (int) ($result['completedProjects'] ?? 0),
+                'in_period'      => (int) ($result['totalProjects'] ?? 0),
+                'by_type'        => $byType,
+                'by_client_type' => $byClientType,
+                'by_category'    => $byCategory,
             ],
             'orders' => [
                 'total'           => (int) ($result['totalOrders'] ?? 0),
                 'pending'         => (int) ($result['pendingOrders'] ?? 0),
                 'won'             => (int) ($result['wonOrders'] ?? 0),
-                'signed'          => 0, // TODO: ajouter signedOrderCount dans le modèle
-                'lost'            => 0, // TODO: ajouter lostOrderCount dans le modèle
+                'signed'          => (int) ($result['signedOrders'] ?? 0),
+                'lost'            => (int) ($result['lostOrders'] ?? 0),
                 'conversion_rate' => $result['totalOrders'] > 0
                     ? round(($result['wonOrders'] / $result['totalOrders']) * 100, 2)
                     : 0,
                 'pending_revenue' => (float) ($result['pendingRevenue'] ?? 0),
             ],
             'contributors' => [
-                'active' => 0, // TODO: ajouter dans le modèle si nécessaire
-                'top'    => [], // TODO: ajouter dans le modèle si nécessaire
+                'active' => (int) ($result['contributorCount'] ?? 0),
+                'top'    => $topContributors,
             ],
             'time' => [
                 'total_hours'            => (float) ($result['totalWorkedDays'] ?? 0) * 8, // Conversion jours -> heures
                 'total_days'             => (float) ($result['totalWorkedDays'] ?? 0),
-                'working_days_in_period' => 0, // TODO: calculer depuis dates période
+                'working_days_in_period' => $workingDays,
                 'theoretical_capacity'   => (float) ($result['totalSoldDays'] ?? 0) * 8, // Conversion jours -> heures
                 'occupation_rate'        => (float) ($result['avgUtilization'] ?? 0),
             ],
@@ -279,5 +283,165 @@ readonly class DashboardReadService
                 ->andWhere('sc.id = :serviceCategory')
                 ->setParameter('serviceCategory', $filters['serviceCategory']);
         }
+    }
+
+    /**
+     * Récupère la répartition des projets par type (forfait/régie).
+     */
+    private function getProjectsByType(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select(
+            'dpt.projectType as type',
+            'SUM(f.projectCount) as count',
+        )
+            ->from(FactProjectMetrics::class, 'f')
+            ->join('f.dimTime', 'dt')
+            ->join('f.dimProjectType', 'dpt')
+            ->where('dt.date BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->groupBy('dpt.projectType');
+
+        $this->applyFilters($qb, $filters);
+
+        $results = $qb->getQuery()->getResult();
+
+        // Formater en tableau associatif
+        $byType = ['forfait' => 0, 'regie' => 0];
+        foreach ($results as $row) {
+            $byType[$row['type']] = (int) $row['count'];
+        }
+
+        return $byType;
+    }
+
+    /**
+     * Récupère la répartition des projets par type de client (interne/client).
+     */
+    private function getProjectsByClientType(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select(
+            'dpt.isInternal',
+            'SUM(f.projectCount) as count',
+        )
+            ->from(FactProjectMetrics::class, 'f')
+            ->join('f.dimTime', 'dt')
+            ->join('f.dimProjectType', 'dpt')
+            ->where('dt.date BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->groupBy('dpt.isInternal');
+
+        $this->applyFilters($qb, $filters);
+
+        $results = $qb->getQuery()->getResult();
+
+        // Formater en tableau associatif
+        $byClientType = ['internal' => 0, 'client' => 0];
+        foreach ($results as $row) {
+            $key                = $row['isInternal'] ? 'internal' : 'client';
+            $byClientType[$key] = (int) $row['count'];
+        }
+
+        return $byClientType;
+    }
+
+    /**
+     * Récupère la répartition des projets par catégorie de service.
+     */
+    private function getProjectsByCategory(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select(
+            'dpt.serviceCategory as category',
+            'SUM(f.projectCount) as count',
+        )
+            ->from(FactProjectMetrics::class, 'f')
+            ->join('f.dimTime', 'dt')
+            ->join('f.dimProjectType', 'dpt')
+            ->where('dt.date BETWEEN :start AND :end')
+            ->andWhere('dpt.serviceCategory IS NOT NULL')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->groupBy('dpt.serviceCategory')
+            ->orderBy('count', 'DESC');
+
+        $this->applyFilters($qb, $filters);
+
+        $results = $qb->getQuery()->getResult();
+
+        // Formater en tableau associatif
+        $byCategory = [];
+        foreach ($results as $row) {
+            $byCategory[$row['category']] = (int) $row['count'];
+        }
+
+        return $byCategory;
+    }
+
+    /**
+     * Récupère les top contributeurs par CA généré.
+     *
+     * @param int $limit Nombre de contributeurs à retourner (défaut 5)
+     */
+    private function getTopContributors(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters, int $limit = 5): array
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select(
+            'dc.contributorId',
+            'dc.firstName',
+            'dc.lastName',
+            'SUM(f.totalRevenue) as totalRevenue',
+            'SUM(f.grossMargin) as totalMargin',
+            'SUM(f.totalWorkedDays) as totalDays',
+        )
+            ->from(FactProjectMetrics::class, 'f')
+            ->join('f.dimTime', 'dt')
+            ->leftJoin('f.dimProjectManager', 'dc')
+            ->where('dt.date BETWEEN :start AND :end')
+            ->andWhere('dc.contributorId IS NOT NULL')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->groupBy('dc.contributorId', 'dc.firstName', 'dc.lastName')
+            ->orderBy('totalRevenue', 'DESC')
+            ->setMaxResults($limit);
+
+        $this->applyFilters($qb, $filters);
+
+        $results = $qb->getQuery()->getResult();
+
+        // Formater pour le template
+        return array_map(function ($row) {
+            return [
+                'id'      => $row['contributorId'],
+                'name'    => trim("{$row['firstName']} {$row['lastName']}"),
+                'revenue' => (float) $row['totalRevenue'],
+                'margin'  => (float) $row['totalMargin'],
+                'days'    => (float) $row['totalDays'],
+            ];
+        }, $results);
+    }
+
+    /**
+     * Calcule le nombre de jours ouvrés dans une période (hors week-ends).
+     */
+    private function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
+    {
+        $start = clone $startDate;
+        $end   = clone $endDate;
+        $days  = 0;
+
+        while ($start <= $end) {
+            // Exclure samedi (6) et dimanche (0)
+            $dayOfWeek = (int) $start->format('w');
+            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
+                ++$days;
+            }
+            $start = $start->modify('+1 day');
+        }
+
+        return $days;
     }
 }
