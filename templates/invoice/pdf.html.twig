@@ -221,19 +221,7 @@
         <div class="left">
             <h3>Client facturé:</h3>
             <p>
-                <strong>{{ invoice.client.name }}</strong><br>
-                {% if invoice.client.address %}
-                    {{ invoice.client.address }}<br>
-                {% endif %}
-                {% if invoice.client.postalCode or invoice.client.city %}
-                    {{ invoice.client.postalCode }} {{ invoice.client.city }}<br>
-                {% endif %}
-                {% if invoice.client.email %}
-                    Email: {{ invoice.client.email }}<br>
-                {% endif %}
-                {% if invoice.client.phone %}
-                    Tél: {{ invoice.client.phone }}
-                {% endif %}
+                <strong>{{ invoice.client.name }}</strong>
             </p>
         </div>
         <div class="right">
