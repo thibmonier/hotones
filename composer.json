@@ -54,6 +54,7 @@
         "symfony/process": "^7.4 || ^8.0",
         "symfony/property-access": "^7.4 || ^8.0",
         "symfony/property-info": "^7.4 || ^8.0",
+        "symfony/rate-limiter": "^7.4 || ^8.0",
         "symfony/redis-messenger": "^7.4 || ^8.0",
         "symfony/runtime": "^7.4 || ^8.0",
         "symfony/scheduler": "^7.4 || ^8.0",

@@ -5,7 +5,7 @@ const RtlCssPlugin = require('rtlcss-webpack-plugin');
 Encore
   .setOutputPath('public/assets/')
   .setPublicPath('/assets/')
-  .addEntry('app', './assets/scss/app.scss')
+  .addEntry('app', './assets/app.js')
   .addEntry('bootstrap', './assets/scss/bootstrap.scss')
   .addEntry('icons', './assets/scss/icons.scss')
   .addEntry('toast', './assets/js/toast.js')
