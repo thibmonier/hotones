@@ -229,9 +229,6 @@
                 <h3>Projet concerné:</h3>
                 <p>
                     <strong>{{ invoice.project.name }}</strong>
-                    {% if invoice.project.reference %}
-                        <br>Réf: {{ invoice.project.reference }}
-                    {% endif %}
                 </p>
             {% endif %}
             {% if invoice.order %}
