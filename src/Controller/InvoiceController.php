@@ -93,14 +93,30 @@ class InvoiceController extends AbstractController
         };
         $qb->orderBy($sortField, strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC');
 
-        // Total
-        $total = (int) $em->createQueryBuilder()
+        // Total - recréer les joins pour le comptage
+        $qbCount = $em->createQueryBuilder()
             ->select('COUNT(i2.id)')
             ->from(Invoice::class, 'i2')
-            ->where($qb->getDQLPart('where'))
-            ->setParameters($qb->getParameters())
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->leftJoin('i2.client', 'c2')
+            ->leftJoin('i2.project', 'p2');
+
+        if ($client) {
+            $qbCount->andWhere('i2.client = :client')->setParameter('client', $client);
+        }
+        if ($project) {
+            $qbCount->andWhere('i2.project = :project')->setParameter('project', $project);
+        }
+        if ($status) {
+            $qbCount->andWhere('i2.status = :status')->setParameter('status', $status);
+        }
+        if ($startDate) {
+            $qbCount->andWhere('i2.issuedAt >= :startDate')->setParameter('startDate', new DateTime($startDate));
+        }
+        if ($endDate) {
+            $qbCount->andWhere('i2.issuedAt <= :endDate')->setParameter('endDate', new DateTime($endDate));
+        }
+
+        $total = (int) $qbCount->getQuery()->getSingleScalarResult();
 
         // Résultats paginés
         $invoices = $qb->setMaxResults($perPage)->setFirstResult($offset)->getQuery()->getResult();
