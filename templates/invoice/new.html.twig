@@ -1,0 +1,121 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouvelle facture{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', {
+        title: 'Nouvelle facture',
+        pagetitle: 'Factures',
+        parent_route: 'invoice_index',
+        parent_label: 'Liste des factures'
+    }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouvelle facture</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="bx bx-info-circle me-2"></i>
+                        <strong>Note :</strong> Le numéro de facture sera généré automatiquement lors de l'enregistrement.
+                    </div>
+
+                    {{ form_start(form) }}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.client) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.project) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.issuedAt) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.dueDate) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.amountHt) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.tvaRate) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.status) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.paymentTerms) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.internalNotes) }}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('invoice_index') }}" class="btn btn-light">
+                                <i class="bx bx-x me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-save me-1"></i> Créer la facture
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Aide</h5>
+                    <p class="small mb-2">
+                        <strong>Client :</strong> Sélectionnez le client à facturer. Requis.
+                    </p>
+                    <p class="small mb-2">
+                        <strong>Projet :</strong> Optionnel. Permet de lier la facture à un projet spécifique.
+                    </p>
+                    <p class="small mb-2">
+                        <strong>Date d'échéance :</strong> Date limite de paiement (généralement 30 jours après l'émission).
+                    </p>
+                    <p class="small mb-2">
+                        <strong>TVA :</strong> Par défaut 20%. Ajustez selon le type de prestation.
+                    </p>
+                    <p class="small mb-0">
+                        <strong>Notes internes :</strong> Non affichées sur la facture PDF.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card bg-warning bg-opacity-10 border-warning">
+                <div class="card-body">
+                    <h6 class="text-warning">
+                        <i class="bx bx-info-circle me-1"></i> Important
+                    </h6>
+                    <p class="small mb-0">
+                        Cette interface permet de créer une facture manuellement. Pour les factures régie ou forfait, utilisez plutôt les commandes CLI :
+                    </p>
+                    <ul class="small mb-0 mt-2">
+                        <li><code>app:invoice:generate-monthly-regie</code></li>
+                        <li><code>app:invoice:generate-from-schedules</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

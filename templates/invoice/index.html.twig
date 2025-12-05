@@ -1,0 +1,280 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Factures{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', { title: 'Factures', pagetitle: 'Gestion' }) }}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Factures</h4>
+                <div class="page-title-right">
+                    {% if is_granted('ROLE_COMPTA') %}
+                        <a href="{{ path('invoice_new') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Nouvelle facture
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    {% set activeFiltersCount = 0 %}
+                    {% set activeFiltersCount = activeFiltersCount
+                        + (selectedClient ? 1 : 0)
+                        + (selectedProject ? 1 : 0)
+                        + (selectedStatus ? 1 : 0)
+                        + (startDate ? 1 : 0)
+                        + (endDate ? 1 : 0)
+                        + (sort != 'issuedAt' ? 1 : 0)
+                        + (dir != 'DESC' ? 1 : 0)
+                        + (pagination.per_page != 20 ? 1 : 0)
+                    %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Filtres
+                            {% if activeFiltersCount > 0 %}
+                                <span class="badge bg-info ms-2">{{ activeFiltersCount }}</span>
+                            {% endif %}
+                        </h4>
+                        <div class="btn-group">
+                            <a href="{{ path('invoice_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                            <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-invoices" aria-expanded="true" aria-controls="filters-invoices">
+                                <i class="bx bx-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="filters-invoices" class="collapse show">
+                        {# Rappel des critères actifs #}
+                        {% set chips = [] %}
+                        {% if selectedClient %}
+                            {% set cli = (clients|filter(c => c.id == selectedClient)|first) %}
+                            {% set chips = chips|merge(['Client: ' ~ (cli ? cli.name : selectedClient)]) %}
+                        {% endif %}
+                        {% if selectedProject %}
+                            {% set proj = (projects|filter(p => p.id == selectedProject)|first) %}
+                            {% set chips = chips|merge(['Projet: ' ~ (proj ? proj.name : selectedProject)]) %}
+                        {% endif %}
+                        {% if selectedStatus %}
+                            {% set chips = chips|merge(['Statut: ' ~ (statusOptions[selectedStatus] ?? selectedStatus)]) %}
+                        {% endif %}
+                        {% if startDate %}
+                            {% set chips = chips|merge(['Du: ' ~ startDate]) %}
+                        {% endif %}
+                        {% if endDate %}
+                            {% set chips = chips|merge(['Au: ' ~ endDate]) %}
+                        {% endif %}
+                        {% if sort != 'issuedAt' or dir != 'DESC' %}
+                            {% set chips = chips|merge(['Tri: ' ~ sort ~ ' ' ~ dir]) %}
+                        {% endif %}
+                        {% if pagination.per_page != 20 %}
+                            {% set chips = chips|merge(['Par page: ' ~ pagination.per_page]) %}
+                        {% endif %}
+                        {% if chips|length > 0 %}
+                            <div class="mb-3 small text-muted">
+                                {% for c in chips %}
+                                    <span class="badge bg-light text-dark me-1">{{ c }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="client" class="form-label">Client</label>
+                                <select name="client" id="client" class="form-select">
+                                    <option value="">Tous les clients</option>
+                                    {% for client in clients %}
+                                        <option value="{{ client.id }}" {% if selectedClient == client.id %}selected{% endif %}>
+                                            {{ client.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="project" class="form-label">Projet</label>
+                                <select name="project" id="project" class="form-select">
+                                    <option value="">Tous les projets</option>
+                                    {% for project in projects %}
+                                        <option value="{{ project.id }}" {% if selectedProject == project.id %}selected{% endif %}>
+                                            {{ project.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">Statut</label>
+                                <select name="status" id="status" class="form-select">
+                                    <option value="">Tous les statuts</option>
+                                    {% for key, label in statusOptions %}
+                                        <option value="{{ key }}" {% if selectedStatus == key %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="start_date" class="form-label">Date d'émission (du)</label>
+                                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ startDate }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="end_date" class="form-label">Date d'émission (au)</label>
+                                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ endDate }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="sort" class="form-label">Trier par</label>
+                                <select name="sort" id="sort" class="form-select">
+                                    <option value="issuedAt" {% if sort == 'issuedAt' %}selected{% endif %}>Date d'émission</option>
+                                    <option value="invoiceNumber" {% if sort == 'invoiceNumber' %}selected{% endif %}>Numéro</option>
+                                    <option value="client" {% if sort == 'client' %}selected{% endif %}>Client</option>
+                                    <option value="status" {% if sort == 'status' %}selected{% endif %}>Statut</option>
+                                    <option value="dueDate" {% if sort == 'dueDate' %}selected{% endif %}>Date d'échéance</option>
+                                    <option value="amountHt" {% if sort == 'amountHt' %}selected{% endif %}>Montant HT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="dir" class="form-label">Ordre</label>
+                                <select name="dir" id="dir" class="form-select">
+                                    <option value="DESC" {% if dir == 'DESC' %}selected{% endif %}>Décroissant</option>
+                                    <option value="ASC" {% if dir == 'ASC' %}selected{% endif %}>Croissant</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="per_page" class="form-label">Par page</label>
+                                <select name="per_page" id="per_page" class="form-select">
+                                    <option value="10" {% if pagination.per_page == 10 %}selected{% endif %}>10</option>
+                                    <option value="20" {% if pagination.per_page == 20 %}selected{% endif %}>20</option>
+                                    <option value="50" {% if pagination.per_page == 50 %}selected{% endif %}>50</option>
+                                    <option value="100" {% if pagination.per_page == 100 %}selected{% endif %}>100</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bx bx-filter me-1"></i> Filtrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Client</th>
+                                    <th>Projet</th>
+                                    <th>Date d'émission</th>
+                                    <th>Date d'échéance</th>
+                                    <th>Statut</th>
+                                    <th class="text-end">Montant HT</th>
+                                    <th class="text-end">Montant TTC</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ path('invoice_show', {id: invoice.id}) }}" class="text-dark fw-medium">
+                                                {{ invoice.invoiceNumber }}
+                                            </a>
+                                        </td>
+                                        <td>{{ invoice.client.name }}</td>
+                                        <td>{{ invoice.project ? invoice.project.name : '-' }}</td>
+                                        <td>{{ invoice.issuedAt|date('d/m/Y') }}</td>
+                                        <td>
+                                            {{ invoice.dueDate|date('d/m/Y') }}
+                                            {% if invoice.isOverdue() %}
+                                                <span class="badge bg-danger ms-1">En retard</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% set statusBadge = {
+                                                'brouillon': 'secondary',
+                                                'envoyee': 'info',
+                                                'payee': 'success',
+                                                'en_retard': 'danger',
+                                                'annulee': 'dark'
+                                            } %}
+                                            <span class="badge bg-{{ statusBadge[invoice.status] ?? 'secondary' }}">
+                                                {{ statusOptions[invoice.status] ?? invoice.status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">{{ invoice.amountHt|number_format(2, ',', ' ') }} €</td>
+                                        <td class="text-end">{{ invoice.amountTtc|number_format(2, ',', ' ') }} €</td>
+                                        <td>
+                                            <a href="{{ path('invoice_show', {id: invoice.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir">
+                                                <i class="bx bx-show"></i>
+                                            </a>
+                                            {% if is_granted('ROLE_COMPTA') and invoice.status == 'brouillon' %}
+                                                <a href="{{ path('invoice_edit', {id: invoice.id}) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                                    <i class="bx bx-edit"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="9" class="text-center text-muted py-4">
+                                            Aucune facture trouvée
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {# Pagination #}
+                    {% if pagination.total_pages > 1 %}
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="text-muted small">
+                                Page {{ pagination.current_page }} sur {{ pagination.total_pages }} ({{ pagination.total }} facture{{ pagination.total > 1 ? 's' : '' }})
+                            </div>
+                            <nav>
+                                <ul class="pagination mb-0">
+                                    {% if pagination.has_prev %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ path('invoice_index', filters_query|merge({page: pagination.current_page - 1})) }}">
+                                                <i class="bx bx-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% for p in 1..pagination.total_pages %}
+                                        {% if p == pagination.current_page %}
+                                            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                                        {% elseif p == 1 or p == pagination.total_pages or (p >= pagination.current_page - 2 and p <= pagination.current_page + 2) %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ path('invoice_index', filters_query|merge({page: p})) }}">{{ p }}</a>
+                                            </li>
+                                        {% elseif p == pagination.current_page - 3 or p == pagination.current_page + 3 %}
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if pagination.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ path('invoice_index', filters_query|merge({page: pagination.current_page + 1})) }}">
+                                                <i class="bx bx-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

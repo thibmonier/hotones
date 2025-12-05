@@ -1,0 +1,236 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Facture {{ invoice.invoiceNumber }}{% endblock %}
+
+{% block content %}
+    {{ component('breadcrumb', {
+        title: 'Facture ' ~ invoice.invoiceNumber,
+        pagetitle: 'Factures',
+        parent_route: 'invoice_index',
+        parent_label: 'Liste des factures'
+    }) }}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Facture {{ invoice.invoiceNumber }}</h4>
+                <div class="page-title-right">
+                    <div class="btn-group">
+                        {% if is_granted('ROLE_COMPTA') and invoice.status == 'brouillon' %}
+                            <a href="{{ path('invoice_edit', {id: invoice.id}) }}" class="btn btn-outline-secondary">
+                                <i class="bx bx-edit me-1"></i> Modifier
+                            </a>
+                        {% endif %}
+                        <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                            <i class="bx bx-printer me-1"></i> Imprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <h4 class="card-title">Facture {{ invoice.invoiceNumber }}</h4>
+                            <div class="mt-2">
+                                {% set statusBadge = {
+                                    'brouillon': 'secondary',
+                                    'envoyee': 'info',
+                                    'payee': 'success',
+                                    'en_retard': 'danger',
+                                    'annulee': 'dark'
+                                } %}
+                                <span class="badge bg-{{ statusBadge[invoice.status] ?? 'secondary' }} font-size-12">
+                                    {{ statusOptions[invoice.status] ?? invoice.status }}
+                                </span>
+                                {% if invoice.isOverdue() %}
+                                    <span class="badge bg-danger font-size-12 ms-2">En retard de paiement</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <p class="mb-1"><strong>Date d'émission</strong></p>
+                            <p>{{ invoice.issuedAt|date('d/m/Y') }}</p>
+                            <p class="mb-1 mt-2"><strong>Date d'échéance</strong></p>
+                            <p>{{ invoice.dueDate|date('d/m/Y') }}</p>
+                            {% if invoice.paidAt %}
+                                <p class="mb-1 mt-2"><strong>Date de paiement</strong></p>
+                                <p class="text-success">{{ invoice.paidAt|date('d/m/Y') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase mb-2">Client</h6>
+                            <p class="mb-0 fw-medium">{{ invoice.client.name }}</p>
+                            {% if invoice.client.address %}
+                                <p class="mb-0 small text-muted">{{ invoice.client.address }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase mb-2">Projet</h6>
+                            {% if invoice.project %}
+                                <p class="mb-0">
+                                    <a href="{{ path('project_show', {id: invoice.project.id}) }}">
+                                        {{ invoice.project.name }}
+                                    </a>
+                                </p>
+                            {% else %}
+                                <p class="mb-0 text-muted">-</p>
+                            {% endif %}
+                            {% if invoice.order %}
+                                <p class="mb-0 small text-muted mt-1">
+                                    Devis : <a href="{{ path('order_show', {id: invoice.order.id}) }}">{{ invoice.order.orderNumber }}</a>
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-center">Quantité</th>
+                                    <th class="text-center">Unité</th>
+                                    <th class="text-end">Prix unitaire HT</th>
+                                    <th class="text-end">Total HT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for line in invoice.lines %}
+                                    <tr>
+                                        <td>{{ line.description }}</td>
+                                        <td class="text-center">{{ line.quantity|number_format(2, ',', ' ') }}</td>
+                                        <td class="text-center">{{ line.unit }}</td>
+                                        <td class="text-end">{{ line.unitPriceHt|number_format(2, ',', ' ') }} €</td>
+                                        <td class="text-end">{{ line.totalHt|number_format(2, ',', ' ') }} €</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Aucune ligne de facturation</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-medium">Total HT</td>
+                                    <td class="text-end fw-medium">{{ invoice.amountHt|number_format(2, ',', ' ') }} €</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end">TVA ({{ invoice.tvaRate|number_format(2, ',', ' ') }}%)</td>
+                                    <td class="text-end">{{ invoice.amountTva|number_format(2, ',', ' ') }} €</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total TTC</td>
+                                    <td class="text-end fw-bold h5 mb-0">{{ invoice.amountTtc|number_format(2, ',', ' ') }} €</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    {% if invoice.paymentTerms %}
+                        <div class="mt-4">
+                            <h6 class="text-muted text-uppercase mb-2">Conditions de paiement</h6>
+                            <p class="mb-0">{{ invoice.paymentTerms|nl2br }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if invoice.internalNotes %}
+                        <div class="mt-4">
+                            <h6 class="text-muted text-uppercase mb-2">Notes internes</h6>
+                            <div class="alert alert-info">
+                                {{ invoice.internalNotes|nl2br }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {# Changement de statut #}
+            {% if is_granted('ROLE_COMPTA') %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Changer le statut</h5>
+                        <form method="POST" action="{{ path('invoice_update_status', {id: invoice.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('status' ~ invoice.id) }}">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Nouveau statut</label>
+                                <select name="status" id="status" class="form-select" required>
+                                    {% for key, label in statusOptions %}
+                                        <option value="{{ key }}" {% if invoice.status == key %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3" id="paid-at-field" {% if invoice.status != 'brouillon' and invoice.status != 'envoyee' %}style="display:none"{% endif %}>
+                                <label for="paid_at" class="form-label">Date de paiement</label>
+                                <input type="date" name="paid_at" id="paid_at" class="form-control" value="{{ invoice.paidAt ? invoice.paidAt|date('Y-m-d') : 'now'|date('Y-m-d') }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bx bx-check me-1"></i> Mettre à jour
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <script>
+                    document.getElementById('status').addEventListener('change', function() {
+                        const paidAtField = document.getElementById('paid-at-field');
+                        if (this.value === 'payee') {
+                            paidAtField.style.display = 'block';
+                        } else {
+                            paidAtField.style.display = 'none';
+                        }
+                    });
+                </script>
+            {% endif %}
+
+            {# Suppression #}
+            {% if is_granted('ROLE_ADMIN') and invoice.status == 'brouillon' %}
+                <div class="card border-danger">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger">Zone de danger</h5>
+                        <p class="card-text small text-muted">
+                            La suppression d'une facture est irréversible. Cette action ne peut être effectuée que pour les factures en brouillon.
+                        </p>
+                        <form method="POST" action="{{ path('invoice_delete', {id: invoice.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette facture ? Cette action est irréversible.');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ invoice.id) }}">
+                            <button type="submit" class="btn btn-danger btn-sm w-100">
+                                <i class="bx bx-trash me-1"></i> Supprimer la facture
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Informations système #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Informations</h5>
+                    <div class="small">
+                        <p class="mb-2">
+                            <span class="text-muted">Créée le :</span><br>
+                            {{ invoice.createdAt|date('d/m/Y à H:i') }}
+                        </p>
+                        <p class="mb-0">
+                            <span class="text-muted">Dernière modification :</span><br>
+                            {{ invoice.updatedAt|date('d/m/Y à H:i') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
