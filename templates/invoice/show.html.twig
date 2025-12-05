@@ -21,9 +21,12 @@
                                 <i class="bx bx-edit me-1"></i> Modifier
                             </a>
                         {% endif %}
-                        <button type="button" class="btn btn-outline-primary" onclick="window.print()">
-                            <i class="bx bx-printer me-1"></i> Imprimer
-                        </button>
+                        <a href="{{ path('invoice_pdf_preview', {id: invoice.id}) }}" class="btn btn-outline-info" target="_blank">
+                            <i class="bx bx-show me-1"></i> Aperçu PDF
+                        </a>
+                        <a href="{{ path('invoice_pdf', {id: invoice.id}) }}" class="btn btn-outline-primary">
+                            <i class="bx bx-download me-1"></i> Télécharger PDF
+                        </a>
                     </div>
                 </div>
             </div>

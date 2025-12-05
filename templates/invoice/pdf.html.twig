@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture {{ invoice.invoiceNumber }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+            padding: 20px;
+        }
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 20px;
+        }
+        .company-info {
+            float: left;
+            width: 50%;
+        }
+        .company-info h1 {
+            color: #2c3e50;
+            font-size: 24pt;
+            margin-bottom: 10px;
+        }
+        .document-info {
+            float: right;
+            width: 45%;
+            text-align: right;
+        }
+        .document-info h2 {
+            color: #27ae60;
+            font-size: 20pt;
+            margin-bottom: 10px;
+        }
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        .invoice-details {
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+        .invoice-details .left {
+            float: left;
+            width: 50%;
+        }
+        .invoice-details .right {
+            float: right;
+            width: 45%;
+        }
+        .invoice-details h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 14pt;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 9pt;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .status-paid {
+            background: #27ae60;
+            color: white;
+        }
+        .status-sent {
+            background: #3498db;
+            color: white;
+        }
+        .status-draft {
+            background: #95a5a6;
+            color: white;
+        }
+        .status-overdue {
+            background: #e74c3c;
+            color: white;
+        }
+        .status-cancelled {
+            background: #34495e;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        table thead th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #1a252f;
+        }
+        table tbody td {
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .totals {
+            margin-top: 20px;
+            float: right;
+            width: 45%;
+        }
+        .totals table {
+            width: 100%;
+            margin: 0;
+        }
+        .totals table tbody td {
+            padding: 8px;
+            border: none;
+        }
+        .totals table tr.subtotal {
+            font-weight: bold;
+            border-top: 2px solid #bdc3c7;
+        }
+        .totals table tr.total {
+            font-weight: bold;
+            font-size: 14pt;
+            background: #27ae60;
+            color: white;
+        }
+        .payment-info {
+            clear: both;
+            margin-top: 100px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 5px;
+        }
+        .payment-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .payment-info p {
+            margin-bottom: 5px;
+        }
+        .legal-mentions {
+            margin-top: 30px;
+            font-size: 9pt;
+            color: #7f8c8d;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 15px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            text-align: center;
+            font-size: 9pt;
+            color: #7f8c8d;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <div class="header clearfix">
+        <div class="company-info">
+            <h1>{{ company_name|default('HotOnes Agency') }}</h1>
+            <p>
+                {{ company_address|default('Adresse de l\'entreprise') }}<br>
+                {{ company_postal|default('Code postal') }} {{ company_city|default('Ville') }}<br>
+                Tél: {{ company_phone|default('01 23 45 67 89') }}<br>
+                Email: {{ company_email|default('contact@hotones.com') }}
+            </p>
+        </div>
+        <div class="document-info">
+            <h2>FACTURE</h2>
+            <p>
+                <strong>N° {{ invoice.invoiceNumber }}</strong><br>
+                Date d'émission: {{ invoice.issuedAt|date('d/m/Y') }}<br>
+                Date d'échéance: {{ invoice.dueDate|date('d/m/Y') }}
+                {% if invoice.paidAt %}
+                    <br>Date de paiement: {{ invoice.paidAt|date('d/m/Y') }}
+                {% endif %}
+            </p>
+            {% set statusClass = {
+                'brouillon': 'draft',
+                'envoyee': 'sent',
+                'payee': 'paid',
+                'en_retard': 'overdue',
+                'annulee': 'cancelled'
+            } %}
+            {% set statusLabel = {
+                'brouillon': 'BROUILLON',
+                'envoyee': 'ENVOYÉE',
+                'payee': 'PAYÉE',
+                'en_retard': 'EN RETARD',
+                'annulee': 'ANNULÉE'
+            } %}
+            <span class="status-badge status-{{ statusClass[invoice.status] ?? 'draft' }}">
+                {{ statusLabel[invoice.status] ?? invoice.status|upper }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Informations facturation -->
+    <div class="invoice-details clearfix">
+        <div class="left">
+            <h3>Client facturé:</h3>
+            <p>
+                <strong>{{ invoice.client.name }}</strong><br>
+                {% if invoice.client.address %}
+                    {{ invoice.client.address }}<br>
+                {% endif %}
+                {% if invoice.client.postalCode or invoice.client.city %}
+                    {{ invoice.client.postalCode }} {{ invoice.client.city }}<br>
+                {% endif %}
+                {% if invoice.client.email %}
+                    Email: {{ invoice.client.email }}<br>
+                {% endif %}
+                {% if invoice.client.phone %}
+                    Tél: {{ invoice.client.phone }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="right">
+            {% if invoice.project %}
+                <h3>Projet concerné:</h3>
+                <p>
+                    <strong>{{ invoice.project.name }}</strong>
+                    {% if invoice.project.reference %}
+                        <br>Réf: {{ invoice.project.reference }}
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% if invoice.order %}
+                <p style="margin-top: 15px;">
+                    <small>Devis associé: {{ invoice.order.orderNumber }}</small>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <!-- Lignes de facturation -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 45%;">Description</th>
+                <th style="width: 12%;" class="text-center">Quantité</th>
+                <th style="width: 10%;" class="text-center">Unité</th>
+                <th style="width: 15%;" class="text-right">Prix unitaire HT</th>
+                <th style="width: 18%;" class="text-right">Total HT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in invoice.lines %}
+            <tr>
+                <td>{{ line.description|nl2br }}</td>
+                <td class="text-center">{{ line.quantity|number_format(2, ',', ' ') }}</td>
+                <td class="text-center">{{ line.unit }}</td>
+                <td class="text-right">{{ line.unitPriceHt|number_format(2, ',', ' ') }} €</td>
+                <td class="text-right"><strong>{{ line.totalHt|number_format(2, ',', ' ') }} €</strong></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center" style="padding: 20px; color: #7f8c8d;">
+                    Aucune ligne de facturation
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totaux -->
+    <div class="clearfix">
+        <div class="totals">
+            <table>
+                <tbody>
+                    <tr class="subtotal">
+                        <td>Total HT:</td>
+                        <td class="text-right">{{ invoice.amountHt|number_format(2, ',', ' ') }} €</td>
+                    </tr>
+                    <tr>
+                        <td>TVA ({{ invoice.tvaRate|number_format(2, ',', ' ') }}%):</td>
+                        <td class="text-right">{{ invoice.amountTva|number_format(2, ',', ' ') }} €</td>
+                    </tr>
+                    <tr class="total">
+                        <td><strong>Total TTC:</strong></td>
+                        <td class="text-right"><strong>{{ invoice.amountTtc|number_format(2, ',', ' ') }} €</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <!-- Informations de paiement -->
+    <div class="payment-info">
+        <h3>Modalités de règlement</h3>
+        {% if invoice.paymentTerms %}
+            <p>{{ invoice.paymentTerms|nl2br }}</p>
+        {% else %}
+            <p>Paiement à réception de facture</p>
+        {% endif %}
+
+        <p style="margin-top: 15px;">
+            <strong>Coordonnées bancaires:</strong><br>
+            Titulaire: {{ company_name|default('HotOnes Agency') }}<br>
+            IBAN: {{ company_iban|default('FR76 XXXX XXXX XXXX XXXX XXXX XXX') }}<br>
+            BIC: {{ company_bic|default('XXXXFRPPXXX') }}
+        </p>
+
+        {% if invoice.status != 'payee' %}
+        <p style="margin-top: 10px; color: #e74c3c; font-weight: bold;">
+            Merci d'indiquer le numéro de facture {{ invoice.invoiceNumber }} en référence de votre virement.
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Mentions légales -->
+    <div class="legal-mentions">
+        <p><strong>Mentions légales:</strong></p>
+        <p>{{ company_legal|default('SIRET: XXX XXX XXX XXXXX - TVA intracommunautaire: FR XX XXX XXX XXX') }}</p>
+        <p>{{ company_capital|default('Capital social: 10 000 € - RCS Paris B XXX XXX XXX') }}</p>
+        <p style="margin-top: 10px; font-size: 8pt;">
+            En cas de retard de paiement, une pénalité de 10% du montant TTC sera appliquée,
+            ainsi qu'une indemnité forfaitaire pour frais de recouvrement de 40 €,
+            conformément aux articles L441-6 et D441-5 du Code de commerce.
+        </p>
+    </div>
+
+    <!-- Pied de page -->
+    <div class="footer">
+        <p>Document généré le {{ "now"|date('d/m/Y à H:i') }}</p>
+    </div>
+</body>
+</html>

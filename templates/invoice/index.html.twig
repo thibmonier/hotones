@@ -223,6 +223,9 @@
                                                     <i class="bx bx-edit"></i>
                                                 </a>
                                             {% endif %}
+                                            <a href="{{ path('invoice_pdf', {id: invoice.id}) }}" class="btn btn-sm btn-outline-info" title="Télécharger PDF">
+                                                <i class="bx bx-download"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 {% else %}
