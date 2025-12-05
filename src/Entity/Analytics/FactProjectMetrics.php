@@ -97,6 +97,14 @@ class FactProjectMetrics
 
     #[ORM\Column(type: 'integer')]
     #[Groups(['metrics:read'])]
+    private int $signedOrderCount = 0; // Devis signés (statut signed)
+
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
+    private int $lostOrderCount = 0; // Devis perdus (statut lost)
+
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['metrics:read'])]
     private int $contributorCount = 0; // Nombre de contributeurs
 
     // KPIs - Métriques financières
@@ -309,6 +317,30 @@ class FactProjectMetrics
     public function setWonOrderCount(int $wonOrderCount): self
     {
         $this->wonOrderCount = $wonOrderCount;
+
+        return $this;
+    }
+
+    public function getSignedOrderCount(): int
+    {
+        return $this->signedOrderCount;
+    }
+
+    public function setSignedOrderCount(int $signedOrderCount): self
+    {
+        $this->signedOrderCount = $signedOrderCount;
+
+        return $this;
+    }
+
+    public function getLostOrderCount(): int
+    {
+        return $this->lostOrderCount;
+    }
+
+    public function setLostOrderCount(int $lostOrderCount): self
+    {
+        $this->lostOrderCount = $lostOrderCount;
 
         return $this;
     }
