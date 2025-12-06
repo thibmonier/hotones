@@ -9,7 +9,7 @@
 import './scss/app.scss';
 
 // start the Stimulus application
-import './bootstrap';
+import './bootstrap.js';
 
 // Import Global Search
-import './js/global-search';
+import './js/global-search.js';

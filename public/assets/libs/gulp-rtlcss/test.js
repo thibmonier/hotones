@@ -1,1 +1,72 @@
-!function(){"use strict";var t=require("assert"),e=require("vinyl"),n=require("./index");it("should convert LTR CSS to RTL",(function(r){var o=n();o.on("data",(function(e){t.equal(e.contents.toString(),".selector { float: right; /* comment */ }"),r()})),o.write(new e({path:"styles.css",contents:Buffer.from(".selector { float: left; /* comment */ }")}))})),it("should accept rtlcss configuration",(function(r){var o=n({options:{preserveComments:!0,preserveDirectives:!1,swapLeftRightInUrl:!0,swapLtrRtlInUrl:!0,swapWestEastInUrl:!0,autoRename:!1,greedy:!1,enableLogging:!1,minify:!1},rules:[],declarations:[],properties:[],map:!1});o.on("data",(function(e){t.equal(e.contents.toString(),".pull-left {content: ' ';}"),r()})),o.write(new e({path:"styles.css",contents:Buffer.from(".pull-left {content: ' ';}")}))})),it("should honour rtlcss directives",(function(r){var o=n();o.on("data",(function(e){t.equal(e.contents.toString(),".toRight {\n  text-align: left;\n}\n"),r()})),o.write(new e({path:"styles.css",contents:Buffer.from(".toRight {\n  /*rtl:remove*/\n  direction: rtl;\n  \n  /*rtl:ignore*/\n  text-align: left;\n}\n")}))}))}();
+(function() {
+    'use strict';
+    var assert = require('assert');
+    var Vinyl = require('vinyl');
+    var gulpRtlcss = require('./index');
+
+    it('should convert LTR CSS to RTL', function (cb) {
+        var stream = gulpRtlcss();
+
+        stream.on('data', function (file) {
+            assert.equal(file.contents.toString(), '.selector { float: right; /* comment */ }');
+            cb();
+        });
+
+        stream.write(new Vinyl({
+            path: 'styles.css',
+            contents: Buffer.from('.selector { float: left; /* comment */ }')
+        }));
+    });
+
+    it('should accept rtlcss configuration', function (cb) {
+        var stream = gulpRtlcss({
+            "options": {
+                "preserveComments": true,
+                "preserveDirectives": false,
+                "swapLeftRightInUrl": true,
+                "swapLtrRtlInUrl": true,
+                "swapWestEastInUrl": true,
+                "autoRename": false,
+                "greedy": false,
+                "enableLogging": false,
+                "minify": false
+            },
+            "rules": [ ],
+            "declarations": [ ],
+            "properties": [ ],
+            "map": false
+        });
+
+        stream.on('data', function (file) {
+            assert.equal(file.contents.toString(), ".pull-left {content: ' ';}");
+            cb();
+        });
+
+        stream.write(new Vinyl({
+            path: 'styles.css',
+            contents: Buffer.from(".pull-left {content: ' ';}")
+        }));
+    });
+
+    it('should honour rtlcss directives', function (cb) {
+        var stream = gulpRtlcss();
+
+        stream.on('data', function (file) {
+            assert.equal(file.contents.toString(), ".toRight {\n" +
+                                                   "  text-align: left;\n" +
+                                                   "}\n");
+            cb();
+        });
+
+        stream.write(new Vinyl({
+            path: 'styles.css',
+            contents: Buffer.from(".toRight {\n" +
+                                 "  /*rtl:remove*/\n" +
+                                 "  direction: rtl;\n" +
+                                 "  \n" +
+                                 "  /*rtl:ignore*/\n" +
+                                 "  text-align: left;\n" +
+                                 "}\n")
+        }));
+    });
+})();

@@ -1,0 +1,385 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}À propos - {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="container-fluid">
+
+        <!-- Page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <h4 class="mb-sm-0 font-size-18">À propos de HotOnes</h4>
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                            <li class="breadcrumb-item active">À propos</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Description -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="bx bx-info-circle me-2"></i>Description du projet
+                        </h4>
+                        <p class="text-muted">
+                            <strong>HotOnes</strong> est une plateforme complète de gestion de projets et de suivi de rentabilité
+                            conçue spécifiquement pour les agences web et digitales.
+                        </p>
+                        <p class="text-muted mb-0">
+                            Le système gère l'intégralité du cycle de vie des projets, depuis la création des devis jusqu'à
+                            l'analyse de rentabilité, en passant par le suivi du temps, la planification des ressources et
+                            la facturation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Environment Info -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="bx bx-server me-2"></i>Environnement
+                        </h4>
+                        <div class="table-responsive">
+                            <table class="table table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted">Framework</td>
+                                        <td class="text-end">
+                                            <span class="badge bg-primary">Symfony {{ environment.symfony_version }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">PHP Version</td>
+                                        <td class="text-end">
+                                            <span class="badge bg-success">PHP {{ environment.php_version }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Environnement</td>
+                                        <td class="text-end">
+                                            <span class="badge bg-{{ environment.environment == 'prod' ? 'danger' : 'warning' }}">
+                                                {{ environment.environment|upper }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Mode Debug</td>
+                                        <td class="text-end">
+                                            <span class="badge bg-{{ environment.debug ? 'warning' : 'success' }}">
+                                                {{ environment.debug ? 'Activé' : 'Désactivé' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHP Extensions -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="bx bx-extension me-2"></i>Extensions PHP
+                        </h4>
+                        <div class="table-responsive">
+                            <table class="table table-borderless mb-0">
+                                <tbody>
+                                    {% for name, loaded in extensions %}
+                                    <tr>
+                                        <td class="text-muted">{{ name }}</td>
+                                        <td class="text-end">
+                                            {% if loaded %}
+                                                <i class="bx bx-check-circle text-success font-size-16"></i>
+                                            {% else %}
+                                                <i class="bx bx-x-circle text-danger font-size-16"></i>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Stack -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="bx bx-layer me-2"></i>Stack Technique
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="font-size-15 mb-3">Backend</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Symfony 8.0</strong> - Framework PHP
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Doctrine ORM 3.5</strong> - Gestion base de données
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>API Platform 4.2</strong> - REST API
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Lexik JWT</strong> - Authentification API
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Scheb 2FA</strong> - Authentification 2 facteurs (TOTP)
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Symfony Messenger</strong> - File de messages asynchrones
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Symfony Scheduler</strong> - Tâches planifiées
+                                    </li>
+                                </ul>
+
+                                <h5 class="font-size-15 mb-3 mt-4">Base de données</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>MariaDB 11.4</strong> - Base de données principale
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Redis</strong> - Cache et sessions
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h5 class="font-size-15 mb-3">Frontend</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Twig</strong> - Moteur de templates
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Bootstrap 5</strong> - Framework CSS
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Stimulus</strong> - Framework JavaScript
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Turbo</strong> - Navigation rapide (SPA-like)
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Webpack Encore</strong> - Build assets
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Chart.js</strong> - Graphiques et visualisations
+                                    </li>
+                                </ul>
+
+                                <h5 class="font-size-15 mb-3 mt-4">Qualité & Tests</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>PHPUnit 12</strong> - Tests unitaires et fonctionnels
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>PHPStan</strong> - Analyse statique (niveau 3)
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>PHP CS Fixer</strong> - Style de code (PSR-12)
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        <strong>Foundry</strong> - Factories pour les tests
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="bx bx-star me-2"></i>Fonctionnalités principales
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <div class="avatar-sm mb-3">
+                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary font-size-20">
+                                            <i class="bx bx-briefcase"></i>
+                                        </span>
+                                    </div>
+                                    <h5 class="font-size-15">Gestion de projets</h5>
+                                    <p class="text-muted mb-0">Suivi complet du cycle de vie des projets, de la prospection à la livraison</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <div class="avatar-sm mb-3">
+                                        <span class="avatar-title rounded-circle bg-success bg-soft text-success font-size-20">
+                                            <i class="bx bx-time"></i>
+                                        </span>
+                                    </div>
+                                    <h5 class="font-size-15">Suivi du temps</h5>
+                                    <p class="text-muted mb-0">Timesheet hebdomadaire avec timer, imputation par tâche et validation</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <div class="avatar-sm mb-3">
+                                        <span class="avatar-title rounded-circle bg-info bg-soft text-info font-size-20">
+                                            <i class="bx bx-line-chart"></i>
+                                        </span>
+                                    </div>
+                                    <h5 class="font-size-15">Analytics & Rentabilité</h5>
+                                    <p class="text-muted mb-0">Dashboards analytiques avec KPIs, marges et prédictions</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <div class="avatar-sm mb-3">
+                                        <span class="avatar-title rounded-circle bg-warning bg-soft text-warning font-size-20">
+                                            <i class="bx bx-calendar"></i>
+                                        </span>
+                                    </div>
+                                    <h5 class="font-size-15">Planning & Ressources</h5>
+                                    <p class="text-muted mb-0">Timeline des affectations, gestion des congés et taux de staffing</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <div class="avatar-sm mb-3">
+                                        <span class="avatar-title rounded-circle bg-danger bg-soft text-danger font-size-20">
+                                            <i class="bx bx-file"></i>
+                                        </span>
+                                    </div>
+                                    <h5 class="font-size-15">Devis & Facturation</h5>
+                                    <p class="text-muted mb-0">Génération de devis et factures PDF, suivi des paiements</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <div class="avatar-sm mb-3">
+                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary font-size-20">
+                                            <i class="bx bx-shield"></i>
+                                        </span>
+                                    </div>
+                                    <h5 class="font-size-15">Sécurité</h5>
+                                    <p class="text-muted mb-0">2FA (TOTP), gestion des rôles, audit des connexions</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="bx bx-sitemap me-2"></i>Architecture
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="font-size-15 mb-3">Design Patterns</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>MVC</strong> - Architecture Modèle-Vue-Contrôleur
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>Repository Pattern</strong> - Abstraction de la couche données
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>Service Layer</strong> - Logique métier centralisée
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>Event-Driven</strong> - Communication via événements
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>Star Schema</strong> - Entrepôt de données pour analytics
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h5 class="font-size-15 mb-3">Déploiement</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>Docker</strong> - Conteneurisation (dev & prod)
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>GitHub Actions</strong> - CI/CD automatisé
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>Render</strong> - Hébergement production
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bx bx-chevron-right text-primary me-2"></i>
+                                        <strong>SonarCloud</strong> - Analyse qualité de code
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,2 +1,1387 @@
-/*! For license information please see dataTables.keyTable.mjs.LICENSE.txt */
-import t from"jquery";import e from"datatables.net";let n=t;var i=0,s=0,o=function(t,s){if(!e.versionCheck||!e.versionCheck("1.10.8"))throw"KeyTable requires DataTables 1.10.8 or newer";this.c=n.extend(!0,{},e.defaults.keyTable,o.defaults,s),this.s={dt:new e.Api(t),dtDrawing:!1,enable:!0,focusDraw:!1,waitingForDraw:!1,lastFocus:null,namespace:".keyTable-"+i++,tabInput:null},this.dom={};var l=this.s.dt.settings()[0],a=l.keytable;if(a)return a;l.keytable=this,this._constructor()};n.extend(o.prototype,{blur:function(){this._blur()},enable:function(t){this.s.enable=t},enabled:function(){return this.s.enable},focus:function(t,e){this._focus(this.s.dt.cell(t,e))},focused:function(t){if(!this.s.lastFocus)return!1;var e=this.s.lastFocus.cell.index();return t.row===e.row&&t.column===e.column},_constructor:function(){this._tabInput();var t=this,e=this.s.dt,i=n(e.table().node()),s=this.s.namespace,o=!1;if("static"===i.css("position")&&i.css("position","relative"),n(e.table().body()).on("click"+s,"th, td",(function(n){if(!1!==t.s.enable){var i=e.cell(this);i.any()&&t._focus(i,null,!1,n)}})),n(document).on("keydown"+s,(function(e){o||t.s.dtDrawing?e.preventDefault():t._key(e)})),this.c.blurable&&n(document).on("mousedown"+s,(function(i){n(i.target).parents(".dataTables_filter, .dt-search").length&&t._blur(),n(i.target).parents().filter(e.table().container()).length||n(i.target).parents("div.DTE").length||n(i.target).parents("div.editor-datetime").length||n(i.target).parents("div.dt-datetime").length||n(i.target).parents().filter(".DTFC_Cloned").length||t._blur()})),this.c.editor){var l=this.c.editor;l.on("open.keyTableMain",(function(e,n,i){"inline"!==n&&t.s.enable&&(t.enable(!1),l.one("close"+s,(function(){t.enable(!0)})))})),this.c.editOnFocus&&e.on("key-focus"+s+" key-refocus"+s,(function(e,n,i,s){t._editor(null,s,!0)})),e.on("key"+s,(function(e,n,i,s,o){t._editor(i,o,!1)})),n(e.table().body()).on("dblclick"+s,"th, td",(function(n){!1!==t.s.enable&&(e.cell(this).any()&&(t.s.lastFocus&&this!==t.s.lastFocus.cell.node()||t._editor(null,n,!0)))})),l.on("preSubmit",(function(){o=!0})).on("preSubmitCancelled",(function(){o=!1})).on("submitComplete",(function(){o=!1}))}e.on("stateSaveParams"+s,(function(e,n,i){i.keyTable=t.s.lastFocus?t.s.lastFocus.cell.index():null})),e.on("column-visibility"+s,(function(e){t._tabInput()})),e.on("column-reorder"+s,(function(e,n,i){var s=t.s.lastFocus;if(s&&s.cell){var o=s.relative.column;s.cell[0][0].column=i.mapping.indexOf(o),s.relative.column=i.mapping.indexOf(o)}})),e.on("preDraw"+s+" scroller-will-draw"+s,(function(e){t.s.dtDrawing=!0})),e.on("draw"+s,(function(n){if((t.s.dtDrawing=!1,t._tabInput(),!t.s.focusDraw)&&t.s.lastFocus){var i=t.s.lastFocus.relative,s=e.page.info(),o=i.row;if(0===s.recordsDisplay)return;if(o<s.start||o>s.start+s.length)return;o>=s.recordsDisplay&&(o=s.recordsDisplay-1),t._focus(o,i.column,!0,n)}})),this.c.clipboard&&this._clipboard(),e.on("destroy"+s,(function(){t._blur(!0),e.off(s),n(e.table().body()).off("click"+s,"th, td").off("dblclick"+s,"th, td"),n(document).off("mousedown"+s).off("keydown"+s).off("copy"+s).off("paste"+s)}));var a=e.state.loaded();a&&a.keyTable?e.one("init",(function(){var t=e.cell(a.keyTable);t.any()&&t.focus()})):this.c.focus&&e.cell(this.c.focus).focus()},_blur:function(t){if(this.s.enable&&this.s.lastFocus){var e=this.s.lastFocus.cell;n(e.node()).removeClass(this.c.className),this.s.lastFocus=null,t||(this._updateFixedColumns(e.index().column),this._emitEvent("key-blur",[this.s.dt,e]))}},_clipboard:function(){var t=this.s.dt,e=this,i=this.s.namespace,s=this.c.clipboard;window.getSelection&&((!0===s||s.copy)&&n(document).on("copy"+i,(function(t){var n=t.originalEvent,i=window.getSelection().toString(),s=e.s.lastFocus;!i&&s&&(n.clipboardData.setData("text/plain",s.cell.render(e.c.clipboardOrthogonal)),n.preventDefault())})),(!0===s||s.paste)&&n(document).on("paste"+i,(function(n){var i,s=n.originalEvent,o=e.s.lastFocus,l=document.activeElement,a=e.c.editor;if(o&&(!l||"body"===l.nodeName.toLowerCase()))if(s.preventDefault(),window.clipboardData&&window.clipboardData.getData?i=window.clipboardData.getData("Text"):s.clipboardData&&s.clipboardData.getData&&(i=s.clipboardData.getData("text/plain")),a){var r=e._inlineOptions(o.cell.index());a.inline(r.cell,r.field,r.options).set(a.displayed()[0],i).submit()}else o.cell.data(i),t.draw(!1)})))},_columns:function(){var t=this.s.dt,e=t.columns(this.c.columns).indexes(),n=[];return t.columns(":visible").every((function(t){-1!==e.indexOf(t)&&n.push(t)})),n},_editor:function(t,e,i){if(this.s.lastFocus&&(!e||"draw"!==e.type)){var o=this,l=this.s.dt,a=this.c.editor,r=this.s.lastFocus.cell,c=this.s.namespace+"e"+s++;if(!(n("div.DTE",r.node()).length||null!==t&&(t>=0&&t<=9||11===t||12===t||t>=14&&t<=31||t>=112&&t<=123||t>=127&&t<=159))){e&&(e.stopPropagation(),13===t&&e.preventDefault());var u=function(){var t=o._inlineOptions(r.index());a.one("open"+c,(function(){a.off("cancelOpen"+c),i||n("div.DTE_Field_InputControl input, div.DTE_Field_InputControl textarea").select(),l.keys.enable(i?"tab-only":"navigation-only"),l.on("key-blur.editor",(function(t,e,n){"submit"!==a.s.editOpts.onBlur&&a.displayed()&&n.node()===r.node()&&a.submit()})),i&&n(l.table().container()).addClass("dtk-focus-alt"),a.on("preSubmitCancelled"+c,(function(){setTimeout((function(){o._focus(r,null,!1)}),50)})),a.on("submitUnsuccessful"+c,(function(){o._focus(r,null,!1)})),a.one("close"+c,(function(){l.keys.enable(!0),l.off("key-blur.editor"),a.off(c),n(l.table().container()).removeClass("dtk-focus-alt"),o.s.returnSubmit&&(o.s.returnSubmit=!1,o._emitEvent("key-return-submit",[l,r]))}))})).one("cancelOpen"+c,(function(){a.off(c)})).inline(t.cell,t.field,t.options)};13===t?(i=!0,n(document).one("keyup",(function(){u()}))):u()}}},_inlineOptions:function(t){return this.c.editorOptions?this.c.editorOptions(t):{cell:t,field:void 0,options:void 0}},_emitEvent:function(t,e){return this.s.dt.iterator("table",(function(i,s){return n(i.nTable).triggerHandler(t,e)}))},_focus:function(t,e,i,s){var o=this,l=this.s.dt,a=l.page.info(),r=this.s.lastFocus;if(s||(s=null),this.s.enable){if("number"!=typeof t){if(!t.any())return;var c=t.index();if(e=c.column,(t=l.rows({filter:"applied",order:"applied"}).indexes().indexOf(c.row))<0)return;a.serverSide&&(t+=a.start)}if(-1!==a.length&&(t<a.start||t>=a.start+a.length))return this.s.focusDraw=!0,this.s.waitingForDraw=!0,void l.one("draw",(function(){o.s.focusDraw=!1,o.s.waitingForDraw=!1,o._focus(t,e,void 0,s)})).page(Math.floor(t/a.length)).draw(!1);if(-1!==n.inArray(e,this._columns())){a.serverSide&&(t-=a.start);var u=l.cells(null,e,{search:"applied",order:"applied"}).flatten(),d=l.cell(u[t]);if(-1===this._emitEvent("key-prefocus",[this.s.dt,d,s||null]).indexOf(!1)){if(r){if(r.node===d.node())return void this._emitEvent("key-refocus",[this.s.dt,d,s||null]);this._blur()}this._removeOtherFocus();var f=n(d.node());if(f.addClass(this.c.className),this._updateFixedColumns(e),void 0===i||!0===i){this._scroll(n(window),n(document.body),f,"offset");var h=l.table().body().parentNode;if(h!==l.table().header().parentNode){var p=n(h.parentNode);this._scroll(p,p,f,"position")}}var b=l.page.info();this.s.lastFocus={cell:d,node:d.node(),relative:{row:b.start+l.rows({page:"current"}).indexes().indexOf(d.index().row),column:d.index().column}},this._emitEvent("key-focus",[this.s.dt,d,s||null]),l.state.save()}}}},_key:function(t){if(this.s.waitingForDraw)t.preventDefault();else if(!n(t.target).closest(".dte-inlineAdd").length){var e=this.s.enable;this.s.returnSubmit=("navigation-only"===e||"tab-only"===e)&&13===t.keyCode;var i=!0===e||"navigation-only"===e;if(e&&(!(0===t.keyCode||t.ctrlKey||t.metaKey||t.altKey)||t.ctrlKey&&t.altKey)){var s=this.s.lastFocus;if(s)if(this.s.dt.cell(s.node).any()){var o=this,l=this.s.dt,a=!!this.s.dt.settings()[0].oScroll.sY;if(!this.c.keys||-1!==n.inArray(t.keyCode,this.c.keys))switch(t.keyCode){case 9:t.preventDefault(),this._keyAction((function(){o._shift(t,t.shiftKey?"left":"right",!0)}));break;case 27:if(n(s.node).find("div.DTE").length)return;this.c.blurable&&!0===e&&this._blur();break;case 33:case 34:i&&!a&&(t.preventDefault(),this._keyAction((function(){l.page(33===t.keyCode?"previous":"next").draw(!1)})));break;case 35:case 36:i&&(t.preventDefault(),this._keyAction((function(){var e=l.cells({page:"current"}).indexes(),n=o._columns();o._focus(l.cell(e[35===t.keyCode?e.length-1:n[0]]),null,!0,t)})));break;case 37:i&&this._keyAction((function(){o._shift(t,"left")}));break;case 38:i&&this._keyAction((function(){o._shift(t,"up")}));break;case 39:i&&this._keyAction((function(){o._shift(t,"right")}));break;case 40:i&&this._keyAction((function(){o._shift(t,"down")}));break;case 113:if(this.c.editor){this._editor(null,t,!0);break}default:!0===e&&this._emitEvent("key",[l,t.keyCode,this.s.lastFocus.cell,t])}}else this.s.lastFocus=null}}},_keyAction:function(t){var e=this.c.editor;e&&e.mode()&&e.display()?e.submit(t):t()},_removeOtherFocus:function(){var t=this.s.dt.table().node();n.fn.dataTable.tables({api:!0}).iterator("table",(function(e){this.table().node()!==t&&this.cell.blur()}))},_scroll:function(t,e,n,i){var s=n[i](),o=n.outerHeight(),l=n.outerWidth(),a=e.scrollTop(),r=e.scrollLeft(),c=t.height(),u=t.width();"position"===i&&(s.top+=parseInt(n.closest("table").css("top"),10)),s.top<a&&s.top+o>a-5&&e.scrollTop(s.top),s.left<r&&e.scrollLeft(s.left),s.top+o>a+c&&s.top<a+c+5&&o<c&&e.scrollTop(s.top+o-c),s.left+l>r+u&&l<u&&e.scrollLeft(s.left+l-u)},_shift:function(t,e,i){var s=this.s.dt,o=s.page.info(),l=o.recordsDisplay,a=this._columns(),r=this.s.lastFocus;if(r){var c=r.cell;if(c){var u=s.rows({filter:"applied",order:"applied"}).indexes().indexOf(c.index().row);o.serverSide&&(u+=o.start);var d=s.columns(a).indexes().indexOf(c.index().column),f=u,h=a[d];"rtl"===n(s.table().node()).css("direction")&&("right"===e?e="left":"left"===e&&(e="right")),"right"===e?d>=a.length-1?(f++,h=a[0]):h=a[d+1]:"left"===e?0===d?(f--,h=a[a.length-1]):h=a[d-1]:"up"===e?f--:"down"===e&&f++,f>=0&&f<l&&-1!==n.inArray(h,a)?(t&&t.preventDefault(),this._focus(f,h,!0,t)):i&&this.c.blurable?this._blur():t&&t.preventDefault()}}},_tabInput:function(){var t=this,e=this.s.dt,i=null!==this.c.tabIndex?this.c.tabIndex:e.settings()[0].iTabIndex;if(-1!=i){if(!this.s.tabInput){var s=n('<div><input type="text" tabindex="'+i+'"/></div>').css({position:"absolute",height:1,width:0,overflow:"hidden"});s.children().on("focus",(function(n){var i=e.cell(":eq(0)",t._columns(),{page:"current"});i.any()&&t._focus(i,null,!0,n)})),this.s.tabInput=s}var o=this.s.dt.cell(":eq(0)","0:visible",{page:"current",order:"current"}).node();o&&n(o).prepend(this.s.tabInput)}},_updateFixedColumns:function(t){var e=this.s.dt,n=e.settings()[0];if(n._oFixedColumns){var i=n._oFixedColumns.s.iLeftColumns,s=n.aoColumns.length-n._oFixedColumns.s.iRightColumns;(t<i||t>=s)&&e.fixedColumns().update()}}}),o.defaults={blurable:!0,className:"focus",clipboard:!0,clipboardOrthogonal:"display",columns:"",editor:null,editOnFocus:!1,editorOptions:null,focus:null,keys:null,tabIndex:null},o.version="2.12.1",n.fn.dataTable.KeyTable=o,n.fn.DataTable.KeyTable=o,e.Api.register("cell.blur()",(function(){return this.iterator("table",(function(t){t.keytable&&t.keytable.blur()}))})),e.Api.register("cell().focus()",(function(){return this.iterator("cell",(function(t,e,n){t.keytable&&t.keytable.focus(e,n)}))})),e.Api.register("keys.disable()",(function(){return this.iterator("table",(function(t){t.keytable&&t.keytable.enable(!1)}))})),e.Api.register("keys.enable()",(function(t){return this.iterator("table",(function(e){e.keytable&&e.keytable.enable(void 0===t||t)}))})),e.Api.register("keys.enabled()",(function(t){var e=this.context;return!!e.length&&(!!e[0].keytable&&e[0].keytable.enabled())})),e.Api.register("keys.move()",(function(t){return this.iterator("table",(function(e){e.keytable&&e.keytable._shift(null,t,!1)}))})),e.ext.selector.cell.push((function(t,e,n){var i=e.focused,s=t.keytable,o=[];if(!s||void 0===i)return n;for(var l=0,a=n.length;l<a;l++)(!0===i&&s.focused(n[l])||!1===i&&!s.focused(n[l]))&&o.push(n[l]);return o})),n(document).on("preInit.dt.dtk",(function(t,i,s){if("dt"===t.namespace){var l=i.oInit.keys,a=e.defaults.keys;if(l||a){var r=n.extend({},a,l);!1!==l&&new o(i,r)}}}));export default e;
+/*! KeyTable 2.12.1
+ * © SpryMedia Ltd - datatables.net/license
+ */
+
+import jQuery from 'jquery';
+import DataTable from 'datatables.net';
+
+// Allow reassignment of the $ variable
+let $ = jQuery;
+
+
+/**
+ * @summary     KeyTable
+ * @description Spreadsheet like keyboard navigation for DataTables
+ * @version     2.12.1
+ * @file        dataTables.keyTable.js
+ * @author      SpryMedia Ltd
+ * @contact     datatables.net
+ * @copyright   Copyright SpryMedia Ltd.
+ *
+ * This source file is free software, available under the following license:
+ *   MIT license - http://datatables.net/license/mit
+ *
+ * This source file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
+ *
+ * For details please refer to: http://www.datatables.net
+ */
+
+var namespaceCounter = 0;
+var editorNamespaceCounter = 0;
+
+var KeyTable = function (dt, opts) {
+	// Sanity check that we are using DataTables 1.10 or newer
+	if (!DataTable.versionCheck || !DataTable.versionCheck('1.10.8')) {
+		throw 'KeyTable requires DataTables 1.10.8 or newer';
+	}
+
+	// User and defaults configuration object
+	this.c = $.extend(true, {}, DataTable.defaults.keyTable, KeyTable.defaults, opts);
+
+	// Internal settings
+	this.s = {
+		/** @type {DataTable.Api} DataTables' API instance */
+		dt: new DataTable.Api(dt),
+
+		/** Indicate when the DataTable is redrawing - take no action on key presses */
+		dtDrawing: false,
+
+		enable: true,
+
+		/** @type {bool} Flag for if a draw is triggered by focus */
+		focusDraw: false,
+
+		/** @type {bool} Flag to indicate when waiting for a draw to happen.
+		 *   Will ignore key presses at this point
+		 */
+		waitingForDraw: false,
+
+		/** @type {object} Information about the last cell that was focused */
+		lastFocus: null,
+
+		/** @type {string} Unique namespace per instance */
+		namespace: '.keyTable-' + namespaceCounter++,
+
+		/** @type {Node} Input element for tabbing into the table */
+		tabInput: null
+	};
+
+	// DOM items
+	this.dom = {};
+
+	// Check if row reorder has already been initialised on this table
+	var settings = this.s.dt.settings()[0];
+	var exisiting = settings.keytable;
+	if (exisiting) {
+		return exisiting;
+	}
+
+	settings.keytable = this;
+	this._constructor();
+};
+
+$.extend(KeyTable.prototype, {
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * API methods for DataTables API interface
+	 */
+
+	/**
+	 * Blur the table's cell focus
+	 */
+	blur: function () {
+		this._blur();
+	},
+
+	/**
+	 * Enable cell focus for the table
+	 *
+	 * @param  {string} state Can be `true`, `false` or `-string navigation-only`
+	 */
+	enable: function (state) {
+		this.s.enable = state;
+	},
+
+	/**
+	 * Get enable status
+	 */
+	enabled: function () {
+		return this.s.enable;
+	},
+
+	/**
+	 * Focus on a cell
+	 * @param  {integer} row    Row index
+	 * @param  {integer} column Column index
+	 */
+	focus: function (row, column) {
+		this._focus(this.s.dt.cell(row, column));
+	},
+
+	/**
+	 * Is the cell focused
+	 * @param  {object} cell Cell index to check
+	 * @returns {boolean} true if focused, false otherwise
+	 */
+	focused: function (cell) {
+		var lastFocus = this.s.lastFocus;
+
+		if (!lastFocus) {
+			return false;
+		}
+
+		var lastIdx = this.s.lastFocus.cell.index();
+		return cell.row === lastIdx.row && cell.column === lastIdx.column;
+	},
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Constructor
+	 */
+
+	/**
+	 * Initialise the KeyTable instance
+	 *
+	 * @private
+	 */
+	_constructor: function () {
+		this._tabInput();
+
+		var that = this;
+		var dt = this.s.dt;
+		var table = $(dt.table().node());
+		var namespace = this.s.namespace;
+		var editorBlock = false;
+
+		// Need to be able to calculate the cell positions relative to the table
+		if (table.css('position') === 'static') {
+			table.css('position', 'relative');
+		}
+
+		// Click to focus
+		$(dt.table().body()).on('click' + namespace, 'th, td', function (e) {
+			if (that.s.enable === false) {
+				return;
+			}
+
+			var cell = dt.cell(this);
+
+			if (!cell.any()) {
+				return;
+			}
+
+			that._focus(cell, null, false, e);
+		});
+
+		// Key events
+		$(document).on('keydown' + namespace, function (e) {
+			if (!editorBlock && !that.s.dtDrawing) {
+				that._key(e);
+			}
+			else {
+				e.preventDefault();
+			}
+		});
+
+		// Click blur
+		if (this.c.blurable) {
+			$(document).on('mousedown' + namespace, function (e) {
+				// Click on the search input will blur focus
+				if ($(e.target).parents('.dataTables_filter, .dt-search').length) {
+					that._blur();
+				}
+
+				// If the click was inside the DataTables container, don't blur
+				if ($(e.target).parents().filter(dt.table().container()).length) {
+					return;
+				}
+
+				// Don't blur in Editor form
+				if ($(e.target).parents('div.DTE').length) {
+					return;
+				}
+
+				// Or an Editor date input
+				if (
+					$(e.target).parents('div.editor-datetime').length ||
+					$(e.target).parents('div.dt-datetime').length
+				) {
+					return;
+				}
+
+				//If the click was inside the fixed columns container, don't blur
+				if ($(e.target).parents().filter('.DTFC_Cloned').length) {
+					return;
+				}
+
+				that._blur();
+			});
+		}
+
+		if (this.c.editor) {
+			var editor = this.c.editor;
+
+			// Need to disable KeyTable when the main editor is shown
+			editor.on('open.keyTableMain', function (e, mode, action) {
+				if (mode !== 'inline' && that.s.enable) {
+					that.enable(false);
+
+					editor.one('close' + namespace, function () {
+						that.enable(true);
+					});
+				}
+			});
+
+			if (this.c.editOnFocus) {
+				dt.on(
+					'key-focus' + namespace + ' key-refocus' + namespace,
+					function (e, dt, cell, orig) {
+						that._editor(null, orig, true);
+					}
+				);
+			}
+
+			// Activate Editor when a key is pressed (will be ignored, if
+			// already active).
+			dt.on('key' + namespace, function (e, dt, key, cell, orig) {
+				that._editor(key, orig, false);
+			});
+
+			// Active editing on double click - it will already have focus from
+			// the click event handler above
+			$(dt.table().body()).on('dblclick' + namespace, 'th, td', function (e) {
+				if (that.s.enable === false) {
+					return;
+				}
+
+				var cell = dt.cell(this);
+
+				if (!cell.any()) {
+					return;
+				}
+
+				if (that.s.lastFocus && this !== that.s.lastFocus.cell.node()) {
+					return;
+				}
+
+				that._editor(null, e, true);
+			});
+
+			// While Editor is busy processing, we don't want to process any key events
+			editor
+				.on('preSubmit', function () {
+					editorBlock = true;
+				})
+				.on('preSubmitCancelled', function () {
+					editorBlock = false;
+				})
+				.on('submitComplete', function () {
+					editorBlock = false;
+				});
+		}
+
+		// Stave saving
+		// if ( dt.settings()[0].oFeatures.bStateSave ) {
+		dt.on('stateSaveParams' + namespace, function (e, s, d) {
+			d.keyTable = that.s.lastFocus ? that.s.lastFocus.cell.index() : null;
+		});
+		// }
+
+		dt.on('column-visibility' + namespace, function (e) {
+			that._tabInput();
+		});
+
+		dt.on('column-reorder' + namespace, function (e, s, d) {
+			// Need to update the last focus cell's index
+			var lastFocus = that.s.lastFocus;
+
+			if (lastFocus && lastFocus.cell) {
+				var curr = lastFocus.relative.column;
+
+				// Manipulate the API instance to correct the column index
+				lastFocus.cell[0][0].column = d.mapping.indexOf(curr);
+				lastFocus.relative.column = d.mapping.indexOf(curr);
+			}
+		});
+
+		// When the table is about to do a draw we need to block key
+		// handling. This is only important for async draws - i.e.
+		// server-side processing.
+		dt.on('preDraw' + namespace + ' scroller-will-draw' + namespace, function (e) {
+			that.s.dtDrawing = true;
+		});
+
+		// Redraw - retain focus on the current cell
+		dt.on('draw' + namespace, function (e) {
+			that.s.dtDrawing = false;
+
+			that._tabInput();
+
+			if (that.s.focusDraw) {
+				return;
+			}
+
+			var lastFocus = that.s.lastFocus;
+
+			if (lastFocus) {
+				var relative = that.s.lastFocus.relative;
+				var info = dt.page.info();
+				var row = relative.row;
+
+				if (info.recordsDisplay === 0) {
+					return;
+				}
+
+				// If the refocus is outside the current draw zone -
+				// don't attempt to refocus onto it
+				if (row < info.start || row > info.start + info.length) {
+					return;
+				}
+
+				// Reverse if needed
+				if (row >= info.recordsDisplay) {
+					row = info.recordsDisplay - 1;
+				}
+
+				that._focus(row, relative.column, true, e);
+			}
+		});
+
+		// Clipboard support
+		if (this.c.clipboard) {
+			this._clipboard();
+		}
+
+		dt.on('destroy' + namespace, function () {
+			that._blur(true);
+
+			// Event tidy up
+			dt.off(namespace);
+
+			$(dt.table().body())
+				.off('click' + namespace, 'th, td')
+				.off('dblclick' + namespace, 'th, td');
+
+			$(document)
+				.off('mousedown' + namespace)
+				.off('keydown' + namespace)
+				.off('copy' + namespace)
+				.off('paste' + namespace);
+		});
+
+		// Initial focus comes from state or options
+		var state = dt.state.loaded();
+
+		if (state && state.keyTable) {
+			// Wait until init is done
+			dt.one('init', function () {
+				var cell = dt.cell(state.keyTable);
+
+				// Ensure that the saved cell still exists
+				if (cell.any()) {
+					cell.focus();
+				}
+			});
+		}
+		else if (this.c.focus) {
+			dt.cell(this.c.focus).focus();
+		}
+	},
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Private methods
+	 */
+
+	/**
+	 * Blur the control
+	 *
+	 * @param {boolean} [noEvents=false] Don't trigger updates / events (for destroying)
+	 * @private
+	 */
+	_blur: function (noEvents) {
+		if (!this.s.enable || !this.s.lastFocus) {
+			return;
+		}
+
+		var cell = this.s.lastFocus.cell;
+
+		$(cell.node()).removeClass(this.c.className);
+		this.s.lastFocus = null;
+
+		if (!noEvents) {
+			this._updateFixedColumns(cell.index().column);
+
+			this._emitEvent('key-blur', [this.s.dt, cell]);
+		}
+	},
+
+	/**
+	 * Clipboard interaction handlers
+	 *
+	 * @private
+	 */
+	_clipboard: function () {
+		var dt = this.s.dt;
+		var that = this;
+		var namespace = this.s.namespace;
+		var opts = this.c.clipboard;
+
+		// IE8 doesn't support getting selected text
+		if (!window.getSelection) {
+			return;
+		}
+
+		if (opts === true || opts.copy) {
+			$(document).on('copy' + namespace, function (ejq) {
+				var e = ejq.originalEvent;
+				var selection = window.getSelection().toString();
+				var focused = that.s.lastFocus;
+
+				// Only copy cell text to clipboard if there is no other selection
+				// and there is a focused cell
+				if (!selection && focused) {
+					e.clipboardData.setData(
+						'text/plain',
+						focused.cell.render(that.c.clipboardOrthogonal)
+					);
+					e.preventDefault();
+				}
+			});
+		}
+
+		if (opts === true || opts.paste) {
+			$(document).on('paste' + namespace, function (ejq) {
+				var e = ejq.originalEvent;
+				var focused = that.s.lastFocus;
+				var activeEl = document.activeElement;
+				var editor = that.c.editor;
+				var pastedText;
+
+				if (focused && (!activeEl || activeEl.nodeName.toLowerCase() === 'body')) {
+					e.preventDefault();
+
+					if (window.clipboardData && window.clipboardData.getData) {
+						// IE
+						pastedText = window.clipboardData.getData('Text');
+					}
+					else if (e.clipboardData && e.clipboardData.getData) {
+						// Everything else
+						pastedText = e.clipboardData.getData('text/plain');
+					}
+
+					if (editor) {
+						// Got Editor - need to activate inline editing,
+						// set the value and submit
+						var options = that._inlineOptions(focused.cell.index());
+
+						editor
+							.inline(options.cell, options.field, options.options)
+							.set(editor.displayed()[0], pastedText)
+							.submit();
+					}
+					else {
+						// No editor, so just dump the data in
+						focused.cell.data(pastedText);
+						dt.draw(false);
+					}
+				}
+			});
+		}
+	},
+
+	/**
+	 * Get an array of the column indexes that KeyTable can operate on. This
+	 * is a merge of the user supplied columns and the visible columns.
+	 *
+	 * @private
+	 */
+	_columns: function () {
+		var dt = this.s.dt;
+		var user = dt.columns(this.c.columns).indexes();
+		var out = [];
+
+		dt.columns(':visible').every(function (i) {
+			if (user.indexOf(i) !== -1) {
+				out.push(i);
+			}
+		});
+
+		return out;
+	},
+
+	/**
+	 * Perform excel like navigation for Editor by triggering an edit on key
+	 * press
+	 *
+	 * @param  {integer} key Key code for the pressed key
+	 * @param  {object} orig Original event
+	 * @private
+	 */
+	_editor: function (key, orig, hardEdit) {
+		// If nothing focused, we can't take any action
+		if (!this.s.lastFocus) {
+			return;
+		}
+
+		// DataTables draw event
+		if (orig && orig.type === 'draw') {
+			return;
+		}
+
+		var that = this;
+		var dt = this.s.dt;
+		var editor = this.c.editor;
+		var editCell = this.s.lastFocus.cell;
+		var namespace = this.s.namespace + 'e' + editorNamespaceCounter++;
+
+		// Do nothing if there is already an inline edit in this cell
+		if ($('div.DTE', editCell.node()).length) {
+			return;
+		}
+
+		// Don't activate Editor on control key presses
+		if (
+			key !== null &&
+			((key >= 0x00 && key <= 0x09) ||
+				key === 0x0b ||
+				key === 0x0c ||
+				(key >= 0x0e && key <= 0x1f) ||
+				(key >= 0x70 && key <= 0x7b) ||
+				(key >= 0x7f && key <= 0x9f))
+		) {
+			return;
+		}
+
+		if (orig) {
+			orig.stopPropagation();
+
+			// Return key should do nothing - for textareas it would empty the
+			// contents
+			if (key === 13) {
+				orig.preventDefault();
+			}
+		}
+
+		var editInline = function () {
+			var options = that._inlineOptions(editCell.index());
+
+			editor
+				.one('open' + namespace, function () {
+					// Remove cancel open
+					editor.off('cancelOpen' + namespace);
+
+					// Excel style - select all text
+					if (!hardEdit) {
+						$(
+							'div.DTE_Field_InputControl input, div.DTE_Field_InputControl textarea'
+						).select();
+					}
+
+					// Reduce the keys the Keys listens for
+					dt.keys.enable(hardEdit ? 'tab-only' : 'navigation-only');
+
+					// On blur of the navigation submit
+					dt.on('key-blur.editor', function (e, dt, cell) {
+						// When Editor has its own blur enabled - do nothing here
+						if (editor.s.editOpts.onBlur === 'submit') {
+							return;
+						}
+
+						if (editor.displayed() && cell.node() === editCell.node()) {
+							editor.submit();
+						}
+					});
+
+					// Highlight the cell a different colour on full edit
+					if (hardEdit) {
+						$(dt.table().container()).addClass('dtk-focus-alt');
+					}
+
+					// If the dev cancels the submit, we need to return focus
+					editor.on('preSubmitCancelled' + namespace, function () {
+						setTimeout(function () {
+							that._focus(editCell, null, false);
+						}, 50);
+					});
+
+					editor.on('submitUnsuccessful' + namespace, function () {
+						that._focus(editCell, null, false);
+					});
+
+					// Restore full key navigation on close
+					editor.one('close' + namespace, function () {
+						dt.keys.enable(true);
+						dt.off('key-blur.editor');
+						editor.off(namespace);
+						$(dt.table().container()).removeClass('dtk-focus-alt');
+
+						if (that.s.returnSubmit) {
+							that.s.returnSubmit = false;
+							that._emitEvent('key-return-submit', [dt, editCell]);
+						}
+					});
+				})
+				.one('cancelOpen' + namespace, function () {
+					// `preOpen` can cancel the display of the form, so it
+					// might be that the open event handler isn't needed
+					editor.off(namespace);
+				})
+				.inline(options.cell, options.field, options.options);
+		};
+
+		// Editor 1.7 listens for `return` on keyup, so if return is the trigger
+		// key, we need to wait for `keyup` otherwise Editor would just submit
+		// the content triggered by this keypress.
+		if (key === 13) {
+			hardEdit = true;
+
+			$(document).one('keyup', function () {
+				// immediately removed
+				editInline();
+			});
+		}
+		else {
+			editInline();
+		}
+	},
+
+	_inlineOptions: function (cellIdx) {
+		if (this.c.editorOptions) {
+			return this.c.editorOptions(cellIdx);
+		}
+
+		return {
+			cell: cellIdx,
+			field: undefined,
+			options: undefined
+		};
+	},
+
+	/**
+	 * Emit an event on the DataTable for listeners
+	 *
+	 * @param  {string} name Event name
+	 * @param  {array} args Event arguments
+	 * @private
+	 */
+	_emitEvent: function (name, args) {
+		return this.s.dt.iterator('table', function (ctx, i) {
+			return $(ctx.nTable).triggerHandler(name, args);
+		});
+	},
+
+	/**
+	 * Focus on a particular cell, shifting the table's paging if required
+	 *
+	 * @param  {DataTables.Api|integer} row Can be given as an API instance that
+	 *   contains the cell to focus or as an integer. As the latter it is the
+	 *   visible row index (from the whole data set) - NOT the data index
+	 * @param  {integer} [column] Not required if a cell is given as the first
+	 *   parameter. Otherwise this is the column data index for the cell to
+	 *   focus on
+	 * @param {boolean} [shift=true] Should the viewport be moved to show cell
+	 * @private
+	 */
+	_focus: function (row, column, shift, originalEvent) {
+		var that = this;
+		var dt = this.s.dt;
+		var pageInfo = dt.page.info();
+		var lastFocus = this.s.lastFocus;
+
+		if (!originalEvent) {
+			originalEvent = null;
+		}
+
+		if (!this.s.enable) {
+			return;
+		}
+
+		if (typeof row !== 'number') {
+			// Its an API instance - check that there is actually a row
+			if (!row.any()) {
+				return;
+			}
+
+			// Convert the cell to a row and column
+			var index = row.index();
+			column = index.column;
+			row = dt.rows({ filter: 'applied', order: 'applied' }).indexes().indexOf(index.row);
+
+			// Don't focus rows that were filtered out.
+			if (row < 0) {
+				return;
+			}
+
+			// For server-side processing normalise the row by adding the start
+			// point, since `rows().indexes()` includes only rows that are
+			// available at the client-side
+			if (pageInfo.serverSide) {
+				row += pageInfo.start;
+			}
+		}
+
+		// Is the row on the current page? If not, we need to redraw to show the
+		// page
+		if (
+			pageInfo.length !== -1 &&
+			(row < pageInfo.start || row >= pageInfo.start + pageInfo.length)
+		) {
+			this.s.focusDraw = true;
+			this.s.waitingForDraw = true;
+
+			dt.one('draw', function () {
+				that.s.focusDraw = false;
+				that.s.waitingForDraw = false;
+				that._focus(row, column, undefined, originalEvent);
+			})
+				.page(Math.floor(row / pageInfo.length))
+				.draw(false);
+
+			return;
+		}
+
+		// In the available columns?
+		if ($.inArray(column, this._columns()) === -1) {
+			return;
+		}
+
+		// De-normalise the server-side processing row, so we select the row
+		// in its displayed position
+		if (pageInfo.serverSide) {
+			row -= pageInfo.start;
+		}
+
+		// Get the cell from the current position - ignoring any cells which might
+		// not have been rendered (therefore can't use `:eq()` selector).
+		var cells = dt.cells(null, column, { search: 'applied', order: 'applied' }).flatten();
+		var cell = dt.cell(cells[row]);
+
+		// Prefocus check - this event allows a focus action to be disallowed.
+		var preFocus = this._emitEvent('key-prefocus', [this.s.dt, cell, originalEvent || null]);
+		if (preFocus.indexOf(false) !== -1) {
+			return;
+		}
+
+		if (lastFocus) {
+			// Don't trigger a refocus on the same cell
+			if (lastFocus.node === cell.node()) {
+				this._emitEvent('key-refocus', [this.s.dt, cell, originalEvent || null]);
+				return;
+			}
+
+			// Otherwise blur the old focus
+			this._blur();
+		}
+
+		// Clear focus from other tables
+		this._removeOtherFocus();
+
+		var node = $(cell.node());
+		node.addClass(this.c.className);
+
+		this._updateFixedColumns(column);
+
+		// Shift viewpoint and page to make cell visible
+		if (shift === undefined || shift === true) {
+			this._scroll($(window), $(document.body), node, 'offset');
+
+			var bodyParent = dt.table().body().parentNode;
+			if (bodyParent !== dt.table().header().parentNode) {
+				var parent = $(bodyParent.parentNode);
+
+				this._scroll(parent, parent, node, 'position');
+			}
+		}
+
+		// Event and finish
+		var info = dt.page.info();
+
+		this.s.lastFocus = {
+			cell: cell,
+			node: cell.node(),
+			relative: {
+				row: info.start + dt.rows({ page: 'current' }).indexes().indexOf(cell.index().row),
+				column: cell.index().column
+			}
+		};
+
+		this._emitEvent('key-focus', [this.s.dt, cell, originalEvent || null]);
+		dt.state.save();
+	},
+
+	/**
+	 * Handle key press
+	 *
+	 * @param  {object} e Event
+	 * @private
+	 */
+	_key: function (e) {
+		// If we are waiting for a draw to happen from another key event, then
+		// do nothing for this new key press.
+		if (this.s.waitingForDraw) {
+			e.preventDefault();
+			return;
+		}
+
+		// Ignore key presses in an Editor inline create row - it is not navigatable
+		// by KeyTable
+		if ($(e.target).closest('.dte-inlineAdd').length) {
+			return;
+		}
+
+		var enable = this.s.enable;
+		this.s.returnSubmit =
+			(enable === 'navigation-only' || enable === 'tab-only') && e.keyCode === 13
+				? true
+				: false;
+
+		var navEnable = enable === true || enable === 'navigation-only';
+		if (!enable) {
+			return;
+		}
+
+		if ((e.keyCode === 0 || e.ctrlKey || e.metaKey || e.altKey) && !(e.ctrlKey && e.altKey)) {
+			return;
+		}
+
+		// If not focused, then there is no key action to take
+		var lastFocus = this.s.lastFocus;
+		if (!lastFocus) {
+			return;
+		}
+
+		// And the last focus still exists!
+		if (!this.s.dt.cell(lastFocus.node).any()) {
+			this.s.lastFocus = null;
+			return;
+		}
+
+		var that = this;
+		var dt = this.s.dt;
+		var scrolling = this.s.dt.settings()[0].oScroll.sY ? true : false;
+
+		// If we are not listening for this key, do nothing
+		if (this.c.keys && $.inArray(e.keyCode, this.c.keys) === -1) {
+			return;
+		}
+
+		switch (e.keyCode) {
+			case 9: // tab
+				// `enable` can be tab-only
+				e.preventDefault();
+
+				this._keyAction(function () {
+					that._shift(e, e.shiftKey ? 'left' : 'right', true);
+				});
+				break;
+
+			case 27: // esc
+				// If there is an inline edit in the cell, let it blur first,
+				// a second escape will then blur keytable
+				if ($(lastFocus.node).find('div.DTE').length) {
+					return;
+				}
+
+				if (this.c.blurable && enable === true) {
+					this._blur();
+				}
+				break;
+
+			case 33: // page up (previous page)
+			case 34: // page down (next page)
+				if (navEnable && !scrolling) {
+					e.preventDefault();
+
+					this._keyAction(function () {
+						dt.page(e.keyCode === 33 ? 'previous' : 'next').draw(false);
+					});
+				}
+				break;
+
+			case 35: // end (end of current page)
+			case 36: // home (start of current page)
+				if (navEnable) {
+					e.preventDefault();
+
+					this._keyAction(function () {
+						var indexes = dt.cells({ page: 'current' }).indexes();
+						var colIndexes = that._columns();
+
+						that._focus(
+							dt.cell(indexes[e.keyCode === 35 ? indexes.length - 1 : colIndexes[0]]),
+							null,
+							true,
+							e
+						);
+					});
+				}
+				break;
+
+			case 37: // left arrow
+				if (navEnable) {
+					this._keyAction(function () {
+						that._shift(e, 'left');
+					});
+				}
+				break;
+
+			case 38: // up arrow
+				if (navEnable) {
+					this._keyAction(function () {
+						that._shift(e, 'up');
+					});
+				}
+				break;
+
+			case 39: // right arrow
+				if (navEnable) {
+					this._keyAction(function () {
+						that._shift(e, 'right');
+					});
+				}
+				break;
+
+			case 40: // down arrow
+				if (navEnable) {
+					this._keyAction(function () {
+						that._shift(e, 'down');
+					});
+				}
+				break;
+
+			case 113: // F2 - Excel like hard edit
+				if (this.c.editor) {
+					this._editor(null, e, true);
+					break;
+				}
+			// else fallthrough
+
+			default:
+				// Everything else - pass through only when fully enabled
+				if (enable === true) {
+					this._emitEvent('key', [dt, e.keyCode, this.s.lastFocus.cell, e]);
+				}
+				break;
+		}
+	},
+
+	/**
+	 * Whether we perform a key shift action immediately or not depends
+	 * upon if Editor is being used. If it is, then we wait until it
+	 * completes its action
+	 * @param {*} action Function to trigger when ready
+	 */
+	_keyAction: function (action) {
+		var editor = this.c.editor;
+
+		if (editor && editor.mode() && editor.display()) {
+			editor.submit(action);
+		}
+		else {
+			action();
+		}
+	},
+
+	/**
+	 * Remove focus from all tables other than this one
+	 */
+	_removeOtherFocus: function () {
+		var thisTable = this.s.dt.table().node();
+
+		$.fn.dataTable.tables({ api: true }).iterator('table', function (settings) {
+			if (this.table().node() !== thisTable) {
+				this.cell.blur();
+			}
+		});
+	},
+
+	/**
+	 * Scroll a container to make a cell visible in it. This can be used for
+	 * both DataTables scrolling and native window scrolling.
+	 *
+	 * @param  {jQuery} container Scrolling container
+	 * @param  {jQuery} scroller  Item being scrolled
+	 * @param  {jQuery} cell      Cell in the scroller
+	 * @param  {string} posOff    `position` or `offset` - which to use for the
+	 *   calculation. `offset` for the document, otherwise `position`
+	 * @private
+	 */
+	_scroll: function (container, scroller, cell, posOff) {
+		var offset = cell[posOff]();
+		var height = cell.outerHeight();
+		var width = cell.outerWidth();
+
+		var scrollTop = scroller.scrollTop();
+		var scrollLeft = scroller.scrollLeft();
+		var containerHeight = container.height();
+		var containerWidth = container.width();
+
+		// If Scroller is being used, the table can be `position: absolute` and that
+		// needs to be taken account of in the offset. If no Scroller, this will be 0
+		if (posOff === 'position') {
+			offset.top += parseInt(cell.closest('table').css('top'), 10);
+		}
+
+		// Top correction (partially in view)
+		if (offset.top < scrollTop && offset.top + height > scrollTop - 5) {
+			scroller.scrollTop(offset.top);
+		}
+
+		// Left correction
+		if (offset.left < scrollLeft) {
+			scroller.scrollLeft(offset.left);
+		}
+
+		// Bottom correction plus in view correction. Note that the magic 5 is to allow
+		// for the edge just passing the bottom of the view
+		if (
+			offset.top + height > scrollTop + containerHeight &&
+			offset.top < scrollTop + containerHeight + 5 &&
+			height < containerHeight
+		) {
+			scroller.scrollTop(offset.top + height - containerHeight);
+		}
+
+		// Right correction
+		if (offset.left + width > scrollLeft + containerWidth && width < containerWidth) {
+			scroller.scrollLeft(offset.left + width - containerWidth);
+		}
+	},
+
+	/**
+	 * Calculate a single offset movement in the table - up, down, left and
+	 * right and then perform the focus if possible
+	 *
+	 * @param  {object}  e           Event object
+	 * @param  {string}  direction   Movement direction
+	 * @param  {boolean} keyBlurable `true` if the key press can result in the
+	 *   table being blurred. This is so arrow keys won't blur the table, but
+	 *   tab will.
+	 * @private
+	 */
+	_shift: function (e, direction, keyBlurable) {
+		var dt = this.s.dt;
+		var pageInfo = dt.page.info();
+		var rows = pageInfo.recordsDisplay;
+		var columns = this._columns();
+		var last = this.s.lastFocus;
+		if (!last) {
+			return;
+		}
+
+		var currentCell = last.cell;
+		if (!currentCell) {
+			return;
+		}
+
+		var currRow = dt
+			.rows({ filter: 'applied', order: 'applied' })
+			.indexes()
+			.indexOf(currentCell.index().row);
+
+		// When server-side processing, `rows().indexes()` only gives the rows
+		// that are available at the client-side, so we need to normalise the
+		// row's current position by the display start point
+		if (pageInfo.serverSide) {
+			currRow += pageInfo.start;
+		}
+
+		var currCol = dt.columns(columns).indexes().indexOf(currentCell.index().column);
+
+		var row = currRow,
+			column = columns[currCol]; // row is the display, column is an index
+
+		// If the direction is rtl then the logic needs to be inverted from this point forwards
+		if ($(dt.table().node()).css('direction') === 'rtl') {
+			if (direction === 'right') {
+				direction = 'left';
+			}
+			else if (direction === 'left') {
+				direction = 'right';
+			}
+		}
+
+		if (direction === 'right') {
+			if (currCol >= columns.length - 1) {
+				row++;
+				column = columns[0];
+			}
+			else {
+				column = columns[currCol + 1];
+			}
+		}
+		else if (direction === 'left') {
+			if (currCol === 0) {
+				row--;
+				column = columns[columns.length - 1];
+			}
+			else {
+				column = columns[currCol - 1];
+			}
+		}
+		else if (direction === 'up') {
+			row--;
+		}
+		else if (direction === 'down') {
+			row++;
+		}
+
+		if (row >= 0 && row < rows && $.inArray(column, columns) !== -1) {
+			if (e) {
+				e.preventDefault();
+			}
+
+			this._focus(row, column, true, e);
+		}
+		else if (!keyBlurable || !this.c.blurable) {
+			// No new focus, but if the table isn't blurable, then don't loose
+			// focus
+			if (e) {
+				e.preventDefault();
+			}
+		}
+		else {
+			this._blur();
+		}
+	},
+
+	/**
+	 * Create and insert a hidden input element that can receive focus on behalf
+	 * of the table
+	 *
+	 * @private
+	 */
+	_tabInput: function () {
+		var that = this;
+		var dt = this.s.dt;
+		var tabIndex = this.c.tabIndex !== null ? this.c.tabIndex : dt.settings()[0].iTabIndex;
+
+		if (tabIndex == -1) {
+			return;
+		}
+
+		// Only create the input element once on first class
+		if (!this.s.tabInput) {
+			var div = $('<div><input type="text" tabindex="' + tabIndex + '"/></div>').css({
+				position: 'absolute',
+				height: 1,
+				width: 0,
+				overflow: 'hidden'
+			});
+
+			div.children().on('focus', function (e) {
+				var cell = dt.cell(':eq(0)', that._columns(), { page: 'current' });
+
+				if (cell.any()) {
+					that._focus(cell, null, true, e);
+				}
+			});
+
+			this.s.tabInput = div;
+		}
+
+		// Insert the input element into the first cell in the table's body
+		var cell = this.s.dt
+			.cell(':eq(0)', '0:visible', { page: 'current', order: 'current' })
+			.node();
+		if (cell) {
+			$(cell).prepend(this.s.tabInput);
+		}
+	},
+
+	/**
+	 * Update fixed columns if they are enabled and if the cell we are
+	 * focusing is inside a fixed column
+	 * @param  {integer} column Index of the column being changed
+	 * @private
+	 */
+	_updateFixedColumns: function (column) {
+		var dt = this.s.dt;
+		var settings = dt.settings()[0];
+
+		if (settings._oFixedColumns) {
+			var leftCols = settings._oFixedColumns.s.iLeftColumns;
+			var rightCols = settings.aoColumns.length - settings._oFixedColumns.s.iRightColumns;
+
+			if (column < leftCols || column >= rightCols) {
+				dt.fixedColumns().update();
+			}
+		}
+	}
+});
+
+/**
+ * KeyTable default settings for initialisation
+ *
+ * @namespace
+ * @name KeyTable.defaults
+ * @static
+ */
+KeyTable.defaults = {
+	/**
+	 * Can focus be removed from the table
+	 * @type {Boolean}
+	 */
+	blurable: true,
+
+	/**
+	 * Class to give to the focused cell
+	 * @type {String}
+	 */
+	className: 'focus',
+
+	/**
+	 * Enable or disable clipboard support
+	 * @type {Boolean}
+	 */
+	clipboard: true,
+
+	/**
+	 * Orthogonal data that should be copied to clipboard
+	 * @type {string}
+	 */
+	clipboardOrthogonal: 'display',
+
+	/**
+	 * Columns that can be focused. This is automatically merged with the
+	 * visible columns as only visible columns can gain focus.
+	 * @type {String}
+	 */
+	columns: '', // all
+
+	/**
+	 * Editor instance to automatically perform Excel like navigation
+	 * @type {Editor}
+	 */
+	editor: null,
+
+	/**
+	 * Trigger editing immediately on focus
+	 * @type {boolean}
+	 */
+	editOnFocus: false,
+
+	/**
+	 * Options to pass to Editor's inline method
+	 * @type {function}
+	 */
+	editorOptions: null,
+
+	/**
+	 * Select a cell to automatically select on start up. `null` for no
+	 * automatic selection
+	 * @type {cell-selector}
+	 */
+	focus: null,
+
+	/**
+	 * Array of keys to listen for
+	 * @type {null|array}
+	 */
+	keys: null,
+
+	/**
+	 * Tab index for where the table should sit in the document's tab flow
+	 * @type {integer|null}
+	 */
+	tabIndex: null
+};
+
+KeyTable.version = '2.12.1';
+
+$.fn.dataTable.KeyTable = KeyTable;
+$.fn.DataTable.KeyTable = KeyTable;
+
+DataTable.Api.register('cell.blur()', function () {
+	return this.iterator('table', function (ctx) {
+		if (ctx.keytable) {
+			ctx.keytable.blur();
+		}
+	});
+});
+
+DataTable.Api.register('cell().focus()', function () {
+	return this.iterator('cell', function (ctx, row, column) {
+		if (ctx.keytable) {
+			ctx.keytable.focus(row, column);
+		}
+	});
+});
+
+DataTable.Api.register('keys.disable()', function () {
+	return this.iterator('table', function (ctx) {
+		if (ctx.keytable) {
+			ctx.keytable.enable(false);
+		}
+	});
+});
+
+DataTable.Api.register('keys.enable()', function (opts) {
+	return this.iterator('table', function (ctx) {
+		if (ctx.keytable) {
+			ctx.keytable.enable(opts === undefined ? true : opts);
+		}
+	});
+});
+
+DataTable.Api.register('keys.enabled()', function (opts) {
+	var ctx = this.context;
+
+	if (ctx.length) {
+		return ctx[0].keytable ? ctx[0].keytable.enabled() : false;
+	}
+
+	return false;
+});
+
+DataTable.Api.register('keys.move()', function (dir) {
+	return this.iterator('table', function (ctx) {
+		if (ctx.keytable) {
+			ctx.keytable._shift(null, dir, false);
+		}
+	});
+});
+
+// Cell selector
+DataTable.ext.selector.cell.push(function (settings, opts, cells) {
+	var focused = opts.focused;
+	var kt = settings.keytable;
+	var out = [];
+
+	if (!kt || focused === undefined) {
+		return cells;
+	}
+
+	for (var i = 0, ien = cells.length; i < ien; i++) {
+		if (
+			(focused === true && kt.focused(cells[i])) ||
+			(focused === false && !kt.focused(cells[i]))
+		) {
+			out.push(cells[i]);
+		}
+	}
+
+	return out;
+});
+
+// Attach a listener to the document which listens for DataTables initialisation
+// events so we can automatically initialise
+$(document).on('preInit.dt.dtk', function (e, settings, json) {
+	if (e.namespace !== 'dt') {
+		return;
+	}
+
+	var init = settings.oInit.keys;
+	var defaults = DataTable.defaults.keys;
+
+	if (init || defaults) {
+		var opts = $.extend({}, defaults, init);
+
+		if (init !== false) {
+			new KeyTable(settings, opts);
+		}
+	}
+});
+
+
+export default DataTable;
