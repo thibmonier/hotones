@@ -390,9 +390,8 @@ readonly class DashboardReadService
     {
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select(
-            'dc.contributorId',
-            'dc.firstName',
-            'dc.lastName',
+            'dc.id',
+            'dc.name',
             'SUM(f.totalRevenue) as totalRevenue',
             'SUM(f.grossMargin) as totalMargin',
             'SUM(f.totalWorkedDays) as totalDays',
@@ -401,10 +400,10 @@ readonly class DashboardReadService
             ->join('f.dimTime', 'dt')
             ->leftJoin('f.dimProjectManager', 'dc')
             ->where('dt.date BETWEEN :start AND :end')
-            ->andWhere('dc.contributorId IS NOT NULL')
+            ->andWhere('dc.id IS NOT NULL')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->groupBy('dc.contributorId', 'dc.firstName', 'dc.lastName')
+            ->groupBy('dc.id', 'dc.name')
             ->orderBy('totalRevenue', 'DESC')
             ->setMaxResults($limit);
 
@@ -412,11 +411,16 @@ readonly class DashboardReadService
 
         $results = $qb->getQuery()->getResult();
 
+        // Gérer le cas où getResult() retourne null
+        if (!is_array($results)) {
+            return [];
+        }
+
         // Formater pour le template
         return array_map(function ($row) {
             return [
-                'id'      => $row['contributorId'],
-                'name'    => trim("{$row['firstName']} {$row['lastName']}"),
+                'id'      => $row['id'],
+                'name'    => $row['name'],
                 'revenue' => (float) $row['totalRevenue'],
                 'margin'  => (float) $row['totalMargin'],
                 'days'    => (float) $row['totalDays'],
