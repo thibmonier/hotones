@@ -392,6 +392,7 @@ readonly class MetricsCalculationService
                 ->setDimProjectDirector($dimProjectDirector)
                 ->setGranularity($granularity);
             $this->entityManager->persist($metrics);
+            $this->entityManager->flush(); // Flush immédiatement pour éviter les doublons
         }
 
         return $metrics;
