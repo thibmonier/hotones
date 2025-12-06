@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\RunningTimerRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: RunningTimerRepository::class)]
 #[ORM\Table(name: 'running_timers')]

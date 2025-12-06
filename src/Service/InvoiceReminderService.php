@@ -131,9 +131,16 @@ class InvoiceReminderService
             default => 'final',
         };
 
+        // Récupérer l'email du premier contact actif du client
+        $contacts = $client->getContacts()->filter(fn ($contact) => $contact->getEmail() !== null);
+        if ($contacts->isEmpty()) {
+            return; // Pas de contact avec email, impossible d'envoyer la relance
+        }
+        $primaryContact = $contacts->first();
+
         $email = (new TemplatedEmail())
             ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($client->getEmail())
+            ->to($primaryContact->getEmail())
             ->subject(sprintf('Relance facture %s - %s', $invoice->getInvoiceNumber(), $client->getName()))
             ->htmlTemplate('emails/invoice_reminder.html.twig')
             ->context([

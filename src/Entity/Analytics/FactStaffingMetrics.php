@@ -12,7 +12,7 @@ use App\Repository\StaffingMetricsRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Table de faits pour les métriques de staffing
