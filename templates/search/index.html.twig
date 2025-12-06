@@ -1,8 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}Recherche : {{ query }}{% endblock %}
 
-{% block body %}
+{% block content %}
 {% include 'components/page_header.html.twig' with {
     title: 'Résultats de recherche',
     breadcrumb: [
@@ -108,4 +108,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}
