@@ -1,1 +1,78 @@
-module.exports=function(s){var t='// <%= pkg.name %> version <%= pkg.version %>\n// <%= pkg.repository.url %>\n// (<%= pkg.license %>) <%= grunt.template.today("dd-mm-yyyy") %>\n// <%= pkg.author %>\n';s.initConfig({pkg:s.file.readJSON("package.json"),preprocess:{options:{context:{DEBUG:!0}},test:{src:"test/index.pre.html",dest:"test/index.html"},index:{src:"index.pre.html",dest:"index.html"}},concat:{options:{separator:"\n",banner:t},dist:{src:["src/intro.js","src/lib.js","src/jquery.input.js","src/repeater.js","src/outro.js"],dest:"<%= pkg.name %>.js"}},uglify:{options:{banner:t},dist:{files:{"<%= pkg.name %>.min.js":["<%= concat.dist.dest %>"]}}},qunit:{options:{"--web-security":!1,"--local-to-remote-url-access":!0},all:["test/index.html"]},watch:{scripts:{files:["**/*"],tasks:["preprocess","concat","uglify","qunit"],options:{spawn:!0}}}}),s.loadNpmTasks("grunt-preprocess"),s.loadNpmTasks("grunt-contrib-concat"),s.loadNpmTasks("grunt-contrib-uglify"),s.loadNpmTasks("grunt-contrib-watch"),s.loadNpmTasks("grunt-contrib-qunit"),s.registerTask("default",["preprocess","concat","uglify","qunit"]),s.registerTask("test",["preprocess","concat","uglify","qunit"])};
+module.exports = function (grunt) {
+    var bannerTemplate = '' +
+        '// <%= pkg.name %> version <%= pkg.version %>\n' +
+        '// <%= pkg.repository.url %>\n' +
+        '// (<%= pkg.license %>) <%= grunt.template.today("dd-mm-yyyy") %>\n' +
+        '// <%= pkg.author %>\n';
+
+    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
+
+        preprocess : {
+            options: {
+                context : {
+                    DEBUG: true
+                }
+            },
+            test : {
+                src : 'test/index.pre.html',
+                dest : 'test/index.html'
+            },
+            index: {
+                src: 'index.pre.html',
+                dest: 'index.html'
+            }
+        },
+
+        concat: {
+            options: {
+                separator: '\n',
+                banner: bannerTemplate
+            },
+            dist: {
+                src: [
+                    'src/intro.js',
+                    'src/lib.js',
+                    'src/jquery.input.js',
+                    'src/repeater.js',
+                    'src/outro.js'
+                ],
+                dest: '<%= pkg.name %>.js'
+            }
+        },
+
+        uglify: {
+            options: { banner: bannerTemplate },
+            dist: {
+                files: { '<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>'] }
+            }
+        },
+
+        qunit: {
+            // http://stackoverflow.com/questions/22409002/qunitphantomjs-ajax-success-handler-not-called-in-grunt-using-qunit-with-phant
+            options : {
+                '--web-security': false,
+                '--local-to-remote-url-access': true
+            },
+            all: ['test/index.html']
+        },
+
+        watch: {
+            scripts: {
+                files: ['**/*'],
+                tasks: ['preprocess', 'concat', 'uglify', 'qunit'],
+                options: { spawn: true }
+            }
+        }
+
+    });
+
+    grunt.loadNpmTasks('grunt-preprocess');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-qunit');
+
+    grunt.registerTask('default', ['preprocess', 'concat', 'uglify', 'qunit']);
+    grunt.registerTask('test', ['preprocess', 'concat', 'uglify', 'qunit']);
+};
