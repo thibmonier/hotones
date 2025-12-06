@@ -256,6 +256,7 @@
       <path value="$PROJECT_DIR$/vendor/knplabs/knp-components" />
       <path value="$PROJECT_DIR$/vendor/knplabs/knp-paginator-bundle" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php85" />
+      <path value="$PROJECT_DIR$/vendor/symfony/rate-limiter" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
