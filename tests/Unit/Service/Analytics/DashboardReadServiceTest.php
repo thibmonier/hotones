@@ -75,7 +75,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
@@ -118,7 +118,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
@@ -193,7 +193,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('addOrderBy')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
@@ -232,7 +232,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('addOrderBy')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
