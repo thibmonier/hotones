@@ -83,6 +83,11 @@ Encore
    * FEATURE CONFIG
    */
   .cleanupOutputBeforeBuild()
-  .enableBuildNotifications();
+  .enableBuildNotifications()
+
+  // Configure Stimulus controllers.json alias
+  .addAliases({
+    '@symfony/stimulus-bridge/controllers.json': require('path').resolve(__dirname, 'assets/controllers.json')
+  });
 
 module.exports = Encore.getWebpackConfig();
