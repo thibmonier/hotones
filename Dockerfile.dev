@@ -25,6 +25,8 @@ RUN apk add --no-cache \
   && docker-php-ext-enable apcu \
   && pecl install redis \
   && docker-php-ext-enable redis \
+  && pecl install pcov \
+  && docker-php-ext-enable pcov \
   && docker-php-ext-install \
     pdo \
     pdo_mysql \
