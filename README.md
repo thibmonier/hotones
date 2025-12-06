@@ -19,7 +19,7 @@
 
 ### Stack
 [![PHP Version](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
-[![Symfony Version](https://img.shields.io/badge/Symfony-7.4-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
+[![Symfony Version](https://img.shields.io/badge/Symfony-8.0-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-11.4-003545?style=flat&logo=mariadb&logoColor=white)](https://mariadb.org/)
 
 Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en croisant ventes (jours/TJM), temps passés, coûts (CJM), achats et KPIs consolidés.
