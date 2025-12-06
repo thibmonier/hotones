@@ -965,6 +965,11 @@
   resolved "https://registry.npmjs.org/@hotwired/stimulus/-/stimulus-3.2.1.tgz"
   integrity sha512-HGlzDcf9vv/EQrMJ5ZG6VWNs8Z/xMN+1o2OhV1gKiSG6CqZt5MCBB1gRg5ILiN3U0jEAxuDTNPRfBcnZBDmupQ==
 
+"@hotwired/turbo@^8.0.20":
+  version "8.0.20"
+  resolved "https://registry.yarnpkg.com/@hotwired/turbo/-/turbo-8.0.20.tgz#068ede648c4db09fed4cf0ac0266788056673f2f"
+  integrity sha512-IilkH/+h92BRLeY/rMMR3MUh1gshIfdra/qZzp/Bl5FmiALD/6sQZK/ecxSbumeyOYiWr/JRI+Au1YQmkJGnoA==
+
 "@jest/schemas@^29.6.0":
   version "29.6.0"
   resolved "https://registry.npmjs.org/@jest/schemas/-/schemas-29.6.0.tgz"
@@ -1153,6 +1158,16 @@
     acorn "^8.0.5"
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
+
+"@symfony/ux-live-component@^2.31.0":
+  version "2.31.0"
+  resolved "https://registry.yarnpkg.com/@symfony/ux-live-component/-/ux-live-component-2.31.0.tgz#35f4cdfe4ffbf9fcbf84e22b7b1d3cd19e6dbb2f"
+  integrity sha512-bBrnVoyKpHZpXZFRTRxz+PaY6wKM0bTF0sM2IrtmE9oHn3xaahV6G7hBq5R12/8IGKzZx1ct4S4qO7Ar+80UYA==
+
+"@symfony/ux-turbo@^2.31.0":
+  version "2.31.0"
+  resolved "https://registry.yarnpkg.com/@symfony/ux-turbo/-/ux-turbo-2.31.0.tgz#b9f053bdf47734731278984971a8c3997d030dd8"
+  integrity sha512-Nr08xK8CSObJ9ZVELv4Gehe1PkIjC6tr4UTcPQZ2Lvx+wsOc1LRiHA5nWqBZi+puVf5UaJI78wi8LqgwYQ7Zdg==
 
 "@symfony/webpack-encore@^4.0.0":
   version "4.4.0"
