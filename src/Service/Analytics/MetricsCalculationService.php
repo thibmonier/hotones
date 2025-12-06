@@ -432,7 +432,7 @@ readonly class MetricsCalculationService
                 SELECT t.id FROM App\Entity\Analytics\DimTime t
                 WHERE t.year = :year
             )
-        ')->setParameter('year', $year)->execute();
+        ')->setParameter('year', $year)->getResult();
 
         // Recalculer mois par mois
         for ($month = 1; $month <= 12; ++$month) {
