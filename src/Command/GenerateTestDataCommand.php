@@ -236,11 +236,11 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             ->setPendingOrderCount(rand(0, 3))
             ->setWonOrderCount(rand(1, 5))
             ->setContributorCount(rand(2, 8))
-            ->setTotalRevenue(number_format($baseRevenue, 2, '.', ''))
-            ->setTotalCosts(number_format($baseCosts, 2, '.', ''))
-            ->setPendingRevenue(number_format(rand(5000, 25000), 2, '.', ''))
-            ->setTotalSoldDays(number_format(rand(20, 100), 2, '.', ''))
-            ->setTotalWorkedDays(number_format(rand(15, 95), 2, '.', ''));
+            ->setTotalRevenue(number_format((float) $baseRevenue, 2, '.', ''))
+            ->setTotalCosts(number_format((float) $baseCosts, 2, '.', ''))
+            ->setPendingRevenue(number_format((float) rand(5000, 25000), 2, '.', ''))
+            ->setTotalSoldDays(number_format((float) rand(20, 100), 2, '.', ''))
+            ->setTotalWorkedDays(number_format((float) rand(15, 95), 2, '.', ''));
 
         // Calcul automatique des marges
         $metric->calculateMargins();
@@ -279,7 +279,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             ->setParameter('granularity', 'monthly')
             ->getSingleScalarResult();
 
-        $io->writeln('💰 CA total généré : '.number_format($totalRevenue, 0, ',', ' ').'€');
+        $io->writeln('💰 CA total généré : '.number_format((float) $totalRevenue, 0, ',', ' ').'€');
 
         // Nombre de projets
         $totalProjects = $this->entityManager->createQuery('
