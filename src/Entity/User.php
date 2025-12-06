@@ -107,6 +107,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $updatedAt = null;
 
+    // Login tracking
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $lastLoginAt = null;
+
+    #[ORM\Column(type: 'string', length: 45, nullable: true)]
+    private ?string $lastLoginIp = null;
+
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable();
@@ -356,5 +363,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     public function getFullName(): string
     {
         return $this->firstName.' '.$this->lastName;
+    }
+
+    public function getLastLoginAt(): ?DateTimeImmutable
+    {
+        return $this->lastLoginAt;
+    }
+
+    public function setLastLoginAt(?DateTimeImmutable $lastLoginAt): self
+    {
+        $this->lastLoginAt = $lastLoginAt;
+
+        return $this;
+    }
+
+    public function getLastLoginIp(): ?string
+    {
+        return $this->lastLoginIp;
+    }
+
+    public function setLastLoginIp(?string $lastLoginIp): self
+    {
+        $this->lastLoginIp = $lastLoginIp;
+
+        return $this;
     }
 }

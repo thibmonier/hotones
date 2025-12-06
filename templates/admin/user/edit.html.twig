@@ -19,6 +19,20 @@
     <div class="card">
       <div class="card-body">
         <h5 class="mb-3">{{ user.firstName }} {{ user.lastName }} <small class="text-muted">({{ user.email }})</small></h5>
+
+        {% if user.lastLoginAt %}
+        <div class="alert alert-info mb-3">
+          <strong><i class="bx bx-time-five me-1"></i> Dernière connexion:</strong><br>
+          {{ user.lastLoginAt|date('d/m/Y à H:i:s') }}
+          {% if user.lastLoginIp %}
+            <br><small class="text-muted">IP: {{ user.lastLoginIp }}</small>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="alert alert-secondary mb-3">
+          <i class="bx bx-info-circle me-1"></i> Aucune connexion enregistrée
+        </div>
+        {% endif %}
         <form method="post" enctype="multipart/form-data">
           <div class="row">
             <div class="col-md-6">

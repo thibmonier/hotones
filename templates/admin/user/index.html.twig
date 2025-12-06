@@ -25,6 +25,7 @@
             <th>Nom</th>
             <th>Contributeur</th>
             <th>Rôles</th>
+            <th>Dernière connexion</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
@@ -45,6 +46,15 @@
               {% for r in u.roles %}
                 <span class="badge bg-primary me-1">{{ r }}</span>
               {% endfor %}
+            </td>
+            <td>
+              {% if u.lastLoginAt %}
+                <span data-bs-toggle="tooltip" title="IP: {{ u.lastLoginIp ?? 'N/A' }}">
+                  {{ u.lastLoginAt|date('d/m/Y H:i') }}
+                </span>
+              {% else %}
+                <span class="text-muted">Jamais</span>
+              {% endif %}
             </td>
             <td class="text-end">
               <a href="{{ path('admin_users_edit', {id: u.id}) }}" class="btn btn-sm btn-outline-primary"><i class="bx bx-edit"></i> Modifier</a>
