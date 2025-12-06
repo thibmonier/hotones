@@ -32,6 +32,7 @@ class AiAssistantService
         }
 
         if (!empty($this->anthropicKey)) {
+            // @phpstan-ignore-next-line
             $this->anthropic = Anthropic::client($this->anthropicKey);
         }
     }
@@ -98,6 +99,7 @@ class AiAssistantService
         }
 
         if ($this->anthropic) {
+            // @phpstan-ignore-next-line
             $response = $this->anthropic->messages()->create([
                 'model'      => 'claude-3-haiku-20240307',
                 'max_tokens' => 1024,

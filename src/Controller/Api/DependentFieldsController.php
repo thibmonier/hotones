@@ -30,7 +30,7 @@ class DependentFieldsController extends AbstractController
         ProjectRepository $projectRepository
     ): JsonResponse {
         $projects = $projectRepository->findBy(
-            ['client' => $id, 'active' => true],
+            ['client' => $id, 'status' => 'active'],
             ['name' => 'ASC'],
         );
 

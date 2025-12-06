@@ -118,15 +118,15 @@ class ValidationController extends AbstractController
             ]);
         }
 
-        // Check uniqueness
-        $client = $this->clientRepository->findOneBy(['siret' => $siret]);
-
-        if ($client && $client->getId() !== $excludeId) {
-            return new JsonResponse([
-                'valid'   => false,
-                'message' => 'Ce SIRET est déjà enregistré',
-            ]);
-        }
+        // Check uniqueness - Disabled: Client entity doesn't have siret field
+        // TODO: Add siret field to Client entity or remove this validation
+        // $client = $this->clientRepository->findOneBy(['siret' => $siret]);
+        // if ($client && $client->getId() !== $excludeId) {
+        //     return new JsonResponse([
+        //         'valid'   => false,
+        //         'message' => 'Ce SIRET est déjà enregistré',
+        //     ]);
+        // }
 
         return new JsonResponse([
             'valid'   => true,
