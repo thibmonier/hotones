@@ -26,7 +26,7 @@ class ProjectController extends AbstractController
 
         $session = $request->getSession();
         $reset   = (bool) $request->query->get('reset', false);
-        if ($reset && $session) {
+        if ($reset) {
             $session->remove('project_filters');
 
             return $this->redirectToRoute('project_index');
@@ -36,7 +36,7 @@ class ProjectController extends AbstractController
         $queryAll   = $request->query->all();
         $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'per_page', 'sort', 'dir', 'search'];
         $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved      = ($session && $session->has('project_filters')) ? (array) $session->get('project_filters') : [];
+        $saved      = $session->has('project_filters') ? (array) $session->get('project_filters') : [];
 
         // Filtres période: année courante par défaut
         $yearParam  = $hasFilter ? ($request->query->get('year') ?? null) : ($saved['year'] ?? null);
@@ -130,20 +130,18 @@ class ProjectController extends AbstractController
         ];
 
         // Sauvegarder les filtres en session
-        if ($session) {
-            $session->set('project_filters', [
-                'year'         => $year,
-                'start_date'   => $startDate->format('Y-m-d'),
-                'end_date'     => $endDate->format('Y-m-d'),
-                'project_type' => $filterProjectType,
-                'status'       => $filterStatus,
-                'technology'   => $filterTechnology,
-                'search'       => $filterSearch,
-                'per_page'     => $perPage,
-                'sort'         => $sort,
-                'dir'          => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
-            ]);
-        }
+        $session->set('project_filters', [
+            'year'         => $year,
+            'start_date'   => $startDate->format('Y-m-d'),
+            'end_date'     => $endDate->format('Y-m-d'),
+            'project_type' => $filterProjectType,
+            'status'       => $filterStatus,
+            'technology'   => $filterTechnology,
+            'search'       => $filterSearch,
+            'per_page'     => $perPage,
+            'sort'         => $sort,
+            'dir'          => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
+        ]);
 
         return $this->render('project/index.html.twig', [
             'projects_with_metrics' => $projectsWithMetrics,
@@ -388,7 +386,7 @@ class ProjectController extends AbstractController
     {
         $projectRepo = $em->getRepository(Project::class);
         $session     = $request->getSession();
-        $saved       = ($session && $session->has('project_filters')) ? (array) $session->get('project_filters') : [];
+        $saved       = $session->has('project_filters') ? (array) $session->get('project_filters') : [];
 
         // Lire filtres depuis requête ou session
         $year       = (int) $request->query->get('year', $saved['year'] ?? date('Y'));

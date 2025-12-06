@@ -27,7 +27,7 @@ class InvoiceController extends AbstractController
         $session = $request->getSession();
         $reset   = (bool) $request->query->get('reset', false);
 
-        if ($reset && $session) {
+        if ($reset) {
             $session->remove('invoice_filters');
 
             return $this->redirectToRoute('invoice_index');
@@ -36,7 +36,7 @@ class InvoiceController extends AbstractController
         $queryAll   = $request->query->all();
         $filterKeys = ['client', 'project', 'status', 'start_date', 'end_date'];
         $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved      = ($session && $session->has('invoice_filters')) ? (array) $session->get('invoice_filters') : [];
+        $saved      = $session->has('invoice_filters') ? (array) $session->get('invoice_filters') : [];
 
         $clientId  = $hasFilter ? ($request->query->get('client') ?? null) : ($saved['client'] ?? null);
         $projectId = $hasFilter ? ($request->query->get('project') ?? null) : ($saved['project'] ?? null);
@@ -135,18 +135,16 @@ class InvoiceController extends AbstractController
         ];
 
         // Sauvegarder les filtres
-        if ($session) {
-            $session->set('invoice_filters', [
-                'client'     => $clientId,
-                'project'    => $projectId,
-                'status'     => $status,
-                'start_date' => $startDate,
-                'end_date'   => $endDate,
-                'sort'       => $sort,
-                'dir'        => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
-                'per_page'   => $perPage,
-            ]);
-        }
+        $session->set('invoice_filters', [
+            'client'     => $clientId,
+            'project'    => $projectId,
+            'status'     => $status,
+            'start_date' => $startDate,
+            'end_date'   => $endDate,
+            'sort'       => $sort,
+            'dir'        => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+            'per_page'   => $perPage,
+        ]);
 
         return $this->render('invoice/index.html.twig', [
             'invoices'        => $invoices,

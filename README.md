@@ -1,6 +1,26 @@
 # HotOnes
 
-[![WARP Index](https://img.shields.io/badge/WARP-Index-0A84FF?style=for-the-badge)](WARP.md) [![Agents Guide](https://img.shields.io/badge/Agents-Guide-2EA043?style=for-the-badge)](AGENTS.md) [![CI](https://github.com/thibmonier/hotones/actions/workflows/ci.yml/badge.svg)](https://github.com/thibmonier/hotones/actions/workflows/ci.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=alert_status&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+## Badges
+
+### Documentation & CI/CD
+[![WARP Index](https://img.shields.io/badge/WARP-Index-0A84FF?style=for-the-badge)](WARP.md)
+[![Agents Guide](https://img.shields.io/badge/Agents-Guide-2EA043?style=for-the-badge)](AGENTS.md)
+[![CI](https://github.com/thibmonier/hotones/actions/workflows/ci.yml/badge.svg)](https://github.com/thibmonier/hotones/actions/workflows/ci.yml)
+
+### Code Quality (SonarCloud)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=alert_status&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=coverage&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=security_rating&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=sqale_rating&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=bugs&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=vulnerabilities&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=code_smells&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=sqale_index&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
+
+### Stack
+[![PHP Version](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
+[![Symfony Version](https://img.shields.io/badge/Symfony-7.4-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
+[![MariaDB Version](https://img.shields.io/badge/MariaDB-11.4-003545?style=flat&logo=mariadb&logoColor=white)](https://mariadb.org/)
 
 Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en croisant ventes (jours/TJM), temps passés, coûts (CJM), achats et KPIs consolidés.
 

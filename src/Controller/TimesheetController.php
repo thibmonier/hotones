@@ -290,7 +290,7 @@ class TimesheetController extends AbstractController
     {
         $session = $request->getSession();
         $reset   = (bool) $request->query->get('reset', false);
-        if ($reset && $session) {
+        if ($reset) {
             $session->remove('timesheet_all_filters');
 
             return $this->redirectToRoute('timesheet_all');
@@ -299,7 +299,7 @@ class TimesheetController extends AbstractController
         $queryAll = $request->query->all();
         $keys     = ['month', 'project'];
         $has      = count(array_intersect(array_keys($queryAll), $keys)) > 0;
-        $saved    = ($session && $session->has('timesheet_all_filters')) ? (array) $session->get('timesheet_all_filters') : [];
+        $saved    = $session->has('timesheet_all_filters') ? (array) $session->get('timesheet_all_filters') : [];
 
         $month     = $has ? ($request->query->get('month', date('Y-m'))) : ($saved['month'] ?? date('Y-m'));
         $projectId = $has ? ($request->query->get('project')) : ($saved['project'] ?? null);
@@ -316,12 +316,10 @@ class TimesheetController extends AbstractController
         $timesheets      = $timesheetRepo->findForPeriodWithProject($startDate, $endDate, $selectedProject);
         $projects        = $projectRepo->findActiveOrderedByName();
 
-        if ($session) {
-            $session->set('timesheet_all_filters', [
-                'month'   => $month,
-                'project' => $projectId,
-            ]);
-        }
+        $session->set('timesheet_all_filters', [
+            'month'   => $month,
+            'project' => $projectId,
+        ]);
 
         // Calculer le nombre de filtres actifs
         $activeFiltersCount = 0;

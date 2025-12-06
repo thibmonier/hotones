@@ -21,9 +21,6 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
 
         $contributor       = $em->getRepository(\App\Entity\Contributor::class)->findOneBy(['user' => $user]);
         $employmentPeriods = [];
@@ -44,9 +41,6 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
 
         if ($request->isMethod('POST')) {
             $user->setFirstName($request->request->get('first_name'));
@@ -91,9 +85,6 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
 
         if (!$user->getTotpSecret()) {
             $totp = TOTP::create();
@@ -119,9 +110,6 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
 
         if ($request->isMethod('POST')) {
             $current = (string) $request->request->get('current_password');
@@ -150,10 +138,8 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if ($user) {
-            $user->setTotpEnabled(true);
-            $em->flush();
-        }
+        $user->setTotpEnabled(true);
+        $em->flush();
 
         return $this->redirectToRoute('profile_2fa_setup');
     }
@@ -164,9 +150,6 @@ class ProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
 
         // Charger les préférences existantes indexées par event type
         $current = $prefs->findByUserIndexedByEventType($user);
