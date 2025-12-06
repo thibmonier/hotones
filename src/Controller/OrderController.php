@@ -33,7 +33,7 @@ class OrderController extends AbstractController
     {
         $session = $request->getSession();
         $reset   = (bool) $request->query->get('reset', false);
-        if ($reset && $session) {
+        if ($reset) {
             $session->remove('order_filters');
 
             return $this->redirectToRoute('order_index');
@@ -42,7 +42,7 @@ class OrderController extends AbstractController
         $queryAll   = $request->query->all();
         $filterKeys = ['project', 'status'];
         $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved      = ($session && $session->has('order_filters')) ? (array) $session->get('order_filters') : [];
+        $saved      = $session->has('order_filters') ? (array) $session->get('order_filters') : [];
 
         $projectId = $hasFilter ? ($request->query->get('project') ?? null) : ($saved['project'] ?? null);
         $status    = $hasFilter ? ($request->query->get('status') ?? null) : ($saved['status'] ?? null);
@@ -72,15 +72,13 @@ class OrderController extends AbstractController
             'has_next'     => $page * $perPage < $total,
         ];
 
-        if ($session) {
-            $session->set('order_filters', [
-                'project'  => $projectId,
-                'status'   => $status,
-                'sort'     => $sort,
-                'dir'      => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
-                'per_page' => $perPage,
-            ]);
-        }
+        $session->set('order_filters', [
+            'project'  => $projectId,
+            'status'   => $status,
+            'sort'     => $sort,
+            'dir'      => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+            'per_page' => $perPage,
+        ]);
 
         return $this->render('order/index.html.twig', [
             'orders'          => $orders,
@@ -683,7 +681,7 @@ class OrderController extends AbstractController
     public function exportCsv(Request $request, EntityManagerInterface $em): Response
     {
         $session   = $request->getSession();
-        $saved     = ($session && $session->has('order_filters')) ? (array) $session->get('order_filters') : [];
+        $saved     = $session->has('order_filters') ? (array) $session->get('order_filters') : [];
         $projectId = $request->query->get('project', $saved['project'] ?? null);
         $status    = $request->query->get('status', $saved['status'] ?? null);
         $sort      = $request->query->get('sort', $saved['sort'] ?? 'createdAt');

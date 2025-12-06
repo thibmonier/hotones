@@ -35,7 +35,7 @@ class ContributorController extends AbstractController
     {
         $session = $request->getSession();
         $reset   = (bool) $request->query->get('reset', false);
-        if ($reset && $session) {
+        if ($reset) {
             $session->remove('contributor_filters');
 
             return $this->redirectToRoute('contributor_index');
@@ -44,7 +44,7 @@ class ContributorController extends AbstractController
         $queryAll  = $request->query->all();
         $keys      = ['search', 'active', 'employment_status'];
         $hasFilter = count(array_intersect(array_keys($queryAll), $keys)) > 0;
-        $saved     = ($session && $session->has('contributor_filters')) ? (array) $session->get('contributor_filters') : [];
+        $saved     = $session->has('contributor_filters') ? (array) $session->get('contributor_filters') : [];
 
         $search           = $hasFilter ? ($request->query->get('search', '')) : ($saved['search'] ?? '');
         $active           = $hasFilter ? ($request->query->get('active', 'all')) : ($saved['active'] ?? 'all');
@@ -162,16 +162,14 @@ class ContributorController extends AbstractController
             'has_next'     => $page * $perPage < $total,
         ];
 
-        if ($session) {
-            $session->set('contributor_filters', [
-                'search'            => $search,
-                'active'            => $active,
-                'employment_status' => $employmentStatus,
-                'sort'              => $sort,
-                'dir'               => $direction,
-                'per_page'          => $perPage,
-            ]);
-        }
+        $session->set('contributor_filters', [
+            'search'            => $search,
+            'active'            => $active,
+            'employment_status' => $employmentStatus,
+            'sort'              => $sort,
+            'dir'               => $direction,
+            'per_page'          => $perPage,
+        ]);
 
         return $this->render('contributor/index.html.twig', [
             'contributors'       => $contributors,
@@ -387,7 +385,7 @@ class ContributorController extends AbstractController
     public function exportCsv(Request $request): Response
     {
         $session          = $request->getSession();
-        $saved            = ($session && $session->has('contributor_filters')) ? (array) $session->get('contributor_filters') : [];
+        $saved            = $session->has('contributor_filters') ? (array) $session->get('contributor_filters') : [];
         $search           = $request->query->get('search', $saved['search'] ?? '');
         $active           = $request->query->get('active', $saved['active'] ?? 'all');
         $employmentStatus = $request->query->get('employment_status', $saved['employment_status'] ?? 'all');
