@@ -22,7 +22,7 @@ class AboutController extends AbstractController
             'bcmath'    => extension_loaded('bcmath'),
             'redis'     => extension_loaded('redis'),
             'intl'      => extension_loaded('intl'),
-            'opcache'   => extension_loaded('opcache'),
+            'opcache'   => extension_loaded('Zend OPcache'),
             'pdo_mysql' => extension_loaded('pdo_mysql'),
         ];
 
