@@ -9,7 +9,6 @@ use App\Entity\Order;
 use App\Entity\Project;
 use App\Entity\User;
 use DateTime;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -63,8 +62,9 @@ class GenerateForecastTestDataCommand extends Command
 
         $io->section(sprintf('Génération de %d mois d\'historique avec ~%d projets/mois', $months, $projectsPerMonth));
 
-        $now          = new DateTime();
-        $createdCount = 0;
+        $now           = new DateTime();
+        $createdCount  = 0;
+        $orderSequence = time() % 1000; // Partir d'un numéro basé sur le timestamp pour éviter les doublons
 
         // Coefficients de saisonnalité réalistes (industrie services IT)
         $seasonality = [
@@ -147,11 +147,11 @@ class GenerateForecastTestDataCommand extends Command
                 $order = new Order();
                 $order->setProject($project);
                 $order->setName('Devis principal');
-                $order->setOrderNumber(sprintf('DEV-%s-%03d', $monthDate->format('Ym'), $j + 1));
+                $order->setOrderNumber(sprintf('DEV-%s-%03d', $monthDate->format('Ym'), $orderSequence++));
                 $order->setStatus(rand(1, 10) <= 9 ? 'signe' : 'gagne'); // 90% signés, 10% gagnés
                 $order->setContractType($projectType);
                 $order->setTotalAmount((string) $soldAmount);
-                $order->setCreatedAt(DateTimeImmutable::createFromMutable($startDate));
+                $order->setCreatedAt(clone $startDate);
 
                 // Date de validité (1 mois après création)
                 $validUntil = (clone $startDate)->modify('+1 month');
