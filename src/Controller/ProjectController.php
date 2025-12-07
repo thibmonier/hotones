@@ -525,4 +525,89 @@ class ProjectController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Erreur lors de l\'archivage: '.$e->getMessage()], 500);
         }
     }
+
+    #[Route('/{id}/planning-suggestions', name: 'project_planning_suggestions', methods: ['GET'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function planningSuggestions(
+        Project $project,
+        Request $request,
+        \App\Service\Planning\ProjectPlanningAssistant $assistant
+    ): Response {
+        // Date de début préférée (par défaut: date de début du projet ou lundi prochain)
+        $startParam = $request->query->get('start_date');
+        $startDate  = $startParam ? new DateTime($startParam) : null;
+
+        // Générer les suggestions
+        $result = $assistant->generateSuggestions($project, $startDate);
+
+        return $this->render('project/planning_suggestions.html.twig', [
+            'project'     => $project,
+            'suggestions' => $result['suggestions'],
+            'unassigned'  => $result['unassigned'],
+            'statistics'  => $result['statistics'],
+            'startDate'   => $startDate,
+        ]);
+    }
+
+    #[Route('/{id}/planning-suggestions/apply', name: 'project_planning_suggestions_apply', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function applyPlanningSuggestions(
+        Project $project,
+        Request $request,
+        EntityManagerInterface $em,
+        \App\Service\Planning\ProjectPlanningAssistant $assistant
+    ): Response {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$this->isCsrfTokenValid('apply_suggestions_'.$project->getId(), $data['_token'] ?? '')) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 400);
+        }
+
+        $taskIds = $data['tasks'] ?? [];
+        if (empty($taskIds)) {
+            return $this->json(['success' => false, 'message' => 'Aucune tâche sélectionnée'], 400);
+        }
+
+        try {
+            // Regénérer les suggestions
+            $startDate = isset($data['start_date']) ? new DateTime($data['start_date']) : null;
+            $result    = $assistant->generateSuggestions($project, $startDate);
+
+            $created = 0;
+            foreach ($result['suggestions'] as $suggestion) {
+                $taskId = $suggestion['task']->getId();
+                if (in_array($taskId, $taskIds, true)) {
+                    // Créer le planning
+                    $planning = new \App\Entity\Planning();
+                    $planning->setContributor($suggestion['contributor']);
+                    $planning->setProject($project);
+                    $planning->setTask($suggestion['task']);
+                    $planning->setProfile($suggestion['task']->getRequiredProfile());
+                    $planning->setStartDate($suggestion['startDate']);
+                    $planning->setEndDate($suggestion['endDate']);
+                    $planning->setDailyHours((string) $suggestion['dailyHours']);
+                    $planning->setStatus('planned');
+                    $planning->setNotes('Suggestion automatique: '.$suggestion['reasoning']);
+
+                    $em->persist($planning);
+                    ++$created;
+                }
+            }
+
+            $em->flush();
+
+            $this->addFlash('success', sprintf('%d planification(s) créée(s) avec succès', $created));
+
+            return $this->json([
+                'success' => true,
+                'created' => $created,
+                'message' => sprintf('%d planification(s) créée(s)', $created),
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'application des suggestions: '.$e->getMessage(),
+            ], 500);
+        }
+    }
 }
