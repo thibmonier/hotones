@@ -3,21 +3,19 @@
 {% block title %}Contributeurs{% endblock %}
 
 {% block content %}
-    {{ component('breadcrumb', { title: 'Contributeurs', pagetitle: 'Gestion' }) }}
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Contributeurs</h4>
-                <div class="page-title-right">
-                    {% if is_granted('ROLE_MANAGER') %}
-                        <a href="{{ path('contributor_new') }}" class="btn btn-primary">
-                            <i class="bx bx-plus me-1"></i> Nouveau contributeur
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'components/page_header.html.twig' with {
+        title: 'Contributeurs',
+        breadcrumb: [
+            {label: 'Gestion', path: null},
+            {label: 'Contributeurs', path: null}
+        ],
+        actions: is_granted('ROLE_MANAGER') ? [{
+            label: 'Nouveau contributeur',
+            path: 'contributor_new',
+            icon: 'bx-plus',
+            class: 'btn-primary'
+        }] : []
+    } %}
 
     <!-- Bloc filtres (contributeurs) -->
     <div class="row mb-3">
@@ -328,24 +326,13 @@
     </div>
 
     {% if pagination.total_pages > 1 %}
+        {% include 'components/pagination.html.twig' with {
+            currentPage: pagination.current_page,
+            totalPages: pagination.total_pages,
+            itemsPerPage: pagination.per_page,
+            totalItems: pagination.total
+        } %}
     <div class="row mt-2">
-        <div class="col-12">
-            <nav>
-                <ul class="pagination">
-                    <li class="page-item {{ pagination.current_page == 1 ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page - 1 }) }}">Précédent</a>
-                    </li>
-                    {% for p in 1..pagination.total_pages %}
-                        <li class="page-item {{ p == pagination.current_page ? 'active' : '' }}">
-                            <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: sort, dir: dir, per_page: pagination.per_page, page: p }) }}">{{ p }}</a>
-                        </li>
-                    {% endfor %}
-                    <li class="page-item {{ pagination.current_page == pagination.total_pages ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ path('contributor_index', { search: search, active: active, employment_status: employment_status, sort: sort, dir: dir, per_page: pagination.per_page, page: pagination.current_page + 1 }) }}">Suivant</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
         <div class="col-lg-3 col-md-6">
             <div class="card">
                 <div class="card-body">
