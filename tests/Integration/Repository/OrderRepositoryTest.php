@@ -13,9 +13,14 @@ use App\Repository\OrderRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 class OrderRepositoryTest extends KernelTestCase
 {
+    use Factories;
+    use ResetDatabase;
+
     private EntityManagerInterface $entityManager;
     private OrderRepository $repository;
 
@@ -24,14 +29,6 @@ class OrderRepositoryTest extends KernelTestCase
         self::bootKernel();
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $this->repository    = $this->entityManager->getRepository(Order::class);
-
-        // Clean database before each test
-        $this->entityManager->createQuery('DELETE FROM App\Entity\OrderLine')->execute();
-        $this->entityManager->createQuery('DELETE FROM App\Entity\OrderSection')->execute();
-        $this->entityManager->createQuery('DELETE FROM App\Entity\Order')->execute();
-        $this->entityManager->createQuery('DELETE FROM App\Entity\Project')->execute();
-        $this->entityManager->createQuery('DELETE FROM App\Entity\Client')->execute();
-        $this->entityManager->clear();
     }
 
     protected function tearDown(): void
