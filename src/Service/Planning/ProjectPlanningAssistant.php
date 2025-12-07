@@ -145,7 +145,7 @@ class ProjectPlanningAssistant
     private function findCandidates($profile, DateTime $startDate, float $estimatedDays): array
     {
         // Récupérer les contributeurs avec le profil requis
-        $contributors = $this->contributorRepository->findByProfile($profile);
+        $contributors = $this->contributorRepository->findActiveContributorsByProfile($profile);
 
         $candidates = [];
         foreach ($contributors as $contributor) {
