@@ -8,6 +8,7 @@
             {% include 'components/page_header.html.twig' with {
                 title: 'Clients',
                 breadcrumb: [
+                    {label: 'Commercial', path: null},
                     {label: 'Clients', path: null}
                 ],
                 actions: [
@@ -119,14 +120,12 @@
 
                     {# Pagination #}
                     {% if clients.pageCount > 1 %}
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted">
-                            Page {{ clients.currentPageNumber }} sur {{ clients.pageCount }} ({{ clients.totalItemCount }} clients au total)
-                        </div>
-                        <div>
-                            {{ knp_pagination_render(clients) }}
-                        </div>
-                    </div>
+                        {% include 'components/pagination.html.twig' with {
+                            currentPage: clients.currentPageNumber,
+                            totalPages: clients.pageCount,
+                            itemsPerPage: clients.itemNumberPerPage,
+                            totalItems: clients.totalItemCount
+                        } %}
                     {% endif %}
                 </div>
             </div>
