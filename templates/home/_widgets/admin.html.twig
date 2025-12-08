@@ -13,49 +13,53 @@
 
 {# KPIs globaux - Vue d'ensemble #}
 <div class="row">
-    {% if kpis is defined %}
-        <div class="col-xl-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="flex-1 overflow-hidden">
-                            <p class="text-truncate font-size-14 mb-2">CA du mois</p>
-                            <h4 class="mb-0">{{ kpis.total_revenue|default(0)|number_format(0, '', ' ') }}€</h4>
-                        </div>
-                        <div class="text-success">
-                            <i class="bx bx-euro font-size-24"></i>
-                        </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">CA produit ce mois</p>
+                        <h4 class="mb-0">
+                            {% if kpis is defined and kpis.total_revenue is defined %}
+                                {{ kpis.total_revenue|number_format(0, '', ' ') }}€
+                            {% else %}
+                                0€
+                            {% endif %}
+                        </h4>
                     </div>
-                </div>
-                <div class="card-body border-top py-3">
-                    <div class="text-truncate">
-                        <span class="text-muted">Mois en cours</span>
+                    <div class="text-success">
+                        <i class="bx bx-time font-size-24"></i>
                     </div>
                 </div>
             </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">Temps valorisés</span>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="flex-1 overflow-hidden">
-                            <p class="text-truncate font-size-14 mb-2">Marge</p>
-                            <h4 class="mb-0">{{ kpis.margin_rate|default(0)|number_format(1) }}%</h4>
-                        </div>
-                        <div class="text-primary">
-                            <i class="bx bx-trending-up font-size-24"></i>
-                        </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">CA signé ce mois</p>
+                        <h4 class="mb-0">{{ monthlySignedRevenue|default(0)|number_format(0, '', ' ') }}€</h4>
                     </div>
-                </div>
-                <div class="card-body border-top py-3">
-                    <div class="text-truncate">
-                        <span class="text-muted">Taux de marge</span>
+                    <div class="text-info">
+                        <i class="bx bx-dollar-circle font-size-24"></i>
                     </div>
                 </div>
             </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">Devis signés</span>
+                </div>
+            </div>
         </div>
-    {% endif %}
+    </div>
 
     <div class="col-xl-3 col-md-6">
         <div class="card">
@@ -65,7 +69,7 @@
                         <p class="text-truncate font-size-14 mb-2">Projets actifs</p>
                         <h4 class="mb-0">{{ activeProjects|length }}</h4>
                     </div>
-                    <div class="text-info">
+                    <div class="text-primary">
                         <i class="bx bx-folder-open font-size-24"></i>
                     </div>
                 </div>

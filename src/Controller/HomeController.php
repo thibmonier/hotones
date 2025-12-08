@@ -139,8 +139,11 @@ class HomeController extends AbstractController
         $invoiceRepo  = $em->getRepository(Invoice::class);
         $vacationRepo = $em->getRepository(Vacation::class);
 
-        // KPIs globaux
+        // KPIs globaux (CA produit = temps valorisés)
         $kpis = $this->dashboardReadService->getKPIs($currentMonth, $endMonth, []);
+
+        // CA signé ce mois (devis)
+        $monthlySignedRevenue = $orderRepo->getSignedRevenueForPeriod($currentMonth, $endMonth);
 
         // Projets actifs
         $activeProjects = $projectRepo->findBy(['status' => 'active'], ['name' => 'ASC'], 5);
@@ -159,11 +162,12 @@ class HomeController extends AbstractController
         }
 
         return [
-            'kpis'             => $kpis,
-            'activeProjects'   => $activeProjects,
-            'pendingOrders'    => $pendingOrders,
-            'pendingInvoices'  => $pendingInvoices,
-            'pendingVacations' => $pendingVacations,
+            'kpis'                 => $kpis,
+            'monthlySignedRevenue' => $monthlySignedRevenue,
+            'activeProjects'       => $activeProjects,
+            'pendingOrders'        => $pendingOrders,
+            'pendingInvoices'      => $pendingInvoices,
+            'pendingVacations'     => $pendingVacations,
         ];
     }
 
