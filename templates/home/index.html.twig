@@ -10,9 +10,17 @@
     {% include 'home/_widgets/chef_projet.html.twig' %}
 {% elseif userRole == 'manager' %}
     {% include 'home/_widgets/manager.html.twig' %}
-{% elseif userRole == 'compta' or userRole == 'admin' %}
-    {# Pour l'instant, admin et compta utilisent l'affichage par défaut #}
-    {# On créera leurs widgets dédiés dans une prochaine phase #}
+{% elseif userRole == 'admin' %}
+    {% include 'home/_widgets/admin.html.twig' %}
+{% elseif userRole == 'compta' %}
+    {# TODO: créer le widget compta #}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4>Dashboard Comptabilité (à venir)</h4>
+            </div>
+        </div>
+    </div>
 {% else %}
 
     <!-- KPIs -->
