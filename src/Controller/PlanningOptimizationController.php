@@ -50,10 +50,6 @@ class PlanningOptimizationController extends AbstractController
             $endDate->format('Y-m-d'),
         );
 
-        // Vérifier si les données sont en cache
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $fromCache = $cacheItem->isHit();
-
         // Utiliser le cache pour les recommandations
         $result = $this->cache->get($cacheKey, function (ItemInterface $item) use ($startDate, $endDate) {
             // Cache valide pendant 1 heure
@@ -85,7 +81,6 @@ class PlanningOptimizationController extends AbstractController
             'period'          => $result['period'],
             'thresholds'      => $this->taceAnalyzer->getThresholds(),
             'ai_enhanced'     => $aiEnhanced,
-            'from_cache'      => $fromCache,
         ]);
     }
 
