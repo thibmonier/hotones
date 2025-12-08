@@ -124,7 +124,8 @@
                             currentPage: clients.currentPageNumber,
                             totalPages: clients.pageCount,
                             itemsPerPage: clients.itemNumberPerPage,
-                            totalItems: clients.totalItemCount
+                            totalItems: clients.totalItemCount,
+                            queryParams: filters|default({})
                         } %}
                     {% endif %}
                 </div>
