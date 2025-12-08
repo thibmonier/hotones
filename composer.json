@@ -18,6 +18,7 @@
         "doctrine/orm": "^3.5.8",
         "dompdf/dompdf": "^3.1.4",
         "dragonmantank/cron-expression": "^3.6",
+        "easycorp/easyadmin-bundle": "*",
         "endroid/qr-code-bundle": ">=6.1",
         "gedmo/doctrine-extensions": "dev-main || >=3.21",
         "knplabs/knp-paginator-bundle": "^6.10.0",

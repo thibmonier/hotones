@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Controller\Admin;
+
+use App\Entity\ServiceCategory;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ColorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+
+class ServiceCategoryCrudController extends AbstractCrudController
+{
+    public static function getEntityFqcn(): string
+    {
+        return ServiceCategory::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Catégorie de service')
+            ->setEntityLabelInPlural('Catégories de service')
+            ->setSearchFields(['name', 'description'])
+            ->setDefaultSort(['name' => 'ASC'])
+            ->setPaginatorPageSize(25);
+    }
+
+    public function configureFields(string $pageName): iterable
+    {
+        yield IdField::new('id')
+            ->hideOnForm();
+
+        yield TextField::new('name', 'Nom')
+            ->setRequired(true);
+
+        yield TextareaField::new('description', 'Description')
+            ->hideOnIndex();
+
+        yield ColorField::new('color', 'Couleur');
+
+        yield IntegerField::new('projects.count', 'Nombre de projets')
+            ->hideOnForm()
+            ->formatValue(function ($value, ServiceCategory $entity) {
+                return $entity->getProjects()->count();
+            });
+
+        yield BooleanField::new('active', 'Actif')
+            ->renderAsSwitch(false);
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(BooleanFilter::new('active', 'Actif'));
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->setPermission(Action::NEW, 'ROLE_ADMIN')
+            ->setPermission(Action::EDIT, 'ROLE_ADMIN')
+            ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+}

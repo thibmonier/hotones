@@ -124,24 +124,15 @@
                 </li>
                 {% endif %}
 
-                {# Configuration - Accessible aux administrateurs #}
+                {# Backoffice - Accessible aux administrateurs #}
                 {% if is_granted('ROLE_ADMIN') %}
-                <li class="menu-title">Configuration</li>
+                <li class="menu-title">Backoffice</li>
 
                 <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <a href="{{ path('backoffice') }}" class="waves-effect">
                         <i class="bx bx-cog"></i>
-                        <span>Configuration</span>
+                        <span>Backoffice</span>
                     </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('technology_index') }}">Technologies</a></li>
-                        <li><a href="{{ path('service_category_index') }}">Catégories de service</a></li>
-                        <li><a href="{{ path('job_profile_index') }}">Profils métier</a></li>
-                        <li><a href="{{ path('skill_index') }}">Compétences</a></li>
-                        <li><a href="#" class="text-muted">Paramètres généraux</a></li>
-                        <li><a href="{{ path('admin_scheduler_index') }}">Scheduler</a></li>
-                        <li><a href="{{ path('admin_notification_settings') }}">Notifications</a></li>
-                    </ul>
                 </li>
                 {% endif %}
 
