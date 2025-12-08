@@ -9,6 +9,10 @@ function dc() {
   fi
 }
 
+printf "[pre-push] Cleaning test database...\n"
+# Clean test database to avoid corruption issues
+dc exec -T app rm -f var/test.db* 2>/dev/null || true
+
 printf "[pre-push] Running test suite (excluding E2E)...\n"
 # Run PHPUnit suite excluding E2E tests (require geckodriver)
 if ! dc run --rm -T app ./vendor/bin/phpunit tests/Unit tests/Integration tests/Api tests/Functional; then

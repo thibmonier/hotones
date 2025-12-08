@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\PlanningRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PlanningRepository::class)]
 #[ORM\Table(name: 'planning')]
 class Planning
 {
