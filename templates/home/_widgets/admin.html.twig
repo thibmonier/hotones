@@ -1,0 +1,294 @@
+{# Widget personnalisé pour les administrateurs (ROLE_ADMIN) #}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Dashboard Direction</h4>
+            <div class="page-title-right">
+                <p class="text-muted mb-0">Bonjour {{ app.user.firstName }} {{ app.user.lastName }} !</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# KPIs globaux - Vue d'ensemble #}
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">CA produit ce mois</p>
+                        <h4 class="mb-0">
+                            {% if kpis is defined and kpis.total_revenue is defined %}
+                                {{ kpis.total_revenue|number_format(0, '', ' ') }}€
+                            {% else %}
+                                0€
+                            {% endif %}
+                        </h4>
+                    </div>
+                    <div class="text-success">
+                        <i class="bx bx-time font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">Temps valorisés</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">CA signé ce mois</p>
+                        <h4 class="mb-0">{{ monthlySignedRevenue|default(0)|number_format(0, '', ' ') }}€</h4>
+                    </div>
+                    <div class="text-info">
+                        <i class="bx bx-dollar-circle font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">Devis signés</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Projets actifs</p>
+                        <h4 class="mb-0">{{ activeProjects|length }}</h4>
+                    </div>
+                    <div class="text-primary">
+                        <i class="bx bx-folder-open font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">En cours</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Alertes</p>
+                        <h4 class="mb-0">
+                            {{ (pendingOrders|default([])|length) + (pendingInvoices|default([])|length) + (pendingVacations|default([])|length) }}
+                        </h4>
+                    </div>
+                    <div class="text-warning">
+                        <i class="bx bx-bell font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">À traiter</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Alertes multiples #}
+<div class="row">
+    {# Devis en attente #}
+    {% if pendingOrders is defined and pendingOrders is not empty %}
+    <div class="col-xl-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning bg-soft">
+                <h5 class="card-title mb-0">
+                    <i class="bx bx-file me-2"></i>
+                    Devis en attente
+                    <span class="badge bg-warning ms-2">{{ pendingOrders|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for order in pendingOrders|slice(0, 3) %}
+                    <div class="d-flex align-items-center pb-2">
+                        <div class="flex-1">
+                            <h6 class="mb-0">{{ order.orderNumber }}</h6>
+                            <p class="text-muted font-size-13 mb-0">{{ order.totalAmount|number_format(0, '', ' ') }}€</p>
+                        </div>
+                        <a href="{{ path('order_show', {id: order.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                    </div>
+                {% endfor %}
+                <div class="text-center mt-2">
+                    <a href="{{ path('order_index', {status: 'a_signer'}) }}" class="btn btn-sm btn-warning w-100">Voir tous ({{ pendingOrders|length }})</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Factures en attente #}
+    {% if pendingInvoices is defined and pendingInvoices is not empty %}
+    <div class="col-xl-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger bg-soft">
+                <h5 class="card-title mb-0">
+                    <i class="bx bx-receipt me-2"></i>
+                    Factures en attente
+                    <span class="badge bg-danger ms-2">{{ pendingInvoices|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for invoice in pendingInvoices|slice(0, 3) %}
+                    <div class="d-flex align-items-center pb-2">
+                        <div class="flex-1">
+                            <h6 class="mb-0">{{ invoice.invoiceNumber }}</h6>
+                            <p class="text-muted font-size-13 mb-0">{{ invoice.totalAmount|number_format(0, '', ' ') }}€</p>
+                        </div>
+                        <a href="{{ path('invoice_show', {id: invoice.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                    </div>
+                {% endfor %}
+                <div class="text-center mt-2">
+                    <a href="{{ path('invoice_index') }}" class="btn btn-sm btn-danger w-100">Voir tous ({{ pendingInvoices|length }})</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Congés en attente #}
+    {% if pendingVacations is defined and pendingVacations is not empty %}
+    <div class="col-xl-4">
+        <div class="card border-info">
+            <div class="card-header bg-info bg-soft">
+                <h5 class="card-title mb-0">
+                    <i class="bx bx-calendar me-2"></i>
+                    Congés à valider
+                    <span class="badge bg-info ms-2">{{ pendingVacations|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for vacation in pendingVacations|slice(0, 3) %}
+                    <div class="d-flex align-items-center pb-2">
+                        <div class="flex-1">
+                            <h6 class="mb-0">{{ vacation.contributor.fullName }}</h6>
+                            <p class="text-muted font-size-13 mb-0">{{ vacation.startDate|date('d/m') }} - {{ vacation.endDate|date('d/m') }}</p>
+                        </div>
+                        <a href="{{ path('vacation_approval_show', {id: vacation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                    </div>
+                {% endfor %}
+                <div class="text-center mt-2">
+                    <a href="{{ path('vacation_approval_index') }}" class="btn btn-sm btn-info w-100">Voir tous ({{ pendingVacations|length }})</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{# Vue d'ensemble : Projets et actions #}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Projets actifs</h4>
+                <div class="card-header-action">
+                    <a href="{{ path('project_index') }}" class="btn btn-sm btn-primary">Voir tous</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-nowrap table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Projet</th>
+                                <th>Client</th>
+                                <th>Chef de projet</th>
+                                <th>CA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in activeProjects|slice(0, 10) %}
+                                <tr>
+                                    <td>
+                                        <h5 class="font-size-14 mb-0">
+                                            <a href="{{ path('project_show', {'id': project.id}) }}">{{ project.name }}</a>
+                                        </h5>
+                                    </td>
+                                    <td>{{ project.client ? project.client.name : '-' }}</td>
+                                    <td>
+                                        {% if project.projectManager %}
+                                            {{ project.projectManager.firstName }} {{ project.projectManager.lastName }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ project.totalSoldAmount|number_format(0, '', ' ') }}€</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <p>Aucun projet actif</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Dashboards</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ path('analytics_dashboard') }}" class="btn btn-primary">
+                        <i class="bx bx-line-chart me-1"></i> Analytics & KPIs
+                    </a>
+                    <a href="{{ path('sales_dashboard_index') }}" class="btn btn-success">
+                        <i class="bx bx-bar-chart me-1"></i> Dashboard Commercial
+                    </a>
+                    <a href="{{ path('hr_dashboard') }}" class="btn btn-info">
+                        <i class="bx bx-group me-1"></i> Dashboard RH
+                    </a>
+                    <a href="{{ path('invoice_index') }}" class="btn btn-warning">
+                        <i class="bx bx-receipt me-1"></i> Facturation
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Actions rapides</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ path('project_new') }}" class="btn btn-outline-primary">
+                        <i class="bx bx-folder-plus me-1"></i> Nouveau projet
+                    </a>
+                    <a href="{{ path('order_new') }}" class="btn btn-outline-success">
+                        <i class="bx bx-plus me-1"></i> Nouveau devis
+                    </a>
+                    <a href="{{ path('contributor_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-user me-1"></i> Contributeurs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

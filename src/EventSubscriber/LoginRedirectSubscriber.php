@@ -49,7 +49,7 @@ class LoginRedirectSubscriber implements EventSubscriberInterface
                 if (str_contains($targetUrl, $pattern)) {
                     // Rediriger vers la page d'accueil au lieu de l'URL bloquée
                     $event->setResponse(
-                        new RedirectResponse($this->urlGenerator->generate('app_home')),
+                        new RedirectResponse($this->urlGenerator->generate('home')),
                     );
 
                     return;

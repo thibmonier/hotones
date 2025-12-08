@@ -41,7 +41,7 @@ class VacationRequestController extends AbstractController
         if (!$contributor) {
             $this->addFlash('warning', 'Aucun profil contributeur n\'est associé à votre compte.');
 
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('home');
         }
 
         // Récupérer toutes les demandes de congés du contributeur
@@ -68,7 +68,7 @@ class VacationRequestController extends AbstractController
         if (!$contributor) {
             $this->addFlash('error', 'Aucun profil contributeur n\'est associé à votre compte.');
 
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('home');
         }
 
         $vacation = new Vacation();

@@ -1,0 +1,272 @@
+{# Widget personnalisé pour les managers (ROLE_MANAGER) #}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Dashboard Management</h4>
+            <div class="page-title-right">
+                <p class="text-muted mb-0">Bonjour {{ app.user.firstName }} {{ app.user.lastName }} !</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# KPIs Management #}
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Congés en attente</p>
+                        <h4 class="mb-0">{{ pendingVacations|length }}</h4>
+                    </div>
+                    <div class="text-warning">
+                        <i class="bx bx-calendar-exclamation font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">À valider</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Contributeurs actifs</p>
+                        <h4 class="mb-0">{{ activeContributors }}</h4>
+                    </div>
+                    <div class="text-success">
+                        <i class="bx bx-user font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">Effectif actuel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Projets actifs</p>
+                        <h4 class="mb-0">{{ activeProjects|length }}</h4>
+                    </div>
+                    <div class="text-primary">
+                        <i class="bx bx-folder-open font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">En cours</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Satisfaction</p>
+                        <h4 class="mb-0">
+                            {% if hrMetrics and hrMetrics.nps is defined %}
+                                {{ hrMetrics.nps|number_format(1) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </h4>
+                    </div>
+                    <div class="text-info">
+                        <i class="bx bx-happy font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">NPS moyen</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Demandes de congés en attente #}
+{% if pendingVacations is not empty %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning bg-soft">
+                <h4 class="card-title mb-0">
+                    <i class="bx bx-calendar-exclamation me-2"></i>
+                    Demandes de congés en attente
+                    <span class="badge bg-warning ms-2">{{ pendingVacations|length }}</span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Contributeur</th>
+                                <th>Type</th>
+                                <th>Date de début</th>
+                                <th>Date de fin</th>
+                                <th>Jours ouvrés</th>
+                                <th>Demandé le</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vacation in pendingVacations|slice(0, 5) %}
+                            <tr>
+                                <td>
+                                    <strong>{{ vacation.contributor.fullName }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ vacation.typeLabel }}</span>
+                                </td>
+                                <td>{{ vacation.startDate|date('d/m/Y') }}</td>
+                                <td>{{ vacation.endDate|date('d/m/Y') }}</td>
+                                <td>{{ vacation.numberOfWorkingDays }} jour(s)</td>
+                                <td>{{ vacation.createdAt|date('d/m/Y') }}</td>
+                                <td>
+                                    <a href="{{ path('vacation_approval_show', {id: vacation.id}) }}" class="btn btn-sm btn-primary">
+                                        <i class="bx bx-check-circle"></i> Traiter
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if pendingVacations|length > 5 %}
+                <div class="text-center mt-3">
+                    <a href="{{ path('vacation_approval_index') }}" class="btn btn-outline-warning">
+                        Voir toutes les demandes ({{ pendingVacations|length }})
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    {# Projets actifs #}
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Projets en cours</h4>
+                <div class="card-header-action">
+                    <a href="{{ path('project_index') }}" class="btn btn-sm btn-primary">Voir tous</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-nowrap table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Projet</th>
+                                <th>Client</th>
+                                <th>Chef de projet</th>
+                                <th>CA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in activeProjects|slice(0, 10) %}
+                                <tr>
+                                    <td>
+                                        <h5 class="font-size-14 mb-0">
+                                            <a href="{{ path('project_show', {'id': project.id}) }}">{{ project.name }}</a>
+                                        </h5>
+                                    </td>
+                                    <td>{{ project.client ? project.client.name : '-' }}</td>
+                                    <td>
+                                        {% if project.projectManager %}
+                                            {{ project.projectManager.firstName }} {{ project.projectManager.lastName }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ project.totalSoldAmount|number_format(0, '', ' ') }}€</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <p>Aucun projet actif</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Actions et métriques RH #}
+    <div class="col-lg-4">
+        {% if hrMetrics %}
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Métriques RH</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted mb-1">Taux de satisfaction</p>
+                    <h5>{{ hrMetrics.satisfaction_rate|default(0)|number_format(1) }}%</h5>
+                </div>
+                <div class="mb-3">
+                    <p class="text-muted mb-1">Turnover</p>
+                    <h5>{{ hrMetrics.turnover_rate|default(0)|number_format(1) }}%</h5>
+                </div>
+                <div class="mb-0">
+                    <a href="{{ path('hr_dashboard') }}" class="btn btn-sm btn-outline-primary w-100">
+                        Dashboard RH complet
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Actions rapides</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ path('vacation_approval_index') }}" class="btn btn-warning">
+                        <i class="bx bx-calendar-check me-1"></i> Valider congés
+                        {% if pendingVacations is not empty %}
+                            <span class="badge bg-light text-dark ms-1">{{ pendingVacations|length }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{{ path('hr_dashboard') }}" class="btn btn-primary">
+                        <i class="bx bx-bar-chart me-1"></i> Dashboard RH
+                    </a>
+                    <a href="{{ path('contributor_index') }}" class="btn btn-outline-primary">
+                        <i class="bx bx-user me-1"></i> Contributeurs
+                    </a>
+                    <a href="{{ path('analytics_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-line-chart me-1"></i> Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
