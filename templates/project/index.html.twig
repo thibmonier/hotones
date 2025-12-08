@@ -456,7 +456,8 @@
             currentPage: pagination.current_page,
             totalPages: pagination.total_pages,
             itemsPerPage: pagination.per_page,
-            totalItems: pagination.total
+            totalItems: pagination.total,
+            queryParams: filters_query|default({})
         } %}
     {% endif %}
 {% endblock %}

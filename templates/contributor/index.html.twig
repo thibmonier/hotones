@@ -330,7 +330,8 @@
             currentPage: pagination.current_page,
             totalPages: pagination.total_pages,
             itemsPerPage: pagination.per_page,
-            totalItems: pagination.total
+            totalItems: pagination.total,
+            queryParams: {search: search, active: active, employment_status: employment_status, sort: sort, dir: dir}
         } %}
     <div class="row mt-2">
         <div class="col-lg-3 col-md-6">
