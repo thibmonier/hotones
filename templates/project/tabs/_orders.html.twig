@@ -111,11 +111,7 @@
                         </td>
                         <td>
                             <span class="badge bg-{% if order.status == 'signe' or order.status == 'gagne' or order.status == 'termine' %}success{% elseif order.status == 'a_signer' %}primary{% elseif order.status == 'perdu' or order.status == 'abandonne' %}danger{% else %}secondary{% endif %}">
-                                {% if order.status in constant('App\\Entity\\Order::STATUS_OPTIONS') %}
-                                    {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] }}
-                                {% else %}
-                                    {{ order.status }}
-                                {% endif %}
+                                {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] ?? order.status }}
                             </span>
                         </td>
                         <td class="text-end">
@@ -185,11 +181,7 @@
                                 <p class="text-muted mb-0 small">{{ order.name|default('Sans nom') }}</p>
                             </div>
                             <span class="badge bg-{% if order.status == 'signe' or order.status == 'gagne' or order.status == 'termine' %}success{% elseif order.status == 'a_signer' %}primary{% else %}secondary{% endif %}">
-                                {% if order.status in constant('App\\Entity\\Order::STATUS_OPTIONS') %}
-                                    {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] }}
-                                {% else %}
-                                    {{ order.status }}
-                                {% endif %}
+                                {{ constant('App\\Entity\\Order::STATUS_OPTIONS')[order.status] ?? order.status }}
                             </span>
                         </div>
                     </div>
