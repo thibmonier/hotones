@@ -13,6 +13,7 @@ use App\Service\HrMetricsService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -27,16 +28,33 @@ class HomeController extends AbstractController
 
     #[Route('/', name: 'home')]
     #[IsGranted('ROLE_USER')]
-    public function index(EntityManagerInterface $em): Response
+    public function index(Request $request, EntityManagerInterface $em): Response
     {
         $contributorRepo = $em->getRepository(Contributor::class);
         $contributor     = $contributorRepo->findByUser($this->getUser());
 
-        // Déterminer le rôle principal pour personnaliser l'affichage
-        $userRole = $this->getUserPrimaryRole();
+        // Récupérer tous les rôles disponibles pour l'utilisateur
+        $availableRoles = $this->getAvailableRoles();
 
-        // Préparer les données selon le rôle
-        $data = match ($userRole) {
+        // Déterminer le rôle à afficher (session > query > défaut)
+        $selectedRole = $request->query->get('view');
+        if ($selectedRole && in_array($selectedRole, array_keys($availableRoles))) {
+            // Sauvegarder la préférence en session
+            $request->getSession()->set('home_dashboard_view', $selectedRole);
+        } elseif ($request->getSession()->has('home_dashboard_view')) {
+            // Récupérer depuis la session
+            $selectedRole = $request->getSession()->get('home_dashboard_view');
+            // Vérifier que le rôle est toujours disponible
+            if (!in_array($selectedRole, array_keys($availableRoles))) {
+                $selectedRole = $this->getUserPrimaryRole();
+            }
+        } else {
+            // Utiliser le rôle par défaut (le plus élevé)
+            $selectedRole = $this->getUserPrimaryRole();
+        }
+
+        // Préparer les données selon le rôle sélectionné
+        $data = match ($selectedRole) {
             'admin'       => $this->getAdminData($em, $contributor),
             'compta'      => $this->getComptaData($em, $contributor),
             'manager'     => $this->getManagerData($em, $contributor),
@@ -45,8 +63,9 @@ class HomeController extends AbstractController
             default       => $this->getDefaultData($em, $contributor),
         };
 
-        $data['userRole']    = $userRole;
-        $data['contributor'] = $contributor;
+        $data['userRole']       = $selectedRole;
+        $data['availableRoles'] = $availableRoles;
+        $data['contributor']    = $contributor;
 
         return $this->render('home/index.html.twig', $data);
     }
@@ -74,6 +93,37 @@ class HomeController extends AbstractController
         }
 
         return 'user';
+    }
+
+    /**
+     * Retourne tous les rôles disponibles pour l'utilisateur avec leurs labels.
+     */
+    private function getAvailableRoles(): array
+    {
+        $roles = [];
+
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $roles['admin'] = 'Dashboard Direction';
+        }
+        if ($this->isGranted('ROLE_COMPTA')) {
+            $roles['compta'] = 'Dashboard Comptabilité';
+        }
+        if ($this->isGranted('ROLE_MANAGER')) {
+            $roles['manager'] = 'Dashboard Management';
+        }
+        if ($this->isGranted('ROLE_CHEF_PROJET')) {
+            $roles['chef_projet'] = 'Dashboard Commercial';
+        }
+        if ($this->isGranted('ROLE_INTERVENANT')) {
+            $roles['intervenant'] = 'Mon Dashboard';
+        }
+
+        // Si aucun rôle spécifique, afficher la vue par défaut
+        if (empty($roles)) {
+            $roles['user'] = 'Dashboard';
+        }
+
+        return $roles;
     }
 
     /**

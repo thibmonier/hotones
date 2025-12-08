@@ -3,6 +3,44 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block content %}
+{# Sélecteur de vue si plusieurs rôles disponibles #}
+{% if availableRoles|length > 1 %}
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="viewSelectorDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bx bx-grid-alt me-1"></i>
+                    {{ availableRoles[userRole] }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="viewSelectorDropdown">
+                    {% for roleKey, roleLabel in availableRoles %}
+                        <li>
+                            <a class="dropdown-item {% if roleKey == userRole %}active{% endif %}" href="{{ path('home', {view: roleKey}) }}">
+                                {% if roleKey == 'admin' %}
+                                    <i class="bx bx-shield me-2"></i>
+                                {% elseif roleKey == 'compta' %}
+                                    <i class="bx bx-calculator me-2"></i>
+                                {% elseif roleKey == 'manager' %}
+                                    <i class="bx bx-group me-2"></i>
+                                {% elseif roleKey == 'chef_projet' %}
+                                    <i class="bx bx-briefcase me-2"></i>
+                                {% elseif roleKey == 'intervenant' %}
+                                    <i class="bx bx-user me-2"></i>
+                                {% else %}
+                                    <i class="bx bx-home me-2"></i>
+                                {% endif %}
+                                {{ roleLabel }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {# Affichage personnalisé selon le rôle de l'utilisateur #}
 {% if userRole == 'intervenant' %}
     {% include 'home/_widgets/intervenant.html.twig' %}
