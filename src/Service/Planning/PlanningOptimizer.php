@@ -307,8 +307,9 @@ class PlanningOptimizer
      */
     private function findCompatibleContributors(Contributor $source, array $candidates): array
     {
-        $sourceProfiles = $source->getProfiles()->toArray();
-        $compatible     = [];
+        // Extraire les IDs des profils du contributeur source
+        $sourceProfileIds = array_map(fn ($p) => $p->getId(), $source->getProfiles()->toArray());
+        $compatible       = [];
 
         foreach ($candidates as $candidate) {
             /** @var Contributor $targetContributor */
@@ -318,11 +319,11 @@ class PlanningOptimizer
                 continue;
             }
 
-            // Vérifier les profils communs
-            $targetProfiles = $targetContributor->getProfiles()->toArray();
-            $commonProfiles = array_intersect($sourceProfiles, $targetProfiles);
+            // Vérifier les profils communs (par ID)
+            $targetProfileIds = array_map(fn ($p) => $p->getId(), $targetContributor->getProfiles()->toArray());
+            $commonProfileIds = array_intersect($sourceProfileIds, $targetProfileIds);
 
-            if (count($commonProfiles) > 0) {
+            if (count($commonProfileIds) > 0) {
                 $compatible[] = $candidate;
             }
         }
@@ -367,13 +368,17 @@ class PlanningOptimizer
     private function generateSummary(array $analysis, array $recommendations): array
     {
         return [
-            'total_contributors'    => count($analysis['critical']) + count($analysis['overloaded']) + count($analysis['underutilized']) + count($analysis['optimal']),
-            'critical_count'        => count($analysis['critical']),
-            'overloaded_count'      => count($analysis['overloaded']),
-            'underutilized_count'   => count($analysis['underutilized']),
-            'optimal_count'         => count($analysis['optimal']),
-            'total_recommendations' => count($recommendations),
-            'high_priority_count'   => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high')),
+            'total_contributors'      => count($analysis['critical']) + count($analysis['overloaded']) + count($analysis['underutilized']) + count($analysis['optimal']),
+            'critical_count'          => count($analysis['critical']),
+            'overloaded_count'        => count($analysis['overloaded']),
+            'underutilized_count'     => count($analysis['underutilized']),
+            'optimal_count'           => count($analysis['optimal']),
+            'total_recommendations'   => count($recommendations),
+            'high_priority_count'     => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high')),
+            'medium_priority_count'   => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'medium')),
+            'low_priority_count'      => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'low')),
+            'critical_workload_count' => count($analysis['critical']),
+            'contributors_analyzed'   => count($analysis['critical']) + count($analysis['overloaded']) + count($analysis['underutilized']) + count($analysis['optimal']),
         ];
     }
 

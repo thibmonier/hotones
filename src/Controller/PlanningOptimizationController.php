@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Route('/planning/optimization')]
 #[IsGranted('ROLE_MANAGER')]
@@ -24,7 +26,8 @@ class PlanningOptimizationController extends AbstractController
     public function __construct(
         private readonly PlanningOptimizer $optimizer,
         private readonly TaceAnalyzer $taceAnalyzer,
-        private readonly PlanningAIAssistant $aiAssistant
+        private readonly PlanningAIAssistant $aiAssistant,
+        private readonly CacheInterface $cache
     ) {
     }
 
@@ -40,17 +43,39 @@ class PlanningOptimizationController extends AbstractController
             ? new DateTime($request->query->get('end_date'))
             : new DateTime('last day of next month');
 
-        // Générer les recommandations
-        $result = $this->optimizer->generateRecommendations($startDate, $endDate);
+        // Créer une clé de cache basée sur la période
+        $cacheKey = sprintf(
+            'planning_optimization_%s_%s',
+            $startDate->format('Y-m-d'),
+            $endDate->format('Y-m-d'),
+        );
 
-        // Enrichir avec l'IA si disponible
+        // Vérifier si les données sont en cache
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $fromCache = $cacheItem->isHit();
+
+        // Utiliser le cache pour les recommandations
+        $result = $this->cache->get($cacheKey, function (ItemInterface $item) use ($startDate, $endDate) {
+            // Cache valide pendant 1 heure
+            $item->expiresAfter(3600);
+
+            return $this->optimizer->generateRecommendations($startDate, $endDate);
+        });
+
+        // Enrichir avec l'IA si disponible (toujours en cache séparé car plus coûteux)
         $aiEnhanced = null;
         if ($this->aiAssistant->isEnabled()) {
-            $aiEnhanced = $this->aiAssistant->enhanceRecommendations([
-                'analysis'        => $result['analysis'],
-                'recommendations' => $result['recommendations'],
-                'projects'        => [], // TODO: Ajouter les projets actifs
-            ]);
+            $aiCacheKey = $cacheKey.'_ai';
+            $aiEnhanced = $this->cache->get($aiCacheKey, function (ItemInterface $item) use ($result) {
+                // Cache IA valide pendant 2 heures
+                $item->expiresAfter(7200);
+
+                return $this->aiAssistant->enhanceRecommendations([
+                    'analysis'        => $result['analysis'],
+                    'recommendations' => $result['recommendations'],
+                    'projects'        => [], // TODO: Ajouter les projets actifs
+                ]);
+            });
         }
 
         return $this->render('planning_optimization/index.html.twig', [
@@ -60,6 +85,7 @@ class PlanningOptimizationController extends AbstractController
             'period'          => $result['period'],
             'thresholds'      => $this->taceAnalyzer->getThresholds(),
             'ai_enhanced'     => $aiEnhanced,
+            'from_cache'      => $fromCache,
         ]);
     }
 
@@ -159,5 +185,37 @@ class PlanningOptimizationController extends AbstractController
         }
 
         return $this->json($applyResult);
+    }
+
+    #[Route('/clear-cache', name: 'planning_optimization_clear_cache', methods: ['POST'])]
+    public function clearCache(Request $request): Response
+    {
+        // Récupérer les paramètres de période
+        $startDate = $request->request->get('start_date')
+            ? new DateTime($request->request->get('start_date'))
+            : new DateTime('first day of this month');
+
+        $endDate = $request->request->get('end_date')
+            ? new DateTime($request->request->get('end_date'))
+            : new DateTime('last day of next month');
+
+        // Créer la clé de cache
+        $cacheKey = sprintf(
+            'planning_optimization_%s_%s',
+            $startDate->format('Y-m-d'),
+            $endDate->format('Y-m-d'),
+        );
+
+        // Supprimer le cache
+        $this->cache->delete($cacheKey);
+        $this->cache->delete($cacheKey.'_ai');
+
+        $this->addFlash('success', 'Le cache a été vidé avec succès.');
+
+        // Rediriger vers la page d\'optimisation
+        return $this->redirectToRoute('planning_optimization_index', [
+            'start_date' => $startDate->format('Y-m-d'),
+            'end_date'   => $endDate->format('Y-m-d'),
+        ]);
     }
 }
