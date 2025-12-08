@@ -4,7 +4,8 @@
        currentPage: page,
        totalPages: totalPages,
        itemsPerPage: limit,
-       totalItems: total
+       totalItems: total,
+       queryParams: filters_query  // optional: existing query params to preserve
    } %}
 #}
 
@@ -12,6 +13,13 @@
 {% set totalPages = totalPages|default(1) %}
 {% set itemsPerPage = itemsPerPage|default(25) %}
 {% set totalItems = totalItems|default(0) %}
+{% set queryParams = queryParams|default({}) %}
+
+{# Build URL helper macro #}
+{% macro buildUrl(page, limit, queryParams) %}
+    {%- set params = queryParams|merge({page: page, limit: limit}) -%}
+    {{- app.request.pathInfo }}?{{ params|url_encode -}}
+{% endmacro %}
 
 {% if totalPages > 1 %}
 <div class="row mt-3">
@@ -27,7 +35,7 @@
             <ul class="pagination pagination-sm mb-0">
                 {# Bouton Précédent #}
                 <li class="page-item {% if currentPage <= 1 %}disabled{% endif %}">
-                    <a class="page-link" href="?page={{ currentPage - 1 }}&limit={{ itemsPerPage }}" tabindex="-1">
+                    <a class="page-link" href="{{ _self.buildUrl(currentPage - 1, itemsPerPage, queryParams) }}" tabindex="-1">
                         <i class="bx bx-chevron-left"></i>
                     </a>
                 </li>
@@ -35,7 +43,7 @@
                 {# Première page #}
                 {% if currentPage > 3 %}
                     <li class="page-item">
-                        <a class="page-link" href="?page=1&limit={{ itemsPerPage }}">1</a>
+                        <a class="page-link" href="{{ _self.buildUrl(1, itemsPerPage, queryParams) }}">1</a>
                     </li>
                     {% if currentPage > 4 %}
                         <li class="page-item disabled">
@@ -47,7 +55,7 @@
                 {# Pages autour de la page courante #}
                 {% for i in range(max(1, currentPage - 2), min(totalPages, currentPage + 2)) %}
                     <li class="page-item {% if i == currentPage %}active{% endif %}">
-                        <a class="page-link" href="?page={{ i }}&limit={{ itemsPerPage }}">{{ i }}</a>
+                        <a class="page-link" href="{{ _self.buildUrl(i, itemsPerPage, queryParams) }}">{{ i }}</a>
                     </li>
                 {% endfor %}
 
@@ -59,13 +67,13 @@
                         </li>
                     {% endif %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ totalPages }}&limit={{ itemsPerPage }}">{{ totalPages }}</a>
+                        <a class="page-link" href="{{ _self.buildUrl(totalPages, itemsPerPage, queryParams) }}">{{ totalPages }}</a>
                     </li>
                 {% endif %}
 
                 {# Bouton Suivant #}
                 <li class="page-item {% if currentPage >= totalPages %}disabled{% endif %}">
-                    <a class="page-link" href="?page={{ currentPage + 1 }}&limit={{ itemsPerPage }}">
+                    <a class="page-link" href="{{ _self.buildUrl(currentPage + 1, itemsPerPage, queryParams) }}">
                         <i class="bx bx-chevron-right"></i>
                     </a>
                 </li>
@@ -76,7 +84,13 @@
 
 <div class="row mt-2">
     <div class="col-md-12">
-        <form method="get" class="d-inline">
+        <form method="get" action="{{ app.request.pathInfo }}" class="d-inline">
+            {# Preserve existing query params as hidden fields #}
+            {% for key, value in queryParams %}
+                {% if key != 'page' and key != 'limit' and key != 'per_page' %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endif %}
+            {% endfor %}
             <label class="d-inline me-2">Éléments par page :</label>
             <select name="limit" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
                 <option value="25" {% if itemsPerPage == 25 %}selected{% endif %}>25</option>
