@@ -59,6 +59,45 @@ fi
 
 echo "Database connection established!"
 
+# Wait for Redis to be ready (for cache)
+if [ -n "$REDIS_URL" ]; then
+    echo "Waiting for Redis connection..."
+    echo "REDIS_URL: ${REDIS_URL:0:30}..." # Show first 30 chars only for security
+
+    max_redis_attempts=15
+    redis_attempt=0
+
+    # Extract Redis connection info from URL for testing
+    until php -r "
+        \$redis = new Redis();
+        \$url = parse_url(getenv('REDIS_URL'));
+        \$host = \$url['host'] ?? 'localhost';
+        \$port = \$url['port'] ?? 6379;
+        \$pass = \$url['pass'] ?? null;
+        try {
+            \$redis->connect(\$host, \$port, 2);
+            if (\$pass) \$redis->auth(\$pass);
+            \$redis->ping();
+            exit(0);
+        } catch (Exception \$e) {
+            exit(1);
+        }
+    " > /dev/null 2>&1 || [ $redis_attempt -eq $max_redis_attempts ]; do
+        redis_attempt=$((redis_attempt + 1))
+        echo "  Attempt $redis_attempt/$max_redis_attempts - Redis not ready, waiting..."
+        sleep 1
+    done
+
+    if [ $redis_attempt -eq $max_redis_attempts ]; then
+        echo "WARNING: Redis connection timeout after $max_redis_attempts attempts"
+        echo "Cache warmup may fail or be slower without Redis"
+    else
+        echo "Redis connection established!"
+    fi
+else
+    echo "No REDIS_URL configured, skipping Redis check"
+fi
+
 # Generate JWT keys if not present
 echo "Checking JWT keys..."
 if [ ! -f config/jwt/private.pem ] || [ ! -f config/jwt/public.pem ]; then
