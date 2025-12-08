@@ -467,7 +467,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         max_host_connections?: int, // The maximum number of connections to a single host.
  *         default_options?: array{
  *             headers?: array<string, mixed>,
- *             vars?: array<string, mixed>,
+ *             vars?: list<mixed>,
  *             max_redirects?: int, // The maximum number of redirects to follow.
  *             http_version?: scalar|null, // The default HTTP version, typically 1.1 or 2.0, leave to null for the best version.
  *             resolve?: array<string, scalar|null>,
@@ -490,7 +490,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *                 md5?: mixed,
  *             },
  *             crypto_method?: scalar|null, // The minimum version of TLS to accept; must be one of STREAM_CRYPTO_METHOD_TLSv*_CLIENT constants.
- *             extra?: array<string, mixed>,
+ *             extra?: list<mixed>,
  *             rate_limiter?: scalar|null, // Rate limiter name to use for throttling requests. // Default: null
  *             caching?: bool|array{ // Caching configuration.
  *                 enabled?: bool, // Default: false
@@ -543,7 +543,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *                 md5?: mixed,
  *             },
  *             crypto_method?: scalar|null, // The minimum version of TLS to accept; must be one of STREAM_CRYPTO_METHOD_TLSv*_CLIENT constants.
- *             extra?: array<string, mixed>,
+ *             extra?: list<mixed>,
  *             rate_limiter?: scalar|null, // Rate limiter name to use for throttling requests. // Default: null
  *             caching?: bool|array{ // Caching configuration.
  *                 enabled?: bool, // Default: false
@@ -636,7 +636,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         }>,
  *     },
  *     uid?: bool|array{ // Uid configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *         default_uuid_version?: 7|6|4|1, // Default: 7
  *         name_based_uuid_version?: 5|3, // Default: 5
  *         name_based_uuid_namespace?: scalar|null,
@@ -1473,7 +1473,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         enabled?: bool, // Default: false
  *     },
  *     html?: bool|array{
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *     },
  *     markdown?: bool|array{
  *         enabled?: bool, // Default: true
@@ -1910,6 +1910,28 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  * @psalm-type LiveComponentConfig = array{
  *     secret?: scalar|null, // The secret used to compute fingerprints and checksums // Default: "%kernel.secret%"
  * }
+ * @psalm-type KnpPaginatorConfig = array{
+ *     default_options?: array{
+ *         sort_field_name?: scalar|null, // Default: "sort"
+ *         sort_direction_name?: scalar|null, // Default: "direction"
+ *         filter_field_name?: scalar|null, // Default: "filterField"
+ *         filter_value_name?: scalar|null, // Default: "filterValue"
+ *         page_name?: scalar|null, // Default: "page"
+ *         distinct?: bool, // Default: true
+ *         page_out_of_range?: scalar|null, // Default: "ignore"
+ *         default_limit?: scalar|null, // Default: 10
+ *     },
+ *     template?: array{
+ *         pagination?: scalar|null, // Default: "@KnpPaginator/Pagination/sliding.html.twig"
+ *         rel_links?: scalar|null, // Default: "@KnpPaginator/Pagination/rel_links.html.twig"
+ *         filtration?: scalar|null, // Default: "@KnpPaginator/Pagination/filtration.html.twig"
+ *         sortable?: scalar|null, // Default: "@KnpPaginator/Pagination/sortable_link.html.twig"
+ *     },
+ *     page_range?: scalar|null, // Default: 5
+ *     page_limit?: scalar|null, // Default: null
+ *     convert_exception?: bool, // Default: false
+ *     remove_first_page_param?: bool, // Default: false
+ * }
  * @psalm-type DamaDoctrineTestConfig = array{
  *     enable_static_connection?: mixed, // Default: true
  *     enable_static_meta_data_cache?: bool, // Default: true
@@ -1994,28 +2016,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *             excluded_commands?: list<scalar|null>,
  *         },
  *     },
- * }
- * @psalm-type KnpPaginatorConfig = array{
- *     default_options?: array{
- *         sort_field_name?: scalar|null, // Default: "sort"
- *         sort_direction_name?: scalar|null, // Default: "direction"
- *         filter_field_name?: scalar|null, // Default: "filterField"
- *         filter_value_name?: scalar|null, // Default: "filterValue"
- *         page_name?: scalar|null, // Default: "page"
- *         distinct?: bool, // Default: true
- *         page_out_of_range?: scalar|null, // Default: "ignore"
- *         default_limit?: scalar|null, // Default: 10
- *     },
- *     template?: array{
- *         pagination?: scalar|null, // Default: "@KnpPaginator/Pagination/sliding.html.twig"
- *         rel_links?: scalar|null, // Default: "@KnpPaginator/Pagination/rel_links.html.twig"
- *         filtration?: scalar|null, // Default: "@KnpPaginator/Pagination/filtration.html.twig"
- *         sortable?: scalar|null, // Default: "@KnpPaginator/Pagination/sortable_link.html.twig"
- *     },
- *     page_range?: scalar|null, // Default: 5
- *     page_limit?: scalar|null, // Default: null
- *     convert_exception?: bool, // Default: false
- *     remove_first_page_param?: bool, // Default: false
  * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
