@@ -41,7 +41,7 @@ class VacationApprovalController extends AbstractController
         if (!$managerContributor) {
             $this->addFlash('warning', 'Aucun profil contributeur n\'est associé à votre compte.');
 
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('home');
         }
 
         // Récupérer les demandes de congés des contributeurs gérés

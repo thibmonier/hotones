@@ -3,16 +3,17 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Tableau de bord</h4>
-                <div class="page-title-right">
-                    <p class="text-muted mb-0">Bonjour {{ app.user.firstName }} {{ app.user.lastName }} !</p>
-                </div>
-            </div>
-        </div>
-    </div>
+{# Affichage personnalisé selon le rôle de l'utilisateur #}
+{% if userRole == 'intervenant' %}
+    {% include 'home/_widgets/intervenant.html.twig' %}
+{% elseif userRole == 'chef_projet' %}
+    {% include 'home/_widgets/chef_projet.html.twig' %}
+{% elseif userRole == 'manager' %}
+    {% include 'home/_widgets/manager.html.twig' %}
+{% elseif userRole == 'compta' or userRole == 'admin' %}
+    {# Pour l'instant, admin et compta utilisent l'affichage par défaut #}
+    {# On créera leurs widgets dédiés dans une prochaine phase #}
+{% else %}
 
     <!-- KPIs -->
     <div class="row">
@@ -280,4 +281,5 @@
             </div>
         </div>
     </div>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,244 @@
+{# Widget personnalisé pour les chefs de projet (ROLE_CHEF_PROJET) #}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Dashboard Commercial</h4>
+            <div class="page-title-right">
+                <p class="text-muted mb-0">Bonjour {{ app.user.firstName }} {{ app.user.lastName }} !</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# KPIs Commerciaux #}
+<div class="row">
+    <div class="col-xl-4 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Devis en attente</p>
+                        <h4 class="mb-0">{{ pendingOrders|length }}</h4>
+                    </div>
+                    <div class="text-warning">
+                        <i class="bx bx-file font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">À signer</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">CA signé ce mois</p>
+                        <h4 class="mb-0">{{ monthlySignedRevenue|number_format(0, '', ' ') }}€</h4>
+                    </div>
+                    <div class="text-success">
+                        <i class="bx bx-euro font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">{{ 'now'|date('F Y') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-truncate font-size-14 mb-2">Mes projets actifs</p>
+                        <h4 class="mb-0">{{ myProjects|length }}</h4>
+                    </div>
+                    <div class="text-primary">
+                        <i class="bx bx-folder-open font-size-24"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-top py-3">
+                <div class="text-truncate">
+                    <span class="text-muted">En cours</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Devis en attente - Alerte #}
+{% if pendingOrders is not empty %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning bg-soft">
+                <h4 class="card-title mb-0">
+                    <i class="bx bx-file-blank me-2"></i>
+                    Devis en attente de signature
+                    <span class="badge bg-warning ms-2">{{ pendingOrders|length }}</span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>N° Devis</th>
+                                <th>Projet</th>
+                                <th>Montant</th>
+                                <th>Créé le</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in pendingOrders|slice(0, 5) %}
+                                <tr>
+                                    <td><strong>{{ order.orderNumber }}</strong></td>
+                                    <td>{{ order.project.name }}</td>
+                                    <td>{{ order.totalAmount|number_format(0, '', ' ') }}€</td>
+                                    <td>{{ order.createdAt|date('d/m/Y') }}</td>
+                                    <td>
+                                        <a href="{{ path('order_show', {id: order.id}) }}" class="btn btn-sm btn-primary">
+                                            <i class="bx bx-show"></i> Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if pendingOrders|length > 5 %}
+                <div class="text-center mt-3">
+                    <a href="{{ path('order_index', {status: 'a_signer'}) }}" class="btn btn-outline-warning">
+                        Voir tous les devis en attente ({{ pendingOrders|length }})
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    {# Mes projets actifs #}
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Mes projets actifs</h4>
+                <div class="card-header-action">
+                    <a href="{{ path('project_index') }}" class="btn btn-sm btn-primary">Voir tous</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-nowrap table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Projet</th>
+                                <th>Client</th>
+                                <th>CA</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in myProjects|slice(0, 10) %}
+                                <tr>
+                                    <td>
+                                        <h5 class="font-size-14 mb-0">
+                                            <a href="{{ path('project_show', {'id': project.id}) }}">{{ project.name }}</a>
+                                        </h5>
+                                    </td>
+                                    <td>{{ project.client ? project.client.name : '-' }}</td>
+                                    <td>{{ project.totalSoldAmount|number_format(0, '', ' ') }}€</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            {{ project.status|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <p>Aucun projet actif</p>
+                                        <a href="{{ path('project_new') }}" class="btn btn-primary btn-sm">Créer un projet</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Devis récents et actions #}
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Devis récents</h4>
+                <div class="card-header-action">
+                    <a href="{{ path('order_index') }}" class="btn btn-sm btn-outline-primary">Voir tous</a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if recentOrders is not empty %}
+                    {% for order in recentOrders %}
+                        <div class="d-flex align-items-center pb-3">
+                            <div class="avatar-xs me-3">
+                                <span class="avatar-title rounded-circle bg-{% if order.status == 'signe' %}success{% elseif order.status == 'a_signer' %}warning{% else %}secondary{% endif %} font-size-12">
+                                    <i class="bx bx-file"></i>
+                                </span>
+                            </div>
+                            <div class="flex-1">
+                                <h5 class="font-size-14 mb-1">
+                                    <a href="{{ path('order_show', {'id': order.id}) }}">{{ order.orderNumber }}</a>
+                                </h5>
+                                <p class="text-muted font-size-13 mb-0">
+                                    {{ order.totalAmount|number_format(0, '', ' ') }}€
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <p>Aucun devis</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Actions rapides</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ path('order_new') }}" class="btn btn-success">
+                        <i class="bx bx-plus me-1"></i> Nouveau devis
+                    </a>
+                    <a href="{{ path('project_new') }}" class="btn btn-primary">
+                        <i class="bx bx-folder-plus me-1"></i> Nouveau projet
+                    </a>
+                    <a href="{{ path('sales_dashboard_index') }}" class="btn btn-outline-primary">
+                        <i class="bx bx-bar-chart me-1"></i> Dashboard commercial
+                    </a>
+                    <a href="{{ path('analytics_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-line-chart me-1"></i> Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

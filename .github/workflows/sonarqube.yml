@@ -52,7 +52,7 @@ jobs:
         run: mkdir -p var/coverage
 
       - name: Run tests with coverage
-        run: vendor/bin/phpunit --coverage-clover=var/coverage/clover.xml
+        run: vendor/bin/phpunit --configuration phpunit.coverage.xml
         env:
           APP_ENV: test
 

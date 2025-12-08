@@ -33,10 +33,10 @@
                             <label class="form-label">Niveau de service</label>
                             <select class="form-select form-select-sm" name="service_level">
                                 <option value="">Tous</option>
-                                <option value="bronze" {% if filters.service_level == 'bronze' %}selected{% endif %}>Bronze</option>
-                                <option value="silver" {% if filters.service_level == 'silver' %}selected{% endif %}>Silver</option>
-                                <option value="gold" {% if filters.service_level == 'gold' %}selected{% endif %}>Gold</option>
-                                <option value="platinum" {% if filters.service_level == 'platinum' %}selected{% endif %}>Platinum</option>
+                                <option value="vip" {% if filters.service_level == 'vip' %}selected{% endif %}>VIP</option>
+                                <option value="priority" {% if filters.service_level == 'priority' %}selected{% endif %}>Prioritaire</option>
+                                <option value="standard" {% if filters.service_level == 'standard' %}selected{% endif %}>Standard</option>
+                                <option value="low" {% if filters.service_level == 'low' %}selected{% endif %}>Basse priorité</option>
                             </select>
                         </div>
                         <div class="col-md-2">

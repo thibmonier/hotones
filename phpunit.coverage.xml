@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
+<!-- PHPUnit configuration with code coverage enabled for CI/CD -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="tests/bootstrap.php"
+>
+    <php>
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
+        <ini name="memory_limit" value="512M" />
+        <server name="APP_ENV" value="test" force="true" />
+        <server name="SHELL_VERBOSITY" value="-1" />
+        <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
+        <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
+        <!-- Use Chrome for Panther in container -->
+        <server name="PANTHER_BROWSER" value="chrome" />
+        <server name="PANTHER_CHROME_BINARY" value="/usr/bin/chromium-browser" />
+        <server name="PANTHER_CHROME_DRIVER_BINARY" value="${{ github.workspace }}/vendor/bin/chromedriver" />
+        <server name="PANTHER_NO_SANDBOX" value="1" />
+        <server name="PANTHER_NO_HEADLESS" value="0" />
+        <server name="PANTHER_GECKO_BINARY" value="" />
+        <server name="MOZ_HEADLESS" value="1" />
+    </php>
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>tests/Functional</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="api">
+            <directory>tests/Api</directory>
+        </testsuite>
+        <testsuite name="security">
+            <directory>tests/Security</directory>
+        </testsuite>
+        <!-- E2E test suite disabled due to Panther incompatibility with BrowserKit 8.0 -->
+        <!-- TODO: Re-enable when Panther is updated to support BrowserKit 8.0 -->
+        <!--
+        <testsuite name="e2e">
+            <directory>tests/E2E</directory>
+        </testsuite>
+        -->
+    </testsuites>
+
+    <!-- Code coverage enabled for CI/CD with PCOV or Xdebug -->
+    <coverage>
+        <report>
+            <clover outputFile="var/coverage/clover.xml"/>
+            <html outputDirectory="var/coverage/html"/>
+        </report>
+    </coverage>
+
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
+
+    <!-- Listeners are removed in PHPUnit 10+; use extensions instead -->
+
+    <groups>
+        <exclude>
+            <group>e2e</group>
+        </exclude>
+    </groups>
+
+    <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
+        <!-- Panther extension disabled due to incompatibility with BrowserKit 8.0 -->
+        <!-- TODO: Re-enable when Panther is updated to support BrowserKit 8.0 signature changes -->
+        <!-- <bootstrap class="Symfony\Component\Panther\ServerExtension" /> -->
+        <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension" />
+    </extensions>
+</phpunit>
