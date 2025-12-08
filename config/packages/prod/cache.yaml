@@ -3,8 +3,8 @@ framework:
         # Redis for application cache (shared across servers)
         app: cache.adapter.redis
 
-        # APCu for system cache (fast, local, metadata/config)
-        system: cache.adapter.apcu
+        # Redis for system cache (APCu not available on Render)
+        system: cache.adapter.redis
 
         # Custom pools remain with Redis for cross-server sharing
         pools:
