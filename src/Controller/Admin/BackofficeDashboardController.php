@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Profile;
+use App\Entity\SchedulerEntry;
 use App\Entity\ServiceCategory;
 use App\Entity\Skill;
 use App\Entity\Technology;
@@ -56,7 +57,7 @@ class BackofficeDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Compétences', 'fas fa-certificate', Skill::class);
 
         yield MenuItem::section('Système');
-        yield MenuItem::linkToRoute('Scheduler', 'fas fa-clock', 'admin_scheduler_index');
+        yield MenuItem::linkToCrud('Scheduler', 'fas fa-clock', SchedulerEntry::class);
         yield MenuItem::linkToRoute('Notifications', 'fas fa-bell', 'admin_notification_settings');
 
         yield MenuItem::section();

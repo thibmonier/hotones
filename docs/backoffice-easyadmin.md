@@ -19,7 +19,7 @@ composer require easycorp/easyadmin-bundle
 
 ## 📦 Entités gérées
 
-### Actuellement dans EasyAdmin
+### Migrées vers EasyAdmin ✅
 
 1. **Technologies** (`TechnologyCrudController`)
    - Nom, catégorie, couleur
@@ -41,11 +41,15 @@ composer require easycorp/easyadmin-bundle
    - Filtres : catégorie, actif/inactif
    - Affichage du nombre de contributeurs
 
-### À migrer ultérieurement
+5. **Scheduler** (`SchedulerEntryCrudController`)
+   - Nom, expression CRON, commande
+   - Timezone, paramètres JSON
+   - Filtres : actif/inactif
 
-- Scheduler
-- Notifications
-- Paramètres généraux
+### Non migrées (par choix)
+
+- **Notifications** : Écran de paramètres unique, pas un CRUD
+- **Paramètres généraux** : Non implémenté
 
 ## 🔗 Accès
 
@@ -61,8 +65,28 @@ src/Controller/Admin/
 ├── TechnologyCrudController.php       # CRUD Technologies
 ├── ServiceCategoryCrudController.php  # CRUD Catégories de service
 ├── ProfileCrudController.php          # CRUD Profils métier
-└── SkillCrudController.php            # CRUD Compétences
+├── SkillCrudController.php            # CRUD Compétences
+└── SchedulerEntryCrudController.php   # CRUD Scheduler
 ```
+
+## 🧹 Nettoyage effectué
+
+### Contrôleurs supprimés
+- `src/Controller/TechnologyController.php`
+- `src/Controller/ServiceCategoryController.php`
+- `src/Controller/JobProfileController.php`
+- `src/Controller/SkillController.php`
+- `src/Controller/Admin/SchedulerController.php`
+
+### Templates supprimés
+- `templates/technology/`
+- `templates/service_category/`
+- `templates/job_profile/`
+- `templates/skill/`
+- `templates/scheduler/`
+
+### Formulaires supprimés
+- `src/Form/SchedulerEntryType.php`
 
 ## 🎨 Fonctionnalités EasyAdmin
 
@@ -83,11 +107,12 @@ src/Controller/Admin/
 
 ## 🔄 Prochaines étapes
 
-### Phase 2 - Migration complète
-1. Migrer les écrans restants (Scheduler, Notifications)
-2. Supprimer les anciens contrôleurs CRUD
-3. Supprimer les anciens templates Twig
-4. Mettre à jour les tests
+### Phase 2 - Migration complète ✅ TERMINÉE
+1. ✅ Migrer Scheduler vers EasyAdmin
+2. ✅ Supprimer les anciens contrôleurs CRUD
+3. ✅ Supprimer les anciens templates Twig
+4. ✅ Supprimer les formulaires obsolètes
+5. ❌ Mettre à jour les tests (si nécessaire)
 
 ### Phase 3 - Améliorations
 1. Ajouter les exports CSV natifs dans EasyAdmin
