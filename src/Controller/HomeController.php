@@ -131,8 +131,11 @@ class HomeController extends AbstractController
         // Factures en attente
         $pendingInvoices = $invoiceRepo->findBy(['status' => 'pending'], ['dueDate' => 'ASC'], 10);
 
-        // CA facturé ce mois
-        $monthlyRevenue = $invoiceRepo->getTotalRevenueForPeriod($currentMonth, $endMonth);
+        // CA facturé ce mois (si méthode disponible)
+        $monthlyRevenue = 0;
+        if (method_exists($invoiceRepo, 'getTotalRevenueForPeriod')) {
+            $monthlyRevenue = $invoiceRepo->getTotalRevenueForPeriod($currentMonth, $endMonth);
+        }
 
         // Devis signés ce mois
         $monthlySignedOrders = $orderRepo->getSignedRevenueForPeriod($currentMonth, $endMonth);
