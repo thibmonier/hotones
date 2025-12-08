@@ -581,7 +581,6 @@ class ProjectController extends AbstractController
                     $planning = new \App\Entity\Planning();
                     $planning->setContributor($suggestion['contributor']);
                     $planning->setProject($project);
-                    $planning->setTask($suggestion['task']);
                     $planning->setProfile($suggestion['task']->getRequiredProfile());
                     $planning->setStartDate($suggestion['startDate']);
                     $planning->setEndDate($suggestion['endDate']);
