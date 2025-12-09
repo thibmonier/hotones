@@ -11,6 +11,7 @@ use App\Service\Planning\TaceAnalyzer;
 use function count;
 
 use DateTime;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +28,7 @@ class PlanningOptimizationController extends AbstractController
         private readonly PlanningOptimizer $optimizer,
         private readonly TaceAnalyzer $taceAnalyzer,
         private readonly PlanningAIAssistant $aiAssistant,
+        private readonly CacheItemPoolInterface $cachePool,
         private readonly CacheInterface $cache
     ) {
     }
@@ -52,7 +54,7 @@ class PlanningOptimizationController extends AbstractController
 
         // Vérifier si les données sont en cache
         $fromCache = false;
-        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem = $this->cachePool->getItem($cacheKey);
         if ($cacheItem->isHit()) {
             $fromCache = true;
             $result    = $cacheItem->get();
@@ -60,7 +62,7 @@ class PlanningOptimizationController extends AbstractController
             $result = $this->optimizer->generateRecommendations($startDate, $endDate);
             $cacheItem->set($result);
             $cacheItem->expiresAfter(3600); // Cache valide pendant 1 heure
-            $this->cache->save($cacheItem);
+            $this->cachePool->save($cacheItem);
         }
 
         // Enrichir avec l'IA si disponible (toujours en cache séparé car plus coûteux)

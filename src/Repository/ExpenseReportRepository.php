@@ -222,7 +222,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function findTopContributors(DateTimeInterface $start, DateTimeInterface $end, int $limit = 5): array
     {
-        return $this->createQueryBuilder('e')
+        $results = $this->createQueryBuilder('e')
             ->select('IDENTITY(e.contributor) as contributor_id', 'SUM(e.amountTTC) as total', 'COUNT(e.id) as count')
             ->where('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -235,6 +235,22 @@ class ExpenseReportRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        $contributorRepo = $this->getEntityManager()->getRepository(Contributor::class);
+        $topContributors = [];
+
+        foreach ($results as $result) {
+            $contributor = $contributorRepo->find($result['contributor_id']);
+            if ($contributor instanceof Contributor) {
+                $topContributors[] = [
+                    'contributor' => $contributor,
+                    'total'       => (string) $result['total'],
+                    'count'       => (int) $result['count'],
+                ];
+            }
+        }
+
+        return $topContributors;
     }
 
     /**
