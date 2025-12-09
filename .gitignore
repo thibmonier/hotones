@@ -44,3 +44,4 @@ yarn-error.log
 /.scannerwork/
 /.idea/
 /.DS_Store
+/*.code-workspace
