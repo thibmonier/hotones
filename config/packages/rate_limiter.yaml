@@ -5,26 +5,28 @@ framework:
             policy: 'sliding_window'
             limit: 5
             interval: '15 minutes'
-            # Clé basée sur l'IP
-            
+
         # Rate limiting pour API endpoints
+        # Token bucket permet des burst courts tout en limitant le débit moyen
         api:
             policy: 'token_bucket'
-            limit: 100
-            rate: { interval: '1 minute', amount: 100 }
-            
+            limit: 100  # Capacité max du bucket
+            rate:
+                interval: '1 minute'
+                amount: 60  # Recharge de 60 tokens/minute (1 req/seconde)
+
         # Rate limiting pour exports (PDF, Excel, CSV)
         exports:
             policy: 'fixed_window'
             limit: 10
             interval: '1 hour'
-            
+
         # Rate limiting pour uploads de fichiers
         uploads:
             policy: 'sliding_window'
             limit: 20
             interval: '1 hour'
-            
+
         # Rate limiting strict pour actions admin critiques
         admin_actions:
             policy: 'fixed_window'

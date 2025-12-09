@@ -10,3 +10,8 @@ framework:
             cache.analytics:
                 adapter: cache.adapter.redis
                 default_lifetime: 1800  # 30 minutes
+
+            # Cache for rate limiter (API throttling)
+            cache.rate_limiter:
+                adapter: cache.adapter.redis
+                default_lifetime: 3600  # 1 hour
