@@ -1,0 +1,173 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Feuilles de temps — {{ contributor.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Feuilles de temps — {{ contributor.name }}</h4>
+      <div class="page-title-right d-flex gap-2">
+        <a href="{{ path('contributor_show', {'id': contributor.id}) }}" class="btn btn-secondary">
+          <i class="bx bx-arrow-back me-1"></i> Retour au contributeur
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label for="month" class="form-label">Période</label>
+            <input type="month" class="form-control" id="month" name="month" value="{{ month }}" onchange="this.form.submit()">
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex gap-2 flex-column">
+              <label class="form-label">Totaux</label>
+              <div>
+                <span class="badge bg-primary fs-6">{{ totalHours|number_format(2, ',', ' ') }} heures</span>
+                <span class="badge bg-info fs-6 ms-2">{{ (totalHours / 7)|number_format(2, ',', ' ') }} jours</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="bx bx-time me-1"></i>
+          Imputations du {{ startDate|date('d/m/Y') }} au {{ endDate|date('d/m/Y') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        {% if timesheets %}
+          <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Projet</th>
+                  <th>Tâche</th>
+                  <th>Sous-tâche</th>
+                  <th>Description</th>
+                  <th class="text-end">Heures</th>
+                  <th class="text-end">Jours</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for ts in timesheets %}
+                <tr>
+                  <td>{{ ts.date|date('d/m/Y') }}</td>
+                  <td>
+                    {% if ts.project %}
+                      <a href="{{ path('project_show', {'id': ts.project.id}) }}" class="text-decoration-none">
+                        {{ ts.project.name }}
+                      </a>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if ts.projectTask %}
+                      {{ ts.projectTask.name }}
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if ts.projectSubTask %}
+                      {{ ts.projectSubTask.title }}
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if ts.description %}
+                      <small class="text-muted">{{ ts.description|slice(0, 80) }}{% if ts.description|length > 80 %}...{% endif %}</small>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">{{ ts.hours|number_format(2, ',', ' ') }}</td>
+                  <td class="text-end">{{ (ts.hours / 7)|number_format(2, ',', ' ') }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr class="table-active fw-bold">
+                  <td colspan="5" class="text-end">Total :</td>
+                  <td class="text-end">{{ totalHours|number_format(2, ',', ' ') }} h</td>
+                  <td class="text-end">{{ (totalHours / 7)|number_format(2, ',', ' ') }} j</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center text-muted py-5">
+            <i class="bx bx-time-five font-size-48 d-block mb-2"></i>
+            Aucune feuille de temps pour cette période
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if projectTotals %}
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="bx bx-pie-chart-alt me-1"></i>
+          Répartition par projet
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Projet</th>
+                <th class="text-end">Heures</th>
+                <th class="text-end">Jours</th>
+                <th class="text-end">Pourcentage</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for projectTotal in projectTotals %}
+              <tr>
+                <td>
+                  <a href="{{ path('project_show', {'id': projectTotal.project_id}) }}" class="text-decoration-none">
+                    {{ projectTotal.project_name }}
+                  </a>
+                </td>
+                <td class="text-end">{{ projectTotal.total_hours|number_format(2, ',', ' ') }}</td>
+                <td class="text-end">{{ (projectTotal.total_hours / 7)|number_format(2, ',', ' ') }}</td>
+                <td class="text-end">
+                  <span class="badge bg-primary">
+                    {{ ((projectTotal.total_hours / totalHours) * 100)|number_format(1) }}%
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
