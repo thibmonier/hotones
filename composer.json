@@ -77,6 +77,7 @@
         "twig/extra-bundle": "^2.12|^3.22.1",
         "twig/intl-extra": "^3.22.1",
         "twig/markdown-extra": "^3.22",
+        "twig/string-extra": "^3.22",
         "twig/twig": "^2.12|^3.22.1"
     },
     "require-dev": {

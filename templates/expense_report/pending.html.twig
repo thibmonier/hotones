@@ -1,0 +1,110 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Frais en attente de validation{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Frais en attente de validation</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">En attente de validation</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-sm-8">
+                            <p class="text-muted">Notes de frais soumises par les contributeurs, en attente de votre validation.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle table-nowrap table-check">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Contributeur</th>
+                                    <th>Catégorie</th>
+                                    <th>Description</th>
+                                    <th class="text-end">Montant TTC</th>
+                                    <th>Projet/Devis</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in expenses %}
+                                    <tr>
+                                        <td>{{ expense.expenseDate|date('d/m/Y') }}</td>
+                                        <td>
+                                            <a href="{{ path('contributor_show', {id: expense.contributor.id}) }}">{{ expense.contributor.fullName }}</a>
+                                        </td>
+                                        <td><i class="{{ expense.categoryIcon }} me-1"></i> {{ expense.categoryLabel }}</td>
+                                        <td>{{ expense.description|u.truncate(40) }}</td>
+                                        <td class="text-end"><strong>{{ expense.amountTTC }} €</strong></td>
+                                        <td>
+                                            {% if expense.project %}
+                                                <a href="{{ path('project_show', {id: expense.project.id}) }}">{{ expense.project.name }}</a>
+                                            {% elseif expense.order %}
+                                                <a href="{{ path('order_show', {id: expense.order.id}) }}">{{ expense.order.reference }}</a>
+                                            {% else %}—{% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ path('expense_report_show', {id: expense.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir détails"><i class="mdi mdi-eye"></i></a>
+                                            <form method="post" action="{{ path('expense_report_validate', {id: expense.id}) }}" class="d-inline-block">
+                                                <input type="hidden" name="comment" value="">
+                                                <button type="submit" class="btn btn-sm btn-success" title="Valider"><i class="mdi mdi-check"></i></button>
+                                            </form>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Rejeter" data-bs-toggle="modal" data-bs-target="#rejectModal{{ expense.id }}">
+                                                <i class="mdi mdi-close"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center">Aucune note de frais en attente de validation.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Modals for rejection #}
+    {% for expense in expenses %}
+        <div class="modal fade" id="rejectModal{{ expense.id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ expense.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="{{ path('expense_report_reject', {id: expense.id}) }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rejectModalLabel{{ expense.id }}">Rejeter la note de frais</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Vous êtes sur le point de rejeter la note de frais de <strong>{{ expense.contributor.fullName }}</strong> d'un montant de <strong>{{ expense.amountTTC }} €</strong>.</p>
+                            <div class="mb-3">
+                                <label for="rejectComment{{ expense.id }}" class="form-label">Motif du rejet <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="rejectComment{{ expense.id }}" name="comment" rows="3" required placeholder="Indiquez le motif du rejet..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-danger">Rejeter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

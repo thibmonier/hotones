@@ -120,11 +120,22 @@ class Order
     #[ORM\OrderBy(['billingDate' => 'ASC'])]
     private Collection $paymentSchedules;
 
+    // Gestion des notes de frais refacturables
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $expensesRebillable = false;
+
+    #[ORM\Column(type: 'decimal', precision: 5, scale: 2, options: ['default' => '0.00'])]
+    private string $expenseManagementFeeRate = '0.00';
+
+    #[ORM\OneToMany(targetEntity: ExpenseReport::class, mappedBy: 'order')]
+    private Collection $expenseReports;
+
     public function __construct()
     {
         $this->tasks            = new ArrayCollection();
         $this->sections         = new ArrayCollection();
         $this->paymentSchedules = new ArrayCollection();
+        $this->expenseReports   = new ArrayCollection();
         $this->createdAt        = new DateTime();
     }
 
@@ -450,5 +461,99 @@ class Order
     public function calculateTotal(): float
     {
         return (float) $this->calculateTotalFromSections();
+    }
+
+    // === Gestion des notes de frais ===
+
+    public function isExpensesRebillable(): bool
+    {
+        return $this->expensesRebillable;
+    }
+
+    public function setExpensesRebillable(bool $expensesRebillable): self
+    {
+        $this->expensesRebillable = $expensesRebillable;
+
+        return $this;
+    }
+
+    public function getExpenseManagementFeeRate(): string
+    {
+        return $this->expenseManagementFeeRate;
+    }
+
+    public function setExpenseManagementFeeRate(string $expenseManagementFeeRate): self
+    {
+        $this->expenseManagementFeeRate = $expenseManagementFeeRate;
+
+        return $this;
+    }
+
+    public function getExpenseReports(): Collection
+    {
+        return $this->expenseReports;
+    }
+
+    public function addExpenseReport(ExpenseReport $expenseReport): self
+    {
+        if (!$this->expenseReports->contains($expenseReport)) {
+            $this->expenseReports[] = $expenseReport;
+            $expenseReport->setOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpenseReport(ExpenseReport $expenseReport): self
+    {
+        if ($this->expenseReports->removeElement($expenseReport)) {
+            if ($expenseReport->getOrder() === $this) {
+                $expenseReport->setOrder(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Calcule le total des frais validés rattachés à ce devis.
+     */
+    public function getTotalValidatedExpenses(): string
+    {
+        $total = '0.00';
+        foreach ($this->expenseReports as $expense) {
+            if ($expense->getStatus() === ExpenseReport::STATUS_VALIDATED || $expense->getStatus() === ExpenseReport::STATUS_PAID) {
+                $total = bcadd($total, $expense->getAmountTTC(), 2);
+            }
+        }
+
+        return $total;
+    }
+
+    /**
+     * Calcule le montant total refacturable (frais + frais de gestion).
+     */
+    public function getTotalRebillableExpenses(): string
+    {
+        if (!$this->expensesRebillable) {
+            return '0.00';
+        }
+
+        $total         = $this->getTotalValidatedExpenses();
+        $feeMultiplier = bcadd('1', bcdiv($this->expenseManagementFeeRate, '100', 4), 4);
+
+        return bcmul($total, $feeMultiplier, 2);
+    }
+
+    /**
+     * Calcule les frais de gestion totaux.
+     */
+    public function getTotalManagementFees(): string
+    {
+        if (!$this->expensesRebillable) {
+            return '0.00';
+        }
+
+        return bcsub($this->getTotalRebillableExpenses(), $this->getTotalValidatedExpenses(), 2);
     }
 }

@@ -1,0 +1,170 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouvelle note de frais{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouvelle note de frais</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('expense_report_mine') }}">Mes notes de frais</a></li>
+                        <li class="breadcrumb-item active">Nouvelle</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.expenseDate, 'Date de la dépense', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.expenseDate, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(form.expenseDate) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.category, 'Catégorie', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.category, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_errors(form.category) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form_label(form.amountHT, 'Montant HT (€)', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.amountHT, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(form.amountHT) }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form_label(form.vatRate, 'Taux de TVA (%)', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.vatRate, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_errors(form.vatRate) }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Montant TTC</label>
+                                    <div class="form-control bg-light" id="amountTTCPreview">—</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.project, 'Projet (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.project) }}
+                                    {{ form_errors(form.project) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.order, 'Devis (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.order) }}
+                                    {{ form_errors(form.order) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.receiptFile, 'Justificatif (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.receiptFile) }}
+                            {{ form_errors(form.receiptFile) }}
+                            <div class="form-text">Formats acceptés : PDF, JPG, PNG (max 5 Mo)</div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary"><i class="mdi mdi-content-save me-1"></i> Enregistrer</button>
+                            <a href="{{ path('expense_report_mine') }}" class="btn btn-secondary"><i class="mdi mdi-arrow-left me-1"></i> Retour</a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Informations</h5>
+                    <p class="text-muted">Renseignez les détails de votre note de frais. Vous pourrez la soumettre pour validation une fois enregistrée.</p>
+                    <hr>
+                    <h6>Catégories disponibles</h6>
+                    <ul class="text-muted small">
+                        <li><i class="mdi mdi-train me-1"></i> Transport</li>
+                        <li><i class="mdi mdi-bed me-1"></i> Hébergement</li>
+                        <li><i class="mdi mdi-food me-1"></i> Repas</li>
+                        <li><i class="mdi mdi-laptop me-1"></i> Matériel</li>
+                        <li><i class="mdi mdi-file-document me-1"></i> Abonnements & Licences</li>
+                        <li><i class="mdi mdi-dots-horizontal me-1"></i> Autre</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calcul TTC en temps réel
+            const amountHTInput = document.querySelector('[name="expense_report[amountHT]"]');
+            const vatRateSelect = document.querySelector('[name="expense_report[vatRate]"]');
+            const preview = document.getElementById('amountTTCPreview');
+
+            function updatePreview() {
+                const amountHT = parseFloat(amountHTInput.value) || 0;
+                const vatRate = parseFloat(vatRateSelect.value) || 0;
+                const amountTTC = amountHT * (1 + vatRate / 100);
+                preview.textContent = amountTTC.toFixed(2) + ' €';
+            }
+
+            if (amountHTInput && vatRateSelect) {
+                amountHTInput.addEventListener('input', updatePreview);
+                vatRateSelect.addEventListener('change', updatePreview);
+                updatePreview();
+            }
+
+            // Initialisation Choices.js pour les selects avec recherche
+            document.querySelectorAll('.select2-search').forEach(function(select) {
+                new Choices(select, {
+                    removeItemButton: false,
+                    placeholder: true,
+                    placeholderValue: select.getAttribute('data-placeholder') || 'Sélectionner...',
+                    searchPlaceholderValue: 'Rechercher...',
+                    noResultsText: 'Aucun résultat',
+                    noChoicesText: 'Aucune option disponible',
+                    itemSelectText: '',
+                    shouldSort: false,
+                    searchResultLimit: 20,
+                });
+            });
+        });
+    </script>
+{% endblock %}

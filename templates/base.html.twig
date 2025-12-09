@@ -167,7 +167,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/skills' ? 'active' : '' }}" href="{{ path('skill_index') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/hr/skills-matrix' ? 'active' : '' }}" href="{{ path('hr_skills_matrix') }}">
                                 <i class="bx bx-star me-2"></i>
                                 Compétences
                             </a>
@@ -264,25 +264,25 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/technologies' ? 'active' : '' }}" href="{{ path('technology_index') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/backoffice' ? 'active' : '' }}" href="{{ path('backoffice') }}">
                                 <i class="bx bx-code-alt me-2"></i>
                                 Technologies
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/service-categories' ? 'active' : '' }}" href="{{ path('service_category_index') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/backoffice' ? 'active' : '' }}" href="{{ path('backoffice') }}">
                                 <i class="bx bx-category me-2"></i>
                                 Catégories de service
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/job-profiles' ? 'active' : '' }}" href="{{ path('job_profile_index') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/backoffice' ? 'active' : '' }}" href="{{ path('backoffice') }}">
                                 <i class="bx bx-badge-check me-2"></i>
                                 Profils métier
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/scheduler' ? 'active' : '' }}" href="{{ path('admin_scheduler_index') }}">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/backoffice' ? 'active' : '' }}" href="{{ path('backoffice') }}">
                                 <i class="bx bx-time-five me-2"></i>
                                 Tâches planifiées
                             </a>

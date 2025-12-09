@@ -7,6 +7,8 @@ parameters:
     # Avatar storage: use persistent disk in production, public folder in dev
     avatars_directory: '%env(default:avatars_directory_default:AVATARS_DIRECTORY)%'
     avatars_directory_default: '%kernel.project_dir%/public/uploads/avatars'
+    # Expense receipts storage
+    expense_receipts_directory: '%kernel.project_dir%/public/uploads/expenses'
     app.mail.from_email: '%env(MAIL_FROM_ADDRESS)%'
     app.mail.from_name: '%env(MAIL_FROM_NAME)%'
 
@@ -55,6 +57,11 @@ services:
         arguments:
             $fromEmail: '%app.mail.from_email%'
             $fromName: '%app.mail.from_name%'
+
+    # Expense Report Controller - upload directory
+    App\Controller\ExpenseReportController:
+        arguments:
+            $expenseReceiptsDirectory: '%expense_receipts_directory%'
 
     # Analytics Dashboard Service with Redis cache
     App\Service\Analytics\DashboardReadService:

@@ -168,7 +168,7 @@
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0" id="recommendations-table">
                             <thead>
                                 <tr>
                                     <th width="50">Priorité</th>
@@ -180,7 +180,7 @@
                             </thead>
                             <tbody>
                                 {% for rec in recommendations %}
-                                <tr>
+                                <tr class="recommendation-row" data-index="{{ loop.index0 }}" {% if loop.index0 >= 10 %}style="display: none;"{% endif %}>
                                     <td class="text-center">
                                         {% if rec.severity_level == 'critical' %}
                                             <span class="badge bg-danger rounded-pill">{{ rec.priority_score }}</span>
@@ -254,6 +254,17 @@
                             </tbody>
                         </table>
                     </div>
+                    {% if recommendations|length > 10 %}
+                    <div class="text-center mt-3">
+                        <button id="show-more-btn" class="btn btn-outline-primary" onclick="showMoreRecommendations()">
+                            <i class="bx bx-chevron-down"></i>
+                            Voir plus (<span id="remaining-count">{{ recommendations|length - 10 }}</span> restantes)
+                        </button>
+                        <button id="show-all-btn" class="btn btn-link text-muted" onclick="showAllRecommendations()" style="display: none;">
+                            Tout afficher
+                        </button>
+                    </div>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -352,6 +363,57 @@
 {% block javascripts %}
 {{ parent() }}
 <script>
+let currentlyVisible = 10;
+const increment = 10;
+const totalRecommendations = {{ recommendations|length }};
+
+function showMoreRecommendations() {
+    const rows = document.querySelectorAll('.recommendation-row');
+    const newVisible = Math.min(currentlyVisible + increment, totalRecommendations);
+
+    // Afficher les lignes suivantes
+    for (let i = currentlyVisible; i < newVisible; i++) {
+        if (rows[i]) {
+            rows[i].style.display = '';
+        }
+    }
+
+    currentlyVisible = newVisible;
+    updateShowMoreButton();
+}
+
+function showAllRecommendations() {
+    const rows = document.querySelectorAll('.recommendation-row');
+    rows.forEach(row => {
+        row.style.display = '';
+    });
+
+    currentlyVisible = totalRecommendations;
+    updateShowMoreButton();
+}
+
+function updateShowMoreButton() {
+    const remaining = totalRecommendations - currentlyVisible;
+    const remainingCount = document.getElementById('remaining-count');
+    const showMoreBtn = document.getElementById('show-more-btn');
+    const showAllBtn = document.getElementById('show-all-btn');
+
+    if (remaining > 0) {
+        remainingCount.textContent = remaining;
+
+        // Afficher le bouton "Tout afficher" si plus de 20 restantes
+        if (remaining > 20) {
+            showAllBtn.style.display = 'inline-block';
+        }
+    } else {
+        // Cacher les boutons si tout est affiché
+        showMoreBtn.style.display = 'none';
+        if (showAllBtn) {
+            showAllBtn.style.display = 'none';
+        }
+    }
+}
+
 function applyRecommendation(index) {
     if (!confirm('Voulez-vous vraiment appliquer cette recommandation ?\n\nCela créera ou modifiera automatiquement des plannings.')) {
         return;
@@ -386,7 +448,11 @@ function applyRecommendation(index) {
             row.style.transition = 'opacity 0.5s';
             setTimeout(() => {
                 row.style.opacity = '0';
-                setTimeout(() => row.remove(), 500);
+                setTimeout(() => {
+                    row.remove();
+                    // Mettre à jour le compteur après suppression
+                    updateShowMoreButton();
+                }, 500);
             }, 1000);
         } else {
             showAlert('danger', 'Erreur: ' + data.message);

@@ -1,0 +1,227 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Note de frais #{{ expense.id }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Note de frais #{{ expense.id }}</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('expense_report_mine') }}">Mes notes de frais</a></li>
+                        <li class="breadcrumb-item active">#{{ expense.id }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0">Détails de la note de frais</h5>
+                        <span class="badge rounded-pill {{ expense.statusBadgeClass }} fs-6">{{ expense.statusLabel }}</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="ps-0" style="width: 200px;">Date de la dépense</th>
+                                    <td class="text-muted">{{ expense.expenseDate|date('d/m/Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Contributeur</th>
+                                    <td class="text-muted">
+                                        <a href="{{ path('contributor_show', {id: expense.contributor.id}) }}">{{ expense.contributor.fullName }}</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Catégorie</th>
+                                    <td class="text-muted"><i class="{{ expense.categoryIcon }} me-1"></i> {{ expense.categoryLabel }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Description</th>
+                                    <td class="text-muted">{{ expense.description }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Montant HT</th>
+                                    <td class="text-muted">{{ expense.amountHT }} €</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Taux de TVA</th>
+                                    <td class="text-muted">{{ expense.vatRate }} %</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Montant TTC</th>
+                                    <td><strong>{{ expense.amountTTC }} €</strong></td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Projet</th>
+                                    <td class="text-muted">
+                                        {% if expense.project %}
+                                            <a href="{{ path('project_show', {id: expense.project.id}) }}">{{ expense.project.name }}</a>
+                                        {% else %}—{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Devis</th>
+                                    <td class="text-muted">
+                                        {% if expense.order %}
+                                            <a href="{{ path('order_show', {id: expense.order.id}) }}">{{ expense.order.orderNumber }}</a>
+                                        {% else %}—{% endif %}
+                                    </td>
+                                </tr>
+                                {% if expense.validationComment and expense.status == 'rejected' %}
+                                    <tr>
+                                        <th class="ps-0">Motif de rejet</th>
+                                        <td class="text-danger">{{ expense.validationComment }}</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% if expense.filePath %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Justificatif</h5>
+                        <a href="{{ asset('uploads/expenses/' ~ expense.filePath) }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="mdi mdi-file-download me-1"></i> Télécharger le justificatif
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Actions</h5>
+
+                    {% if expense.isEditable %}
+                        <a href="{{ path('expense_report_edit', {id: expense.id}) }}" class="btn btn-secondary w-100 mb-2">
+                            <i class="mdi mdi-pencil me-1"></i> Modifier
+                        </a>
+                    {% endif %}
+
+                    {% if expense.canBeSubmitted %}
+                        <form method="post" action="{{ path('expense_report_submit', {id: expense.id}) }}">
+                            <button type="submit" class="btn btn-success w-100 mb-2">
+                                <i class="mdi mdi-send me-1"></i> Soumettre pour validation
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_MANAGER') and expense.status == 'submitted' %}
+                        <hr>
+                        <h6 class="text-muted">Validation manager</h6>
+                        <form method="post" action="{{ path('expense_report_validate', {id: expense.id}) }}" class="mb-2">
+                            <input type="hidden" name="comment" value="">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="mdi mdi-check me-1"></i> Valider
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('expense_report_reject', {id: expense.id}) }}">
+                            <div class="mb-2">
+                                <input type="text" name="comment" class="form-control" placeholder="Motif du rejet">
+                            </div>
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="mdi mdi-close me-1"></i> Rejeter
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    <hr>
+                    <a href="{{ path('expense_report_mine') }}" class="btn btn-outline-secondary w-100">
+                        <i class="mdi mdi-arrow-left me-1"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Historique</h5>
+                    <ul class="verti-timeline list-unstyled">
+                        <li class="event-list">
+                            <div class="event-timeline-dot">
+                                <i class="bx bx-right-arrow-circle"></i>
+                            </div>
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <div><strong>Création</strong></div>
+                                    <p class="text-muted mb-0">{{ expense.createdAt|date('d/m/Y H:i') }}</p>
+                                </div>
+                            </div>
+                        </li>
+                        {% if expense.status == 'pending' or expense.status == 'validated' or expense.status == 'rejected' or expense.status == 'paid' %}
+                            <li class="event-list">
+                                <div class="event-timeline-dot">
+                                    <i class="bx bx-right-arrow-circle"></i>
+                                </div>
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <div><strong>Soumis</strong></div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                        {% if expense.validatedAt and expense.status == 'validated' %}
+                            <li class="event-list">
+                                <div class="event-timeline-dot">
+                                    <i class="bx bx-right-arrow-circle text-success"></i>
+                                </div>
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <div><strong class="text-success">Validé</strong></div>
+                                        <p class="text-muted mb-0">{{ expense.validatedAt|date('d/m/Y H:i') }}</p>
+                                        {% if expense.validator %}
+                                            <small class="text-muted">par {{ expense.validator.firstName }} {{ expense.validator.lastName }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                        {% if expense.status == 'rejected' %}
+                            <li class="event-list">
+                                <div class="event-timeline-dot">
+                                    <i class="bx bx-right-arrow-circle text-danger"></i>
+                                </div>
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <div><strong class="text-danger">Rejeté</strong></div>
+                                        {% if expense.validatedAt %}
+                                            <p class="text-muted mb-0">{{ expense.validatedAt|date('d/m/Y H:i') }}</p>
+                                        {% endif %}
+                                        {% if expense.validator %}
+                                            <small class="text-muted">par {{ expense.validator.firstName }} {{ expense.validator.lastName }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                        {% if expense.paidAt %}
+                            <li class="event-list">
+                                <div class="event-timeline-dot">
+                                    <i class="bx bx-right-arrow-circle text-primary"></i>
+                                </div>
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <div><strong class="text-primary">Remboursé</strong></div>
+                                        <p class="text-muted mb-0">{{ expense.paidAt|date('d/m/Y H:i') }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
