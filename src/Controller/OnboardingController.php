@@ -24,22 +24,37 @@ class OnboardingController extends AbstractController
     ) {
     }
 
-    #[Route('/{id}', name: 'onboarding_show', methods: ['GET'])]
-    public function show(Contributor $contributor): Response
+    #[Route('/team', name: 'onboarding_team', methods: ['GET'])]
+    #[IsGranted('ROLE_MANAGER')]
+    public function team(): Response
     {
-        // Check access: contributor can see their own, manager can see team members
-        $user = $this->getUser();
-        if ($contributor->getUser() !== $user && !$this->isGranted('ROLE_MANAGER')) {
-            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cet onboarding.');
+        // Get all active contributors with onboarding
+        $contributors = $this->contributorRepository->findActiveContributors();
+
+        $onboardingData = [];
+        foreach ($contributors as $contributor) {
+            $summary = $this->onboardingService->getOnboardingSummary($contributor);
+
+            // Only include contributors with onboarding tasks
+            if ($summary['total'] > 0) {
+                $onboardingData[] = [
+                    'contributor' => $contributor,
+                    'summary'     => $summary,
+                ];
+            }
         }
 
-        $tasksByWeek = $this->onboardingService->getTasksByWeek($contributor);
-        $summary     = $this->onboardingService->getOnboardingSummary($contributor);
+        // Sort by progress (incomplete first, then by overdue count)
+        usort($onboardingData, function ($a, $b) {
+            if ($a['summary']['is_complete'] !== $b['summary']['is_complete']) {
+                return $a['summary']['is_complete'] ? 1 : -1;
+            }
 
-        return $this->render('onboarding/show.html.twig', [
-            'contributor'   => $contributor,
-            'tasks_by_week' => $tasksByWeek,
-            'summary'       => $summary,
+            return $b['summary']['overdue'] <=> $a['summary']['overdue'];
+        });
+
+        return $this->render('onboarding/team.html.twig', [
+            'onboarding_data' => $onboardingData,
         ]);
     }
 
@@ -97,37 +112,22 @@ class OnboardingController extends AbstractController
         ]);
     }
 
-    #[Route('/team', name: 'onboarding_team', methods: ['GET'])]
-    #[IsGranted('ROLE_MANAGER')]
-    public function team(): Response
+    #[Route('/contributor/{id}', name: 'onboarding_show', methods: ['GET'])]
+    public function show(Contributor $contributor): Response
     {
-        // Get all active contributors with onboarding
-        $contributors = $this->contributorRepository->findActiveContributors();
-
-        $onboardingData = [];
-        foreach ($contributors as $contributor) {
-            $summary = $this->onboardingService->getOnboardingSummary($contributor);
-
-            // Only include contributors with onboarding tasks
-            if ($summary['total'] > 0) {
-                $onboardingData[] = [
-                    'contributor' => $contributor,
-                    'summary'     => $summary,
-                ];
-            }
+        // Check access: contributor can see their own, manager can see team members
+        $user = $this->getUser();
+        if ($contributor->getUser() !== $user && !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cet onboarding.');
         }
 
-        // Sort by progress (incomplete first, then by overdue count)
-        usort($onboardingData, function ($a, $b) {
-            if ($a['summary']['is_complete'] !== $b['summary']['is_complete']) {
-                return $a['summary']['is_complete'] ? 1 : -1;
-            }
+        $tasksByWeek = $this->onboardingService->getTasksByWeek($contributor);
+        $summary     = $this->onboardingService->getOnboardingSummary($contributor);
 
-            return $b['summary']['overdue'] <=> $a['summary']['overdue'];
-        });
-
-        return $this->render('onboarding/team.html.twig', [
-            'onboarding_data' => $onboardingData,
+        return $this->render('onboarding/show.html.twig', [
+            'contributor'   => $contributor,
+            'tasks_by_week' => $tasksByWeek,
+            'summary'       => $summary,
         ]);
     }
 }
