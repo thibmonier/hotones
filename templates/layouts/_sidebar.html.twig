@@ -115,9 +115,11 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ path('satisfaction_index') }}">Ma satisfaction</a></li>
                         <li><a href="{{ path('leaderboard_index') }}">Classement & XP</a></li>
+                        <li><a href="{{ path('performance_review_index') }}">Mes évaluations</a></li>
                         {% if is_granted('ROLE_MANAGER') %}
                         <li><a href="{{ path('nps_index') }}">Satisfaction client (NPS)</a></li>
                         <li><a href="{{ path('satisfaction_stats') }}">Stats satisfaction équipe</a></li>
+                        <li><a href="{{ path('onboarding_team') }}">Onboarding équipe</a></li>
                         {% endif %}
                         {% if is_granted('ROLE_ADMIN') %}
                         <li><a href="{{ path('badge_index') }}">Gestion des badges</a></li>

@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Auto-évaluation {{ review.year }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Auto-évaluation {{ review.year }}</h4>
+
+                <div class="page-title-right">
+                    <a href="{{ path('performance_review_show', {id: review.id}) }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="bx bx-info-circle me-2"></i>
+                        <strong>Instructions:</strong> Prenez le temps de réfléchir à votre année {{ review.year }}.
+                        Cette auto-évaluation servira de base pour l'entretien avec votre manager.
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('self-evaluation-' ~ review.id) }}">
+
+                        <div class="mb-4">
+                            <label for="achievements" class="form-label">
+                                <strong>1. Quelles sont vos principales réalisations en {{ review.year }} ?</strong>
+                            </label>
+                            <p class="text-muted small">Listez vos réussites, projets menés à bien, objectifs atteints...</p>
+                            <textarea name="achievements" id="achievements" class="form-control" rows="6" required>{{ review.selfEvaluation.achievements|default('') }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="strengths" class="form-label">
+                                <strong>2. Quels sont vos points forts ?</strong>
+                            </label>
+                            <p class="text-muted small">Compétences techniques, soft skills, qualités professionnelles...</p>
+                            <textarea name="strengths" id="strengths" class="form-control" rows="5" required>{{ review.selfEvaluation.strengths|default('') }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="improvements" class="form-label">
+                                <strong>3. Quels sont vos axes d'amélioration ?</strong>
+                            </label>
+                            <p class="text-muted small">Compétences à développer, domaines à approfondir, difficultés rencontrées...</p>
+                            <textarea name="improvements" id="improvements" class="form-control" rows="5" required>{{ review.selfEvaluation.improvements|default('') }}</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('performance_review_show', {id: review.id}) }}" class="btn btn-secondary">
+                                <i class="bx bx-x me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-check me-1"></i> Enregistrer mon auto-évaluation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

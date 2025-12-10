@@ -1,0 +1,249 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Évaluation {{ review.year }} - {{ review.contributor.fullName }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">
+                    Évaluation {{ review.year }} - {{ review.contributor.fullName }}
+                </h4>
+
+                <div class="page-title-right">
+                    <a href="{{ path('performance_review_index') }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Status card #}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <h6 class="text-muted mb-2">Statut</h6>
+                            <h4>
+                                <span class="badge badge-soft-{{ review.status == 'validee' ? 'success' : (review.status == 'en_attente' ? 'warning' : 'info') }} font-size-14">
+                                    {{ review.statusLabel }}
+                                </span>
+                            </h4>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Progression</h6>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar" role="progressbar"
+                                     style="width: {{ review.progressPercentage }}%"
+                                     aria-valuenow="{{ review.progressPercentage }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                    {{ review.progressPercentage }}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            {% if review.overallRating %}
+                                <h6 class="text-muted mb-2">Note globale</h6>
+                                <h4 class="text-warning mb-0">
+                                    {% for i in 1..review.overallRating %}
+                                        <i class="bx bxs-star"></i>
+                                    {% endfor %}
+                                    {% for i in (review.overallRating + 1)..5 %}
+                                        <i class="bx bx-star"></i>
+                                    {% endfor %}
+                                    <span class="font-size-16 text-muted ms-2">({{ review.overallRating }}/5)</span>
+                                </h4>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Action buttons #}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Actions disponibles</h5>
+                    <div class="d-flex gap-2">
+                        {% if review.status == 'en_attente' and app.user == review.contributor.user %}
+                            <a href="{{ path('performance_review_self_evaluation', {id: review.id}) }}"
+                               class="btn btn-primary">
+                                <i class="bx bx-edit me-1"></i> Compléter mon auto-évaluation
+                            </a>
+                        {% endif %}
+
+                        {% if review.status == 'auto_eval_faite' and is_granted('ROLE_MANAGER') and app.user == review.manager %}
+                            <a href="{{ path('performance_review_manager_evaluation', {id: review.id}) }}"
+                               class="btn btn-primary">
+                                <i class="bx bx-edit me-1"></i> Compléter l'évaluation manager
+                            </a>
+                        {% endif %}
+
+                        {% if review.status == 'eval_manager_faite' and is_granted('ROLE_MANAGER') and app.user == review.manager %}
+                            <a href="{{ path('performance_review_validate', {id: review.id}) }}"
+                               class="btn btn-success">
+                                <i class="bx bx-check-double me-1"></i> Valider l'évaluation
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# Self evaluation #}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bx bx-user me-2"></i> Auto-évaluation
+                    </h5>
+
+                    {% if review.selfEvaluation %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Réalisations principales</h6>
+                            <p>{{ review.selfEvaluation.achievements|nl2br }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6 class="text-muted">Points forts</h6>
+                            <p>{{ review.selfEvaluation.strengths|nl2br }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6 class="text-muted">Points d'amélioration</h6>
+                            <p>{{ review.selfEvaluation.improvements|nl2br }}</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Auto-évaluation non complétée
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Manager evaluation #}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bx bx-user-check me-2"></i> Évaluation manager
+                    </h5>
+
+                    {% if review.managerEvaluation %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Réalisations observées</h6>
+                            <p>{{ review.managerEvaluation.achievements|nl2br }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6 class="text-muted">Points forts identifiés</h6>
+                            <p>{{ review.managerEvaluation.strengths|nl2br }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6 class="text-muted">Axes d'amélioration</h6>
+                            <p>{{ review.managerEvaluation.improvements|nl2br }}</p>
+                        </div>
+
+                        {% if review.managerEvaluation.feedback %}
+                            <div class="mb-3">
+                                <h6 class="text-muted">Feedback général</h6>
+                                <p>{{ review.managerEvaluation.feedback|nl2br }}</p>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Évaluation manager non complétée
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Objectives #}
+    {% if review.objectives %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bx bx-target-lock me-2"></i> Objectifs pour {{ review.year + 1 }}
+                        </h5>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Objectif</th>
+                                        <th>Description</th>
+                                        <th>Échéance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for objective in review.objectives %}
+                                        <tr>
+                                            <td><strong>{{ objective.title }}</strong></td>
+                                            <td>{{ objective.description }}</td>
+                                            <td>
+                                                {% if objective.deadline %}
+                                                    {{ objective.deadline }}
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {# Interview details #}
+    {% if review.status == 'validee' %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bx bx-calendar-check me-2"></i> Informations de l'entretien
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if review.interviewDate %}
+                                    <p><strong>Date de l'entretien:</strong> {{ review.interviewDate|date('d/m/Y') }}</p>
+                                {% endif %}
+                                <p><strong>Validée le:</strong> {{ review.validatedAt|date('d/m/Y à H:i') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                {% if review.comments %}
+                                    <p><strong>Commentaires:</strong></p>
+                                    <p>{{ review.comments|nl2br }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

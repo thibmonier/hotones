@@ -1,0 +1,125 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Évaluation manager - {{ review.contributor.fullName }} ({{ review.year }}){% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">
+                    Évaluation manager - {{ review.contributor.fullName }} ({{ review.year }})
+                </h4>
+
+                <div class="page-title-right">
+                    <a href="{{ path('performance_review_show', {id: review.id}) }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            {# Self evaluation recap #}
+            <div class="card mb-3">
+                <div class="card-body bg-light">
+                    <h5 class="card-title mb-3">
+                        <i class="bx bx-info-circle me-2"></i> Auto-évaluation du collaborateur
+                    </h5>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Réalisations</h6>
+                            <p class="small">{{ review.selfEvaluation.achievements|nl2br }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Points forts</h6>
+                            <p class="small">{{ review.selfEvaluation.strengths|nl2br }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Axes d'amélioration</h6>
+                            <p class="small">{{ review.selfEvaluation.improvements|nl2br }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Manager evaluation form #}
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="bx bx-info-circle me-2"></i>
+                        <strong>Instructions:</strong> Évaluez les performances de {{ review.contributor.firstName }} en vous basant
+                        sur les faits observés durant l'année {{ review.year }}.
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('manager-evaluation-' ~ review.id) }}">
+
+                        <div class="mb-4">
+                            <label for="achievements" class="form-label">
+                                <strong>1. Réalisations et contributions observées</strong>
+                            </label>
+                            <p class="text-muted small">Résultats concrets, projets menés, valeur ajoutée...</p>
+                            <textarea name="achievements" id="achievements" class="form-control" rows="6" required>{{ review.managerEvaluation.achievements|default('') }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="strengths" class="form-label">
+                                <strong>2. Points forts identifiés</strong>
+                            </label>
+                            <p class="text-muted small">Compétences maîtrisées, qualités professionnelles remarquées...</p>
+                            <textarea name="strengths" id="strengths" class="form-control" rows="5" required>{{ review.managerEvaluation.strengths|default('') }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="improvements" class="form-label">
+                                <strong>3. Axes d'amélioration et pistes de développement</strong>
+                            </label>
+                            <p class="text-muted small">Compétences à renforcer, formations recommandées, accompagnement nécessaire...</p>
+                            <textarea name="improvements" id="improvements" class="form-control" rows="5" required>{{ review.managerEvaluation.improvements|default('') }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="feedback" class="form-label">
+                                <strong>4. Feedback général et perspectives</strong>
+                            </label>
+                            <p class="text-muted small">Vision globale, appréciation générale, perspectives d'évolution...</p>
+                            <textarea name="feedback" id="feedback" class="form-control" rows="4">{{ review.managerEvaluation.feedback|default('') }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="rating" class="form-label">
+                                <strong>5. Évaluation globale (optionnel)</strong>
+                            </label>
+                            <p class="text-muted small">Note de 1 à 5 étoiles</p>
+                            <div class="rating-select">
+                                {% for i in 1..5 %}
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="rating" id="rating{{ i }}"
+                                               value="{{ i }}" {% if review.overallRating == i %}checked{% endif %}>
+                                        <label class="form-check-label" for="rating{{ i }}">
+                                            {{ i }} ⭐
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('performance_review_show', {id: review.id}) }}" class="btn btn-secondary">
+                                <i class="bx bx-x me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-check me-1"></i> Enregistrer l'évaluation manager
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

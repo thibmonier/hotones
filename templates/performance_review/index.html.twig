@@ -1,0 +1,179 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Évaluations annuelles{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Évaluations annuelles</h4>
+
+                <div class="page-title-right">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('performance_review_campaign_create') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Créer campagne
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Filters #}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="year" class="form-label">Année</label>
+                            <select name="year" id="year" class="form-select">
+                                {% for y in range('now'|date('Y') + 1, 2020) %}
+                                    <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Statut</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">Tous les statuts</option>
+                                <option value="en_attente" {% if status == 'en_attente' %}selected{% endif %}>En attente</option>
+                                <option value="auto_eval_faite" {% if status == 'auto_eval_faite' %}selected{% endif %}>Auto-évaluation complétée</option>
+                                <option value="eval_manager_faite" {% if status == 'eval_manager_faite' %}selected{% endif %}>Évaluation manager complétée</option>
+                                <option value="validee" {% if status == 'validee' %}selected{% endif %}>Validée</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bx bx-filter-alt me-1"></i> Filtrer
+                            </button>
+                            <a href="{{ path('performance_review_index') }}" class="btn btn-secondary">
+                                <i class="bx bx-reset me-1"></i> Réinitialiser
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Statistics for managers #}
+    {% if statistics %}
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Statistiques globales</h5>
+                        <div class="row">
+                            {% for stat_year, stats in statistics.stats_by_year %}
+                                <div class="col-md-3 mb-3">
+                                    <div class="border rounded p-3">
+                                        <h6 class="text-muted mb-2">{{ stat_year }}</h6>
+                                        <div class="mb-1"><strong>Total:</strong> {{ stats.total }}</div>
+                                        <div class="mb-1"><small>En attente: {{ stats.en_attente }}</small></div>
+                                        <div class="mb-1"><small>Auto-éval: {{ stats.auto_eval_faite }}</small></div>
+                                        <div class="mb-1"><small>Éval manager: {{ stats.eval_manager_faite }}</small></div>
+                                        <div><small>Validées: {{ stats.validee }}</small></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {# Reviews list #}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        {% if is_granted('ROLE_MANAGER') %}
+                            Évaluations de votre équipe
+                        {% else %}
+                            Mes évaluations
+                        {% endif %}
+                    </h5>
+
+                    {% if reviews is empty %}
+                        <div class="alert alert-info">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Aucune évaluation trouvée pour les filtres sélectionnés.
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Année</th>
+                                        <th>Collaborateur</th>
+                                        {% if is_granted('ROLE_MANAGER') %}
+                                            <th>Manager</th>
+                                        {% endif %}
+                                        <th>Statut</th>
+                                        <th>Progression</th>
+                                        <th>Note</th>
+                                        <th>Créée le</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for review in reviews %}
+                                        <tr>
+                                            <td><strong>{{ review.year }}</strong></td>
+                                            <td>{{ review.contributor.fullName }}</td>
+                                            {% if is_granted('ROLE_MANAGER') %}
+                                                <td>{{ review.manager.fullName }}</td>
+                                            {% endif %}
+                                            <td>
+                                                <span class="badge badge-soft-{{ review.status == 'validee' ? 'success' : (review.status == 'en_attente' ? 'warning' : 'info') }}">
+                                                    {{ review.statusLabel }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar" role="progressbar"
+                                                         style="width: {{ review.progressPercentage }}%"
+                                                         aria-valuenow="{{ review.progressPercentage }}"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        {{ review.progressPercentage }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if review.overallRating %}
+                                                    <span class="text-warning">
+                                                        {% for i in 1..review.overallRating %}
+                                                            <i class="bx bxs-star"></i>
+                                                        {% endfor %}
+                                                        {% for i in (review.overallRating + 1)..5 %}
+                                                            <i class="bx bx-star"></i>
+                                                        {% endfor %}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ review.createdAt|date('d/m/Y') }}</td>
+                                            <td>
+                                                <a href="{{ path('performance_review_show', {id: review.id}) }}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bx bx-show me-1"></i> Voir
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

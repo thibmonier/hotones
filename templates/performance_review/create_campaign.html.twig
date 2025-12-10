@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Créer une campagne d'évaluations{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Créer une campagne d'évaluations</h4>
+
+                <div class="page-title-right">
+                    <a href="{{ path('performance_review_index') }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="bx bx-info-circle me-2"></i>
+                        <strong>Information:</strong> Une campagne crée automatiquement une évaluation pour chaque
+                        collaborateur actif avec un manager assigné.
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('create-campaign') }}">
+
+                        <div class="mb-4">
+                            <label for="year" class="form-label">
+                                <strong>Année de la campagne</strong>
+                            </label>
+                            <select name="year" id="year" class="form-select" required>
+                                <option value="{{ current_year - 1 }}">{{ current_year - 1 }}</option>
+                                <option value="{{ current_year }}" selected>{{ current_year }} (année en cours)</option>
+                                <option value="{{ current_year + 1 }}">{{ current_year + 1 }}</option>
+                            </select>
+                            <div class="form-text">
+                                Sélectionnez l'année pour laquelle vous souhaitez lancer les évaluations.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bx bx-error me-2"></i>
+                            <strong>Attention:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Les collaborateurs sans manager ne recevront pas d'évaluation</li>
+                                <li>Si une évaluation existe déjà pour un collaborateur cette année, elle ne sera pas recréée</li>
+                                <li>Les collaborateurs seront notifiés par email pour compléter leur auto-évaluation</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('performance_review_index') }}" class="btn btn-secondary">
+                                <i class="bx bx-x me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-plus me-1"></i> Créer la campagne
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

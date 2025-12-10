@@ -1,0 +1,146 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Validation - {{ review.contributor.fullName }} ({{ review.year }}){% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">
+                    Validation de l'évaluation - {{ review.contributor.fullName }} ({{ review.year }})
+                </h4>
+
+                <div class="page-title-right">
+                    <a href="{{ path('performance_review_show', {id: review.id}) }}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            {# Summary cards #}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">Auto-évaluation</h6>
+                            <div class="mb-2">
+                                <strong>Réalisations:</strong>
+                                <p class="small">{{ review.selfEvaluation.achievements|length > 150 ? review.selfEvaluation.achievements|slice(0, 150) ~ '...' : review.selfEvaluation.achievements }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">Évaluation manager</h6>
+                            <div class="mb-2">
+                                <strong>Réalisations observées:</strong>
+                                <p class="small">{{ review.managerEvaluation.achievements|length > 150 ? review.managerEvaluation.achievements|slice(0, 150) ~ '...' : review.managerEvaluation.achievements }}</p>
+                            </div>
+                            {% if review.overallRating %}
+                                <div>
+                                    <strong>Note:</strong>
+                                    <span class="text-warning">
+                                        {% for i in 1..review.overallRating %}⭐{% endfor %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Validation form #}
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-success mb-4">
+                        <i class="bx bx-check-circle me-2"></i>
+                        <strong>Dernière étape:</strong> Définissez les objectifs pour {{ review.year + 1 }}
+                        et planifiez l'entretien de restitution.
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('validate-review-' ~ review.id) }}">
+
+                        <h5 class="mb-3">Objectifs {{ review.year + 1 }}</h5>
+
+                        <div id="objectives-container">
+                            {% set existing_objectives = review.objectives|default([]) %}
+                            {% for i in 0..2 %}
+                                <div class="objective-item card mb-3">
+                                    <div class="card-body">
+                                        <h6>Objectif {{ i + 1 }}</h6>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">Titre</label>
+                                                <input type="text" name="objectives[{{ i }}][title]"
+                                                       class="form-control"
+                                                       value="{{ existing_objectives[i].title|default('') }}"
+                                                       placeholder="Ex: Maîtriser la technologie X">
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">Échéance (optionnel)</label>
+                                                <input type="text" name="objectives[{{ i }}][deadline]"
+                                                       class="form-control"
+                                                       value="{{ existing_objectives[i].deadline|default('') }}"
+                                                       placeholder="Ex: T2 2025, Juin 2025...">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Description</label>
+                                                <textarea name="objectives[{{ i }}][description]"
+                                                          class="form-control" rows="2"
+                                                          placeholder="Description détaillée de l'objectif...">{{ existing_objectives[i].description|default('') }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Informations complémentaires</h5>
+
+                        <div class="mb-4">
+                            <label for="interview_date" class="form-label">
+                                <strong>Date de l'entretien de restitution</strong>
+                            </label>
+                            <input type="date" name="interview_date" id="interview_date"
+                                   class="form-control"
+                                   value="{{ review.interviewDate ? review.interviewDate|date('Y-m-d') : '' }}">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="comments" class="form-label">
+                                <strong>Commentaires généraux (optionnel)</strong>
+                            </label>
+                            <textarea name="comments" id="comments" class="form-control" rows="3"
+                                      placeholder="Autres éléments à documenter...">{{ review.comments|default('') }}</textarea>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Une fois validée, l'évaluation sera figée et le collaborateur sera notifié.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('performance_review_show', {id: review.id}) }}" class="btn btn-secondary">
+                                <i class="bx bx-x me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bx bx-check-double me-1"></i> Valider définitivement l'évaluation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

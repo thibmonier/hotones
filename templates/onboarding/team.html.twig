@@ -1,0 +1,215 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Onboarding - Suivi d'équipe{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Onboarding - Suivi d'équipe</h4>
+
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}">Tableau de bord</a></li>
+                        <li class="breadcrumb-item active">Onboarding équipe</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if onboarding_data is empty %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-info mb-0">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Aucun collaborateur avec onboarding en cours.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {# Summary cards #}
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">Total collaborateurs</p>
+                                <h4 class="mb-0">{{ onboarding_data|length }}</h4>
+                            </div>
+                            <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
+                                <span class="avatar-title rounded-circle bg-primary">
+                                    <i class="bx bx-group font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">Onboarding terminés</p>
+                                <h4 class="mb-0">
+                                    {{ onboarding_data|filter(data => data.summary.is_complete)|length }}
+                                </h4>
+                            </div>
+                            <div class="avatar-sm rounded-circle bg-success align-self-center mini-stat-icon">
+                                <span class="avatar-title rounded-circle bg-success">
+                                    <i class="bx bx-check-circle font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">En cours</p>
+                                <h4 class="mb-0">
+                                    {{ onboarding_data|filter(data => not data.summary.is_complete)|length }}
+                                </h4>
+                            </div>
+                            <div class="avatar-sm rounded-circle bg-info align-self-center mini-stat-icon">
+                                <span class="avatar-title rounded-circle bg-info">
+                                    <i class="bx bx-play-circle font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">Tâches en retard</p>
+                                <h4 class="mb-0 text-danger">
+                                    {% set total_overdue = 0 %}
+                                    {% for data in onboarding_data %}
+                                        {% set total_overdue = total_overdue + data.summary.overdue %}
+                                    {% endfor %}
+                                    {{ total_overdue }}
+                                </h4>
+                            </div>
+                            <div class="avatar-sm rounded-circle bg-danger align-self-center mini-stat-icon">
+                                <span class="avatar-title rounded-circle bg-danger">
+                                    <i class="bx bx-error font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Team list #}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Détail par collaborateur</h5>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Collaborateur</th>
+                                        <th>Profil</th>
+                                        <th>Progression</th>
+                                        <th>Tâches</th>
+                                        <th>En retard</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for data in onboarding_data %}
+                                        {% set contributor = data.contributor %}
+                                        {% set summary = data.summary %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ contributor.fullName }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ contributor.email }}</small>
+                                            </td>
+                                            <td>
+                                                {% if contributor.profile %}
+                                                    <span class="badge badge-soft-primary">
+                                                        {{ contributor.profile.name }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td style="width: 200px;">
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar {% if summary.is_complete %}bg-success{% endif %}"
+                                                         role="progressbar"
+                                                         style="width: {{ summary.progress }}%"
+                                                         aria-valuenow="{{ summary.progress }}"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        {{ summary.progress }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <strong>{{ summary.completed }}</strong> / {{ summary.total }}
+                                                <br>
+                                                <small class="text-muted">{{ summary.pending }} restante(s)</small>
+                                            </td>
+                                            <td>
+                                                {% if summary.overdue > 0 %}
+                                                    <span class="badge badge-soft-danger">
+                                                        {{ summary.overdue }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if summary.is_complete %}
+                                                    <span class="badge badge-soft-success">
+                                                        <i class="bx bx-check-circle me-1"></i> Terminé
+                                                    </span>
+                                                {% elseif summary.overdue > 0 %}
+                                                    <span class="badge badge-soft-danger">
+                                                        <i class="bx bx-error me-1"></i> Attention
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge badge-soft-info">
+                                                        <i class="bx bx-time me-1"></i> En cours
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ path('onboarding_show', {id: contributor.id}) }}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bx bx-show me-1"></i> Détails
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
