@@ -4,16 +4,35 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\FactForecast;
+use App\Repository\FactForecastRepository;
+use App\Repository\OrderRepository;
 use App\Repository\ProjectRepository;
+use App\Service\Analytics\DashboardReadService;
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use RuntimeException;
 
 class ForecastingService
 {
+    private const SCENARIO_REALISTIC   = 'realistic';
+    private const SCENARIO_OPTIMISTIC  = 'optimistic';
+    private const SCENARIO_PESSIMISTIC = 'pessimistic';
+
+    private const SCENARIO_ADJUSTMENTS = [
+        self::SCENARIO_OPTIMISTIC  => 1.10,   // +10%
+        self::SCENARIO_REALISTIC   => 1.00,    // baseline
+        self::SCENARIO_PESSIMISTIC => 0.85,  // -15%
+    ];
+
     public function __construct(
-        private ProjectRepository $projectRepository
+        private readonly EntityManagerInterface $em,
+        private readonly FactForecastRepository $forecastRepository,
+        private readonly OrderRepository $orderRepository,
+        private readonly ProjectRepository $projectRepository,
+        private readonly DashboardReadService $dashboardService,
     ) {
     }
 
@@ -266,5 +285,243 @@ class ForecastingService
         }
 
         return 'stable';
+    }
+
+    /**
+     * Generate and persist forecasts for the next N months.
+     *
+     * @return FactForecast[] Generated forecasts for all scenarios
+     */
+    public function generateForecasts(int $months = 12): array
+    {
+        $forecasts = [];
+        $now       = new DateTimeImmutable();
+
+        // Pre-calculate historical data ONCE to avoid repeated expensive queries
+        $historicalData = $this->preCalculateHistoricalData();
+
+        for ($i = 1; $i <= $months; ++$i) {
+            $periodStart = $now->modify("+{$i} months")->modify('first day of this month');
+            $periodEnd   = $periodStart->modify('last day of this month');
+
+            // Calculate base prediction ONCE per month
+            $trendPrediction   = $this->calculateTrendPredictionFromCache($periodStart, $historicalData);
+            $seasonalityFactor = $this->calculateSeasonalityFromCache($periodStart, $historicalData);
+
+            $basePrediction = ($trendPrediction * 0.70) + ($trendPrediction * $seasonalityFactor * 0.30);
+
+            foreach (self::SCENARIO_ADJUSTMENTS as $scenario => $adjustment) {
+                $forecast    = $this->createForecastFromBase($periodStart, $periodEnd, $scenario, $adjustment, $basePrediction, $trendPrediction, $seasonalityFactor);
+                $forecasts[] = $forecast;
+                $this->em->persist($forecast);
+            }
+        }
+
+        $this->em->flush();
+
+        return $forecasts;
+    }
+
+    /**
+     * Pre-calculate all historical data needed for forecasting.
+     * This avoids repeated expensive database queries.
+     *
+     * Simplified version: Uses only 6 months for trend and 1 year for seasonality
+     * to reduce computation time while maintaining reasonable accuracy.
+     *
+     * @return array{trend: array, seasonality: array}
+     */
+    private function preCalculateHistoricalData(): array
+    {
+        $historicalMonths = 6; // Reduced from 12 for performance
+        $trendData        = [];
+        $seasonalityData  = [];
+
+        // Collect last 6 months for trend analysis (sufficient for short-term forecasting)
+        for ($i = $historicalMonths; $i >= 1; --$i) {
+            $month     = (new DateTimeImmutable())->modify("-{$i} months");
+            $startDate = $month->modify('first day of this month');
+            $endDate   = $month->modify('last day of this month');
+
+            $metrics = $this->dashboardService->getKPIs($startDate, $endDate);
+            $revenue = (float) ($metrics['revenue'] ?? 0);
+
+            $trendData[] = [
+                'x'     => $historicalMonths - $i + 1,
+                'y'     => $revenue,
+                'month' => $month,
+            ];
+        }
+
+        // Collect last 12 months for seasonality analysis (1 year instead of 3)
+        // This is much faster and still captures seasonal patterns
+        for ($i = 12; $i >= 1; --$i) {
+            $month     = (new DateTimeImmutable())->modify("-{$i} months");
+            $monthNum  = (int) $month->format('m');
+            $startDate = $month->modify('first day of this month');
+            $endDate   = $month->modify('last day of this month');
+
+            $metrics = $this->dashboardService->getKPIs($startDate, $endDate);
+            if (isset($metrics['revenue'])) {
+                $seasonalityData[$monthNum] = (float) $metrics['revenue'];
+            }
+        }
+
+        // Calculate year average for seasonality normalization
+        $yearAverage = !empty($seasonalityData) ? array_sum($seasonalityData) / count($seasonalityData) : 1.0;
+
+        return [
+            'trend'       => $trendData,
+            'seasonality' => $seasonalityData,
+            'yearAverage' => $yearAverage,
+        ];
+    }
+
+    /**
+     * Calculate trend prediction using pre-calculated historical data.
+     */
+    private function calculateTrendPredictionFromCache(DateTimeImmutable $targetMonth, array $historicalData): float
+    {
+        $dataPoints = array_map(fn ($item) => ['x' => $item['x'], 'y' => $item['y']], $historicalData['trend']);
+
+        $regression  = $this->linearRegressionSimple($dataPoints);
+        $monthsAhead = $this->getMonthsDifference(new DateTimeImmutable(), $targetMonth);
+
+        $prediction = ($regression['slope'] * (count($dataPoints) + $monthsAhead)) + $regression['intercept'];
+
+        return max(0, $prediction);
+    }
+
+    /**
+     * Calculate seasonality factor using pre-calculated historical data.
+     */
+    private function calculateSeasonalityFromCache(DateTimeImmutable $targetMonth, array $historicalData): float
+    {
+        $targetMonthNum  = (int) $targetMonth->format('m');
+        $seasonalityData = $historicalData['seasonality'];
+        $yearAverage     = $historicalData['yearAverage'];
+
+        if (!isset($seasonalityData[$targetMonthNum]) || $yearAverage <= 0) {
+            return 1.0;
+        }
+
+        return $seasonalityData[$targetMonthNum] / $yearAverage;
+    }
+
+    /**
+     * Create forecast from pre-calculated base prediction.
+     */
+    private function createForecastFromBase(
+        DateTimeImmutable $periodStart,
+        DateTimeImmutable $periodEnd,
+        string $scenario,
+        float $scenarioAdjustment,
+        float $basePrediction,
+        float $trendPrediction,
+        float $seasonalityFactor
+    ): FactForecast {
+        // Apply scenario adjustment
+        $predictedRevenue = bcmul((string) $basePrediction, (string) $scenarioAdjustment, 2);
+
+        // Calculate confidence intervals
+        $confidenceRange = $scenario === self::SCENARIO_REALISTIC ? 0.15 : 0.25;
+        $confidenceMin   = bcmul($predictedRevenue, (string) (1 - $confidenceRange), 2);
+        $confidenceMax   = bcmul($predictedRevenue, (string) (1 + $confidenceRange), 2);
+
+        $forecast = new FactForecast();
+        $forecast->setPeriodStart($periodStart);
+        $forecast->setPeriodEnd($periodEnd);
+        $forecast->setScenario($scenario);
+        $forecast->setPredictedRevenue($predictedRevenue);
+        $forecast->setConfidenceMin($confidenceMin);
+        $forecast->setConfidenceMax($confidenceMax);
+        $forecast->setMetadata([
+            'trend_prediction'   => $trendPrediction,
+            'seasonality_factor' => $seasonalityFactor,
+            'method'             => 'hybrid_linear_regression_seasonality',
+        ]);
+
+        return $forecast;
+    }
+
+    /**
+     * Simple linear regression: y = mx + b.
+     *
+     * @param array<array{x: int|float, y: float}> $points
+     *
+     * @return array{slope: float, intercept: float}
+     */
+    private function linearRegressionSimple(array $points): array
+    {
+        $n = count($points);
+        if ($n < 2) {
+            return ['slope' => 0.0, 'intercept' => 0.0];
+        }
+
+        $sumX  = 0;
+        $sumY  = 0;
+        $sumXY = 0;
+        $sumX2 = 0;
+
+        foreach ($points as $point) {
+            $sumX  += $point['x'];
+            $sumY  += $point['y'];
+            $sumXY += $point['x'] * $point['y'];
+            $sumX2 += $point['x'] * $point['x'];
+        }
+
+        $denominator = ($n * $sumX2) - ($sumX * $sumX);
+        if ($denominator == 0) {
+            return ['slope' => 0.0, 'intercept' => $sumY / $n];
+        }
+
+        $slope     = (($n * $sumXY) - ($sumX * $sumY)) / $denominator;
+        $intercept = ($sumY - ($slope * $sumX))        / $n;
+
+        return ['slope' => $slope, 'intercept' => $intercept];
+    }
+
+    /**
+     * Calculate difference in months between two dates.
+     */
+    private function getMonthsDifference(DateTimeImmutable $from, DateTimeImmutable $to): int
+    {
+        $diff = $from->diff($to);
+
+        return ($diff->y * 12) + $diff->m;
+    }
+
+    /**
+     * Update forecast accuracy by comparing predictions with actual data.
+     */
+    public function updateForecastAccuracy(DateTimeImmutable $period): void
+    {
+        $periodStart = $period->modify('first day of this month');
+        $periodEnd   = $period->modify('last day of this month');
+
+        // Get actual revenue for the period
+        $metrics       = $this->dashboardService->getKPIs($periodStart, $periodEnd);
+        $actualRevenue = (string) ($metrics['revenue'] ?? 0);
+
+        // Update all forecasts for this period
+        foreach (self::SCENARIO_ADJUSTMENTS as $scenario => $adjustment) {
+            $forecast = $this->forecastRepository->findLatestForPeriod($periodStart, $periodEnd, $scenario);
+
+            if ($forecast) {
+                $forecast->setActualRevenue($actualRevenue);
+
+                // Calculate accuracy: (1 - |predicted - actual| / actual) * 100
+                $predicted = (float) $forecast->getPredictedRevenue();
+                $actual    = (float) $actualRevenue;
+
+                if ($actual > 0) {
+                    $error    = abs($predicted - $actual) / $actual;
+                    $accuracy = bcmul((string) (1 - $error), '100', 2);
+                    $forecast->setAccuracy($accuracy);
+                }
+
+                $this->em->flush();
+            }
+        }
     }
 }

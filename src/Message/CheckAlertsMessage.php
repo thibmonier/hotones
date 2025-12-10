@@ -1,0 +1,10 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Message;
+
+class CheckAlertsMessage
+{
+    // Empty message class - no parameters needed
+}

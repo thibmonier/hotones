@@ -210,7 +210,8 @@ class ProjectController extends AbstractController
         int $id,
         EntityManagerInterface $em,
         \App\Service\ProjectRiskAnalyzer $riskAnalyzer,
-        \App\Service\ProfitabilityPredictor $profitabilityPredictor
+        \App\Service\ProfitabilityPredictor $profitabilityPredictor,
+        \App\Repository\ProjectHealthScoreRepository $healthScoreRepo
     ): Response {
         $project = $em->getRepository(Project::class)->findOneWithRelations($id);
 
@@ -223,6 +224,9 @@ class ProjectController extends AbstractController
 
         // Analyser les risques du projet
         $riskAnalysis = $riskAnalyzer->analyzeProject($project);
+
+        // Get latest health score from database
+        $healthScore = $healthScoreRepo->findLatestForProject($project);
 
         // Prédire la rentabilité du projet
         $profitabilityPrediction = $profitabilityPredictor->predictProfitability($project);
@@ -259,6 +263,7 @@ class ProjectController extends AbstractController
             'project'                 => $project,
             'metrics'                 => $projectMetrics,
             'riskAnalysis'            => $riskAnalysis,
+            'healthScore'             => $healthScore,
             'profitabilityPrediction' => $profitabilityPrediction,
             'orders'                  => $orders,
             'orders_pagination'       => $oPagination,

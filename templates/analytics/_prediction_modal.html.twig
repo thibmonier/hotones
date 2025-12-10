@@ -1,0 +1,138 @@
+{# Modal for prediction details #}
+<div class="modal fade" id="predictionModal{{ project.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bx bx-bar-chart-alt-2 me-2"></i>
+                    Détails de Prédiction - {{ project.name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {# Project Info #}
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Informations Projet</h6>
+                        <p class="mb-1"><strong>Client:</strong> {{ project.client.name }}</p>
+                        <p class="mb-1"><strong>Chef de projet:</strong> {{ project.projectManager ? project.projectManager.fullName : 'Non assigné' }}</p>
+                        <p class="mb-0"><strong>Avancement:</strong> {{ prediction.currentProgress }}%</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Métriques Actuelles</h6>
+                        <p class="mb-1"><strong>Marge actuelle:</strong>
+                            <span class="badge badge-soft-{{ prediction.currentMargin >= 20 ? 'success' : (prediction.currentMargin >= 10 ? 'warning' : 'danger') }}">
+                                {{ prediction.currentMargin|number_format(1) }}%
+                            </span>
+                        </p>
+                        <p class="mb-0"><strong>Budget consommé:</strong> {{ prediction.budgetDrift.consumedPercentage|number_format(0) }}%</p>
+                    </div>
+                </div>
+
+                {# Scenarios #}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">Scénarios de Prédiction</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="bx bx-trending-up text-success"></i> Optimiste
+                                    </h6>
+                                    <h4 class="text-success mb-0">{{ prediction.predictedMargin.optimistic|number_format(1) }}%</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-primary">
+                                <div class="card-body text-white">
+                                    <h6 class="mb-2">
+                                        <i class="bx bx-target-lock"></i> Réaliste
+                                    </h6>
+                                    <h4 class="mb-0">{{ prediction.predictedMargin.projected|number_format(1) }}%</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="bx bx-trending-down text-danger"></i> Pessimiste
+                                    </h6>
+                                    <h4 class="text-danger mb-0">{{ prediction.predictedMargin.pessimistic|number_format(1) }}%</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Budget Drift Analysis #}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">Analyse de Dérive Budgétaire</h6>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <p class="text-muted mb-1">Dépassement</p>
+                                    <h5 class="mb-0">
+                                        {% if prediction.budgetDrift.isOverBudget %}
+                                            <span class="text-danger">
+                                                +{{ prediction.budgetDrift.deviation|number_format(0) }}%
+                                            </span>
+                                        {% else %}
+                                            <span class="text-success">
+                                                Dans le budget
+                                            </span>
+                                        {% endif %}
+                                    </h5>
+                                </div>
+                                <div class="col-md-4 text-center border-start">
+                                    <p class="text-muted mb-1">Budget consommé</p>
+                                    <h5 class="mb-0">{{ prediction.budgetDrift.consumedPercentage|number_format(0) }}%</h5>
+                                </div>
+                                <div class="col-md-4 text-center border-start">
+                                    <p class="text-muted mb-1">Tendance</p>
+                                    <h5 class="mb-0">
+                                        {% if prediction.budgetDrift.trend == 'stable' %}
+                                            <span class="text-info">
+                                                <i class="bx bx-minus"></i> Stable
+                                            </span>
+                                        {% elseif prediction.budgetDrift.trend == 'improving' %}
+                                            <span class="text-success">
+                                                <i class="bx bx-trending-up"></i> Amélioration
+                                            </span>
+                                        {% else %}
+                                            <span class="text-warning">
+                                                <i class="bx bx-trending-down"></i> Dégradation
+                                            </span>
+                                        {% endif %}
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Recommendations #}
+                {% if prediction.recommendations|length > 0 %}
+                    <div>
+                        <h6 class="text-muted mb-3">Recommandations</h6>
+                        <div class="alert alert-warning">
+                            <ul class="mb-0 ps-3">
+                                {% for recommendation in prediction.recommendations %}
+                                    <li>{{ recommendation }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <a href="{{ path('project_show', {id: project.id}) }}" class="btn btn-primary">
+                    <i class="bx bx-folder-open"></i> Voir le projet
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>

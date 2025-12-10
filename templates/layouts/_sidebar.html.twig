@@ -150,7 +150,8 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ path('analytics_dashboard') }}">Dashboard KPIs</a></li>
                         {% if is_granted('ROLE_MANAGER') %}
-                        <li><a href="{{ path('forecasting_dashboard') }}">Prévisions CA</a></li>
+                        <li><a href="{{ path('analytics_predictions') }}">Prédictions & Alertes</a></li>
+                        <li><a href="{{ path('forecasting_index') }}">Prévisions CA</a></li>
                         <li><a href="{{ path('staffing_prediction') }}">Prédiction de charge</a></li>
                         <li><a href="{{ path('hr_dashboard') }}">Dashboard RH</a></li>
                         {% endif %}

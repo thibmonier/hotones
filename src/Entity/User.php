@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: 'App\Repository\UserRepository')]
 #[ORM\Table(name: 'users')]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(

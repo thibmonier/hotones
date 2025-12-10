@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Scheduler;
 
+use App\Message\AnalyzeProjectRisksMessage;
+use App\Message\CheckAlertsMessage;
+use App\Message\GenerateForecastsMessage;
 use App\Message\RecalculateMetricsMessage;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -18,7 +21,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 class AnalyticsScheduleProvider implements ScheduleProviderInterface
 {
     public function __construct(
-        private CacheInterface $cache
+        private readonly CacheInterface $cache
     ) {
     }
 
@@ -38,6 +41,18 @@ class AnalyticsScheduleProvider implements ScheduleProviderInterface
             // Recalcul annuel le 1er janvier à 8h
             ->add(
                 RecurringMessage::cron('0 8 1 1 *', new RecalculateMetricsMessage((string) $currentYear, 'yearly')),
+            )
+            // Analyse quotidienne des risques projets à 8h (après le recalcul des métriques)
+            ->add(
+                RecurringMessage::cron('0 8 * * *', new AnalyzeProjectRisksMessage()),
+            )
+            // Vérification quotidienne des alertes à 8h (budget, marge, surcharge, paiements)
+            ->add(
+                RecurringMessage::cron('0 8 * * *', new CheckAlertsMessage()),
+            )
+            // Génération mensuelle des prévisions le 1er de chaque mois à 9h
+            ->add(
+                RecurringMessage::cron('0 9 1 * *', new GenerateForecastsMessage(12)),
             );
     }
 }

@@ -21,8 +21,9 @@ class WorkloadPredictionService
     /**
      * Analyse le pipeline de devis et prédit la charge future.
      *
-     * @param array $profileIds     IDs des profils à filtrer (vide = tous)
-     * @param array $contributorIds IDs des contributeurs à filtrer (vide = tous)
+     * @param array $profileIds       IDs des profils à filtrer (vide = tous)
+     * @param array $contributorIds   IDs des contributeurs à filtrer (vide = tous)
+     * @param bool  $includeConfirmed Inclure la charge confirmée (devis signés/gagnés)
      *
      * @return array{
      *     pipeline: array,
@@ -31,18 +32,28 @@ class WorkloadPredictionService
      *     totalPotentialDays: float
      * }
      */
-    public function analyzePipeline(array $profileIds = [], array $contributorIds = []): array
+    public function analyzePipeline(array $profileIds = [], array $contributorIds = [], bool $includeConfirmed = false): array
     {
-        // Récupérer tous les devis en attente de signature
-        $pendingOrders = $this->orderRepository->findBy(
-            ['status' => 'a_signer'],
-            ['createdAt' => 'DESC'],
-        );
-
         $pipeline           = [];
         $workloadByMonth    = [];
         $alerts             = [];
         $totalPotentialDays = 0;
+
+        // Ajouter la charge confirmée si demandé
+        if ($includeConfirmed) {
+            $confirmedOrders = $this->orderRepository->findBy(
+                ['status' => ['signe', 'gagne', 'en_cours']],
+            );
+
+            foreach ($confirmedOrders as $order) {
+                $this->addConfirmedWorkloadToMonth($workloadByMonth, $order, $profileIds, $contributorIds);
+            }
+        }
+
+        // Récupérer tous les devis en attente de signature
+        $pendingOrders = $this->orderRepository->findBy(
+            ['status' => 'a_signer'],
+        );
 
         foreach ($pendingOrders as $order) {
             $analysis = $this->analyzeOrder($order, $profileIds, $contributorIds);
@@ -339,5 +350,49 @@ class WorkloadPredictionService
         }
 
         return array_unique($profileIds);
+    }
+
+    /**
+     * Ajoute la charge confirmée d'un devis à la répartition mensuelle.
+     */
+    private function addConfirmedWorkloadToMonth(array &$workloadByMonth, Order $order, array $profileIds = [], array $contributorIds = []): void
+    {
+        $project = $order->getProject();
+        if (!$project || !$project->getStartDate()) {
+            return;
+        }
+
+        $startDate = $project->getStartDate();
+        $endDate   = $project->getEndDate();
+
+        if (!$endDate) {
+            // Si pas de date de fin, prévoir 3 mois par défaut
+            $endDate = (clone $startDate)->modify('+3 months');
+        }
+
+        $duration  = $startDate->diff($endDate)->days;
+        $totalDays = $this->calculateOrderDays($order, $profileIds, $contributorIds);
+
+        if ($totalDays <= 0) {
+            return;
+        }
+
+        $daysPerMonth = $duration > 0 ? $totalDays / (max(1, $duration / 30)) : $totalDays;
+
+        // Répartir sur la durée du projet
+        $monthsToSpread = max(1, ceil($duration / 30));
+        for ($i = 0; $i < $monthsToSpread; ++$i) {
+            $month = (clone $startDate)->modify("+{$i} months")->format('Y-m');
+
+            if (!isset($workloadByMonth[$month])) {
+                $workloadByMonth[$month] = [
+                    'potential' => 0,
+                    'confirmed' => 0,
+                    'orders'    => [],
+                ];
+            }
+
+            $workloadByMonth[$month]['confirmed'] += $daysPerMonth / $monthsToSpread;
+        }
     }
 }

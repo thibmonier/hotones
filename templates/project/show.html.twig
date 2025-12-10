@@ -34,13 +34,26 @@
                         <div class="flex-grow-1">
                             <span class="text-muted mb-3 lh-1 d-block text-truncate">Santé du projet</span>
                             <h4 class="mb-3">
-                                {% set healthScore = riskAnalysis.healthScore %}
-                                {% set riskLevel = riskAnalysis.riskLevel %}
-                                <span class="counter-value text-{{ riskLevel == 'low' ? 'success' : (riskLevel == 'medium' ? 'warning' : 'danger') }}">
-                                    {{ healthScore }}%
-                                </span>
+                                {% if healthScore %}
+                                    <span class="counter-value text-{{ healthScore.healthLevel == 'healthy' ? 'success' : (healthScore.healthLevel == 'warning' ? 'warning' : 'danger') }}">
+                                        {{ healthScore.score }}/100
+                                    </span>
+                                    <span class="badge bg-{{ healthScore.badgeColor }} ms-2">
+                                        {{ healthScore.healthLevel|upper }}
+                                    </span>
+                                {% else %}
+                                    {% set fallbackScore = riskAnalysis.healthScore %}
+                                    {% set riskLevel = riskAnalysis.riskLevel %}
+                                    <span class="counter-value text-{{ riskLevel == 'low' ? 'success' : (riskLevel == 'medium' ? 'warning' : 'danger') }}">
+                                        {{ fallbackScore }}%
+                                    </span>
+                                {% endif %}
                             </h4>
-                            {% if riskAnalysis.risks|length > 0 %}
+                            {% if healthScore and healthScore.recommendations|length > 0 %}
+                                <small class="text-muted">
+                                    {{ healthScore.recommendations|length }} recommandation(s)
+                                </small>
+                            {% elseif riskAnalysis.risks|length > 0 %}
                                 <small class="text-muted">
                                     {{ riskAnalysis.risks|length }} risque(s) détecté(s)
                                 </small>
@@ -49,7 +62,11 @@
                         <div class="flex-shrink-0 text-end">
                             <div class="avatar-sm bg-white rounded">
                                 <span class="avatar-title bg-white text-dark font-size-24">
-                                    <i class="bx bx-{{ riskLevel == 'critical' ? 'error' : (riskLevel == 'high' ? 'error-circle' : (riskLevel == 'medium' ? 'info-circle' : 'check-circle')) }}"></i>
+                                    {% if healthScore %}
+                                        <i class="bx {{ healthScore.icon }}"></i>
+                                    {% else %}
+                                        <i class="bx bx-{{ riskLevel == 'critical' ? 'error' : (riskLevel == 'high' ? 'error-circle' : (riskLevel == 'medium' ? 'info-circle' : 'check-circle')) }}"></i>
+                                    {% endif %}
                                 </span>
                             </div>
                         </div>

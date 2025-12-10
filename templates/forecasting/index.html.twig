@@ -1,0 +1,255 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Prévisions de CA{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Prévisions de Chiffre d'Affaires</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('analytics_dashboard') }}">Analytics</a></li>
+                        <li class="breadcrumb-item active">Prévisions</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Horizon selector and Generate button #}
+    <div class="row mb-3">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <form method="get" class="form-inline" id="horizon-form">
+                                <label for="months" class="me-2">Horizon de prévision :</label>
+                                <select name="months" id="months" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                                    <option value="3" {% if months == 3 %}selected{% endif %}>3 mois</option>
+                                    <option value="6" {% if months == 6 %}selected{% endif %}>6 mois</option>
+                                    <option value="12" {% if months == 12 %}selected{% endif %}>12 mois</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div>
+                            <form method="post" action="{{ path('forecasting_generate') }}" onsubmit="return confirm('Générer de nouvelles prévisions ? Cela peut prendre quelques secondes.');">
+                                <input type="hidden" name="months" value="{{ months }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('generate_forecast') }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bx bx-refresh"></i> Générer les prévisions
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Accuracy KPI #}
+    {% if average_accuracy is not null %}
+    <div class="row mb-3">
+        <div class="col-lg-4">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Précision Moyenne (6 derniers mois)</p>
+                            <h4 class="mb-0">{{ average_accuracy|number_format(1) }}%</h4>
+                        </div>
+                        <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
+                            <span class="avatar-title rounded-circle bg-primary">
+                                <i class="bx bx-target-lock font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Main forecast chart #}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Prévisions de CA - {{ months }} prochains mois</h4>
+
+                    {% if realistic_forecasts is empty %}
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Aucune prévision disponible. Cliquez sur "Générer les prévisions" pour créer de nouvelles prévisions.
+                        </div>
+                    {% else %}
+                        <canvas id="forecastChart" height="80"></canvas>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Forecast table #}
+    {% if realistic_forecasts is not empty %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Détails des prévisions</h4>
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Période</th>
+                                    <th class="text-end">Pessimiste</th>
+                                    <th class="text-end">Réaliste</th>
+                                    <th class="text-end">Optimiste</th>
+                                    <th class="text-end">Intervalle de confiance</th>
+                                    <th>Méthode</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i, forecast in realistic_forecasts %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ forecast.periodStart|date('M Y') }}</strong>
+                                    </td>
+                                    <td class="text-end text-danger">
+                                        {{ pessimistic_forecasts[i].predictedRevenue|number_format(0, ',', ' ') }} €
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>{{ forecast.predictedRevenue|number_format(0, ',', ' ') }} €</strong>
+                                    </td>
+                                    <td class="text-end text-success">
+                                        {{ optimistic_forecasts[i].predictedRevenue|number_format(0, ',', ' ') }} €
+                                    </td>
+                                    <td class="text-end text-muted">
+                                        {{ forecast.confidenceMin|number_format(0, ',', ' ') }} € -
+                                        {{ forecast.confidenceMax|number_format(0, ',', ' ') }} €
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            {% if forecast.metadata.method is defined %}
+                                                {{ forecast.metadata.method|replace({'_': ' '})|title }}
+                                            {% else %}
+                                                Régression linéaire
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Methodology explanation #}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Méthodologie</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="font-size-14">Analyse de tendance</h5>
+                            <p class="text-muted mb-3">
+                                Régression linéaire sur les 12 derniers mois pour identifier la tendance de croissance.
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="font-size-14">Saisonnalité</h5>
+                            <p class="text-muted mb-3">
+                                Moyenne sur 3 ans pour capturer les variations saisonnières (forte/faible activité selon les mois).
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5 class="font-size-14">Scénarios</h5>
+                            <ul class="text-muted">
+                                <li><strong>Réaliste</strong> : Prévision basée sur la tendance historique (pondération : 70% tendance, 30% saisonnalité)</li>
+                                <li><strong>Optimiste</strong> : +10% sur le scénario réaliste</li>
+                                <li><strong>Pessimiste</strong> : -15% sur le scénario réaliste</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if realistic_forecasts is not empty %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('forecastChart').getContext('2d');
+    const chartData = {{ chart_data|json_encode|raw }};
+
+    new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('fr-FR', {
+                                    style: 'currency',
+                                    currency: 'EUR',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('fr-FR', {
+                                style: 'currency',
+                                currency: 'EUR',
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                                notation: 'compact',
+                                compactDisplay: 'short'
+                            }).format(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+
+{% endblock %}
