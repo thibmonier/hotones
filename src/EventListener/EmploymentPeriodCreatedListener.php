@@ -45,12 +45,15 @@ class EmploymentPeriodCreatedListener
                     ],
                 );
             } else {
+                $profiles     = $contributor->getProfiles();
+                $profileNames = $profiles->isEmpty() ? 'none' : $profiles->first()->getName();
+
                 $this->logger->warning(
                     'No onboarding template found for contributor',
                     [
                         'contributor_id'   => $contributor->getId(),
                         'contributor_name' => $contributor->getFullName(),
-                        'profile'          => $contributor->getProfile()?->getName(),
+                        'profile'          => $profileNames,
                     ],
                 );
             }

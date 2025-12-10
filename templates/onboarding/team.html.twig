@@ -146,9 +146,9 @@
                                                 <small class="text-muted">{{ contributor.email }}</small>
                                             </td>
                                             <td>
-                                                {% if contributor.profile %}
+                                                {% if contributor.profiles|length > 0 %}
                                                     <span class="badge badge-soft-primary">
-                                                        {{ contributor.profile.name }}
+                                                        {{ contributor.profiles.first.name }}
                                                     </span>
                                                 {% else %}
                                                     <span class="text-muted">-</span>

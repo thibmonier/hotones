@@ -29,11 +29,13 @@ class OnboardingService
      */
     public function createOnboardingFromTemplate(Contributor $contributor, ?EmploymentPeriod $employmentPeriod = null): int
     {
-        // Find appropriate template based on contributor's profile
-        $profile  = $contributor->getProfile();
+        // Find appropriate template based on contributor's primary profile
+        $profiles = $contributor->getProfiles();
         $template = null;
 
-        if (null !== $profile) {
+        // Try to find a template for the first profile
+        if (!$profiles->isEmpty()) {
+            $profile  = $profiles->first();
             $template = $this->templateRepository->findByProfile($profile);
         }
 
