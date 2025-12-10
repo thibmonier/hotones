@@ -8,7 +8,10 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">Prévisions de Chiffre d'Affaires</h4>
-                <div class="page-title-right">
+                <div class="page-title-right d-flex align-items-center gap-3">
+                    <a href="{{ path('forecasting_dashboard') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bx bx-line-chart me-1"></i> Vue Simple
+                    </a>
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
                         <li class="breadcrumb-item"><a href="{{ path('analytics_dashboard') }}">Analytics</a></li>

@@ -71,6 +71,28 @@ class ForecastingController extends AbstractController
         ]);
     }
 
+    #[Route('/dashboard', name: 'forecasting_dashboard', methods: ['GET'])]
+    public function dashboard(Request $request): Response
+    {
+        $horizon = (int) $request->query->get('horizon', 12);
+
+        if (!in_array($horizon, [3, 6, 12], true)) {
+            $horizon = 12;
+        }
+
+        try {
+            $forecast = $this->forecastingService->forecastRevenue($horizon);
+        } catch (RuntimeException $e) {
+            $this->addFlash('error', 'Impossible de générer les prévisions : '.$e->getMessage());
+            $forecast = null;
+        }
+
+        return $this->render('forecasting/dashboard_legacy.html.twig', [
+            'forecast' => $forecast,
+            'horizon'  => $horizon,
+        ]);
+    }
+
     #[Route('/generate', name: 'forecasting_generate', methods: ['POST'])]
     public function generate(Request $request): Response
     {
