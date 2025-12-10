@@ -2,7 +2,8 @@
 
 ## Badges
 
-### Documentation & CI/CD
+### License & Documentation
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge)](LICENSE)
 [![WARP Index](https://img.shields.io/badge/WARP-Index-0A84FF?style=for-the-badge)](WARP.md)
 [![Agents Guide](https://img.shields.io/badge/Agents-Guide-2EA043?style=for-the-badge)](AGENTS.md)
 [![CI](https://github.com/thibmonier/hotones/actions/workflows/ci.yml/badge.svg)](https://github.com/thibmonier/hotones/actions/workflows/ci.yml)
@@ -171,3 +172,33 @@ export PANTHER_NO_SANDBOX=1
 ## Notes
 - 2FA à configurer via `/me/2fa/enable`
 - Timesheet peut (optionnellement) référencer une tâche projet pour exclure AVV/Non-vendu des calculs.
+
+## 📄 Licence
+
+Ce projet est sous licence **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International** (CC BY-NC-SA 4.0).
+
+### Résumé des droits
+
+✅ **Vous êtes autorisé à** :
+- **Partager** : Copier et redistribuer le code
+- **Adapter** : Remixer, transformer et développer à partir du code
+- **Usage personnel et éducatif** : Utiliser pour apprendre, étudier, former
+
+❌ **Vous N'ÊTES PAS autorisé à** :
+- **Usage commercial** : Utiliser ce code dans un cadre commercial, vendre des services basés sur ce code, l'intégrer dans un produit commercial
+- **Changer de licence** : Toute œuvre dérivée doit utiliser la même licence CC BY-NC-SA 4.0
+
+📋 **Conditions** :
+- **Attribution** : Vous devez créditer l'auteur original
+- **ShareAlike** : Les modifications doivent être partagées sous la même licence
+- **NonCommercial** : Pas d'utilisation commerciale
+
+Pour plus de détails, consultez le fichier [LICENSE](LICENSE) complet ou visitez [creativecommons.org/licenses/by-nc-sa/4.0/](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+### Usage commercial
+
+Si vous souhaitez utiliser ce code dans un contexte commercial, veuillez contacter l'auteur pour discuter d'une licence commerciale séparée.
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Consultez [CONTRIBUTING.md](CONTRIBUTING.md) pour les guidelines de développement et le processus de contribution.
