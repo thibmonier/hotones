@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
+use App\Repository\FactForecastRepository;
+use App\Repository\OrderRepository;
 use App\Repository\ProjectRepository;
+use App\Service\Analytics\DashboardReadService;
 use App\Service\ForecastingService;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
@@ -20,10 +24,27 @@ use RuntimeException;
  */
 class ForecastingServiceTest extends TestCase
 {
+    private function createService(
+        ?ProjectRepository $projectRepository = null
+    ): ForecastingService {
+        $em                 = $this->createMock(EntityManagerInterface::class);
+        $forecastRepository = $this->createMock(FactForecastRepository::class);
+        $orderRepository    = $this->createMock(OrderRepository::class);
+        $projectRepository  = $projectRepository ?? $this->createMock(ProjectRepository::class);
+        $dashboardService   = $this->createMock(DashboardReadService::class);
+
+        return new ForecastingService(
+            $em,
+            $forecastRepository,
+            $orderRepository,
+            $projectRepository,
+            $dashboardService,
+        );
+    }
+
     public function testForecastRevenueThrowsExceptionForInvalidHorizon(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Horizon must be 3, 6, or 12 months');
@@ -33,8 +54,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testForecastRevenueAcceptsValidHorizons(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         // Should not throw exception for valid horizons
         $validHorizons = [3, 6, 12];
@@ -72,7 +92,7 @@ class ForecastingServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
         $query->method('getResult')->willReturn([]);
 
-        $service = new ForecastingService($projectRepository);
+        $service = $this->createService($projectRepository);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Insufficient historical data for forecasting (minimum 6 months required)');
@@ -116,7 +136,7 @@ class ForecastingServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
         $query->method('getResult')->willReturn($projects);
 
-        $service = new ForecastingService($projectRepository);
+        $service = $this->createService($projectRepository);
         $result  = $service->forecastRevenue(6);
 
         // Verify structure
@@ -150,8 +170,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testCalculateWeightedMovingAverage(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('calculateWeightedMovingAverage');
@@ -170,8 +189,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testCalculateSeasonalityFactors(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('calculateSeasonalityFactors');
@@ -207,8 +225,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testCalculateConfidenceWithMinimalData(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('calculateConfidence');
@@ -226,8 +243,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testCalculateConfidenceWithModerateData(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('calculateConfidence');
@@ -244,8 +260,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testCalculateConfidenceWithExtensiveData(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('calculateConfidence');
@@ -263,8 +278,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testDetermineTrendDirectionGrowth(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('determineTrendDirection');
@@ -285,8 +299,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testDetermineTrendDirectionStable(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('determineTrendDirection');
@@ -307,8 +320,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testDetermineTrendDirectionDecline(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('determineTrendDirection');
@@ -329,8 +341,7 @@ class ForecastingServiceTest extends TestCase
 
     public function testDetermineTrendDirectionInsufficientData(): void
     {
-        $projectRepository = $this->createMock(ProjectRepository::class);
-        $service           = new ForecastingService($projectRepository);
+        $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
         $method     = $reflection->getMethod('determineTrendDirection');

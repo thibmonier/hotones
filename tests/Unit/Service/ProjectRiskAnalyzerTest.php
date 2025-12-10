@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
+use App\Repository\ProjectHealthScoreRepository;
 use App\Service\ProjectRiskAnalyzer;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class ProjectRiskAnalyzerTest extends TestCase
@@ -16,7 +18,10 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->service = new ProjectRiskAnalyzer();
+        $em                    = $this->createMock(EntityManagerInterface::class);
+        $healthScoreRepository = $this->createMock(ProjectHealthScoreRepository::class);
+
+        $this->service = new ProjectRiskAnalyzer($em, $healthScoreRepository);
     }
 
     public function testAnalyzeProjectReturnsHealthyScoreForGoodProject(): void

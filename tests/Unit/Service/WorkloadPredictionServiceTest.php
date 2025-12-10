@@ -30,10 +30,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $orderRepository
             ->expects($this->once())
             ->method('findBy')
-            ->with(
-                ['status' => 'a_signer'],
-                ['createdAt' => 'DESC'],
-            )
+            ->with(['status' => 'a_signer'])
             ->willReturn([]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
@@ -96,10 +93,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $orderRepository
             ->expects($this->once())
             ->method('findBy')
-            ->with(
-                ['status' => 'a_signer'],
-                ['createdAt' => 'DESC'],
-            )
+            ->with(['status' => 'a_signer'])
             ->willReturn([$order]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
