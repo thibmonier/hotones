@@ -6,11 +6,10 @@ namespace App\Tests\Unit\Service;
 
 use App\Entity\Contributor;
 use App\Entity\EmploymentPeriod;
-use App\Entity\Onboarding;
 use App\Entity\OnboardingTask;
 use App\Entity\OnboardingTemplate;
 use App\Entity\Profile;
-use App\Repository\OnboardingRepository;
+use App\Repository\OnboardingTaskRepository;
 use App\Repository\OnboardingTemplateRepository;
 use App\Service\OnboardingService;
 use DateTime;
@@ -18,27 +17,23 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 
 class OnboardingServiceTest extends TestCase
 {
     private EntityManagerInterface $em;
-    private OnboardingRepository $onboardingRepository;
+    private OnboardingTaskRepository $taskRepository;
     private OnboardingTemplateRepository $templateRepository;
-    private LoggerInterface $logger;
     private OnboardingService $service;
 
     protected function setUp(): void
     {
-        $this->em                   = $this->createMock(EntityManagerInterface::class);
-        $this->onboardingRepository = $this->createMock(OnboardingRepository::class);
-        $this->templateRepository   = $this->createMock(OnboardingTemplateRepository::class);
-        $this->logger               = $this->createMock(LoggerInterface::class);
-        $this->service              = new OnboardingService(
+        $this->em                 = $this->createMock(EntityManagerInterface::class);
+        $this->templateRepository = $this->createMock(OnboardingTemplateRepository::class);
+        $this->taskRepository     = $this->createMock(OnboardingTaskRepository::class);
+        $this->service            = new OnboardingService(
             $this->em,
-            $this->onboardingRepository,
             $this->templateRepository,
-            $this->logger,
+            $this->taskRepository,
         );
     }
 

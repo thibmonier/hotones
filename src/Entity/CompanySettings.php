@@ -135,4 +135,11 @@ class CompanySettings
     {
         return $this->updatedAt;
     }
+
+    public function setUpdatedAt(DateTime $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
 }

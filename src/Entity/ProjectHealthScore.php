@@ -223,4 +223,11 @@ class ProjectHealthScore
             default    => 'bx-help-circle',
         };
     }
+
+    public function setCalculatedAt(DateTimeImmutable $calculatedAt): static
+    {
+        $this->calculatedAt = $calculatedAt;
+
+        return $this;
+    }
 }

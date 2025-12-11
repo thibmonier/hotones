@@ -462,4 +462,11 @@ class ExpenseReport
 
         return bcsub($this->getRebillableAmount(), $this->amountTTC, 2);
     }
+
+    public function setAmountTTC(string $amountTTC): static
+    {
+        $this->amountTTC = $amountTTC;
+
+        return $this;
+    }
 }

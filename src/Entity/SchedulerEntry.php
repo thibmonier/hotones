@@ -154,4 +154,11 @@ class SchedulerEntry
             $context->buildViolation('Expression CRON invalide.')->atPath('cronExpression')->addViolation();
         }
     }
+
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
 }

@@ -392,4 +392,18 @@ class ContributorSatisfaction
 
         return array_sum($scores) / count($scores);
     }
+
+    public function setCreatedAt(DateTime $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function setUpdatedAt(DateTime $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
 }

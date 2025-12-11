@@ -114,4 +114,9 @@ class ServiceCategory
 
         return $this;
     }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
 }

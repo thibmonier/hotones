@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: \App\Repository\ProjectTaskRepository::class)]
@@ -95,7 +97,7 @@ class ProjectTask
 
     public function __construct()
     {
-        $this->subTasks = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->subTasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -580,5 +582,20 @@ class ProjectTask
             'completed'   => 'Terminée',
             'on_hold'     => 'En attente',
         ];
+    }
+
+    public function isDefault(): ?bool
+    {
+        return $this->isDefault;
+    }
+
+    public function isCountsForProfitability(): ?bool
+    {
+        return $this->countsForProfitability;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
     }
 }

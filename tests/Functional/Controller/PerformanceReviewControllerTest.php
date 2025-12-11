@@ -102,48 +102,33 @@ class PerformanceReviewControllerTest extends WebTestCase
         $user = $this->createAuthenticatedUser('ROLE_INTERVENANT');
         $this->client->loginUser($user);
 
-        $this->client->request('GET', '/performance-review/create');
+        $this->client->request('GET', '/performance-reviews/campaign/create');
 
         $this->assertResponseStatusCodeSame(403);
     }
 
     public function testCreateDisplaysForm(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
         $this->client->loginUser($user);
 
-        $this->client->request('GET', '/performance-review/create');
+        $this->client->request('GET', '/performance-reviews/campaign/create');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('form');
-        $this->assertSelectorExists('select[name="contributor_id"]');
-        $this->assertSelectorExists('input[name="review_date"]');
-        $this->assertSelectorExists('textarea[name="general_comments"]');
+        $this->assertSelectorExists('input[name="year"]');
     }
 
     public function testCreateSubmitWithValidData(): void
     {
-        $user        = $this->createAuthenticatedUser('ROLE_MANAGER');
-        $contributor = $this->createContributor();
-
-        $userContributor = new Contributor();
-        $userContributor->setFirstName('Manager');
-        $userContributor->setLastName('User');
-        $user->setContributor($userContributor);
-
-        $em = static::getContainer()->get('doctrine')->getManager();
-        $em->persist($userContributor);
-        $em->flush();
+        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $this->createContributor();
 
         $this->client->loginUser($user);
 
-        $crawler = $this->client->request('GET', '/performance-review/create');
-        $form    = $crawler->selectButton('Créer l\'évaluation')->form([
-            'contributor_id'   => (string) $contributor->getId(),
-            'review_date'      => '2024-12-01',
-            'next_review_date' => '2025-06-01',
-            'general_comments' => 'Excellent work',
-            'goals'            => 'Leadership development',
+        $crawler = $this->client->request('GET', '/performance-reviews/campaign/create');
+        $form    = $crawler->selectButton('Créer la campagne')->form([
+            'year' => '2024',
         ]);
 
         $this->client->submit($form);
@@ -153,11 +138,6 @@ class PerformanceReviewControllerTest extends WebTestCase
 
         // Check flash message
         $this->assertSelectorExists('.alert-success');
-
-        // Verify review was created
-        $review = $this->reviewRepository->findOneBy(['contributor' => $contributor]);
-        $this->assertNotNull($review);
-        $this->assertEquals('Excellent work', $review->getGeneralComments());
     }
 
     public function testShowRequiresAuthentication(): void

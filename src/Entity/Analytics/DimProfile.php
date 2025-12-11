@@ -124,4 +124,21 @@ class DimProfile
 
         return implode(' ', $parts);
     }
+
+    public function isProductive(): ?bool
+    {
+        return $this->isProductive;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setCompositeKey(string $compositeKey): static
+    {
+        $this->compositeKey = $compositeKey;
+
+        return $this;
+    }
 }
