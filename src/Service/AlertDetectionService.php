@@ -64,7 +64,7 @@ class AlertDetectionService
                 continue;
             }
 
-            $spentHours     = $project->calculateSpentDays();
+            $spentHours     = (float) $project->getTotalTasksSpentHours();
             $consumedPct    = ($spentHours / $soldHours) * 100;
             $globalProgress = (float) $project->getGlobalProgress();
             $timeRemaining  = 100 - $globalProgress;
@@ -325,9 +325,9 @@ class AlertDetectionService
     /**
      * Remove duplicate users by ID.
      *
-     * @param User[] $users
+     * @param \App\Entity\User[] $users
      *
-     * @return User[]
+     * @return \App\Entity\User[]
      */
     private function uniqueUsers(array $users): array
     {

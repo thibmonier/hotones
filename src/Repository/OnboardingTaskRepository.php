@@ -105,13 +105,15 @@ class OnboardingTaskRepository extends ServiceEntityRepository
     public function getTeamStatistics(array $contributorIds = []): array
     {
         $qb = $this->createQueryBuilder('ot')
+            ->leftJoin('ot.contributor', 'c')
             ->select('IDENTITY(ot.contributor) as contributor_id')
+            ->addSelect('CONCAT(c.firstName, \' \', c.lastName) as contributor_name')
             ->addSelect('COUNT(ot.id) as total')
             ->addSelect('SUM(CASE WHEN ot.status = :completed THEN 1 ELSE 0 END) as completed')
             ->addSelect('SUM(CASE WHEN ot.status != :completed AND ot.dueDate < :now THEN 1 ELSE 0 END) as overdue')
             ->setParameter('completed', 'termine')
             ->setParameter('now', new DateTimeImmutable())
-            ->groupBy('ot.contributor');
+            ->groupBy('ot.contributor, c.firstName, c.lastName');
 
         if (!empty($contributorIds)) {
             $qb->andWhere('ot.contributor IN (:contributorIds)')
@@ -120,13 +122,23 @@ class OnboardingTaskRepository extends ServiceEntityRepository
 
         $results = $qb->getQuery()->getResult();
 
-        // Calculate progress percentage
-        foreach ($results as &$result) {
-            $total              = (int) $result['total'];
-            $completed          = (int) $result['completed'];
-            $result['progress'] = $total > 0 ? (int) round(($completed / $total) * 100) : 100;
+        // Calculate progress percentage and ensure proper types
+        $typedResults = [];
+        foreach ($results as $result) {
+            $total     = (int) $result['total'];
+            $completed = (int) $result['completed'];
+            $overdue   = (int) $result['overdue'];
+
+            $typedResults[] = [
+                'contributor_id'   => (int) $result['contributor_id'],
+                'contributor_name' => (string) $result['contributor_name'],
+                'total'            => $total,
+                'completed'        => $completed,
+                'overdue'          => $overdue,
+                'progress'         => $total > 0 ? (int) round(($completed / $total) * 100) : 100,
+            ];
         }
 
-        return $results;
+        return $typedResults;
     }
 }

@@ -53,11 +53,12 @@ class OnboardingTemplateFixtures extends Fixture implements DependentFixtureInte
         $manager->flush();
     }
 
+    /**
+     * @return array<class-string>
+     */
     public function getDependencies(): array
     {
-        return [
-            ProfileFixtures::class,
-        ];
+        return [];
     }
 
     private function getProfileByName(ObjectManager $manager, string $name): ?Profile

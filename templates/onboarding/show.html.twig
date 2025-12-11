@@ -84,7 +84,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
-                            <i class="bx bx-calendar me-2"></i> {{ week_data.label }}
+                            <i class="bx bx-calendar me-2"></i> {{ week_data.week_label }}
                         </h5>
 
                         <div class="table-responsive">
@@ -102,7 +102,7 @@
                                 </thead>
                                 <tbody>
                                     {% for task in week_data.tasks %}
-                                        <tr class="{% if task.isComplete %}table-success{% elseif task.isOverdue %}table-danger{% endif %}">
+                                        <tr class="{% if task.isCompleted %}table-success{% elseif task.isOverdue %}table-danger{% endif %}">
                                             <td class="text-center">
                                                 <i class="bx {{ task.typeIcon }} font-size-18"></i>
                                             </td>

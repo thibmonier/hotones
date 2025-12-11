@@ -199,7 +199,7 @@
                                             <td><strong>{{ objective.title }}</strong></td>
                                             <td>{{ objective.description }}</td>
                                             <td>
-                                                {% if objective.deadline %}
+                                                {% if objective.deadline is defined and objective.deadline %}
                                                     {{ objective.deadline }}
                                                 {% else %}
                                                     <span class="text-muted">-</span>

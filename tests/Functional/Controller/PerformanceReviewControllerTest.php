@@ -97,7 +97,7 @@ class PerformanceReviewControllerTest extends WebTestCase
         $this->client->request('GET', '/performance-reviews');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'Évaluations de performance');
+        $this->assertSelectorTextContains('h4', 'Évaluations annuelles');
     }
 
     public function testCreateRequiresManagerRole(): void
@@ -119,7 +119,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('form');
-        $this->assertSelectorExists('input[name="year"]');
+        $this->assertSelectorExists('select[name="year"]');
     }
 
     public function testCreateSubmitWithValidData(): void

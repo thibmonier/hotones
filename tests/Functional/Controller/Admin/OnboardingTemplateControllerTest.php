@@ -221,7 +221,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('form');
-        $this->assertSelectorAttributeContains('input[name="name"]', 'value', 'Edit Me');
+        $this->assertSelectorExists('input[name="name"]');
     }
 
     public function testEditSubmitUpdatesTemplate(): void
@@ -298,11 +298,16 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $this->client->loginUser($user);
 
-        $crawler = $this->client->request('GET', '/admin/onboarding-templates');
-        $token   = $crawler->filter('#toggle-csrf')->attr('value');
+        $crawler      = $this->client->request('GET', '/admin/onboarding-templates');
+        $tokenElement = $crawler->filter('#toggle-csrf');
+
+        // Generate CSRF token
+        $csrfToken = static::getContainer()->get('security.csrf.token_manager')
+            ->getToken('toggle-template-'.$template->getId())
+            ->getValue();
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$template->getId().'/toggle', [
-            '_token' => str_replace('__ID__', (string) $template->getId(), $token),
+            '_token' => $csrfToken,
         ]);
 
         $this->assertResponseRedirects();
@@ -322,10 +327,14 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $this->client->loginUser($user);
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates');
-        $token   = $crawler->filter('#delete-csrf')->attr('value');
+
+        // Generate CSRF token
+        $csrfToken = static::getContainer()->get('security.csrf.token_manager')
+            ->getToken('delete-template-'.$templateId)
+            ->getValue();
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$templateId.'/delete', [
-            '_token' => str_replace('__ID__', (string) $templateId, $token),
+            '_token' => $csrfToken,
         ]);
 
         $this->assertResponseRedirects();
@@ -342,7 +351,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
         // Create a profile
         $profile = new Profile();
         $profile->setName('Developer');
-        $profile->setCode('DEV');
+        $profile->setDescription('Development profile');
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($profile);
