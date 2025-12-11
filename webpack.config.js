@@ -51,30 +51,8 @@ Encore
 
   /*
    * RTL CSS GENERATION
+   * Using rtlcss-webpack-plugin for automatic RTL CSS generation
    */
-  // .addLoader({
-  //   test: /\.scss$/,
-  //   use: [
-  //     'css-loader',
-  //     'sass-loader',
-  //     {
-  //       loader: 'sass-loader',
-  //       options: {
-  //         // rtlcss options, if needed
-  //       },
-  //     },
-  //   ],
-  // })
-
-  // .webpackConfig({
-  //   plugins: [
-  //       new RtlCssPlugin()
-  //   ],
-  //   stats: {
-  //       children: true,
-  //   },
-  // })
-
   .addPlugin(new RtlCssPlugin({
     filename: 'css/[name]-rtl.min.css',
   }))
