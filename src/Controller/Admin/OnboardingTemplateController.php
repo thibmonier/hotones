@@ -79,12 +79,12 @@ class OnboardingTemplateController extends AbstractController
             }
 
             try {
-                $profile = null;
-                if ($profileId) {
-                    $profile = $this->profileRepository->find($profileId);
-                }
-
-                $template = $this->onboardingService->createTemplate($name, $description, $tasks, $profile);
+                $template = $this->onboardingService->createTemplate(
+                    $name,
+                    $description,
+                    $profileId ? (int) $profileId : null,
+                    $tasks,
+                );
 
                 $this->addFlash('success', "Template '{$name}' créé avec succès.");
 
