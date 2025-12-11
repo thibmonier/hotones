@@ -39,9 +39,12 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCreateCampaignWithoutManagers(): void
     {
+        $user1 = $this->createMockUser('john@example.com');
+        $user2 = $this->createMockUser('jane@example.com');
+
         $contributors = [
-            $this->createContributor(1, 'John', 'Doe'),
-            $this->createContributor(2, 'Jane', 'Smith'),
+            $this->createContributor(1, 'John', 'Doe', $user1),
+            $this->createContributor(2, 'Jane', 'Smith', $user2),
         ];
 
         $this->contributorRepository->expects($this->once())
@@ -65,9 +68,12 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCreateCampaignSkipsExistingReviews(): void
     {
+        $user1 = $this->createMockUser('john@example.com');
+        $user2 = $this->createMockUser('jane@example.com');
+
         $contributors = [
-            $this->createContributor(1, 'John', 'Doe'),
-            $this->createContributor(2, 'Jane', 'Smith'),
+            $this->createContributor(1, 'John', 'Doe', $user1),
+            $this->createContributor(2, 'Jane', 'Smith', $user2),
         ];
 
         $this->contributorRepository->expects($this->once())
@@ -123,13 +129,15 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCompleteManagerEvaluation(): void
     {
+        $manager = $this->createMockUser('manager@example.com');
+        $user    = $this->createMockUser('john@example.com');
+
         $review = new PerformanceReview();
         $review->setStatus('auto_eval_faite');
         $review->setYear(2024);
+        $review->setManager($manager);
 
-        $contributor = $this->createContributor(1, 'John', 'Doe');
-        $user        = $this->createMockUser('john@example.com');
-        $contributor->setUser($user);
+        $contributor = $this->createContributor(1, 'John', 'Doe', $user);
 
         $review->setContributor($contributor);
 
@@ -160,13 +168,15 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testValidateReview(): void
     {
+        $manager = $this->createMockUser('manager@example.com');
+        $user    = $this->createMockUser('john@example.com');
+
         $review = new PerformanceReview();
         $review->setStatus('eval_manager_faite');
         $review->setYear(2024);
+        $review->setManager($manager);
 
-        $contributor = $this->createContributor(1, 'John', 'Doe');
-        $user        = $this->createMockUser('john@example.com');
-        $contributor->setUser($user);
+        $contributor = $this->createContributor(1, 'John', 'Doe', $user);
         $review->setContributor($contributor);
 
         $objectives = [
@@ -200,12 +210,14 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCanEditSelfEvaluation(): void
     {
+        $manager     = $this->createMockUser('manager@example.com');
         $user        = $this->createMockUser('john@example.com');
-        $contributor = $this->createContributor(1, 'John', 'Doe');
-        $contributor->setUser($user);
+        $contributor = $this->createContributor(1, 'John', 'Doe', $user);
 
         $review = new PerformanceReview();
+        $review->setYear(2024);
         $review->setContributor($contributor);
+        $review->setManager($manager);
         $review->setStatus('en_attente');
 
         $this->assertTrue($this->service->canEditSelfEvaluation($review, $user));
@@ -213,12 +225,14 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCanEditSelfEvaluationWhenAlreadyCompleted(): void
     {
+        $manager     = $this->createMockUser('manager@example.com');
         $user        = $this->createMockUser('john@example.com');
-        $contributor = $this->createContributor(1, 'John', 'Doe');
-        $contributor->setUser($user);
+        $contributor = $this->createContributor(1, 'John', 'Doe', $user);
 
         $review = new PerformanceReview();
+        $review->setYear(2024);
         $review->setContributor($contributor);
+        $review->setManager($manager);
         $review->setStatus('auto_eval_faite');
 
         $this->assertTrue($this->service->canEditSelfEvaluation($review, $user));
@@ -308,13 +322,14 @@ class PerformanceReviewServiceTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    private function createContributor(int $id, string $firstName, string $lastName): Contributor
+    private function createContributor(int $id, string $firstName, string $lastName, ?User $user = null): Contributor
     {
         $contributor = $this->createMock(Contributor::class);
         $contributor->method('getId')->willReturn($id);
         $contributor->method('getFirstName')->willReturn($firstName);
         $contributor->method('getLastName')->willReturn($lastName);
         $contributor->method('getFullName')->willReturn($firstName.' '.$lastName);
+        $contributor->method('getUser')->willReturn($user);
 
         return $contributor;
     }
