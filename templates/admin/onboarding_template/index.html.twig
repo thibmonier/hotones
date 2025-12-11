@@ -1,0 +1,145 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Templates d'onboarding{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Templates d'onboarding</h4>
+
+                <div class="page-title-right">
+                    <a href="{{ path('admin_onboarding_template_create') }}" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Nouveau template
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if templates is empty %}
+                        <div class="alert alert-info">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Aucun template d'onboarding. Créez-en un pour automatiser l'intégration des nouveaux collaborateurs.
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Profil</th>
+                                        <th>Tâches</th>
+                                        <th>Statut</th>
+                                        <th>Créé le</th>
+                                        <th style="width: 200px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for template in templates %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ template.name }}</strong>
+                                                {% if template.description %}
+                                                    <br>
+                                                    <small class="text-muted">{{ template.description|u.truncate(50, '...') }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if template.profile %}
+                                                    <span class="badge badge-soft-primary">{{ template.profile.name }}</span>
+                                                {% else %}
+                                                    <span class="badge badge-soft-secondary">Défaut</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-soft-info">{{ template.tasks|length }} tâches</span>
+                                            </td>
+                                            <td>
+                                                {% if template.active %}
+                                                    <span class="badge badge-soft-success">Actif</span>
+                                                {% else %}
+                                                    <span class="badge badge-soft-danger">Inactif</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ template.createdAt|date('d/m/Y') }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{ path('admin_onboarding_template_show', {id: template.id}) }}"
+                                                       class="btn btn-sm btn-outline-primary"
+                                                       title="Voir">
+                                                        <i class="bx bx-show"></i>
+                                                    </a>
+                                                    <a href="{{ path('admin_onboarding_template_edit', {id: template.id}) }}"
+                                                       class="btn btn-sm btn-outline-info"
+                                                       title="Éditer">
+                                                        <i class="bx bx-edit"></i>
+                                                    </a>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-{{ template.active ? 'warning' : 'success' }}"
+                                                            title="{{ template.active ? 'Désactiver' : 'Activer' }}"
+                                                            onclick="toggleTemplate({{ template.id }}, '{{ template.name }}', {{ template.active ? 'true' : 'false' }})">
+                                                        <i class="bx bx-{{ template.active ? 'hide' : 'show' }}"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            title="Supprimer"
+                                                            onclick="deleteTemplate({{ template.id }}, '{{ template.name }}')">
+                                                        <i class="bx bx-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Forms cachés pour toggle et delete #}
+<form id="toggle-form" method="post" style="display: none;">
+    <input type="hidden" name="_token" id="toggle-csrf">
+</form>
+
+<form id="delete-form" method="post" style="display: none;">
+    <input type="hidden" name="_token" id="delete-csrf">
+</form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function toggleTemplate(id, name, isActive) {
+            const action = isActive ? 'désactiver' : 'activer';
+            if (!confirm(`Voulez-vous ${action} le template "${name}" ?`)) {
+                return;
+            }
+
+            const form = document.getElementById('toggle-form');
+            form.action = '{{ path('admin_onboarding_template_toggle', {id: '__ID__'}) }}'.replace('__ID__', id);
+            document.getElementById('toggle-csrf').value = '{{ csrf_token('toggle-template-__ID__') }}'.replace('__ID__', id);
+            form.submit();
+        }
+
+        function deleteTemplate(id, name) {
+            if (!confirm(`Voulez-vous vraiment supprimer le template "${name}" ?\n\nCette action est irréversible.`)) {
+                return;
+            }
+
+            const form = document.getElementById('delete-form');
+            form.action = '{{ path('admin_onboarding_template_delete', {id: '__ID__'}) }}'.replace('__ID__', id);
+            document.getElementById('delete-csrf').value = '{{ csrf_token('delete-template-__ID__') }}'.replace('__ID__', id);
+            form.submit();
+        }
+    </script>
+{% endblock %}
