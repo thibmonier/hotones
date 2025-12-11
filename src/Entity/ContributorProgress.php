@@ -196,4 +196,11 @@ class ContributorProgress
         // Formule: 100 * level^1.5
         return (int) (100 * pow($this->level, 1.5));
     }
+
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
 }

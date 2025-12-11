@@ -21,6 +21,7 @@ class PerformanceReviewController extends AbstractController
     public function __construct(
         private readonly PerformanceReviewService $reviewService,
         private readonly PerformanceReviewRepository $reviewRepository,
+        private readonly \App\Repository\ContributorRepository $contributorRepository,
     ) {
     }
 
@@ -30,6 +31,7 @@ class PerformanceReviewController extends AbstractController
         $year   = (int) $request->query->get('year', date('Y'));
         $status = $request->query->get('status');
 
+        /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
         // Get reviews based on user role
@@ -38,7 +40,7 @@ class PerformanceReviewController extends AbstractController
             $reviews = $this->reviewRepository->findByManager($user);
         } else {
             // Contributors see only their own reviews
-            $contributor = $user->getContributor();
+            $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
             if (null === $contributor) {
                 $reviews = [];
             } else {

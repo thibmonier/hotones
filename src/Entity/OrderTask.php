@@ -130,4 +130,11 @@ class OrderTask
             $this->totalAmount = bcmul($this->soldDays, $this->soldDailyRate, 2);
         }
     }
+
+    public function setTotalAmount(string $totalAmount): static
+    {
+        $this->totalAmount = $totalAmount;
+
+        return $this;
+    }
 }

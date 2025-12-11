@@ -10,6 +10,7 @@ use App\Entity\OnboardingTask;
 use App\Entity\OnboardingTemplate;
 use App\Repository\OnboardingTaskRepository;
 use App\Repository\OnboardingTemplateRepository;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -66,6 +67,9 @@ class OnboardingService
 
         // Get start date from employment period or use today
         $startDate = $employmentPeriod?->getStartDate() ?? new DateTimeImmutable();
+        if ($startDate instanceof DateTime) {
+            $startDate = DateTimeImmutable::createFromMutable($startDate);
+        }
 
         foreach ($tasks as $taskDef) {
             $task = new OnboardingTask();

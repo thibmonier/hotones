@@ -122,4 +122,16 @@ class DimProjectType
 
         return implode(' - ', $parts);
     }
+
+    public function isInternal(): ?bool
+    {
+        return $this->isInternal;
+    }
+
+    public function setCompositeKey(string $compositeKey): static
+    {
+        $this->compositeKey = $compositeKey;
+
+        return $this;
+    }
 }

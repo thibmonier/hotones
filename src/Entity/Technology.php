@@ -112,4 +112,9 @@ class Technology
 
         return $this;
     }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
 }

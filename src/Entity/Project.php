@@ -883,4 +883,9 @@ class Project
 
         return $this;
     }
+
+    public function isInternal(): ?bool
+    {
+        return $this->isInternal;
+    }
 }

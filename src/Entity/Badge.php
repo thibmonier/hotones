@@ -175,4 +175,11 @@ class Badge
 
         return $this;
     }
+
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
 }

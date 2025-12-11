@@ -388,4 +388,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
         return $this;
     }
+
+    public function isTotpEnabled(): ?bool
+    {
+        return $this->totpEnabled;
+    }
 }

@@ -111,4 +111,53 @@ class DimTime
     {
         return $this->quarterName;
     }
+
+    public function setYear(int $year): static
+    {
+        $this->year = $year;
+
+        return $this;
+    }
+
+    public function setQuarter(int $quarter): static
+    {
+        $this->quarter = $quarter;
+
+        return $this;
+    }
+
+    public function setMonth(int $month): static
+    {
+        $this->month = $month;
+
+        return $this;
+    }
+
+    public function setYearMonth(string $yearMonth): static
+    {
+        $this->yearMonth = $yearMonth;
+
+        return $this;
+    }
+
+    public function setYearQuarter(string $yearQuarter): static
+    {
+        $this->yearQuarter = $yearQuarter;
+
+        return $this;
+    }
+
+    public function setMonthName(string $monthName): static
+    {
+        $this->monthName = $monthName;
+
+        return $this;
+    }
+
+    public function setQuarterName(string $quarterName): static
+    {
+        $this->quarterName = $quarterName;
+
+        return $this;
+    }
 }

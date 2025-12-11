@@ -1,0 +1,206 @@
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Informations générales</h5>
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nom du template <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="name" class="form-control" required
+                           value="{{ template ? template.name : '' }}"
+                           placeholder="Ex: Onboarding Développeur">
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea name="description" id="description" class="form-control" rows="3"
+                              placeholder="Description du parcours d'onboarding...">{{ template ? template.description : '' }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="profile_id" class="form-label">Profil cible</label>
+                    <select name="profile_id" id="profile_id" class="form-select">
+                        <option value="">Défaut (tous profils)</option>
+                        {% for profile in profiles %}
+                            <option value="{{ profile.id }}"
+                                    {% if template and template.profile and template.profile.id == profile.id %}selected{% endif %}>
+                                {{ profile.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">
+                        Si aucun profil n'est sélectionné, ce template sera utilisé par défaut.
+                    </div>
+                </div>
+
+                {% if template %}
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="active" id="active"
+                                   {% if template.active %}checked{% endif %}>
+                            <label class="form-check-label" for="active">
+                                Template actif
+                            </label>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Tâches d'onboarding</h5>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addTask()">
+                        <i class="bx bx-plus me-1"></i> Ajouter une tâche
+                    </button>
+                </div>
+
+                <div id="tasks-container">
+                    {% if template and template.tasks|length > 0 %}
+                        {% for task in template.tasks %}
+                            <div class="task-item card mb-3" data-task-index="{{ loop.index0 }}">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">Tâche {{ loop.index }}</h6>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeTask(this)">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 mb-2">
+                                            <input type="text" name="tasks[{{ loop.index0 }}][title]" class="form-control"
+                                                   placeholder="Titre de la tâche" value="{{ task.title }}" required>
+                                        </div>
+
+                                        <div class="col-md-12 mb-2">
+                                            <textarea name="tasks[{{ loop.index0 }}][description]" class="form-control" rows="2"
+                                                      placeholder="Description (optionnel)">{{ task.description }}</textarea>
+                                        </div>
+
+                                        <div class="col-md-4 mb-2">
+                                            <select name="tasks[{{ loop.index0 }}][type]" class="form-select">
+                                                <option value="action" {% if task.type == 'action' %}selected{% endif %}>Action</option>
+                                                <option value="lecture" {% if task.type == 'lecture' %}selected{% endif %}>Lecture</option>
+                                                <option value="formation" {% if task.type == 'formation' %}selected{% endif %}>Formation</option>
+                                                <option value="meeting" {% if task.type == 'meeting' %}selected{% endif %}>Réunion</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4 mb-2">
+                                            <select name="tasks[{{ loop.index0 }}][assigned_to]" class="form-select">
+                                                <option value="contributor" {% if task.assigned_to == 'contributor' %}selected{% endif %}>Collaborateur</option>
+                                                <option value="manager" {% if task.assigned_to == 'manager' %}selected{% endif %}>Manager</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4 mb-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text">J+</span>
+                                                <input type="number" name="tasks[{{ loop.index0 }}][days_after_start]"
+                                                       class="form-control" min="0" value="{{ task.days_after_start }}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div id="no-tasks-message" class="alert alert-info" {% if template and template.tasks|length > 0 %}style="display:none;"{% endif %}>
+                    <i class="bx bx-info-circle me-2"></i>
+                    Aucune tâche ajoutée. Cliquez sur "Ajouter une tâche" pour commencer.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let taskIndex = {{ template and template.tasks ? template.tasks|length : 0 }};
+
+function addTask() {
+    const container = document.getElementById('tasks-container');
+    const noTasksMessage = document.getElementById('no-tasks-message');
+
+    const taskHtml = `
+        <div class="task-item card mb-3" data-task-index="${taskIndex}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0">Tâche ${taskIndex + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeTask(this)">
+                        <i class="bx bx-trash"></i>
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-2">
+                        <input type="text" name="tasks[${taskIndex}][title]" class="form-control"
+                               placeholder="Titre de la tâche" required>
+                    </div>
+
+                    <div class="col-md-12 mb-2">
+                        <textarea name="tasks[${taskIndex}][description]" class="form-control" rows="2"
+                                  placeholder="Description (optionnel)"></textarea>
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <select name="tasks[${taskIndex}][type]" class="form-select">
+                            <option value="action" selected>Action</option>
+                            <option value="lecture">Lecture</option>
+                            <option value="formation">Formation</option>
+                            <option value="meeting">Réunion</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <select name="tasks[${taskIndex}][assigned_to]" class="form-select">
+                            <option value="contributor" selected>Collaborateur</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text">J+</span>
+                            <input type="number" name="tasks[${taskIndex}][days_after_start]"
+                                   class="form-control" min="0" value="0" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', taskHtml);
+    noTasksMessage.style.display = 'none';
+    taskIndex++;
+    updateTaskNumbers();
+}
+
+function removeTask(button) {
+    const taskItem = button.closest('.task-item');
+    taskItem.remove();
+
+    const container = document.getElementById('tasks-container');
+    const noTasksMessage = document.getElementById('no-tasks-message');
+
+    if (container.children.length === 0) {
+        noTasksMessage.style.display = 'block';
+    }
+
+    updateTaskNumbers();
+}
+
+function updateTaskNumbers() {
+    const tasks = document.querySelectorAll('.task-item');
+    tasks.forEach((task, index) => {
+        const title = task.querySelector('h6');
+        title.textContent = `Tâche ${index + 1}`;
+    });
+}
+</script>

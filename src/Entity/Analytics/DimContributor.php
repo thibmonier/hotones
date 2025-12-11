@@ -130,4 +130,16 @@ class DimContributor
     {
         return $this->name.' ('.$this->getRoleDisplayName().')';
     }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setCompositeKey(string $compositeKey): static
+    {
+        $this->compositeKey = $compositeKey;
+
+        return $this;
+    }
 }
