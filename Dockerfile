@@ -90,7 +90,7 @@ RUN composer install \
     && composer clear-cache
 
 # Install AssetMapper vendor files and compile assets
-RUN php bin/console importmap:install && php bin/console asset-map:compile
+RUN APP_ENV=prod php bin/console importmap:install && APP_ENV=prod php bin/console asset-map:compile
 
 # Create JWT directory (keys will be generated on first startup)
 RUN mkdir -p config/jwt
