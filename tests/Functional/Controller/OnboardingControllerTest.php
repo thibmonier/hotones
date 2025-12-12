@@ -25,6 +25,7 @@ class OnboardingControllerTest extends WebTestCase
     private UserRepository $userRepository;
     private ContributorRepository $contributorRepository;
     private OnboardingTaskRepository $taskRepository;
+    private static int $userCounter = 0;
 
     protected function setUp(): void
     {
@@ -38,8 +39,9 @@ class OnboardingControllerTest extends WebTestCase
 
     private function createAuthenticatedUser(string $role = 'ROLE_INTERVENANT'): User
     {
+        ++self::$userCounter;
         $user = new User();
-        $user->setEmail('test@example.com');
+        $user->setEmail('test'.self::$userCounter.'@example.com');
         $user->setPassword('$2y$13$hashedpassword');
         $user->setRoles([$role]);
         $user->setFirstName('Test');
@@ -139,8 +141,11 @@ class OnboardingControllerTest extends WebTestCase
 
         $this->client->loginUser($user);
 
-        // Generate CSRF token
-        $csrfToken = static::getContainer()->get('security.csrf.token_manager')
+        // Initialize session by making a GET request first
+        $this->client->request('GET', '/onboarding/contributor/'.$contributor->getId());
+
+        // Use client's container which has the session
+        $csrfToken = $this->client->getContainer()->get('security.csrf.token_manager')
             ->getToken('complete-task-'.$task->getId())
             ->getValue();
 
@@ -201,8 +206,11 @@ class OnboardingControllerTest extends WebTestCase
 
         $this->client->loginUser($user);
 
-        // Generate CSRF token
-        $csrfToken = static::getContainer()->get('security.csrf.token_manager')
+        // Initialize session by making a GET request first
+        $this->client->request('GET', '/onboarding/contributor/'.$contributor->getId());
+
+        // Use client's container which has the session
+        $csrfToken = $this->client->getContainer()->get('security.csrf.token_manager')
             ->getToken('update-task-'.$task->getId())
             ->getValue();
 
