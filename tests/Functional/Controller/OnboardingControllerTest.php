@@ -142,15 +142,13 @@ class OnboardingControllerTest extends WebTestCase
         $this->client->loginUser($user);
 
         // Initialize session by making a GET request first
-        $this->client->request('GET', '/onboarding/contributor/'.$contributor->getId());
+        $crawler = $this->client->request('GET', '/onboarding/contributor/'.$contributor->getId());
 
-        // Use client's container which has the session
-        $csrfToken = $this->client->getContainer()->get('security.csrf.token_manager')
-            ->getToken('complete-task-'.$task->getId())
-            ->getValue();
+        // Extract token
+        $token = $crawler->filter('a[onclick*="completeTask('.$task->getId().'"]')->attr('data-token');
 
         $this->client->request('POST', '/onboarding/task/'.$task->getId().'/complete', [
-            '_token'   => $csrfToken,
+            '_token'   => $token,
             'comments' => 'Task completed successfully',
         ]);
 
@@ -207,15 +205,13 @@ class OnboardingControllerTest extends WebTestCase
         $this->client->loginUser($user);
 
         // Initialize session by making a GET request first
-        $this->client->request('GET', '/onboarding/contributor/'.$contributor->getId());
+        $crawler = $this->client->request('GET', '/onboarding/contributor/'.$contributor->getId());
 
-        // Use client's container which has the session
-        $csrfToken = $this->client->getContainer()->get('security.csrf.token_manager')
-            ->getToken('update-task-'.$task->getId())
-            ->getValue();
+        // Extract token
+        $token = $crawler->filter('a[onclick*="updateTaskStatus('.$task->getId().'"]')->attr('data-token');
 
         $this->client->request('POST', '/onboarding/task/'.$task->getId().'/update-status', [
-            '_token' => $csrfToken,
+            '_token' => $token,
             'status' => 'en_cours',
         ]);
 

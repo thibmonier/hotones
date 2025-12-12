@@ -220,6 +220,17 @@ class PerformanceReviewControllerTest extends WebTestCase
 
         $review = $this->createPerformanceReview($contributor, $user, 2024);
         $review->setStatus('eval_manager_faite');
+        $review->setSelfEvaluation([
+            'achievements' => 'Did great things',
+            'strengths'    => 'Coding',
+            'improvements' => 'Testing',
+        ]);
+        $review->setManagerEvaluation([
+            'achievements' => 'Observed great things',
+            'strengths'    => 'Coding',
+            'improvements' => 'Testing',
+            'feedback'     => 'Good job',
+        ]);
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($review);
@@ -227,21 +238,11 @@ class PerformanceReviewControllerTest extends WebTestCase
 
         $this->client->loginUser($user);
 
-        // Get CSRF token
-        $crawler = $this->client->request('GET', '/performance-reviews/'.$review->getId());
+        // Get CSRF token from validate page
+        $crawler = $this->client->request('GET', '/performance-reviews/'.$review->getId().'/validate');
         $this->assertResponseIsSuccessful();
 
-        $tokenCrawler = $crawler->filter('input[name="_token"]');
-        if ($tokenCrawler->count() === 0) {
-            // If token not in show page, get it from validate page or generate it
-            $this->client->request('GET', '/performance-reviews/'.$review->getId().'/validate');
-            // Use client's container which has the session
-            $token = $this->client->getContainer()->get('security.csrf.token_manager')
-                ->getToken('validate-review-'.$review->getId())
-                ->getValue();
-        } else {
-            $token = $tokenCrawler->attr('value');
-        }
+        $token = $crawler->filter('input[name="_token"]')->attr('value');
 
         $this->client->request('POST', '/performance-reviews/'.$review->getId().'/validate', [
             '_token' => $token,

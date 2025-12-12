@@ -298,18 +298,13 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $this->client->loginUser($user);
 
-        $this->client->request('GET', '/admin/onboarding-templates');
+        $crawler = $this->client->request('GET', '/admin/onboarding-templates');
 
-        // Use a second request to ensure session is fully initialized
-        $this->client->request('GET', '/admin/onboarding-templates');
-
-        // Generate CSRF token using the session from the client
-        $csrfToken = $this->client->getContainer()->get('security.csrf.token_manager')
-            ->getToken('toggle-template-'.$template->getId())
-            ->getValue();
+        // Extract token from the toggle button
+        $token = $crawler->filter('button[onclick*="toggleTemplate('.$template->getId().'"]')->attr('data-token');
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$template->getId().'/toggle', [
-            '_token' => $csrfToken,
+            '_token' => $token,
         ]);
 
         $this->assertResponseRedirects();
@@ -328,18 +323,13 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $this->client->loginUser($user);
 
-        $this->client->request('GET', '/admin/onboarding-templates');
+        $crawler = $this->client->request('GET', '/admin/onboarding-templates');
 
-        // Use a second request to ensure session is fully initialized
-        $this->client->request('GET', '/admin/onboarding-templates');
-
-        // Generate CSRF token using the session from the client
-        $csrfToken = $this->client->getContainer()->get('security.csrf.token_manager')
-            ->getToken('delete-template-'.$templateId)
-            ->getValue();
+        // Extract token from the delete button
+        $token = $crawler->filter('button[onclick*="deleteTemplate('.$templateId.'"]')->attr('data-token');
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$templateId.'/delete', [
-            '_token' => $csrfToken,
+            '_token' => $token,
         ]);
 
         $this->assertResponseRedirects();

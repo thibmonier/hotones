@@ -83,13 +83,15 @@
                                                     <button type="button"
                                                             class="btn btn-sm btn-outline-{{ template.active ? 'warning' : 'success' }}"
                                                             title="{{ template.active ? 'Désactiver' : 'Activer' }}"
-                                                            onclick="toggleTemplate({{ template.id }}, '{{ template.name }}', {{ template.active ? 'true' : 'false' }})">
+                                                            data-token="{{ csrf_token('toggle-template-' ~ template.id) }}"
+                                                            onclick="toggleTemplate({{ template.id }}, '{{ template.name }}', {{ template.active ? 'true' : 'false' }}, this.dataset.token)">
                                                         <i class="bx bx-{{ template.active ? 'hide' : 'show' }}"></i>
                                                     </button>
                                                     <button type="button"
                                                             class="btn btn-sm btn-outline-danger"
                                                             title="Supprimer"
-                                                            onclick="deleteTemplate({{ template.id }}, '{{ template.name }}')">
+                                                            data-token="{{ csrf_token('delete-template-' ~ template.id) }}"
+                                                            onclick="deleteTemplate({{ template.id }}, '{{ template.name }}', this.dataset.token)">
                                                         <i class="bx bx-trash"></i>
                                                     </button>
                                                 </div>
@@ -119,7 +121,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        function toggleTemplate(id, name, isActive) {
+        function toggleTemplate(id, name, isActive, token) {
             const action = isActive ? 'désactiver' : 'activer';
             if (!confirm(`Voulez-vous ${action} le template "${name}" ?`)) {
                 return;
@@ -127,18 +129,18 @@
 
             const form = document.getElementById('toggle-form');
             form.action = '{{ path('admin_onboarding_template_toggle', {id: '__ID__'}) }}'.replace('__ID__', id);
-            document.getElementById('toggle-csrf').value = '{{ csrf_token('toggle-template-__ID__') }}'.replace('__ID__', id);
+            document.getElementById('toggle-csrf').value = token;
             form.submit();
         }
 
-        function deleteTemplate(id, name) {
+        function deleteTemplate(id, name, token) {
             if (!confirm(`Voulez-vous vraiment supprimer le template "${name}" ?\n\nCette action est irréversible.`)) {
                 return;
             }
 
             const form = document.getElementById('delete-form');
             form.action = '{{ path('admin_onboarding_template_delete', {id: '__ID__'}) }}'.replace('__ID__', id);
-            document.getElementById('delete-csrf').value = '{{ csrf_token('delete-template-__ID__') }}'.replace('__ID__', id);
+            document.getElementById('delete-csrf').value = token;
             form.submit();
         }
     </script>

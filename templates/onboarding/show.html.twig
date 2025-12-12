@@ -151,14 +151,16 @@
                                                             {% if task.status != 'en_cours' %}
                                                                 <li>
                                                                     <a class="dropdown-item" href="#"
-                                                                       onclick="updateTaskStatus({{ task.id }}, 'en_cours'); return false;">
+                                                                       data-token="{{ csrf_token('update-task-' ~ task.id) }}"
+                                                                       onclick="updateTaskStatus({{ task.id }}, 'en_cours', this.dataset.token); return false;">
                                                                         <i class="bx bx-play me-1"></i> En cours
                                                                     </a>
                                                                 </li>
                                                             {% endif %}
                                                             <li>
                                                                 <a class="dropdown-item" href="#"
-                                                                   onclick="completeTask({{ task.id }}); return false;">
+                                                                   data-token="{{ csrf_token('complete-task-' ~ task.id) }}"
+                                                                   onclick="completeTask({{ task.id }}, this.dataset.token); return false;">
                                                                     <i class="bx bx-check me-1"></i> Marquer terminé
                                                                 </a>
                                                             </li>
@@ -209,21 +211,21 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        function completeTask(taskId) {
+        function completeTask(taskId, token) {
             const comments = prompt('Commentaires (optionnel):');
             if (comments === null) return; // User cancelled
 
             const form = document.getElementById('complete-task-form');
             form.action = '{{ path('onboarding_task_complete', {id: '__TASK_ID__'}) }}'.replace('__TASK_ID__', taskId);
-            document.getElementById('complete-csrf-token').value = '{{ csrf_token('complete-task-__TASK_ID__') }}'.replace('__TASK_ID__', taskId);
+            document.getElementById('complete-csrf-token').value = token;
             document.getElementById('complete-comments').value = comments;
             form.submit();
         }
 
-        function updateTaskStatus(taskId, status) {
+        function updateTaskStatus(taskId, status, token) {
             const form = document.getElementById('update-status-form');
             form.action = '{{ path('onboarding_task_update_status', {id: '__TASK_ID__'}) }}'.replace('__TASK_ID__', taskId);
-            document.getElementById('update-csrf-token').value = '{{ csrf_token('update-task-__TASK_ID__') }}'.replace('__TASK_ID__', taskId);
+            document.getElementById('update-csrf-token').value = token;
             document.getElementById('update-status').value = status;
 
             // Use fetch API for AJAX call
