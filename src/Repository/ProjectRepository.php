@@ -521,7 +521,7 @@ class ProjectRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn ($r) => $r['type'], $rows), fn($v) => $v !== null && $v !== ''));
+        return array_values(array_filter(array_map(fn ($r) => $r['type'], $rows), fn ($v) => $v !== null && $v !== ''));
     }
 
     /**
@@ -536,7 +536,7 @@ class ProjectRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn ($r) => $r['status'], $rows), fn($v) => $v !== null && $v !== ''));
+        return array_values(array_filter(array_map(fn ($r) => $r['status'], $rows), fn ($v) => $v !== null && $v !== ''));
     }
 
     /**

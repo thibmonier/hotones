@@ -384,7 +384,7 @@ class ContributorSatisfaction
             $this->teamScore,
             $this->workEnvironmentScore,
             $this->workLifeBalanceScore,
-        ], fn($score) => $score !== null);
+        ], fn ($score) => $score !== null);
 
         if (count($scores) === 0) {
             return 0.0;

@@ -32,10 +32,10 @@ class PlanningController extends AbstractController
         $startParam = $request->query->get('start');
 
         // Filters (arrays)
-        $selectedContributors = array_filter((array) $request->query->all('contributors'), fn($v) => $v !== null && $v !== '');
-        $selectedManagers     = array_filter((array) $request->query->all('project_managers'), fn($v) => $v !== null && $v !== '');
-        $selectedProjects     = array_filter((array) $request->query->all('projects'), fn($v) => $v !== null && $v !== '');
-        $selectedProjectTypes = array_filter((array) $request->query->all('project_types'), fn($v) => $v !== null && $v !== '');
+        $selectedContributors = array_filter((array) $request->query->all('contributors'), fn ($v) => $v !== null && $v !== '');
+        $selectedManagers     = array_filter((array) $request->query->all('project_managers'), fn ($v) => $v !== null && $v !== '');
+        $selectedProjects     = array_filter((array) $request->query->all('projects'), fn ($v) => $v !== null && $v !== '');
+        $selectedProjectTypes = array_filter((array) $request->query->all('project_types'), fn ($v) => $v !== null && $v !== '');
 
         $today = new DateTime('today');
         // Start at Monday of the current week by default

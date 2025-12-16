@@ -3,7 +3,10 @@
     <description>PHP_CodeSniffer configuration for HotOnes project</description>
 
     <!-- Include PSR-12 coding standard -->
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <!-- Exclude concatenation spacing to match Symfony style (no spaces) -->
+        <exclude name="Squiz.Strings.ConcatenationSpacing"/>
+    </rule>
 
     <!-- Paths to check -->
     <file>src</file>
@@ -53,4 +56,10 @@
 
     <!-- Use all CPU cores for faster analysis -->
     <arg name="parallel" value="75"/>
+
+    <!-- Disable specific PSR12 checks that conflict with Symfony style -->
+    <!-- We use Symfony style (no spaces around concat) via PHP CS Fixer -->
+    <rule ref="PSR12.Operators.OperatorSpacing">
+        <severity>0</severity>
+    </rule>
 </ruleset>

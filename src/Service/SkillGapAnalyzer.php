@@ -227,8 +227,10 @@ class SkillGapAnalyzer
         foreach ($activeProjects as $project) {
             // Rechercher si la compétence correspond à une technologie du projet
             foreach ($project->getTechnologies() as $technology) {
-                if (stripos($technology->getName(), $skill->getName())    !== false
-                    || stripos($skill->getName(), $technology->getName()) !== false) {
+                if (
+                    stripos($technology->getName(), $skill->getName())    !== false
+                    || stripos($skill->getName(), $technology->getName()) !== false
+                ) {
                     ++$demandCount;
                     break;
                 }
