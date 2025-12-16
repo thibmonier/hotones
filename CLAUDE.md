@@ -59,10 +59,11 @@ docker compose exec app php bin/console messenger:failed:retry
 docker compose exec app composer check-code
 
 # Individual checks
-docker compose exec app composer phpstan              # Static analysis
+docker compose exec app composer phpstan              # Static analysis (level 3 + strict rules)
 docker compose exec app composer phpcsfixer           # Code style check (dry-run)
 docker compose exec app composer phpcsfixer-fix       # Fix code style
-docker compose exec app composer phpmd                # Mess detector
+docker compose exec app composer phpcs                # PHP_CodeSniffer (PSR-12 + quality rules)
+docker compose exec app composer phpcbf               # PHP Code Beautifier and Fixer (auto-fix)
 ```
 
 ### Testing
@@ -254,11 +255,18 @@ docker compose exec app php bin/console doctrine:migrations:migrate
 
 ### Code Style Rules
 - PSR-12 + Symfony standards
-- PHPStan level 3
+- PHPStan level 3 with strict rules extension
+- PHP_CodeSniffer with PSR-12 + quality rules
 - Strict types declaration: `declare(strict_types=1);`
 - No Yoda conditions
 - Aligned operators, ordered imports
 - PHP CS Fixer configuration in `.php-cs-fixer.dist.php`
+- PHP_CodeSniffer configuration in `phpcs.xml`
+
+**Quality Tools:**
+- **PHP CS Fixer**: PSR-12 + Symfony coding standards, auto-formatting
+- **PHPStan**: Static analysis with Doctrine/Symfony extensions + strict rules
+- **PHP_CodeSniffer**: PSR-12 compliance, cyclomatic complexity, code quality metrics
 
 ## Testing
 
