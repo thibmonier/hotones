@@ -341,7 +341,7 @@ class ProjectController extends AbstractController
             ++$ordersByStatus[$status];
 
             // Ne compter dans les totaux que les devis signés/gagnés/terminés
-            if (in_array($status, ['signed', 'won', 'completed', 'signe', 'gagne', 'termine'])) {
+            if (in_array($status, ['signed', 'won', 'completed', 'signe', 'gagne', 'termine'], true)) {
                 // CA du devis (calculé depuis les sections)
                 $orderTotal   = $order->calculateTotalFromSections();
                 $totalRevenue = bcadd($totalRevenue, $orderTotal, 2);

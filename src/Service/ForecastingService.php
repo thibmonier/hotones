@@ -271,7 +271,7 @@ class ForecastingService
             ? array_sum(array_column($previous, 'actual')) / count($previous)
             : $recentAvg;
 
-        if ($previousAvg == 0) {
+        if ($previousAvg === 0) {
             return 'stable';
         }
 
@@ -471,7 +471,7 @@ class ForecastingService
         }
 
         $denominator = ($n * $sumX2) - ($sumX * $sumX);
-        if ($denominator == 0) {
+        if ($denominator === 0) {
             return ['slope' => 0.0, 'intercept' => $sumY / $n];
         }
 

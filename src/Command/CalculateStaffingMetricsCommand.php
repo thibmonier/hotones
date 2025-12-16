@@ -61,7 +61,7 @@ Exemples :
         $range            = (int) $input->getOption('range');
 
         // Validation de la granularité
-        if (!in_array($granularity, ['monthly', 'quarterly', 'weekly'])) {
+        if (!in_array($granularity, ['monthly', 'quarterly', 'weekly'], true)) {
             $io->error('Granularité invalide. Valeurs acceptées: monthly, quarterly, weekly');
 
             return Command::FAILURE;

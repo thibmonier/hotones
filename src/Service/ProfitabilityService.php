@@ -282,7 +282,7 @@ class ProfitabilityService
 
         foreach ($project->getOrders() as $order) {
             // Ne compter que les devis signés/gagnés
-            if (in_array($order->getStatus(), ['signed', 'won', 'completed'])) {
+            if (in_array($order->getStatus(), ['signed', 'won', 'completed'], true)) {
                 $orderTotal   = $this->calculateOrderTotal($order);
                 $totalRevenue = bcadd($totalRevenue, $orderTotal, 2);
             }
@@ -322,7 +322,7 @@ class ProfitabilityService
         $totalDays = '0';
 
         foreach ($project->getOrders() as $order) {
-            if (in_array($order->getStatus(), ['signed', 'won', 'completed'])) {
+            if (in_array($order->getStatus(), ['signed', 'won', 'completed'], true)) {
                 foreach ($order->getSections() as $section) {
                     foreach ($section->getLines() as $line) {
                         $totalDays = bcadd($totalDays, $line->getDays(), 2);

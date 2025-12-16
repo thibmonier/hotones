@@ -53,7 +53,7 @@ Exemples :
         $forceRecalculate = $input->getOption('force-recalculate');
 
         // Validation de la granularité
-        if (!in_array($granularity, ['monthly', 'quarterly', 'yearly'])) {
+        if (!in_array($granularity, ['monthly', 'quarterly', 'yearly'], true)) {
             $io->error('Granularité invalide. Valeurs acceptées: monthly, quarterly, yearly');
 
             return Command::FAILURE;

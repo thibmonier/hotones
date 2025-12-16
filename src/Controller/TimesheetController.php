@@ -674,7 +674,7 @@ class TimesheetController extends AbstractController
 
         // Filtrer par projet si spécifié
         if ($projectId) {
-            $timesheets = array_filter($timesheets, fn ($t) => $t->getProject()->getId() == $projectId);
+            $timesheets = array_filter($timesheets, fn ($t) => $t->getProject()->getId() === $projectId);
         }
 
         // Créer le fichier Excel

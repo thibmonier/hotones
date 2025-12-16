@@ -220,7 +220,7 @@ class Vacation
 
         while ($start <= $end) {
             // Exclure les weekends (samedi=6, dimanche=0)
-            if (!in_array($start->format('w'), ['0', '6'])) {
+            if (!in_array($start->format('w'), ['0', '6'], true)) {
                 ++$days;
             }
             $start->modify('+1 day');

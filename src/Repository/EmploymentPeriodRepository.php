@@ -55,7 +55,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             ->setParameter('contributor', $period->getContributor());
 
         if ($excludeId) {
-            $queryBuilder->andWhere('ep.id != :excludeId')
+            $queryBuilder->andWhere('ep.id <> :excludeId')
                 ->setParameter('excludeId', $excludeId);
         }
 
@@ -168,7 +168,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
 
         while ($current <= $endDate) {
             // Exclure les weekends (samedi = 6, dimanche = 0)
-            if ($current->format('w') != 0 && $current->format('w') != 6) {
+            if ($current->format('w') !== 0 && $current->format('w') !== 6) {
                 ++$workingDays;
             }
             $current->modify('+1 day');

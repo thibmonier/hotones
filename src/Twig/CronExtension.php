@@ -212,7 +212,7 @@ class CronExtension extends AbstractExtension
         $fmt   = function (string $n) use ($locale) {
             $i = (int) $n;
             if ($locale === 'en') {
-                return (string) $i.(in_array($i % 100, [11, 12, 13]) ? 'th' : (['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][$i % 10] ?? 'th'));
+                return (string) $i.(in_array($i % 100, [11, 12, 13], true) ? 'th' : (['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][$i % 10] ?? 'th'));
             }
 
             return (string) $i; // FR no ordinal for DOM

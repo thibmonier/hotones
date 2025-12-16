@@ -54,7 +54,7 @@ class OnboardingTemplateFixtures extends Fixture implements DependentFixtureInte
     }
 
     /**
-     * @return array<class-string>
+     * @return array<class-string<\Doctrine\Common\DataFixtures\FixtureInterface>>
      */
     public function getDependencies(): array
     {
