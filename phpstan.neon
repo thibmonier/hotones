@@ -15,6 +15,7 @@ parameters:
     symfony:
 #        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
         consoleApplicationLoader: tests/console-application.php
+
     ignoreErrors:
         # Ignore Doctrine collection generics for now
         - '#Property .+ type mapping mismatch#'
@@ -24,3 +25,21 @@ parameters:
         - '#Call to an undefined method .*CronExpressionTrigger::withDescription\(\)#'
         - '#Call to method withName\(\) on an unknown class .*RecurringCommand#'
         - '#Instantiated class .*RecurringCommand not found#'
+
+        # Disable overly strict rules from phpstan-strict-rules
+        # Allow non-boolean in conditions (common PHP pattern)
+        - identifier: if.condNotBoolean
+        - identifier: booleanNot.exprNotBoolean
+        - identifier: booleanAnd.leftNotBoolean
+        - identifier: booleanAnd.rightNotBoolean
+        - identifier: ternary.condNotBoolean
+        - identifier: elseif.condNotBoolean
+
+        # Allow empty() construct (common and useful)
+        - identifier: empty.notAllowed
+
+        # Allow short ternary operator (readable and common)
+        - identifier: ternary.shortNotAllowed
+
+        # Allow useless casts from PHPDoc (PHPDoc types are not always reliable)
+        - identifier: cast.useless
