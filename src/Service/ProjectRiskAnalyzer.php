@@ -312,7 +312,7 @@ class ProjectRiskAnalyzer
         }
 
         // Vérifier si le projet est bloqué (0% ou 100% sans changement de statut)
-        if ($progress === 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
+        if ($progress == 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
             return [
                 'type'     => 'not_started',
                 'severity' => 'high',
@@ -550,7 +550,7 @@ class ProjectRiskAnalyzer
 
         // Check progress velocity (has progress been made?)
         $progress = (float) $project->getGlobalProgress();
-        if ($progress === 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
+        if ($progress == 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
             return 40; // Started but no progress
         }
 
