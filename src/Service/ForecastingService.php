@@ -271,8 +271,8 @@ class ForecastingService
             ? array_sum(array_column($previous, 'actual')) / count($previous)
             : $recentAvg;
 
-        if ($previousAvg === 0) {
-            return 'stable';
+        if ($previousAvg === 0 || $previousAvg === 0.0) {
+            return $recentAvg > 0 ? 'growth' : 'stable';
         }
 
         $change = (($recentAvg - $previousAvg) / $previousAvg) * 100;
