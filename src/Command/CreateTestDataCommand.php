@@ -219,7 +219,7 @@ Répartition des contributeurs :
                     $firstName = self::FIRST_NAMES[array_rand(self::FIRST_NAMES)];
                     $lastName  = self::LAST_NAMES[array_rand(self::LAST_NAMES)];
                     $fullName  = "$firstName $lastName";
-                } while (in_array($fullName, $usedNames));
+                } while (in_array($fullName, $usedNames, true));
 
                 $usedNames[] = $fullName;
 
@@ -476,7 +476,7 @@ Répartition des contributeurs :
                 $task->setEstimatedHoursRevised($taskData['hours_revised']);
                 $task->setProgressPercentage($taskData['progress']);
                 $task->setPosition($position++);
-                $task->setStatus($taskData['progress'] == 100 ? 'completed' : ($taskData['progress'] > 0 ? 'in_progress' : 'not_started'));
+                $task->setStatus($taskData['progress'] === 100 ? 'completed' : ($taskData['progress'] > 0 ? 'in_progress' : 'not_started'));
                 $task->setCountsForProfitability($taskData['type'] === 'regular');
                 $task->setActive(true);
 

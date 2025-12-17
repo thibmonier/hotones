@@ -1,0 +1,289 @@
+{% extends 'public/base.html.twig' %}
+
+{% block title %}HotOnes - Pilotez la rentabilité de votre agence web{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h1>Pilotez la rentabilité de votre agence web</h1>
+                <p class="lead">
+                    HotOnes vous aide à suivre vos projets, gérer vos temps, et analyser votre profitabilité.
+                    Une solution complète pour faire grandir votre agence.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ path('public_pricing') }}" class="btn btn-light btn-lg px-4">
+                        Voir les tarifs
+                    </a>
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg px-4">
+                        Essayer gratuitement
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <small class="opacity-75">
+                        <i class="bx bx-check-circle me-1"></i> 14 jours d'essai gratuit
+                        <span class="mx-2">•</span>
+                        <i class="bx bx-check-circle me-1"></i> Sans engagement
+                        <span class="mx-2">•</span>
+                        <i class="bx bx-check-circle me-1"></i> Support inclus
+                    </small>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <img src="https://via.placeholder.com/600x400/667eea/ffffff?text=Dashboard+Preview"
+                     alt="HotOnes Dashboard"
+                     class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="h2 fw-bold text-primary mb-1">500+</div>
+                <div class="text-muted">Agences clientes</div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="h2 fw-bold text-primary mb-1">5M+</div>
+                <div class="text-muted">Heures suivies</div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="h2 fw-bold text-primary mb-1">10K+</div>
+                <div class="text-muted">Projets gérés</div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="h2 fw-bold text-primary mb-1">98%</div>
+                <div class="text-muted">Satisfaction client</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Tout ce dont votre agence a besoin</h2>
+            <p class="section-subtitle">Des fonctionnalités pensées pour les agences web et digitales</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bx bx-time"></i>
+                    </div>
+                    <h4>Suivi du temps</h4>
+                    <p class="text-muted">
+                        Enregistrez facilement le temps passé sur chaque projet et tâche.
+                        Interface intuitive avec timer intégré.
+                    </p>
+                    <a href="{{ path('public_features_time_tracking') }}" class="text-primary fw-semibold">
+                        En savoir plus <i class="bx bx-right-arrow-alt"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bx bx-folder-open"></i>
+                    </div>
+                    <h4>Gestion de projets</h4>
+                    <p class="text-muted">
+                        Suivez vos projets de A à Z : devis, tâches, équipes, budgets.
+                        Tout au même endroit.
+                    </p>
+                    <a href="{{ path('public_features_project_management') }}" class="text-primary fw-semibold">
+                        En savoir plus <i class="bx bx-right-arrow-alt"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bx bx-line-chart"></i>
+                    </div>
+                    <h4>Analyse de rentabilité</h4>
+                    <p class="text-muted">
+                        Visualisez la rentabilité réelle de chaque projet avec des KPIs précis
+                        et des tableaux de bord détaillés.
+                    </p>
+                    <a href="{{ path('public_features_analytics') }}" class="text-primary fw-semibold">
+                        En savoir plus <i class="bx bx-right-arrow-alt"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                    <h4>Planning & Staffing</h4>
+                    <p class="text-muted">
+                        Planifiez les ressources, gérez les congés et optimisez
+                        le taux de charge de vos équipes.
+                    </p>
+                    <a href="{{ path('public_features_planning') }}" class="text-primary fw-semibold">
+                        En savoir plus <i class="bx bx-right-arrow-alt"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bx bx-file"></i>
+                    </div>
+                    <h4>Devis & Facturation</h4>
+                    <p class="text-muted">
+                        Créez et gérez vos devis facilement. Suivez leur statut
+                        et générez automatiquement les tâches projet.
+                    </p>
+                    <a href="{{ path('public_features') }}" class="text-primary fw-semibold">
+                        En savoir plus <i class="bx bx-right-arrow-alt"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bx bx-group"></i>
+                    </div>
+                    <h4>Gestion RH</h4>
+                    <p class="text-muted">
+                        Gérez vos contributeurs, leurs contrats, compétences,
+                        et demandes de congés centralisés.
+                    </p>
+                    <a href="{{ path('public_features') }}" class="text-primary fw-semibold">
+                        En savoir plus <i class="bx bx-right-arrow-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8" data-aos="fade-right">
+                <h2 class="mb-3">Prêt à booster la rentabilité de votre agence ?</h2>
+                <p class="lead mb-0">
+                    Rejoignez des centaines d'agences qui utilisent HotOnes pour piloter leur croissance.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0" data-aos="fade-left">
+                <a href="{{ path('public_pricing') }}" class="btn btn-light btn-lg px-5">
+                    Commencer maintenant
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Ce que disent nos clients</h2>
+            <p class="section-subtitle">Des agences de toutes tailles nous font confiance</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                        </div>
+                        <p class="mb-4">
+                            "HotOnes a transformé notre façon de gérer les projets.
+                            Nous avons augmenté notre rentabilité de 30% en 6 mois."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
+                                 style="width: 48px; height: 48px;">
+                                <span class="fw-bold">JD</span>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">Jean Dupont</div>
+                                <small class="text-muted">CEO, WebAgency Pro</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                        </div>
+                        <p class="mb-4">
+                            "Interface intuitive, fonctionnalités complètes.
+                            Exactement ce dont nous avions besoin pour structurer notre croissance."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
+                                 style="width: 48px; height: 48px;">
+                                <span class="fw-bold">SM</span>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">Sophie Martin</div>
+                                <small class="text-muted">Directrice, Digital Studio</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                            <i class="bx bxs-star text-warning"></i>
+                        </div>
+                        <p class="mb-4">
+                            "Le suivi de rentabilité projet par projet est un game changer.
+                            Nous savons enfin où nous gagnons et où nous perdons de l'argent."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
+                                 style="width: 48px; height: 48px;">
+                                <span class="fw-bold">PL</span>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">Pierre Lefebvre</div>
+                                <small class="text-muted">COO, CreativeHub</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

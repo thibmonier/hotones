@@ -81,8 +81,8 @@
         "twig/twig": "^2.12|^3.22.1"
     },
     "require-dev": {
-        "dbrekelmans/bdi": "^1.4.1",
         "dama/doctrine-test-bundle": "^8.4.1",
+        "dbrekelmans/bdi": "^1.4.1",
         "doctrine/doctrine-fixtures-bundle": "^4.3.1",
         "fakerphp/faker": "^1.24.1",
         "friendsofphp/php-cs-fixer": "^3.91.3",
@@ -90,7 +90,9 @@
         "phpstan/phpstan": "^2.1.33",
         "phpstan/phpstan-doctrine": "^2.0.12",
         "phpstan/phpstan-symfony": "^2.0.9",
+        "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^12.5.3",
+        "squizlabs/php_codesniffer": "^3.10",
         "symfony/browser-kit": "^8.0",
         "symfony/css-selector": "^8.0",
         "symfony/debug-bundle": "^8.0",
@@ -146,10 +148,12 @@
         "phpstan-clear": "phpstan clear-result-cache",
         "phpcsfixer": "php-cs-fixer fix --dry-run --diff --ansi",
         "phpcsfixer-fix": "php-cs-fixer fix --ansi",
-        "phpmd": "phpmd src text phpmd.xml",
+        "phpcs": "phpcs --standard=phpcs.xml",
+        "phpcbf": "phpcbf --standard=phpcs.xml",
         "check-code": [
             "@phpcsfixer",
-            "@phpstan"
+            "@phpstan",
+            "@phpcs"
         ],
         "test": "phpunit -c phpunit.xml.dist",
         "test-unit": "phpunit --testsuite unit",

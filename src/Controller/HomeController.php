@@ -26,7 +26,7 @@ class HomeController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'home')]
+    #[Route('/app', name: 'home')]
     #[IsGranted('ROLE_USER')]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
@@ -38,14 +38,14 @@ class HomeController extends AbstractController
 
         // Déterminer le rôle à afficher (session > query > défaut)
         $selectedRole = $request->query->get('view');
-        if ($selectedRole && in_array($selectedRole, array_keys($availableRoles))) {
+        if ($selectedRole && in_array($selectedRole, array_keys($availableRoles), true)) {
             // Sauvegarder la préférence en session
             $request->getSession()->set('home_dashboard_view', $selectedRole);
         } elseif ($request->getSession()->has('home_dashboard_view')) {
             // Récupérer depuis la session
             $selectedRole = $request->getSession()->get('home_dashboard_view');
             // Vérifier que le rôle est toujours disponible
-            if (!in_array($selectedRole, array_keys($availableRoles))) {
+            if (!in_array($selectedRole, array_keys($availableRoles), true)) {
                 $selectedRole = $this->getUserPrimaryRole();
             }
         } else {

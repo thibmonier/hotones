@@ -46,7 +46,8 @@ class ProjectTaskType extends AbstractType
                     }
                     $order = $line->getSection()->getOrder();
 
-                    return sprintf('%s - %s (%s j)',
+                    return sprintf(
+                        '%s - %s (%s j)',
                         $order->getOrderNumber(),
                         $line->getDescription(),
                         $line->getDays() ?? '0',

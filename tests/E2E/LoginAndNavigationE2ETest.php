@@ -41,7 +41,9 @@ class LoginAndNavigationE2ETest extends PantherTestCase
 
         // After successful login, should be on homepage (/) or 2FA page
         // Check that we're not still on /login (which would indicate failed auth)
-        $this->assertStringNotContainsString('/login', $currentPath,
+        $this->assertStringNotContainsString(
+            '/login',
+            $currentPath,
             sprintf('Should not be redirected back to login page, currently on: %s', $currentPath),
         );
 

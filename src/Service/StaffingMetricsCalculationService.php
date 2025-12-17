@@ -155,7 +155,7 @@ class StaffingMetricsCalculationService
 
         while ($current <= $end) {
             // Exclure samedi (6) et dimanche (0)
-            if (!in_array((int) $current->format('w'), [0, 6])) {
+            if (!in_array((int) $current->format('w'), [0, 6], true)) {
                 ++$days;
             }
             $current->modify('+1 day');

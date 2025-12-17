@@ -1,0 +1,233 @@
+{% extends 'public/base.html.twig' %}
+
+{% block title %}Contact - HotOnes{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 data-aos="fade-up">Contactez-nous</h1>
+        <p class="lead" data-aos="fade-up" data-aos-delay="100">
+            Une question ? Notre équipe est là pour vous aider
+        </p>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Contact Form -->
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+                        <h3 class="mb-4">Envoyez-nous un message</h3>
+                        <form>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">Prénom <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="firstName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Nom <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="lastName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Téléphone</label>
+                                    <input type="tel" class="form-control" id="phone">
+                                </div>
+                                <div class="col-12">
+                                    <label for="company" class="form-label">Société</label>
+                                    <input type="text" class="form-control" id="company">
+                                </div>
+                                <div class="col-12">
+                                    <label for="subject" class="form-label">Sujet <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="subject" required>
+                                        <option value="">Choisissez un sujet...</option>
+                                        <option value="demo">Demande de démo</option>
+                                        <option value="pricing">Question sur les tarifs</option>
+                                        <option value="technical">Question technique</option>
+                                        <option value="support">Support client</option>
+                                        <option value="partnership">Partenariat</option>
+                                        <option value="other">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="message" rows="6" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="consent" required>
+                                        <label class="form-check-label small" for="consent">
+                                            J'accepte que mes données soient utilisées pour me recontacter <span class="text-danger">*</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary-custom btn-lg w-100">
+                                        <i class="bx bx-send me-2"></i>Envoyer le message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-lg-5" data-aos="fade-left">
+                <div class="mb-5">
+                    <h3 class="mb-4">Informations de contact</h3>
+
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px;">
+                                <i class="bx bx-envelope font-size-20"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-1">Email</h5>
+                            <p class="text-muted mb-0">
+                                <a href="mailto:contact@hotones.io" class="text-muted">contact@hotones.io</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px;">
+                                <i class="bx bx-phone font-size-20"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-1">Téléphone</h5>
+                            <p class="text-muted mb-0">
+                                <a href="tel:+33123456789" class="text-muted">+33 1 23 45 67 89</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px;">
+                                <i class="bx bx-map font-size-20"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-1">Adresse</h5>
+                            <p class="text-muted mb-0">
+                                123 Avenue des Champs-Élysées<br>
+                                75008 Paris, France
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px;">
+                                <i class="bx bx-time font-size-20"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-1">Horaires</h5>
+                            <p class="text-muted mb-0">
+                                Lundi - Vendredi: 9h00 - 18h00<br>
+                                <small class="text-muted">Support 24/7 pour les clients Enterprise</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm bg-light">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Besoin d'aide rapidement ?</h5>
+                        <p class="text-muted mb-4">
+                            Consultez notre documentation ou contactez notre support client directement.
+                        </p>
+                        <div class="d-grid gap-2">
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="bx bx-book me-2"></i>Documentation
+                            </a>
+                            <a href="{{ path('app_login') }}" class="btn btn-primary-custom">
+                                <i class="bx bx-log-in me-2"></i>Accéder au support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Quick Links -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Questions fréquentes</h2>
+            <p class="section-subtitle">Trouvez peut-être votre réponse ici</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bx bx-help-circle font-size-40 text-primary"></i>
+                        </div>
+                        <h5 class="mb-3">Comment démarrer ?</h5>
+                        <p class="text-muted mb-3">
+                            Créez votre compte, ajoutez vos contributeurs et commencez à suivre vos projets en quelques minutes.
+                        </p>
+                        <a href="{{ path('public_pricing') }}" class="text-primary fw-semibold">
+                            Voir les tarifs <i class="bx bx-right-arrow-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bx bx-dollar-circle font-size-40 text-primary"></i>
+                        </div>
+                        <h5 class="mb-3">Quels sont les tarifs ?</h5>
+                        <p class="text-muted mb-3">
+                            Des offres adaptées à toutes les tailles d'agence, à partir de 29€/utilisateur/mois.
+                        </p>
+                        <a href="{{ path('public_pricing') }}" class="text-primary fw-semibold">
+                            Voir tous les tarifs <i class="bx bx-right-arrow-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bx bx-customize font-size-40 text-primary"></i>
+                        </div>
+                        <h5 class="mb-3">Quelles fonctionnalités ?</h5>
+                        <p class="text-muted mb-3">
+                            Gestion de projets, suivi du temps, analytics, planning, RH et bien plus encore.
+                        </p>
+                        <a href="{{ path('public_features') }}" class="text-primary fw-semibold">
+                            Découvrir les fonctionnalités <i class="bx bx-right-arrow-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

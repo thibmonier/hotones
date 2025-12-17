@@ -337,7 +337,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     // Méthodes utilitaires pour les rôles
     public function hasRole(string $role): bool
     {
-        return in_array($role, $this->getRoles());
+        return in_array($role, $this->getRoles(), true);
     }
 
     public function isIntervenant(): bool

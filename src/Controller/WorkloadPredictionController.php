@@ -32,8 +32,8 @@ class WorkloadPredictionController extends AbstractController
         $contributorIds = $request->query->all('contributors') ?? [];
 
         // Convertir en entiers
-        $profileIds     = array_map('intval', array_filter($profileIds));
-        $contributorIds = array_map('intval', array_filter($contributorIds));
+        $profileIds     = array_map('intval', array_filter($profileIds, fn ($v) => $v !== null && $v !== ''));
+        $contributorIds = array_map('intval', array_filter($contributorIds, fn ($v) => $v !== null && $v !== ''));
 
         // Analyser le pipeline avec filtres
         $analysis = $this->predictionService->analyzePipeline($profileIds, $contributorIds);

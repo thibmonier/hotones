@@ -1,0 +1,295 @@
+{% extends 'public/base.html.twig' %}
+
+{% block title %}Fonctionnalités - HotOnes{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 data-aos="fade-up">Une solution complète pour votre agence</h1>
+        <p class="lead" data-aos="fade-up" data-aos-delay="100">
+            Tous les outils dont vous avez besoin pour gérer, suivre et optimiser la rentabilité de vos projets
+        </p>
+    </div>
+</section>
+
+<!-- Main Features -->
+<section class="py-5">
+    <div class="container">
+        <!-- Time Tracking -->
+        <div class="row align-items-center mb-5 pb-5 border-bottom">
+            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="pe-lg-5">
+                    <div class="feature-icon mb-4">
+                        <i class="bx bx-time"></i>
+                    </div>
+                    <h2 class="mb-4">Suivi du temps intelligent</h2>
+                    <p class="text-muted mb-4">
+                        Enregistrez simplement et rapidement le temps passé sur chaque projet et tâche.
+                        Interface intuitive avec timer intégré pour ne jamais oublier de pointer.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Timer en temps réel</strong> - Un clic pour démarrer, un clic pour arrêter
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Saisie hebdomadaire</strong> - Interface optimisée pour pointer toute la semaine
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Historique complet</strong> - Retrouvez tous vos temps passés
+                        </li>
+                    </ul>
+                    <a href="{{ path('public_features_time_tracking') }}" class="btn btn-primary-custom">
+                        En savoir plus
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <img src="https://via.placeholder.com/600x400/556ee6/ffffff?text=Time+Tracking"
+                     alt="Suivi du temps" class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+
+        <!-- Project Management -->
+        <div class="row align-items-center mb-5 pb-5 border-bottom flex-lg-row-reverse">
+            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-left">
+                <div class="ps-lg-5">
+                    <div class="feature-icon mb-4">
+                        <i class="bx bx-folder-open"></i>
+                    </div>
+                    <h2 class="mb-4">Gestion de projets complète</h2>
+                    <p class="text-muted mb-4">
+                        Gérez tous vos projets depuis la phase de devis jusqu'à la livraison.
+                        Suivez les tâches, assignez les équipes, et pilotez vos budgets.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Projets illimités</strong> - Gérez autant de projets que nécessaire
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Tâches & sous-tâches</strong> - Organisation hiérarchique type Kanban
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Suivi budgétaire</strong> - Temps estimé vs temps réel en un coup d'œil
+                        </li>
+                    </ul>
+                    <a href="{{ path('public_features_project_management') }}" class="btn btn-primary-custom">
+                        En savoir plus
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-right">
+                <img src="https://via.placeholder.com/600x400/34c38f/ffffff?text=Projects"
+                     alt="Gestion de projets" class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+
+        <!-- Analytics -->
+        <div class="row align-items-center mb-5 pb-5 border-bottom">
+            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="pe-lg-5">
+                    <div class="feature-icon mb-4">
+                        <i class="bx bx-line-chart"></i>
+                    </div>
+                    <h2 class="mb-4">Analytics & Rentabilité</h2>
+                    <p class="text-muted mb-4">
+                        Visualisez la rentabilité réelle de chaque projet avec des KPIs précis.
+                        Tableaux de bord détaillés pour piloter votre activité.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Calcul automatique</strong> - Marge, CA, coûts calculés en temps réel
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Tableaux de bord</strong> - Analytics, commercial, staffing, RH
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Export Excel</strong> - Exportez vos données pour vos analyses
+                        </li>
+                    </ul>
+                    <a href="{{ path('public_features_analytics') }}" class="btn btn-primary-custom">
+                        En savoir plus
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <img src="https://via.placeholder.com/600x400/f46a6a/ffffff?text=Analytics"
+                     alt="Analytics" class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+
+        <!-- Planning -->
+        <div class="row align-items-center flex-lg-row-reverse">
+            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-left">
+                <div class="ps-lg-5">
+                    <div class="feature-icon mb-4">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                    <h2 class="mb-4">Planning & Ressources</h2>
+                    <p class="text-muted mb-4">
+                        Planifiez les ressources, optimisez le staffing et gérez les congés.
+                        Vue timeline pour visualiser la charge de travail.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Vue timeline</strong> - Planning visuel avec drag & drop
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Taux de charge</strong> - Optimisez l'utilisation de vos ressources
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Gestion des congés</strong> - Demandes et approbations intégrées
+                        </li>
+                    </ul>
+                    <a href="{{ path('public_features_planning') }}" class="btn btn-primary-custom">
+                        En savoir plus
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-right">
+                <img src="https://via.placeholder.com/600x400/50a5f1/ffffff?text=Planning"
+                     alt="Planning" class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Additional Features -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Et bien plus encore...</h2>
+            <p class="section-subtitle">Toutes les fonctionnalités pour gérer votre agence efficacement</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="0">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-file font-size-40 text-primary"></i>
+                    </div>
+                    <h5>Devis & Facturation</h5>
+                    <p class="text-muted small">
+                        Créez vos devis et suivez leur transformation en projets
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-group font-size-40 text-primary"></i>
+                    </div>
+                    <h5>Gestion RH</h5>
+                    <p class="text-muted small">
+                        Contributeurs, contrats, compétences, évaluations
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-shield font-size-40 text-primary"></i>
+                    </div>
+                    <h5>Sécurité</h5>
+                    <p class="text-muted small">
+                        Authentification 2FA, gestion fine des rôles et permissions
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-bell font-size-40 text-primary"></i>
+                    </div>
+                    <h5>Notifications</h5>
+                    <p class="text-muted small">
+                        Restez informé en temps réel des événements importants
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-search font-size-40 text-primary"></i>
+                    </div>
+                    <h5>Recherche globale</h5>
+                    <p class="text-muted small">
+                        Trouvez rapidement projets, clients, tâches (Ctrl+K)
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-error-circle font-size-40 text-primary"></i>
+                    </div>
+                    <h5>Alertes risques</h5>
+                    <p class="text-muted small">
+                        Identifiez les projets à risque avant qu'il ne soit trop tard
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-trophy font-size-40 text-primary"></i>
+                    </div>
+                    <h5>Gamification</h5>
+                    <p class="text-muted small">
+                        Badges, leaderboard pour motiver vos équipes
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="700">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="bx bx-code-alt font-size-40 text-primary"></i>
+                    </div>
+                    <h5>API REST</h5>
+                    <p class="text-muted small">
+                        Intégrez HotOnes avec vos outils existants
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body p-5 text-center text-white">
+                <h2 class="mb-4" data-aos="fade-up">Prêt à tester HotOnes ?</h2>
+                <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">
+                    14 jours d'essai gratuit, sans carte bancaire
+                </p>
+                <div data-aos="fade-up" data-aos-delay="200">
+                    <a href="{{ path('public_pricing') }}" class="btn btn-light btn-lg px-5">
+                        Voir les tarifs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

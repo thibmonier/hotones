@@ -364,7 +364,8 @@ class OrderController extends AbstractController
         if ($line->getProfile() && $line->getDays()) {
             $margin     = $line->getGrossMargin();
             $marginRate = $line->getMarginRate();
-            $marginInfo = sprintf(' (Marge: %s€ - %s%%)',
+            $marginInfo = sprintf(
+                ' (Marge: %s€ - %s%%)',
                 number_format(floatval($margin), 0, ',', ' '),
                 number_format(floatval($marginRate), 1, ',', ' '),
             );

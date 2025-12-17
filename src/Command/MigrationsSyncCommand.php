@@ -271,7 +271,7 @@ HELP
 
             if (preg_match_all('/DROP\s+(\w+)(?:\s|,|;)/i', $upMethod, $colMatches)) {
                 foreach (array_unique($colMatches[1]) as $col) {
-                    if (!in_array(strtoupper($col), ['TABLE', 'INDEX', 'CONSTRAINT'])) {
+                    if (!in_array(strtoupper($col), ['TABLE', 'INDEX', 'CONSTRAINT'], true)) {
                         $operations[] = "  • Drop column: <error>{$col}</error>";
                     }
                 }
