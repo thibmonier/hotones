@@ -44,7 +44,7 @@ class ProfitabilityPredictor
         $soldHours  = (float) $project->getTotalTasksSoldHours();
         $spentHours = (float) $project->getTotalTasksSpentHours();
 
-        if ($soldAmount === 0 || $soldHours === 0) {
+        if ($soldAmount == 0 || $soldHours == 0) {
             return [
                 'canPredict'      => false,
                 'currentProgress' => $progress,
@@ -59,8 +59,8 @@ class ProfitabilityPredictor
 
         // Coût actuel estimé (simplifié : 400€/jour de coût moyen)
         $costPerDay    = 400;
-        $currentCost   = ($spentHours / 7)                            * $costPerDay; // 7h par jour
-        $currentMargin = (($soldAmount - $currentCost) / $soldAmount) * 100;
+        $currentCost   = ($spentHours / 7)                                              * $costPerDay; // 7h par jour
+        $currentMargin = $soldAmount > 0 ? (($soldAmount - $currentCost) / $soldAmount) * 100 : 0;
 
         // Prédiction de la marge finale
         $predictedMargin = $this->calculatePredictedMargin($project, $progress, $soldAmount, $soldHours, $spentHours, $costPerDay);
@@ -100,12 +100,12 @@ class ProfitabilityPredictor
         $burnRate            = $progress > 0 ? $spentHours / $progress : 0;
         $projectedTotalHours = $burnRate * 100; // Projection à 100%
 
-        $projectedTotalCost = ($projectedTotalHours / 7)                          * $costPerDay;
-        $projectedMargin    = (($soldAmount - $projectedTotalCost) / $soldAmount) * 100;
+        $projectedTotalCost = ($projectedTotalHours / 7)                                            * $costPerDay;
+        $projectedMargin    = $soldAmount > 0 ? (($soldAmount - $projectedTotalCost) / $soldAmount) * 100 : 0;
 
         // Marge budgétée initiale (objectif)
-        $budgetedCost   = ($soldHours / 7)                              * $costPerDay;
-        $budgetedMargin = (($soldAmount - $budgetedCost) / $soldAmount) * 100;
+        $budgetedCost   = ($soldHours / 7)                                                * $costPerDay;
+        $budgetedMargin = $soldAmount > 0 ? (($soldAmount - $budgetedCost) / $soldAmount) * 100 : 0;
 
         return [
             'projected'           => round($projectedMargin, 2),
@@ -260,19 +260,19 @@ class ProfitabilityPredictor
         $burnRate = $progress > 0 ? $spentHours / $progress : 0;
 
         // Scénario réaliste : tendance actuelle
-        $realisticHours  = $burnRate                                      * 100;
-        $realisticCost   = ($realisticHours / 7)                          * $costPerDay;
-        $realisticMargin = (($soldAmount - $realisticCost) / $soldAmount) * 100;
+        $realisticHours  = $burnRate                                                        * 100;
+        $realisticCost   = ($realisticHours / 7)                                            * $costPerDay;
+        $realisticMargin = $soldAmount > 0 ? (($soldAmount - $realisticCost) / $soldAmount) * 100 : 0;
 
         // Scénario optimiste : amélioration de 15%
-        $optimisticHours  = $realisticHours                                 * 0.85;
-        $optimisticCost   = ($optimisticHours / 7)                          * $costPerDay;
-        $optimisticMargin = (($soldAmount - $optimisticCost) / $soldAmount) * 100;
+        $optimisticHours  = $realisticHours                                                   * 0.85;
+        $optimisticCost   = ($optimisticHours / 7)                                            * $costPerDay;
+        $optimisticMargin = $soldAmount > 0 ? (($soldAmount - $optimisticCost) / $soldAmount) * 100 : 0;
 
         // Scénario pessimiste : dérive de 20%
-        $pessimisticHours  = $realisticHours                                  * 1.20;
-        $pessimisticCost   = ($pessimisticHours / 7)                          * $costPerDay;
-        $pessimisticMargin = (($soldAmount - $pessimisticCost) / $soldAmount) * 100;
+        $pessimisticHours  = $realisticHours                                                    * 1.20;
+        $pessimisticCost   = ($pessimisticHours / 7)                                            * $costPerDay;
+        $pessimisticMargin = $soldAmount > 0 ? (($soldAmount - $pessimisticCost) / $soldAmount) * 100 : 0;
 
         return [
             'optimistic' => [

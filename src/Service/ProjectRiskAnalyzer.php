@@ -88,7 +88,7 @@ class ProjectRiskAnalyzer
         $soldHours  = (float) $project->getTotalTasksSoldHours();
         $spentHours = (float) $project->getTotalTasksSpentHours();
 
-        if ($soldHours === 0) {
+        if ($soldHours == 0) {
             return null; // Pas de budget défini
         }
 
@@ -207,7 +207,7 @@ class ProjectRiskAnalyzer
     private function analyzeProfitability(Project $project): ?array
     {
         $soldAmount = (float) $project->getTotalSoldAmount();
-        if ($soldAmount === 0) {
+        if ($soldAmount == 0) {
             return null;
         }
 
@@ -312,7 +312,7 @@ class ProjectRiskAnalyzer
         }
 
         // Vérifier si le projet est bloqué (0% ou 100% sans changement de statut)
-        if ($progress === 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
+        if ($progress == 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
             return [
                 'type'     => 'not_started',
                 'severity' => 'high',
@@ -442,7 +442,7 @@ class ProjectRiskAnalyzer
         $soldHours  = (float) $project->getTotalTasksSoldHours();
         $spentHours = (float) $project->getTotalTasksSpentHours();
 
-        if ($soldHours === 0) {
+        if ($soldHours == 0) {
             return 100; // No budget defined, neutral score
         }
 
@@ -550,7 +550,7 @@ class ProjectRiskAnalyzer
 
         // Check progress velocity (has progress been made?)
         $progress = (float) $project->getGlobalProgress();
-        if ($progress === 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
+        if ($progress == 0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
             return 40; // Started but no progress
         }
 

@@ -30,7 +30,7 @@ class HomeControllerTest extends WebTestCase
 
         $client->loginUser($user);
 
-        $client->request('GET', '/');
+        $client->request('GET', '/app');
         $this->assertResponseIsSuccessful();
         $this->assertPageTitleContains(''); // Smoke test: page rendered
     }
