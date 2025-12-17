@@ -1,0 +1,201 @@
+# Deptrac Configuration for HotOnes
+# Architecture validation to prevent circular dependencies and enforce layering
+deptrac:
+  # Paths to analyze
+  paths:
+    - ./src
+
+  # Files to exclude
+  exclude_files:
+    - '#.*Test\.php$#'
+    - '#.*Kernel\.php$#'
+    - '#.*Component\.php$#'
+
+  # Define architectural layers
+  layers:
+    # Presentation Layer
+    - name: Controller
+      collectors:
+        - type: directory
+          value: src/Controller/.*
+
+    # Application Layer
+    - name: Service
+      collectors:
+        - type: directory
+          value: src/Service/.*
+
+    - name: Command
+      collectors:
+        - type: directory
+          value: src/Command/.*
+
+    - name: Form
+      collectors:
+        - type: directory
+          value: src/Form/.*
+
+    - name: EventListener
+      collectors:
+        - type: directory
+          value: src/EventListener/.*
+
+    - name: MessageHandler
+      collectors:
+        - type: directory
+          value: src/MessageHandler/.*
+
+    - name: Message
+      collectors:
+        - type: directory
+          value: src/Message/.*
+
+    # Domain Layer
+    - name: Entity
+      collectors:
+        - type: directory
+          value: src/Entity/.*
+
+    - name: Repository
+      collectors:
+        - type: directory
+          value: src/Repository/.*
+
+    - name: Enum
+      collectors:
+        - type: directory
+          value: src/Enum/.*
+
+    - name: Factory
+      collectors:
+        - type: directory
+          value: src/Factory/.*
+
+    # Infrastructure Layer
+    - name: Security
+      collectors:
+        - type: directory
+          value: src/Security/.*
+
+    - name: Scheduler
+      collectors:
+        - type: directory
+          value: src/Scheduler/.*
+
+  # Define allowed dependencies between layers
+  ruleset:
+    # Controllers can depend on:
+    Controller:
+      - Service
+      - Form
+      - Entity
+      - Repository
+      - Security
+      - Enum
+      - Message
+
+    # Services can depend on:
+    Service:
+      - Entity
+      - Repository
+      - Factory
+      - Enum
+      - Message
+      - Security
+
+    # Commands can depend on:
+    Command:
+      - Service
+      - Entity
+      - Repository
+      - Enum
+      - Message
+
+    # Forms can depend on:
+    Form:
+      - Entity
+      - Enum
+      - Repository
+
+    # Event Listeners can depend on:
+    EventListener:
+      - Service
+      - Entity
+      - Repository
+      - Enum
+      - Message
+
+    # Message Handlers can depend on:
+    MessageHandler:
+      - Service
+      - Entity
+      - Repository
+      - Message
+      - Enum
+
+    # Messages can depend on:
+    Message:
+      - Entity
+      - Enum
+
+    # Entities can depend on:
+    Entity:
+      - Enum
+
+    # Repositories can depend on:
+    Repository:
+      - Entity
+      - Enum
+
+    # Enums are leaf nodes (no dependencies)
+    Enum: []
+
+    # Factories can depend on:
+    Factory:
+      - Entity
+      - Enum
+
+    # Security can depend on:
+    Security:
+      - Entity
+      - Repository
+      - Service
+      - Enum
+
+    # Scheduler can depend on:
+    Scheduler:
+      - Service
+      - Message
+      - Entity
+      - Repository
+      - Enum
+
+  # Skip violations (if needed)
+  skip_violations:
+    # Example: Skip specific known violations during migration
+    # Controller:
+    #   - Repository  # Controllers should not directly access repositories
+
+  # Format options
+  formatters:
+    graphviz:
+      enabled: true
+      output: var/deptrac/dependencies.svg
+      groups:
+        presentation:
+          - Controller
+          - Form
+        application:
+          - Service
+          - Command
+          - EventListener
+          - MessageHandler
+          - Message
+        domain:
+          - Entity
+          - Repository
+          - Enum
+          - Factory
+        infrastructure:
+          - Security
+          - Scheduler

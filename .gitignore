@@ -45,3 +45,13 @@ yarn-error.log
 /.idea/
 /.DS_Store
 /*.code-workspace
+
+###> infection/infection ###
+/var/infection/
+/.infection.cache
+###< infection/infection ###
+
+###> qossmic/deptrac ###
+/var/deptrac/
+/.deptrac.cache
+###< qossmic/deptrac ###

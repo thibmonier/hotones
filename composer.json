@@ -86,12 +86,14 @@
         "doctrine/doctrine-fixtures-bundle": "^4.3.1",
         "fakerphp/faker": "^1.24.1",
         "friendsofphp/php-cs-fixer": "^3.91.3",
+        "infection/infection": "dev-master",
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan": "^2.1.33",
         "phpstan/phpstan-doctrine": "^2.0.12",
-        "phpstan/phpstan-symfony": "^2.0.9",
         "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0.9",
         "phpunit/phpunit": "^12.5.3",
+        "qossmic/deptrac": "^2.0",
         "squizlabs/php_codesniffer": "^3.10",
         "symfony/browser-kit": "^8.0",
         "symfony/css-selector": "^8.0",
@@ -107,7 +109,8 @@
             "symfony/flex": true,
             "symfony/runtime": true,
             "endroid/installer": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "infection/extension-installer": true
         },
         "bump-after-update": true,
         "sort-packages": true
@@ -155,6 +158,11 @@
             "@phpstan",
             "@phpcs"
         ],
+        "check-architecture": "deptrac analyze --config-file=deptrac.yaml --no-interaction",
+        "check-all": [
+            "@check-code",
+            "@check-architecture"
+        ],
         "test": "phpunit -c phpunit.xml.dist",
         "test-unit": "phpunit --testsuite unit",
         "test-functional": "phpunit --testsuite functional",
@@ -162,6 +170,12 @@
         "test-api": "phpunit --testsuite api",
         "test-security": "phpunit --testsuite security",
         "test-e2e": "phpunit --testsuite e2e",
+        "infection": "infection --threads=4 --min-msi=70 --min-covered-msi=80 --show-mutations --no-interaction",
+        "infection-ci": "infection --threads=max --min-msi=70 --min-covered-msi=80 --logger-github --no-interaction",
+        "infection-debug": "infection --threads=1 --min-msi=70 --min-covered-msi=80 --show-mutations --debug",
+        "deptrac": "deptrac analyze --config-file=deptrac.yaml --no-interaction",
+        "deptrac-graph": "deptrac analyze --config-file=deptrac.yaml --formatter=graphviz --output=var/deptrac/dependencies.svg",
+        "deptrac-debug": "deptrac analyze --config-file=deptrac.yaml --formatter=console -vvv",
         "security-check": "composer audit",
         "security-test": [
             "@security-check",
