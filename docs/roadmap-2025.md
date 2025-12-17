@@ -118,6 +118,139 @@
 
 ---
 
+### 💡 Lot 25 : Facturation Électronique 🆕 🔴 **Obligation Légale 2027**
+**Objectif** : Conformité avec la réforme française de la facturation électronique
+
+#### Contexte
+- **Obligation légale** : Toutes les entreprises doivent émettre et recevoir des factures électroniques à partir de **septembre 2027**
+- **Échéance anticipée recommandée** : Q1-Q2 2026 (anticiper 18 mois)
+- **Format** : Factur-X (PDF + XML structuré, standard français)
+- **PDP** : Chorus Pro (Portail Public de Facturation, gratuit)
+
+#### Fonctionnalités
+- 💡 **Génération de factures Factur-X** :
+  - Création automatique depuis devis signés (forfait) ou temps saisis (régie)
+  - Génération PDF + XML CII (norme EN 16931)
+  - Fusion hybride Factur-X (PDF lisible + données structurées)
+  - Numérotation unique et chronologique (FAC-2025-001)
+- 💡 **Émission via Chorus Pro** :
+  - Intégration API Chorus Pro (PDP gratuite de l'État)
+  - Envoi automatique au client et au PPF
+  - Suivi du statut (émise, reçue, rejetée, acceptée)
+  - Webhooks pour notifications temps réel
+- 💡 **Réception de factures fournisseurs** :
+  - Récupération automatique depuis Chorus Pro
+  - Parsing XML et extraction des données
+  - Enregistrement dans `Purchase` (achats)
+  - Rapprochement automatique avec les commandes
+- 💡 **Archivage légal** :
+  - Conservation 10 ans (obligation fiscale)
+  - Hash SHA-256 pour garantir l'intégrité
+  - Export pour audit fiscal
+  - Horodatage qualifié (optionnel)
+
+#### Entités
+- `Invoice` (facture) : numéro unique, statut, montants, échéances, fichiers PDF/Factur-X
+- `InvoiceLine` (ligne de facture) : description, quantité, prix unitaire, TVA
+- `PdpLog` (audit) : traçabilité des échanges avec Chorus Pro
+
+#### Technologies
+- **Bibliothèque PHP** : horstoeko/zugferd (génération Factur-X)
+- **API** : Chorus Pro (REST, authentification par certificat client X.509)
+- **Formats** : Factur-X (PDF + XML CII EN 16931)
+
+#### Sécurité et conformité
+- Numérotation chronologique obligatoire (aucun trou)
+- Mentions légales complètes (SIREN, TVA, conditions de paiement)
+- Intégrité des factures (hash, horodatage)
+- Archivage chiffré (AES-256)
+- Certificat client X.509 pour Chorus Pro
+
+#### Coûts
+- **Chorus Pro** : Gratuit (plateforme publique)
+- **Certificat client X.509** : ~50-100€ HT/an
+- **Total** : ~100€ HT/an
+
+#### Documentation complète
+Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibility.md) pour l'étude de faisabilité complète
+
+**Dépendances** : Lot 9 (Module de Facturation)
+**Tests** : Tests unitaires génération Factur-X, tests d'intégration API Chorus Pro, tests de conformité EN 16931
+**Estimation** : 25-27 jours
+
+---
+
+### 💡 Lot 26 : Signature Électronique 🆕
+**Objectif** : Dématérialiser la signature des devis et contrats
+
+#### Contexte
+- **Cadre légal** : Règlement européen eIDAS
+- **Type de signature** : Avancée (conforme eIDAS, valeur juridique pour contrats B2B)
+- **Fournisseur recommandé** : Yousign (français, API complète)
+
+#### Fonctionnalités
+- 💡 **Signature de devis** :
+  - Envoi du devis au client par email avec lien sécurisé
+  - Interface de signature en ligne (sans compte client)
+  - Changement automatique du statut (`a_signer` → `signe`)
+  - Archivage du PDF signé avec certificat de signature
+  - Notifications internes (commercial, chef de projet)
+- 💡 **Signature de contrats** (futurs) :
+  - Contrats de prestation (TMA, support, maintenance)
+  - Contrats de confidentialité (NDA)
+  - Avenants
+- 💡 **Signature multi-parties** (optionnel) :
+  - Workflow d'approbation interne avant envoi
+  - Signature côté client + signature côté agence
+- 💡 **Journal d'audit** :
+  - Traçabilité complète (IP, user-agent, timestamp)
+  - Certificat de signature Yousign
+  - Export du journal en cas de litige
+
+#### Entités
+- `Order` : ajout de `yousignProcedureId`, `yousignSignedFileUrl`, `signedAt`, `signerEmail`, etc.
+- `SignatureAudit` : audit trail complet (procédure, statut, métadonnées)
+
+#### Technologies
+- **Fournisseur** : Yousign (API REST, webhooks)
+- **Intégration** : Symfony HttpClient
+- **Sécurité** : HMAC pour validation des webhooks
+
+#### Workflow
+1. Utilisateur clique sur "Envoyer pour signature" dans l'interface devis
+2. Backend génère le PDF et appelle l'API Yousign
+3. Yousign envoie un email au client avec lien sécurisé
+4. Client signe électroniquement
+5. Yousign notifie HotOnes via webhook
+6. Symfony met à jour le statut du devis et télécharge le PDF signé
+7. Génération automatique des tâches projet (workflow existant)
+
+#### Sécurité
+- Clé API Yousign dans `.env` (Symfony Secrets en production)
+- Validation HMAC des webhooks Yousign
+- URL de signature à usage unique
+- PDF signés dans répertoire sécurisé (hors web root)
+- Accès restreint (ROLE_ADMIN, ROLE_MANAGER, créateur du devis)
+
+#### Coûts
+- **Plan Start** : 9€ HT/mois + 1,80€ HT/signature
+- **Estimation** : ~10 signatures/mois → 27€ HT/mois (324€ HT/an)
+
+#### ROI
+- Gain de temps : 2-3h/mois (plus d'impression/scan/envoi)
+- Délai de signature : 3-5 jours → quelques heures
+- Taux de conversion : +10-15% (facilité de signature)
+- Sécurité juridique renforcée
+
+#### Documentation complète
+Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibility.md) pour l'étude de faisabilité complète
+
+**Dépendances** : Lot 1.4 (Prévisualisation PDF du devis)
+**Tests** : Tests unitaires services, tests d'intégration API Yousign (mock), tests fonctionnels workflow complet, tests de sécurité webhook
+**Estimation** : 10-11 jours
+
+---
+
 ## 📊 Phase 2 : Analytics Avancés & Prédictif (Q2 2025)
 
 ### 💡 Lot 10 : Analytics Prédictifs 🆕
@@ -777,7 +910,7 @@
 
 | Phase | Lots | Priorité | Estimation | Trimestre |
 |-------|------|----------|------------|-----------|
-| Phase 1 : Consolidation | Lots 2, 3, 1.3, 1.4, 9 | 🔴 Haute | 27-36j | Q1 2025 |
+| Phase 1 : Consolidation | Lots 2, 3, 1.3, 1.4, 9, 25, 26 | 🔴 Haute | 72-84j | Q1 2025 - Q1 2026 |
 | Phase 2 : Analytics | Lots 10, 11, 7 | 🟡 Moyenne | 26-32j | Q2 2025 |
 | Phase 3 : Ouverture | Lots 8, 12, 13 | 🟡 Moyenne | 35-45j | Q3 2025 |
 | Phase 4 : Mobile | Lots 14, 15 | 🟢 Basse | 26-33j | Q4 2025 |
@@ -786,8 +919,9 @@
 | Phase 7 : Automatisation | Lots 6, 22 | 🟢 Basse | 10-13j | 2026 |
 | Phase 8 : Qualité | Lots 22.5, 23, 24 | 🟡 Continue | 26-34j | Continue |
 
-**Total estimé 2025** : ~150-190 jours (7-9 mois pour 1 développeur full-stack)
-**Total estimé 2026** : ~80-100 jours supplémentaires (incluant migration PHP 8.5/Symfony 8)
+**Total estimé 2025-2026** : ~215-235 jours (incluant signature électronique et facturation électronique)
+- **Facturation électronique (Lot 25)** : 25-27 jours (Q1 2026, **obligation légale septembre 2027**)
+- **Signature électronique (Lot 26)** : 10-11 jours (Q3 2026)
 
 ---
 
@@ -797,11 +931,13 @@
 1. **Finaliser les fondations** : Lots 2, 3, 1.3, 1.4 (saisie temps + analytics + projets)
 2. **Mettre en place la facturation** : Lot 9 (critique pour le business)
 3. **Renforcer les tests** : Augmenter la couverture pour sécuriser les évolutions
+4. **⚠️ NOUVEAU : Anticiper la facturation électronique** : Lot 25 (obligation légale septembre 2027, à démarrer en Q1 2026)
 
 ### Moyen terme (6-9 mois)
-1. **Analytics prédictifs** : Lot 10 (différenciation compétitive forte)
-2. **API REST** : Lot 8 (ouvrir l'écosystème)
-3. **Intégrations externes** : Lot 12 (gain de productivité)
+1. **⚠️ NOUVEAU : Signature électronique** : Lot 26 (gain de productivité, amélioration du taux de conversion)
+2. **Analytics prédictifs** : Lot 10 (différenciation compétitive forte)
+3. **API REST** : Lot 8 (ouvrir l'écosystème)
+4. **Intégrations externes** : Lot 12 (gain de productivité)
 
 ### Long terme (12+ mois)
 1. **Mobile App** : Lot 14 (usage terrain)
