@@ -522,6 +522,185 @@ Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibi
 
 ---
 
+## 💡 Lot 27 : Conformité RGPD (Priorité Haute) 🆕 🔴 **Obligation Légale**
+
+### Objectif
+Mise en conformité avec le Règlement Général sur la Protection des Données (obligation légale depuis 2018)
+
+### Fonctionnalités
+
+#### 27.1 Registre des activités de traitement (Art. 30)
+- 💡 Entité `ProcessingActivity` (finalités, bases légales, durées de conservation, mesures de sécurité)
+- 💡 Interface admin `/admin/gdpr/register` pour gérer le registre
+- 💡 Export PDF/Excel pour audit CNIL
+- 💡 Liste des catégories de données et personnes concernées
+- 💡 Identification des transferts hors UE (le cas échéant)
+
+#### 27.2 Droits des personnes (Art. 15-22)
+- 💡 **Droit d'accès** : Bouton "Télécharger mes données" (export JSON/PDF complet)
+- 💡 **Droit de rectification** : Page "Mon compte" avec modification des données
+- 💡 **Droit à l'effacement** : Bouton "Supprimer mon compte" avec anonymisation
+- 💡 **Droit à la portabilité** : Export JSON/CSV/XML des données structurées
+- 💡 **Droit à la limitation** : Statut `User.dataProcessingLimited` (gel temporaire)
+- 💡 **Droit d'opposition** : Opt-out analytics, cookies non essentiels
+- 💡 Formulaire `/privacy/request` pour demandes d'exercice de droits
+- 💡 Entité `PrivacyRequest` avec workflow (pending, in_progress, completed, rejected)
+- 💡 Délai de réponse : 1 mois (notification automatique)
+
+#### 27.3 Politique de confidentialité (Art. 13-14)
+- 💡 Page `/privacy` avec politique complète et claire
+- 💡 Contenu : finalités, bases légales, durées de conservation, droits, contact RGPD
+- 💡 Acceptation lors de la première connexion (checkbox)
+- 💡 Versionning de la politique (notification en cas de mise à jour)
+- 💡 Lien dans footer sur toutes les pages
+
+#### 27.4 Gestion des consentements
+- 💡 Entité `ConsentRecord` (purpose, consented, consentedAt, withdrawnAt)
+- 💡 Bannière de consentement (Tarteaucitron.js, open-source français)
+- 💡 Opt-in par défaut pour cookies non essentiels (analytics, marketing)
+- 💡 Page de gestion des consentements dans "Mon compte"
+- 💡 Remplacement de Google Analytics par Matomo (auto-hébergé, conforme RGPD)
+
+#### 27.5 Audit trail (journalisation)
+- 💡 Entité `AuditLog` (user, action, entityType, entityId, changes, IP, user-agent)
+- 💡 Journalisation automatique des actions sensibles (création, modification, suppression, export de données)
+- 💡 Conservation 6 mois (recommandation CNIL)
+- 💡 Interface admin `/admin/gdpr/audit` pour consultation
+- 💡 Filtres : utilisateur, action, date, entité
+
+#### 27.6 Violations de données (Art. 33-34)
+- 💡 Entité `DataBreach` (title, description, severity, affectedDataCategories, affectedPersonsCount)
+- 💡 Formulaire de déclaration de violation (admin)
+- 💡 Procédure : détection → investigation → notification CNIL (sous 72h) → notification personnes (si risque élevé) → résolution
+- 💡 Documentation des mesures correctives
+- 💡 Statut : detected, under_investigation, resolved, closed
+
+#### 27.7 Durées de conservation et purge automatique
+- 💡 Commande `app:gdpr:purge` (quotidienne via cron)
+- 💡 Suppression logs de sécurité > 6 mois
+- 💡 Anonymisation comptes inactifs > 3 ans (email, nom → anonymized_XXX)
+- 💡 Suppression données RH après départ + 5 ans (obligation légale)
+- 💡 Soft delete vs hard delete selon les cas
+- 💡 Conservation agrégée pour statistiques (anonymisée)
+
+### Entités
+- `ProcessingActivity` : Registre des traitements
+- `PrivacyRequest` : Demandes d'exercice de droits
+- `DataBreach` : Violations de données
+- `AuditLog` : Journalisation des actions sensibles
+- `ConsentRecord` : Consentements (cookies, analytics)
+
+### Services
+- `GdprService` : Export, anonymisation, suppression, limitation des données
+- `PrivacyRequestService` : Gestion des demandes de droits (création, traitement, réponse)
+- `AuditLogService` : Journalisation automatique (listeners Doctrine)
+- `DataRetentionService` : Purge et anonymisation automatiques
+
+### Commandes CLI
+```bash
+# Purge automatique (quotidien)
+php bin/console app:gdpr:purge
+
+# Export des données d'un utilisateur
+php bin/console app:gdpr:export-user <user-id>
+
+# Anonymisation d'un utilisateur
+php bin/console app:gdpr:anonymize-user <user-id>
+
+# Génération du registre des traitements (PDF)
+php bin/console app:gdpr:generate-register
+```
+
+### Sécurité et conformité
+- Chiffrement des données sensibles au repos (salaires, données bancaires)
+- Anonymisation / pseudonymisation
+- Contrôle d'accès par rôles (déjà en place)
+- 2FA disponible (déjà en place)
+- HTTPS obligatoire (déjà en place)
+- Sauvegardes chiffrées
+- Tests de sécurité recommandés (pentests annuels)
+- Privilégier les services UE (éviter transferts hors UE)
+
+### Documentation et procédures
+- Registre des activités de traitement (modèle CNIL)
+- Politique de confidentialité (modèle CNIL)
+- Procédure de gestion des violations de données
+- Procédure de gestion des demandes d'exercice de droits
+- Désignation d'un référent RGPD interne (email : rgpd@hotones.fr)
+
+### Coûts
+- **Développement** : 35-37 jours
+- **Audit RGPD externe** (optionnel) : 2 000 - 5 000€
+- **DPO externe** (optionnel pour PME) : 1 000 - 3 000€/an
+- **Pentest annuel** (recommandé) : 3 000 - 10 000€
+- **Formation RGPD équipes** : 500 - 1 500€
+- **Total optionnel** : ~5 000 - 15 000€ (première année)
+
+### ROI
+- Éviter les sanctions CNIL (jusqu'à 20M€ ou 4% du CA)
+- Conformité pour appels d'offres (clause RGPD souvent obligatoire)
+- Renforcer la confiance des clients et employés (transparence)
+- Différenciation concurrentielle (peu d'agences réellement conformes)
+- Amélioration de la sécurité et de la gouvernance des données
+- Meilleure qualité des données (nettoyage régulier)
+
+### Documentation complète
+Voir [docs/rgpd-compliance-feasibility.md](./rgpd-compliance-feasibility.md)
+
+### Dépendances
+- Aucune (peut être développé en parallèle des autres lots)
+
+### Tests
+- 🔲 Tests unitaires services (export, anonymisation, suppression, limitation)
+- 🔲 Tests fonctionnels workflows (demandes de droits, consentements)
+- 🔲 Tests de sécurité (accès, fuites de données, chiffrement)
+- 🔲 Tests de procédure de violation (simulation exercice)
+- 🔲 Tests de purge automatique (logs, données périmées)
+
+### Estimation
+**35-37 jours** de développement
+
+### Checklist de conformité RGPD
+
+#### Gouvernance
+- [ ] Référent RGPD désigné (interne ou externe)
+- [ ] Email de contact RGPD créé (rgpd@hotones.fr)
+- [ ] Registre des activités de traitement rédigé
+- [ ] Politique de confidentialité rédigée et accessible
+- [ ] Procédure de gestion des violations rédigée
+- [ ] Procédure de gestion des demandes de droits rédigée
+
+#### Droits des personnes
+- [ ] Droit d'accès implémenté
+- [ ] Droit de rectification implémenté
+- [ ] Droit à l'effacement implémenté
+- [ ] Droit à la portabilité implémenté
+- [ ] Droit à la limitation implémenté
+- [ ] Droit d'opposition implémenté
+- [ ] Formulaire de demande accessible
+
+#### Sécurité
+- [ ] Mots de passe hachés (bcrypt/argon2)
+- [ ] HTTPS activé (TLS 1.2+)
+- [ ] 2FA disponible
+- [ ] Contrôle d'accès par rôles
+- [ ] Chiffrement données sensibles
+- [ ] Logs de sécurité (6 mois)
+- [ ] Sauvegardes chiffrées
+
+#### Durées de conservation
+- [ ] Durées définies pour chaque traitement
+- [ ] Purge automatique des données périmées
+- [ ] Anonymisation des données anciennes
+
+#### Consentement
+- [ ] Bannière de consentement implémentée
+- [ ] Cookies non essentiels bloqués par défaut
+- [ ] Enregistrement des consentements
+- [ ] Possibilité de retrait du consentement
+
+---
+
 ## 📊 Récapitulatif des priorités
 
 | Lot                         | Priorité   | Estimation | Dépendances            |
@@ -534,12 +713,13 @@ Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibi
 | Lot 6 : Notifications       | 🟢 Basse   | 4-5j       | Lot 1                  |
 | Lot 7 : Rapports            | 🟢 Basse   | 6-7j       | Lot 3                  |
 | Lot 8 : API REST            | 🟢 Basse   | 8-10j      | Lots 1-3               |
-| **Lot 25 : Facturation Électronique** 🆕 | 🔴 **Haute** (Obligation légale) | **25-27j** | Lot 9 (Facturation), Lot 2 |
+| **Lot 25 : Facturation Électronique** 🆕 | 🔴 **Haute** (Obligation légale 2027) | **25-27j** | Lot 9 (Facturation), Lot 2 |
 | **Lot 26 : Signature Électronique** 🆕 | 🟡 **Moyenne** | **10-11j** | Lot 1.4 (PDF devis) |
+| **Lot 27 : Conformité RGPD** 🆕 | 🔴 **Haute** (Obligation légale depuis 2018) | **35-37j** | Aucune |
 
-**Total estimé : 81-97 jours** de développement (incluant signature et facturation électroniques)
+**Total estimé : 116-134 jours** de développement (incluant conformité légale complète)
 - **Lots initiaux** : 46-59 jours
-- **Nouveaux lots (25+26)** : 35-38 jours
+- **Nouveaux lots (25+26+27)** : 70-75 jours
 
 ---
 

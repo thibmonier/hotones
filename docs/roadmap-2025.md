@@ -251,6 +251,102 @@ Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibi
 
 ---
 
+### 💡 Lot 27 : Conformité RGPD 🆕 🔴 **Obligation Légale**
+**Objectif** : Mise en conformité avec le Règlement Général sur la Protection des Données
+
+#### Contexte
+- **Obligation légale** : RGPD en vigueur depuis le 25 mai 2018
+- **Sanctions** : Jusqu'à **20 millions d'euros** ou **4% du CA annuel mondial**
+- **Opportunité** : Différenciation concurrentielle, conformité pour appels d'offres
+
+#### Fonctionnalités
+- 💡 **Registre des activités de traitement** (Art. 30) :
+  - Entité `ProcessingActivity` (finalités, bases légales, durées de conservation)
+  - Interface admin pour gérer le registre
+  - Export PDF/Excel pour audit
+- 💡 **Droits des personnes** (Art. 15-22) :
+  - Droit d'accès : Export JSON/PDF de toutes les données personnelles
+  - Droit de rectification : Modification des données (page "Mon compte")
+  - Droit à l'effacement : Suppression/anonymisation du compte
+  - Droit à la portabilité : Export JSON/CSV/XML
+  - Droit à la limitation : Gel du traitement (statut `dataProcessingLimited`)
+  - Droit d'opposition : Opt-out analytics, cookies non essentiels
+  - Formulaire de demande d'exercice de droits (`PrivacyRequest`)
+- 💡 **Politique de confidentialité** (Art. 13-14) :
+  - Page `/privacy` avec politique complète
+  - Acceptation lors de la première connexion
+  - Versionning et notification des mises à jour
+- 💡 **Gestion des consentements** :
+  - Entité `ConsentRecord` (analytics, cookies, newsletter)
+  - Bannière de consentement (Tarteaucitron.js)
+  - Opt-in par défaut pour cookies non essentiels
+- 💡 **Audit trail** :
+  - Entité `AuditLog` (journalisation des actions sensibles)
+  - Qui, quoi, quand, IP, user-agent
+  - Conservation 6 mois (recommandation CNIL)
+- 💡 **Violations de données** (Art. 33-34) :
+  - Entité `DataBreach` (déclaration, suivi, notifications)
+  - Procédure de notification CNIL sous 72h
+  - Documentation des violations
+- 💡 **Durées de conservation et purge** :
+  - Commande `app:gdpr:purge` (automatique quotidien)
+  - Suppression logs > 6 mois
+  - Anonymisation comptes inactifs > 3 ans
+  - Suppression données RH après départ + 5 ans
+
+#### Entités
+- `ProcessingActivity` : Registre des traitements
+- `PrivacyRequest` : Demandes d'exercice de droits
+- `DataBreach` : Violations de données
+- `AuditLog` : Journalisation des actions sensibles
+- `ConsentRecord` : Consentements (cookies, analytics)
+
+#### Services
+- `GdprService` : Export, anonymisation, suppression, limitation
+- `PrivacyRequestService` : Gestion des demandes de droits
+- `AuditLogService` : Journalisation automatique
+- `DataRetentionService` : Purge et anonymisation
+
+#### Sécurité et conformité
+- Chiffrement des données sensibles (salaires, etc.)
+- Anonymisation / pseudonymisation
+- Contrôle d'accès par rôles (déjà en place)
+- 2FA (déjà disponible)
+- HTTPS (déjà en place)
+- Sauvegardes chiffrées
+- Tests de sécurité (pentests recommandés annuellement)
+
+#### Documentation et procédures
+- Registre des activités de traitement
+- Politique de confidentialité
+- Procédure de gestion des violations
+- Procédure de gestion des demandes de droits
+- Désignation d'un référent RGPD interne
+
+#### Coûts
+- **Développement** : 35-37 jours
+- **Audit RGPD externe** (optionnel) : 2 000 - 5 000€
+- **DPO externe** (optionnel pour PME) : 1 000 - 3 000€/an
+- **Pentest annuel** (recommandé) : 3 000 - 10 000€
+- **Formation RGPD** : 500 - 1 500€
+- **Total optionnel** : ~5 000 - 15 000€ (première année)
+
+#### ROI
+- Éviter les sanctions CNIL (jusqu'à 20M€ ou 4% du CA)
+- Conformité pour appels d'offres (clause RGPD souvent obligatoire)
+- Renforcer la confiance des clients et employés
+- Différenciation concurrentielle
+- Amélioration de la sécurité et de la gouvernance des données
+
+#### Documentation complète
+Voir [docs/rgpd-compliance-feasibility.md](./rgpd-compliance-feasibility.md) pour l'étude de faisabilité complète
+
+**Dépendances** : Aucune (peut être développé en parallèle)
+**Tests** : Tests unitaires services, tests fonctionnels workflows, tests de sécurité, tests de procédure de violation (simulation)
+**Estimation** : 35-37 jours
+
+---
+
 ## 📊 Phase 2 : Analytics Avancés & Prédictif (Q2 2025)
 
 ### 💡 Lot 10 : Analytics Prédictifs 🆕
@@ -910,7 +1006,7 @@ Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibi
 
 | Phase | Lots | Priorité | Estimation | Trimestre |
 |-------|------|----------|------------|-----------|
-| Phase 1 : Consolidation | Lots 2, 3, 1.3, 1.4, 9, 25, 26 | 🔴 Haute | 72-84j | Q1 2025 - Q1 2026 |
+| Phase 1 : Consolidation & Conformité | Lots 2, 3, 1.3, 1.4, 9, 25, 26, 27 | 🔴 Haute | 107-121j | Q1 2025 - Q2 2026 |
 | Phase 2 : Analytics | Lots 10, 11, 7 | 🟡 Moyenne | 26-32j | Q2 2025 |
 | Phase 3 : Ouverture | Lots 8, 12, 13 | 🟡 Moyenne | 35-45j | Q3 2025 |
 | Phase 4 : Mobile | Lots 14, 15 | 🟢 Basse | 26-33j | Q4 2025 |
@@ -919,9 +1015,10 @@ Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibi
 | Phase 7 : Automatisation | Lots 6, 22 | 🟢 Basse | 10-13j | 2026 |
 | Phase 8 : Qualité | Lots 22.5, 23, 24 | 🟡 Continue | 26-34j | Continue |
 
-**Total estimé 2025-2026** : ~215-235 jours (incluant signature électronique et facturation électronique)
+**Total estimé 2025-2026** : ~250-272 jours (incluant conformité légale complète)
 - **Facturation électronique (Lot 25)** : 25-27 jours (Q1 2026, **obligation légale septembre 2027**)
 - **Signature électronique (Lot 26)** : 10-11 jours (Q3 2026)
+- **Conformité RGPD (Lot 27)** : 35-37 jours (Q1-Q2 2026, **obligation légale depuis 2018**)
 
 ---
 
@@ -931,13 +1028,15 @@ Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibi
 1. **Finaliser les fondations** : Lots 2, 3, 1.3, 1.4 (saisie temps + analytics + projets)
 2. **Mettre en place la facturation** : Lot 9 (critique pour le business)
 3. **Renforcer les tests** : Augmenter la couverture pour sécuriser les évolutions
-4. **⚠️ NOUVEAU : Anticiper la facturation électronique** : Lot 25 (obligation légale septembre 2027, à démarrer en Q1 2026)
+4. **⚠️ NOUVEAU : Démarrer la conformité RGPD** : Lot 27 (**URGENT** - obligation légale depuis 2018, sanctions jusqu'à 20M€)
+5. **⚠️ NOUVEAU : Anticiper la facturation électronique** : Lot 25 (obligation légale septembre 2027, à démarrer en Q1 2026)
 
 ### Moyen terme (6-9 mois)
-1. **⚠️ NOUVEAU : Signature électronique** : Lot 26 (gain de productivité, amélioration du taux de conversion)
-2. **Analytics prédictifs** : Lot 10 (différenciation compétitive forte)
-3. **API REST** : Lot 8 (ouvrir l'écosystème)
-4. **Intégrations externes** : Lot 12 (gain de productivité)
+1. **⚠️ NOUVEAU : Finaliser la conformité RGPD** : Lot 27 (registre, droits des personnes, audit trail, politique de confidentialité)
+2. **⚠️ NOUVEAU : Signature électronique** : Lot 26 (gain de productivité, amélioration du taux de conversion)
+3. **Analytics prédictifs** : Lot 10 (différenciation compétitive forte)
+4. **API REST** : Lot 8 (ouvrir l'écosystème)
+5. **Intégrations externes** : Lot 12 (gain de productivité)
 
 ### Long terme (12+ mois)
 1. **Mobile App** : Lot 14 (usage terrain)
