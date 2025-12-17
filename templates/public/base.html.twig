@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{% block meta_description %}HotOnes - Solution SaaS de gestion de projets et de rentabilité pour agences web. Suivez votre temps, vos projets, et analysez votre profitabilité.{% endblock %}">
 
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" href="{{ asset('favicon.svg') }}">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Box Icons -->
@@ -54,12 +58,13 @@
         }
 
         .navbar-public .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-public .navbar-brand img {
+            height: 32px;
+            width: auto;
         }
 
         .navbar-public .nav-link {
@@ -562,7 +567,7 @@
     <nav class="navbar navbar-expand-lg navbar-public fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{{ path('public_homepage') }}">
-                <i class="bx bx-line-chart me-2"></i>HotOnes
+                <img src="{{ asset('assets/images/logo-hotones-light.svg') }}" alt="HotOnes">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
