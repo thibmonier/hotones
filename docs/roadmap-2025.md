@@ -1,8 +1,10 @@
 # 🗺️ Roadmap HotOnes 2025
 
-> Roadmap mise à jour le 23 novembre 2025
+> Roadmap mise à jour le 17 décembre 2025
 >
 > Cette roadmap consolide l'état actuel du projet et présente les évolutions futures organisées par thématiques et priorités.
+>
+> **🆕 NOUVEAU** : Ajout de la **Transformation SAAS Multi-Tenant** (Lot 17.5) - transformation stratégique majeure pour permettre l'utilisation multi-sociétés avec isolation complète des données.
 
 ## Liens
 - **Plan d'Exécution 2025 (Phases 1, 2, 5 prioritaires)** : [docs/execution-plan-2025.md](./execution-plan-2025.md)
@@ -682,31 +684,143 @@ Voir [docs/rgpd-compliance-feasibility.md](./rgpd-compliance-feasibility.md) pou
 
 ---
 
-## 🏢 Phase 6 : Structuration Entreprise (2026)
+## 🏢 Phase 6 : Structuration Entreprise & SAAS (2026)
 
-### 💡 Lot 18 : Business Units (BU) 🆕
-**Objectif** : Cloisonner plusieurs équipes au sein de la même société
+### 💡 Lot 17.5 : Transformation SAAS Multi-Tenant 🆕 🔴 **STRATÉGIQUE**
+**Objectif** : Transformer HotOnes en solution SAAS multi-sociétés avec isolation complète des données
 
-#### Fonctionnalités
+#### Contexte stratégique
+- **Vision** : Permettre à plusieurs sociétés d'utiliser la même instance HotOnes avec isolation totale des données
+- **Modèle** : 1 compte utilisateur = 1 société (Company)
+- **Organisation** : Business Units au sein de chaque société pour séparer les équipes
+- **Architecture** : Single database avec tenant_id, isolation par Company
+
+#### Fonctionnalités principales
+
+##### 1. Gestion multi-société (Company)
+- 💡 **Entité Company** :
+  - Slug unique (identifiant/sous-domaine)
+  - Informations légales (SIREN, SIRET, TVA, adresse)
+  - Configuration (tier d'abonnement, limites utilisateurs/projets)
+  - Soft delete avec CASCADE pour isolation complète
+- 💡 **Authentification avec contexte Company** :
+  - JWT avec claim `company_id`
+  - CompanyContext service pour scope automatique
+  - Middleware de vérification du tenant
+- 💡 **Isolation des données** :
+  - Ajout de `company_id` sur 45 entités principales
+  - Repository scoping explicite sur toutes les requêtes
+  - Protection contre les fuites de données entre sociétés
+
+##### 2. Business Units hiérarchiques
 - 💡 **Entité BusinessUnit** :
-  - Nom, manager, objectifs annuels (CA, marge, contributeurs)
-  - Rattachement contributeurs (1 BU par contributeur)
-  - Rattachement devis et clients (optionnel)
-- 💡 **Dashboards isolés** :
-  - Chaque BU voit uniquement ses chiffres
-  - Comparaison inter-BU pour direction
-  - Consolidation globale (vue SUPERADMIN)
-- 💡 **Objectifs et suivi** :
-  - CA signé vs objectif
-  - Marge générée vs objectif
-  - Effectif réel vs prévu
-  - Graphiques d'évolution trimestrielle
-- 💡 **Permissions** :
-  - Manager BU : accès complet à sa BU
+  - Rattachement à une Company
+  - Structure hiérarchique (parent/enfants)
+  - Manager, objectifs annuels (CA, marge)
+  - Rattachement contributeurs, projets, clients
+- 💡 **Dashboards par BU** :
+  - Isolation des KPIs par Business Unit
+  - Consolidation hiérarchique (BU → Company)
+  - Comparaison inter-BU pour managers
+- 💡 **Permissions granulaires** :
+  - Manager BU : accès complet à sa BU et sous-BU
   - Contributeur : accès limité à sa BU
-  - Direction : vue consolidée toutes BU
+  - Admin Company : vue consolidée de toutes les BU
 
-**Estimation** : 8-10 jours
+##### 3. Migration et compatibilité
+- 💡 **Migration des données existantes** :
+  - Création d'une Company par défaut
+  - Migration de toutes les données vers cette Company
+  - Conservation de l'intégrité référentielle
+- 💡 **Gestion des utilisateurs** :
+  - 1 User = 1 Company (simplifié)
+  - Support multi-company optionnel (phase 2)
+- 💡 **Interface d'administration SAAS** :
+  - Gestion des Companies (CRUD)
+  - Monitoring par tenant (usage, limites)
+  - Statistiques globales (toutes companies)
+
+##### 4. Sécurité et isolation
+- 💡 **Scoping automatique** :
+  - CompanyContext injecté dans tous les repositories
+  - Protection au niveau base de données
+  - Validation systématique du company_id
+- 💡 **Voters personnalisés** :
+  - CompanyVoter pour vérifier l'appartenance
+  - BusinessUnitVoter pour permissions hiérarchiques
+  - AdminVoter pour super-admins SAAS
+- 💡 **Tests de sécurité** :
+  - Tests d'isolation entre tenants
+  - Tests de fuites de données
+  - Audit de sécurité complet
+
+#### Plan de migration (9 phases)
+1. **Préparation & Design** (5-7j) : Architecture, entités, stratégie
+2. **Database & Models** (15-18j) : Modification des 45 entités
+3. **Authentication & Context** (5-6j) : JWT, CompanyContext, Voters
+4. **Repository Scoping** (10-12j) : Scoping de 36 repositories
+5. **Controllers & Services** (8-10j) : Adaptation des controllers/services
+6. **API & Frontend** (5-6j) : API multi-tenant, UI Company
+7. **Business Units** (4-5j) : Hiérarchie, dashboards BU
+8. **Testing & Validation** (7-8j) : Tests isolation, sécurité, performance
+9. **Deployment & Monitoring** (3-4j) : Déploiement, monitoring
+
+#### Technologies et approches
+- **Architecture** : Single database + tenant_id (Company)
+- **Scoping** : Explicit repository scoping (préféré à Doctrine Filters)
+- **Authentification** : JWT avec company_id claim
+- **Isolation** : CASCADE DELETE pour sécurité maximale
+- **Performance** : Index sur company_id, optimisation requêtes
+
+#### Risques et mitigation
+- ⚠️ **Fuite de données** : Tests d'isolation exhaustifs, code review systématique
+- ⚠️ **Performance** : Index company_id, cache stratégique, monitoring
+- ⚠️ **Migration complexe** : Migration progressive, tests en parallèle, rollback plan
+- ⚠️ **Changement culturel** : Formation équipe, documentation complète
+
+#### Documentation complète
+Voir **[docs/saas-multi-tenant-plan.md](./saas-multi-tenant-plan.md)** pour le plan détaillé complet :
+- Architecture cible complète
+- Code exemples (entités, repositories, voters, services)
+- Plan de migration détaillé phase par phase
+- Liste complète des 45 entités à modifier
+- Stratégies d'implémentation et alternatives
+- Analyse de risques et mitigation
+
+**Dépendances** : Aucune (transformation structurelle fondamentale)
+**Tests** : Tests d'isolation multi-tenant, tests de sécurité, tests de performance, tests de migration
+**Estimation** : **45-55 jours** (14 semaines)
+
+---
+
+### 💡 Lot 18 : Business Units (BU) - Améliorations Post-SAAS 🆕
+**Objectif** : Fonctionnalités avancées des Business Units (post Lot 17.5)
+
+> **Note** : La structure de base des Business Units est créée dans le Lot 17.5 (Transformation SAAS). Ce lot couvre les fonctionnalités avancées supplémentaires.
+
+#### Fonctionnalités avancées
+- 💡 **Objectifs et suivi avancés** :
+  - Budget prévisionnel par BU (mensuel/trimestriel/annuel)
+  - Alertes de dérive budgétaire automatiques
+  - Comparaison performance entre BU similaires
+  - Scoring de performance BU (vert/orange/rouge)
+- 💡 **Workflows inter-BU** :
+  - Transfert de contributeurs entre BU
+  - Partage de ressources (contributeurs partagés)
+  - Facturation inter-BU (si prestations internes)
+  - Consolidation de projets multi-BU
+- 💡 **Analytics avancées** :
+  - Taux d'utilisation par BU
+  - Rentabilité comparative
+  - Évolution des effectifs par BU
+  - Prédiction de charge par BU
+- 💡 **Gamification** :
+  - Classement des BU (CA, marge, satisfaction client)
+  - Badges de performance (meilleure BU du mois)
+  - Challenges inter-BU
+
+**Dépendances** : Lot 17.5 (SAAS Multi-Tenant)
+**Estimation** : 6-8 jours
 
 ---
 
@@ -1010,15 +1124,16 @@ Voir [docs/rgpd-compliance-feasibility.md](./rgpd-compliance-feasibility.md) pou
 | Phase 2 : Analytics | Lots 10, 11, 7 | 🟡 Moyenne | 26-32j | Q2 2025 |
 | Phase 3 : Ouverture | Lots 8, 12, 13 | 🟡 Moyenne | 35-45j | Q3 2025 |
 | Phase 4 : Mobile | Lots 14, 15 | 🟢 Basse | 26-33j | Q4 2025 |
-| Phase 5 : UX/UI | Lots 5, 16, 17 | 🟡 Moyenne | 23-28j | Q4 2025 |
-| Phase 6 : Structuration | Lots 18, 19, 20, 21 | 🟢 Basse | 32-40j | 2026 |
+| Phase 5 : UX/UI | Lots 5, 15.5, 16, 17 | 🟡 Moyenne | 33-38j | Q4 2025 |
+| Phase 6 : Structuration & SAAS | **Lot 17.5 (SAAS)**, Lots 18, 19, 20, 21 | 🔴 **Stratégique** | **83-103j** | **Q3-Q4 2026** |
 | Phase 7 : Automatisation | Lots 6, 22 | 🟢 Basse | 10-13j | 2026 |
 | Phase 8 : Qualité | Lots 22.5, 23, 24 | 🟡 Continue | 26-34j | Continue |
 
-**Total estimé 2025-2026** : ~250-272 jours (incluant conformité légale complète)
+**Total estimé 2025-2026** : ~300-325 jours (incluant conformité légale complète + transformation SAAS)
 - **Facturation électronique (Lot 25)** : 25-27 jours (Q1 2026, **obligation légale septembre 2027**)
 - **Signature électronique (Lot 26)** : 10-11 jours (Q3 2026)
 - **Conformité RGPD (Lot 27)** : 35-37 jours (Q1-Q2 2026, **obligation légale depuis 2018**)
+- **🆕 Transformation SAAS Multi-Tenant (Lot 17.5)** : 45-55 jours (Q3-Q4 2026, **transformation stratégique majeure**)
 
 ---
 
@@ -1038,12 +1153,19 @@ Voir [docs/rgpd-compliance-feasibility.md](./rgpd-compliance-feasibility.md) pou
 4. **API REST** : Lot 8 (ouvrir l'écosystème)
 5. **Intégrations externes** : Lot 12 (gain de productivité)
 
-### Long terme (12+ mois)
-1. **Mobile App** : Lot 14 (usage terrain)
-2. **Business Units** : Lot 18 (structuration entreprise)
-3. **Portail Client** : Lot 13 (amélioration relation client)
+### Long terme (12-18 mois)
+1. **⚠️ NOUVEAU : Transformation SAAS Multi-Tenant** : Lot 17.5 (**transformation stratégique majeure**, 45-55 jours)
+   - Permet à HotOnes de devenir une solution SAAS multi-sociétés
+   - Isolation complète des données entre companies
+   - Business Units hiérarchiques au sein de chaque société
+   - Ouvre de nouvelles opportunités business (vente en SAAS)
+   - À planifier pour Q3-Q4 2026 après stabilisation des fondamentaux
+2. **Mobile App** : Lot 14 (usage terrain)
+3. **Business Units avancées** : Lot 18 (fonctionnalités post-SAAS)
+4. **Portail Client** : Lot 13 (amélioration relation client)
 
 ### Axes stratégiques prioritaires
+- **🆕 SAAS Multi-Tenant** : Transformer HotOnes en solution multi-sociétés pour ouvrir de nouveaux marchés
 - **Automatisation** : Réduire le temps passé sur les tâches administratives
 - **Données** : Exploiter la richesse des données pour anticiper et décider
 - **UX** : Simplifier les workflows quotidiens pour améliorer l'adoption
@@ -1064,5 +1186,11 @@ Voir [docs/rgpd-compliance-feasibility.md](./rgpd-compliance-feasibility.md) pou
 
 ---
 
-**Dernière mise à jour** : 25 novembre 2025
+**Dernière mise à jour** : 17 décembre 2025
 **Prochaine revue** : Fin Q1 2025 (mars 2025)
+
+**Changements récents** :
+- ✅ Ajout du **Lot 17.5 : Transformation SAAS Multi-Tenant** (45-55 jours, stratégique)
+- ✅ Refonte du **Lot 18 : Business Units** pour devenir post-SAAS (6-8 jours)
+- ✅ Mise à jour de la **Phase 6** renommée en "Structuration Entreprise & SAAS"
+- ✅ Ajout du document de référence [docs/saas-multi-tenant-plan.md](./saas-multi-tenant-plan.md)
