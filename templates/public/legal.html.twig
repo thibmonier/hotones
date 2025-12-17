@@ -1,0 +1,279 @@
+{% extends 'public/base.html.twig' %}
+
+{% block title %}Mentions légales - HotOnes{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 data-aos="fade-up">Mentions légales</h1>
+        <p class="lead" data-aos="fade-up" data-aos-delay="100">
+            Informations légales et politique de confidentialité
+        </p>
+    </div>
+</section>
+
+<!-- Legal Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="sticky-top" style="top: 100px;">
+                    <div class="list-group">
+                        <a href="#mentions" class="list-group-item list-group-item-action">Mentions légales</a>
+                        <a href="#privacy" class="list-group-item list-group-item-action">Confidentialité</a>
+                        <a href="#cgv" class="list-group-item list-group-item-action">CGV</a>
+                        <a href="#cookies" class="list-group-item list-group-item-action">Cookies</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <!-- Mentions Légales -->
+                <div id="mentions" class="mb-5" data-aos="fade-up">
+                    <h2 class="mb-4">Mentions légales</h2>
+
+                    <h4 class="mt-4 mb-3">Éditeur du site</h4>
+                    <p>
+                        <strong>HotOnes SAS</strong><br>
+                        Société par Actions Simplifiée au capital de 50 000 €<br>
+                        Siège social : 123 Avenue des Champs-Élysées, 75008 Paris, France<br>
+                        RCS Paris : 123 456 789<br>
+                        SIRET : 123 456 789 00012<br>
+                        N° TVA intracommunautaire : FR 12 123456789<br>
+                        Téléphone : +33 1 23 45 67 89<br>
+                        Email : <a href="mailto:contact@hotones.io">contact@hotones.io</a>
+                    </p>
+
+                    <h4 class="mt-4 mb-3">Directeur de la publication</h4>
+                    <p>
+                        Thomas Martin, Président de HotOnes SAS
+                    </p>
+
+                    <h4 class="mt-4 mb-3">Hébergeur</h4>
+                    <p>
+                        <strong>OVH SAS</strong><br>
+                        2 rue Kellermann<br>
+                        59100 Roubaix, France<br>
+                        Téléphone : 1007<br>
+                        Site web : <a href="https://www.ovh.com" target="_blank">www.ovh.com</a>
+                    </p>
+
+                    <h4 class="mt-4 mb-3">Propriété intellectuelle</h4>
+                    <p>
+                        L'ensemble du contenu du site HotOnes (structure, textes, logos, images, vidéos, etc.)
+                        est la propriété exclusive de HotOnes SAS, sauf mention contraire.
+                    </p>
+                    <p>
+                        Toute reproduction, distribution, modification, adaptation, retransmission ou publication
+                        de ces différents éléments est strictement interdite sans l'accord exprès par écrit de HotOnes SAS.
+                    </p>
+                </div>
+
+                <!-- Politique de confidentialité -->
+                <div id="privacy" class="mb-5" data-aos="fade-up">
+                    <h2 class="mb-4">Politique de confidentialité</h2>
+
+                    <p class="lead text-muted">
+                        Dernière mise à jour : {{ 'now'|date('d/m/Y') }}
+                    </p>
+
+                    <h4 class="mt-4 mb-3">1. Collecte des données</h4>
+                    <p>
+                        HotOnes collecte les données personnelles suivantes :
+                    </p>
+                    <ul>
+                        <li>Données d'identification (nom, prénom, email)</li>
+                        <li>Données de connexion (logs, adresse IP)</li>
+                        <li>Données d'utilisation du service (projets, temps, etc.)</li>
+                        <li>Données de paiement (gérées par notre prestataire de paiement sécurisé)</li>
+                    </ul>
+
+                    <h4 class="mt-4 mb-3">2. Finalités du traitement</h4>
+                    <p>Vos données sont utilisées pour :</p>
+                    <ul>
+                        <li>Fournir et améliorer nos services</li>
+                        <li>Gérer votre compte et votre abonnement</li>
+                        <li>Vous contacter concernant votre utilisation du service</li>
+                        <li>Assurer la sécurité de nos systèmes</li>
+                        <li>Respecter nos obligations légales</li>
+                    </ul>
+
+                    <h4 class="mt-4 mb-3">3. Base légale</h4>
+                    <p>
+                        Le traitement de vos données repose sur :
+                    </p>
+                    <ul>
+                        <li>L'exécution du contrat vous liant à HotOnes</li>
+                        <li>Votre consentement explicite</li>
+                        <li>Le respect d'obligations légales</li>
+                        <li>Notre intérêt légitime pour améliorer nos services</li>
+                    </ul>
+
+                    <h4 class="mt-4 mb-3">4. Durée de conservation</h4>
+                    <p>
+                        Vos données sont conservées pendant toute la durée de votre abonnement et pendant
+                        3 ans après la résiliation pour les besoins de gestion et de comptabilité.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">5. Vos droits</h4>
+                    <p>
+                        Conformément au RGPD, vous disposez des droits suivants :
+                    </p>
+                    <ul>
+                        <li>Droit d'accès à vos données</li>
+                        <li>Droit de rectification</li>
+                        <li>Droit à l'effacement ("droit à l'oubli")</li>
+                        <li>Droit à la limitation du traitement</li>
+                        <li>Droit à la portabilité</li>
+                        <li>Droit d'opposition</li>
+                    </ul>
+                    <p>
+                        Pour exercer ces droits, contactez-nous à :
+                        <a href="mailto:privacy@hotones.io">privacy@hotones.io</a>
+                    </p>
+
+                    <h4 class="mt-4 mb-3">6. Sécurité</h4>
+                    <p>
+                        HotOnes met en œuvre toutes les mesures techniques et organisationnelles appropriées
+                        pour protéger vos données contre tout accès non autorisé, perte ou destruction.
+                    </p>
+                    <ul>
+                        <li>Chiffrement SSL/TLS pour toutes les communications</li>
+                        <li>Hébergement sécurisé en Europe</li>
+                        <li>Sauvegardes quotidiennes chiffrées</li>
+                        <li>Authentification à deux facteurs disponible</li>
+                        <li>Accès aux données strictement limité</li>
+                    </ul>
+
+                    <h4 class="mt-4 mb-3">7. Transferts de données</h4>
+                    <p>
+                        Vos données sont hébergées en France et dans l'Union Européenne. Nous ne transférons
+                        pas vos données en dehors de l'UE sans garanties appropriées.
+                    </p>
+                </div>
+
+                <!-- CGV -->
+                <div id="cgv" class="mb-5" data-aos="fade-up">
+                    <h2 class="mb-4">Conditions Générales de Vente (CGV)</h2>
+
+                    <p class="lead text-muted">
+                        En vigueur au {{ 'now'|date('d/m/Y') }}
+                    </p>
+
+                    <h4 class="mt-4 mb-3">1. Objet</h4>
+                    <p>
+                        Les présentes Conditions Générales de Vente régissent la vente des abonnements
+                        au service HotOnes entre HotOnes SAS et ses clients.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">2. Prix et paiement</h4>
+                    <p>
+                        Les prix sont indiqués en euros HT et TTC. La TVA applicable est celle en vigueur
+                        au jour de la commande.
+                    </p>
+                    <p>
+                        Le paiement s'effectue :
+                    </p>
+                    <ul>
+                        <li>Par carte bancaire</li>
+                        <li>Par prélèvement SEPA</li>
+                        <li>Par virement bancaire (sur devis pour les formules Enterprise)</li>
+                    </ul>
+                    <p>
+                        La facturation est mensuelle ou annuelle selon l'abonnement choisi.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">3. Durée et renouvellement</h4>
+                    <p>
+                        L'abonnement est souscrit pour une durée d'un mois ou d'un an selon la formule choisie.
+                        Il se renouvelle automatiquement par tacite reconduction sauf résiliation.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">4. Résiliation</h4>
+                    <p>
+                        Vous pouvez résilier votre abonnement à tout moment depuis votre espace client.
+                        La résiliation prendra effet à la fin de la période en cours.
+                        Aucun remboursement au prorata ne sera effectué.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">5. Droit de rétractation</h4>
+                    <p>
+                        Conformément à l'article L221-18 du Code de la consommation, vous disposez d'un délai
+                        de 14 jours à compter de la souscription pour exercer votre droit de rétractation.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">6. Disponibilité du service</h4>
+                    <p>
+                        HotOnes s'engage à fournir le service avec un taux de disponibilité de 99,5%
+                        (99,9% pour les clients Enterprise). Des maintenances programmées peuvent avoir lieu
+                        et seront annoncées à l'avance.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">7. Responsabilité</h4>
+                    <p>
+                        HotOnes ne saurait être tenu responsable des dommages indirects résultant de l'utilisation
+                        du service. La responsabilité de HotOnes est limitée au montant de l'abonnement annuel.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">8. Loi applicable</h4>
+                    <p>
+                        Les présentes CGV sont soumises au droit français. En cas de litige, une solution amiable
+                        sera recherchée avant toute action judiciaire. À défaut, les tribunaux de Paris seront
+                        seuls compétents.
+                    </p>
+                </div>
+
+                <!-- Cookies -->
+                <div id="cookies" class="mb-5" data-aos="fade-up">
+                    <h2 class="mb-4">Politique de cookies</h2>
+
+                    <h4 class="mt-4 mb-3">Qu'est-ce qu'un cookie ?</h4>
+                    <p>
+                        Un cookie est un petit fichier texte déposé sur votre ordinateur lors de la visite d'un site.
+                        Il permet de mémoriser des informations relatives à votre navigation.
+                    </p>
+
+                    <h4 class="mt-4 mb-3">Les cookies que nous utilisons</h4>
+
+                    <h5 class="mt-3 mb-2">Cookies essentiels</h5>
+                    <p>
+                        Ces cookies sont nécessaires au fonctionnement du site et ne peuvent pas être désactivés :
+                    </p>
+                    <ul>
+                        <li>Cookies de session (authentification)</li>
+                        <li>Cookies de sécurité (CSRF)</li>
+                        <li>Cookies de préférence (langue, thème)</li>
+                    </ul>
+
+                    <h5 class="mt-3 mb-2">Cookies analytiques</h5>
+                    <p>
+                        Avec votre consentement, nous utilisons des cookies pour analyser l'utilisation du site :
+                    </p>
+                    <ul>
+                        <li>Google Analytics (anonymisé)</li>
+                        <li>Statistiques d'utilisation</li>
+                    </ul>
+
+                    <h4 class="mt-4 mb-3">Gestion des cookies</h4>
+                    <p>
+                        Vous pouvez à tout moment modifier vos préférences de cookies depuis votre navigateur
+                        ou en utilisant notre outil de gestion des cookies accessible en bas de page.
+                    </p>
+                </div>
+
+                <!-- Contact -->
+                <div class="alert alert-info" data-aos="fade-up">
+                    <h5 class="alert-heading">
+                        <i class="bx bx-info-circle me-2"></i>Des questions ?
+                    </h5>
+                    <p class="mb-0">
+                        Pour toute question concernant ces mentions légales ou notre politique de confidentialité,
+                        contactez-nous à <a href="mailto:legal@hotones.io" class="alert-link">legal@hotones.io</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

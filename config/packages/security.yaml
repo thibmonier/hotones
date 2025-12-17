@@ -42,7 +42,7 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
-                default_target_path: /
+                default_target_path: /app
             logout:
                 path: app_logout
                 target: /
@@ -58,6 +58,11 @@ security:
         - { path: ^/api, roles: ROLE_USER }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/2fa, roles: PUBLIC_ACCESS }
+        - { path: ^/features, roles: PUBLIC_ACCESS }
+        - { path: ^/pricing$, roles: PUBLIC_ACCESS }
+        - { path: ^/about$, roles: PUBLIC_ACCESS }
+        - { path: ^/contact$, roles: PUBLIC_ACCESS }
+        - { path: ^/legal$, roles: PUBLIC_ACCESS }
         - { path: ^/public, roles: PUBLIC_ACCESS }
         - { path: ^/status$, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }

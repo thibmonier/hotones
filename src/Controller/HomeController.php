@@ -26,7 +26,7 @@ class HomeController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'home')]
+    #[Route('/app', name: 'home')]
     #[IsGranted('ROLE_USER')]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
