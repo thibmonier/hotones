@@ -369,6 +369,159 @@ Exposer une API REST pour intégrations externes et applications tierces en util
 
 ---
 
+## 💡 Lot 25 : Facturation Électronique (Priorité Haute) 🆕 🔴 **Obligation Légale 2027**
+
+### Objectif
+Conformité avec la réforme française de la facturation électronique (obligation légale septembre 2027)
+
+### Fonctionnalités
+
+#### 25.1 Génération de factures Factur-X
+- 💡 Création automatique depuis devis signés (forfait) ou temps saisis (régie)
+- 💡 Génération PDF + XML CII (norme EN 16931)
+- 💡 Fusion hybride Factur-X (PDF lisible + données structurées)
+- 💡 Numérotation unique et chronologique (FAC-2025-001)
+- 💡 Mentions légales complètes (SIREN, TVA, conditions de paiement)
+
+#### 25.2 Émission via Chorus Pro
+- 💡 Intégration API Chorus Pro (PDP gratuite de l'État)
+- 💡 Envoi automatique au client et au Portail Public de Facturation (PPF)
+- 💡 Suivi du statut (émise, reçue, rejetée, acceptée)
+- 💡 Webhooks pour notifications temps réel
+- 💡 Gestion des erreurs et rejets
+
+#### 25.3 Réception de factures fournisseurs
+- 💡 Récupération automatique depuis Chorus Pro
+- 💡 Parsing XML et extraction des données
+- 💡 Enregistrement dans `Purchase` (achats)
+- 💡 Rapprochement automatique avec les commandes
+
+#### 25.4 Archivage légal
+- 💡 Conservation 10 ans (obligation fiscale)
+- 💡 Hash SHA-256 pour garantir l'intégrité
+- 💡 Export pour audit fiscal
+- 💡 Horodatage qualifié (optionnel)
+- 💡 Archivage chiffré (AES-256)
+
+### Entités
+- `Invoice` : numéro unique, statut, montants, échéances, fichiers PDF/Factur-X
+- `InvoiceLine` : description, quantité, prix unitaire, TVA
+- `PdpLog` : traçabilité des échanges avec Chorus Pro
+
+### Technologies
+- **Bibliothèque PHP** : horstoeko/zugferd (génération Factur-X)
+- **API** : Chorus Pro (REST, authentification par certificat client X.509)
+- **Formats** : Factur-X (PDF + XML CII EN 16931)
+
+### Sécurité
+- Numérotation chronologique obligatoire (aucun trou)
+- Intégrité des factures (hash, horodatage)
+- Certificat client X.509 pour Chorus Pro (stockage sécurisé)
+
+### Coûts
+- **Chorus Pro** : Gratuit (plateforme publique)
+- **Certificat client X.509** : ~50-100€ HT/an
+- **Total** : ~100€ HT/an
+
+### Documentation complète
+Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibility.md)
+
+### Dépendances
+- Lot 9 (Module de Facturation - entité Invoice)
+- Lot 2 (Saisie des Temps - facturation au temps passé pour régie)
+
+### Tests
+- 🔲 Tests unitaires génération Factur-X
+- 🔲 Tests d'intégration API Chorus Pro (mock)
+- 🔲 Tests de conformité EN 16931 (validation XML)
+- 🔲 Tests de sécurité (certificat, intégrité)
+
+### Estimation
+**25-27 jours** de développement
+
+---
+
+## 💡 Lot 26 : Signature Électronique (Priorité Moyenne) 🆕
+
+### Objectif
+Dématérialiser la signature des devis et contrats avec signature électronique avancée
+
+### Fonctionnalités
+
+#### 26.1 Signature de devis
+- 💡 Envoi du devis au client par email avec lien sécurisé
+- 💡 Interface de signature en ligne (sans compte client)
+- 💡 Changement automatique du statut (`a_signer` → `signe`)
+- 💡 Archivage du PDF signé avec certificat de signature
+- 💡 Notifications internes (commercial, chef de projet)
+
+#### 26.2 Signature de contrats (futurs)
+- 💡 Contrats de prestation (TMA, support, maintenance)
+- 💡 Contrats de confidentialité (NDA)
+- 💡 Avenants
+
+#### 26.3 Signature multi-parties (optionnel)
+- 💡 Workflow d'approbation interne avant envoi
+- 💡 Signature côté client + signature côté agence
+
+#### 26.4 Journal d'audit
+- 💡 Traçabilité complète (IP, user-agent, timestamp)
+- 💡 Certificat de signature Yousign
+- 💡 Export du journal en cas de litige
+
+### Entités
+- `Order` : ajout de `yousignProcedureId`, `yousignSignedFileUrl`, `signedAt`, `signerEmail`, etc.
+- `SignatureAudit` : audit trail complet (procédure, statut, métadonnées JSON)
+
+### Technologies
+- **Fournisseur** : Yousign (français, conforme eIDAS)
+- **Type de signature** : Avancée (valeur juridique pour contrats B2B)
+- **Intégration** : Symfony HttpClient, API REST, Webhooks
+- **Sécurité** : HMAC pour validation des webhooks
+
+### Workflow
+1. Utilisateur clique sur "Envoyer pour signature" dans l'interface devis
+2. Backend génère le PDF et appelle l'API Yousign
+3. Yousign envoie un email au client avec lien sécurisé
+4. Client signe électroniquement
+5. Yousign notifie HotOnes via webhook
+6. Symfony met à jour le statut du devis et télécharge le PDF signé
+7. Génération automatique des tâches projet (workflow existant)
+
+### Sécurité
+- Clé API Yousign dans `.env` (Symfony Secrets en production)
+- Validation HMAC des webhooks Yousign
+- URL de signature à usage unique (Yousign)
+- PDF signés dans répertoire sécurisé (hors web root)
+- Accès restreint (ROLE_ADMIN, ROLE_MANAGER, créateur du devis)
+
+### Coûts
+- **Plan Start** : 9€ HT/mois + 1,80€ HT/signature
+- **Estimation** : ~10 signatures/mois → 27€ HT/mois (324€ HT/an)
+
+### ROI
+- Gain de temps : 2-3h/mois (plus d'impression/scan/envoi)
+- Délai de signature : 3-5 jours → quelques heures
+- Taux de conversion : +10-15% (facilité de signature)
+- Sécurité juridique renforcée
+
+### Documentation complète
+Voir [docs/esignature-einvoicing-feasibility.md](./esignature-einvoicing-feasibility.md)
+
+### Dépendances
+- Lot 1.4 (Prévisualisation PDF du devis - à faire)
+
+### Tests
+- 🔲 Tests unitaires services (YousignProvider, OrderSignatureService)
+- 🔲 Tests d'intégration API Yousign (mock)
+- 🔲 Tests fonctionnels workflow complet
+- 🔲 Tests de sécurité webhook (HMAC, accès documents)
+
+### Estimation
+**10-11 jours** de développement
+
+---
+
 ## 📊 Récapitulatif des priorités
 
 | Lot                         | Priorité   | Estimation | Dépendances            |
@@ -381,8 +534,12 @@ Exposer une API REST pour intégrations externes et applications tierces en util
 | Lot 6 : Notifications       | 🟢 Basse   | 4-5j       | Lot 1                  |
 | Lot 7 : Rapports            | 🟢 Basse   | 6-7j       | Lot 3                  |
 | Lot 8 : API REST            | 🟢 Basse   | 8-10j      | Lots 1-3               |
+| **Lot 25 : Facturation Électronique** 🆕 | 🔴 **Haute** (Obligation légale) | **25-27j** | Lot 9 (Facturation), Lot 2 |
+| **Lot 26 : Signature Électronique** 🆕 | 🟡 **Moyenne** | **10-11j** | Lot 1.4 (PDF devis) |
 
-**Total estimé : 46-59 jours** de développement
+**Total estimé : 81-97 jours** de développement (incluant signature et facturation électroniques)
+- **Lots initiaux** : 46-59 jours
+- **Nouveaux lots (25+26)** : 35-38 jours
 
 ---
 
