@@ -13,11 +13,12 @@ class HomeControllerTest extends WebTestCase
     use Factories;
     use ResetDatabase;
 
-    public function testRedirectsToLoginWhenAnonymous(): void
+    public function testHomepageLoadsForAnonymousUser(): void
     {
         $client = static::createClient();
         $client->request('GET', '/');
-        $this->assertResponseRedirects('/login');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'rentabilité'); // Check for key content
     }
 
     public function testHomepageLoadsForAuthenticatedUser(): void
