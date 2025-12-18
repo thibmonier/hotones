@@ -10,6 +10,7 @@ deptrac:
     - '#.*Test\.php$#'
     - '#.*Kernel\.php$#'
     - '#.*Component\.php$#'
+    - '#src/Scheduler/.*\.php$#'  # Deptrac parser issues with PHP 8.4 syntax
 
   # Define architectural layers
   layers:
@@ -172,15 +173,82 @@ deptrac:
 
   # Skip violations (if needed)
   skip_violations:
-    # Example: Skip specific known violations during migration
-    # Controller:
-    #   - Repository  # Controllers should not directly access repositories
+    # Doctrine ORM entities reference their repository classes via attributes
+    # This is metadata, not actual code dependency, so we skip it
+    App\Entity\Achievement:
+      - App\Repository\AchievementRepository
+    App\Entity\Analytics\FactStaffingMetrics:
+      - App\Repository\StaffingMetricsRepository
+    App\Entity\Badge:
+      - App\Repository\BadgeRepository
+    App\Entity\BillingMarker:
+      - App\Repository\BillingMarkerRepository
+    App\Entity\Client:
+      - App\Repository\ClientRepository
+    App\Entity\ClientContact:
+      - App\Repository\ClientContactRepository
+    App\Entity\CompanySettings:
+      - App\Repository\CompanySettingsRepository
+    App\Entity\Contributor:
+      - App\Repository\ContributorRepository
+    App\Entity\ContributorProgress:
+      - App\Repository\ContributorProgressRepository
+    App\Entity\ContributorSatisfaction:
+      - App\Repository\ContributorSatisfactionRepository
+    App\Entity\ContributorSkill:
+      - App\Repository\ContributorSkillRepository
+    App\Entity\EmploymentPeriod:
+      - App\Repository\EmploymentPeriodRepository
+    App\Entity\ExpenseReport:
+      - App\Repository\ExpenseReportRepository
+    App\Entity\FactForecast:
+      - App\Repository\FactForecastRepository
+    App\Entity\Invoice:
+      - App\Repository\InvoiceRepository
+    App\Entity\Notification:
+      - App\Repository\NotificationRepository
+    App\Entity\NotificationPreference:
+      - App\Repository\NotificationPreferenceRepository
+    App\Entity\NotificationSetting:
+      - App\Repository\NotificationSettingRepository
+    App\Entity\NpsSurvey:
+      - App\Repository\NpsSurveyRepository
+    App\Entity\OnboardingTask:
+      - App\Repository\OnboardingTaskRepository
+    App\Entity\OnboardingTemplate:
+      - App\Repository\OnboardingTemplateRepository
+    App\Entity\PerformanceReview:
+      - App\Repository\PerformanceReviewRepository
+    App\Entity\Order:
+      - App\Repository\OrderRepository
+    App\Entity\Planning:
+      - App\Repository\PlanningRepository
+    App\Entity\Profile:
+      - App\Repository\ProfileRepository
+    App\Entity\Project:
+      - App\Repository\ProjectRepository
+    App\Entity\ProjectEvent:
+      - App\Repository\ProjectEventRepository
+    App\Entity\ProjectHealthScore:
+      - App\Repository\ProjectHealthScoreRepository
+    App\Entity\ProjectSubTask:
+      - App\Repository\ProjectSubTaskRepository
+    App\Entity\ProjectTask:
+      - App\Repository\ProjectTaskRepository
+    App\Entity\RunningTimer:
+      - App\Repository\RunningTimerRepository
+    App\Entity\Skill:
+      - App\Repository\SkillRepository
+    App\Entity\Timesheet:
+      - App\Repository\TimesheetRepository
+    App\Entity\Vacation:
+      - App\Repository\VacationRepository
+    App\Entity\XpHistory:
+      - App\Repository\XpHistoryRepository
 
   # Format options
   formatters:
     graphviz:
-      enabled: true
-      output: var/deptrac/dependencies.svg
       groups:
         presentation:
           - Controller

@@ -36,9 +36,7 @@
 
     // Test framework configuration
     "testFramework": "phpunit",
-    "testFrameworkOptions": {
-        "order": "random"
-    },
+    "testFrameworkOptions": "--order=random",
 
     // Bootstrap file
     "bootstrap": "tests/bootstrap.php",
@@ -57,26 +55,7 @@
     "threads": 4,
     "timeout": 10,
 
-    // Ignore specific source code patterns
-    "ignoreSourceCodeByRegex": [
-        // Ignore simple getters/setters
-        ".*->get[A-Z].*\\(\\)",
-        ".*->set[A-Z].*\\(.*\\)",
-        ".*->is[A-Z].*\\(\\)",
-        ".*->has[A-Z].*\\(\\)"
-    ],
-
-    // Coverage reports
-    "coverageReport": {
-        "ignoreSourceCodeByRegex": [
-            ".*Test\\.php$"
-        ]
-    },
-
-    // Profiles for different environments
-    "onlyCovered": true, // Only mutate code covered by tests
-    "noProgress": false,
-    "ignoreMsiWithNoMutations": true,
+    "ignoreMsiWithNoMutations": true
 
     // HTML report (optional, can be heavy)
     // Uncomment to enable HTML reports
