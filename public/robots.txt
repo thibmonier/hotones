@@ -1,0 +1,22 @@
+# robots.txt pour HotOnes
+# https://www.robotstxt.org/
+
+# Règles globales (tous les robots)
+User-agent: *
+
+# Pages autorisées (sitemap)
+Sitemap: /sitemap.xml
+
+# Bloquer l'accès aux dossiers techniques
+Disallow: /bundles/
+Disallow: /build/
+Disallow: /_profiler/
+Disallow: /_wdt/
+
+# Bloquer l'accès aux routes d'admin et backend (si applicable)
+# Disallow: /admin/
+# Disallow: /api/
+
+# NOTE: Avec l'authentification HTTP Basic activée,
+# les robots sont déjà bloqués au niveau Nginx (401).
+# Ce fichier sera utilisé en production après retrait de l'auth.

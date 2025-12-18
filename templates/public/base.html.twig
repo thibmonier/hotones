@@ -4,7 +4,28 @@
     <meta charset="utf-8">
     <title>{% block title %}HotOnes - Gestion de rentabilité pour agences web{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{% block meta_description %}HotOnes - Solution SaaS de gestion de projets et de rentabilité pour agences web. Suivez votre temps, vos projets, et analysez votre profitabilité.{% endblock %}">
+
+    {# SEO Meta Tags #}
+    <meta name="description" content="{% block meta_description %}{{ app.request.server.get('SITE_DESCRIPTION', 'HotOnes - Solution SaaS de gestion de projets et de rentabilité pour agences web. Suivez votre temps, vos projets, et analysez votre profitabilité.') }}{% endblock %}">
+    <meta name="author" content="{% block meta_author %}HotOnes{% endblock %}" />
+    <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}" />
+    <link rel="canonical" href="{% block canonical_url %}{{ app.request.uri }}{% endblock %}" />
+
+    {# Open Graph / Facebook #}
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+    <meta property="og:url" content="{{ app.request.uri }}" />
+    <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}" />
+    <meta property="og:description" content="{{ block('meta_description') }}" />
+    <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('favicon.svg')) }}{% endblock %}" />
+    <meta property="og:site_name" content="{{ app.request.server.get('SITE_NAME', 'HotOnes') }}" />
+    <meta property="og:locale" content="{% block og_locale %}fr_FR{% endblock %}" />
+
+    {# Twitter Card #}
+    <meta property="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
+    <meta property="twitter:url" content="{{ app.request.uri }}" />
+    <meta property="twitter:title" content="{{ block('og_title') }}" />
+    <meta property="twitter:description" content="{{ block('meta_description') }}" />
+    <meta property="twitter:image" content="{{ block('og_image') }}" />
 
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
@@ -560,6 +581,20 @@
     </style>
 
     {% block stylesheets %}{% endblock %}
+
+    {# Google Analytics 4 #}
+    {% if app.request.server.get('GOOGLE_ANALYTICS_ID') %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ app.request.server.get('GOOGLE_ANALYTICS_ID') }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ app.request.server.get('GOOGLE_ANALYTICS_ID') }}', {
+            'anonymize_ip': true,
+            'cookie_flags': 'SameSite=None;Secure'
+        });
+    </script>
+    {% endif %}
 </head>
 
 <body>

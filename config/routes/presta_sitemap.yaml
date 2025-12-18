@@ -1,0 +1,4 @@
+# Presta Sitemap Bundle Routes
+PrestaSitemapBundle:
+    resource: "@PrestaSitemapBundle/config/routing.yml"
+    prefix: /

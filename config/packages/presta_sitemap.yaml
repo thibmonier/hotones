@@ -1,0 +1,15 @@
+presta_sitemap:
+    # The address of your website (required for absolute URLs)
+    timetolive: 3600
+
+    # Sitemap default values
+    defaults:
+        # Priority for URLs (0.0 to 1.0)
+        priority: 0.5
+        # Change frequency (always, hourly, daily, weekly, monthly, yearly, never)
+        changefreq: weekly
+        # Last modification date
+        lastmod: ~
+
+    # Sitemap configuration
+    default_section: default

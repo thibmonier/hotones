@@ -276,6 +276,7 @@
       <path value="$PROJECT_DIR$/vendor/sanmai/later" />
       <path value="$PROJECT_DIR$/vendor/marc-mabe/php-enum" />
       <path value="$PROJECT_DIR$/vendor/qossmic/deptrac" />
+      <path value="$PROJECT_DIR$/vendor/presta/sitemap-bundle" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
