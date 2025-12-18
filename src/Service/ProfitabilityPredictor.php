@@ -44,7 +44,7 @@ class ProfitabilityPredictor
         $soldHours  = (float) $project->getTotalTasksSoldHours();
         $spentHours = (float) $project->getTotalTasksSpentHours();
 
-        if ($soldAmount == 0 || $soldHours == 0) {
+        if ($soldAmount === 0.0 || $soldHours === 0.0) {
             return [
                 'canPredict'      => false,
                 'currentProgress' => $progress,
