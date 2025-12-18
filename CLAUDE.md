@@ -56,7 +56,9 @@ docker compose exec app php bin/console messenger:failed:retry
 ### Code Quality
 ```bash
 # Run all quality checks
-docker compose exec app composer check-code
+docker compose exec app composer check-code          # Code style + static analysis
+docker compose exec app composer check-architecture  # Architecture validation (Deptrac)
+docker compose exec app composer check-all           # All quality checks (code + architecture)
 
 # Individual checks
 docker compose exec app composer phpstan              # Static analysis (level 3 + strict rules)
@@ -64,6 +66,16 @@ docker compose exec app composer phpcsfixer           # Code style check (dry-ru
 docker compose exec app composer phpcsfixer-fix       # Fix code style
 docker compose exec app composer phpcs                # PHP_CodeSniffer (PSR-12 + quality rules)
 docker compose exec app composer phpcbf               # PHP Code Beautifier and Fixer (auto-fix)
+
+# Architecture validation
+docker compose exec app composer deptrac              # Validate architecture layers
+docker compose exec app composer deptrac-graph        # Generate dependency graph (SVG)
+docker compose exec app composer deptrac-debug        # Debug mode with verbose output
+
+# Mutation testing (tests the quality of your tests)
+docker compose exec app composer infection            # Run mutation testing (4 threads)
+docker compose exec app composer infection-ci         # CI mode (max threads, GitHub logger)
+docker compose exec app composer infection-debug      # Debug mode (single thread, verbose)
 ```
 
 ### Testing
@@ -265,8 +277,10 @@ docker compose exec app php bin/console doctrine:migrations:migrate
 
 **Quality Tools:**
 - **PHP CS Fixer**: PSR-12 + Symfony coding standards, auto-formatting
-- **PHPStan**: Static analysis with Doctrine/Symfony extensions + strict rules
+- **PHPStan**: Static analysis with Doctrine/Symfony extensions + strict rules (level 3)
 - **PHP_CodeSniffer**: PSR-12 compliance, cyclomatic complexity, code quality metrics
+- **Infection**: Mutation testing framework - validates test suite quality by introducing code mutations
+- **Deptrac**: Architecture testing - enforces layering rules and prevents circular dependencies
 
 ## Testing
 

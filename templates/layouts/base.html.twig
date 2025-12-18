@@ -7,8 +7,10 @@
         <meta content="Gestion d'agence digitale" name="description" />
         <meta content="Thib" name="author" />
         <base href="/">
-        <!-- App favicon -->
-        <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
+
+        <!-- Favicons -->
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="alternate icon" href="{{ asset('favicon.svg') }}">
 
         {% block stylesheets %}{% endblock %}
         {% include 'layouts/_head-css.html.twig' %}

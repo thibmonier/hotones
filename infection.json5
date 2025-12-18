@@ -1,0 +1,65 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+
+    // Source code directories
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Components",
+            "Kernel.php"
+        ]
+    },
+
+    // Logs configuration
+    "logs": {
+        "text": "var/infection/infection.log",
+        "summary": "var/infection/summary.log",
+        "json": "var/infection/infection.json",
+        "github": true
+    },
+
+    // Mutation configuration
+    "mutators": {
+        "@default": true,
+        "@function_signature": false,  // Can be noisy with typed properties
+
+        // Fine-tune specific mutators
+        "MethodCallRemoval": {
+            "ignore": [
+                "Assert::*",
+                "PHPUnit\\Framework\\*::assert*"
+            ]
+        }
+    },
+
+    // Test framework configuration
+    "testFramework": "phpunit",
+    "testFrameworkOptions": "--order=random",
+
+    // Bootstrap file
+    "bootstrap": "tests/bootstrap.php",
+
+    // PHPUnit configuration
+    "phpUnit": {
+        "configDir": ".",
+        "customPath": "vendor/bin/phpunit"
+    },
+
+    // Minimum thresholds (adjust based on your needs)
+    "minMsi": 70,        // Minimum Mutation Score Indicator (70%)
+    "minCoveredMsi": 80, // Minimum Covered Code MSI (80%)
+
+    // Performance optimizations
+    "threads": 4,
+    "timeout": 10,
+
+    "ignoreMsiWithNoMutations": true
+
+    // HTML report (optional, can be heavy)
+    // Uncomment to enable HTML reports
+    // "logs": {
+    //     "html": "var/infection/html"
+    // }
+}

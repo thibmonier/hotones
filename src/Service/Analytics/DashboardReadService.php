@@ -119,7 +119,7 @@ readonly class DashboardReadService
             // Appliquer les filtres si fournis
             $this->applyFilters($qb, $filters);
 
-            $results = $qb->getQuery()->getResult();
+            $results = $qb->getQuery()->getResult() ?? [];
 
             // Si pas de données, fallback
             if (empty($results)) {
@@ -216,8 +216,8 @@ readonly class DashboardReadService
                 'won'             => (int) ($result['wonOrders'] ?? 0),
                 'signed'          => (int) ($result['signedOrders'] ?? 0),
                 'lost'            => (int) ($result['lostOrders'] ?? 0),
-                'conversion_rate' => $result['totalOrders'] > 0
-                    ? round(($result['wonOrders'] / $result['totalOrders']) * 100, 2)
+                'conversion_rate' => ($result['totalOrders'] ?? 0) > 0
+                    ? round((($result['wonOrders'] ?? 0) / ($result['totalOrders'] ?? 1)) * 100, 2)
                     : 0,
                 'pending_revenue' => (float) ($result['pendingRevenue'] ?? 0),
             ],
@@ -305,7 +305,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult() ?? [];
 
         // Formater en tableau associatif
         $byType = ['forfait' => 0, 'regie' => 0];
@@ -336,7 +336,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult() ?? [];
 
         // Formater en tableau associatif
         $byClientType = ['internal' => 0, 'client' => 0];
@@ -370,7 +370,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult() ?? [];
 
         // Formater en tableau associatif
         $byCategory = [];
@@ -409,12 +409,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult();
-
-        // Gérer le cas où getResult() retourne null
-        if (!is_array($results)) {
-            return [];
-        }
+        $results = $qb->getQuery()->getResult() ?? [];
 
         // Formater pour le template
         return array_map(function ($row) {

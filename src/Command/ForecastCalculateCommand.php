@@ -29,7 +29,8 @@ class ForecastCalculateCommand extends Command
     {
         $this
             ->addOption('months', 'm', InputOption::VALUE_OPTIONAL, 'Nombre de mois à prévoir (3, 6, ou 12)', 12)
-            ->setHelp(<<<'HELP'
+            ->setHelp(
+                <<<'HELP'
 Cette commande génère les prévisions de chiffre d'affaires pour les prochains mois.
 
 Utilisation:
