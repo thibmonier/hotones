@@ -55,3 +55,7 @@ yarn-error.log
 /var/deptrac/
 /.deptrac.cache
 ###< qossmic/deptrac ###
+
+###> HTTP Basic Authentication ###
+/docker/nginx/.htpasswd
+###< HTTP Basic Authentication ###
