@@ -137,7 +137,7 @@ class ContributorType extends AbstractType
                 'required'      => false,
                 'placeholder'   => '-- Aucun manager --',
                 'attr'          => ['class' => 'form-select'],
-                'help'          => 'Sélectionnez le manager qui validera les demandes de congés de ce contributeur',
+                'help'          => 'Sélectionnez le manager qui validera les demandes de congés de ce collaborateur',
                 'query_builder' => function ($er) {
                     return $er->createQueryBuilder('c')
                         ->where('c.active = :active')

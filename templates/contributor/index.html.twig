@@ -1,16 +1,16 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}Contributeurs{% endblock %}
+{% block title %}Collaborateurs{% endblock %}
 
 {% block content %}
     {% include 'components/page_header.html.twig' with {
-        title: 'Contributeurs',
+        title: 'Collaborateurs',
         breadcrumb: [
             {label: 'Ressources Humaines', path: null},
-            {label: 'Contributeurs', path: null}
+            {label: 'Collaborateurs', path: null}
         ],
         actions: is_granted('ROLE_MANAGER') ? [{
-            label: 'Nouveau contributeur',
+            label: 'Nouveau collaborateur',
             path: 'contributor_new',
             icon: 'bx-plus',
             class: 'btn-primary'
@@ -148,12 +148,12 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h4 class="card-title mb-0">Liste des contributeurs</h4>
+                    <div class=\"row align-items-center\">
+                        <div class=\"col\">
+                            <h4 class=\"card-title mb-0\">Liste des collaborateurs</h4>
                         </div>
-                        <div class="col-auto">
-                            <span class="badge bg-primary">{{ pagination.total }} contributeur{{ pagination.total > 1 ? 's' : '' }}</span>
+                        <div class=\"col-auto\">
+                            <span class=\"badge bg-primary\">{{ pagination.total }} collaborateur{{ pagination.total > 1 ? 's' : '' }}</span>
                         </div>
                     </div>
                 </div>
@@ -311,11 +311,11 @@
                                     <i class="bx bx-user"></i>
                                 </div>
                             </div>
-                            <h5>Aucun contributeur</h5>
-                            <p class="text-muted">Commencez par ajouter votre premier contributeur à l'équipe.</p>
+                            <h5>Aucun collaborateur</h5>
+                            <p class=\"text-muted\">Commencez par ajouter votre premier collaborateur à l'équipe.</p>
                             {% if is_granted('ROLE_MANAGER') %}
-                                <a href="{{ path('contributor_new') }}" class="btn btn-primary">
-                                    <i class="bx bx-plus me-1"></i> Ajouter un contributeur
+                                <a href=\"{{ path('contributor_new') }}\" class=\"btn btn-primary\">
+                                    <i class=\"bx bx-plus me-1\"></i> Ajouter un collaborateur
                                 </a>
                             {% endif %}
                         </div>
@@ -364,9 +364,9 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex">
-                        <div class="flex-1">
-                            <p class="text-truncate font-size-14 mb-2">Total contributeurs</p>
-                            <h4 class="mb-2">{{ pagination.total }}</h4>
+                        <div class=\"flex-1\">
+                            <p class=\"text-truncate font-size-14 mb-2\">Total collaborateurs</p>
+                            <h4 class=\"mb-2\">{{ pagination.total }}</h4>
                         </div>
                         <div class="avatar-sm">
                             <span class="avatar-title bg-light text-primary rounded-3">

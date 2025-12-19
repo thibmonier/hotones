@@ -205,7 +205,7 @@ class ContributorController extends AbstractController
                 $this->entityManager->persist($contributor);
                 $this->entityManager->flush();
 
-                $this->addFlash('success', 'Le contributeur a été créé avec succès.');
+                $this->addFlash('success', 'Le collaborateur a été créé avec succès.');
 
                 return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
             } catch (RuntimeException $e) {
@@ -273,7 +273,7 @@ class ContributorController extends AbstractController
 
                 $this->entityManager->flush();
 
-                $this->addFlash('success', 'Le contributeur a été modifié avec succès.');
+                $this->addFlash('success', 'Le collaborateur a été modifié avec succès.');
 
                 return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
             } catch (RuntimeException $e) {
@@ -332,7 +332,7 @@ class ContributorController extends AbstractController
             // Soft delete - marquer comme inactif au lieu de supprimer
             $contributor->setActive(false);
             $this->entityManager->flush();
-            $this->addFlash('success', 'Contributeur désactivé avec succès');
+            $this->addFlash('success', 'Collaborateur désactivé avec succès');
         }
 
         return $this->redirectToRoute('contributor_index');
@@ -460,7 +460,7 @@ class ContributorController extends AbstractController
         rewind($handle);
         $csv = "\xEF\xBB\xBF".stream_get_contents($handle);
 
-        $filename = sprintf('contributeurs_%s.csv', date('Y-m-d'));
+        $filename = sprintf('collaborateurs_%s.csv', date('Y-m-d'));
         $response = new Response($csv);
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
