@@ -304,7 +304,7 @@
         <div class="col-xl-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bx bx-line-chart me-2"></i>Évolution du CA signé ({{ selectedYear }})</h5>
+                    <h5 class=\"card-title mb-0\"><i class=\"bx bx-line-chart me-2\"></i>Évolution Commerciale ({{ selectedYear }})</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="revenueEvolutionChart" height="100"></canvas>
@@ -440,17 +440,29 @@
             const ctx = document.getElementById('revenueEvolutionChart');
             if (ctx) {
                 new Chart(ctx, {
-                    type: 'line',
+                    type: 'bar', // Type de base en bar pour l'histogramme
                     data: {
                         labels: {{ evolutionData.labels|json_encode|raw }},
-                        datasets: [{
-                            label: 'CA Signé (€)',
-                            data: {{ evolutionData.data|json_encode|raw }},
-                            borderColor: 'rgb(75, 192, 192)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            tension: 0.4,
-                            fill: true
-                        }]
+                        datasets: [
+                            {
+                                label: 'Volume de devis créés',
+                                data: {{ evolutionData.volume_data|json_encode|raw }},
+                                type: 'bar',
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                borderColor: 'rgb(54, 162, 235)',
+                                yAxisID: 'yVolume',
+                            },
+                            {
+                                label: 'CA Signé (€)',
+                                data: {{ evolutionData.revenue_data|json_encode|raw }},
+                                type: 'line',
+                                borderColor: 'rgb(75, 192, 192)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'yRevenue',
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
@@ -461,16 +473,34 @@
                                 position: 'top'
                             },
                             tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'CA: ' + context.parsed.y.toLocaleString('fr-FR') + ' €';
-                                    }
-                                }
+                                mode: 'index',
+                                intersect: false,
                             }
                         },
                         scales: {
-                            y: {
-                                beginAtZero: true,
+                            x: {
+                                stacked: true,
+                            },
+                            yVolume: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Volume de devis'
+                                }
+                            },
+                            yRevenue: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'CA Signé (€)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false, // seulement pour cet axe
+                                },
                                 ticks: {
                                     callback: function(value) {
                                         return value.toLocaleString('fr-FR') + ' €';

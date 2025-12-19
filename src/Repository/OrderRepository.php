@@ -319,6 +319,45 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
+     * Obtient l'évolution mensuelle du volume de devis créés sur une période.
+     * Retourne un tableau [month => count].
+     */
+    public function getCreatedOrdersVolumeEvolution(DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $platform   = $conn->getDatabasePlatform();
+        $dateFormat = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform
+            ? "TO_CHAR(created_at, 'YYYY-MM')"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+
+        $sql = "
+            SELECT
+                {$dateFormat} as month,
+                COUNT(id) as volume
+            FROM orders
+            WHERE created_at BETWEEN :start AND :end
+            GROUP BY month
+            ORDER BY month ASC
+        ";
+
+        $results = $conn->executeQuery(
+            $sql,
+            [
+                'start' => $startDate->format('Y-m-d'),
+                'end'   => $endDate->format('Y-m-d'),
+            ],
+        )->fetchAllAssociative();
+
+        $evolution = [];
+        foreach ($results as $row) {
+            $evolution[$row['month']] = (int) $row['volume'];
+        }
+
+        return $evolution;
+    }
+
+    /**
      * Obtient les devis récents (par défaut 10).
      */
     public function getRecentOrders(int $limit = 10): array

@@ -34,6 +34,33 @@
 
 ## 🎯 Phase 1 : Consolidation & Professionnalisation (Q1 2025)
 
+### 🔄 Lot 16 - Dashboard Commercial & Analytics (Nouveau)
+**Objectif** : Améliorer la visibilité sur les performances commerciales avec des indicateurs clés.
+
+#### Fonctionnalités
+- 🎯 **Taux de conversion commerciaux** (devis signés vs devis perdus)
+- 🎯 **Graphique multi-axes** :
+  - Axe X: Temps sur l'année (mois par mois)
+  - Axe Y1: Évolution du CA signé (courbe, k€)
+  - Axe Y2: Volume de devis créés par mois (histogramme, k€)
+- 🎯 **Correction du bloc "Devis en attente"** sur le dashboard direction (alignement avec dashboard commercial)
+
+**Estimation** : 5-7 jours
+
+---
+
+### 🔄 Lot 17 - Renommage Contributeur → Collaborateur (Nouveau)
+**Objectif** : Harmoniser la terminologie dans toute l'application pour plus de clarté.
+
+#### Tâches
+- 🎯 Renommer "contributeur" par "collaborateur" dans tous les templates, labels et messages.
+- 🎯 Mettre à jour la navigation et les breadcrumbs.
+- 🎯 **Note technique** : L'entité `Contributor` et ses relations en base de données ne seront pas renommées pour éviter une migration complexe et risquée. Le changement est purement cosmétique (affichage).
+
+**Estimation** : 1-2 jours
+
+---
+
 ### 🔲 Lot 2 : Saisie des Temps - Finalisation
 **Objectif** : Interface complète de saisie et gestion des temps
 
@@ -1120,7 +1147,7 @@ Voir **[docs/saas-multi-tenant-plan.md](./saas-multi-tenant-plan.md)** pour le p
 
 | Phase | Lots | Priorité | Estimation | Trimestre |
 |-------|------|----------|------------|-----------|
-| Phase 1 : Consolidation & Conformité | Lots 2, 3, 1.3, 1.4, 9, 25, 26, 27 | 🔴 Haute | 107-121j | Q1 2025 - Q2 2026 |
+| Phase 1 : Consolidation & Conformité | Lots 16, 17, 2, 3, 1.3, 1.4, 9, 25, 26, 27 | 🔴 Haute | 113-130j | Q1 2025 - Q2 2026 |
 | Phase 2 : Analytics | Lots 10, 11, 7 | 🟡 Moyenne | 26-32j | Q2 2025 |
 | Phase 3 : Ouverture | Lots 8, 12, 13 | 🟡 Moyenne | 35-45j | Q3 2025 |
 | Phase 4 : Mobile | Lots 14, 15 | 🟢 Basse | 26-33j | Q4 2025 |

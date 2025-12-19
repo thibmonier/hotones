@@ -8,6 +8,7 @@ use App\Entity\Order;
 use App\Entity\Project;
 use App\Entity\Timesheet;
 use App\Entity\Vacation;
+use App\Enum\OrderStatus;
 use App\Service\Analytics\DashboardReadService;
 use App\Service\HrMetricsService;
 use DateTime;
@@ -149,7 +150,7 @@ class HomeController extends AbstractController
         $activeProjects = $projectRepo->findBy(['status' => 'active'], ['name' => 'ASC'], 5);
 
         // Devis en attente
-        $pendingOrders = $orderRepo->findBy(['status' => 'a_signer'], ['createdAt' => 'DESC'], 5);
+        $pendingOrders = $orderRepo->findBy(['status' => OrderStatus::PENDING->value], ['createdAt' => 'DESC'], 5);
 
         // Factures en attente
         $pendingInvoices = $invoiceRepo->findBy(['status' => 'pending'], ['createdAt' => 'DESC'], 5);
@@ -251,7 +252,7 @@ class HomeController extends AbstractController
         $orderRepo   = $em->getRepository(Order::class);
 
         // Devis en attente de signature
-        $pendingOrders = $orderRepo->findBy(['status' => 'a_signer'], ['createdAt' => 'DESC'], 5);
+        $pendingOrders = $orderRepo->findBy(['status' => OrderStatus::PENDING->value], ['createdAt' => 'DESC'], 5);
 
         // CA signé ce mois
         $monthlySignedRevenue = $orderRepo->getSignedRevenueForPeriod($currentMonth, $endMonth);

@@ -48,7 +48,10 @@ class SalesDashboardController extends AbstractController
         // KPI 4: Évolution du CA signé (mensuelle)
         $revenueEvolution = $orderRepository->getRevenueEvolution($startDate, $endDate);
 
-        // KPI 4: Somme de CA par statut (filtrée par période)
+        // KPI 5: Évolution du volume de devis créés (mensuel)
+        $volumeEvolution = $orderRepository->getCreatedOrdersVolumeEvolution($startDate, $endDate);
+
+        // KPI 6: Somme de CA par statut (filtrée par période)
         $statsByStatus = $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
 
         // Complément: Enrichir avec les labels et les devis manquants
@@ -67,7 +70,7 @@ class SalesDashboardController extends AbstractController
         $recentOrders = $orderRepository->getRecentOrders(5);
 
         // Préparer les données pour le graphique d'évolution
-        $evolutionData = $this->prepareEvolutionChartData($revenueEvolution, $startDate, $endDate);
+        $evolutionData = $this->prepareEvolutionChartData($revenueEvolution, $volumeEvolution, $startDate, $endDate);
 
         // Années disponibles pour le filtre
         $availableYears = $this->getAvailableYears($em);
@@ -102,22 +105,27 @@ class SalesDashboardController extends AbstractController
     /**
      * Prépare les données pour le graphique d'évolution mensuelle.
      */
-    private function prepareEvolutionChartData(array $revenueEvolution, DateTime $startDate, DateTime $endDate): array
+    private function prepareEvolutionChartData(array $revenueEvolution, array $volumeEvolution, DateTime $startDate, DateTime $endDate): array
     {
-        $labels = [];
-        $data   = [];
+        $labels      = [];
+        $revenueData = [];
+        $volumeData  = [];
 
         $currentMonth = clone $startDate;
         while ($currentMonth <= $endDate) {
             $monthKey = $currentMonth->format('Y-m');
             $labels[] = $currentMonth->format('M Y');
-            $data[]   = $revenueEvolution[$monthKey] ?? 0.0;
+
+            $revenueData[] = $revenueEvolution[$monthKey] ?? 0.0;
+            $volumeData[]  = $volumeEvolution[$monthKey]  ?? 0;
+
             $currentMonth->modify('+1 month');
         }
 
         return [
-            'labels' => $labels,
-            'data'   => $data,
+            'labels'       => $labels,
+            'revenue_data' => $revenueData,
+            'volume_data'  => $volumeData,
         ];
     }
 
