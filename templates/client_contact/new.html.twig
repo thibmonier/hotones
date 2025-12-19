@@ -3,62 +3,82 @@
 {% block title %}Nouveau contact{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-      <h4 class="mb-sm-0 font-size-18">Nouveau contact — {{ client.name }}</h4>
-      <div class="page-title-right">
-        <a href="{{ path('client_show', {id: client.id}) }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
-      </div>
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Nouveau contact',
+                breadcrumb: [
+                    {label: 'Clients', path: 'client_index'},
+                    {label: client.name, path: 'client_show', params: {id: client.id}},
+                    {label: 'Nouveau contact', path: null}
+                ],
+                actions: [
+                    {label: 'Retour au client', path: 'client_show', params: {id: client.id}, icon: 'bx-arrow-back', class: 'btn-outline-secondary'}
+                ]
+            } %}
+        </div>
     </div>
-  </div>
-</div>
 
-<form method="post">
-  <div class="card">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label class="form-label">Nom *</label>
-            <input type="text" class="form-control" name="last_name" required>
-          </div>
+    <form method="post">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-user me-2"></i>
+                            Informations du contact
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nom <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="last_name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Prénom <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="first_name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tél. fixe</label>
+                                    <input type="tel" class="form-control" name="phone">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Mobile</label>
+                                    <input type="tel" class="form-control" name="mobile_phone">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Poste</label>
+                            <input type="text" class="form-control" name="position_title">
+                        </div>
+                    </div>
+                </div>
+
+                {% include 'components/form_buttons.html.twig' with {
+                    submit_label: 'Créer le contact',
+                    cancel_route: 'client_show',
+                    cancel_params: {id: client.id}
+                } %}
+            </div>
         </div>
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label class="form-label">Prénom *</label>
-            <input type="text" class="form-control" name="first_name" required>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" name="email">
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="mb-3">
-            <label class="form-label">Tél. fixe</label>
-            <input type="text" class="form-control" name="phone">
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="mb-3">
-            <label class="form-label">Mobile</label>
-            <input type="text" class="form-control" name="mobile_phone">
-          </div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Poste</label>
-        <input type="text" class="form-control" name="position_title">
-      </div>
-      <div class="text-end">
-        <button type="submit" class="btn btn-primary"><i class="bx bx-save me-1"></i> Enregistrer</button>
-      </div>
-    </div>
-  </div>
-</form>
+    </form>
 {% endblock %}

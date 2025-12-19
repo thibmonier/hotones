@@ -37,6 +37,10 @@ Dans cet écran il faudrait montrer dans les encarts de chiffres :
 
 Il faudrait renommer "contributeur" par "collaborateur" dans l'application (l'entité peut rester telle quelle pour éviter les regressions de code)
 
+# homepage > dashboard direction
+
+Le bloc devis en attente ne s'affiche pas comme il faut, il faudrait l'afficher de la meme maniere que le dashboard commercial de la home
+
 # dashboard commercial (priorité haute)
 
 voir l'évolution du taux de conversion pour les commerciaux. Il est calculé entre les devis signés vs les devis perdus
