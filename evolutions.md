@@ -33,11 +33,11 @@ Dans cet écran il faudrait montrer dans les encarts de chiffres :
 - afficher un graphique représentant la consommation du projet dans le temps (par semaines ou par mois) montrant une ligne horizontale décrivant le budget du projet, une courbe montrant le budget consommé et une courbe montrant le budget prévisionnel à consommer
 - afficher un graphique sous forme de donut montrant la répartition du budget total entre la marge, les achats et le cout homme
 
-# Contributeurs dans l'application
+# Contributeurs dans l'application (priorité haute)
 
 Il faudrait renommer "contributeur" par "collaborateur" dans l'application (l'entité peut rester telle quelle pour éviter les regressions de code)
 
-# dashboard commercial
+# dashboard commercial (priorité haute)
 
 voir l'évolution du taux de conversion pour les commerciaux. Il est calculé entre les devis signés vs les devis perdus
 
@@ -46,7 +46,7 @@ prévoir un graphique montrant sur 3 axes :
 - l'évolution du CA signé (ordonnée 1 en courbe et k€)
 - le volume de  devis créés sur le mois (ordonnée 2 en histogramme et en k€)
 
-# créer une app mobile (au moins PWA) (priorité mineure)
+# créer une app mobile (au moins PWA) (priorité basse)
 
 Permettant de saisir des temps, de vois ses temps passés sur la semaine, de voir les temps restant à passer
 l'application devra permettre ensuite des fonctionnalités supplémentaires, mais pour le moment on reste sur quelque chose de simple
@@ -54,4 +54,9 @@ l'utilisateur devra pouvoir se connecter avec le même compte que le hotones
 
 # technique : designer les pages d'erreurs
 
+## pages d'erreur
 Il faudrait utiliser le thème pour les pages d'erreurs (à minima 5xx et 4xx) en s'inspirant des templates pages-404.html.twig et pages-500.html.twig en les adaptant aux adaptations du thème actuel
+
+## augmentation de la couverture des tests
+Il faudrait arriver à une couverture de tests automatisés de 80%
+
