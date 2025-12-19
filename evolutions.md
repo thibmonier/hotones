@@ -44,11 +44,14 @@ voir l'évolution du taux de conversion pour les commerciaux. Il est calculé en
 prévoir un graphique montrant sur 3 axes : 
 - le temps sur l'année en abscisse (mois par mois pourrait suffire)
 - l'évolution du CA signé (ordonnée 1 en courbe et k€)
-- l'évolution de la masse de devis créée (ordonnée 2 en histogramme et en k€)
-les 2 ordonnées risquent de ne pas correspondre sur les mêmes échelles
+- le volume de  devis créés sur le mois (ordonnée 2 en histogramme et en k€)
 
-# créer une app mobile (au moins PWA)
+# créer une app mobile (au moins PWA) (priorité mineure)
 
 Permettant de saisir des temps, de vois ses temps passés sur la semaine, de voir les temps restant à passer
 l'application devra permettre ensuite des fonctionnalités supplémentaires, mais pour le moment on reste sur quelque chose de simple
 l'utilisateur devra pouvoir se connecter avec le même compte que le hotones
+
+# technique : designer les pages d'erreurs
+
+Il faudrait utiliser le thème pour les pages d'erreurs (à minima 5xx et 4xx) en s'inspirant des templates pages-404.html.twig et pages-500.html.twig en les adaptant aux adaptations du thème actuel

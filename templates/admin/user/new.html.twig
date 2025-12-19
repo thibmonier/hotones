@@ -3,48 +3,61 @@
 {% block title %}Nouvel utilisateur{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-      <h4 class="mb-sm-0 font-size-18">Nouvel utilisateur</h4>
-      <div class="page-title-right">
-        <a href="{{ path('admin_users') }}" class="btn btn-secondary"><i class="bx bx-arrow-back me-1"></i> Retour</a>
-      </div>
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Nouvel utilisateur',
+                breadcrumb: [
+                    {label: 'Administration', path: null},
+                    {label: 'Utilisateurs', path: 'admin_users'},
+                    {label: 'Nouveau', path: null}
+                ],
+                actions: [
+                    {label: 'Retour à la liste', path: 'admin_users', icon: 'bx-arrow-back', class: 'btn-outline-secondary'}
+                ]
+            } %}
+        </div>
     </div>
-  </div>
-</div>
 
-<div class="row">
-  <div class="col-lg-6">
-    <div class="card">
-      <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-          <div class="mb-3">
-            <label for="first_name" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" required>
-          </div>
-          <div class="mb-3">
-            <label for="last_name" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" required>
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Mot de passe</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-          </div>
-          <div class="mb-3">
-            <label for="avatar" class="form-label">Avatar (optionnel)</label>
-            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
-          </div>
-          <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary"><i class="bx bx-save me-1"></i> Créer</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+    <form method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-user me-2"></i>
+                            Informations personnelles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">Prénom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="avatar" class="form-label">Avatar</label>
+                            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+
+                {% include 'components/form_buttons.html.twig' with {
+                    submit_label: 'Créer l\'utilisateur',
+                    cancel_route: 'admin_users'
+                } %}
+            </div>
+        </div>
+    </form>
 {% endblock %}
