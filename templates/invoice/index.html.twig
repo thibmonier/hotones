@@ -3,19 +3,18 @@
 {% block title %}Factures{% endblock %}
 
 {% block content %}
-    {{ component('breadcrumb', { title: 'Factures', pagetitle: 'Gestion' }) }}
     <div class="row">
         <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Factures</h4>
-                <div class="page-title-right">
-                    {% if is_granted('ROLE_COMPTA') %}
-                        <a href="{{ path('invoice_new') }}" class="btn btn-primary">
-                            <i class="bx bx-plus me-1"></i> Nouvelle facture
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
+            {% include 'components/page_header.html.twig' with {
+                title: 'Factures',
+                breadcrumb: [
+                    {label: 'Comptabilité', path: null},
+                    {label: 'Factures', path: null}
+                ],
+                actions: [
+                    {label: 'Nouvelle facture', path: 'invoice_new', icon: 'bx-plus', class: 'btn-primary', permission: 'ROLE_COMPTA'}
+                ]
+            } %}
         </div>
     </div>
 
@@ -172,14 +171,70 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Numéro</th>
-                                    <th>Client</th>
-                                    <th>Projet</th>
-                                    <th>Date d'émission</th>
-                                    <th>Date d'échéance</th>
-                                    <th>Statut</th>
-                                    <th class="text-end">Montant HT</th>
-                                    <th class="text-end">Montant TTC</th>
+                                    <th>
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'invoiceNumber', dir: sort == 'invoiceNumber' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Numéro
+                                            {% if sort == 'invoiceNumber' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'client', dir: sort == 'client' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Client
+                                            {% if sort == 'client' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'project', dir: sort == 'project' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Projet
+                                            {% if sort == 'project' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'issuedAt', dir: sort == 'issuedAt' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Date d'émission
+                                            {% if sort == 'issuedAt' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'dueDate', dir: sort == 'dueDate' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Date d'échéance
+                                            {% if sort == 'dueDate' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'status', dir: sort == 'status' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Statut
+                                            {% if sort == 'status' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th class="text-end">
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'amountHt', dir: sort == 'amountHt' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Montant HT
+                                            {% if sort == 'amountHt' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th class="text-end">
+                                        <a href="{{ path('invoice_index', filters_query|merge({ sort: 'amountTtc', dir: sort == 'amountTtc' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Montant TTC
+                                            {% if sort == 'amountTtc' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -241,40 +296,13 @@
 
                     {# Pagination #}
                     {% if pagination.total_pages > 1 %}
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="text-muted small">
-                                Page {{ pagination.current_page }} sur {{ pagination.total_pages }} ({{ pagination.total }} facture{{ pagination.total > 1 ? 's' : '' }})
-                            </div>
-                            <nav>
-                                <ul class="pagination mb-0">
-                                    {% if pagination.has_prev %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ path('invoice_index', filters_query|merge({page: pagination.current_page - 1})) }}">
-                                                <i class="bx bx-chevron-left"></i>
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                    {% for p in 1..pagination.total_pages %}
-                                        {% if p == pagination.current_page %}
-                                            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
-                                        {% elseif p == 1 or p == pagination.total_pages or (p >= pagination.current_page - 2 and p <= pagination.current_page + 2) %}
-                                            <li class="page-item">
-                                                <a class="page-link" href="{{ path('invoice_index', filters_query|merge({page: p})) }}">{{ p }}</a>
-                                            </li>
-                                        {% elseif p == pagination.current_page - 3 or p == pagination.current_page + 3 %}
-                                            <li class="page-item disabled"><span class="page-link">...</span></li>
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% if pagination.has_next %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ path('invoice_index', filters_query|merge({page: pagination.current_page + 1})) }}">
-                                                <i class="bx bx-chevron-right"></i>
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </nav>
-                        </div>
+                        {% include 'components/pagination.html.twig' with {
+                            currentPage: pagination.current_page,
+                            totalPages: pagination.total_pages,
+                            itemsPerPage: pagination.per_page,
+                            totalItems: pagination.total,
+                            queryParams: filters_query|default({})
+                        } %}
                     {% endif %}
                 </div>
             </div>

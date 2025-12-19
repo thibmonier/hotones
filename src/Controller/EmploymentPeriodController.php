@@ -25,15 +25,46 @@ class EmploymentPeriodController extends AbstractController
     #[Route('', name: 'employment_period_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator, ContributorRepository $contributorRepository): Response
     {
+        $session = $request->getSession();
+        $reset   = (bool) $request->query->get('reset', false);
+        if ($reset) {
+            $session->remove('employment_period_filters');
+
+            return $this->redirectToRoute('employment_period_index');
+        }
+
+        // Charger filtres depuis la session si aucun filtre explicite n'est fourni
+        $queryAll   = $request->query->all();
+        $filterKeys = ['contributor', 'status', 'per_page', 'sort', 'dir'];
+        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved      = $session->has('employment_period_filters') ? (array) $session->get('employment_period_filters') : [];
+
         // Filtres
-        $contributorId = $request->query->get('contributor', '');
-        $status        = $request->query->get('status', '');
+        $contributorId = $hasFilter ? ($request->query->get('contributor') ?: '') : ($saved['contributor'] ?? '');
+        $status        = $hasFilter ? ($request->query->get('status') ?: '') : ($saved['status'] ?? '');
+
+        // Tri
+        $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'startDate')) : ($saved['sort'] ?? 'startDate');
+        $dir  = $hasFilter ? ($request->query->get('dir') ?: ($saved['dir'] ?? 'DESC')) : ($saved['dir'] ?? 'DESC');
+
+        // Pagination
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPageParam   = (int) ($hasFilter ? ($request->query->get('per_page', 25)) : ($saved['per_page'] ?? 25));
+        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
+
+        // Sauvegarder en session
+        $session->set('employment_period_filters', [
+            'contributor' => $contributorId,
+            'status'      => $status,
+            'per_page'    => $perPage,
+            'sort'        => $sort,
+            'dir'         => $dir,
+        ]);
 
         // Query builder avec filtres
         $qb = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
-            ->addSelect('c')
-            ->orderBy('ep.startDate', 'DESC');
+            ->addSelect('c');
 
         if ($contributorId) {
             $qb->andWhere('ep.contributor = :contributor')
@@ -48,11 +79,23 @@ class EmploymentPeriodController extends AbstractController
                 ->setParameter('today', new DateTime());
         }
 
+        // Tri
+        $validSortFields = [
+            'contributor' => 'c.lastName',
+            'startDate'   => 'ep.startDate',
+            'salary'      => 'ep.salary',
+            'cjm'         => 'ep.cjm',
+            'tjm'         => 'ep.tjm',
+        ];
+        $sortField = $validSortFields[$sort] ?? 'ep.startDate';
+        $sortDir   = strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC';
+        $qb->orderBy($sortField, $sortDir);
+
         // Pagination
         $pagination = $paginator->paginate(
             $qb->getQuery(),
             $request->query->getInt('page', 1),
-            $request->query->getInt('per_page', 25),
+            $perPage,
         );
 
         $contributors = $contributorRepository->findActiveContributors();
@@ -64,6 +107,8 @@ class EmploymentPeriodController extends AbstractController
                 'contributor' => $contributorId,
                 'status'      => $status,
             ],
+            'sort' => $sort,
+            'dir'  => $dir,
         ]);
     }
 

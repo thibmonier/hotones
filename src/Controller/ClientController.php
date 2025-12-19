@@ -22,13 +22,44 @@ class ClientController extends AbstractController
     #[Route('', name: 'client_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
-        // Filtres
-        $search       = $request->query->get('search', '');
-        $serviceLevel = $request->query->get('service_level', '');
+        $session = $request->getSession();
+        $reset   = (bool) $request->query->get('reset', false);
+        if ($reset) {
+            $session->remove('client_filters');
 
-        // Query builder avec filtres
-        $qb = $em->getRepository(Client::class)->createQueryBuilder('c')
-            ->orderBy('c.name', 'ASC');
+            return $this->redirectToRoute('client_index');
+        }
+
+        // Charger filtres depuis la session si aucun filtre explicite n'est fourni
+        $queryAll   = $request->query->all();
+        $filterKeys = ['search', 'service_level', 'per_page', 'sort', 'dir'];
+        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved      = $session->has('client_filters') ? (array) $session->get('client_filters') : [];
+
+        // Filtres
+        $search       = $hasFilter ? ($request->query->get('search') ?: '') : ($saved['search'] ?? '');
+        $serviceLevel = $hasFilter ? ($request->query->get('service_level') ?: '') : ($saved['service_level'] ?? '');
+
+        // Tri
+        $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'name')) : ($saved['sort'] ?? 'name');
+        $dir  = $hasFilter ? ($request->query->get('dir') ?: ($saved['dir'] ?? 'ASC')) : ($saved['dir'] ?? 'ASC');
+
+        // Pagination
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPageParam   = (int) ($hasFilter ? ($request->query->get('per_page', 25)) : ($saved['per_page'] ?? 25));
+        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
+
+        // Sauvegarder en session
+        $session->set('client_filters', [
+            'search'        => $search,
+            'service_level' => $serviceLevel,
+            'per_page'      => $perPage,
+            'sort'          => $sort,
+            'dir'           => $dir,
+        ]);
+
+        // Query builder avec filtres et tri
+        $qb = $em->getRepository(Client::class)->createQueryBuilder('c');
 
         if ($search) {
             $qb->andWhere('c.name LIKE :search OR c.website LIKE :search OR c.description LIKE :search')
@@ -40,11 +71,17 @@ class ClientController extends AbstractController
                 ->setParameter('serviceLevel', $serviceLevel);
         }
 
+        // Tri
+        $validSortFields = ['name' => 'c.name', 'serviceLevel' => 'c.serviceLevel'];
+        $sortField       = $validSortFields[$sort] ?? 'c.name';
+        $sortDir         = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $qb->orderBy($sortField, $sortDir);
+
         // Pagination
         $pagination = $paginator->paginate(
             $qb->getQuery(),
             $request->query->getInt('page', 1),
-            $request->query->getInt('per_page', 25),
+            $perPage,
         );
 
         return $this->render('client/index.html.twig', [
@@ -53,6 +90,8 @@ class ClientController extends AbstractController
                 'search'        => $search,
                 'service_level' => $serviceLevel,
             ],
+            'sort' => $sort,
+            'dir'  => $dir,
         ]);
     }
 
