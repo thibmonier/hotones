@@ -1,0 +1,494 @@
+{# Marvin chatbot widget - Accessible depuis toutes les pages #}
+<div id="marvin-widget">
+    {# Bouton flottant #}
+    <button id="marvin-toggle-btn" class="marvin-float-btn" aria-label="Ouvrir Marvin - Assistant IA">
+        <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">
+        <span class="marvin-badge" id="marvin-notification-badge" style="display: none;">1</span>
+    </button>
+
+    {# Fenêtre de chat #}
+    <div id="marvin-chat-window" class="marvin-chat-window" style="display: none;">
+        <div class="marvin-chat-header">
+            <div class="marvin-header-left">
+                <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin" class="marvin-header-avatar">
+                <div class="marvin-header-info">
+                    <h6 class="mb-0">Marvin</h6>
+                    <small class="text-muted">Assistant IA</small>
+                </div>
+            </div>
+            <div class="marvin-header-actions">
+                <button id="marvin-minimize-btn" class="btn btn-sm btn-link text-white" title="Réduire">
+                    <i class="bx bx-minus"></i>
+                </button>
+                <button id="marvin-close-btn" class="btn btn-sm btn-link text-white" title="Fermer">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="marvin-chat-body" id="marvin-chat-body">
+            <div class="marvin-welcome-msg">
+                <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin" class="marvin-welcome-avatar">
+                <p class="mb-1"><strong>*Soupir*... Encore quelqu'un qui a besoin d'aide...</strong></p>
+                <small class="text-muted">
+                    J'ai un cerveau de la taille d'une planète et on me demande de chatter.<br>
+                    Mais bon... posez votre question.
+                </small>
+            </div>
+        </div>
+
+        <div class="marvin-chat-footer">
+            <form id="marvin-widget-form">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="marvin-widget-input"
+                        class="form-control"
+                        placeholder="Posez votre question..."
+                        autocomplete="off"
+                    >
+                    <button type="submit" id="marvin-widget-send-btn" class="btn btn-primary">
+                        <i class="bx bx-send"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Bouton flottant */
+    .marvin-float-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 3px solid #fff;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        cursor: pointer;
+        z-index: 999;
+        transition: all 0.3s ease;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .marvin-float-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .marvin-float-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .marvin-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: bold;
+        border: 2px solid #fff;
+    }
+
+    /* Fenêtre de chat */
+    .marvin-chat-window {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 380px;
+        height: 550px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .marvin-chat-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .marvin-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .marvin-header-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .marvin-header-info h6 {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .marvin-header-info small {
+        font-size: 11px;
+        opacity: 0.9;
+    }
+
+    .marvin-header-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .marvin-header-actions .btn-link {
+        padding: 4px 8px;
+        opacity: 0.9;
+    }
+
+    .marvin-header-actions .btn-link:hover {
+        opacity: 1;
+    }
+
+    .marvin-chat-body {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #f7fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .marvin-welcome-msg {
+        text-align: center;
+        padding: 20px;
+        color: #718096;
+    }
+
+    .marvin-welcome-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        opacity: 0.8;
+    }
+
+    .marvin-message {
+        display: flex;
+        gap: 8px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .marvin-message.user {
+        flex-direction: row-reverse;
+    }
+
+    .marvin-message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+    .marvin-message-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .marvin-message.bot .marvin-message-avatar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 2px solid #4a5568;
+    }
+
+    .marvin-message.user .marvin-message-avatar {
+        background: #48bb78;
+        color: white;
+    }
+
+    .marvin-message-content {
+        max-width: 75%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .marvin-message.bot .marvin-message-content {
+        background: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .marvin-message.user .marvin-message-content {
+        background: #48bb78;
+        color: white;
+    }
+
+    .marvin-typing-indicator {
+        display: none;
+        padding: 10px 12px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        width: fit-content;
+    }
+
+    .marvin-typing-indicator.active {
+        display: block;
+    }
+
+    .marvin-typing-indicator span {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: #667eea;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+
+    .marvin-typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .marvin-typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+        30% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    .marvin-chat-footer {
+        padding: 12px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .marvin-chat-footer .input-group {
+        gap: 8px;
+    }
+
+    .marvin-chat-footer .form-control {
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    .marvin-chat-footer .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .marvin-chat-footer .btn {
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+
+    .marvin-chat-footer .btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .marvin-chat-window {
+            width: calc(100vw - 40px);
+            height: calc(100vh - 120px);
+            bottom: 90px;
+            right: 20px;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        const toggleBtn = document.getElementById('marvin-toggle-btn');
+        const chatWindow = document.getElementById('marvin-chat-window');
+        const closeBtn = document.getElementById('marvin-close-btn');
+        const minimizeBtn = document.getElementById('marvin-minimize-btn');
+        const chatBody = document.getElementById('marvin-chat-body');
+        const form = document.getElementById('marvin-widget-form');
+        const input = document.getElementById('marvin-widget-input');
+        const sendBtn = document.getElementById('marvin-widget-send-btn');
+
+        let isOpen = false;
+        let conversationHistory = [];
+
+        // Créer l'indicateur de frappe
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'marvin-message bot';
+        typingIndicator.innerHTML = `
+            <div class="marvin-message-avatar">
+                <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">
+            </div>
+            <div class="marvin-typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+
+        // Toggle chat window
+        toggleBtn.addEventListener('click', () => {
+            isOpen = !isOpen;
+            chatWindow.style.display = isOpen ? 'flex' : 'none';
+            if (isOpen) {
+                input.focus();
+            }
+        });
+
+        // Close button
+        closeBtn.addEventListener('click', () => {
+            isOpen = false;
+            chatWindow.style.display = 'none';
+        });
+
+        // Minimize button
+        minimizeBtn.addEventListener('click', () => {
+            isOpen = false;
+            chatWindow.style.display = 'none';
+        });
+
+        // Ajouter un message
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `marvin-message ${isUser ? 'user' : 'bot'}`;
+
+            const avatarContent = isUser
+                ? '👤'
+                : '<img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">';
+
+            messageDiv.innerHTML = `
+                <div class="marvin-message-avatar">${avatarContent}</div>
+                <div class="marvin-message-content">${escapeHtml(content)}</div>
+            `;
+
+            // Supprimer le message de bienvenue si présent
+            const welcomeMsg = chatBody.querySelector('.marvin-welcome-msg');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Stocker dans l'historique
+            conversationHistory.push({ role: isUser ? 'user' : 'assistant', content });
+        }
+
+        function showTyping() {
+            const welcomeMsg = chatBody.querySelector('.marvin-welcome-msg');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+            chatBody.appendChild(typingIndicator);
+            typingIndicator.querySelector('.marvin-typing-indicator').classList.add('active');
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.querySelector('.marvin-typing-indicator').classList.remove('active');
+            if (typingIndicator.parentNode) {
+                typingIndicator.parentNode.removeChild(typingIndicator);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        // Soumettre le formulaire
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Désactiver l'input
+            input.disabled = true;
+            sendBtn.disabled = true;
+
+            // Ajouter le message de l'utilisateur
+            addMessage(message, true);
+            input.value = '';
+
+            // Afficher l'indicateur de frappe
+            showTyping();
+
+            try {
+                const response = await fetch('{{ path('chatbot_message') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                hideTyping();
+
+                if (data.error) {
+                    addMessage('*Soupir*... Une erreur est survenue. Évidemment. (' + data.error + ')', false);
+                } else {
+                    addMessage(data.message, false);
+                }
+            } catch (error) {
+                hideTyping();
+                addMessage('*Soupir profond*... Je savais que ça ne marcherait pas.', false);
+                console.error('Erreur:', error);
+            } finally {
+                // Réactiver l'input
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        });
+    })();
+</script>

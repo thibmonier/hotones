@@ -103,6 +103,11 @@
 
         {% block javascripts %}{% endblock %}
 
+        {# Marvin chatbot widget - Accessible sur toutes les pages #}
+        {% if is_granted('ROLE_USER') %}
+            {% include 'components/marvin_widget.html.twig' %}
+        {% endif %}
+
         {% endblock %}
     </body>
 </html>

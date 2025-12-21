@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Exception;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +19,7 @@ class ChatbotController extends AbstractController
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
+        private readonly string $anthropicApiKey,
     ) {
     }
 
@@ -42,22 +42,15 @@ class ChatbotController extends AbstractController
         }
 
         try {
-            // Configuration de l'API Claude (Anthropic)
-            $apiKey = $_ENV['ANTHROPIC_API_KEY'] ?? '';
-
-            if (empty($apiKey)) {
-                throw new RuntimeException('ANTHROPIC_API_KEY not configured');
-            }
-
             // Appel à l'API Claude avec la personnalité de Marvin
             $response = $this->httpClient->request('POST', 'https://api.anthropic.com/v1/messages', [
                 'headers' => [
-                    'x-api-key'         => $apiKey,
+                    'x-api-key'         => $this->anthropicApiKey,
                     'anthropic-version' => '2023-06-01',
                     'content-type'      => 'application/json',
                 ],
                 'json' => [
-                    'model'      => 'claude-3-5-sonnet-20241022',
+                    'model'      => 'claude-3-haiku-20240307',
                     'max_tokens' => 1024,
                     'system'     => $this->getMarvinSystemPrompt(),
                     'messages'   => [
