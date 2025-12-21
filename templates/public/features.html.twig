@@ -97,23 +97,30 @@
                     <div class="feature-icon mb-4">
                         <i class="bx bx-line-chart"></i>
                     </div>
-                    <h2 class="mb-4">Analytics & Rentabilité</h2>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <h2 class="mb-0">Analytics & Rentabilité</h2>
+                        <span class="badge bg-primary">Unique</span>
+                    </div>
                     <p class="text-muted mb-4">
-                        Visualisez la rentabilité réelle de chaque projet avec des KPIs précis.
-                        Tableaux de bord détaillés pour piloter votre activité.
+                        <strong>Seul outil pour agences utilisant un schéma en étoile (star schema)</strong> comme les plateformes BI professionnelles.
+                        KPIs pré-calculés pour des performances 100x supérieures au calcul temps réel.
                     </p>
                     <ul class="list-unstyled">
                         <li class="mb-3">
                             <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
-                            <strong>Calcul automatique</strong> - Marge, CA, coûts calculés en temps réel
+                            <strong>Schéma en étoile</strong> - Architecture data warehouse avec FactProjectMetrics et FactStaffingMetrics
                         </li>
                         <li class="mb-3">
                             <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
-                            <strong>Tableaux de bord</strong> - Analytics, commercial, staffing, RH
+                            <strong>Recalcul automatisé</strong> - Metrics recalculés quotidiennement via scheduler Symfony
                         </li>
                         <li class="mb-3">
                             <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
-                            <strong>Export Excel</strong> - Exportez vos données pour vos analyses
+                            <strong>4 dashboards spécialisés</strong> - Analytics, Commercial, Staffing, Profitabilité
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2 font-size-20"></i>
+                            <strong>Export Excel enrichi</strong> - Multi-feuilles avec graphiques et analyses
                         </li>
                     </ul>
                     <a href="{{ path('public_features_analytics') }}" class="btn btn-primary-custom">
@@ -252,9 +259,12 @@
                     <div class="mb-3">
                         <i class="bx bx-trophy font-size-40 text-primary"></i>
                     </div>
-                    <h5>Gamification</h5>
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                        <h5 class="mb-0">Gamification</h5>
+                        <span class="badge bg-success" style="font-size: 0.65rem;">Unique</span>
+                    </div>
                     <p class="text-muted small">
-                        Badges, leaderboard pour motiver vos équipes
+                        Badges, XP, leaderboards - système complet pour motiver vos équipes
                     </p>
                 </div>
             </div>

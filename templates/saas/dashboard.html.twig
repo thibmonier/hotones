@@ -1,0 +1,282 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Abonnements SaaS - Dashboard{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Abonnements SaaS',
+                breadcrumb: [
+                    {label: 'Gestion', path: null},
+                    {label: 'Abonnements SaaS', path: null}
+                ],
+                actions: [
+                    {label: 'Gérer les abonnements', path: 'saas_subscription_index', icon: 'bx-list-ul', class: 'btn-primary', permission: 'ROLE_ADMIN'}
+                ]
+            } %}
+        </div>
+    </div>
+
+    {# KPIs #}
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-truncate font-size-14 mb-2">Abonnements actifs</p>
+                            <h4 class="mb-0">{{ stats.total_active }}</h4>
+                        </div>
+                        <div class="text-primary">
+                            <i class="bx bx-check-circle font-size-24"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-top py-3">
+                    <div class="text-truncate">
+                        <span class="text-muted">Total</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-truncate font-size-14 mb-2">Coût mensuel</p>
+                            <h4 class="mb-0">{{ stats.monthly_cost|number_format(2, ',', ' ') }}€</h4>
+                        </div>
+                        <div class="text-info">
+                            <i class="bx bx-euro font-size-24"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-top py-3">
+                    <div class="text-truncate">
+                        <span class="text-muted">Par mois</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-truncate font-size-14 mb-2">Coût annuel</p>
+                            <h4 class="mb-0">{{ stats.yearly_cost|number_format(2, ',', ' ') }}€</h4>
+                        </div>
+                        <div class="text-success">
+                            <i class="bx bx-dollar-circle font-size-24"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-top py-3">
+                    <div class="text-truncate">
+                        <span class="text-muted">Par an</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-truncate font-size-14 mb-2">À renouveler</p>
+                            <h4 class="mb-0">{{ stats.due_for_renewal }}</h4>
+                        </div>
+                        <div class="text-warning">
+                            <i class="bx bx-bell font-size-24"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-top py-3">
+                    <div class="text-truncate">
+                        <span class="text-muted">En attente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# Abonnements à renouveler #}
+        {% if due_for_renewal is not empty %}
+        <div class="col-xl-6">
+            <div class="card border-warning">
+                <div class="card-header bg-warning bg-soft">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-bell me-2"></i>
+                        À renouveler
+                        <span class="badge bg-warning ms-2">{{ due_for_renewal|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for subscription in due_for_renewal|slice(0, 5) %}
+                            <div class="list-group-item px-0 {% if not loop.last %}border-bottom{% endif %}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">
+                                            <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="text-dark">
+                                                {{ subscription.displayName }}
+                                            </a>
+                                        </h6>
+                                        <p class="text-muted font-size-13 mb-0">
+                                            {{ subscription.billingPeriod == 'monthly' ? 'Mensuel' : 'Annuel' }} •
+                                            <strong>{{ subscription.price|number_format(2, ',', ' ') }}€</strong>
+                                        </p>
+                                        <small class="text-muted">
+                                            <i class="bx bx-calendar"></i>
+                                            {{ subscription.nextRenewalDate|date('d/m/Y') }}
+                                        </small>
+                                    </div>
+                                    <div class="flex-shrink-0 ms-2">
+                                        <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-warning">
+                                            <i class="bx bx-show"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if due_for_renewal|length > 5 %}
+                        <div class="text-center mt-3 pt-2 border-top">
+                            <a href="{{ path('saas_subscription_index') }}" class="btn btn-sm btn-warning">
+                                Voir tous <i class="bx bx-right-arrow-alt ms-1"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# Abonnements expirant bientôt #}
+        {% if expiring_subscriptions is not empty %}
+        <div class="col-xl-6">
+            <div class="card border-info">
+                <div class="card-header bg-info bg-soft">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-time-five me-2"></i>
+                        Expirent dans 30 jours
+                        <span class="badge bg-info ms-2">{{ expiring_subscriptions|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for subscription in expiring_subscriptions|slice(0, 5) %}
+                            <div class="list-group-item px-0 {% if not loop.last %}border-bottom{% endif %}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">
+                                            <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="text-dark">
+                                                {{ subscription.displayName }}
+                                            </a>
+                                        </h6>
+                                        <p class="text-muted font-size-13 mb-0">
+                                            {{ subscription.billingPeriod == 'monthly' ? 'Mensuel' : 'Annuel' }} •
+                                            <strong>{{ subscription.price|number_format(2, ',', ' ') }}€</strong>
+                                        </p>
+                                        <small class="text-muted">
+                                            <i class="bx bx-calendar"></i>
+                                            {{ subscription.nextRenewalDate|date('d/m/Y') }}
+                                        </small>
+                                    </div>
+                                    <div class="flex-shrink-0 ms-2">
+                                        <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-info">
+                                            <i class="bx bx-show"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if expiring_subscriptions|length > 5 %}
+                        <div class="text-center mt-3 pt-2 border-top">
+                            <a href="{{ path('saas_subscription_index') }}" class="btn btn-sm btn-info">
+                                Voir tous <i class="bx bx-right-arrow-alt ms-1"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Liste des abonnements actifs #}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            Tous les abonnements actifs
+                        </h5>
+                        <a href="{{ path('saas_subscription_index') }}" class="btn btn-sm btn-primary">
+                            Voir tous <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Facturation</th>
+                                    <th>Prix</th>
+                                    <th>Coût mensuel</th>
+                                    <th>Prochain renouvellement</th>
+                                    <th>Auto-renouvellement</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subscription in active_subscriptions %}
+                                    <tr>
+                                        <td>
+                                            <h6 class="mb-0">{{ subscription.displayName }}</h6>
+                                            {% if subscription.service.provider %}
+                                                <small class="text-muted">{{ subscription.service.provider.name }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ subscription.billingPeriod == 'monthly' ? 'info' : 'primary' }}">
+                                                {{ subscription.billingPeriod == 'monthly' ? 'Mensuel' : 'Annuel' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ subscription.price|number_format(2, ',', ' ') }}€</td>
+                                        <td>{{ subscription.monthlyCost|number_format(2, ',', ' ') }}€</td>
+                                        <td>{{ subscription.nextRenewalDate|date('d/m/Y') }}</td>
+                                        <td>
+                                            <i class="bx bx{{ subscription.autoRenewal ? 'x-check text-success' : '-x text-danger' }}"></i>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bx bx-show"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            <p>Aucun abonnement actif</p>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

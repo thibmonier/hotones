@@ -1,0 +1,269 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}{{ subscription.displayName }} - Abonnement SaaS{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: subscription.displayName,
+                breadcrumb: [
+                    {label: 'Gestion', path: null},
+                    {label: 'Abonnements SaaS', path: 'saas_dashboard'},
+                    {label: 'Liste', path: 'saas_subscription_index'},
+                    {label: subscription.displayName, path: null}
+                ],
+                actions: [
+                    {label: 'Modifier', path: 'saas_subscription_edit', params: {id: subscription.id}, icon: 'bx-edit', class: 'btn-primary', permission: 'ROLE_ADMIN'}
+                ]
+            } %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width: 200px;">Service</th>
+                                <td>
+                                    <strong>{{ subscription.service.name }}</strong>
+                                    {% if subscription.service.provider %}
+                                        <br>
+                                        <small class="text-muted">Fournisseur: {{ subscription.service.provider.name }}</small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if subscription.customName %}
+                            <tr>
+                                <th class="text-muted">Nom personnalisé</th>
+                                <td>{{ subscription.customName }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th class="text-muted">Statut</th>
+                                <td>
+                                    {% set statusClass = {
+                                        'active': 'success',
+                                        'cancelled': 'danger',
+                                        'suspended': 'warning',
+                                        'expired': 'secondary'
+                                    } %}
+                                    <span class="badge bg-{{ statusClass[subscription.status] ?? 'secondary' }}">
+                                        {{ subscription.status == 'active' ? 'Actif' :
+                                           (subscription.status == 'cancelled' ? 'Annulé' :
+                                           (subscription.status == 'suspended' ? 'Suspendu' : 'Expiré')) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Période de facturation</th>
+                                <td>
+                                    <span class="badge bg-{{ subscription.billingPeriod == 'monthly' ? 'info' : 'primary' }}">
+                                        {{ subscription.billingPeriod == 'monthly' ? 'Mensuel' : 'Annuel' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Prix unitaire</th>
+                                <td>
+                                    <strong>{{ subscription.price|number_format(2, ',', ' ') }} {{ subscription.currency }}</strong>
+                                    {% if subscription.billingPeriod == 'monthly' %}
+                                        <span class="badge bg-info ms-2">par mois</span>
+                                    {% else %}
+                                        <span class="badge bg-primary ms-2">par an</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Quantité / Licences</th>
+                                <td>{{ subscription.quantity }}</td>
+                            </tr>
+                            <tr class="table-active">
+                                <th class="text-muted">
+                                    <i class="bx bx-calculator"></i> Coût mensuel calculé
+                                </th>
+                                <td class="text-info">
+                                    <strong class="fs-5">{{ subscription.monthlyCost|number_format(2, ',', ' ') }}€</strong>
+                                    <small class="text-muted d-block">
+                                        {% if subscription.billingPeriod == 'monthly' %}
+                                            = {{ subscription.price }} × {{ subscription.quantity }}
+                                        {% else %}
+                                            = ({{ subscription.price }} × {{ subscription.quantity }}) ÷ 12
+                                        {% endif %}
+                                    </small>
+                                </td>
+                            </tr>
+                            <tr class="table-active">
+                                <th class="text-muted">
+                                    <i class="bx bx-calculator"></i> Coût annuel calculé
+                                </th>
+                                <td class="text-success">
+                                    <strong class="fs-5">{{ subscription.yearlyCost|number_format(2, ',', ' ') }}€</strong>
+                                    <small class="text-muted d-block">
+                                        {% if subscription.billingPeriod == 'monthly' %}
+                                            = ({{ subscription.price }} × {{ subscription.quantity }}) × 12
+                                        {% else %}
+                                            = {{ subscription.price }} × {{ subscription.quantity }}
+                                        {% endif %}
+                                    </small>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dates</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width: 200px;">Date de début</th>
+                                <td>{{ subscription.startDate|date('d/m/Y') }}</td>
+                            </tr>
+                            {% if subscription.endDate %}
+                            <tr>
+                                <th class="text-muted">Date de fin</th>
+                                <td class="text-danger">{{ subscription.endDate|date('d/m/Y') }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th class="text-muted">Prochain renouvellement</th>
+                                <td class="text-warning">
+                                    <strong>{{ subscription.nextRenewalDate|date('d/m/Y') }}</strong>
+                                </td>
+                            </tr>
+                            {% if subscription.lastRenewalDate %}
+                            <tr>
+                                <th class="text-muted">Dernier renouvellement</th>
+                                <td>{{ subscription.lastRenewalDate|date('d/m/Y') }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th class="text-muted">Renouvellement automatique</th>
+                                <td>
+                                    {% if subscription.autoRenewal %}
+                                        <i class="bx bxs-check-circle text-success"></i> Activé
+                                    {% else %}
+                                        <i class="bx bxs-x-circle text-danger"></i> Désactivé
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if subscription.notes or subscription.externalReference %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations complémentaires</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            {% if subscription.externalReference %}
+                            <tr>
+                                <th class="text-muted" style="width: 200px;">Référence externe</th>
+                                <td>{{ subscription.externalReference }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if subscription.notes %}
+                            <tr>
+                                <th class="text-muted align-top">Notes</th>
+                                <td>{{ subscription.notes|nl2br }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if subscription.isActive %}
+                            <form method="post" action="{{ path('saas_subscription_renew', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer le renouvellement de cet abonnement ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('renew' ~ subscription.id) }}">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bx bx-refresh"></i> Renouveler maintenant
+                                </button>
+                            </form>
+
+                            <form method="post" action="{{ path('saas_subscription_suspend', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la suspension de cet abonnement ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('suspend' ~ subscription.id) }}">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="bx bx-pause"></i> Suspendre
+                                </button>
+                            </form>
+
+                            <form method="post" action="{{ path('saas_subscription_cancel', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer l\'annulation de cet abonnement ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ subscription.id) }}">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="bx bx-x"></i> Annuler
+                                </button>
+                            </form>
+                        {% elseif subscription.status == 'suspended' or subscription.status == 'cancelled' %}
+                            <form method="post" action="{{ path('saas_subscription_reactivate', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la réactivation de cet abonnement ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('reactivate' ~ subscription.id) }}">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bx bx-check"></i> Réactiver
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <hr>
+
+                        <a href="{{ path('saas_subscription_edit', {id: subscription.id}) }}" class="btn btn-primary w-100">
+                            <i class="bx bx-edit"></i> Modifier
+                        </a>
+
+                        <form method="post" action="{{ path('saas_subscription_delete', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la suppression définitive de cet abonnement ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ subscription.id) }}">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="bx bx-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Métadonnées</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted">Créé le</th>
+                                <td class="text-end">{{ subscription.createdAt|date('d/m/Y H:i') }}</td>
+                            </tr>
+                            {% if subscription.updatedAt %}
+                            <tr>
+                                <th class="text-muted">Modifié le</th>
+                                <td class="text-end">{{ subscription.updatedAt|date('d/m/Y H:i') }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

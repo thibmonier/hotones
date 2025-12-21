@@ -1,0 +1,347 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lead: {{ lead.fullName }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Détail du Lead</h4>
+
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('dashboard_index') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('admin_crm_statistics') }}">CRM</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('admin_crm_leads_index') }}">Leads</a></li>
+                        <li class="breadcrumb-item active">{{ lead.fullName }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# Colonne gauche - Informations du lead #}
+        <div class="col-xl-8">
+            {# Informations principales #}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Informations du Lead</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="width: 200px;">Nom complet</th>
+                                    <td><strong>{{ lead.fullName }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Email</th>
+                                    <td>
+                                        <a href="mailto:{{ lead.email }}">{{ lead.email }}</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Entreprise</th>
+                                    <td>{{ lead.company ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Téléphone</th>
+                                    <td>{{ lead.phone ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Source</th>
+                                    <td><span class="badge bg-secondary">{{ lead.source }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Type de contenu</th>
+                                    <td>{{ lead.contentType }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Date de création</th>
+                                    <td>{{ lead.createdAt|date('d/m/Y à H:i') }} ({{ lead.daysSinceCreation }} jours)</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Consentement marketing</th>
+                                    <td>
+                                        {% if lead.hasMarketingConsent %}
+                                            <span class="badge bg-success"><i class="bx bx-check"></i> Oui</span>
+                                        {% else %}
+                                            <span class="badge bg-danger"><i class="bx bx-x"></i> Non</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Téléchargement</th>
+                                    <td>
+                                        {% if lead.hasDownloaded %}
+                                            <span class="badge bg-success">
+                                                <i class="bx bx-check"></i> Téléchargé {{ lead.downloadCount }} fois
+                                            </span><br>
+                                            <small class="text-muted">{{ lead.downloadedAt|date('d/m/Y à H:i') }}</small>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pas encore téléchargé</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# Timeline #}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Timeline de Communication</h4>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for event in timeline %}
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-{{ event.color }}">
+                                <i class="bx {{ event.icon }}"></i>
+                            </div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h5 class="timeline-title">{{ event.title }}</h5>
+                                    <p class="text-muted mb-0">
+                                        <small><i class="bx bx-time-five align-middle"></i> {{ event.date|date('d/m/Y à H:i') }}</small>
+                                    </p>
+                                </div>
+                                <div class="timeline-body">
+                                    <p class="mb-0">{{ event.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {# Notes internes #}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Notes Internes</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('admin_crm_leads_update_notes', {id: lead.id}) }}">
+                        <div class="mb-3">
+                            <textarea class="form-control" name="notes" rows="5"
+                                      placeholder="Ajouter des notes internes sur ce lead...">{{ lead.internalNotes }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i> Enregistrer les notes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Colonne droite - Actions et statut #}
+        <div class="col-xl-4">
+            {# Statut #}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Statut du Lead</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('admin_crm_leads_update_status', {id: lead.id}) }}">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Changer le statut</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Nouveau</option>
+                                <option value="nurturing" {% if lead.status == 'nurturing' %}selected{% endif %}>En nurturing</option>
+                                <option value="qualified" {% if lead.status == 'qualified' %}selected{% endif %}>Qualifié</option>
+                                <option value="converted" {% if lead.status == 'converted' %}selected{% endif %}>Converti</option>
+                                <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>Perdu</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bx bx-save me-1"></i> Mettre à jour
+                        </button>
+                    </form>
+
+                    <hr>
+
+                    <div class="mt-3">
+                        <h6 class="mb-3">Statut actuel:</h6>
+                        {% set statusColors = {
+                            'new': 'info',
+                            'nurturing': 'primary',
+                            'qualified': 'warning',
+                            'converted': 'success',
+                            'lost': 'danger'
+                        } %}
+                        <span class="badge bg-{{ statusColors[lead.status] ?? 'secondary' }} font-size-14 w-100">
+                            {{ lead.status|upper }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {# Emails de nurturing #}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Emails de Nurturing</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="py-2">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    {% if lead.nurturingDay1SentAt %}
+                                        <i class="bx bx-check-circle text-success font-size-20"></i>
+                                    {% else %}
+                                        <i class="bx bx-x-circle text-muted font-size-20"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Email J+1</h6>
+                                    {% if lead.nurturingDay1SentAt %}
+                                        <small class="text-muted">Envoyé le {{ lead.nurturingDay1SentAt|date('d/m/Y') }}</small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            {% if lead.shouldReceiveNurturingDay1 %}
+                                                <span class="text-warning">À envoyer</span>
+                                            {% else %}
+                                                Non envoyé
+                                            {% endif %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="py-2">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    {% if lead.nurturingDay3SentAt %}
+                                        <i class="bx bx-check-circle text-success font-size-20"></i>
+                                    {% else %}
+                                        <i class="bx bx-x-circle text-muted font-size-20"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Email J+3</h6>
+                                    {% if lead.nurturingDay3SentAt %}
+                                        <small class="text-muted">Envoyé le {{ lead.nurturingDay3SentAt|date('d/m/Y') }}</small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            {% if lead.shouldReceiveNurturingDay3 %}
+                                                <span class="text-warning">À envoyer</span>
+                                            {% else %}
+                                                Non envoyé
+                                            {% endif %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="py-2">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    {% if lead.nurturingDay7SentAt %}
+                                        <i class="bx bx-check-circle text-success font-size-20"></i>
+                                    {% else %}
+                                        <i class="bx bx-x-circle text-muted font-size-20"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Email J+7</h6>
+                                    {% if lead.nurturingDay7SentAt %}
+                                        <small class="text-muted">Envoyé le {{ lead.nurturingDay7SentAt|date('d/m/Y') }}</small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            {% if lead.shouldReceiveNurturingDay7 %}
+                                                <span class="text-warning">À envoyer</span>
+                                            {% else %}
+                                                Non envoyé
+                                            {% endif %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            {# Actions rapides #}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Actions Rapides</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="mailto:{{ lead.email }}" class="btn btn-outline-primary">
+                            <i class="bx bx-envelope me-1"></i> Envoyer un email
+                        </a>
+                        <a href="{{ path('admin_crm_leads_index') }}" class="btn btn-outline-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 50px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 30px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -35px;
+    top: 30px;
+    bottom: -30px;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item:last-child::before {
+    display: none;
+}
+
+.timeline-badge {
+    position: absolute;
+    left: -45px;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.timeline-panel {
+    position: relative;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #556ee6;
+}
+
+.timeline-title {
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+</style>
+{% endblock %}

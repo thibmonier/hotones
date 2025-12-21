@@ -52,6 +52,12 @@ services:
             $fromEmail: '%app.mail.from_email%'
             $fromName: '%app.mail.from_name%'
 
+    # Lead Magnet Mailer Service
+    App\Service\LeadMagnetMailer:
+        arguments:
+            $fromEmail: '%app.mail.from_email%'
+            $fromName: '%app.mail.from_name%'
+
     # Contributor Satisfaction Reminder Command
     App\Command\ContributorSatisfactionReminderCommand:
         arguments:

@@ -1,0 +1,257 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CRM HotOnes - Leads{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">CRM HotOnes - Leads</h4>
+
+                <div class="page-title-right">
+                    <a href="{{ path('admin_crm_leads_export_csv', filters) }}" class="btn btn-success me-2">
+                        <i class="bx bx-download me-1"></i> Export CSV
+                    </a>
+                    <ol class="breadcrumb m-0 d-inline-block">
+                        <li class="breadcrumb-item"><a href="{{ path('dashboard_index') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('admin_crm_statistics') }}">CRM</a></li>
+                        <li class="breadcrumb-item active">Leads</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Statistiques rapides #}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Total Leads</p>
+                            <h4 class="mb-0">{{ total }}</h4>
+                        </div>
+                        <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
+                            <span class="avatar-title rounded-circle bg-primary">
+                                <i class="bx bx-user font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">Page Actuelle</p>
+                            <h4 class="mb-0">{{ page }} / {{ totalPages }}</h4>
+                        </div>
+                        <div class="avatar-sm rounded-circle bg-info align-self-center mini-stat-icon">
+                            <span class="avatar-title rounded-circle bg-info">
+                                <i class="bx bx-file font-size-24"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Filtres #}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" action="{{ path('admin_crm_leads_index') }}">
+                        <div class="row align-items-end">
+                            <div class="col-md-2">
+                                <label for="search" class="form-label">Recherche</label>
+                                <input type="text" class="form-control" id="search" name="search"
+                                       value="{{ filters.search }}" placeholder="Email, nom, entreprise...">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="status" class="form-label">Statut</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">Tous</option>
+                                    <option value="new" {% if filters.status == 'new' %}selected{% endif %}>Nouveau</option>
+                                    <option value="nurturing" {% if filters.status == 'nurturing' %}selected{% endif %}>En nurturing</option>
+                                    <option value="qualified" {% if filters.status == 'qualified' %}selected{% endif %}>Qualifié</option>
+                                    <option value="converted" {% if filters.status == 'converted' %}selected{% endif %}>Converti</option>
+                                    <option value="lost" {% if filters.status == 'lost' %}selected{% endif %}>Perdu</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="source" class="form-label">Source</label>
+                                <select class="form-select" id="source" name="source">
+                                    <option value="">Toutes</option>
+                                    <option value="homepage" {% if filters.source == 'homepage' %}selected{% endif %}>Homepage</option>
+                                    <option value="pricing" {% if filters.source == 'pricing' %}selected{% endif %}>Tarifs</option>
+                                    <option value="analytics" {% if filters.source == 'analytics' %}selected{% endif %}>Analytics</option>
+                                    <option value="features" {% if filters.source == 'features' %}selected{% endif %}>Fonctionnalités</option>
+                                    <option value="contact" {% if filters.source == 'contact' %}selected{% endif %}>Contact</option>
+                                    <option value="other" {% if filters.source == 'other' %}selected{% endif %}>Autre</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="has_downloaded" class="form-label">Téléchargement</label>
+                                <select class="form-select" id="has_downloaded" name="has_downloaded">
+                                    <option value="">Tous</option>
+                                    <option value="1" {% if filters.has_downloaded == '1' %}selected{% endif %}>Téléchargé</option>
+                                    <option value="0" {% if filters.has_downloaded == '0' %}selected{% endif %}>Non téléchargé</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="marketing_consent" class="form-label">Consentement</label>
+                                <select class="form-select" id="marketing_consent" name="marketing_consent">
+                                    <option value="">Tous</option>
+                                    <option value="1" {% if filters.marketing_consent == '1' %}selected{% endif %}>Oui</option>
+                                    <option value="0" {% if filters.marketing_consent == '0' %}selected{% endif %}>Non</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bx bx-filter-alt me-1"></i> Filtrer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Table des leads #}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Lead</th>
+                                    <th>Entreprise</th>
+                                    <th>Source</th>
+                                    <th>Statut</th>
+                                    <th>Téléchargé</th>
+                                    <th>Marketing</th>
+                                    <th>Date création</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lead in leads %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ lead.fullName }}</strong><br>
+                                            <small class="text-muted">{{ lead.email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>{{ lead.company ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ lead.source }}</span>
+                                    </td>
+                                    <td>
+                                        {% set statusColors = {
+                                            'new': 'info',
+                                            'nurturing': 'primary',
+                                            'qualified': 'warning',
+                                            'converted': 'success',
+                                            'lost': 'danger'
+                                        } %}
+                                        <span class="badge bg-{{ statusColors[lead.status] ?? 'secondary' }}">
+                                            {{ lead.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if lead.hasDownloaded %}
+                                            <i class="bx bx-check text-success"></i> Oui ({{ lead.downloadCount }}×)
+                                        {% else %}
+                                            <i class="bx bx-x text-danger"></i> Non
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if lead.hasMarketingConsent %}
+                                            <i class="bx bx-check text-success"></i> Oui
+                                        {% else %}
+                                            <i class="bx bx-x text-danger"></i> Non
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ lead.createdAt|date('d/m/Y H:i') }}</small><br>
+                                        <small class="text-muted">({{ lead.daysSinceCreation }} jours)</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('admin_crm_leads_show', {id: lead.id}) }}"
+                                           class="btn btn-sm btn-primary">
+                                            <i class="bx bx-show"></i> Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-5">
+                                        <i class="bx bx-info-circle font-size-24 mb-2"></i><br>
+                                        Aucun lead trouvé avec ces filtres
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {# Pagination #}
+                    {% if totalPages > 1 %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    {% if page > 1 %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ path('admin_crm_leads_index', filters|merge({page: page - 1})) }}">
+                                            Précédent
+                                        </a>
+                                    </li>
+                                    {% endif %}
+
+                                    {% for p in 1..totalPages %}
+                                        {% if p == page %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ p }}</span>
+                                        </li>
+                                        {% elseif p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ path('admin_crm_leads_index', filters|merge({page: p})) }}">
+                                                {{ p }}
+                                            </a>
+                                        </li>
+                                        {% elseif p == page - 3 or p == page + 3 %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page < totalPages %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ path('admin_crm_leads_index', filters|merge({page: page + 1})) }}">
+                                            Suivant
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

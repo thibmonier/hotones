@@ -1,0 +1,21 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouvel abonnement SaaS{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Nouvel abonnement SaaS',
+                breadcrumb: [
+                    {label: 'Gestion', path: null},
+                    {label: 'Abonnements SaaS', path: 'saas_dashboard'},
+                    {label: 'Liste', path: 'saas_subscription_index'},
+                    {label: 'Nouveau', path: null}
+                ]
+            } %}
+        </div>
+    </div>
+
+    {% include 'saas/subscription/_form.html.twig' %}
+{% endblock %}

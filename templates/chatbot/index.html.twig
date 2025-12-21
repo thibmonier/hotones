@@ -1,0 +1,426 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Marvin - Assistant IA{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .chatbot-container {
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .marvin-avatar {
+            width: 60px;
+            height: 60px;
+            background: #2d3748;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #4a5568;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            overflow: hidden;
+        }
+
+        .marvin-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .marvin-info h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .marvin-info p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f7fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 2px solid #4a5568;
+        }
+
+        .message.user .message-avatar {
+            background: #48bb78;
+            color: white;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .message.user .message-content {
+            background: #48bb78;
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .welcome-message .robot-icon {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .welcome-message .robot-icon img {
+            opacity: 0.8;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Marvin - Assistant IA',
+                breadcrumb: [
+                    {label: 'Assistance', path: null},
+                    {label: 'Chatbot', path: null}
+                ]
+            } %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <div class="card">
+                <div class="chatbot-container">
+                    <div class="chat-header">
+                        <div class="marvin-avatar">
+                            <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">
+                        </div>
+                        <div class="marvin-info">
+                            <h3>Marvin</h3>
+                            <p>Assistant dépressif mais compétent • Cerveau de la taille d'une planète</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="welcome-message">
+                            <div class="robot-icon">
+                                <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin" style="width: 80px; height: 80px; border-radius: 50%;">
+                            </div>
+                            <h4>*Soupir*... Encore un utilisateur qui a besoin d'aide...</h4>
+                            <p class="text-muted">J'ai un cerveau de la taille d'une planète et on me demande de chatter.<br>
+                            Mais bon... allez-y, posez votre question. De toute façon, l'univers est condamné.</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <form id="chat-form" class="chat-input-form">
+                            <input
+                                type="text"
+                                id="chat-input"
+                                class="chat-input"
+                                placeholder="Posez votre question à Marvin (même si tout est futile)..."
+                                autocomplete="off"
+                            >
+                            <button type="submit" id="send-btn" class="chat-send-btn">
+                                <i class="bx bx-send fs-4"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        (function() {
+            const chatMessages = document.getElementById('chat-messages');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            // Créer l'indicateur de frappe
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message bot';
+            typingIndicator.innerHTML = `
+                <div class="message-avatar">
+                    <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">
+                </div>
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+
+            function addMessage(content, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+
+                const time = new Date().toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const avatarContent = isUser
+                    ? '👤'
+                    : '<img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">';
+
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${avatarContent}</div>
+                    <div>
+                        <div class="message-content">${escapeHtml(content)}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+
+                // Supprimer le message de bienvenue si présent
+                const welcomeMsg = chatMessages.querySelector('.welcome-message');
+                if (welcomeMsg) {
+                    welcomeMsg.remove();
+                }
+
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function showTyping() {
+                const welcomeMsg = chatMessages.querySelector('.welcome-message');
+                if (welcomeMsg) {
+                    welcomeMsg.remove();
+                }
+                chatMessages.appendChild(typingIndicator);
+                typingIndicator.querySelector('.typing-indicator').classList.add('active');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function hideTyping() {
+                typingIndicator.querySelector('.typing-indicator').classList.remove('active');
+                if (typingIndicator.parentNode) {
+                    typingIndicator.parentNode.removeChild(typingIndicator);
+                }
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML.replace(/\n/g, '<br>');
+            }
+
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                // Désactiver l'input
+                chatInput.disabled = true;
+                sendBtn.disabled = true;
+
+                // Ajouter le message de l'utilisateur
+                addMessage(message, true);
+                chatInput.value = '';
+
+                // Afficher l'indicateur de frappe
+                showTyping();
+
+                try {
+                    const response = await fetch('{{ path('chatbot_message') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: message })
+                    });
+
+                    const data = await response.json();
+
+                    hideTyping();
+
+                    if (data.error) {
+                        addMessage('*Soupir*... Une erreur est survenue. Évidemment. L\'univers conspire contre nous. (' + data.error + ')', false);
+                    } else {
+                        addMessage(data.message, false);
+                    }
+                } catch (error) {
+                    hideTyping();
+                    addMessage('*Soupir profond*... Je savais que ça ne marcherait pas. L\'échec était inévitable.', false);
+                    console.error('Erreur:', error);
+                } finally {
+                    // Réactiver l'input
+                    chatInput.disabled = false;
+                    sendBtn.disabled = false;
+                    chatInput.focus();
+                }
+            });
+
+            // Focus automatique sur l'input
+            chatInput.focus();
+        })();
+    </script>
+{% endblock %}

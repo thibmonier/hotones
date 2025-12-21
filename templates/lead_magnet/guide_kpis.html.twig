@@ -1,0 +1,306 @@
+{% extends 'public/base.html.twig' %}
+
+{% block title %}Téléchargez gratuitement le Guide des 15 KPIs Essentiels pour Agences Web - HotOnes{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-success" style="font-size: 0.9rem;">Guide Gratuit</span>
+                    <span class="badge bg-primary" style="font-size: 0.9rem;">PDF 25 pages</span>
+                </div>
+                <h1 class="mb-4">
+                    Les 15 KPIs Essentiels pour Piloter Votre Agence Web
+                </h1>
+                <p class="lead mb-4">
+                    Découvrez les indicateurs clés utilisés par les agences les plus performantes pour
+                    maximiser leur rentabilité et optimiser leur croissance.
+                </p>
+
+                <div class="mb-4">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2" style="font-size: 1.3rem;"></i>
+                            <strong>15 KPIs détaillés</strong> avec formules de calcul prêtes à l'emploi
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2" style="font-size: 1.3rem;"></i>
+                            <strong>Tableaux de bord Excel</strong> téléchargeables et personnalisables
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2" style="font-size: 1.3rem;"></i>
+                            <strong>Cas pratiques</strong> d'agences qui ont doublé leur marge en 12 mois
+                        </li>
+                        <li class="mb-3">
+                            <i class="bx bx-check-circle text-success me-2" style="font-size: 1.3rem;"></i>
+                            <strong>Check-list PDF</strong> pour auditer vos KPIs actuels
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-info border-0" style="background: rgba(99, 102, 241, 0.1);">
+                    <div class="d-flex align-items-center">
+                        <i class="bx bx-info-circle text-primary me-2" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>Plus de 2,500 agences</strong> ont déjà téléchargé ce guide
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+                <!-- Formulaire de capture -->
+                <div class="card border-0 shadow-lg" style="background: var(--dark-card);">
+                    <div class="card-body p-4">
+                        <h3 class="mb-3 text-center">Téléchargez gratuitement le guide</h3>
+                        <p class="text-muted text-center mb-4">Recevez le guide par email en moins de 2 minutes</p>
+
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.firstName) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.lastName) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.email) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.company) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.phone) }}
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form_widget(form.marketingConsent) }}
+                                {{ form_label(form.marketingConsent, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form_widget(form.rgpdConsent) }}
+                                {{ form_label(form.rgpdConsent, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                {{ form_errors(form.rgpdConsent) }}
+                            </div>
+                            <small class="text-muted">
+                                En soumettant ce formulaire, vous acceptez que HotOnes traite vos données personnelles
+                                conformément à notre <a href="{{ path('public_legal') }}" target="_blank">politique de confidentialité</a>.
+                            </small>
+                        </div>
+
+                        {{ form_widget(form.source) }}
+                        {{ form_widget(form.contentType) }}
+
+                        <button type="submit" class="btn btn-primary-custom btn-lg w-100 text-white">
+                            <i class="bx bx-download me-2"></i>Télécharger le guide gratuitement
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="bx bx-lock me-1"></i>
+                                Vos données sont sécurisées et ne seront jamais partagées
+                            </small>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Ce que vous allez découvrir -->
+<section class="py-5 mt-5" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Ce que vous allez découvrir dans ce guide</h2>
+            <p class="section-subtitle">
+                15 indicateurs essentiels répartis en 4 catégories stratégiques
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="0">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="bx bx-dollar-circle text-success" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4 class="mb-3">KPIs Financiers</h4>
+                        <ul class="list-unstyled text-start text-muted small">
+                            <li class="mb-2">• Chiffre d'affaires récurrent</li>
+                            <li class="mb-2">• Marge brute par projet</li>
+                            <li class="mb-2">• Taux de marge net</li>
+                            <li class="mb-2">• CAC (Coût d'Acquisition Client)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="bx bx-group text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4 class="mb-3">KPIs Opérationnels</h4>
+                        <ul class="list-unstyled text-start text-muted small">
+                            <li class="mb-2">• Taux de staffing</li>
+                            <li class="mb-2">• TACE (Taux d'Activité Congés Exclus)</li>
+                            <li class="mb-2">• Taux d'utilisation</li>
+                            <li class="mb-2">• Temps moyen par projet</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="bx bx-line-chart text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4 class="mb-3">KPIs Commerciaux</h4>
+                        <ul class="list-unstyled text-start text-muted small">
+                            <li class="mb-2">• Taux de conversion devis</li>
+                            <li class="mb-2">• Valeur moyenne des projets</li>
+                            <li class="mb-2">• Cycle de vente moyen</li>
+                            <li class="mb-2">• Taux de rétention clients</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="bx bx-happy text-info" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4 class="mb-3">KPIs Satisfaction</h4>
+                        <ul class="list-unstyled text-start text-muted small">
+                            <li class="mb-2">• NPS (Net Promoter Score)</li>
+                            <li class="mb-2">• Satisfaction équipe</li>
+                            <li class="mb-2">• Turnover collaborateurs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Témoignages -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Ce qu'en disent les agences</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="testimonial-card h-100">
+                    <div class="mb-3">
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                    </div>
+                    <p class="mb-4" style="font-size: 1.05rem; line-height: 1.7; color: var(--text-secondary);">
+                        "Ce guide m'a ouvert les yeux sur les KPIs que je ne suivais pas. Résultat : <strong style="color: var(--primary-color);">+25% de marge</strong> en 6 mois !"
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                             style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; font-weight: 700; font-size: 1.2rem;">
+                            ML
+                        </div>
+                        <div>
+                            <div class="fw-semibold" style="color: var(--text-primary);">Marie Leroy</div>
+                            <small style="color: var(--text-secondary);">CEO, Digital Factory</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="testimonial-card h-100">
+                    <div class="mb-3">
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                    </div>
+                    <p class="mb-4" style="font-size: 1.05rem; line-height: 1.7; color: var(--text-secondary);">
+                        "Enfin un guide <strong style="color: var(--primary-color);">adapté aux agences françaises</strong> avec des formules de calcul claires. Indispensable !"
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                             style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--secondary-color), var(--accent-color)); color: white; font-weight: 700; font-size: 1.2rem;">
+                            TD
+                        </div>
+                        <div>
+                            <div class="fw-semibold" style="color: var(--text-primary);">Thomas Dubois</div>
+                            <small style="color: var(--text-secondary);">Directeur, WebStudio</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="testimonial-card h-100">
+                    <div class="mb-3">
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                        <i class="bx bxs-star" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                    </div>
+                    <p class="mb-4" style="font-size: 1.05rem; line-height: 1.7; color: var(--text-secondary);">
+                        "Les tableaux Excel fournis m'ont fait gagner <strong style="color: var(--primary-color);">des heures</strong> de travail. Très pro !"
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                             style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; font-weight: 700; font-size: 1.2rem;">
+                            SB
+                        </div>
+                        <div>
+                            <div class="fw-semibold" style="color: var(--text-primary);">Sophie Bernard</div>
+                            <small style="color: var(--text-secondary);">COO, Creative Agency</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final -->
+<section class="py-5" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);">
+    <div class="container text-center">
+        <h2 class="mb-4" data-aos="fade-up">Prêt à optimiser la rentabilité de votre agence ?</h2>
+        <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">
+            Rejoignez les 2,500+ agences qui pilotent déjà leur activité avec ces KPIs
+        </p>
+        <div data-aos="fade-up" data-aos-delay="200">
+            <a href="#" class="btn btn-primary-custom btn-lg text-white" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
+                <i class="bx bx-download me-2"></i>Télécharger le guide gratuitement
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

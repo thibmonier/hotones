@@ -165,8 +165,48 @@
                 </li>
                 {% endif %}
 
+                {# CRM HotOnes - Accessible aux administrateurs uniquement #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="menu-title">CRM HotOnes</li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-user-check"></i>
+                        <span>CRM HotOnes</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('admin_crm_statistics') }}"><i class="bx bx-bar-chart"></i> Statistiques</a></li>
+                        <li><a href="{{ path('admin_crm_leads_index') }}"><i class="bx bx-list-ul"></i> Tous les leads</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+
+                {# Gestion - Accessible aux administrateurs #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="menu-title">Gestion</li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-cloud"></i>
+                        <span>Abonnements SaaS</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ path('saas_dashboard') }}"><i class="bx bx-line-chart"></i> Dashboard</a></li>
+                        <li><a href="{{ path('saas_subscription_index') }}"><i class="bx bx-list-ul"></i> Abonnements</a></li>
+                        <li><a href="{{ path('saas_service_index') }}"><i class="bx bx-server"></i> Services</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+
                 {# À propos - Accessible à tous #}
                 <li class="menu-title">Informations</li>
+
+                <li>
+                    <a href="{{ path('chatbot_index') }}" class="waves-effect">
+                        <i class="bx bx-bot"></i>
+                        <span>Marvin - Assistant IA</span>
+                    </a>
+                </li>
 
                 <li>
                     <a href="{{ path('about') }}" class="waves-effect">

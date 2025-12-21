@@ -3,26 +3,468 @@
 {% block title %}Analytics & Rentabilité - HotOnes{% endblock %}
 
 {% block body %}
+<!-- Hero Section -->
 <section class="hero-section">
-    <div class="container text-center">
-        <h1 data-aos="fade-up">Analytics & Rentabilité</h1>
-        <p class="lead" data-aos="fade-up" data-aos-delay="100">
-            Visualisez la rentabilité réelle de vos projets
-        </p>
-    </div>
-</section>
-
-<section class="py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6" data-aos="fade-right">
-                <h2 class="mb-4">KPIs en temps réel</h2>
-                <p class="text-muted mb-4">
-                    Suivez votre CA, vos marges, vos coûts et votre productivité avec des tableaux de bord détaillés.
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <h1 class="mb-0">Analytics & Rentabilité</h1>
+                    <span class="badge bg-primary" style="font-size: 0.9rem;">Unique</span>
+                </div>
+                <p class="lead mb-4">
+                    La seule solution pour agences utilisant un <strong>schéma en étoile</strong> (star schema)
+                    comme les plateformes BI professionnelles. Des analytics 100x plus rapides que les outils traditionnels.
                 </p>
+                <div class="d-flex gap-3 flex-wrap mb-4">
+                    <a href="{{ path('public_pricing') }}" class="btn btn-primary-custom btn-lg text-white">
+                        <span><i class="bx bx-rocket me-2"></i>Essayer gratuitement</span>
+                    </a>
+                    <a href="{{ path('public_contact') }}" class="btn btn-outline-primary-custom btn-lg">
+                        Demander une démo
+                    </a>
+                </div>
             </div>
             <div class="col-lg-6" data-aos="fade-left">
-                <img src="https://via.placeholder.com/600x400/f46a6a/ffffff?text=Analytics+Dashboard" alt="Analytics" class="img-fluid rounded shadow-lg">
+                <img src="https://via.placeholder.com/600x400/f46a6a/ffffff?text=Analytics+Dashboard"
+                     alt="Analytics Dashboard"
+                     class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Star Schema Explanation -->
+<section class="py-5 mt-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Architecture Data Warehouse professionnelle</h2>
+            <p class="section-subtitle">
+                Contrairement aux outils qui calculent les KPIs à la volée, HotOnes utilise un schéma en étoile
+                pour pré-calculer et stocker vos métriques
+            </p>
+        </div>
+
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="card border-0 shadow-lg" style="background: var(--dark-card);">
+                    <div class="card-body p-4">
+                        <h3 class="mb-4">Tables de faits (Fact Tables)</h3>
+
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bx bx-data text-primary me-2" style="font-size: 1.5rem;"></i>
+                                <h5 class="mb-0">FactProjectMetrics</h5>
+                            </div>
+                            <p class="text-muted mb-2">
+                                Métriques de rentabilité par projet avec dimensions temporelles
+                            </p>
+                            <ul class="list-unstyled small text-muted">
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Chiffre d'affaires (revenue)</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Coûts salariaux (totalCost)</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Marge brute (grossMargin)</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Taux d'utilisation (utilizationRate)</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Heures estimées vs réelles</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bx bx-group text-primary me-2" style="font-size: 1.5rem;"></i>
+                                <h5 class="mb-0">FactStaffingMetrics</h5>
+                            </div>
+                            <p class="text-muted mb-2">
+                                Métriques de charge et disponibilité par contributeur
+                            </p>
+                            <ul class="list-unstyled small text-muted">
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Disponibilité (availability)</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Charge de travail (workload)</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> TACE (Taux d'Activité Congés Exclus)</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Taux de staffing</li>
+                                <li><i class="bx bx-check-circle text-success me-1"></i> Breakdown par profil métier</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="card border-0 shadow-lg" style="background: var(--dark-card);">
+                    <div class="card-body p-4">
+                        <h3 class="mb-4">Tables de dimensions</h3>
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-calendar text-success me-2"></i>
+                                <strong>DimTime</strong> - Dimension temporelle (année, trimestre, mois)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-folder-open text-success me-2"></i>
+                                <strong>DimProjectType</strong> - Type de projet (forfait, régie)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-user text-success me-2"></i>
+                                <strong>DimContributor</strong> - Dimension contributeur
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-briefcase text-success me-2"></i>
+                                <strong>DimProfile</strong> - Profil métier (dev, lead, PM, etc.)
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info border-0" style="background: rgba(99, 102, 241, 0.1);">
+                            <div class="d-flex">
+                                <i class="bx bx-info-circle text-primary me-2" style="font-size: 1.3rem;"></i>
+                                <div>
+                                    <strong>Recalcul automatisé</strong>
+                                    <p class="mb-0 small">
+                                        Les métriques sont recalculées automatiquement via Symfony Scheduler :
+                                        quotidiennement pour les KPIs mensuels, trimestriellement pour les analyses trimestrielles.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center p-3 rounded" style="background: rgba(16, 185, 129, 0.1);">
+                            <div class="h1 mb-2" style="color: #10b981; font-weight: 800;">100x</div>
+                            <div class="small text-muted">Plus rapide que calcul temps réel</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 Dashboards -->
+<section class="py-5" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">4 dashboards spécialisés</h2>
+            <p class="section-subtitle">
+                Des tableaux de bord dédiés pour chaque aspect de votre activité
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="0">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon me-3">
+                                <i class="bx bx-line-chart"></i>
+                            </div>
+                            <h4 class="mb-0">Dashboard Analytics</h4>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Vue d'ensemble de la rentabilité avec KPIs pré-calculés issus du schéma en étoile.
+                            Filtrage par période (mensuel, trimestriel, annuel).
+                        </p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                CA total et évolution
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Marge brute et taux de marge
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Coûts salariaux et distribution
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Export Excel multi-feuilles
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon me-3">
+                                <i class="bx bx-shopping-bag"></i>
+                            </div>
+                            <h4 class="mb-0">Dashboard Commercial</h4>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Pilotage du pipeline commercial avec taux de conversion et analyse des devis.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Taux de conversion (signés vs perdus)
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Évolution du CA et volume de devis
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Pipeline de ventes avec prévisions
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Analyse multi-axes (temps + valeur)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon me-3">
+                                <i class="bx bx-group"></i>
+                            </div>
+                            <h4 class="mb-0">Dashboard Staffing</h4>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Optimisation de la charge avec métriques issues de FactStaffingMetrics.
+                            Analyse par profil métier et contributeur.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Taux de staffing : (Staffé / Disponible) × 100
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                TACE : (Jours productifs / Jours ouvrés hors congés) × 100
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Évolution historique (-6 mois → aujourd'hui)
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Breakdown par profil (dev, lead, PM)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon me-3">
+                                <i class="bx bx-dollar-circle"></i>
+                            </div>
+                            <h4 class="mb-0">Dashboard Profitabilité</h4>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Analyse détaillée de la rentabilité projet par projet avec calculs CJM/TJM.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Profitabilité par projet (forfait vs régie)
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Calculs automatiques CJM et TJM
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Détection projets à risque
+                            </li>
+                            <li class="mb-2">
+                                <i class="bx bx-check-circle text-success me-2"></i>
+                                Analyse marge nette avec alertes
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Comparison Section -->
+<section class="py-5 mt-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Pourquoi nos analytics sont différents</h2>
+            <p class="section-subtitle">
+                Comparaison avec les outils traditionnels de gestion d'agence
+            </p>
+        </div>
+
+        <div class="row" data-aos="fade-up">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" style="background: var(--dark-card);">
+                        <thead style="background: rgba(99, 102, 241, 0.1);">
+                            <tr>
+                                <th style="width: 40%;">Fonctionnalité</th>
+                                <th class="text-center" style="width: 30%;">
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <strong>HotOnes</strong>
+                                        <span class="badge bg-primary">Unique</span>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="width: 30%;">Outils traditionnels</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Architecture analytics</strong></td>
+                                <td class="text-center">
+                                    <i class="bx bx-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Schéma en étoile (star schema)</div>
+                                </td>
+                                <td class="text-center">
+                                    <i class="bx bx-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Calcul temps réel</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance KPIs</strong></td>
+                                <td class="text-center">
+                                    <i class="bx bx-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Pré-calculés (100x plus rapide)</div>
+                                </td>
+                                <td class="text-center">
+                                    <i class="bx bx-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Calcul à la volée (lent)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dimensions temporelles</strong></td>
+                                <td class="text-center">
+                                    <i class="bx bx-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Mensuel, trimestriel, annuel</div>
+                                </td>
+                                <td class="text-center">
+                                    <i class="bx bx-minus-circle text-warning" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Limité</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Modèle forfait/régie français</strong></td>
+                                <td class="text-center">
+                                    <i class="bx bx-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Natif avec CJM/TJM</div>
+                                </td>
+                                <td class="text-center">
+                                    <i class="bx bx-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Non supporté</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Recalcul automatisé</strong></td>
+                                <td class="text-center">
+                                    <i class="bx bx-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Scheduler Symfony (quotidien)</div>
+                                </td>
+                                <td class="text-center">
+                                    <i class="bx bx-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Manuel</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Export Excel enrichi</strong></td>
+                                <td class="text-center">
+                                    <i class="bx bx-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">Multi-feuilles avec graphiques</div>
+                                </td>
+                                <td class="text-center">
+                                    <i class="bx bx-minus-circle text-warning" style="font-size: 1.5rem;"></i>
+                                    <div class="small text-muted">CSV basique</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technical Excellence -->
+<section class="py-5" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Excellence technique</h2>
+            <p class="section-subtitle">
+                Une qualité de code et une architecture qui font la différence
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="0">
+                <div class="text-center">
+                    <i class="bx bx-check-shield" style="font-size: 3rem; color: var(--primary-color);"></i>
+                    <h5 class="mt-3">PHPStan niveau 3</h5>
+                    <p class="text-muted small">Analyse statique stricte avec règles Doctrine et Symfony</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-center">
+                    <i class="bx bx-bug" style="font-size: 3rem; color: var(--primary-color);"></i>
+                    <h5 class="mt-3">Mutation Testing</h5>
+                    <p class="text-muted small">Tests validés avec Infection pour garantir la qualité</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center">
+                    <i class="bx bx-layer" style="font-size: 3rem; color: var(--primary-color);"></i>
+                    <h5 class="mt-3">Architecture Deptrac</h5>
+                    <p class="text-muted small">Layering validé automatiquement avec Deptrac</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center">
+                    <i class="bx bx-test-tube" style="font-size: 3rem; color: var(--primary-color);"></i>
+                    <h5 class="mt-3">Tests E2E</h5>
+                    <p class="text-muted small">Tests end-to-end avec Panther pour garantir la stabilité</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="cta-section" data-aos="zoom-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="mb-3" style="font-size: 2.5rem; font-weight: 800;">
+                        Découvrez nos analytics de niveau BI
+                    </h2>
+                    <p class="lead mb-0" style="color: var(--text-secondary);">
+                        Essayez gratuitement pendant 14 jours et transformez vos données en décisions stratégiques.
+                        Aucune carte bancaire requise.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <a href="{{ path('public_pricing') }}" class="btn btn-primary-custom btn-lg text-white mb-3 w-100 w-lg-auto">
+                        <span><i class="bx bx-rocket me-2"></i>Commencer gratuitement</span>
+                    </a>
+                    <div class="text-center text-lg-end">
+                        <a href="{{ path('public_contact') }}" class="btn btn-outline-primary-custom w-100 w-lg-auto">
+                            Demander une démo personnalisée
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

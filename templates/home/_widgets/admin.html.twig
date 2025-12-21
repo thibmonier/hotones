@@ -120,18 +120,51 @@
                 </h5>
             </div>
             <div class="card-body">
-                {% for order in pendingOrders|slice(0, 3) %}
-                    <div class="d-flex align-items-center pb-2">
-                        <div class="flex-1">
-                            <h6 class="mb-0">{{ order.orderNumber }}</h6>
-                            <p class="text-muted font-size-13 mb-0">{{ order.totalAmount|number_format(0, '', ' ') }}€</p>
+                <div class="list-group list-group-flush">
+                    {% for order in pendingOrders|slice(0, 3) %}
+                        <div class="list-group-item px-0 {% if not loop.last %}border-bottom{% endif %}">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <a href="{{ path('order_show', {id: order.id}) }}" class="text-dark">
+                                            {{ order.orderNumber }}
+                                        </a>
+                                    </h6>
+                                    <p class="text-muted font-size-13 mb-0">
+                                        {% if order.project and order.project.client %}
+                                            {{ order.project.client.name }} •
+                                        {% endif %}
+                                        <strong>{{ order.totalAmount|number_format(0, '', ' ') }}€</strong>
+                                    </p>
+                                    {% if order.createdAt %}
+                                        <small class="text-muted">
+                                            <i class="bx bx-time-five"></i>
+                                            {{ order.createdAt|date('d/m/Y') }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-shrink-0 ms-2">
+                                    <a href="{{ path('order_show', {id: order.id}) }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="bx bx-show"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <a href="{{ path('order_show', {id: order.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                    </div>
-                {% endfor %}
-                <div class="text-center mt-2">
-                    <a href="{{ path('order_index', {status: 'a_signer'}) }}" class="btn btn-sm btn-warning w-100">Voir tous ({{ pendingOrders|length }})</a>
+                    {% endfor %}
                 </div>
+                {% if pendingOrders|length > 3 %}
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <a href="{{ path('order_index', {status: 'a_signer'}) }}" class="btn btn-sm btn-warning">
+                            Voir tous les {{ pendingOrders|length }} devis <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <a href="{{ path('order_index', {status: 'a_signer'}) }}" class="btn btn-sm btn-outline-warning">
+                            Voir tous les devis <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -149,18 +182,51 @@
                 </h5>
             </div>
             <div class="card-body">
-                {% for invoice in pendingInvoices|slice(0, 3) %}
-                    <div class="d-flex align-items-center pb-2">
-                        <div class="flex-1">
-                            <h6 class="mb-0">{{ invoice.invoiceNumber }}</h6>
-                            <p class="text-muted font-size-13 mb-0">{{ invoice.totalAmount|number_format(0, '', ' ') }}€</p>
+                <div class="list-group list-group-flush">
+                    {% for invoice in pendingInvoices|slice(0, 3) %}
+                        <div class="list-group-item px-0 {% if not loop.last %}border-bottom{% endif %}">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <a href="{{ path('invoice_show', {id: invoice.id}) }}" class="text-dark">
+                                            {{ invoice.invoiceNumber }}
+                                        </a>
+                                    </h6>
+                                    <p class="text-muted font-size-13 mb-0">
+                                        {% if invoice.client %}
+                                            {{ invoice.client.name }} •
+                                        {% endif %}
+                                        <strong>{{ invoice.totalAmount|number_format(0, '', ' ') }}€</strong>
+                                    </p>
+                                    {% if invoice.dueDate %}
+                                        <small class="text-muted">
+                                            <i class="bx bx-calendar"></i>
+                                            Échéance : {{ invoice.dueDate|date('d/m/Y') }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-shrink-0 ms-2">
+                                    <a href="{{ path('invoice_show', {id: invoice.id}) }}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bx bx-show"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <a href="{{ path('invoice_show', {id: invoice.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                    </div>
-                {% endfor %}
-                <div class="text-center mt-2">
-                    <a href="{{ path('invoice_index') }}" class="btn btn-sm btn-danger w-100">Voir tous ({{ pendingInvoices|length }})</a>
+                    {% endfor %}
                 </div>
+                {% if pendingInvoices|length > 3 %}
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <a href="{{ path('invoice_index') }}" class="btn btn-sm btn-danger">
+                            Voir toutes les {{ pendingInvoices|length }} factures <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <a href="{{ path('invoice_index') }}" class="btn btn-sm btn-outline-danger">
+                            Voir toutes les factures <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -178,18 +244,47 @@
                 </h5>
             </div>
             <div class="card-body">
-                {% for vacation in pendingVacations|slice(0, 3) %}
-                    <div class="d-flex align-items-center pb-2">
-                        <div class="flex-1">
-                            <h6 class="mb-0">{{ vacation.contributor.fullName }}</h6>
-                            <p class="text-muted font-size-13 mb-0">{{ vacation.startDate|date('d/m') }} - {{ vacation.endDate|date('d/m') }}</p>
+                <div class="list-group list-group-flush">
+                    {% for vacation in pendingVacations|slice(0, 3) %}
+                        <div class="list-group-item px-0 {% if not loop.last %}border-bottom{% endif %}">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <a href="{{ path('vacation_approval_show', {id: vacation.id}) }}" class="text-dark">
+                                            {{ vacation.contributor.fullName }}
+                                        </a>
+                                    </h6>
+                                    <p class="text-muted font-size-13 mb-0">
+                                        <i class="bx bx-calendar"></i>
+                                        {{ vacation.startDate|date('d/m/Y') }} - {{ vacation.endDate|date('d/m/Y') }}
+                                    </p>
+                                    <small class="text-muted">
+                                        <i class="bx bx-time-five"></i>
+                                        {{ vacation.totalDays }} jour{% if vacation.totalDays > 1 %}s{% endif %}
+                                    </small>
+                                </div>
+                                <div class="flex-shrink-0 ms-2">
+                                    <a href="{{ path('vacation_approval_show', {id: vacation.id}) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bx bx-show"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <a href="{{ path('vacation_approval_show', {id: vacation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                    </div>
-                {% endfor %}
-                <div class="text-center mt-2">
-                    <a href="{{ path('vacation_approval_index') }}" class="btn btn-sm btn-info w-100">Voir tous ({{ pendingVacations|length }})</a>
+                    {% endfor %}
                 </div>
+                {% if pendingVacations|length > 3 %}
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <a href="{{ path('vacation_approval_index') }}" class="btn btn-sm btn-info">
+                            Voir toutes les {{ pendingVacations|length }} demandes <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <a href="{{ path('vacation_approval_index') }}" class="btn btn-sm btn-outline-info">
+                            Voir toutes les demandes <i class="bx bx-right-arrow-alt ms-1"></i>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

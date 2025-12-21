@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Modifier {{ service.name }} - Service SaaS{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Modifier le service',
+                breadcrumb: [
+                    {label: 'Gestion', path: null},
+                    {label: 'Abonnements SaaS', path: 'saas_dashboard'},
+                    {label: 'Services', path: 'saas_service_index'},
+                    {label: service.name, path: 'saas_service_show', params: {id: service.id}},
+                    {label: 'Modifier', path: null}
+                ]
+            } %}
+        </div>
+    </div>
+
+    {% include 'saas/service/_form.html.twig' %}
+{% endblock %}

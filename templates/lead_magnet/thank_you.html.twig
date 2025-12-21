@@ -1,0 +1,193 @@
+{% extends 'public/base.html.twig' %}
+
+{% block title %}Merci ! Téléchargez votre guide - HotOnes{% endblock %}
+
+{% block body %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="mb-4" data-aos="zoom-in">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                         style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                        <i class="bx bx-check" style="font-size: 4rem; color: white;"></i>
+                    </div>
+                </div>
+
+                <h1 class="mb-4" data-aos="fade-up">
+                    Merci {{ lead.firstName }} ! 🎉
+                </h1>
+
+                <p class="lead mb-5" data-aos="fade-up" data-aos-delay="100">
+                    Votre guide "<strong>Les 15 KPIs Essentiels pour Agences Web</strong>" est prêt à être téléchargé.
+                </p>
+
+                <div class="card border-0 shadow-lg mb-5" style="background: var(--dark-card);" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bx bx-file-blank" style="font-size: 4rem; color: var(--primary-color);"></i>
+                        </div>
+
+                        <h3 class="mb-3">Guide PDF - 25 pages</h3>
+                        <p class="text-muted mb-4">
+                            Votre guide complet avec les 15 KPIs, formules de calcul, tableaux Excel et cas pratiques.
+                        </p>
+
+                        <a href="{{ path('lead_magnet_download_guide_kpis', {email: lead.email|base64_encode}) }}"
+                           class="btn btn-primary-custom btn-lg text-white">
+                            <i class="bx bx-download me-2"></i>
+                            Télécharger le guide maintenant (PDF)
+                        </a>
+
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                <i class="bx bx-info-circle me-1"></i>
+                                Le guide vous a également été envoyé par email à <strong>{{ lead.email }}</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 text-start" style="background: rgba(99, 102, 241, 0.1);" data-aos="fade-up" data-aos-delay="300">
+                    <div class="d-flex">
+                        <i class="bx bx-bulb text-primary me-3" style="font-size: 2rem;"></i>
+                        <div>
+                            <h5 class="mb-2">Prochaine étape : Automatisez le calcul de vos KPIs</h5>
+                            <p class="mb-2">
+                                Maintenant que vous connaissez les KPIs essentiels, découvrez comment HotOnes calcule
+                                automatiquement ces indicateurs grâce à son <strong>schéma en étoile</strong> (star schema).
+                            </p>
+                            <a href="{{ path('public_features_analytics') }}" class="btn btn-sm btn-outline-primary-custom">
+                                Découvrir nos analytics de niveau BI
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What's Next Section -->
+<section class="py-5" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Et maintenant, quoi faire ?</h2>
+            <p class="section-subtitle">
+                3 étapes pour mettre en place vos KPIs dès aujourd'hui
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                                 style="width: 60px; height: 60px; background: rgba(99, 102, 241, 0.1);">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);">1</span>
+                            </div>
+                        </div>
+                        <h4 class="mb-3">Lisez le guide</h4>
+                        <p class="text-muted">
+                            Prenez 30 minutes pour découvrir les 15 KPIs et identifier ceux qui manquent dans votre agence.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                                 style="width: 60px; height: 60px; background: rgba(99, 102, 241, 0.1);">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);">2</span>
+                            </div>
+                        </div>
+                        <h4 class="mb-3">Utilisez les templates Excel</h4>
+                        <p class="text-muted">
+                            Téléchargez les tableaux de bord pré-configurés et commencez à saisir vos données.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow h-100" style="background: var(--dark-card);">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                                 style="width: 60px; height: 60px; background: rgba(99, 102, 241, 0.1);">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);">3</span>
+                            </div>
+                        </div>
+                        <h4 class="mb-3">Automatisez avec HotOnes</h4>
+                        <p class="text-muted">
+                            Testez gratuitement HotOnes pour calculer automatiquement vos KPIs en temps réel.
+                        </p>
+                        <a href="{{ path('public_pricing') }}" class="btn btn-sm btn-primary-custom text-white mt-2">
+                            Essayer gratuitement
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="cta-section" data-aos="zoom-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="mb-3" style="font-size: 2.5rem; font-weight: 800;">
+                        Prêt à automatiser vos KPIs ?
+                    </h2>
+                    <p class="lead mb-0" style="color: var(--text-secondary);">
+                        Découvrez comment HotOnes calcule automatiquement ces 15 KPIs grâce à son architecture
+                        de type data warehouse avec schéma en étoile.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <a href="{{ path('public_features_analytics') }}" class="btn btn-primary-custom btn-lg text-white mb-3 w-100 w-lg-auto">
+                        <span><i class="bx bx-line-chart me-2"></i>Découvrir nos analytics</span>
+                    </a>
+                    <div class="text-center text-lg-end">
+                        <a href="{{ path('public_pricing') }}" class="btn btn-outline-primary-custom w-100 w-lg-auto">
+                            Voir les tarifs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Social Sharing -->
+<section class="py-5" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);">
+    <div class="container text-center">
+        <h3 class="mb-4" data-aos="fade-up">Partagez ce guide avec votre réseau</h3>
+        <p class="text-muted mb-4" data-aos="fade-up" data-aos-delay="100">
+            Aidez d'autres agences à améliorer leur rentabilité
+        </p>
+        <div data-aos="fade-up" data-aos-delay="200">
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ app.request.uri|url_encode }}"
+               target="_blank"
+               class="btn btn-outline-primary-custom me-2">
+                <i class="bx bxl-linkedin me-2"></i>LinkedIn
+            </a>
+            <a href="https://twitter.com/intent/tweet?text={{ 'Je viens de télécharger le guide des 15 KPIs pour agences web'|url_encode }}&url={{ app.request.uri|url_encode }}"
+               target="_blank"
+               class="btn btn-outline-primary-custom me-2">
+                <i class="bx bxl-twitter me-2"></i>Twitter
+            </a>
+            <a href="mailto:?subject={{ 'Guide gratuit : 15 KPIs pour agences web'|url_encode }}&body={{ 'Je te recommande ce guide gratuit sur les KPIs essentiels pour agences web'|url_encode }}%0A%0A{{ app.request.uri|url_encode }}"
+               class="btn btn-outline-primary-custom">
+                <i class="bx bx-envelope me-2"></i>Email
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

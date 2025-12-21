@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Modifier {{ subscription.displayName }} - Abonnement SaaS{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Modifier l\'abonnement',
+                breadcrumb: [
+                    {label: 'Gestion', path: null},
+                    {label: 'Abonnements SaaS', path: 'saas_dashboard'},
+                    {label: 'Liste', path: 'saas_subscription_index'},
+                    {label: subscription.displayName, path: 'saas_subscription_show', params: {id: subscription.id}},
+                    {label: 'Modifier', path: null}
+                ]
+            } %}
+        </div>
+    </div>
+
+    {% include 'saas/subscription/_form.html.twig' %}
+{% endblock %}

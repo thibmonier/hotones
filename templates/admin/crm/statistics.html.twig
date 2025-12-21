@@ -1,0 +1,314 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CRM HotOnes - Statistiques{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">CRM HotOnes - Statistiques</h4>
+
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('dashboard_index') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">CRM</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# KPIs principaux #}
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Total Leads</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value" data-target="{{ stats.total }}">{{ stats.total }}</span>
+                            </h4>
+                        </div>
+                        <div class="flex-shrink-0 text-end dash-widget">
+                            <div id="mini-chart1" data-colors='["--bs-primary"]' class="apex-charts"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Taux de consentement</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value">{{ stats.consent_rate|number_format(1) }}%</span>
+                            </h4>
+                            <div class="text-nowrap">
+                                <span class="badge bg-soft-success text-success">{{ stats.with_marketing_consent }} leads</span>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="avatar-sm rounded-circle bg-primary mini-stat-icon">
+                                <span class="avatar-title rounded-circle bg-primary">
+                                    <i class="bx bx-check-shield font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Taux de téléchargement</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value">{{ stats.download_rate|number_format(1) }}%</span>
+                            </h4>
+                            <div class="text-nowrap">
+                                <span class="badge bg-soft-info text-info">{{ stats.downloaded }} téléchargements</span>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="avatar-sm rounded-circle bg-info mini-stat-icon">
+                                <span class="avatar-title rounded-circle bg-info">
+                                    <i class="bx bx-download font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Téléchargements moyens</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value">{{ stats.avg_downloads|number_format(2) }}</span>
+                            </h4>
+                            <div class="text-nowrap">
+                                <span class="text-muted font-size-13">Par lead</span>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="avatar-sm rounded-circle bg-warning mini-stat-icon">
+                                <span class="avatar-title rounded-circle bg-warning">
+                                    <i class="bx bx-bar-chart-alt font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# Statistiques par source #}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Distribution par Source</h4>
+                    <div class="flex-shrink-0">
+                        <a href="{{ path('admin_crm_leads_index') }}" class="btn btn-sm btn-primary">
+                            <i class="bx bx-list-ul"></i> Voir tous les leads
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Leads</th>
+                                    <th>Convertis</th>
+                                    <th>Taux</th>
+                                    <th>Distribution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in stats_by_source %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ row.source }}</span>
+                                    </td>
+                                    <td><strong>{{ row.count }}</strong></td>
+                                    <td>{{ conversion_by_source[row.source].converted ?? 0 }}</td>
+                                    <td>
+                                        <span class="badge {% if conversion_by_source[row.source].rate > 10 %}bg-success{% elseif conversion_by_source[row.source].rate > 5 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ conversion_by_source[row.source].rate ?? 0 }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            {% set percentage = (row.count / stats.total * 100)|round(1) %}
+                                            <div class="progress-bar" role="progressbar"
+                                                 style="width: {{ percentage }}%"
+                                                 aria-valuenow="{{ percentage }}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                {{ percentage }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Statistiques par statut #}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Distribution par Statut</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Statut</th>
+                                    <th>Nombre</th>
+                                    <th>Pourcentage</th>
+                                    <th>Distribution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set statusLabels = {
+                                    'new': 'Nouveau',
+                                    'nurturing': 'En nurturing',
+                                    'qualified': 'Qualifié',
+                                    'converted': 'Converti',
+                                    'lost': 'Perdu'
+                                } %}
+                                {% set statusColors = {
+                                    'new': 'info',
+                                    'nurturing': 'primary',
+                                    'qualified': 'warning',
+                                    'converted': 'success',
+                                    'lost': 'danger'
+                                } %}
+                                {% for row in stats_by_status %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-{{ statusColors[row.status] ?? 'secondary' }}">
+                                            {{ statusLabels[row.status] ?? row.status }}
+                                        </span>
+                                    </td>
+                                    <td><strong>{{ row.count }}</strong></td>
+                                    <td>
+                                        {% set percentage = (row.count / stats.total * 100)|round(1) %}
+                                        {{ percentage }}%
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-{{ statusColors[row.status] ?? 'secondary' }}"
+                                                 role="progressbar"
+                                                 style="width: {{ percentage }}%"
+                                                 aria-valuenow="{{ percentage }}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                {{ percentage }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Leads récents #}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Leads Récents (7 derniers jours)</h4>
+                    <div class="flex-shrink-0">
+                        <span class="badge bg-light text-dark">{{ recent_leads|length }} nouveaux leads</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Lead</th>
+                                    <th>Entreprise</th>
+                                    <th>Source</th>
+                                    <th>Statut</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lead in recent_leads %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ lead.fullName }}</strong><br>
+                                            <small class="text-muted">{{ lead.email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>{{ lead.company ?? '-' }}</td>
+                                    <td><span class="badge bg-secondary">{{ lead.source }}</span></td>
+                                    <td>
+                                        {% set statusColors = {
+                                            'new': 'info',
+                                            'nurturing': 'primary',
+                                            'qualified': 'warning',
+                                            'converted': 'success',
+                                            'lost': 'danger'
+                                        } %}
+                                        <span class="badge bg-{{ statusColors[lead.status] ?? 'secondary' }}">
+                                            {{ lead.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>{{ lead.createdAt|date('d/m/Y H:i') }}</small><br>
+                                        <small class="text-muted">({{ lead.daysSinceCreation }} jour{% if lead.daysSinceCreation > 1 %}s{% endif %})</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('admin_crm_leads_show', {id: lead.id}) }}"
+                                           class="btn btn-sm btn-primary">
+                                            <i class="bx bx-show"></i> Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">
+                                        Aucun nouveau lead ces 7 derniers jours
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

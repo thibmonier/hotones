@@ -39,6 +39,7 @@ yarn-error.log
 ###< lexik/jwt-authentication-bundle ###
 
 /.env.dev
+/.env.local
 /.cursor/
 /.claude/
 /.scannerwork/

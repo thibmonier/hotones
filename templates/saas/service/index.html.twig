@@ -1,0 +1,213 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Services SaaS{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include 'components/page_header.html.twig' with {
+                title: 'Services SaaS',
+                breadcrumb: [
+                    {label: 'Gestion', path: null},
+                    {label: 'Abonnements SaaS', path: 'saas_dashboard'},
+                    {label: 'Services', path: null}
+                ],
+                actions: [
+                    {label: 'Dashboard', path: 'saas_dashboard', icon: 'bx-line-chart', class: 'btn-outline-primary', permission: 'ROLE_ADMIN'},
+                    {label: 'Nouveau service', path: 'saas_service_new', icon: 'bx-plus', class: 'btn-primary', permission: 'ROLE_ADMIN'}
+                ]
+            } %}
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% set activeFiltersCount = 0 %}
+                    {% set activeFiltersCount = activeFiltersCount
+                        + (filters.search ? 1 : 0)
+                        + (filters.category ? 1 : 0)
+                        + (filters.provider ? 1 : 0)
+                        + (filters.active != '' ? 1 : 0)
+                        + (sort != 'name' ? 1 : 0)
+                        + (dir != 'ASC' ? 1 : 0)
+                    %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">Filtres
+                            {% if activeFiltersCount > 0 %}
+                                <span class="badge bg-info ms-2">{{ activeFiltersCount }}</span>
+                            {% endif %}
+                        </h5>
+                        <div class="btn-group">
+                            <a href="{{ path('saas_service_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                            <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-services" aria-expanded="true" aria-controls="filters-services" id="filters-toggle-services">
+                                <i class="bx bx-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="filters-services" class="collapse show">
+                        <form method="get" class="row g-2 align-items-end">
+                            <div class="col-12 mb-2">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bx bx-search"></i></span>
+                                    <input type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="Rechercher un service...">
+                                    {% if filters.search %}
+                                        <a href="{{ path('saas_service_index', filters|merge({search: null})) }}" class="btn btn-outline-secondary" title="Effacer la recherche">
+                                            <i class="bx bx-x"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Catégorie</label>
+                                <select class="form-select" name="category">
+                                    <option value="">Toutes</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat }}" {% if filters.category == cat %}selected{% endif %}>{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Statut</label>
+                                <select class="form-select" name="active">
+                                    <option value="">Tous</option>
+                                    <option value="1" {% if filters.active == '1' %}selected{% endif %}>Actif</option>
+                                    <option value="0" {% if filters.active == '0' %}selected{% endif %}>Inactif</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                                <a href="{{ path('saas_service_index', { reset: 1 }) }}" class="btn btn-outline-secondary">Réinitialiser</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>
+                                        <a href="{{ path('saas_service_index', filters|merge({ sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Service
+                                            {% if sort == 'name' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('saas_service_index', filters|merge({ sort: 'provider', dir: sort == 'provider' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Fournisseur
+                                            {% if sort == 'provider' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('saas_service_index', filters|merge({ sort: 'category', dir: sort == 'category' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Catégorie
+                                            {% if sort == 'category' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>Prix mensuel</th>
+                                    <th>Prix annuel</th>
+                                    <th>Abonnements</th>
+                                    <th>Statut</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in services %}
+                                    <tr>
+                                        <td>
+                                            <h6 class="mb-0">
+                                                <a href="{{ path('saas_service_show', {id: service.id}) }}">
+                                                    {{ service.name }}
+                                                </a>
+                                            </h6>
+                                            {% if service.description %}
+                                                <small class="text-muted">{{ service.description|u.truncate(50, '...') }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.provider %}
+                                                {{ service.provider.name }}
+                                            {% else %}
+                                                <span class="text-muted">Direct</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.category %}
+                                                <span class="badge bg-secondary">{{ service.category }}</span>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.defaultMonthlyPrice %}
+                                                {{ service.defaultMonthlyPrice|number_format(2, ',', ' ') }}€
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.defaultYearlyPrice %}
+                                                {{ service.defaultYearlyPrice|number_format(2, ',', ' ') }}€
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ service.subscriptions|length }}</span>
+                                        </td>
+                                        <td>
+                                            {% if service.active %}
+                                                <span class="badge bg-success">Actif</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactif</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="btn-group">
+                                                <a href="{{ path('saas_service_show', {id: service.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir">
+                                                    <i class="bx bx-show"></i>
+                                                </a>
+                                                <a href="{{ path('saas_service_edit', {id: service.id}) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                                    <i class="bx bx-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            <p>Aucun service trouvé</p>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {# Pagination #}
+                    {% if services.pageCount > 1 %}
+                        <div class="mt-3">
+                            {{ knp_pagination_render(services) }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

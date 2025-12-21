@@ -1,0 +1,159 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Informations générales</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name) }}
+                    {{ form_errors(form.name) }}
+                    {% if form.name.vars.help %}
+                        <div class="form-text">{{ form.name.vars.help }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
+                    {% if form.description.vars.help %}
+                        <div class="form-text">{{ form.description.vars.help }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.provider) }}
+                        {{ form_widget(form.provider) }}
+                        {{ form_errors(form.provider) }}
+                        {% if form.provider.vars.help %}
+                            <div class="form-text">{{ form.provider.vars.help }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.category) }}
+                        {{ form_widget(form.category) }}
+                        {{ form_errors(form.category) }}
+                        {% if form.category.vars.help %}
+                            <div class="form-text">{{ form.category.vars.help }}</div>
+                        {% endif %}
+                        <datalist id="categories-list">
+                            <option value="Communication">
+                            <option value="Productivité">
+                            <option value="Développement">
+                            <option value="Design">
+                            <option value="Marketing">
+                            <option value="Gestion de projet">
+                            <option value="Comptabilité">
+                            <option value="RH">
+                            <option value="Stockage">
+                            <option value="Sécurité">
+                        </datalist>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.serviceUrl) }}
+                        {{ form_widget(form.serviceUrl) }}
+                        {{ form_errors(form.serviceUrl) }}
+                        {% if form.serviceUrl.vars.help %}
+                            <div class="form-text">{{ form.serviceUrl.vars.help }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.logoUrl) }}
+                        {{ form_widget(form.logoUrl) }}
+                        {{ form_errors(form.logoUrl) }}
+                        {% if form.logoUrl.vars.help %}
+                            <div class="form-text">{{ form.logoUrl.vars.help }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form_widget(form.active) }}
+                        {{ form_label(form.active) }}
+                    </div>
+                    {{ form_errors(form.active) }}
+                    {% if form.active.vars.help %}
+                        <div class="form-text ms-4">{{ form.active.vars.help }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Prix de référence</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        {{ form_label(form.defaultMonthlyPrice) }}
+                        {{ form_widget(form.defaultMonthlyPrice) }}
+                        {{ form_errors(form.defaultMonthlyPrice) }}
+                        {% if form.defaultMonthlyPrice.vars.help %}
+                            <div class="form-text">{{ form.defaultMonthlyPrice.vars.help }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        {{ form_label(form.currency) }}
+                        {{ form_widget(form.currency) }}
+                        {{ form_errors(form.currency) }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.defaultYearlyPrice) }}
+                    {{ form_widget(form.defaultYearlyPrice) }}
+                    {{ form_errors(form.defaultYearlyPrice) }}
+                    {% if form.defaultYearlyPrice.vars.help %}
+                        <div class="form-text">{{ form.defaultYearlyPrice.vars.help }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Notes</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form_label(form.notes) }}
+                    {{ form_widget(form.notes) }}
+                    {{ form_errors(form.notes) }}
+                    {% if form.notes.vars.help %}
+                        <div class="form-text">{{ form.notes.vars.help }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save"></i> Enregistrer
+                    </button>
+                    <a href="{{ path('saas_service_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-x"></i> Annuler
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
