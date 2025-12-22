@@ -10,11 +10,11 @@
                 breadcrumb: [
                     {label: 'Gestion', path: null},
                     {label: 'Abonnements SaaS', path: 'saas_dashboard'},
-                    {label: 'Liste', path: 'saas_subscription_index'},
+                    {label: 'Liste', path: 'subscription_index'},
                     {label: subscription.displayName, path: null}
                 ],
                 actions: [
-                    {label: 'Modifier', path: 'saas_subscription_edit', params: {id: subscription.id}, icon: 'bx-edit', class: 'btn-primary', permission: 'ROLE_ADMIN'}
+                    {label: 'Modifier', path: 'subscription_edit', params: {id: subscription.id}, icon: 'bx-edit', class: 'btn-primary', permission: 'ROLE_ADMIN'}
                 ]
             } %}
         </div>
@@ -30,19 +30,53 @@
                     <table class="table table-borderless mb-0">
                         <tbody>
                             <tr>
-                                <th class="text-muted" style="width: 200px;">Service</th>
+                                <th class="text-muted" style="width: 200px;">Nom</th>
+                                <td><strong>{{ subscription.displayName }}</strong></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Service</th>
                                 <td>
                                     <strong>{{ subscription.service.name }}</strong>
-                                    {% if subscription.service.provider %}
-                                        <br>
-                                        <small class="text-muted">Fournisseur: {{ subscription.service.provider.name }}</small>
+                                    {% if subscription.service.serviceUrl %}
+                                        <br><a href="{{ subscription.service.serviceUrl }}" target="_blank" class="text-muted small">
+                                            <i class="bx bx-link-external"></i> {{ subscription.service.serviceUrl }}
+                                        </a>
                                     {% endif %}
                                 </td>
                             </tr>
-                            {% if subscription.customName %}
+                            {% if subscription.service.provider %}
                             <tr>
-                                <th class="text-muted">Nom personnalisé</th>
-                                <td>{{ subscription.customName }}</td>
+                                <th class="text-muted">Fournisseur</th>
+                                <td>
+                                    <strong>{{ subscription.service.provider.name }}</strong>
+                                    {% if subscription.service.provider.website %}
+                                        <br><a href="{{ subscription.service.provider.website }}" target="_blank" class="text-muted small">
+                                            <i class="bx bx-link-external"></i> {{ subscription.service.provider.website }}
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% if subscription.service.category %}
+                            <tr>
+                                <th class="text-muted">Catégorie</th>
+                                <td><span class="badge bg-secondary">{{ subscription.service.category }}</span></td>
+                            </tr>
+                            {% endif %}
+                            {% if subscription.notes %}
+                            <tr>
+                                <th class="text-muted align-top">Notes</th>
+                                <td>{{ subscription.notes|nl2br }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if subscription.service.serviceUrl and false %}
+                            <tr>
+                                <th class="text-muted">URL du service</th>
+                                <td>
+                                    <a href="{{ subscription.serviceUrl }}" target="_blank">
+                                        <i class="bx bx-link-external"></i> {{ subscription.serviceUrl }}
+                                    </a>
+                                </td>
                             </tr>
                             {% endif %}
                             <tr>
@@ -61,8 +95,20 @@
                                     </span>
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Facturation</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
                             <tr>
-                                <th class="text-muted">Période de facturation</th>
+                                <th class="text-muted" style="width: 200px;">Période de facturation</th>
                                 <td>
                                     <span class="badge bg-{{ subscription.billingPeriod == 'monthly' ? 'info' : 'primary' }}">
                                         {{ subscription.billingPeriod == 'monthly' ? 'Mensuel' : 'Annuel' }}
@@ -136,12 +182,14 @@
                                 <td class="text-danger">{{ subscription.endDate|date('d/m/Y') }}</td>
                             </tr>
                             {% endif %}
+                            {% if subscription.nextRenewalDate %}
                             <tr>
                                 <th class="text-muted">Prochain renouvellement</th>
                                 <td class="text-warning">
                                     <strong>{{ subscription.nextRenewalDate|date('d/m/Y') }}</strong>
                                 </td>
                             </tr>
+                            {% endif %}
                             {% if subscription.lastRenewalDate %}
                             <tr>
                                 <th class="text-muted">Dernier renouvellement</th>
@@ -198,28 +246,28 @@
                 <div class="card-body">
                     <div class="d-grid gap-2">
                         {% if subscription.isActive %}
-                            <form method="post" action="{{ path('saas_subscription_renew', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer le renouvellement de cet abonnement ?');">
+                            <form method="post" action="{{ path('subscription_renew', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer le renouvellement de cet abonnement ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('renew' ~ subscription.id) }}">
                                 <button type="submit" class="btn btn-success w-100">
                                     <i class="bx bx-refresh"></i> Renouveler maintenant
                                 </button>
                             </form>
 
-                            <form method="post" action="{{ path('saas_subscription_suspend', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la suspension de cet abonnement ?');">
+                            <form method="post" action="{{ path('subscription_suspend', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la suspension de cet abonnement ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('suspend' ~ subscription.id) }}">
                                 <button type="submit" class="btn btn-warning w-100">
                                     <i class="bx bx-pause"></i> Suspendre
                                 </button>
                             </form>
 
-                            <form method="post" action="{{ path('saas_subscription_cancel', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer l\'annulation de cet abonnement ?');">
+                            <form method="post" action="{{ path('subscription_cancel', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer l\'annulation de cet abonnement ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ subscription.id) }}">
                                 <button type="submit" class="btn btn-danger w-100">
                                     <i class="bx bx-x"></i> Annuler
                                 </button>
                             </form>
                         {% elseif subscription.status == 'suspended' or subscription.status == 'cancelled' %}
-                            <form method="post" action="{{ path('saas_subscription_reactivate', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la réactivation de cet abonnement ?');">
+                            <form method="post" action="{{ path('subscription_reactivate', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la réactivation de cet abonnement ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('reactivate' ~ subscription.id) }}">
                                 <button type="submit" class="btn btn-success w-100">
                                     <i class="bx bx-check"></i> Réactiver
@@ -229,11 +277,11 @@
 
                         <hr>
 
-                        <a href="{{ path('saas_subscription_edit', {id: subscription.id}) }}" class="btn btn-primary w-100">
+                        <a href="{{ path('subscription_edit', {id: subscription.id}) }}" class="btn btn-primary w-100">
                             <i class="bx bx-edit"></i> Modifier
                         </a>
 
-                        <form method="post" action="{{ path('saas_subscription_delete', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la suppression définitive de cet abonnement ?');">
+                        <form method="post" action="{{ path('subscription_delete', {id: subscription.id}) }}" onsubmit="return confirm('Confirmer la suppression définitive de cet abonnement ?');">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ subscription.id) }}">
                             <button type="submit" class="btn btn-outline-danger w-100">
                                 <i class="bx bx-trash"></i> Supprimer

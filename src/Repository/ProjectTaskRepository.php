@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Project;
 use App\Entity\ProjectTask;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -100,5 +101,24 @@ class ProjectTaskRepository extends ServiceEntityRepository
             ->setParameter('type', ProjectTask::TYPE_REGULAR)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Trouve les tâches en retard pour un contributeur donné.
+     *
+     * @return ProjectTask[]
+     */
+    public function findOverdueTasksByContributor(\App\Entity\Contributor $contributor): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.assignedContributor = :contributor')
+            ->andWhere('t.endDate < :today')
+            ->andWhere('t.status != :status_completed')
+            ->setParameter('contributor', $contributor)
+            ->setParameter('today', new DateTime())
+            ->setParameter('status_completed', 'completed')
+            ->orderBy('t.endDate', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

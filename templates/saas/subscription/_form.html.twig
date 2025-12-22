@@ -4,203 +4,286 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Informations générales</h5>
+                <h5 class="card-title mb-0">
+                    <i class="bx bx-edit me-2"></i>
+                    {{ subscription is defined ? 'Modifier l\'abonnement : ' ~ subscription.displayName : 'Nouvel abonnement SaaS' }}
+                </h5>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    {{ form_label(form.service) }}
-                    {{ form_widget(form.service) }}
-                    {{ form_errors(form.service) }}
-                    {% if form.service.vars.help %}
-                        <div class="form-text">{{ form.service.vars.help }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.customName) }}
-                    {{ form_widget(form.customName) }}
-                    {{ form_errors(form.customName) }}
-                    {% if form.customName.vars.help %}
-                        <div class="form-text">{{ form.customName.vars.help }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.billingPeriod) }}
-                        {{ form_widget(form.billingPeriod) }}
-                        {{ form_errors(form.billingPeriod) }}
-                        {% if form.billingPeriod.vars.help %}
-                            <div class="form-text">{{ form.billingPeriod.vars.help }}</div>
-                        {% endif %}
+                <!-- Informations générales -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="mb-3">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Informations générales
+                        </h6>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.status) }}
-                        {{ form_widget(form.status) }}
-                        {{ form_errors(form.status) }}
-                        {% if form.status.vars.help %}
-                            <div class="form-text">{{ form.status.vars.help }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-8 mb-3">
-                        <label for="{{ form.price.vars.id }}" class="form-label">
-                            Prix <span id="price-period-label"></span>
-                        </label>
-                        {{ form_widget(form.price) }}
-                        {{ form_errors(form.price) }}
-                        <div class="form-text" id="price-help-text">
-                            Prix selon la période de facturation sélectionnée ci-dessus
+                    <div class="col-12">
+                        <div class="mb-3">
+                            {{ form_label(form.name) }}
+                            {{ form_widget(form.name) }}
+                            {{ form_help(form.name) }}
+                            {% if form.name.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form_errors(form.name) }}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        {{ form_label(form.currency) }}
-                        {{ form_widget(form.currency) }}
-                        {{ form_errors(form.currency) }}
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.vendor) }}
+                            {{ form_widget(form.vendor) }}
+                            {{ form_help(form.vendor) }}
+                            {% if form.vendor.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form_errors(form.vendor) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.provider) }}
+                            {{ form_widget(form.provider) }}
+                            {{ form_help(form.provider) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.category) }}
+                            {{ form_widget(form.category) }}
+                            {{ form_help(form.category) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.serviceUrl) }}
+                            {{ form_widget(form.serviceUrl) }}
+                            {{ form_help(form.serviceUrl) }}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="mb-3">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description) }}
+                            {{ form_help(form.description) }}
+                        </div>
                     </div>
                 </div>
 
-                <script>
-                (function() {
-                    const billingPeriodSelect = document.getElementById('{{ form.billingPeriod.vars.id }}');
-                    const pricePeriodLabel = document.getElementById('price-period-label');
-                    const priceHelpText = document.getElementById('price-help-text');
-
-                    function updatePriceLabel() {
-                        const period = billingPeriodSelect.value;
-                        if (period === 'monthly') {
-                            pricePeriodLabel.textContent = 'par mois';
-                            pricePeriodLabel.className = 'text-info';
-                            priceHelpText.innerHTML = '<strong>Facturation mensuelle :</strong> Le prix saisi sera facturé chaque mois. Le coût annuel sera calculé automatiquement (×12).';
-                        } else if (period === 'yearly') {
-                            pricePeriodLabel.textContent = 'par an';
-                            pricePeriodLabel.className = 'text-primary';
-                            priceHelpText.innerHTML = '<strong>Facturation annuelle :</strong> Le prix saisi sera facturé chaque année. Le coût mensuel sera calculé automatiquement (÷12).';
-                        } else {
-                            pricePeriodLabel.textContent = '';
-                            priceHelpText.textContent = 'Prix selon la période de facturation sélectionnée ci-dessus';
-                        }
-                    }
-
-                    if (billingPeriodSelect && pricePeriodLabel) {
-                        billingPeriodSelect.addEventListener('change', updatePriceLabel);
-                        updatePriceLabel(); // Init
-                    }
-                })();
-                </script>
-
-                <div class="mb-3">
-                    {{ form_label(form.quantity) }}
-                    {{ form_widget(form.quantity) }}
-                    {{ form_errors(form.quantity) }}
-                    {% if form.quantity.vars.help %}
-                        <div class="form-text">{{ form.quantity.vars.help }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        {{ form_widget(form.autoRenewal) }}
-                        {{ form_label(form.autoRenewal) }}
+                <!-- Facturation -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="mb-3">
+                            <i class="bx bx-euro me-2"></i>
+                            Facturation
+                        </h6>
                     </div>
-                    {{ form_errors(form.autoRenewal) }}
-                    {% if form.autoRenewal.vars.help %}
-                        <div class="form-text ms-4">{{ form.autoRenewal.vars.help }}</div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Dates</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.startDate) }}
-                        {{ form_widget(form.startDate) }}
-                        {{ form_errors(form.startDate) }}
-                        {% if form.startDate.vars.help %}
-                            <div class="form-text">{{ form.startDate.vars.help }}</div>
-                        {% endif %}
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            {{ form_label(form.billingPeriod) }}
+                            {{ form_widget(form.billingPeriod) }}
+                            {{ form_help(form.billingPeriod) }}
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.endDate) }}
-                        {{ form_widget(form.endDate) }}
-                        {{ form_errors(form.endDate) }}
-                        {% if form.endDate.vars.help %}
-                            <div class="form-text">{{ form.endDate.vars.help }}</div>
-                        {% endif %}
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            {{ form_label(form.price) }}
+                            <span id="price-period-label" class="ms-1"></span>
+                            <div class="input-group">
+                                {{ form_widget(form.price) }}
+                                <span class="input-group-text">€</span>
+                            </div>
+                            <div class="form-text" id="price-help-text">
+                                Prix selon la période de facturation sélectionnée
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            {{ form_label(form.quantity) }}
+                            <div class="input-group">
+                                {{ form_widget(form.quantity) }}
+                                <span class="input-group-text">licence(s)</span>
+                            </div>
+                            {{ form_help(form.quantity) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.status) }}
+                            {{ form_widget(form.status) }}
+                            {{ form_help(form.status) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Renouvellement automatique</label>
+                            {{ form_widget(form.autoRenewal) }}
+                            {{ form_help(form.autoRenewal) }}
+                        </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.nextRenewalDate) }}
-                        {{ form_widget(form.nextRenewalDate) }}
-                        {{ form_errors(form.nextRenewalDate) }}
-                        {% if form.nextRenewalDate.vars.help %}
-                            <div class="form-text">{{ form.nextRenewalDate.vars.help }}</div>
-                        {% endif %}
+                <!-- Planification -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="mb-3">
+                            <i class="bx bx-calendar me-2"></i>
+                            Planification
+                        </h6>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        {{ form_label(form.lastRenewalDate) }}
-                        {{ form_widget(form.lastRenewalDate) }}
-                        {{ form_errors(form.lastRenewalDate) }}
-                        {% if form.lastRenewalDate.vars.help %}
-                            <div class="form-text">{{ form.lastRenewalDate.vars.help }}</div>
-                        {% endif %}
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.startDate) }}
+                            {{ form_widget(form.startDate) }}
+                            {{ form_help(form.startDate) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.nextRenewalDate) }}
+                            {{ form_widget(form.nextRenewalDate) }}
+                            {{ form_help(form.nextRenewalDate) }}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Informations complémentaires</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    {{ form_label(form.externalReference) }}
-                    {{ form_widget(form.externalReference) }}
-                    {{ form_errors(form.externalReference) }}
-                    {% if form.externalReference.vars.help %}
-                        <div class="form-text">{{ form.externalReference.vars.help }}</div>
-                    {% endif %}
+                <!-- Informations complémentaires -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="mb-3">
+                            <i class="bx bx-note me-2"></i>
+                            Informations complémentaires
+                        </h6>
+                    </div>
+                    <div class="col-12">
+                        <div class="mb-3">
+                            {{ form_label(form.externalReference) }}
+                            {{ form_widget(form.externalReference) }}
+                            {{ form_help(form.externalReference) }}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="mb-3">
+                            {{ form_label(form.notes) }}
+                            {{ form_widget(form.notes) }}
+                            {{ form_help(form.notes) }}
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    {{ form_label(form.notes) }}
-                    {{ form_widget(form.notes) }}
-                    {{ form_errors(form.notes) }}
-                    {% if form.notes.vars.help %}
-                        <div class="form-text">{{ form.notes.vars.help }}</div>
-                    {% endif %}
+                <!-- Boutons d'action -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ path('subscription_index') }}" class="btn btn-light">
+                        <i class="bx bx-x me-1"></i>
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save me-1"></i>
+                        Enregistrer
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Sidebar avec informations -->
     <div class="col-lg-4">
+        {% if subscription is defined %}
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Actions</h5>
+                <h5 class="card-title mb-0">Informations de l'abonnement</h5>
             </div>
             <div class="card-body">
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bx bx-save"></i> Enregistrer
-                    </button>
-                    <a href="{{ path('saas_subscription_index') }}" class="btn btn-outline-secondary">
-                        <i class="bx bx-x"></i> Annuler
-                    </a>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>Statut :</strong></td>
+                            <td>
+                                {% set statusClass = {
+                                    'active': 'success',
+                                    'cancelled': 'danger',
+                                    'suspended': 'warning',
+                                    'expired': 'secondary'
+                                } %}
+                                <span class="badge bg-{{ statusClass[subscription.status] ?? 'secondary' }}">
+                                    {{ subscription.status == 'active' ? 'Actif' :
+                                       (subscription.status == 'cancelled' ? 'Annulé' :
+                                       (subscription.status == 'suspended' ? 'Suspendu' : 'Expiré')) }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coût mensuel :</strong></td>
+                            <td class="text-info"><strong>{{ subscription.monthlyCost|number_format(2, ',', ' ') }}€</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coût annuel :</strong></td>
+                            <td class="text-success"><strong>{{ subscription.yearlyCost|number_format(2, ',', ' ') }}€</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Créé le :</strong></td>
+                            <td>{{ subscription.createdAt|date('d/m/Y H:i') }}</td>
+                        </tr>
+                        {% if subscription.updatedAt %}
+                        <tr>
+                            <td><strong>Modifié le :</strong></td>
+                            <td>{{ subscription.updatedAt|date('d/m/Y H:i') }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Aide</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    <h6 class="alert-heading">À propos</h6>
+                    <p class="mb-2"><strong>Fournisseur :</strong> Le fournisseur du service (ex: Disney, Netflix, Adobe).</p>
+                    <p class="mb-2"><strong>Canal de distribution :</strong> Comment l'abonnement est souscrit (ex: Apple Store, Direct).</p>
+                    <p class="mb-0"><strong>Facturation :</strong> Le coût mensuel et annuel est calculé automatiquement selon la période de facturation.</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+(function() {
+    const billingPeriodSelect = document.getElementById('{{ form.billingPeriod.vars.id }}');
+    const pricePeriodLabel = document.getElementById('price-period-label');
+    const priceHelpText = document.getElementById('price-help-text');
+
+    function updatePriceLabel() {
+        if (!billingPeriodSelect || !pricePeriodLabel) return;
+
+        const period = billingPeriodSelect.value;
+        if (period === 'monthly') {
+            pricePeriodLabel.textContent = '(par mois)';
+            pricePeriodLabel.className = 'ms-1 text-info small';
+            priceHelpText.innerHTML = '<strong>Facturation mensuelle :</strong> Le prix sera facturé chaque mois. Le coût annuel sera calculé automatiquement (×12).';
+        } else if (period === 'yearly') {
+            pricePeriodLabel.textContent = '(par an)';
+            pricePeriodLabel.className = 'ms-1 text-primary small';
+            priceHelpText.innerHTML = '<strong>Facturation annuelle :</strong> Le prix sera facturé chaque année. Le coût mensuel sera calculé automatiquement (÷12).';
+        } else {
+            pricePeriodLabel.textContent = '';
+            priceHelpText.textContent = 'Prix selon la période de facturation sélectionnée';
+        }
+    }
+
+    if (billingPeriodSelect) {
+        billingPeriodSelect.addEventListener('change', updatePriceLabel);
+        updatePriceLabel();
+    }
+})();
+</script>
 
 {{ form_end(form) }}

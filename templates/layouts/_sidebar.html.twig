@@ -1,223 +1,41 @@
 <!-- ========== Left Sidebar Start ========== -->
 <div class="vertical-menu">
-
     <div data-simplebar class="h-100">
-
-        <!--- Sidemenu -->
         <div id="sidebar-menu">
-            <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
-                <li class="menu-title">Tableau de bord</li>
+                {% set mainMenu = get_main_menu() %}
 
-                <li>
-                    <a href="{{ path('home') }}" class="waves-effect">
-                        <i class="bx bx-home-circle"></i>
-                        <span>Accueil</span>
-                    </a>
-                </li>
-
-                {# Commerce - Accessible aux Chefs de projet et Commerciaux #}
-                {% if is_granted('ROLE_CHEF_PROJET') %}
-                <li class="menu-title">Commerce</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-store"></i>
-                        <span>Commerce</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('sales_dashboard_index') }}">KPIs commerce</a></li>
-                        <li><a href="{{ path('client_index') }}">Clients</a></li>
-                        <li><a href="{{ path('order_index') }}">Devis</a></li>
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# Delivery - Accessible selon les rôles #}
-                {% if is_granted('ROLE_CHEF_PROJET') or is_granted('ROLE_INTERVENANT') %}
-                <li class="menu-title">Delivery</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-package"></i>
-                        <span>Delivery</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        {% if is_granted('ROLE_CHEF_PROJET') %}
-                        <li><a href="{{ path('project_index') }}">Projets</a></li>
-                        <li><a href="{{ path('planning_index') }}">Planning</a></li>
-                        {% endif %}
-                        {% if is_granted('ROLE_MANAGER') %}
-                        <li><a href="{{ path('planning_optimization_index') }}"><i class="bx bx-bulb"></i> Optimisation</a></li>
-                        <li><a href="{{ path('risk_projects_dashboard') }}"><i class="bx bx-error-circle"></i> Projets à risque</a></li>
-                        {% endif %}
-                        {% if is_granted('ROLE_INTERVENANT') %}
-                        <li><a href="{{ path('my_tasks_index') }}">Mes tâches <span id="sidebar-overdue-tasks-count" class="badge bg-warning ms-2" style="display:none;">0</span></a></li>
-                        <li><a href="{{ path('timesheet_index') }}">Saisir mes temps</a></li>
-                        <li><a href="{{ path('timesheet_my_time') }}">Mon historique</a></li>
-                        <li><a href="{{ path('vacation_request_index') }}">Mes congés</a></li>
-                        {% endif %}
-                        {% if is_granted('ROLE_MANAGER') %}
-                        <li><a href="{{ path('vacation_approval_index') }}">Validation congés <span id="sidebar-pending-vacations-count" class="badge bg-warning ms-2" style="display:none;">0</span></a></li>
-                        <li><a href="{{ path('expense_report_pending') }}">Validation notes de frais</a></li>
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                        <li><a href="{{ path('timesheet_all') }}">Tous les temps</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# Comptabilité - Accessible à la compta #}
-                {% if is_granted('ROLE_COMPTA') %}
-                <li class="menu-title">Comptabilité</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-receipt"></i>
-                        <span>Comptabilité</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('billing_index') }}">Facturation mensuelle</a></li>
-                        <li><a href="{{ path('invoice_index') }}">Factures</a></li>
-                        <li><a href="{{ path('expense_report_index') }}">Notes de frais</a></li>
-                        <li><a href="{{ path('treasury_dashboard') }}">Trésorerie</a></li>
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# Administration - Accessible à la compta et delivery #}
-                {% if is_granted('ROLE_COMPTA') %}
-                <li class="menu-title">Administration</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-briefcase"></i>
-                        <span>Administration</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('contributor_index') }}">Collaborateurs</a></li>
-                        <li><a href="{{ path('admin_users') }}">Utilisateurs et rôles</a></li>
-                        <li><a href="{{ path('employment_period_index') }}">Périodes d'emploi</a></li>
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# RH & Satisfaction - Accessible selon les rôles #}
-                {% if is_granted('ROLE_USER') %}
-                <li class="menu-title">RH & Satisfaction</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-heart"></i>
-                        <span>RH & Satisfaction</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('satisfaction_index') }}">Ma satisfaction</a></li>
-                        <li><a href="{{ path('leaderboard_index') }}">Classement & XP</a></li>
-                        <li><a href="{{ path('performance_review_index') }}">Mes évaluations</a></li>
-                        {% if is_granted('ROLE_MANAGER') %}
-                        <li><a href="{{ path('nps_index') }}">Satisfaction client (NPS)</a></li>
-                        <li><a href="{{ path('satisfaction_stats') }}">Stats satisfaction équipe</a></li>
-                        <li><a href="{{ path('onboarding_team') }}">Onboarding équipe</a></li>
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                        <li><a href="{{ path('badge_index') }}">Gestion des badges</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# Backoffice - Accessible aux administrateurs #}
-                {% if is_granted('ROLE_ADMIN') %}
-                <li class="menu-title">Backoffice</li>
-
-                <li>
-                    <a href="{{ path('backoffice') }}" class="waves-effect">
-                        <i class="bx bx-cog"></i>
-                        <span>Backoffice</span>
-                    </a>
-                </li>
-                {% endif %}
-
-                {# Analytics - Accessible aux administrateurs et delivery #}
-                {% if is_granted('ROLE_ADMIN') %}
-                <li class="menu-title">Analytics</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-bar-chart-alt-2"></i>
-                        <span>Analytics</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('analytics_dashboard') }}">Dashboard KPIs</a></li>
-                        {% if is_granted('ROLE_MANAGER') %}
-                        <li><a href="{{ path('analytics_predictions') }}">Prédictions & Alertes</a></li>
-                        <li><a href="{{ path('forecasting_index') }}">Prévisions CA</a></li>
-                        <li><a href="{{ path('forecasting_dashboard') }}">Prévisions CA (Simple)</a></li>
-                        <li><a href="{{ path('staffing_prediction') }}">Prédiction de charge</a></li>
-                        <li><a href="{{ path('hr_dashboard') }}">Dashboard RH</a></li>
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                        <li><a href="{{ path('staffing_dashboard') }}">Staffing & TACE</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# CRM HotOnes - Accessible aux administrateurs uniquement #}
-                {% if is_granted('ROLE_ADMIN') %}
-                <li class="menu-title">CRM HotOnes</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-user-check"></i>
-                        <span>CRM HotOnes</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('admin_crm_statistics') }}"><i class="bx bx-bar-chart"></i> Statistiques</a></li>
-                        <li><a href="{{ path('admin_crm_leads_index') }}"><i class="bx bx-list-ul"></i> Tous les leads</a></li>
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# Gestion - Accessible aux administrateurs #}
-                {% if is_granted('ROLE_ADMIN') %}
-                <li class="menu-title">Gestion</li>
-
-                <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-cloud"></i>
-                        <span>Abonnements SaaS</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{ path('saas_dashboard') }}"><i class="bx bx-line-chart"></i> Dashboard</a></li>
-                        <li><a href="{{ path('saas_subscription_index') }}"><i class="bx bx-list-ul"></i> Abonnements</a></li>
-                        <li><a href="{{ path('saas_service_index') }}"><i class="bx bx-server"></i> Services</a></li>
-                    </ul>
-                </li>
-                {% endif %}
-
-                {# À propos - Accessible à tous #}
-                <li class="menu-title">Informations</li>
-
-                <li>
-                    <a href="{{ path('chatbot_index') }}" class="waves-effect">
-                        <i class="bx bx-bot"></i>
-                        <span>Marvin - Assistant IA</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ path('about') }}" class="waves-effect">
-                        <i class="bx bx-info-circle"></i>
-                        <span>À propos</span>
-                    </a>
-                </li>
-
+                {% for item in mainMenu %}
+                    {% if item.is_title is defined and item.is_title %}
+                        <li class="menu-title">{{ item.label }}</li>
+                    {% else %}
+                        <li>
+                            {% if item.children is defined and item.children is not empty %}
+                                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                    <i class="bx {{ item.icon|default('bx-folder') }}"></i>
+                                    <span>{{ item.label }}</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    {% for child in item.children %}
+                                        <li>
+                                            <a href="{{ child.route is defined ? path(child.route) : '#' }}">
+                                                {% if child.icon is defined %}<i class="bx {{ child.icon }}"></i>{% endif %}
+                                                {{ child.label }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <a href="{{ item.route is defined ? path(item.route) : '#' }}" class="waves-effect">
+                                    <i class="bx {{ item.icon|default('bx-folder') }}"></i>
+                                    <span>{{ item.label }}</span>
+                                </a>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                {% endfor %}
             </ul>
         </div>
-        <!-- Sidebar -->
     </div>
 </div>
 <!-- Left Sidebar End -->

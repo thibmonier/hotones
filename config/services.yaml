@@ -40,11 +40,7 @@ services:
         arguments:
             $openaiApiKey: '%env(OPENAI_API_KEY)%'
             $anthropicApiKey: '%env(ANTHROPIC_API_KEY)%'
-
-    # Chatbot Controller
-    App\Controller\ChatbotController:
-        arguments:
-            $anthropicApiKey: '%env(ANTHROPIC_API_KEY)%'
+            $geminiApiKey: '%env(GEMINI_API_KEY)%'
 
     # Migrations Sync Command
     App\Command\MigrationsSyncCommand:

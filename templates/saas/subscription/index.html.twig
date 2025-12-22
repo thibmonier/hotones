@@ -14,7 +14,7 @@
                 ],
                 actions: [
                     {label: 'Dashboard', path: 'saas_dashboard', icon: 'bx-line-chart', class: 'btn-outline-primary', permission: 'ROLE_ADMIN'},
-                    {label: 'Nouvel abonnement', path: 'saas_subscription_new', icon: 'bx-plus', class: 'btn-primary', permission: 'ROLE_ADMIN'}
+                    {label: 'Nouvel abonnement', path: 'subscription_new', icon: 'bx-plus', class: 'btn-primary', permission: 'ROLE_ADMIN'}
                 ]
             } %}
         </div>
@@ -30,6 +30,9 @@
                         + (filters.search ? 1 : 0)
                         + (filters.status ? 1 : 0)
                         + (filters.billing_period ? 1 : 0)
+                        + (filters.category ? 1 : 0)
+                        + (filters.vendor ? 1 : 0)
+                        + (filters.provider ? 1 : 0)
                         + (sort != 'nextRenewalDate' ? 1 : 0)
                         + (dir != 'ASC' ? 1 : 0)
                     %}
@@ -40,7 +43,7 @@
                             {% endif %}
                         </h5>
                         <div class="btn-group">
-                            <a href="{{ path('saas_subscription_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                            <a href="{{ path('subscription_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
                             <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-subscriptions" aria-expanded="true" aria-controls="filters-subscriptions" id="filters-toggle-subscriptions">
                                 <i class="bx bx-chevron-up"></i>
                             </button>
@@ -51,15 +54,15 @@
                             <div class="col-12 mb-2">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bx bx-search"></i></span>
-                                    <input type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="Rechercher un abonnement (service, fournisseur)...">
+                                    <input type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="Rechercher un abonnement (nom, description, fournisseur, canal)...">
                                     {% if filters.search %}
-                                        <a href="{{ path('saas_subscription_index', filters|merge({search: null})) }}" class="btn btn-outline-secondary" title="Effacer la recherche">
+                                        <a href="{{ path('subscription_index', filters|merge({search: null})) }}" class="btn btn-outline-secondary" title="Effacer la recherche">
                                             <i class="bx bx-x"></i>
                                         </a>
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Statut</label>
                                 <select class="form-select" name="status">
                                     <option value="">Tous</option>
@@ -69,7 +72,7 @@
                                     <option value="expired" {% if filters.status == 'expired' %}selected{% endif %}>Expiré</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Facturation</label>
                                 <select class="form-select" name="billing_period">
                                     <option value="">Tous</option>
@@ -77,9 +80,17 @@
                                     <option value="yearly" {% if filters.billing_period == 'yearly' %}selected{% endif %}>Annuel</option>
                                 </select>
                             </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Catégorie</label>
+                                <input type="text" class="form-select" name="category" value="{{ filters.category }}" placeholder="Streaming, Productivité...">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Fournisseur</label>
+                                <input type="text" class="form-control" name="vendor" value="{{ filters.vendor }}" placeholder="Disney, Netflix...">
+                            </div>
                             <div class="col-12 mt-2 d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">Filtrer</button>
-                                <a href="{{ path('saas_subscription_index', { reset: 1 }) }}" class="btn btn-outline-secondary">Réinitialiser</a>
+                                <a href="{{ path('subscription_index', { reset: 1 }) }}" class="btn btn-outline-secondary">Réinitialiser</a>
                             </div>
                         </form>
                     </div>
@@ -97,15 +108,23 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>
-                                        <a href="{{ path('saas_subscription_index', filters|merge({ sort: 'service', dir: sort == 'service' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
-                                            Service
-                                            {% if sort == 'service' %}
+                                        <a href="{{ path('subscription_index', filters|merge({ sort: 'name', dir: sort == 'name' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Abonnement
+                                            {% if sort == 'name' %}
                                                 <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
                                             {% endif %}
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="{{ path('saas_subscription_index', filters|merge({ sort: 'status', dir: sort == 'status' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                        <a href="{{ path('subscription_index', filters|merge({ sort: 'vendor', dir: sort == 'vendor' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                            Fournisseur
+                                            {% if sort == 'vendor' %}
+                                                <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ path('subscription_index', filters|merge({ sort: 'status', dir: sort == 'status' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
                                             Statut
                                             {% if sort == 'status' %}
                                                 <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
@@ -114,7 +133,7 @@
                                     </th>
                                     <th>Facturation</th>
                                     <th>
-                                        <a href="{{ path('saas_subscription_index', filters|merge({ sort: 'price', dir: sort == 'price' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                        <a href="{{ path('subscription_index', filters|merge({ sort: 'price', dir: sort == 'price' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
                                             Prix
                                             {% if sort == 'price' %}
                                                 <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
@@ -124,7 +143,7 @@
                                     <th>Quantité</th>
                                     <th>Coût mensuel</th>
                                     <th>
-                                        <a href="{{ path('saas_subscription_index', filters|merge({ sort: 'nextRenewalDate', dir: sort == 'nextRenewalDate' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
+                                        <a href="{{ path('subscription_index', filters|merge({ sort: 'nextRenewalDate', dir: sort == 'nextRenewalDate' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
                                             Prochain renouvellement
                                             {% if sort == 'nextRenewalDate' %}
                                                 <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
@@ -139,12 +158,19 @@
                                     <tr>
                                         <td>
                                             <h6 class="mb-0">
-                                                <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}">
+                                                <a href="{{ path('subscription_show', {id: subscription.id}) }}">
                                                     {{ subscription.displayName }}
                                                 </a>
                                             </h6>
+                                            {% if subscription.service.category %}
+                                                <small class="text-muted"><i class="bx bx-category"></i> {{ subscription.service.category }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
                                             {% if subscription.service.provider %}
-                                                <small class="text-muted">{{ subscription.service.provider.name }}</small>
+                                                <strong>{{ subscription.service.provider.name }}</strong>
+                                            {% else %}
+                                                <small class="text-muted">Direct</small>
                                             {% endif %}
                                         </td>
                                         <td>
@@ -168,13 +194,13 @@
                                         <td>{{ subscription.price|number_format(2, ',', ' ') }}€</td>
                                         <td>{{ subscription.quantity }}</td>
                                         <td>{{ subscription.monthlyCost|number_format(2, ',', ' ') }}€</td>
-                                        <td>{{ subscription.nextRenewalDate|date('d/m/Y') }}</td>
+                                        <td>{{ subscription.nextRenewalDate ? subscription.nextRenewalDate|date('d/m/Y') : '-' }}</td>
                                         <td class="text-end">
                                             <div class="btn-group">
-                                                <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir">
+                                                <a href="{{ path('subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir">
                                                     <i class="bx bx-show"></i>
                                                 </a>
-                                                <a href="{{ path('saas_subscription_edit', {id: subscription.id}) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                                <a href="{{ path('subscription_edit', {id: subscription.id}) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
                                                     <i class="bx bx-edit"></i>
                                                 </a>
                                             </div>
@@ -182,7 +208,7 @@
                                     </tr>
                                 {% else %}
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">
+                                        <td colspan="9" class="text-center text-muted py-4">
                                             <p>Aucun abonnement trouvé</p>
                                         </td>
                                     </tr>

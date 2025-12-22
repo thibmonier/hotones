@@ -230,13 +230,15 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/justinrainbow/json-schema" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/marc-mabe/php-enum" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ondram/ci-detector" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/qossmic/deptrac" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sanmai/di-container" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sanmai/duoclock" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sanmai/later" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sanmai/pipeline" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/thecodingmachine/safe" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/presta/sitemap-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/imagine/imagine" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/liip/imagine-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/deptrac/deptrac" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

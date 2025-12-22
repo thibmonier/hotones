@@ -11,6 +11,61 @@
     </div>
 </div>
 
+{# Alerte Tâches en retard #}
+{% if overdueTasks is defined and overdueTasks is not empty %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="mdi mdi-block-helper me-2"></i>
+            Vous avez <strong>{{ overdueTasks|length }} tâche(s) en retard</strong> !
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-danger">
+            <div class="card-header bg-danger bg-soft">
+                <h4 class="card-title text-danger mb-0">Tâches en retard</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-nowrap table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tâche</th>
+                                <th>Projet</th>
+                                <th>Date de fin</th>
+                                <th>Retard</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in overdueTasks %}
+                                <tr>
+                                    <td>{{ task.name }}</td>
+                                    <td>{{ task.project.name }}</td>
+                                    <td>{{ task.endDate|date('d/m/Y') }}</td>
+                                    <td class="text-danger">
+                                        {{ date().diff(task.endDate).days }} jours
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('my_tasks_index') }}" class="btn btn-sm btn-danger">
+                                            Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {# KPIs - Mes temps cette semaine #}
 <div class="row">
     <div class="col-xl-4 col-md-6">

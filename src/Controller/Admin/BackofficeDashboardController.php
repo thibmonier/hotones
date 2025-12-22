@@ -3,6 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Profile;
+use App\Entity\SaasProvider;
+use App\Entity\SaasService;
+use App\Entity\SaasSubscription;
 use App\Entity\SchedulerEntry;
 use App\Entity\ServiceCategory;
 use App\Entity\Skill;
@@ -55,6 +58,11 @@ class BackofficeDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Catégories de service', 'fas fa-tags', ServiceCategory::class);
         yield MenuItem::linkToCrud('Profils métier', 'fas fa-user-tie', Profile::class);
         yield MenuItem::linkToCrud('Compétences', 'fas fa-certificate', Skill::class);
+
+        yield MenuItem::section('SaaS');
+        yield MenuItem::linkToCrud('Fournisseurs', 'fas fa-building', SaasProvider::class);
+        yield MenuItem::linkToCrud('Services', 'fas fa-cube', SaasService::class);
+        yield MenuItem::linkToCrud('Abonnements', 'fas fa-calendar-check', SaasSubscription::class);
 
         yield MenuItem::section('Système');
         yield MenuItem::linkToCrud('Scheduler', 'fas fa-clock', SchedulerEntry::class);

@@ -12,11 +12,12 @@ use function count;
 use Exception;
 use OpenAI;
 use RuntimeException;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Assistant IA pour générer des recommandations avancées de planning.
  *
- * Utilise OpenAI GPT-4 ou Anthropic Claude pour analyser les situations de charge
+ * Utilise OpenAI GPT-4, Anthropic Claude ou Google Gemini pour analyser les situations de charge
  * et générer des recommandations intelligentes basées sur le contexte du projet.
  */
 class PlanningAIAssistant
@@ -26,10 +27,12 @@ class PlanningAIAssistant
     private ?string $apiKey   = null;
 
     public function __construct(
+        private readonly HttpClientInterface $httpClient,
         ?string $openaiApiKey = null,
-        ?string $anthropicApiKey = null
+        ?string $anthropicApiKey = null,
+        ?string $geminiApiKey = null
     ) {
-        // Déterminer quel provider est disponible
+        // Déterminer quel provider est disponible (ordre de priorité)
         if ($openaiApiKey !== null && $openaiApiKey !== '') {
             $this->enabled  = true;
             $this->provider = 'openai';
@@ -38,6 +41,10 @@ class PlanningAIAssistant
             $this->enabled  = true;
             $this->provider = 'anthropic';
             $this->apiKey   = $anthropicApiKey;
+        } elseif ($geminiApiKey !== null && $geminiApiKey !== '') {
+            $this->enabled  = true;
+            $this->provider = 'gemini';
+            $this->apiKey   = $geminiApiKey;
         }
     }
 
@@ -61,7 +68,7 @@ class PlanningAIAssistant
         if (!$this->enabled) {
             return [
                 'enhanced' => false,
-                'message'  => 'AI assistance is not enabled. Set OPENAI_API_KEY or ANTHROPIC_API_KEY in .env to enable.',
+                'message'  => 'AI assistance is not enabled. Set OPENAI_API_KEY, ANTHROPIC_API_KEY or GEMINI_API_KEY in .env to enable.',
             ];
         }
 
@@ -164,6 +171,10 @@ class PlanningAIAssistant
             return $this->callAnthropic($prompt);
         }
 
+        if ($this->provider === 'gemini') {
+            return $this->callGemini($prompt);
+        }
+
         throw new RuntimeException('No AI provider configured.');
     }
 
@@ -231,6 +242,48 @@ class PlanningAIAssistant
         }
 
         return $data;
+    }
+
+    /**
+     * Appelle l'API Google Gemini pour générer des recommandations.
+     */
+    private function callGemini(string $prompt): array
+    {
+        $systemPrompt = 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.';
+
+        $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='.$this->apiKey, [
+            'json' => [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $systemPrompt."\n\n".$prompt],
+                        ],
+                    ],
+                ],
+                'generationConfig' => [
+                    'temperature'     => 0.7,
+                    'maxOutputTokens' => 2000,
+                ],
+            ],
+        ]);
+
+        $data = $response->toArray();
+
+        // Extraire le contenu textuel de la réponse Gemini
+        $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
+        if (empty($content)) {
+            throw new RuntimeException('Empty response from Gemini API');
+        }
+
+        // Parser la réponse JSON
+        $parsedData = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Failed to parse AI response as JSON: '.json_last_error_msg());
+        }
+
+        return $parsedData;
     }
 
     /**

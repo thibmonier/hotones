@@ -12,7 +12,7 @@
                     {label: 'Abonnements SaaS', path: null}
                 ],
                 actions: [
-                    {label: 'Gérer les abonnements', path: 'saas_subscription_index', icon: 'bx-list-ul', class: 'btn-primary', permission: 'ROLE_ADMIN'}
+                    {label: 'Gérer les abonnements', path: 'subscription_index', icon: 'bx-list-ul', class: 'btn-primary', permission: 'ROLE_ADMIN'}
                 ]
             } %}
         </div>
@@ -124,7 +124,7 @@
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">
-                                            <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="text-dark">
+                                            <a href="{{ path('subscription_show', {id: subscription.id}) }}" class="text-dark">
                                                 {{ subscription.displayName }}
                                             </a>
                                         </h6>
@@ -138,7 +138,7 @@
                                         </small>
                                     </div>
                                     <div class="flex-shrink-0 ms-2">
-                                        <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-warning">
+                                        <a href="{{ path('subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-warning">
                                             <i class="bx bx-show"></i>
                                         </a>
                                     </div>
@@ -148,7 +148,7 @@
                     </div>
                     {% if due_for_renewal|length > 5 %}
                         <div class="text-center mt-3 pt-2 border-top">
-                            <a href="{{ path('saas_subscription_index') }}" class="btn btn-sm btn-warning">
+                            <a href="{{ path('subscription_index') }}" class="btn btn-sm btn-warning">
                                 Voir tous <i class="bx bx-right-arrow-alt ms-1"></i>
                             </a>
                         </div>
@@ -176,7 +176,7 @@
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">
-                                            <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="text-dark">
+                                            <a href="{{ path('subscription_show', {id: subscription.id}) }}" class="text-dark">
                                                 {{ subscription.displayName }}
                                             </a>
                                         </h6>
@@ -190,7 +190,7 @@
                                         </small>
                                     </div>
                                     <div class="flex-shrink-0 ms-2">
-                                        <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-info">
+                                        <a href="{{ path('subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-info">
                                             <i class="bx bx-show"></i>
                                         </a>
                                     </div>
@@ -200,7 +200,7 @@
                     </div>
                     {% if expiring_subscriptions|length > 5 %}
                         <div class="text-center mt-3 pt-2 border-top">
-                            <a href="{{ path('saas_subscription_index') }}" class="btn btn-sm btn-info">
+                            <a href="{{ path('subscription_index') }}" class="btn btn-sm btn-info">
                                 Voir tous <i class="bx bx-right-arrow-alt ms-1"></i>
                             </a>
                         </div>
@@ -220,7 +220,7 @@
                         <h5 class="card-title mb-0">
                             Tous les abonnements actifs
                         </h5>
-                        <a href="{{ path('saas_subscription_index') }}" class="btn btn-sm btn-primary">
+                        <a href="{{ path('subscription_index') }}" class="btn btn-sm btn-primary">
                             Voir tous <i class="bx bx-right-arrow-alt ms-1"></i>
                         </a>
                     </div>
@@ -244,9 +244,9 @@
                                     <tr>
                                         <td>
                                             <h6 class="mb-0">{{ subscription.displayName }}</h6>
-                                            {% if subscription.service.provider %}
-                                                <small class="text-muted">{{ subscription.service.provider.name }}</small>
-                                            {% endif %}
+                                            <small class="text-muted">
+                                                {{ subscription.service.provider ? subscription.service.provider.name : 'Direct' }}
+                                            </small>
                                         </td>
                                         <td>
                                             <span class="badge bg-{{ subscription.billingPeriod == 'monthly' ? 'info' : 'primary' }}">
@@ -255,12 +255,12 @@
                                         </td>
                                         <td>{{ subscription.price|number_format(2, ',', ' ') }}€</td>
                                         <td>{{ subscription.monthlyCost|number_format(2, ',', ' ') }}€</td>
-                                        <td>{{ subscription.nextRenewalDate|date('d/m/Y') }}</td>
+                                        <td>{{ subscription.nextRenewalDate ? subscription.nextRenewalDate|date('d/m/Y') : '-' }}</td>
                                         <td>
                                             <i class="bx bx{{ subscription.autoRenewal ? 'x-check text-success' : '-x text-danger' }}"></i>
                                         </td>
                                         <td class="text-end">
-                                            <a href="{{ path('saas_subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ path('subscription_show', {id: subscription.id}) }}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bx bx-show"></i>
                                             </a>
                                         </td>

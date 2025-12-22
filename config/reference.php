@@ -776,7 +776,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         enable_native_lazy_objects?: bool, // Deprecated: The "enable_native_lazy_objects" option is deprecated and will be removed in DoctrineBundle 4.0, as native lazy objects are now always enabled. // Default: true
  *         controller_resolver?: bool|array{
  *             enabled?: bool, // Default: true
- *             auto_mapping?: bool, // Deprecated: The "auto_mapping" option is deprecated and will be removed in DoctrineBundle 4.0, as it only accepts `false` since 3.0. // Set to true to enable using route placeholders as lookup criteria when the primary key doesn't match the argument name // Default: false
+ *             auto_mapping?: bool, // Deprecated: The "doctrine.orm.controller_resolver.auto_mapping.auto_mapping" option is deprecated and will be removed in DoctrineBundle 4.0, as it only accepts `false` since 3.0. // Set to true to enable using route placeholders as lookup criteria when the primary key doesn't match the argument name // Default: false
  *             evict_cache?: bool, // Set to true to fetch the entity from the database instead of using the cache, if any // Default: false
  *         },
  *         entity_managers?: array<string, array{ // Default: []
@@ -2038,6 +2038,106 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         i18n?: "symfony"|"jms", // Strategy used to create your i18n routes. // Default: "symfony"
  *     },
  * }
+ * @psalm-type LiipImagineConfig = array{
+ *     resolvers?: array<string, array{ // Default: []
+ *         web_path?: array{
+ *             web_root?: scalar|null, // Default: "%kernel.project_dir%/public"
+ *             cache_prefix?: scalar|null, // Default: "media/cache"
+ *         },
+ *         aws_s3?: array{
+ *             bucket: scalar|null,
+ *             cache?: scalar|null, // Default: false
+ *             use_psr_cache?: bool, // Default: false
+ *             acl?: scalar|null, // Default: "public-read"
+ *             cache_prefix?: scalar|null, // Default: ""
+ *             client_id?: scalar|null, // Default: null
+ *             client_config: list<mixed>,
+ *             get_options?: array<string, scalar|null>,
+ *             put_options?: array<string, scalar|null>,
+ *             proxies?: array<string, scalar|null>,
+ *         },
+ *         flysystem?: array{
+ *             filesystem_service: scalar|null,
+ *             cache_prefix?: scalar|null, // Default: ""
+ *             root_url: scalar|null,
+ *             visibility?: "public"|"private"|"noPredefinedVisibility", // Default: "public"
+ *         },
+ *     }>,
+ *     loaders?: array<string, array{ // Default: []
+ *         stream?: array{
+ *             wrapper: scalar|null,
+ *             context?: scalar|null, // Default: null
+ *         },
+ *         filesystem?: array{
+ *             locator?: "filesystem"|"filesystem_insecure", // Using the "filesystem_insecure" locator is not recommended due to a less secure resolver mechanism, but is provided for those using heavily symlinked projects. // Default: "filesystem"
+ *             data_root?: list<scalar|null>,
+ *             allow_unresolvable_data_roots?: bool, // Default: false
+ *             bundle_resources?: array{
+ *                 enabled?: bool, // Default: false
+ *                 access_control_type?: "blacklist"|"whitelist", // Sets the access control method applied to bundle names in "access_control_list" into a blacklist or whitelist. // Default: "blacklist"
+ *                 access_control_list?: list<scalar|null>,
+ *             },
+ *         },
+ *         flysystem?: array{
+ *             filesystem_service: scalar|null,
+ *         },
+ *         chain?: array{
+ *             loaders: list<scalar|null>,
+ *         },
+ *     }>,
+ *     driver?: scalar|null, // Default: "gd"
+ *     cache?: scalar|null, // Default: "default"
+ *     cache_base_path?: scalar|null, // Default: ""
+ *     data_loader?: scalar|null, // Default: "default"
+ *     default_image?: scalar|null, // Default: null
+ *     default_filter_set_settings?: array{
+ *         quality?: scalar|null, // Default: 100
+ *         jpeg_quality?: scalar|null, // Default: null
+ *         png_compression_level?: scalar|null, // Default: null
+ *         png_compression_filter?: scalar|null, // Default: null
+ *         format?: scalar|null, // Default: null
+ *         animated?: bool, // Default: false
+ *         cache?: scalar|null, // Default: null
+ *         data_loader?: scalar|null, // Default: null
+ *         default_image?: scalar|null, // Default: null
+ *         filters?: array<string, array<string, mixed>>,
+ *         post_processors?: array<string, array<string, mixed>>,
+ *     },
+ *     controller?: array{
+ *         filter_action?: scalar|null, // Default: "Liip\\ImagineBundle\\Controller\\ImagineController::filterAction"
+ *         filter_runtime_action?: scalar|null, // Default: "Liip\\ImagineBundle\\Controller\\ImagineController::filterRuntimeAction"
+ *         redirect_response_code?: int, // Default: 302
+ *     },
+ *     filter_sets?: array<string, array{ // Default: []
+ *         quality?: scalar|null,
+ *         jpeg_quality?: scalar|null,
+ *         png_compression_level?: scalar|null,
+ *         png_compression_filter?: scalar|null,
+ *         format?: scalar|null,
+ *         animated?: bool,
+ *         cache?: scalar|null,
+ *         data_loader?: scalar|null,
+ *         default_image?: scalar|null,
+ *         filters?: array<string, array<string, mixed>>,
+ *         post_processors?: array<string, array<string, mixed>>,
+ *     }>,
+ *     twig?: array{
+ *         mode?: "none"|"lazy"|"legacy", // Twig mode: none/lazy/legacy (default) // Default: "legacy"
+ *         assets_version?: scalar|null, // Default: null
+ *     },
+ *     enqueue?: bool, // Enables integration with enqueue if set true. Allows resolve image caches in background by sending messages to MQ. // Default: false
+ *     messenger?: bool|array{ // Enables integration with symfony/messenger if set true. Warmup image caches in background by sending messages to MQ.
+ *         enabled?: bool, // Default: false
+ *     },
+ *     templating?: bool, // Enables integration with symfony/templating component // Default: true
+ *     webp?: array{
+ *         generate?: bool, // Default: false
+ *         quality?: int, // Default: 100
+ *         cache?: scalar|null, // Default: null
+ *         data_loader?: scalar|null, // Default: null
+ *         post_processors?: array<string, array<string, mixed>>,
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2060,6 +2160,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     live_component?: LiveComponentConfig,
  *     knp_paginator?: KnpPaginatorConfig,
  *     presta_sitemap?: PrestaSitemapConfig,
+ *     liip_imagine?: LiipImagineConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2086,6 +2187,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         live_component?: LiveComponentConfig,
  *         knp_paginator?: KnpPaginatorConfig,
  *         presta_sitemap?: PrestaSitemapConfig,
+ *         liip_imagine?: LiipImagineConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2110,6 +2212,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         sentry?: SentryConfig,
  *         knp_paginator?: KnpPaginatorConfig,
  *         presta_sitemap?: PrestaSitemapConfig,
+ *         liip_imagine?: LiipImagineConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2136,6 +2239,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         dama_doctrine_test?: DamaDoctrineTestConfig,
  *         knp_paginator?: KnpPaginatorConfig,
  *         presta_sitemap?: PrestaSitemapConfig,
+ *         liip_imagine?: LiipImagineConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

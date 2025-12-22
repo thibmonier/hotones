@@ -44,12 +44,18 @@ class SaasServiceType extends AbstractType
                 ],
             ])
             ->add('provider', EntityType::class, [
-                'class'        => SaasProvider::class,
-                'label'        => 'Fournisseur',
-                'required'     => false,
-                'choice_label' => 'name',
-                'placeholder'  => '-- Souscription directe (sans fournisseur) --',
-                'attr'         => [
+                'class'         => SaasProvider::class,
+                'label'         => 'Fournisseur',
+                'required'      => false,
+                'choice_label'  => 'name',
+                'placeholder'   => '-- Souscription directe (sans fournisseur) --',
+                'query_builder' => function ($repository) {
+                    return $repository->createQueryBuilder('p')
+                        ->where('p.active = :active')
+                        ->setParameter('active', true)
+                        ->orderBy('p.name', 'ASC');
+                },
+                'attr' => [
                     'class' => 'form-select',
                 ],
                 'help' => 'Laisser vide si le service est souscrit directement',

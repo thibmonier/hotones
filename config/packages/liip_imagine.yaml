@@ -1,0 +1,69 @@
+# Configuration for LiipImagineBundle
+liip_imagine:
+    # Configuration de base
+    driver: "gd"
+
+    # Configuration du cache
+    cache: default
+
+    # Résolveurs d'URL
+    resolvers:
+        default:
+            web_path:
+                web_root: '%kernel.project_dir%/public'
+                cache_prefix: 'media/cache'
+
+    # Loaders pour charger les images depuis différentes sources
+    loaders:
+        default:
+            filesystem:
+                data_root:
+                    - '%kernel.project_dir%/public/assets/images'
+                    - '%kernel.project_dir%/assets/images'
+
+    # Filtres de transformation d'images
+    filter_sets:
+        # Avatar Unit404 - Petit (60x60) pour header et sidebar
+        unit404_avatar_small:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [60, 60]
+                    mode: outbound
+                    allow_upscale: true
+
+        # Avatar Unit404 - Moyen (80x80) pour login et chatbot
+        unit404_avatar_medium:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [80, 80]
+                    mode: outbound
+                    allow_upscale: true
+
+        # Avatar Unit404 - Widget flottant (100x100)
+        unit404_avatar_widget:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [100, 100]
+                    mode: outbound
+                    allow_upscale: true
+
+        # Avatar Unit404 - Grand (250x250) pour page 404
+        unit404_avatar_large:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [250, 250]
+                    mode: outbound
+                    allow_upscale: true
+
+        # Avatar Unit404 - Très petit (40x40) pour messages chat
+        unit404_avatar_tiny:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [40, 40]
+                    mode: outbound
+                    allow_upscale: true

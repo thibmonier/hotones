@@ -44,7 +44,7 @@ class ProjectRepository extends ServiceEntityRepository
             // Totaux
             ->addSelect(
                 // CA signé (services + achats attachés + montants fixes/achats directs)
-                "COALESCE(SUM(CASE 
+                "COALESCE(SUM(CASE
                     WHEN o.status IN (:signed) AND l.type = 'service' THEN (COALESCE(l.dailyRate,0) * COALESCE(l.days,0) + COALESCE(l.attachedPurchaseAmount,0))
                     WHEN o.status IN (:signed) AND l.type IN ('purchase','fixed_amount') THEN COALESCE(l.directAmount,0)
                     ELSE 0
@@ -52,14 +52,14 @@ class ProjectRepository extends ServiceEntityRepository
             )
             ->addSelect(
                 // Marge brute sur services (CA service - coût estimé), seulement sur les devis signés
-                "COALESCE(SUM(CASE 
+                "COALESCE(SUM(CASE
                     WHEN o.status IN (:signed) AND l.type = 'service' THEN (COALESCE(l.dailyRate,0) * COALESCE(l.days,0) - (COALESCE(l.days,0) * COALESCE(prof.defaultDailyRate,0) * 0.7))
                     ELSE 0
                 END), 0) AS totalMargin",
             )
             ->addSelect(
                 // Achats attachés aux lignes de service signées
-                "COALESCE(SUM(CASE 
+                "COALESCE(SUM(CASE
                     WHEN o.status IN (:signed) AND l.type = 'service' THEN COALESCE(l.attachedPurchaseAmount,0)
                     ELSE 0
                 END), 0) AS totalLinePurchases",
@@ -556,5 +556,40 @@ class ProjectRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Trouve les projets actifs qui sont "à risque".
+     * Un projet est à risque si:
+     * - Sa marge réelle est < 20%
+     * - Le temps passé dépasse le temps vendu/révisé.
+     *
+     * @return Project[]
+     */
+    public function findProjectsAtRisk(int $limit = 5): array
+    {
+        // Cette méthode est complexe à écrire en DQL pur car elle dépend de logiques métier
+        // calculées dans l'entité (getRealMarginPercentage, etc.).
+        // On va donc récupérer les projets actifs et les filtrer en PHP.
+        $activeProjects = $this->findBy(['status' => 'active']);
+
+        $projectsAtRisk = [];
+        foreach ($activeProjects as $project) {
+            $performance = $project->getPerformanceComparison();
+            $marginRate  = (float) $project->getRealMarginPercentage();
+
+            $isOverTime  = bccomp($performance['real_hours'], $performance['target_hours'], 2) > 0;
+            $isLowMargin = $marginRate < 20.0;
+
+            if ($isOverTime || $isLowMargin) {
+                $projectsAtRisk[] = $project;
+            }
+
+            if (count($projectsAtRisk) >= $limit) {
+                break;
+            }
+        }
+
+        return $projectsAtRisk;
     }
 }

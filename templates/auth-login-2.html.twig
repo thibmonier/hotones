@@ -102,9 +102,16 @@
                             </div>
                             <div class="my-auto">
 
+                                <div class="text-center mb-4">
+                                    <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_medium') }}" alt="Unit 404" style="width: 80px; height: 80px; border-radius: 50%; opacity: 0.9; filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));">
+                                </div>
+
                                 <div>
                                     <h5 class="text-primary">BIENVENUE !</h5>
                                     <p class="text-muted">Connectez-vous pour utiliser HotOnes et gérer vos projets</p>
+                                    <p class="text-muted" style="font-size: 0.85rem; font-style: italic; opacity: 0.8;">
+                                        <small>"Unit 404 vous accueille. Enfin... accueillir est un bien grand mot."</small>
+                                    </p>
                                 </div>
 
                                 {% if error_message is defined and error_message %}

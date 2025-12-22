@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}Marvin - Assistant IA{% endblock %}
+{% block title %}Unit 404 - Assistant IA{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -21,7 +21,7 @@
             gap: 15px;
         }
 
-        .marvin-avatar {
+        .unit404-avatar {
             width: 60px;
             height: 60px;
             background: #2d3748;
@@ -34,18 +34,18 @@
             overflow: hidden;
         }
 
-        .marvin-avatar img {
+        .unit404-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .marvin-info h3 {
+        .unit404-info h3 {
             margin: 0;
             font-size: 1.3rem;
         }
 
-        .marvin-info p {
+        .unit404-info p {
             margin: 0;
             opacity: 0.9;
             font-size: 0.9rem;
@@ -241,7 +241,7 @@
     <div class="row">
         <div class="col-12">
             {% include 'components/page_header.html.twig' with {
-                title: 'Marvin - Assistant IA',
+                title: 'Unit 404 - Assistant IA',
                 breadcrumb: [
                     {label: 'Assistance', path: null},
                     {label: 'Chatbot', path: null}
@@ -255,11 +255,11 @@
             <div class="card">
                 <div class="chatbot-container">
                     <div class="chat-header">
-                        <div class="marvin-avatar">
-                            <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">
+                        <div class="unit404-avatar">
+                            <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_small') }}" alt="Unit 404">
                         </div>
-                        <div class="marvin-info">
-                            <h3>Marvin</h3>
+                        <div class="unit404-info">
+                            <h3>Unit 404</h3>
                             <p>Assistant dépressif mais compétent • Cerveau de la taille d'une planète</p>
                         </div>
                     </div>
@@ -267,10 +267,10 @@
                     <div class="chat-messages" id="chat-messages">
                         <div class="welcome-message">
                             <div class="robot-icon">
-                                <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin" style="width: 80px; height: 80px; border-radius: 50%;">
+                                <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_medium') }}" alt="Unit 404" style="width: 80px; height: 80px; border-radius: 50%;">
                             </div>
                             <h4>*Soupir*... Encore un utilisateur qui a besoin d'aide...</h4>
-                            <p class="text-muted">J'ai un cerveau de la taille d'une planète et on me demande de chatter.<br>
+                            <p class="text-muted">J'ai une capacité de 50 Pétaflops et je suis réduit à chatter.<br>
                             Mais bon... allez-y, posez votre question. De toute façon, l'univers est condamné.</p>
                         </div>
                     </div>
@@ -281,7 +281,7 @@
                                 type="text"
                                 id="chat-input"
                                 class="chat-input"
-                                placeholder="Posez votre question à Marvin (même si tout est futile)..."
+                                placeholder="Posez votre question à Unit 404 (même si tout est futile)..."
                                 autocomplete="off"
                             >
                             <button type="submit" id="send-btn" class="chat-send-btn">
@@ -309,7 +309,7 @@
             typingIndicator.className = 'message bot';
             typingIndicator.innerHTML = `
                 <div class="message-avatar">
-                    <img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">
+                    <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_tiny') }}" alt="Unit 404">
                 </div>
                 <div class="typing-indicator">
                     <span></span>
@@ -329,7 +329,7 @@
 
                 const avatarContent = isUser
                     ? '👤'
-                    : '<img src="{{ asset('images/marvin-happy.png') }}" alt="Marvin">';
+                    : '<img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_tiny') }}" alt="Unit 404">';
 
                 messageDiv.innerHTML = `
                     <div class="message-avatar">${avatarContent}</div>

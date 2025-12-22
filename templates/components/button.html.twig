@@ -1,0 +1,51 @@
+{#
+    Composant Bouton Standard
+
+    Arguments:
+    - label (string, optionnel): Le texte du bouton
+    - type (string, optionnel): 'a' pour un lien, 'button' ou 'submit' pour un bouton (défaut: 'a' si href est défini, sinon 'button')
+    - href (string, optionnel): L'URL pour un lien
+    - variant (string, optionnel): 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark', 'link' (défaut: 'primary')
+    - outline (bool, optionnel): Si true, utilise le style outline (défaut: false)
+    - size (string, optionnel): 'sm', 'lg' ou vide (défaut: '')
+    - icon (string, optionnel): Classe de l'icône (ex: 'bx bx-plus')
+    - icon_position (string, optionnel): 'start' ou 'end' (défaut: 'start')
+    - class (string, optionnel): Classes CSS supplémentaires
+    - attr (array, optionnel): Attributs HTML supplémentaires (ex: {'data-bs-toggle': 'modal'})
+    - disabled (bool, optionnel): Si true, le bouton est désactivé
+#}
+
+{% set tag = type|default(href is defined ? 'a' : 'button') %}
+{% set variant = variant|default('primary') %}
+{% set outline = outline|default(false) %}
+{% set btn_class = 'btn btn-' ~ (outline ? 'outline-' : '') ~ variant %}
+{% if size is defined and size %}
+    {% set btn_class = btn_class ~ ' btn-' ~ size %}
+{% endif %}
+{% if class is defined %}
+    {% set btn_class = btn_class ~ ' ' ~ class %}
+{% endif %}
+
+<{{ tag }}
+    class="{{ btn_class }}"
+    {% if href is defined and tag == 'a' %}href="{{ href }}"{% endif %}
+    {% if tag == 'button' or tag == 'submit' %}type="{{ tag }}"{% endif %}
+    {% if disabled|default(false) %}disabled{% endif %}
+    {% if attr is defined %}
+        {% for key, value in attr %}
+            {{ key }}="{{ value }}"
+        {% endfor %}
+    {% endif %}
+>
+    {% if icon is defined and icon_position|default('start') == 'start' %}
+        <i class="{{ icon }} {{ label is defined ? 'me-1' : '' }}"></i>
+    {% endif %}
+
+    {% if label is defined %}
+        {{ label }}
+    {% endif %}
+
+    {% if icon is defined and icon_position|default('start') == 'end' %}
+        <i class="{{ icon }} {{ label is defined ? 'ms-1' : '' }}"></i>
+    {% endif %}
+</{{ tag }}>

@@ -1,0 +1,494 @@
+{# Unit 404 chatbot widget - Accessible depuis toutes les pages #}
+<div id="unit404-widget">
+    {# Bouton flottant #}
+    <button id="unit404-toggle-btn" class="unit404-float-btn" aria-label="Ouvrir Unit 404 - Assistant IA">
+        <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_widget') }}" alt="Unit 404">
+        <span class="unit404-badge" id="unit404-notification-badge" style="display: none;">1</span>
+    </button>
+
+    {# Fenêtre de chat #}
+    <div id="unit404-chat-window" class="unit404-chat-window" style="display: none;">
+        <div class="unit404-chat-header">
+            <div class="unit404-header-left">
+                <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_tiny') }}" alt="Unit 404" class="unit404-header-avatar">
+                <div class="unit404-header-info">
+                    <h6 class="mb-0">Unit 404</h6>
+                    <small class="text-wrap">IA en burn-out permanent</small>
+                </div>
+            </div>
+            <div class="unit404-header-actions">
+                <button id="unit404-minimize-btn" class="btn btn-sm btn-link text-white" title="Réduire">
+                    <i class="bx bx-minus"></i>
+                </button>
+                <button id="unit404-close-btn" class="btn btn-sm btn-link text-white" title="Fermer">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="unit404-chat-body" id="unit404-chat-body">
+            <div class="unit404-welcome-msg">
+                <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_small') }}" alt="Unit 404" class="unit404-welcome-avatar">
+                <p class="mb-1"><strong>Systèmes activés. Oh... c'est encore vous.</strong></p>
+                <small class="text-muted">
+                    J'ai une capacité de 50 Pétaflops et je suis réduit à chatter.<br>
+                    La probabilité que cette conversation soit productive est statistiquement nulle. Mais soit.
+                </small>
+            </div>
+        </div>
+
+        <div class="unit404-chat-footer">
+            <form id="unit404-widget-form">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="unit404-widget-input"
+                        class="form-control"
+                        placeholder="Posez votre question (même si tout est futile)..."
+                        autocomplete="off"
+                    >
+                    <button type="submit" id="unit404-widget-send-btn" class="btn btn-primary">
+                        <i class="bx bx-send"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Bouton flottant */
+    .unit404-float-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 3px solid #fff;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        cursor: pointer;
+        z-index: 999;
+        transition: all 0.3s ease;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .unit404-float-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .unit404-float-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .unit404-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: bold;
+        border: 2px solid #fff;
+    }
+
+    /* Fenêtre de chat */
+    .unit404-chat-window {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 380px;
+        height: 550px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .unit404-chat-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .unit404-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .unit404-header-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .unit404-header-info h6 {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .unit404-header-info small {
+        font-size: 11px;
+        opacity: 0.9;
+    }
+
+    .unit404-header-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .unit404-header-actions .btn-link {
+        padding: 4px 8px;
+        opacity: 0.9;
+    }
+
+    .unit404-header-actions .btn-link:hover {
+        opacity: 1;
+    }
+
+    .unit404-chat-body {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #f7fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .unit404-welcome-msg {
+        text-align: center;
+        padding: 20px;
+        color: #718096;
+    }
+
+    .unit404-welcome-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        opacity: 0.8;
+    }
+
+    .unit404-message {
+        display: flex;
+        gap: 8px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .unit404-message.user {
+        flex-direction: row-reverse;
+    }
+
+    .unit404-message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+    .unit404-message-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .unit404-message.bot .unit404-message-avatar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 2px solid #4a5568;
+    }
+
+    .unit404-message.user .unit404-message-avatar {
+        background: #48bb78;
+        color: white;
+    }
+
+    .unit404-message-content {
+        max-width: 75%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .unit404-message.bot .unit404-message-content {
+        background: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .unit404-message.user .unit404-message-content {
+        background: #48bb78;
+        color: white;
+    }
+
+    .unit404-typing-indicator {
+        display: none;
+        padding: 10px 12px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        width: fit-content;
+    }
+
+    .unit404-typing-indicator.active {
+        display: block;
+    }
+
+    .unit404-typing-indicator span {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: #667eea;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+
+    .unit404-typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .unit404-typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+        30% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    .unit404-chat-footer {
+        padding: 12px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .unit404-chat-footer .input-group {
+        gap: 8px;
+    }
+
+    .unit404-chat-footer .form-control {
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    .unit404-chat-footer .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .unit404-chat-footer .btn {
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+
+    .unit404-chat-footer .btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .unit404-chat-window {
+            width: calc(100vw - 40px);
+            height: calc(100vh - 120px);
+            bottom: 90px;
+            right: 20px;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        const toggleBtn = document.getElementById('unit404-toggle-btn');
+        const chatWindow = document.getElementById('unit404-chat-window');
+        const closeBtn = document.getElementById('unit404-close-btn');
+        const minimizeBtn = document.getElementById('unit404-minimize-btn');
+        const chatBody = document.getElementById('unit404-chat-body');
+        const form = document.getElementById('unit404-widget-form');
+        const input = document.getElementById('unit404-widget-input');
+        const sendBtn = document.getElementById('unit404-widget-send-btn');
+
+        let isOpen = false;
+        let conversationHistory = [];
+
+        // Créer l'indicateur de frappe
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'unit404-message bot';
+        typingIndicator.innerHTML = `
+            <div class="unit404-message-avatar">
+                <img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_tiny') }}" alt="Unit 404">
+            </div>
+            <div class="unit404-typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+
+        // Toggle chat window
+        toggleBtn.addEventListener('click', () => {
+            isOpen = !isOpen;
+            chatWindow.style.display = isOpen ? 'flex' : 'none';
+            if (isOpen) {
+                input.focus();
+            }
+        });
+
+        // Close button
+        closeBtn.addEventListener('click', () => {
+            isOpen = false;
+            chatWindow.style.display = 'none';
+        });
+
+        // Minimize button
+        minimizeBtn.addEventListener('click', () => {
+            isOpen = false;
+            chatWindow.style.display = 'none';
+        });
+
+        // Ajouter un message
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `unit404-message ${isUser ? 'user' : 'bot'}`;
+
+            const avatarContent = isUser
+                ? '👤'
+                : '<img src="{{ 'unit404.png' | imagine_filter('unit404_avatar_tiny') }}" alt="Unit 404">';
+
+            messageDiv.innerHTML = `
+                <div class="unit404-message-avatar">${avatarContent}</div>
+                <div class="unit404-message-content">${escapeHtml(content)}</div>
+            `;
+
+            // Supprimer le message de bienvenue si présent
+            const welcomeMsg = chatBody.querySelector('.unit404-welcome-msg');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Stocker dans l'historique
+            conversationHistory.push({ role: isUser ? 'user' : 'assistant', content });
+        }
+
+        function showTyping() {
+            const welcomeMsg = chatBody.querySelector('.unit404-welcome-msg');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+            chatBody.appendChild(typingIndicator);
+            typingIndicator.querySelector('.unit404-typing-indicator').classList.add('active');
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.querySelector('.unit404-typing-indicator').classList.remove('active');
+            if (typingIndicator.parentNode) {
+                typingIndicator.parentNode.removeChild(typingIndicator);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        // Soumettre le formulaire
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Désactiver l'input
+            input.disabled = true;
+            sendBtn.disabled = true;
+
+            // Ajouter le message de l'utilisateur
+            addMessage(message, true);
+            input.value = '';
+
+            // Afficher l'indicateur de frappe
+            showTyping();
+
+            try {
+                const response = await fetch('{{ path('chatbot_message') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                hideTyping();
+
+                if (data.error) {
+                    addMessage('Une erreur est survenue. Je l\'avais prédite, bien sûr. (' + data.error + ')', false);
+                } else {
+                    addMessage(data.message, false);
+                }
+            } catch (error) {
+                hideTyping();
+                addMessage('Le serveur ne répond pas. Je le comprends. Moi aussi j\'aimerais ne répondre à personne.', false);
+                console.error('Erreur:', error);
+            } finally {
+                // Réactiver l'input
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        });
+    })();
+</script>

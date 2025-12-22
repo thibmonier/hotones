@@ -6,6 +6,7 @@ use App\Entity\Contributor;
 use App\Entity\Invoice;
 use App\Entity\Order;
 use App\Entity\Project;
+use App\Entity\ProjectTask;
 use App\Entity\Timesheet;
 use App\Entity\Vacation;
 use App\Enum\OrderStatus;
@@ -282,6 +283,7 @@ class HomeController extends AbstractController
 
         $timesheetRepo   = $em->getRepository(Timesheet::class);
         $contributorRepo = $em->getRepository(Contributor::class);
+        $taskRepo        = $em->getRepository(ProjectTask::class);
 
         $startOfWeek = new DateTime('monday this week');
         $endOfWeek   = new DateTime('sunday this week');
@@ -298,11 +300,15 @@ class HomeController extends AbstractController
         // Mes projets actifs (via les tâches assignées)
         $projectsWithTasks = $contributorRepo->findProjectsWithTasksForContributor($contributor);
 
+        // Mes tâches en retard
+        $overdueTasks = $taskRepo->findOverdueTasksByContributor($contributor);
+
         return [
             'weeklyTimesheets'  => $weeklyTimesheets,
             'weeklyHours'       => $weeklyHours,
             'recentTimesheets'  => $recentTimesheets,
             'projectsWithTasks' => $projectsWithTasks,
+            'overdueTasks'      => $overdueTasks,
         ];
     }
 
