@@ -215,11 +215,14 @@ File: Main Js File
 
     function initSettings() {
         if (window.sessionStorage) {
+            // Skip theme persistence on login page to prevent dark theme from being saved
+            var isLoginPageOverride = sessionStorage.getItem("login_page_override");
+
             var alreadyVisited = sessionStorage.getItem("is_visited");
-            if (!alreadyVisited) {
+            if (!alreadyVisited && !isLoginPageOverride) {
                 if ($('html').attr('dir') === 'rtl' && $('html').attr('data-bs-theme') === 'dark') {
                     $("#dark-rtl-mode-switch").prop('checked', true);
-                    $("#light-mode-switch").prop('checked', false);  
+                    $("#light-mode-switch").prop('checked', false);
                     sessionStorage.setItem("is_visited", "dark-rtl-mode-switch");
                     updateThemeSetting(alreadyVisited);
                 }else if ($('html').attr('dir') === 'rtl') {
@@ -235,7 +238,7 @@ File: Main Js File
                 } else {
                     sessionStorage.setItem("is_visited", "light-mode-switch");
                 }
-            } else {
+            } else if (alreadyVisited && !isLoginPageOverride) {
                 $(".right-bar input:checkbox").prop('checked', false);
                 $("#" + alreadyVisited).prop('checked', true);
             }
