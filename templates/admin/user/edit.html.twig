@@ -89,7 +89,7 @@
                             <label for="avatar" class="form-label">Avatar</label>
                             <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
                             {% if user.avatar %}
-                                <small class="form-text text-muted">Actuel: <a href="{{ user.avatar }}" target="_blank">voir</a></small>
+                                <small class="form-text text-muted">Actuel: <a href="{{ avatar_url(user.avatar) }}" target="_blank">voir</a></small>
                             {% endif %}
                         </div>
                     </div>

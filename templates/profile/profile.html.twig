@@ -25,7 +25,7 @@
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="flex-shrink-0 me-4">
-                            <img src="{{ user.avatar ?: asset('assets/images/users/avatar-1.jpg') }}"
+                            <img src="{{ user.avatar ? avatar_url(user.avatar) : asset('assets/images/users/avatar-1.jpg') }}"
                                  alt="" class="avatar-md rounded-circle img-thumbnail">
                         </div>
                         <div class="flex-grow-1">
