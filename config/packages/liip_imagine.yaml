@@ -6,12 +6,14 @@ liip_imagine:
     # Configuration du cache
     cache: default
 
-    # Résolveurs d'URL
+    # Résolveurs d'URL (où stocker les images traitées)
     resolvers:
         default:
-            web_path:
-                web_root: '%kernel.project_dir%/public'
+            flysystem:
+                filesystem_service: oneup_flysystem.default_filesystem
+                root_url: '%env(IMAGINE_CACHE_URL)%'
                 cache_prefix: 'media/cache'
+                visibility: public
 
     # Loaders pour charger les images depuis différentes sources
     loaders:
