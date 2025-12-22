@@ -8,16 +8,16 @@ use App\Form\ExpenseReportType;
 use App\Repository\ContributorRepository;
 use App\Repository\ExpenseReportRepository;
 use App\Service\ExpenseReportService;
+use App\Service\SecureFileUploadService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/expense-reports')]
 class ExpenseReportController extends AbstractController
@@ -27,8 +27,7 @@ class ExpenseReportController extends AbstractController
         private ContributorRepository $contributorRepo,
         private ExpenseReportService $service,
         private EntityManagerInterface $em,
-        private SluggerInterface $slugger,
-        private string $expenseReceiptsDirectory,
+        private SecureFileUploadService $uploadService,
     ) {
     }
 
@@ -86,15 +85,11 @@ class ExpenseReportController extends AbstractController
             $receiptFile = $form->get('receiptFile')->getData();
 
             if ($receiptFile) {
-                $originalFilename = pathinfo($receiptFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename     = $this->slugger->slug($originalFilename);
-                $newFilename      = sprintf('%s-%s.%s', $safeFilename, uniqid(), $receiptFile->guessExtension());
-
                 try {
-                    $receiptFile->move($this->expenseReceiptsDirectory, $newFilename);
-                    $expense->setFilePath($newFilename);
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors de l\'upload du justificatif.');
+                    $filename = $this->uploadService->uploadDocument($receiptFile, 'expenses');
+                    $expense->setFilePath($filename);
+                } catch (Exception $e) {
+                    $this->addFlash('error', 'Erreur lors de l\'upload du justificatif : '.$e->getMessage());
                 }
             }
 
@@ -166,15 +161,11 @@ class ExpenseReportController extends AbstractController
             $receiptFile = $form->get('receiptFile')->getData();
 
             if ($receiptFile) {
-                $originalFilename = pathinfo($receiptFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename     = $this->slugger->slug($originalFilename);
-                $newFilename      = sprintf('%s-%s.%s', $safeFilename, uniqid(), $receiptFile->guessExtension());
-
                 try {
-                    $receiptFile->move($this->expenseReceiptsDirectory, $newFilename);
-                    $expense->setFilePath($newFilename);
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors de l\'upload du justificatif.');
+                    $filename = $this->uploadService->uploadDocument($receiptFile, 'expenses');
+                    $expense->setFilePath($filename);
+                } catch (Exception $e) {
+                    $this->addFlash('error', 'Erreur lors de l\'upload du justificatif : '.$e->getMessage());
                 }
             }
 

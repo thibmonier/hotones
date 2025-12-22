@@ -1,0 +1,38 @@
+oneup_flysystem:
+    adapters:
+        # Adaptateur local pour développement
+        local_adapter:
+            local:
+                location: '%kernel.project_dir%/public/uploads'
+
+        # Adaptateur S3 pour production (Cloudflare R2)
+        s3_adapter:
+            awss3v3:
+                client: aws_s3_client
+                bucket: '%env(S3_BUCKET)%'
+                prefix: '' # Optionnel: préfixe pour tous les fichiers
+
+    filesystems:
+        # Filesystem principal - utilise local_adapter par défaut (dev)
+        # Override en production via config/packages/prod/oneup_flysystem.yaml
+        default:
+            adapter: local_adapter
+            visibility: public # Les fichiers sont publics par défaut
+
+# Configuration du client AWS S3 (compatible Cloudflare R2)
+services:
+    aws_s3_client:
+        class: Aws\S3\S3Client
+        arguments:
+            -
+                version: 'latest'
+                region: '%env(S3_REGION)%'
+                endpoint: '%env(S3_ENDPOINT)%'
+                use_path_style_endpoint: true
+                credentials:
+                    key: '%env(S3_ACCESS_KEY)%'
+                    secret: '%env(S3_SECRET_KEY)%'
+
+parameters:
+    # Adaptateur par défaut en dev : local
+    default_adapter: local_adapter

@@ -2138,6 +2138,123 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         post_processors?: array<string, array<string, mixed>>,
  *     },
  * }
+ * @psalm-type OneupFlysystemConfig = array{
+ *     adapters?: array<string, array{ // Default: []
+ *         local?: array{
+ *             lazy?: bool, // Default: false
+ *             location: scalar|null,
+ *             permissions?: array{
+ *                 file?: array{
+ *                     public?: int, // Default: null
+ *                     private?: int, // Default: null
+ *                 },
+ *                 dir?: array{
+ *                     public?: int, // Default: null
+ *                     private?: int, // Default: null
+ *                 },
+ *             },
+ *             writeFlags?: scalar|null, // Default: 2
+ *             linkHandling?: scalar|null, // Default: 2
+ *             mimeTypeDetector?: scalar|null, // Default: null
+ *             lazyRootCreation?: scalar|null, // Default: false
+ *         },
+ *         awss3v3?: array{
+ *             client: scalar|null,
+ *             bucket: scalar|null,
+ *             prefix?: scalar|null, // Default: ""
+ *             visibilityConverter?: scalar|null, // Default: null
+ *             mimeTypeDetector?: scalar|null, // Default: null
+ *             options?: list<scalar|null>,
+ *             streamReads?: bool, // Default: true
+ *         },
+ *         ftp?: array{
+ *             options?: array{
+ *                 host: scalar|null,
+ *                 root: scalar|null,
+ *                 username: scalar|null,
+ *                 password: scalar|null,
+ *                 port?: scalar|null, // Default: 21
+ *                 ssl?: bool, // Default: false
+ *                 timeout?: scalar|null, // Default: 90
+ *                 utf8?: bool, // Default: false
+ *                 passive?: bool, // Default: true
+ *                 transferMode?: scalar|null, // Default: null
+ *                 systemType?: scalar|null, // Default: null
+ *                 ignorePassiveAddress?: bool|null, // Default: null
+ *                 timestampsOnUnixListingsEnabled?: bool, // Default: false
+ *                 recurseManually?: bool, // Default: false
+ *                 useRawListOptions?: bool, // Default: false
+ *             },
+ *             connectionProvider?: scalar|null, // Default: null
+ *             connectivityChecker?: scalar|null, // Default: null
+ *             visibilityConverter?: scalar|null, // Default: null
+ *             mimeTypeDetector?: scalar|null, // Default: null
+ *         },
+ *         sftp?: array{
+ *             options: array{
+ *                 host: scalar|null,
+ *                 username: scalar|null,
+ *                 password?: scalar|null, // Default: null
+ *                 privateKey?: scalar|null, // Default: null
+ *                 passphrase?: scalar|null, // Default: null
+ *                 port?: scalar|null, // Default: 22
+ *                 useAgent?: bool, // Default: false
+ *                 timeout?: scalar|null, // Default: 10
+ *                 maxTries?: scalar|null, // Default: 4
+ *                 hostFingerprint?: scalar|null, // Default: null
+ *                 connectivityChecker?: scalar|null, // Default: null
+ *                 root: scalar|null,
+ *             },
+ *             permissions?: array{
+ *                 file?: array{
+ *                     public?: int, // Default: null
+ *                     private?: int, // Default: null
+ *                 },
+ *                 dir?: array{
+ *                     public?: int, // Default: null
+ *                     private?: int, // Default: null
+ *                 },
+ *             },
+ *             mimeTypeDetector?: scalar|null, // Default: null
+ *         },
+ *         memory?: array{
+ *             defaultVisibility?: scalar|null, // Default: "public"
+ *         },
+ *         custom?: array{
+ *             service: mixed,
+ *         },
+ *         async_aws_s3?: array{
+ *             client: scalar|null,
+ *             bucket: scalar|null,
+ *             prefix?: scalar|null, // Default: ""
+ *             visibilityConverter?: scalar|null, // Default: null
+ *         },
+ *         googlecloudstorage?: array{
+ *             client: scalar|null,
+ *             bucket: scalar|null,
+ *             prefix?: scalar|null, // Default: ""
+ *             visibilityHandler?: scalar|null, // Default: null
+ *             defaultVisibility?: scalar|null, // Default: "private"
+ *             mimeTypeDetector?: scalar|null, // Default: null
+ *         },
+ *         gitlab?: array{
+ *             client: scalar|null,
+ *             prefix?: scalar|null, // Default: ""
+ *         },
+ *         azureblob?: array{
+ *             client: scalar|null,
+ *             container: scalar|null,
+ *             prefix?: scalar|null, // Default: null
+ *         },
+ *     }>,
+ *     filesystems?: array<string, array{ // Default: []
+ *         adapter: scalar|null,
+ *         alias?: scalar|null, // Default: null
+ *         mount?: scalar|null, // Default: null
+ *         visibility?: scalar|null,
+ *         directory_visibility?: scalar|null,
+ *     }>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2161,6 +2278,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     knp_paginator?: KnpPaginatorConfig,
  *     presta_sitemap?: PrestaSitemapConfig,
  *     liip_imagine?: LiipImagineConfig,
+ *     oneup_flysystem?: OneupFlysystemConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2188,6 +2306,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         knp_paginator?: KnpPaginatorConfig,
  *         presta_sitemap?: PrestaSitemapConfig,
  *         liip_imagine?: LiipImagineConfig,
+ *         oneup_flysystem?: OneupFlysystemConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2213,6 +2332,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         knp_paginator?: KnpPaginatorConfig,
  *         presta_sitemap?: PrestaSitemapConfig,
  *         liip_imagine?: LiipImagineConfig,
+ *         oneup_flysystem?: OneupFlysystemConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2240,6 +2360,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         knp_paginator?: KnpPaginatorConfig,
  *         presta_sitemap?: PrestaSitemapConfig,
  *         liip_imagine?: LiipImagineConfig,
+ *         oneup_flysystem?: OneupFlysystemConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

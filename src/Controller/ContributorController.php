@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Contributor;
 use App\Form\ContributorType;
 use App\Repository\ContributorRepository;
+use App\Service\SecureFileUploadService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -17,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/contributors')]
 #[IsGranted('ROLE_CHEF_PROJET')]
@@ -26,7 +26,7 @@ class ContributorController extends AbstractController
     public function __construct(
         private readonly ContributorRepository $contributorRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly SluggerInterface $slugger,
+        private readonly SecureFileUploadService $uploadService,
     ) {
     }
 
@@ -341,42 +341,8 @@ class ContributorController extends AbstractController
     private function handleAvatarUpload(UploadedFile $file): string
     {
         try {
-            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename     = $this->slugger->slug($originalFilename);
-            $newFilename      = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
-
-            $uploadDirectory = $this->getParameter('avatars_directory');
-
-            // Vérifier que le paramètre est défini
-            if (!$uploadDirectory || !is_string($uploadDirectory)) {
-                throw new RuntimeException('Le paramètre avatars_directory n\'est pas défini ou invalide');
-            }
-
-            // Créer le répertoire s'il n'existe pas
-            if (!is_dir($uploadDirectory)) {
-                if (!mkdir($uploadDirectory, 0777, true) && !is_dir($uploadDirectory)) {
-                    throw new RuntimeException(sprintf('Impossible de créer le répertoire: %s', $uploadDirectory));
-                }
-            }
-
-            // Vérifier que le répertoire est accessible en écriture
-            if (!is_writable($uploadDirectory)) {
-                throw new RuntimeException(sprintf('Le répertoire n\'est pas accessible en écriture: %s', $uploadDirectory));
-            }
-
-            // Déplacer le fichier
-            $file->move($uploadDirectory, $newFilename);
-
-            return $newFilename;
+            return $this->uploadService->uploadImage($file, 'avatars');
         } catch (Exception $e) {
-            // Logger l'erreur pour debugging
-            error_log(sprintf(
-                'Avatar upload error: %s (directory: %s, original: %s)',
-                $e->getMessage(),
-                $uploadDirectory ?? 'undefined',
-                $file->getClientOriginalName(),
-            ));
-
             throw new RuntimeException(sprintf('Erreur lors de l\'upload de l\'avatar: %s', $e->getMessage()), 0, $e);
         }
     }

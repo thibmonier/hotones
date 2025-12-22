@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\SecureFileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use OTPHP\TOTP;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,8 +38,11 @@ class ProfileController extends AbstractController
 
     #[Route('/me/edit', name: 'profile_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function editProfile(Request $request, EntityManagerInterface $em): Response
-    {
+    public function editProfile(
+        Request $request,
+        EntityManagerInterface $em,
+        SecureFileUploadService $uploadService
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
 
@@ -53,17 +57,14 @@ class ProfileController extends AbstractController
             /** @var UploadedFile|null $avatarFile */
             $avatarFile = $request->files->get('avatar');
             if ($avatarFile instanceof UploadedFile && $avatarFile->isValid()) {
-                $mime = $avatarFile->getMimeType();
-                if (str_starts_with((string) $mime, 'image/')) {
-                    $projectDir = $this->getParameter('kernel.project_dir');
-                    $targetDir  = $projectDir.'/public/uploads/avatars';
-                    (new Filesystem())->mkdir($targetDir);
-                    $ext      = $avatarFile->guessExtension() ?: 'png';
-                    $safeName = 'u'.$user->getId().'_'.bin2hex(random_bytes(6)).'.'.$ext;
-                    $avatarFile->move($targetDir, $safeName);
-                    $user->setAvatar('/uploads/avatars/'.$safeName);
-                } else {
-                    $this->addFlash('danger', 'Format de fichier invalide pour l’avatar');
+                try {
+                    // Utiliser SecureFileUploadService pour l'upload
+                    $filename = $uploadService->uploadImage($avatarFile, 'avatars');
+
+                    // Stocker uniquement le nom du fichier (pas le chemin complet)
+                    $user->setAvatar($filename);
+                } catch (Exception $e) {
+                    $this->addFlash('danger', 'Erreur lors de l\'upload de l\'avatar : '.$e->getMessage());
                 }
             }
 

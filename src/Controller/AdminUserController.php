@@ -4,10 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Contributor;
 use App\Entity\User;
+use App\Service\SecureFileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,8 +39,12 @@ class AdminUserController extends AbstractController
      * @throws RandomException
      */
     #[Route('/{id}/edit', name: 'admin_users_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
-    public function edit(int $id, Request $request, EntityManagerInterface $em): Response
-    {
+    public function edit(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        SecureFileUploadService $uploadService
+    ): Response {
         $user = $em->getRepository(User::class)->find($id);
         if (!$user) {
             throw $this->createNotFoundException();
@@ -61,10 +66,11 @@ class AdminUserController extends AbstractController
 
             $avatarFile = $request->files->get('avatar');
             if ($avatarFile instanceof UploadedFile && $avatarFile->isValid()) {
-                if (str_starts_with((string) $avatarFile->getMimeType(), 'image/')) {
-                    $this->extracted($avatarFile, $user);
-                } else {
-                    $this->addFlash('danger', 'Format de fichier invalide pour l’avatar');
+                try {
+                    $filename = $uploadService->uploadImage($avatarFile, 'avatars');
+                    $user->setAvatar($filename);
+                } catch (Exception $e) {
+                    $this->addFlash('danger', 'Erreur lors de l\'upload : '.$e->getMessage());
                 }
             }
 
@@ -83,8 +89,12 @@ class AdminUserController extends AbstractController
      * @throws RandomException
      */
     #[Route('/new', name: 'admin_users_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $hasher,
+        SecureFileUploadService $uploadService
+    ): Response {
         if ($request->isMethod('POST')) {
             $email     = (string) $request->request->get('email');
             $password  = (string) $request->request->get('password');
@@ -103,11 +113,12 @@ class AdminUserController extends AbstractController
             // handle avatar
             $avatarFile = $request->files->get('avatar');
             if ($avatarFile instanceof UploadedFile && $avatarFile->isValid()) {
-                if (str_starts_with((string) $avatarFile->getMimeType(), 'image/')) {
-                    $this->extracted($avatarFile, $user);
+                try {
+                    $filename = $uploadService->uploadImage($avatarFile, 'avatars');
+                    $user->setAvatar($filename);
                     $em->flush();
-                } else {
-                    $this->addFlash('danger', 'Format de fichier invalide pour l’avatar');
+                } catch (Exception $e) {
+                    $this->addFlash('danger', 'Erreur lors de l\'upload : '.$e->getMessage());
                 }
             }
 
@@ -127,19 +138,5 @@ class AdminUserController extends AbstractController
         }
 
         return $this->render('admin/user/new.html.twig');
-    }
-
-    /**
-     * @throws RandomException
-     */
-    public function extracted(mixed $avatarFile, User|string $user): void
-    {
-        $projectDir = $this->getParameter('kernel.project_dir');
-        $targetDir  = $projectDir.'/public/uploads/avatars';
-        (new Filesystem())->mkdir($targetDir);
-        $ext      = $avatarFile->guessExtension() ?: 'png';
-        $safeName = 'u'.$user->getId().'_'.bin2hex(random_bytes(6)).'.'.$ext;
-        $avatarFile->move($targetDir, $safeName);
-        $user->setAvatar('/uploads/avatars/'.$safeName);
     }
 }

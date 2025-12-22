@@ -1,0 +1,6 @@
+oneup_flysystem:
+    filesystems:
+        # En production, utiliser S3 (Cloudflare R2)
+        default:
+            adapter: s3_adapter
+            visibility: public

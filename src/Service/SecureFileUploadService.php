@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace App\Service;
 
 use Exception;
+use League\Flysystem\FilesystemOperator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
- * Service de gestion sécurisée des uploads de fichiers
+ * Service de gestion sécurisée des uploads de fichiers avec Flysystem
  * - Validation stricte du type MIME réel (pas juste l'extension)
  * - Validation de la taille
  * - Nommage sécurisé
- * - Support de conversion WebP pour images.
+ * - Support de conversion WebP pour images
+ * - Stockage via Flysystem (local en dev, S3/R2 en prod).
  */
 class SecureFileUploadService
 {
@@ -37,7 +40,12 @@ class SecureFileUploadService
 
     public function __construct(
         private readonly SluggerInterface $slugger,
-        private readonly string $uploadsDirectory
+        #[Autowire(service: 'oneup_flysystem.default_filesystem')]
+        private readonly FilesystemOperator $filesystem,
+        #[Autowire(param: 'env(S3_PUBLIC_URL)')]
+        private readonly string $publicUrl = '',
+        #[Autowire(param: 'kernel.environment')]
+        private readonly string $environment = 'dev'
     ) {
     }
 
@@ -45,6 +53,8 @@ class SecureFileUploadService
      * Valide et upload un fichier image (avatar, logo, etc.).
      *
      * @throws FileException Si validation échoue
+     *
+     * @return string Le nom du fichier uploadé
      */
     public function uploadImage(
         UploadedFile $file,
@@ -60,19 +70,26 @@ class SecureFileUploadService
         $extension        = $convertToWebP ? 'webp' : $file->guessExtension();
         $newFilename      = sprintf('%s-%s.%s', $safeFilename, uniqid(), $extension);
 
-        // Création du répertoire si nécessaire
-        $targetDirectory = sprintf('%s/%s', $this->uploadsDirectory, $subdirectory);
-        if (!is_dir($targetDirectory)) {
-            mkdir($targetDirectory, 0755, true);
-        }
+        // Chemin complet dans le filesystem
+        $filePath = sprintf('%s/%s', $subdirectory, $newFilename);
 
-        // Upload du fichier
         try {
-            $file->move($targetDirectory, $newFilename);
+            // Lecture du contenu du fichier uploadé
+            $stream = fopen($file->getPathname(), 'r');
+            if ($stream === false) {
+                throw new FileException('Impossible de lire le fichier uploadé');
+            }
 
-            // Conversion WebP si demandée
-            if ($convertToWebP && extension_loaded('gd')) {
-                $this->convertToWebP($targetDirectory.'/'.$newFilename);
+            // Upload vers Flysystem (local ou S3)
+            $this->filesystem->writeStream($filePath, $stream);
+
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+
+            // Conversion WebP si demandée (uniquement en local)
+            if ($convertToWebP && extension_loaded('gd') && $this->environment === 'dev') {
+                $this->convertToWebP($filePath);
             }
 
             return $newFilename;
@@ -83,6 +100,8 @@ class SecureFileUploadService
 
     /**
      * Valide et upload un document.
+     *
+     * @return string Le nom du fichier uploadé
      */
     public function uploadDocument(
         UploadedFile $file,
@@ -94,13 +113,19 @@ class SecureFileUploadService
         $safeFilename     = $this->slugger->slug($originalFilename);
         $newFilename      = sprintf('%s-%s.%s', $safeFilename, uniqid(), $file->guessExtension());
 
-        $targetDirectory = sprintf('%s/%s', $this->uploadsDirectory, $subdirectory);
-        if (!is_dir($targetDirectory)) {
-            mkdir($targetDirectory, 0755, true);
-        }
+        $filePath = sprintf('%s/%s', $subdirectory, $newFilename);
 
         try {
-            $file->move($targetDirectory, $newFilename);
+            $stream = fopen($file->getPathname(), 'r');
+            if ($stream === false) {
+                throw new FileException('Impossible de lire le fichier uploadé');
+            }
+
+            $this->filesystem->writeStream($filePath, $stream);
+
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
 
             return $newFilename;
         } catch (Exception $e) {
@@ -131,7 +156,7 @@ class SecureFileUploadService
     }
 
     /**
-     * Convertit une image en WebP pour optimisation.
+     * Convertit une image en WebP pour optimisation (uniquement en local).
      */
     private function convertToWebP(string $filePath): void
     {
@@ -139,30 +164,55 @@ class SecureFileUploadService
             return; // GD non disponible, on skip
         }
 
-        $info = getimagesize($filePath);
-        if ($info === false) {
-            return;
-        }
+        try {
+            // Lire le fichier depuis Flysystem
+            $content  = $this->filesystem->read($filePath);
+            $tempFile = tempnam(sys_get_temp_dir(), 'webp_');
+            file_put_contents($tempFile, $content);
 
-        $image = match ($info[2]) {
-            IMAGETYPE_JPEG => imagecreatefromjpeg($filePath),
-            IMAGETYPE_PNG  => imagecreatefrompng($filePath),
-            IMAGETYPE_GIF  => imagecreatefromgif($filePath),
-            default        => null,
-        };
+            $info = getimagesize($tempFile);
+            if ($info === false) {
+                unlink($tempFile);
 
-        if ($image === null) {
-            return;
-        }
+                return;
+            }
 
-        // Conversion en WebP (qualité 85%)
-        $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $filePath);
-        imagewebp($image, $webpPath, 85);
-        imagedestroy($image);
+            $image = match ($info[2]) {
+                IMAGETYPE_JPEG => imagecreatefromjpeg($tempFile),
+                IMAGETYPE_PNG  => imagecreatefrompng($tempFile),
+                IMAGETYPE_GIF  => imagecreatefromgif($tempFile),
+                default        => null,
+            };
 
-        // Suppression de l'original
-        if ($webpPath !== $filePath && file_exists($webpPath)) {
-            unlink($filePath);
+            if ($image === null) {
+                unlink($tempFile);
+
+                return;
+            }
+
+            // Conversion en WebP (qualité 85%)
+            $webpTempFile = tempnam(sys_get_temp_dir(), 'webp_result_');
+            imagewebp($image, $webpTempFile, 85);
+            imagedestroy($image);
+
+            // Upload du fichier WebP
+            $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $filePath);
+            $stream   = fopen($webpTempFile, 'r');
+            if ($stream !== false) {
+                $this->filesystem->writeStream($webpPath, $stream);
+                fclose($stream);
+
+                // Suppression de l'original si différent
+                if ($webpPath !== $filePath) {
+                    $this->filesystem->delete($filePath);
+                }
+            }
+
+            // Nettoyage des fichiers temporaires
+            unlink($tempFile);
+            unlink($webpTempFile);
+        } catch (Exception) {
+            // En cas d'erreur, on ignore la conversion
         }
     }
 
@@ -171,12 +221,34 @@ class SecureFileUploadService
      */
     public function deleteFile(string $filename, string $subdirectory): bool
     {
-        $filePath = sprintf('%s/%s/%s', $this->uploadsDirectory, $subdirectory, $filename);
+        $filePath = sprintf('%s/%s', $subdirectory, $filename);
 
-        if (file_exists($filePath)) {
-            return unlink($filePath);
+        try {
+            if ($this->filesystem->fileExists($filePath)) {
+                $this->filesystem->delete($filePath);
+
+                return true;
+            }
+
+            return false;
+        } catch (Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Obtient l'URL publique d'un fichier.
+     */
+    public function getPublicUrl(string $filename, string $subdirectory): string
+    {
+        $filePath = sprintf('%s/%s', $subdirectory, $filename);
+
+        // En production avec S3, utiliser l'URL publique configurée
+        if ($this->environment === 'prod' && $this->publicUrl !== '') {
+            return sprintf('%s/%s', rtrim($this->publicUrl, '/'), ltrim($filePath, '/'));
         }
 
-        return false;
+        // En dev, utiliser le chemin local
+        return sprintf('/uploads/%s', $filePath);
     }
 }
