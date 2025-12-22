@@ -103,12 +103,17 @@ class SaasServiceRepository extends ServiceEntityRepository
      */
     public function getServicesWithSubscriptionCount(): array
     {
-        return $this->createQueryBuilder('s')
+        $results = $this->createQueryBuilder('s')
             ->select('s', 'COUNT(sub.id) as subscriptionCount')
             ->leftJoin('s.subscriptions', 'sub')
             ->groupBy('s.id')
             ->orderBy('s.name', 'ASC')
             ->getQuery()
             ->getResult();
+
+        return array_map(static fn (array $row): array => [
+            'service'           => $row[0],
+            'subscriptionCount' => (int) $row['subscriptionCount'],
+        ], $results);
     }
 }

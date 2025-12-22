@@ -32,7 +32,7 @@ class ProviderRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Provider[]
+     * @return list<Provider>
      */
     public function findAll(): array
     {

@@ -39,7 +39,7 @@ class SubscriptionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Subscription[]
+     * @return list<Subscription>
      */
     public function findAll(): array
     {

@@ -32,7 +32,7 @@ class VendorRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Vendor[]
+     * @return list<Vendor>
      */
     public function findAll(): array
     {

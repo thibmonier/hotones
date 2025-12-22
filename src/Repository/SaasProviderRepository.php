@@ -55,12 +55,17 @@ class SaasProviderRepository extends ServiceEntityRepository
      */
     public function getProvidersWithServiceCount(): array
     {
-        return $this->createQueryBuilder('p')
+        $results = $this->createQueryBuilder('p')
             ->select('p', 'COUNT(s.id) as serviceCount')
             ->leftJoin('p.services', 's')
             ->groupBy('p.id')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
+
+        return array_map(static fn (array $row): array => [
+            'provider'     => $row[0],
+            'serviceCount' => (int) $row['serviceCount'],
+        ], $results);
     }
 }

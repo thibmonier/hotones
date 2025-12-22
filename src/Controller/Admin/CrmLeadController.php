@@ -296,10 +296,7 @@ class CrmLeadController extends AbstractController
 
         // Taux de conversion par source
         $conversionBySource = [];
-        foreach ($statsBySource as $row) {
-            $source        = $row['source'];
-            $totalBySource = $row['count'];
-
+        foreach ($statsBySource as $source => $totalBySource) {
             $convertedQb = $this->leadCaptureRepository->createQueryBuilder('l')
                 ->select('COUNT(l.id)')
                 ->where('l.source = :source')
