@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Sur Render (et la plupart des plateformes PaaS), le système de fichiers est **éphémère** : tout ce qui est stocké localement est effacé à chaque déploiement. Pour conserver les fichiers uploadés (avatars, reçus de dépenses, etc.), nous devons utiliser un stockage externe.
+Sur Render (et la plupart des plateformes PaaS), le système de fichiers est **éphémère** : tout ce qui est stocké localement est effacé à chaque déploiement. Pour conserver les fichiers uploadés (avatars, reçus de dépenses, etc.) et les images traitées (cache LiipImagine), nous devons utiliser un stockage externe.
 
 ## Solution : Cloudflare R2
 
@@ -11,6 +11,21 @@ Cloudflare R2 est un service de stockage objet compatible S3 avec les avantages 
 - **Pas de frais de sortie** (egress) - contrairement à AWS S3
 - Compatible avec l'API S3 (facile à utiliser avec Symfony Flysystem)
 - Performant et distribué mondialement via le réseau Cloudflare
+- **CDN intégré** pour servir les fichiers rapidement partout dans le monde
+
+## Architecture complète
+
+Notre solution stocke **deux types de fichiers** sur R2 :
+
+### 1. Fichiers uploadés (via SecureFileUploadService)
+- **Avatars** utilisateurs et contributeurs
+- **Reçus de dépenses** (PDF, images)
+- Autres documents uploadés
+
+### 2. Images traitées (via LiipImagineBundle)
+- **Cache d'images redimensionnées** (thumbnails, etc.)
+- Différentes tailles : small (60x60), medium (80x80), large (250x250), etc.
+- Générées à la demande et mises en cache
 
 ## Étape 1 : Créer un bucket Cloudflare R2
 
@@ -72,14 +87,19 @@ FILESYSTEM_ADAPTER=s3_adapter
 # Credentials Cloudflare R2
 S3_ACCESS_KEY=<votre_access_key_id>
 S3_SECRET_KEY=<votre_secret_access_key>
-S3_BUCKET=hotones-uploads
+S3_BUCKET=hotones
 S3_REGION=auto
 S3_ENDPOINT=https://<your-account-id>.r2.cloudflarestorage.com
 
 # URL publique (une des options de l'étape 3)
-S3_PUBLIC_URL=https://files.hotones.com
-# OU
+# IMPORTANT : Utilisez la même URL pour S3_PUBLIC_URL et IMAGINE_CACHE_URL
 S3_PUBLIC_URL=https://pub-xxx.r2.dev
+# OU pour un domaine personnalisé :
+S3_PUBLIC_URL=https://files.hotones.com
+
+# Cache LiipImagine (images redimensionnées)
+# En production, utilise automatiquement S3_PUBLIC_URL
+IMAGINE_CACHE_URL=https://pub-xxx.r2.dev
 ```
 
 5. Cliquez sur **Save Changes**
@@ -119,11 +139,42 @@ aws s3 sync public/uploads/ s3://hotones-uploads/ \
 
 ## Étape 6 : Tester
 
+### Test 1 : Upload de fichiers
+
 1. Déployez votre application sur Render
-2. Uploadez un nouvel avatar via `/me/edit`
+2. **Uploadez un avatar** via `/me/edit`
 3. Vérifiez que l'avatar s'affiche correctement
-4. Vérifiez dans votre bucket R2 que le fichier est bien présent dans `avatars/`
-5. Redéployez l'application → l'avatar doit toujours être visible
+4. Dans votre bucket R2, vérifiez la présence du fichier :
+   ```
+   avatars/
+     └── filename-xxxxx.jpg
+   ```
+5. **Redéployez** l'application → l'avatar doit toujours être visible ✅
+
+### Test 2 : Cache d'images LiipImagine
+
+1. Accédez à une page utilisant LiipImagine (ex: chatbot avec avatar Unit404)
+2. Les images seront traitées et mises en cache automatiquement
+3. Dans votre bucket R2, vérifiez la structure :
+   ```
+   media/cache/
+     ├── unit404_avatar_small/
+     │   └── unit404.png
+     ├── unit404_avatar_medium/
+     │   └── unit404.png
+     └── unit404_avatar_large/
+         └── unit404.png
+   ```
+4. **Redéployez** → les images en cache persistent ✅
+5. Les images sont servies directement depuis R2/CDN (pas de regeneration)
+
+### Test 3 : URLs publiques
+
+1. Inspectez une image dans le navigateur
+2. L'URL doit pointer vers R2 :
+   - Avatars : `https://pub-xxx.r2.dev/avatars/filename.jpg`
+   - Cache : `https://pub-xxx.r2.dev/media/cache/filter/image.png`
+3. Ouvrez l'URL directement → l'image doit s'afficher ✅
 
 ## Architecture technique
 
@@ -145,54 +196,136 @@ aws s3 sync public/uploads/ s3://hotones-uploads/ \
 Les fichiers suivants ont été adaptés pour utiliser Flysystem :
 
 - **Configuration** :
-  - `config/packages/oneup_flysystem.yaml` - Configuration Flysystem
-  - `config/packages/prod/oneup_flysystem.yaml` - Override pour production
+  - `config/packages/oneup_flysystem.yaml` - Configuration Flysystem (adapters S3 + local)
+  - `config/packages/prod/oneup_flysystem.yaml` - Override production (utilise S3)
+  - `config/packages/liip_imagine.yaml` - Configuration LiipImagine avec Flysystem
+  - `config/packages/prod/liip_imagine.yaml` - Override production (URL publique R2)
 
 - **Services** :
-  - `src/Service/SecureFileUploadService.php` - Utilise Flysystem pour upload/delete
+  - `src/Service/SecureFileUploadService.php` - Upload/delete via Flysystem
+  - `src/Twig/FileStorageExtension.php` - Extension Twig pour URLs (avatar_url, file_url)
 
 - **Contrôleurs** :
   - `src/Controller/AvatarController.php` - Redirige vers R2 en prod
   - `src/Controller/ProfileController.php` - Upload d'avatar via service
   - `src/Controller/AdminUserController.php` - Upload d'avatar via service
+  - `src/Controller/ContributorController.php` - Upload d'avatar via service
   - `src/Controller/ExpenseReportController.php` - Upload de reçus via service
+
+- **Templates** :
+  - `templates/layouts/_topbar.html.twig` - Utilise avatar_url()
+  - `templates/home/index.html.twig` - Utilise avatar_url()
+  - `templates/profile/*.html.twig` - Utilise avatar_url()
+  - `templates/admin/user/edit.html.twig` - Utilise avatar_url()
 
 ### Structure de stockage
 
 ```
-hotones-uploads/  (bucket R2)
-├── avatars/
-│   ├── u1-abc123.webp
-│   ├── u2-def456.png
+hotones/  (bucket R2)
+├── avatars/                    # Avatars utilisateurs/contributeurs
+│   ├── filename-abc123.webp
+│   ├── filename-def456.png
 │   └── ...
-└── expenses/
-    ├── facture-xyz789.pdf
-    ├── recu-abc123.jpg
-    └── ...
+├── expenses/                   # Reçus de dépenses
+│   ├── facture-xyz789.pdf
+│   ├── recu-abc123.jpg
+│   └── ...
+└── media/cache/               # Cache LiipImagine
+    ├── unit404_avatar_small/
+    │   └── unit404.png
+    ├── unit404_avatar_medium/
+    │   └── unit404.png
+    ├── unit404_avatar_large/
+    │   └── unit404.png
+    ├── unit404_avatar_tiny/
+    │   └── unit404.png
+    └── unit404_avatar_widget/
+        └── unit404.png
 ```
 
 ## Dépannage
 
 ### Les fichiers ne s'affichent pas après déploiement
 
-1. Vérifiez les variables d'environnement sur Render
-2. Vérifiez les logs : `docker compose logs -f app` (local) ou logs Render
-3. Testez l'accès à R2 :
+1. **Vérifiez les variables d'environnement** sur Render
+   - `FILESYSTEM_ADAPTER=s3_adapter` ✓
+   - `S3_PUBLIC_URL` est défini ✓
+   - `IMAGINE_CACHE_URL` est défini ✓
+
+2. **Vérifiez les logs** Render pour les erreurs
+   - Erreur de connexion S3 → credentials incorrects
+   - Erreur 404 → bucket ou endpoint incorrect
+   - Erreur 403 → permissions manquantes
+
+3. **Testez l'accès direct** à R2 :
    ```bash
-   curl https://<your-account-id>.r2.cloudflarestorage.com/<bucket>/avatars/<filename>
+   # Ne fonctionne PAS (endpoint API, pas public)
+   curl https://<account-id>.r2.cloudflarestorage.com/hotones/avatars/file.jpg
+
+   # Fonctionne (URL publique)
+   curl https://pub-xxx.r2.dev/avatars/file.jpg
    ```
 
 ### Erreur "Access Denied" lors de l'upload
 
-- Vérifiez que les credentials (ACCESS_KEY/SECRET_KEY) sont corrects
-- Vérifiez que le token API a les permissions "Object Read & Write"
-- Vérifiez que le bucket est bien configuré
+- **Vérifiez les credentials** : `S3_ACCESS_KEY` et `S3_SECRET_KEY`
+- **Vérifiez les permissions** du token API : "Object Read & Write"
+- **Vérifiez le bucket name** : doit correspondre à `S3_BUCKET`
 
 ### Les URLs ne fonctionnent pas
 
-- Si vous utilisez un domaine personnalisé, vérifiez la configuration DNS
-- Vérifiez que `S3_PUBLIC_URL` est correctement configuré
-- Vérifiez que "Public Access" est activé sur le bucket
+**Symptôme** : Images uploadées mais erreur 404
+
+1. **Vérifiez l'accès public R2** :
+   - Dashboard R2 → Settings → R2.dev subdomain
+   - Doit être "Allowed" (pas "Disabled")
+
+2. **Vérifiez S3_PUBLIC_URL** :
+   ```bash
+   # ❌ INCORRECT (endpoint API)
+   S3_PUBLIC_URL=https://abc.r2.cloudflarestorage.com/hotones
+
+   # ✅ CORRECT (domaine public R2.dev)
+   S3_PUBLIC_URL=https://pub-xxx.r2.dev
+
+   # ✅ CORRECT (domaine personnalisé)
+   S3_PUBLIC_URL=https://files.hotones.com
+   ```
+
+3. **Vérifiez la visibilité** des fichiers :
+   - Les fichiers doivent être uploadés avec `visibility: public`
+   - Configuration automatique dans `oneup_flysystem.yaml`
+
+### Les images LiipImagine ne se génèrent pas
+
+1. **Vérifiez IMAGINE_CACHE_URL** :
+   ```bash
+   # En production
+   IMAGINE_CACHE_URL=https://pub-xxx.r2.dev
+   ```
+
+2. **Testez manuellement** la génération :
+   ```bash
+   php bin/console liip:imagine:cache:resolve unit404.png unit404_avatar_small
+   ```
+
+3. **Vérifiez les logs** pour erreurs Flysystem/S3
+
+4. **Videz le cache** si nécessaire :
+   ```bash
+   php bin/console liip:imagine:cache:remove
+   ```
+
+### Performance : Images lentes à charger
+
+**Solution** : Activer le CDN Cloudflare
+
+1. Dashboard R2 → votre bucket → Settings
+2. **Custom Domains** → connectez votre domaine
+3. Le domaine bénéficiera automatiquement du CDN Cloudflare
+4. Les images seront mises en cache aux edge locations
+
+**Astuce** : Utilisez un domaine personnalisé plutôt que R2.dev pour de meilleures performances CDN.
 
 ## Coûts
 
