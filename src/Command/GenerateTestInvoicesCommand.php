@@ -46,13 +46,13 @@ class GenerateTestInvoicesCommand extends Command
         $clients  = $this->em->getRepository(Client::class)->findAll();
         $projects = $this->em->getRepository(Project::class)->findAll();
 
-        if (count($clients) === 0) {
+        if (empty($clients)) {
             $io->error('Aucun client trouvé. Exécutez d\'abord app:create-test-data --with-test-data');
 
             return Command::FAILURE;
         }
 
-        if (count($projects) === 0) {
+        if (empty($projects)) {
             $io->error('Aucun projet trouvé. Exécutez d\'abord app:create-test-data --with-test-data');
 
             return Command::FAILURE;

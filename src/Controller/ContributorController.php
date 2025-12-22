@@ -11,6 +11,7 @@ use App\Service\SecureFileUploadService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -27,6 +28,7 @@ class ContributorController extends AbstractController
         private readonly ContributorRepository $contributorRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly SecureFileUploadService $uploadService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -264,20 +266,38 @@ class ContributorController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                $this->logger->info('Début édition collaborateur', [
+                    'contributor_id' => $contributor->getId(),
+                    'has_avatar'     => $form->get('avatarFile')->getData() !== null,
+                ]);
+
                 // Handle avatar upload
                 /** @var UploadedFile $avatarFile */
                 $avatarFile = $form->get('avatarFile')->getData();
                 if ($avatarFile) {
-                    $contributor->setAvatarFilename($this->handleAvatarUpload($avatarFile));
+                    $filename = $this->handleAvatarUpload($avatarFile);
+                    $contributor->setAvatarFilename($filename);
+                    $this->logger->info('Avatar uploadé', ['filename' => $filename]);
                 }
 
                 $this->entityManager->flush();
 
+                $this->logger->info('Collaborateur modifié avec succès');
                 $this->addFlash('success', 'Le collaborateur a été modifié avec succès.');
 
                 return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
             } catch (RuntimeException $e) {
+                $this->logger->error('Erreur modification collaborateur', [
+                    'message' => $e->getMessage(),
+                    'trace'   => $e->getTraceAsString(),
+                ]);
                 $this->addFlash('error', $e->getMessage());
+            } catch (Exception $e) {
+                $this->logger->error('Erreur inattendue modification collaborateur', [
+                    'message' => $e->getMessage(),
+                    'trace'   => $e->getTraceAsString(),
+                ]);
+                $this->addFlash('error', 'Une erreur inattendue s\'est produite. Veuillez réessayer.');
             }
         }
 
@@ -341,8 +361,23 @@ class ContributorController extends AbstractController
     private function handleAvatarUpload(UploadedFile $file): string
     {
         try {
-            return $this->uploadService->uploadImage($file, 'avatars');
+            $this->logger->info('handleAvatarUpload appelé', [
+                'filename' => $file->getClientOriginalName(),
+                'size'     => $file->getSize(),
+                'mime'     => $file->getMimeType(),
+            ]);
+
+            $result = $this->uploadService->uploadImage($file, 'avatars');
+
+            $this->logger->info('handleAvatarUpload réussi', ['result' => $result]);
+
+            return $result;
         } catch (Exception $e) {
+            $this->logger->error('handleAvatarUpload échoué', [
+                'message'  => $e->getMessage(),
+                'previous' => $e->getPrevious()?->getMessage(),
+                'trace'    => $e->getTraceAsString(),
+            ]);
             throw new RuntimeException(sprintf('Erreur lors de l\'upload de l\'avatar: %s', $e->getMessage()), 0, $e);
         }
     }

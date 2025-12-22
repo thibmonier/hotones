@@ -6,6 +6,7 @@ namespace App\Service;
 
 use Exception;
 use League\Flysystem\FilesystemOperator;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -42,6 +43,7 @@ class SecureFileUploadService
         private readonly SluggerInterface $slugger,
         #[Autowire(service: 'oneup_flysystem.default_filesystem')]
         private readonly FilesystemOperator $filesystem,
+        private readonly LoggerInterface $logger,
         #[Autowire(param: 'env(S3_PUBLIC_URL)')]
         private readonly string $publicUrl = '',
         #[Autowire(param: 'kernel.environment')]
@@ -74,6 +76,13 @@ class SecureFileUploadService
         $filePath = sprintf('%s/%s', $subdirectory, $newFilename);
 
         try {
+            $this->logger->info('Début upload image', [
+                'subdirectory' => $subdirectory,
+                'filename'     => $newFilename,
+                'environment'  => $this->environment,
+                'public_url'   => $this->publicUrl,
+            ]);
+
             // Lecture du contenu du fichier uploadé
             $stream = fopen($file->getPathname(), 'r');
             if ($stream === false) {
@@ -87,6 +96,8 @@ class SecureFileUploadService
                 fclose($stream);
             }
 
+            $this->logger->info('Upload image réussi', ['filePath' => $filePath]);
+
             // Conversion WebP si demandée (uniquement en local)
             if ($convertToWebP && extension_loaded('gd') && $this->environment === 'dev') {
                 $this->convertToWebP($filePath);
@@ -94,6 +105,12 @@ class SecureFileUploadService
 
             return $newFilename;
         } catch (Exception $e) {
+            $this->logger->error('Erreur upload image', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
             throw new FileException(sprintf('Impossible d\'uploader le fichier: %s', $e->getMessage()));
         }
     }
@@ -116,6 +133,11 @@ class SecureFileUploadService
         $filePath = sprintf('%s/%s', $subdirectory, $newFilename);
 
         try {
+            $this->logger->info('Début upload document', [
+                'subdirectory' => $subdirectory,
+                'filename'     => $newFilename,
+            ]);
+
             $stream = fopen($file->getPathname(), 'r');
             if ($stream === false) {
                 throw new FileException('Impossible de lire le fichier uploadé');
@@ -127,8 +149,14 @@ class SecureFileUploadService
                 fclose($stream);
             }
 
+            $this->logger->info('Upload document réussi', ['filePath' => $filePath]);
+
             return $newFilename;
         } catch (Exception $e) {
+            $this->logger->error('Erreur upload document', [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
             throw new FileException(sprintf('Impossible d\'uploader le document: %s', $e->getMessage()));
         }
     }
