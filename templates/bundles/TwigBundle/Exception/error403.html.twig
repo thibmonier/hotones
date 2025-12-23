@@ -1,0 +1,59 @@
+{% extends 'layouts/layouts-without-nav.html.twig' %}
+{% block title %}403 - Accès interdit{% endblock %}
+
+{% block body_tag %}
+<body>
+{% endblock %}
+
+{% block content %}
+<div class="account-pages my-5 pt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="text-center mb-5">
+                    <h1 class="display-2 fw-medium">4<i class="bx bx-shield-x bx-flashing text-danger display-3"></i>3</h1>
+                    <h4 class="text-uppercase text-danger">Accès Interdit</h4>
+                    <p class="text-muted mt-3" style="font-style: italic;">
+                        "Zone classifiée. Vos accréditations sont insuffisantes. Ou inexistantes. Probablement les deux."<br>
+                        <small>- Unit 404, Chef de la sécurité (auto-proclamé)</small>
+                    </p>
+                    <div class="mt-5 text-center">
+                        <a class="btn btn-primary waves-effect waves-light" href="{{ path('app_home') }}">
+                            <i class="bx bx-home-circle me-1"></i> Retour au tableau de bord
+                        </a>
+                        {% if app.user %}
+                        <a class="btn btn-outline-secondary waves-effect ms-2" href="{{ path('app_logout') }}">
+                            <i class="bx bx-log-out me-1"></i> Se déconnecter
+                        </a>
+                        {% else %}
+                        <a class="btn btn-outline-secondary waves-effect ms-2" href="{{ path('app_login') }}">
+                            <i class="bx bx-log-in me-1"></i> Se connecter
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-xl-6">
+                <div class="text-center">
+                    <img src="{{ asset('assets/images/unit404.png') }}" alt="Unit 404"
+                         style="width: 250px; height: 250px; opacity: 0.8; filter: drop-shadow(0 8px 16px rgba(239, 68, 68, 0.4));">
+                    <p class="text-muted mt-4" style="font-style: italic; font-size: 0.95rem;">
+                        "Protocole de sécurité niveau 403 activé. Non, je ne peux pas faire d'exception. Même pour vous."
+                    </p>
+                    <div class="alert alert-danger mt-4" role="alert">
+                        <i class="bx bx-lock-alt me-2"></i>
+                        <strong>Alerte sécurité :</strong> Vous n'avez pas les permissions nécessaires pour accéder à cette ressource.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/js/app.js') }}"></script>
+{% endblock %}
