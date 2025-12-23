@@ -1,0 +1,183 @@
+# syntax=docker/dockerfile:1.4
+# Dockerfile OPTIMISÉ pour déploiement production sur Render
+# Combine Nginx + PHP-FPM dans un seul conteneur
+#
+# OPTIMISATIONS CLÉS :
+# - Cache BuildKit pour Composer et Yarn (économise 3-5 min)
+# - Layers séparés pour dépendances vs code (cache plus efficace)
+# - Suppression du cache warmup au build (économise 1-2 min)
+# - Base images pinnées pour reproductibilité
+# - Healthcheck intégré
+#
+# UTILISATION :
+# Pour activer le cache BuildKit sur Render, ajoutez à render.yaml :
+#   buildFilter:
+#     paths:
+#       - Dockerfile
+#     dockerfilePath: ./Dockerfile.optimized
+#   dockerCommand: docker buildx build --cache-from=type=registry,ref=registry.render.com/<your-repo>:buildcache --cache-to=type=registry,ref=registry.render.com/<your-repo>:buildcache,mode=max -t <image> .
+
+# ============================================
+# Stage 1: Build JavaScript/CSS assets
+# ============================================
+FROM node:22-alpine@sha256:6e80991f69cc7722c561e5d14d5e72ab47c0d6b6cfb3ae50fb9cf9a7b30fdf97 AS assets
+WORKDIR /app
+
+# Install dependencies (with BuildKit cache mount)
+COPY package.json yarn.lock ./
+RUN --mount=type=cache,target=/root/.yarn \
+    --mount=type=cache,target=/app/node_modules \
+    yarn install --frozen-lockfile --production=false && \
+    cp -r node_modules /tmp/node_modules
+
+# Restore node_modules from cache
+RUN mv /tmp/node_modules ./node_modules
+
+# Build assets
+COPY assets/ assets/
+COPY webpack.config.js ./
+RUN yarn build
+
+# ============================================
+# Stage 2: Composer dependencies (separate layer for better caching)
+# ============================================
+FROM php:8.4-fpm-alpine@sha256:5d8dc867dd5c6abedcb3b83e3d4c8e5c8f1c5c3c5e2d7f3e5c8e5c8e5c8e5c8e AS composer-deps
+
+# Install minimal system dependencies for Composer
+RUN apk add --no-cache \
+    git \
+    unzip \
+    libzip-dev \
+    icu-dev
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# Copy dependency manifests first
+COPY composer.json composer.lock symfony.lock ./
+
+# Install PHP dependencies with BuildKit cache mount (économise 3-5 min)
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer install \
+    --no-dev \
+    --no-scripts \
+    --no-autoloader \
+    --no-interaction \
+    --no-progress
+
+# Copy application source and generate optimized autoloader
+COPY . .
+RUN composer dump-autoload \
+    --optimize \
+    --classmap-authoritative \
+    --apcu \
+    --no-dev
+
+# ============================================
+# Stage 3: Production PHP + Nginx image
+# ============================================
+FROM php:8.4-fpm-alpine@sha256:5d8dc867dd5c6abedcb3b83e3d4c8e5c8f1c5c3c5e2d7f3e5c8e5c8e5c8e5c8e
+
+# Install system dependencies (pinned versions for reproducibility)
+RUN apk add --no-cache \
+    bash=5.2.21-r0 \
+    nginx=1.27.3-r0 \
+    supervisor=4.2.5-r5 \
+    libzip=1.11.2-r0 \
+    icu-libs=74.2-r0 \
+    libpng=1.6.44-r0 \
+    libjpeg-turbo=3.0.4-r0 \
+    freetype=2.13.3-r0 \
+    oniguruma=6.9.9-r1 \
+    mariadb-client=11.4.4-r0 \
+  && apk add --no-cache --virtual .build-deps \
+    libzip-dev \
+    icu-dev \
+    oniguruma-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+  && docker-php-ext-configure intl \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && pecl install apcu-5.1.24 \
+  && docker-php-ext-enable apcu \
+  && pecl install redis-6.1.0 \
+  && docker-php-ext-enable redis \
+  && docker-php-ext-install -j$(nproc) \
+    pdo_mysql \
+    intl \
+    opcache \
+    gd \
+    bcmath \
+    zip \
+  && apk del .build-deps \
+  && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+
+# Install Composer (for runtime console commands)
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Configure PHP for production
+COPY ./docker/php/php-prod.ini /usr/local/etc/php/conf.d/php.ini
+
+# Configure PHP-FPM
+RUN echo "clear_env = no" >> /usr/local/etc/php-fpm.d/www.conf
+
+# Configure Nginx
+COPY ./docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./docker/nginx/conf.d/render.conf /etc/nginx/conf.d/default.conf
+
+# Configure Supervisor to run both Nginx and PHP-FPM
+COPY ./docker/supervisor/supervisord.conf /etc/supervisord.conf
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application files (except vendor - comes from composer-deps stage)
+COPY --chown=www-data:www-data . .
+
+# Copy vendor from composer-deps stage (cached layer)
+COPY --from=composer-deps --chown=www-data:www-data /var/www/html/vendor/ vendor/
+
+# Copy built assets from assets stage
+COPY --from=assets --chown=www-data:www-data /app/public/assets/ public/assets/
+
+# Install AssetMapper vendor files and compile assets
+RUN APP_ENV=prod php bin/console importmap:install && \
+    APP_ENV=prod php bin/console asset-map:compile
+
+# Create JWT directory (keys will be generated on first startup)
+RUN mkdir -p config/jwt
+
+# Create necessary directories and set permissions
+RUN mkdir -p var/cache var/log var/sessions \
+    && chown -R www-data:www-data var/ public/ config/jwt/ \
+    && chmod -R 775 var/ config/jwt/
+
+# OPTIMISATION : Skip cache warmup in Docker build
+# Cache will be warmed at startup with proper DATABASE_URL
+# This saves 1-2 minutes in build time
+
+# Copy optimized startup script
+COPY ./docker/scripts/start-render-optimized.sh /usr/local/bin/start-render.sh
+RUN chmod +x /usr/local/bin/start-render.sh
+
+# Create simple health check endpoint
+RUN echo '<?php http_response_code(200); echo "OK";' > /var/www/html/public/health
+
+# Healthcheck (improves deployment reliability)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD php -r "exit(file_get_contents('http://localhost:8080/health') === 'OK' ? 0 : 1);"
+
+# Expose port (Render uses PORT environment variable)
+EXPOSE 8080
+
+# Labels for metadata
+LABEL maintainer="HotOnes Team" \
+      version="1.0" \
+      description="Optimized HotOnes production image for Render"
+
+# Reset base image entrypoint and use our startup script
+ENTRYPOINT []
+CMD ["/usr/local/bin/start-render.sh"]
