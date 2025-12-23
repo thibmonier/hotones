@@ -4,4 +4,7 @@ liip_imagine:
     resolvers:
         default:
             flysystem:
+                filesystem_service: oneup_flysystem.default_filesystem
                 root_url: '%env(S3_PUBLIC_URL)%'
+                cache_prefix: 'media/cache'
+                visibility: public
