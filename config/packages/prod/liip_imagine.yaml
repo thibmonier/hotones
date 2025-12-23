@@ -1,4 +1,7 @@
 # Production configuration for LiipImagineBundle
 # Override to use Cloudflare R2 public URL for cached images
-parameters:
-    env(IMAGINE_CACHE_URL): '%env(S3_PUBLIC_URL)%'
+liip_imagine:
+    resolvers:
+        default:
+            flysystem:
+                root_url: '%env(S3_PUBLIC_URL)%'
