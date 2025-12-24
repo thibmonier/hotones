@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -40,6 +41,6 @@ class ErrorTestController extends AbstractController
     #[Route('/500', name: '500')]
     public function error500(): never
     {
-        throw new \RuntimeException('Erreur serveur simulée (test 500)');
+        throw new RuntimeException('Erreur serveur simulée (test 500)');
     }
 }
