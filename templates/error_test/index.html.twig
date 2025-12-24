@@ -1,4 +1,4 @@
-{% extends 'layouts/layouts.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 {% block title %}Test des pages d'erreur{% endblock %}
 
 {% block content %}
@@ -9,7 +9,7 @@
                 <h4 class="mb-0">Test des pages d'erreur</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
                         <li class="breadcrumb-item active">Test des pages d'erreur</li>
                     </ol>
                 </div>
