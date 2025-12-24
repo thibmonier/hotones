@@ -112,14 +112,16 @@
 
 ## 🔧 Technique & Qualité
 
-### Lot 20 - Pages d'Erreur Personnalisées
-**Estimation:** 1 jour
+### Lot 20 - Pages d'Erreur Personnalisées ✅ TERMINÉ
+**Estimation:** 1 jour | **Réalisé:** 23 décembre 2025
 
-**Tâches:**
-- Designer les pages 404 et 500 avec le thème Skote
-- S'inspirer de `pages-404.html.twig` et `pages-500.html.twig`
-- Adapter au design actuel de l'application
-- Tester les pages d'erreur en environnement dev/prod
+**Réalisations:**
+- ✅ Pages d'erreur personnalisées (404, 403, 500, générique)
+- ✅ Design cohérent avec le thème Skote
+- ✅ Mise en scène humoristique de "Unit 404"
+- ✅ Controller de test pour environnement dev (`/test-errors`)
+- ✅ Documentation complète (`docs/error-pages.md`)
+- ✅ Fallback générique pour toutes les autres erreurs
 
 ---
 
@@ -197,12 +199,13 @@
 | Lot 17 - Renommage Collaborateur | Haute | 1-2j | ⏳ À planifier |
 | Lot 18 - Liste Projets KPIs | Haute | 3-4j | ⏳ À planifier |
 | Lot 19 - Détail Projet Graphiques | Moyenne | 4-5j | ⏳ À planifier |
-| Lot 20 - Pages Erreur | Technique | 1j | ⏳ À planifier |
+| Lot 20 - Pages Erreur | Technique | 1j | ✅ Terminé |
 | Lot 21 - Couverture Tests | Technique | 5-7j | ⏳ À planifier |
 | Lot 22 - Intégration CRM | Technique | 8-10j | ⏳ À planifier |
 | Lot 23 - App Mobile PWA | Basse | 10-15j | ⏳ À planifier |
 
 **Total estimé:** ~50-65 jours
+**Réalisé:** 1 jour (Lot 20)
 
 ---
 
@@ -216,7 +219,6 @@
 2. **Moyen terme (1 mois):**
    - Lot 18 (Liste Projets KPIs)
    - Lot 19 (Détail Projet Graphiques)
-   - Lot 20 (Pages Erreur)
 
 3. **Long terme (2-3 mois):**
    - Lot 21 (Tests - progressif)
@@ -225,4 +227,4 @@
 
 ---
 
-**Dernière mise à jour:** 2025-12-19
+**Dernière mise à jour:** 2025-12-23
