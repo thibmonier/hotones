@@ -132,7 +132,7 @@ class AdminUserController extends AbstractController
             $em->persist($contributor);
             $em->flush();
 
-            $this->addFlash('success', 'Utilisateur créé et contributeur associé (#'.$contributor->getId().')');
+            $this->addFlash('success', 'Utilisateur créé et collaborateur associé (#'.$contributor->getId().')');
 
             return $this->redirectToRoute('admin_users');
         }

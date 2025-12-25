@@ -35,16 +35,16 @@ class VacationRequestController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Récupérer le contributeur associé à l'utilisateur
+        // Récupérer le collaborateur associé à l'utilisateur
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
-            $this->addFlash('warning', 'Aucun profil contributeur n\'est associé à votre compte.');
+            $this->addFlash('warning', 'Aucun profil collaborateur n\'est associé à votre compte.');
 
             return $this->redirectToRoute('home');
         }
 
-        // Récupérer toutes les demandes de congés du contributeur
+        // Récupérer toutes les demandes de congés du collaborateur
         $vacations = $this->vacationRepository->findBy(
             ['contributor' => $contributor],
             ['createdAt' => 'DESC'],
@@ -62,11 +62,11 @@ class VacationRequestController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Récupérer le contributeur associé à l'utilisateur
+        // Récupérer le collaborateur associé à l'utilisateur
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
-            $this->addFlash('error', 'Aucun profil contributeur n\'est associé à votre compte.');
+            $this->addFlash('error', 'Aucun profil collaborateur n\'est associé à votre compte.');
 
             return $this->redirectToRoute('home');
         }

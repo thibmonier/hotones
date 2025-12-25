@@ -44,6 +44,9 @@ revoir les éléments présents dans le backoffice et ceux présents dans l'appl
 
 revoir les pages existantes pour ne conserver que les pages utiles
 
+## prévoir l'intégration d'un PSP pour le paiement de l'abonnement 
+
+
 ---
 
 

@@ -273,7 +273,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * Données pour les contributeurs / intervenants.
+     * Données pour les collaborateurs / intervenants.
      */
     private function getIntervenantData(EntityManagerInterface $em, ?Contributor $contributor): array
     {

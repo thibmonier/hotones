@@ -37,7 +37,7 @@
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
-                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Contributeurs critiques</span>
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Collaborateurs critiques</span>
                         <h4 class="mb-3">
                             <span class="counter-value text-danger" data-target="{{ analysis.critical|length }}">{{ analysis.critical|length }}</span>
                         </h4>
@@ -278,19 +278,19 @@
             <div class="card-header bg-danger text-white">
                 <h5 class="card-title mb-0">
                     <i class="bx bx-error-circle me-1"></i>
-                    Contributeurs en surcharge
+                    Collaborateurs en surcharge
                 </h5>
             </div>
             <div class="card-body">
                 {% set all_overloaded = analysis.critical|filter(c => c.status == 'critical_high')|merge(analysis.overloaded) %}
                 {% if all_overloaded is empty %}
-                    <p class="text-muted text-center py-3">Aucun contributeur en surcharge</p>
+                    <p class="text-muted text-center py-3">Aucun collaborateur en surcharge</p>
                 {% else %}
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
                             <thead>
                                 <tr>
-                                    <th>Contributeur</th>
+                                    <th>Collaborateur</th>
                                     <th>TACE</th>
                                     <th>Écart</th>
                                 </tr>
@@ -322,18 +322,18 @@
             <div class="card-header bg-info text-white">
                 <h5 class="card-title mb-0">
                     <i class="bx bx-trending-down me-1"></i>
-                    Contributeurs sous-utilisés
+                    Collaborateurs sous-utilisés
                 </h5>
             </div>
             <div class="card-body">
                 {% if analysis.underutilized is empty %}
-                    <p class="text-muted text-center py-3">Aucun contributeur sous-utilisé</p>
+                    <p class="text-muted text-center py-3">Aucun collaborateur sous-utilisé</p>
                 {% else %}
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
                             <thead>
                                 <tr>
-                                    <th>Contributeur</th>
+                                    <th>Collaborateur</th>
                                     <th>TACE</th>
                                     <th>Disponible</th>
                                 </tr>

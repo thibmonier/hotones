@@ -41,7 +41,7 @@ class ContributorSatisfactionController extends AbstractController
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
-            $this->addFlash('error', 'Aucun profil contributeur associé à votre compte');
+            $this->addFlash('error', 'Aucun profil collaborateur associé à votre compte');
 
             return $this->redirectToRoute('dashboard');
         }
@@ -80,7 +80,7 @@ class ContributorSatisfactionController extends AbstractController
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
-            $this->addFlash('error', 'Aucun profil contributeur associé à votre compte');
+            $this->addFlash('error', 'Aucun profil collaborateur associé à votre compte');
 
             return $this->redirectToRoute('dashboard');
         }
@@ -163,7 +163,7 @@ class ContributorSatisfactionController extends AbstractController
             $title         = 'Satisfaction collaborateur - Année '.$year;
         }
 
-        // Nombre total de contributeurs actifs
+        // Nombre total de collaborateurs actifs
         $totalContributors = $this->contributorRepository->count(['active' => true]);
         $responseRate      = $totalContributors > 0 ? round(($stats['total'] / $totalContributors) * 100, 1) : 0;
 

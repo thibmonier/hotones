@@ -154,7 +154,7 @@
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="flex-1">
-                            <p class="text-truncate font-size-14 mb-2">Contributeurs actifs</p>
+                            <p class="text-truncate font-size-14 mb-2">Collaborateurs actifs</p>
                             <h4 class="mb-2">
                                 {% set uniqueContributors = [] %}
                                 {% for timesheet in timesheets %}
@@ -265,7 +265,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Date</th>
-                                        <th>Contributeur</th>
+                                        <th>Collaborateur</th>
                                         <th>Projet</th>
                                         <th>Client</th>
                                         <th class="text-end">Heures</th>
@@ -334,7 +334,7 @@
                                                         <i class="bx bx-show"></i>
                                                     </a>
                                                     <a href="{{ path('contributor_show', {'id': timesheet.contributor.id}) }}"
-                                                       class="btn btn-sm btn-outline-secondary" title="Voir le contributeur">
+                                                       class="btn btn-sm btn-outline-secondary" title="Voir le collaborateur">
                                                         <i class="bx bx-user"></i>
                                                     </a>
                                                 </div>
@@ -345,9 +345,9 @@
                             </table>
                         </div>
 
-                        <!-- Résumé par contributeur -->
+                        <!-- Résumé par collaborateur -->
                         <div class="mt-4">
-                            <h5>Résumé par contributeur</h5>
+                            <h5>Résumé par collaborateur</h5>
                             <div class="row">
                                 {% set contributorTotals = {} %}
                                 {% for timesheet in timesheets %}
@@ -426,7 +426,7 @@
             const rows = table.querySelectorAll('tr');
             let csvContent = '\uFEFF'; // BOM pour UTF-8
 
-            csvContent += 'Date,Contributeur,Projet,Client,Heures,Notes\n';
+            csvContent += 'Date,Collaborateur,Projet,Client,Heures,Notes\n';
 
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];

@@ -61,7 +61,7 @@ class HrDashboardController extends AbstractController
     #[Route('/skills-matrix', name: 'hr_skills_matrix', methods: ['GET'])]
     public function skillsMatrix(): Response
     {
-        // Matrice de compétences : tous les contributeurs actifs avec leurs compétences
+        // Matrice de compétences : tous les collaborateurs actifs avec leurs compétences
         $contributorRepository = $this->hrMetricsService->contributorRepository;
         $contributors          = $contributorRepository->findBy(['active' => true], ['lastName' => 'ASC']);
 

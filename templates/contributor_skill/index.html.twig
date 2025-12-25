@@ -140,7 +140,7 @@
                                                         <input type="hidden" name="_token" value="{{ csrf_token('assess' ~ contributorSkill.id) }}" />
 
                                                         <div class="mb-3">
-                                                            <label class="form-label">Auto-évaluation du contributeur</label>
+                                                            <label class="form-label">Auto-évaluation du collaborateur</label>
                                                             <div>
                                                                 <span class="badge bg-secondary">{{ contributorSkill.selfAssessmentLevel }} - {{ contributorSkill.selfAssessmentLevelLabel }}</span>
                                                             </div>
@@ -187,7 +187,7 @@
                 <div class="card-body text-center py-5">
                     <i class="bx bx-info-circle text-muted" style="font-size: 48px;"></i>
                     <h5 class="mt-3">Aucune compétence déclarée</h5>
-                    <p class="text-muted">Commencez par ajouter des compétences à ce contributeur.</p>
+                    <p class="text-muted">Commencez par ajouter des compétences à ce collaborateur.</p>
                     <a href="{{ path('contributor_skill_new', {contributorId: contributor.id}) }}" class="btn btn-primary">
                         <i class="bx bx-plus me-1"></i>Ajouter une compétence
                     </a>

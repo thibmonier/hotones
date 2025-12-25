@@ -231,7 +231,7 @@ class ProjectController extends AbstractController
         // Prédire la rentabilité du projet
         $profitabilityPrediction = $profitabilityPredictor->predictProfitability($project);
 
-        // Récupérer l'évolution de la satisfaction des contributeurs du projet
+        // Récupérer l'évolution de la satisfaction des collaborateurs du projet
         $satisfactionRepo = $em->getRepository(\App\Entity\ContributorSatisfaction::class);
         $satisfactionData = $satisfactionRepo->getProjectSatisfactionEvolution($id, 12);
 

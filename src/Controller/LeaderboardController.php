@@ -56,7 +56,7 @@ class LeaderboardController extends AbstractController
     }
 
     /**
-     * Affiche le profil gamification d'un contributeur.
+     * Affiche le profil gamification d'un collaborateur.
      */
     #[Route('/profile/{id}', name: 'leaderboard_profile', methods: ['GET'])]
     public function profile(int $id): Response
@@ -64,7 +64,7 @@ class LeaderboardController extends AbstractController
         $contributor = $this->contributorRepository->find($id);
 
         if (!$contributor) {
-            throw $this->createNotFoundException('Contributeur non trouvé');
+            throw $this->createNotFoundException('Collaborateur non trouvé');
         }
 
         $progress     = $this->gamificationService->getContributorProgress($contributor);
@@ -91,7 +91,7 @@ class LeaderboardController extends AbstractController
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
-            $this->addFlash('error', 'Aucun profil contributeur associé à votre compte');
+            $this->addFlash('error', 'Aucun profil collaborateur associé à votre compte');
 
             return $this->redirectToRoute('dashboard');
         }

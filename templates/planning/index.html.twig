@@ -98,7 +98,7 @@
       {% if totalIssues > 0 %}
       <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
         <i class="bx bx-error-circle me-2"></i>
-        <strong>Attention !</strong> {{ totalIssues }} contributeur(s) en situation critique ou surchargé(s).
+        <strong>Attention !</strong> {{ totalIssues }} collaborateur(s) en situation critique ou surchargé(s).
         {% if criticalCount > 0 %}
           <span class="badge bg-danger">{{ criticalCount }} critique{{ criticalCount > 1 ? 's' : '' }}</span>
         {% endif %}
@@ -124,8 +124,8 @@
         </select>
       </div>
       <div class="col-auto">
-        <label class="form-label">Contributeurs</label>
-        <select name="contributors[]" id="contributorsFilter" class="form-select planning-multiselect" multiple data-placeholder="Tous les contributeurs">
+        <label class="form-label">Collaborateurs</label>
+        <select name="contributors[]" id="contributorsFilter" class="form-select planning-multiselect" multiple data-placeholder="Tous les collaborateurs">
           {% for c in all_contributors %}
             <option value="{{ c.id }}" {% if (c.id ~ '') in selected_contributors %}selected{% endif %}>{{ c.name }}</option>
           {% endfor %}
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     weekends: false, // Masquer les samedis et dimanches
     editable: true,
     selectable: true,
-    resourceAreaHeaderContent: 'Contributeurs',
+    resourceAreaHeaderContent: 'Collaborateurs',
     resourceAreaWidth: '250px',
     resources: resources,
     events: events,

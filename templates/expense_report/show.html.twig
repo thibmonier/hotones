@@ -35,7 +35,7 @@
                                     <td class="text-muted">{{ expense.expenseDate|date('d/m/Y') }}</td>
                                 </tr>
                                 <tr>
-                                    <th class="ps-0">Contributeur</th>
+                                    <th class="ps-0">Collaborateur</th>
                                     <td class="text-muted">
                                         <a href="{{ path('contributor_show', {id: expense.contributor.id}) }}">{{ expense.contributor.fullName }}</a>
                                     </td>

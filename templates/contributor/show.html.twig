@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}{{ contributor.name }} - Contributeur{% endblock %}
+{% block title %}{{ contributor.name }} - Collaborateur{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -118,7 +118,7 @@
                             </div>
                             <p class="text-muted mb-0">Aucun compte utilisateur associé</p>
                             {% if is_granted('ROLE_MANAGER') %}
-                                <small class="text-muted">Modifiez le contributeur pour l'associer à un compte</small>
+                                <small class="text-muted">Modifiez le collaborateur pour l'associer à un compte</small>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -158,7 +158,7 @@
                             </div>
                             <p class="text-muted mb-0">Aucun manager assigné</p>
                             {% if is_granted('ROLE_MANAGER') %}
-                                <small class="text-muted">Modifiez le contributeur pour assigner un manager</small>
+                                <small class="text-muted">Modifiez le collaborateur pour assigner un manager</small>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -224,7 +224,7 @@
                             </div>
                             <p class="text-muted mb-0">Aucun profil défini</p>
                             {% if is_granted('ROLE_MANAGER') %}
-                                <small class="text-muted">Modifiez le contributeur pour ajouter des profils</small>
+                                <small class="text-muted">Modifiez le collaborateur pour ajouter des profils</small>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -305,7 +305,7 @@
                     <div class="mt-3">
                         <small class="text-muted">
                             <i class="bx bx-info-circle me-1"></i>
-                            Ce graphique compare l'auto-évaluation du contributeur avec l'évaluation managériale.
+                            Ce graphique compare l'auto-évaluation du collaborateur avec l'évaluation managériale.
                         </small>
                     </div>
                 </div>

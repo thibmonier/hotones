@@ -30,7 +30,7 @@ class ContributorSkillController extends AbstractController
     {
         $contributor = $this->em->getRepository(Contributor::class)->find($contributorId);
         if (!$contributor) {
-            throw $this->createNotFoundException('Contributeur non trouvé');
+            throw $this->createNotFoundException('Collaborateur non trouvé');
         }
 
         $skillsByCategory = $this->contributorSkillRepository->findByContributorGroupedByCategory($contributor);
@@ -48,7 +48,7 @@ class ContributorSkillController extends AbstractController
     {
         $contributor = $this->em->getRepository(Contributor::class)->find($contributorId);
         if (!$contributor) {
-            throw $this->createNotFoundException('Contributeur non trouvé');
+            throw $this->createNotFoundException('Collaborateur non trouvé');
         }
 
         $contributorSkill = new ContributorSkill();
@@ -76,7 +76,7 @@ class ContributorSkillController extends AbstractController
     #[Route('/{id}/edit', name: 'contributor_skill_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, int $contributorId, ContributorSkill $contributorSkill): Response
     {
-        // Vérifier que la compétence appartient bien au contributeur
+        // Vérifier que la compétence appartient bien au collaborateur
         if ($contributorSkill->getContributor()->getId() !== $contributorId) {
             throw $this->createAccessDeniedException();
         }
@@ -102,7 +102,7 @@ class ContributorSkillController extends AbstractController
     #[Route('/{id}/delete', name: 'contributor_skill_delete', methods: ['POST'])]
     public function delete(Request $request, int $contributorId, ContributorSkill $contributorSkill): Response
     {
-        // Vérifier que la compétence appartient bien au contributeur
+        // Vérifier que la compétence appartient bien au collaborateur
         if ($contributorSkill->getContributor()->getId() !== $contributorId) {
             throw $this->createAccessDeniedException();
         }
@@ -121,7 +121,7 @@ class ContributorSkillController extends AbstractController
     #[IsGranted('ROLE_MANAGER')]
     public function assess(Request $request, int $contributorId, ContributorSkill $contributorSkill): Response
     {
-        // Vérifier que la compétence appartient bien au contributeur
+        // Vérifier que la compétence appartient bien au collaborateur
         if ($contributorSkill->getContributor()->getId() !== $contributorId) {
             throw $this->createAccessDeniedException();
         }

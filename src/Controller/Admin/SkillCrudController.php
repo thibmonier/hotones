@@ -55,7 +55,7 @@ class SkillCrudController extends AbstractCrudController
         yield TextareaField::new('description', 'Description')
             ->hideOnIndex();
 
-        yield IntegerField::new('contributorCount', 'Contributeurs')
+        yield IntegerField::new('contributorCount', 'Collaborateurs')
             ->hideOnForm();
 
         yield BooleanField::new('active', 'Actif')

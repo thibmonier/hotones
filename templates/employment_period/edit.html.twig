@@ -33,9 +33,9 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="contributor_id" class="form-label">Contributeur <span class="text-danger">*</span></label>
+                                <label for="contributor_id" class="form-label">Collaborateur <span class="text-danger">*</span></label>
                                 <select name="contributor_id" id="contributor_id" class="form-select" required>
-                                    <option value="">Sélectionner un contributeur</option>
+                                    <option value="">Sélectionner un collaborateur</option>
                                     {% for contributor in contributors %}
                                         <option value="{{ contributor.id }}" {% if period.contributor and period.contributor.id == contributor.id %}selected{% endif %}>
                                             {{ contributor.name }}
@@ -198,7 +198,7 @@
                         <div class="table-responsive">
                             <table class="table table-borderless table-sm">
                                 <tr>
-                                    <td class="fw-bold">Contributeur :</td>
+                                    <td class="fw-bold">Collaborateur :</td>
                                     <td>{{ period.contributor.name }}</td>
                                 </tr>
                                 <tr>
@@ -234,7 +234,7 @@
                             <ul class="mb-0 small">
                                 <li>La modification de ces données peut affecter les calculs de rentabilité</li>
                                 <li>Vérifiez que les dates ne chevauchent pas avec d'autres périodes</li>
-                                <li>Les profils définissent les compétences du contributeur pour cette période</li>
+                                <li>Les profils définissent les compétences du collaborateur pour cette période</li>
                             </ul>
                         </div>
                     </div>

@@ -29,7 +29,7 @@ class MyTasksController extends AbstractController
         // Logged in contributor
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor instanceof Contributor) {
-            $this->addFlash('error', 'Aucun contributeur associé à votre compte.');
+            $this->addFlash('error', 'Aucun collaborateur associé à votre compte.');
 
             return $this->redirectToRoute('home');
         }

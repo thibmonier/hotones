@@ -138,9 +138,9 @@ class ProjectTaskType extends AbstractType
             ])
             ->add('assignedContributor', EntityType::class, [
                 'class'       => Contributor::class,
-                'label'       => 'Contributeur assigné',
+                'label'       => 'Collaborateur assigné',
                 'required'    => false,
-                'placeholder' => 'Sélectionner un contributeur',
+                'placeholder' => 'Sélectionner un collaborateur',
                 'attr'        => [
                     'class' => 'form-select',
                 ],
@@ -154,7 +154,7 @@ class ProjectTaskType extends AbstractType
                 'choice_label' => function ($contributor) {
                     return $contributor->getFirstName().' '.$contributor->getLastName();
                 },
-                'help' => 'Contributeur responsable de cette tâche',
+                'help' => 'Collaborateur responsable de cette tâche',
             ])
             ->add('requiredProfile', EntityType::class, [
                 'class'       => Profile::class,

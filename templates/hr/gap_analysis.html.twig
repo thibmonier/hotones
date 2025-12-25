@@ -197,7 +197,7 @@
 
                         {% if need.contributorsToTrain|length > 0 %}
                         <div>
-                            <h6 class="text-muted mb-2">Contributeurs à former :</h6>
+                            <h6 class="text-muted mb-2">Collaborateurs à former :</h6>
                             <div class="d-flex flex-wrap gap-2">
                                 {% for training in need.contributorsToTrain %}
                                 <div class="border rounded p-2 bg-light">
@@ -220,7 +220,7 @@
                         {% else %}
                         <div class="alert alert-warning mb-0">
                             <i class="bx bx-info-circle me-2"></i>
-                            Aucun contributeur identifié pour cette formation. Envisager un recrutement.
+                            Aucun collaborateur identifié pour cette formation. Envisager un recrutement.
                         </div>
                         {% endif %}
                     </div>

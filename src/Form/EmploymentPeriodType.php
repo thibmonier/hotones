@@ -26,14 +26,14 @@ class EmploymentPeriodType extends AbstractType
     {
         $builder
             ->add('contributor', EntityType::class, [
-                'label'        => 'Contributeur',
+                'label'        => 'Collaborateur',
                 'class'        => Contributor::class,
                 'choice_label' => 'name',
                 'required'     => true,
-                'placeholder'  => '-- Sélectionner un contributeur --',
+                'placeholder'  => '-- Sélectionner un collaborateur --',
                 'attr'         => ['class' => 'form-select'],
                 'constraints'  => [
-                    new NotBlank(message: 'Le contributeur est obligatoire'),
+                    new NotBlank(message: 'Le collaborateur est obligatoire'),
                 ],
             ])
             ->add('startDate', DateType::class, [
@@ -60,7 +60,7 @@ class EmploymentPeriodType extends AbstractType
                     'class'              => 'form-control',
                     'data-calculate-cjm' => 'true',
                 ],
-                'help' => 'Salaire brut mensuel du contributeur',
+                'help' => 'Salaire brut mensuel du collaborateur',
             ])
             ->add('cjm', MoneyType::class, [
                 'label'    => 'CJM (Coût Journalier Moyen)',

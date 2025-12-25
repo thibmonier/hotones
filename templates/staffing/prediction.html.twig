@@ -40,16 +40,16 @@
                             </div>
                             <div class="col-md-5">
                                 <label for="contributorFilter" class="form-label">
-                                    <i class="bx bx-user me-1"></i>Filtrer par contributeurs
+                                    <i class="bx bx-user me-1"></i>Filtrer par collaborateurs
                                 </label>
-                                <select name="contributors[]" id="contributorFilter" class="form-control" data-choices data-choices-removeItem multiple data-placeholder="Choisissez un ou plusieurs contributeurs...">
+                                <select name="contributors[]" id="contributorFilter" class="form-control" data-choices data-choices-removeItem multiple data-placeholder="Choisissez un ou plusieurs collaborateurs...">
                                     {% for contributor in allContributors %}
                                         <option value="{{ contributor.id }}" {% if contributor.id in selectedContributors %}selected{% endif %}>
                                             {{ contributor.firstName }} {{ contributor.lastName }}
                                         </option>
                                     {% endfor %}
                                 </select>
-                                <small class="form-text text-muted">Laissez vide pour afficher tous les contributeurs</small>
+                                <small class="form-text text-muted">Laissez vide pour afficher tous les collaborateurs</small>
                             </div>
                             <div class="col-md-2 d-flex gap-2">
                                 <button type="submit" class="btn btn-primary flex-fill">
@@ -297,10 +297,10 @@
                 new Choices(contributorFilter, {
                     removeItemButton: true,
                     placeholder: true,
-                    placeholderValue: 'Sélectionner un ou plusieurs contributeurs',
+                    placeholderValue: 'Sélectionner un ou plusieurs collaborateurs',
                     searchPlaceholderValue: 'Rechercher...',
-                    noResultsText: 'Aucun contributeur trouvé',
-                    noChoicesText: 'Aucun contributeur disponible',
+                    noResultsText: 'Aucun collaborateur trouvé',
+                    noChoicesText: 'Aucun collaborateur disponible',
                     itemSelectText: 'Cliquer pour sélectionner',
                 });
             }

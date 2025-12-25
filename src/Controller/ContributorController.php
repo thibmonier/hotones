@@ -75,7 +75,7 @@ class ContributorController extends AbstractController
                ->setParameter('today', $today);
         } elseif ($employmentStatus === 'inactive_employment') {
             $today = new DateTime();
-            // Utiliser une sous-requête pour exclure les contributeurs avec des périodes en cours
+            // Utiliser une sous-requête pour exclure les collaborateurs avec des périodes en cours
             $subQuery = $this->entityManager->createQueryBuilder()
                 ->select('IDENTITY(ep2.contributor)')
                 ->from('App\Entity\EmploymentPeriod', 'ep2')
@@ -133,8 +133,8 @@ class ContributorController extends AbstractController
         $qb->setFirstResult($offset)->setMaxResults($perPage);
         $contributors = $qb->getQuery()->getResult();
 
-        // Calculer les moyennes CJM/TJM à partir des périodes d'emploi des contributeurs
-        // Note: On récupère tous les contributeurs (sans pagination) pour calculer les stats globales
+        // Calculer les moyennes CJM/TJM à partir des périodes d'emploi des collaborateurs
+        // Note: On récupère tous les collaborateurs (sans pagination) pour calculer les stats globales
         $allContributorsQb = clone $qb;
         $allContributorsQb->setFirstResult(0)->setMaxResults(null);
         $allContributors = $allContributorsQb->getQuery()->getResult();
@@ -409,7 +409,7 @@ class ContributorController extends AbstractController
                ->setParameter('today', $today);
         } elseif ($employmentStatus === 'inactive_employment') {
             $today = new DateTime();
-            // Utiliser une sous-requête pour exclure les contributeurs avec des périodes en cours
+            // Utiliser une sous-requête pour exclure les collaborateurs avec des périodes en cours
             $subQuery = $this->entityManager->createQueryBuilder()
                 ->select('IDENTITY(ep2.contributor)')
                 ->from('App\Entity\EmploymentPeriod', 'ep2')

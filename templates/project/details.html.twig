@@ -175,7 +175,7 @@
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Contributeur</th>
+                                    <th>Collaborateur</th>
                                     <th>Temps passé</th>
                                     <th>Temps restant</th>
                                     <th>Total estimé</th>
@@ -700,7 +700,7 @@
         {% endif %}
 
         {% if contributorHoursData.labels|length > 0 %}
-        // Graphique répartition contributeurs
+        // Graphique répartition collaborateurs
         const contributorCtx = document.getElementById('contributorChart').getContext('2d');
         new Chart(contributorCtx, {
             type: 'bar',

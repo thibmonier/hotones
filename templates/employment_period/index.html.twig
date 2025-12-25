@@ -49,14 +49,14 @@
                         {% set chips = [] %}
                         {% if filters.contributor %}
                             {% set contributorObj = (contributors|filter(c => c.id == filters.contributor)|first) %}
-                            {% set chips = chips|merge(['Contributeur: ' ~ (contributorObj ? contributorObj.name : filters.contributor)]) %}
+                            {% set chips = chips|merge(['Collaborateur: ' ~ (contributorObj ? contributorObj.name : filters.contributor)]) %}
                         {% endif %}
                         {% if filters.status %}
                             {% set statusLabels = {'active': 'En cours', 'ended': 'Terminées'} %}
                             {% set chips = chips|merge(['Statut: ' ~ (statusLabels[filters.status] ?? filters.status)]) %}
                         {% endif %}
                         {% if sort != 'startDate' or dir != 'DESC' %}
-                            {% set sortLabels = {'contributor': 'Contributeur', 'startDate': 'Date début', 'salary': 'Salaire', 'cjm': 'CJM', 'tjm': 'TJM'} %}
+                            {% set sortLabels = {'contributor': 'Collaborateur', 'startDate': 'Date début', 'salary': 'Salaire', 'cjm': 'CJM', 'tjm': 'TJM'} %}
                             {% set chips = chips|merge(['Tri: ' ~ (sortLabels[sort] ?? sort) ~ ' ' ~ dir]) %}
                         {% endif %}
                         {% if chips|length > 0 %}
@@ -75,9 +75,9 @@
                         {% endif %}
                         <form method="get" class="row g-2 align-items-end">
                             <div class="col-md-4">
-                                <label class="form-label">Contributeur</label>
+                                <label class="form-label">Collaborateur</label>
                                 <select class="form-select" name="contributor">
-                                    <option value="">Tous les contributeurs</option>
+                                    <option value="">Tous les collaborateurs</option>
                                     {% for contributor in contributors %}
                                         <option value="{{ contributor.id }}" {% if filters.contributor == contributor.id %}selected{% endif %}>
                                             {{ contributor.name }}
@@ -132,7 +132,7 @@
                                 <tr>
                                     <th>
                                         <a href="{{ path('employment_period_index', filters|merge({ sort: 'contributor', dir: sort == 'contributor' and dir == 'ASC' ? 'DESC' : 'ASC' })) }}" class="text-decoration-none text-reset">
-                                            Contributeur
+                                            Collaborateur
                                             {% if sort == 'contributor' %}
                                                 <i class="bx bx-sort-{{ dir == 'ASC' ? 'up' : 'down' }}-alt"></i>
                                             {% endif %}

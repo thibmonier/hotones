@@ -140,7 +140,7 @@ class EmploymentPeriodController extends AbstractController
         $periods = $qb->getQuery()->getResult();
 
         // Génération CSV
-        $csv = "Contributeur;Date début;Date fin;Profils;Salaire;CJM;TJM;Heures/semaine;Temps de travail;Statut\n";
+        $csv = "Collaborateur;Date début;Date fin;Profils;Salaire;CJM;TJM;Heures/semaine;Temps de travail;Statut\n";
         foreach ($periods as $period) {
             $profiles = [];
             foreach ($period->getProfiles() as $profile) {
@@ -177,7 +177,7 @@ class EmploymentPeriodController extends AbstractController
     {
         $period = new EmploymentPeriod();
 
-        // Pré-sélectionner le contributeur si fourni dans l'URL
+        // Pré-sélectionner le collaborateur si fourni dans l'URL
         if ($contributorId = $request->query->get('contributor')) {
             $contributor = $em->getRepository(Contributor::class)->find($contributorId);
             if ($contributor) {
@@ -241,7 +241,7 @@ class EmploymentPeriodController extends AbstractController
 
             // Vérifier les chevauchements de périodes
             if ($employmentPeriodRepository->hasOverlappingPeriods($period)) {
-                $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce contributeur.');
+                $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce collaborateur.');
 
                 $contributors = $contributorRepository->findActiveContributors();
                 $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
@@ -363,7 +363,7 @@ class EmploymentPeriodController extends AbstractController
 
             // Vérifier les chevauchements de périodes (en excluant la période actuelle)
             if ($employmentPeriodRepository->hasOverlappingPeriods($period, $period->getId())) {
-                $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce contributeur.');
+                $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce collaborateur.');
 
                 $contributors = $contributorRepository->findActiveContributors();
                 $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);

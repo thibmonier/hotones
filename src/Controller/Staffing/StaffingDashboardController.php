@@ -94,7 +94,7 @@ class StaffingDashboardController extends AbstractController
             $selectedContributor,
         );
 
-        // Récupérer les métriques par contributeur
+        // Récupérer les métriques par collaborateur
         $metricsByContributor = $this->staffingRepo->getMetricsByContributor(
             $startDate,
             $endDate,
@@ -111,7 +111,7 @@ class StaffingDashboardController extends AbstractController
             $weeklyGlobalTACE = $this->staffingRepo->getWeeklyGlobalTACE($year, $selectedProfile);
         }
 
-        // Récupérer les profils et contributeurs actifs pour les filtres
+        // Récupérer les profils et collaborateurs actifs pour les filtres
         $profileRepo = $this->doctrine->getRepository(Profile::class);
         $profiles    = $profileRepo->findBy(['active' => true], ['name' => 'ASC']);
 

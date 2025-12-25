@@ -16,7 +16,7 @@
             <div class="card-body">
                 <form method="get" action="{{ path('global_search') }}" class="mb-4">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Rechercher un projet, contributeur, devis, client..." value="{{ query }}" autofocus>
+                        <input type="text" name="q" class="form-control" placeholder="Rechercher un projet, collaborateur, devis, client..." value="{{ query }}" autofocus>
                         <button type="submit" class="btn btn-primary">
                             <i class="bx bx-search"></i> Rechercher
                         </button>
@@ -43,7 +43,7 @@
                         {% endif %}
 
                         {% if results.contributors is defined %}
-                            <h5 class="mb-3"><i class="bx bx-user me-2"></i>Contributeurs ({{ results.contributors|length }})</h5>
+                            <h5 class="mb-3"><i class="bx bx-user me-2"></i>Collaborateurs ({{ results.contributors|length }})</h5>
                             <div class="list-group mb-4">
                                 {% for contributor in results.contributors %}
                                     <a href="{{ path('contributor_show', {id: contributor.id}) }}" class="list-group-item list-group-item-action">

@@ -23,7 +23,7 @@
     {% endif %}
     {% if selected_contributor %}
         {% set contribName = (contributors|filter(c => c.id == selected_contributor)|first).name|default('#' ~ selected_contributor) %}
-        {% set activeFilters = activeFilters|merge(['Contributeur: ' ~ contribName]) %}
+        {% set activeFilters = activeFilters|merge(['Collaborateur: ' ~ contribName]) %}
     {% endif %}
     {% if selected_granularity != 'monthly' and selected_view_mode != 'annual' %}
         {% set granLabel = selected_granularity == 'weekly' ? 'Hebdomadaire' : 'Trimestriel' %}
@@ -95,9 +95,9 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Contributeur</label>
+                                <label class="form-label">Collaborateur</label>
                                 <select name="contributor" class="form-select form-select-sm">
-                                    <option value="">Tous les contributeurs</option>
+                                    <option value="">Tous les collaborateurs</option>
                                     {% for contributor in contributors %}
                                         <option
                                             value="{{ contributor.id }}"
@@ -196,7 +196,7 @@
                     <h5 class="card-title mb-0"><i class="bx bx-line-chart me-2"></i>TACE Global Hebdomadaire {{ selected_year }}</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-3">Taux d'Activité Congés Exclus global (tous contributeurs productifs) par semaine</p>
+                    <p class="text-muted mb-3">Taux d'Activité Congés Exclus global (tous collaborateurs productifs) par semaine</p>
                     <canvas id="weeklyGlobalTaceChart" height="60"></canvas>
                 </div>
             </div>
@@ -213,7 +213,7 @@
                     <h5 class="card-title mb-0"><i class="bx bx-trending-up me-2"></i>Taux de Staffing</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-3">Pourcentage du temps où les contributeurs sont affectés à des missions</p>
+                    <p class="text-muted mb-3">Pourcentage du temps où les collaborateurs sont affectés à des missions</p>
                     <canvas id="staffingRateChart" height="80"></canvas>
                 </div>
             </div>
@@ -233,13 +233,13 @@
     </div>
     {% endif %}
 
-    {# Vue annuelle : Tableau d'occupation par contributeur #}
+    {# Vue annuelle : Tableau d'occupation par collaborateur #}
     {% if selected_view_mode == 'annual' and weekly_occupancy is not empty %}
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0"><i class="bx bx-calendar-week me-2"></i>Taux d'Occupation Hebdomadaire par Contributeur</h5>
+                    <h5 class="card-title mb-0"><i class="bx bx-calendar-week me-2"></i>Taux d'Occupation Hebdomadaire par Collaborateur</h5>
                     <span class="badge bg-info">{{ selected_year }}</span>
                 </div>
                 <div class="card-body">
@@ -248,7 +248,7 @@
                         <table class="table table-bordered table-sm mb-0">
                             <thead class="table-light" style="position: sticky; top: 0; z-index: 10;">
                                 <tr>
-                                    <th style="min-width: 180px;">Contributeur</th>
+                                    <th style="min-width: 180px;">Collaborateur</th>
                                     {% set weeks = [] %}
                                     {% for data in weekly_occupancy %}
                                         {% if data.weekNumber not in weeks %}
@@ -374,14 +374,14 @@
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bx bx-group me-2"></i>Top 10 Contributeurs</h5>
+                    <h5 class="card-title mb-0"><i class="bx bx-group me-2"></i>Top 10 Collaborateurs</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-centered table-nowrap mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Contributeur</th>
+                                    <th>Collaborateur</th>
                                     <th class="text-center">Taux de Staffing</th>
                                     <th class="text-center">TACE</th>
                                 </tr>
@@ -481,7 +481,7 @@
             });
         }
 
-        // Filtrage UX des contributeurs en fonction du profil sélectionné
+        // Filtrage UX des collaborateurs en fonction du profil sélectionné
         const profileSelect = document.querySelector('select[name="profile"]');
         const contributorSelect = document.querySelector('select[name="contributor"]');
 
@@ -492,7 +492,7 @@
                 const selectedProfileId = profileSelect.value;
 
                 allContributorOptions.forEach((option) => {
-                    // Toujours afficher l'option "Tous les contributeurs"
+                    // Toujours afficher l'option "Tous les collaborateurs"
                     if (!option.value) {
                         option.hidden = false;
                         option.disabled = false;

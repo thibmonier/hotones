@@ -35,16 +35,16 @@ class VacationApprovalController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Récupérer le contributeur associé au manager
+        // Récupérer le collaborateur associé au manager
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$managerContributor) {
-            $this->addFlash('warning', 'Aucun profil contributeur n\'est associé à votre compte.');
+            $this->addFlash('warning', 'Aucun profil collaborateur n\'est associé à votre compte.');
 
             return $this->redirectToRoute('home');
         }
 
-        // Récupérer les demandes de congés des contributeurs gérés
+        // Récupérer les demandes de congés des collaborateurs gérés
         $managedContributors = $managerContributor->getManagedContributors();
 
         $pendingVacations = [];
@@ -77,7 +77,7 @@ class VacationApprovalController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Vérifier que la demande concerne un contributeur géré par ce manager
+        // Vérifier que la demande concerne un collaborateur géré par ce manager
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
         if (!$managerContributor || $vacation->getContributor()->getManager() !== $managerContributor) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette demande.');
@@ -94,7 +94,7 @@ class VacationApprovalController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Vérifier que la demande concerne un contributeur géré par ce manager
+        // Vérifier que la demande concerne un collaborateur géré par ce manager
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
         if (!$managerContributor || $vacation->getContributor()->getManager() !== $managerContributor) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette demande.');
@@ -117,7 +117,7 @@ class VacationApprovalController extends AbstractController
         $vacation->setApprovedBy($user);
         $this->entityManager->flush();
 
-        // Envoyer une notification au contributeur
+        // Envoyer une notification au collaborateur
         $this->messageBus->dispatch(new VacationNotificationMessage($vacation->getId(), 'approved'));
 
         $this->addFlash('success', 'La demande de congé a été approuvée.');
@@ -131,7 +131,7 @@ class VacationApprovalController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Vérifier que la demande concerne un contributeur géré par ce manager
+        // Vérifier que la demande concerne un collaborateur géré par ce manager
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
         if (!$managerContributor || $vacation->getContributor()->getManager() !== $managerContributor) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette demande.');
@@ -152,7 +152,7 @@ class VacationApprovalController extends AbstractController
         $vacation->setStatus('rejected');
         $this->entityManager->flush();
 
-        // Envoyer une notification au contributeur
+        // Envoyer une notification au collaborateur
         $this->messageBus->dispatch(new VacationNotificationMessage($vacation->getId(), 'rejected'));
 
         $this->addFlash('success', 'La demande de congé a été rejetée.');
@@ -166,14 +166,14 @@ class VacationApprovalController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Récupérer le contributeur associé au manager
+        // Récupérer le collaborateur associé au manager
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$managerContributor) {
             return $this->json(['count' => 0, 'vacations' => []]);
         }
 
-        // Récupérer les demandes de congés des contributeurs gérés
+        // Récupérer les demandes de congés des collaborateurs gérés
         $managedContributors = $managerContributor->getManagedContributors();
 
         $pendingVacations = [];

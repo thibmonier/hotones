@@ -44,7 +44,7 @@ class TimesheetController extends AbstractController
         $projectsWithTasks = [];
 
         if ($contributor) {
-            // Récupérer les projets avec tâches assignées au contributeur
+            // Récupérer les projets avec tâches assignées au collaborateur
             $projectsWithTasks = $contributorRepo->findProjectsWithTasksForContributor($contributor);
 
             // Ajouter les sous-tâches assignées pour chaque tâche
@@ -115,7 +115,7 @@ class TimesheetController extends AbstractController
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
-            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+            return new JsonResponse(['error' => 'Collaborateur non trouvé'], 400);
         }
 
         $projectId = $request->request->get('project_id');
@@ -201,7 +201,7 @@ class TimesheetController extends AbstractController
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
-            $this->addFlash('error', 'Aucun contributeur associé à votre compte.');
+            $this->addFlash('error', 'Aucun collaborateur associé à votre compte.');
 
             return $this->redirectToRoute('home');
         }
@@ -257,7 +257,7 @@ class TimesheetController extends AbstractController
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
-            $this->addFlash('error', 'Aucun contributeur associé à votre compte.');
+            $this->addFlash('error', 'Aucun collaborateur associé à votre compte.');
 
             return $this->redirectToRoute('home');
         }
@@ -349,7 +349,7 @@ class TimesheetController extends AbstractController
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
-            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+            return new JsonResponse(['error' => 'Collaborateur non trouvé'], 400);
         }
 
         $sourceWeek = $request->request->get('source_week'); // Format: 2025-W04
@@ -431,7 +431,7 @@ class TimesheetController extends AbstractController
     {
         $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
         if (!$contributor) {
-            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+            return new JsonResponse(['error' => 'Collaborateur non trouvé'], 400);
         }
 
         $projectId = (int) $request->request->get('project_id');
@@ -502,7 +502,7 @@ class TimesheetController extends AbstractController
     {
         $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
         if (!$contributor) {
-            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+            return new JsonResponse(['error' => 'Collaborateur non trouvé'], 400);
         }
 
         $timer = $em->getRepository(RunningTimer::class)->findActiveByContributor($contributor);
@@ -521,12 +521,12 @@ class TimesheetController extends AbstractController
     {
         $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
         if (!$contributor) {
-            return new JsonResponse(['error' => 'Contributeur non trouvé'], 400);
+            return new JsonResponse(['error' => 'Collaborateur non trouvé'], 400);
         }
 
         $rows = $em->getRepository(Contributor::class)->findProjectsWithTasksForContributor($contributor);
 
-        // Récupérer les sous-tâches assignées au contributeur pour chaque tâche
+        // Récupérer les sous-tâches assignées au collaborateur pour chaque tâche
         $projects = [];
         foreach ($rows as $row) {
             /** @var Project $p */
@@ -640,14 +640,14 @@ class TimesheetController extends AbstractController
     }
 
     /**
-     * Exporte les temps du contributeur au format Excel pour une période donnée.
+     * Exporte les temps du collaborateur au format Excel pour une période donnée.
      */
     #[Route('/export', name: 'timesheet_export', methods: ['GET'])]
     public function export(Request $request, EntityManagerInterface $em): Response
     {
         $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
         if (!$contributor) {
-            $this->addFlash('error', 'Contributeur non trouvé');
+            $this->addFlash('error', 'Collaborateur non trouvé');
 
             return $this->redirectToRoute('timesheet_index');
         }

@@ -462,7 +462,7 @@ class PlanningController extends AbstractController
             return [
                 'valid'   => false,
                 'message' => sprintf(
-                    'La durée quotidienne (%.2fh) dépasse la capacité du contributeur (%.2fh/jour)',
+                    'La durée quotidienne (%.2fh) dépasse la capacité du collaborateur (%.2fh/jour)',
                     $dailyHours,
                     $maxDailyHours,
                 ),

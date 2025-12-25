@@ -44,7 +44,7 @@ class WorkloadPredictionController extends AbstractController
             ['name' => 'ASC'],
         );
 
-        // Récupérer tous les contributeurs actifs pour le filtre
+        // Récupérer tous les collaborateurs actifs pour le filtre
         $allContributors = $this->entityManager->getRepository(Contributor::class)->findBy(
             ['active' => true],
             ['firstName' => 'ASC'],

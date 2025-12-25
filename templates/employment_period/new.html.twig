@@ -29,9 +29,9 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="contributor_id" class="form-label">Contributeur <span class="text-danger">*</span></label>
+                                <label for="contributor_id" class="form-label">Collaborateur <span class="text-danger">*</span></label>
                                 <select name="contributor_id" id="contributor_id" class="form-select" required>
-                                    <option value="">Sélectionner un contributeur</option>
+                                    <option value="">Sélectionner un collaborateur</option>
                                     {% for contributor in contributors %}
                                         <option value="{{ contributor.id }}" {% if selectedContributorId is defined and selectedContributorId == contributor.id %}selected{% endif %}>
                                             {{ contributor.name }}
@@ -190,7 +190,7 @@
                             <ul class="mb-0 small">
                                 <li><strong>CJM</strong> : Coût journalier pour l'entreprise</li>
                                 <li><strong>TJM</strong> : Taux journalier facturable au client</li>
-                                <li><strong>Profils</strong> : Compétences et rôles du contributeur</li>
+                                <li><strong>Profils</strong> : Compétences et rôles du collaborateur</li>
                                 <li>Les dates de début/fin définissent la période d'activité</li>
                             </ul>
                         </div>

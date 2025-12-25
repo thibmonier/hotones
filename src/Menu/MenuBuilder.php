@@ -180,7 +180,7 @@ class MenuBuilder
 
             // Informations
             ['is_title' => true, 'label' => 'Informations'],
-            ['label' => 'Marvin - Assistant IA', 'route' => 'chatbot_index', 'icon' => 'bx-bot'],
+            ['label' => 'Unit404 - Assistant IA', 'route' => 'chatbot_index', 'icon' => 'bx-bot'],
             ['label' => 'À propos', 'route' => 'about', 'icon' => 'bx-info-circle'],
         ];
     }
