@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relevé de temps - {{ contributor.fullName }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #333;
+            padding: 20px;
+        }
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            font-size: 22pt;
+            margin-bottom: 5px;
+        }
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 12pt;
+        }
+        .info-section {
+            margin-bottom: 25px;
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 12pt;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .info-item {
+            margin-bottom: 5px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #34495e;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        table thead {
+            background: #34495e;
+            color: white;
+        }
+        table th {
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+        table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        table tbody tr:hover {
+            background: #f1f1f1;
+        }
+        .total-row {
+            background: #fef3c7 !important;
+            font-weight: bold;
+            border-top: 2px solid #34495e;
+        }
+        .summary {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .summary h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 12pt;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 5px;
+        }
+        .summary-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #c8e6c9;
+        }
+        .summary-label {
+            font-weight: bold;
+        }
+        .summary-value {
+            text-align: right;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 8pt;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Relevé de Temps</h1>
+        <div class="subtitle">{{ contributor.fullName }}</div>
+    </div>
+
+    <div class="info-section">
+        <h3>Informations</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Collaborateur :</span> {{ contributor.fullName }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Période :</span> Du {{ startDate|date('d/m/Y') }} au {{ endDate|date('d/m/Y') }}
+            </div>
+            {% if project %}
+            <div class="info-item">
+                <span class="info-label">Projet :</span> {{ project.name }}
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">Généré le :</span> {{ generatedAt|date('d/m/Y à H:i') }}
+            </div>
+        </div>
+    </div>
+
+    {% if timesheets|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%">Date</th>
+                    <th style="width: 25%">Projet</th>
+                    <th style="width: 20%">Client</th>
+                    <th style="width: 20%">Tâche</th>
+                    <th style="width: 15%">Sous-tâche</th>
+                    <th style="width: 5%" class="text-right">Heures</th>
+                    <th style="width: 5%" class="text-right">Jours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ts in timesheets %}
+                    <tr>
+                        <td>{{ ts.date|date('d/m/Y') }}</td>
+                        <td>{{ ts.project.name }}</td>
+                        <td>{{ ts.project.client ? ts.project.client.name : '-' }}</td>
+                        <td>{{ ts.task ? ts.task.name : '-' }}</td>
+                        <td>{{ ts.subTask ? ts.subTask.title : '-' }}</td>
+                        <td class="text-right">{{ ts.hours|number_format(2, ',', ' ') }}</td>
+                        <td class="text-right">{{ (ts.hours / hoursPerDay)|number_format(3, ',', ' ') }}</td>
+                    </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="5" class="text-right">TOTAL :</td>
+                    <td class="text-right">{{ totalHours|number_format(2, ',', ' ') }}h</td>
+                    <td class="text-right">{{ totalDays|number_format(3, ',', ' ') }}j</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if projectSummary|length > 1 %}
+            <div class="summary">
+                <h3>Répartition par projet</h3>
+                <div class="summary-grid">
+                    {% for projectName, hours in projectSummary %}
+                        <div class="summary-item summary-label">{{ projectName }}</div>
+                        <div class="summary-item summary-value">{{ hours|number_format(2, ',', ' ') }}h ({{ (hours / hoursPerDay)|number_format(2, ',', ' ') }}j)</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: #7f8c8d;">
+            <p>Aucun temps saisi pour cette période</p>
+        </div>
+    {% endif %}
+
+    <div class="footer">
+        Document généré automatiquement le {{ generatedAt|date('d/m/Y à H:i') }}
+    </div>
+</body>
+</html>

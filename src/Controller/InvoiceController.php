@@ -400,4 +400,194 @@ class InvoiceController extends AbstractController
             inline: true, // Affichage dans le navigateur
         );
     }
+
+    /**
+     * Exporte les factures au format FEC (Fichier des Écritures Comptables).
+     * Format standardisé pour les logiciels comptables (CSV avec séparateur pipe |).
+     */
+    #[Route('/export-fec', name: 'invoice_export_fec', methods: ['GET'])]
+    #[IsGranted('ROLE_COMPTA')]
+    public function exportFec(Request $request, EntityManagerInterface $em): Response
+    {
+        // Récupérer les filtres (même logique que l'index)
+        $startDate = $request->query->get('start_date');
+        $endDate   = $request->query->get('end_date');
+        $clientId  = $request->query->get('client');
+        $projectId = $request->query->get('project');
+        $status    = $request->query->get('status');
+
+        // Dates par défaut : année en cours
+        if (!$startDate) {
+            $startDate = (new DateTime('first day of January this year'))->format('Y-m-d');
+        }
+        if (!$endDate) {
+            $endDate = (new DateTime('last day of December this year'))->format('Y-m-d');
+        }
+
+        $start = new DateTime($startDate);
+        $end   = new DateTime($endDate);
+
+        // Construire la requête avec les mêmes filtres que l'index
+        $qb = $em->getRepository(Invoice::class)->createQueryBuilder('i')
+            ->leftJoin('i.client', 'c')
+            ->leftJoin('i.project', 'p')
+            ->addSelect('c', 'p')
+            ->orderBy('i.issuedAt', 'ASC')
+            ->addOrderBy('i.invoiceNumber', 'ASC');
+
+        if ($clientId) {
+            $client = $em->getRepository(Client::class)->find($clientId);
+            if ($client) {
+                $qb->andWhere('i.client = :client')->setParameter('client', $client);
+            }
+        }
+        if ($projectId) {
+            $project = $em->getRepository(Project::class)->find($projectId);
+            if ($project) {
+                $qb->andWhere('i.project = :project')->setParameter('project', $project);
+            }
+        }
+        if ($status) {
+            $qb->andWhere('i.status = :status')->setParameter('status', $status);
+        }
+        if ($start) {
+            $qb->andWhere('i.issuedAt >= :startDate')->setParameter('startDate', $start);
+        }
+        if ($end) {
+            $qb->andWhere('i.issuedAt <= :endDate')->setParameter('endDate', $end);
+        }
+
+        $invoices = $qb->getQuery()->getResult();
+
+        // Créer le contenu CSV au format FEC
+        // Format FEC : Séparateur pipe (|), encodage UTF-8
+        // Colonnes obligatoires selon norme FEC
+        $output = '';
+
+        // En-têtes FEC (18 colonnes obligatoires)
+        $headers = [
+            'JournalCode',      // Code journal
+            'JournalLib',       // Libellé journal
+            'EcritureNum',      // Numéro écriture
+            'EcritureDate',     // Date écriture (YYYYMMDD)
+            'CompteNum',        // Numéro compte
+            'CompteLib',        // Libellé compte
+            'CompAuxNum',       // Compte auxiliaire (client/fournisseur)
+            'CompAuxLib',       // Libellé compte auxiliaire
+            'PieceRef',         // Référence pièce
+            'PieceDate',        // Date pièce (YYYYMMDD)
+            'EcritureLib',      // Libellé écriture
+            'Debit',            // Montant débit
+            'Credit',           // Montant crédit
+            'EcritureLet',      // Lettrage
+            'DateLet',          // Date lettrage
+            'ValidDate',        // Date validation
+            'Montantdevise',    // Montant devise
+            'Idevise',          // Identifiant devise
+        ];
+
+        $output .= implode('|', $headers)."\n";
+
+        // Générer les lignes pour chaque facture
+        foreach ($invoices as $invoice) {
+            $invoiceNumber = $invoice->getInvoiceNumber();
+            $ecritureNum   = str_replace('-', '', $invoiceNumber); // Numéro écriture unique
+            $clientCode    = $invoice->getClient() ? 'C'.str_pad((string) $invoice->getClient()->getId(), 6, '0', STR_PAD_LEFT) : 'C000000';
+            $clientName    = $invoice->getClient() ? $invoice->getClient()->getName() : 'Client inconnu';
+            $totalHT       = $invoice->getTotalHt();
+            $totalTTC      = $invoice->getTotalTtc();
+            $tva           = bcsub((string) $totalTTC, (string) $totalHT, 2);
+
+            // Date au format YYYYMMDD
+            $dateFormat      = $invoice->getIssuedAt()->format('Ymd');
+            $validDateFormat = $invoice->getIssuedAt()->format('Ymd');
+
+            // Ligne 1 : Débit client (411xxx)
+            $line1 = [
+                'VTE',                                    // Journal des ventes
+                'Journal des ventes',
+                $ecritureNum,
+                $dateFormat,
+                '411000',                                 // Compte client
+                'Clients',
+                $clientCode,
+                $clientName,
+                $invoiceNumber,
+                $dateFormat,
+                'Facture '.$invoiceNumber.' - '.$clientName,
+                number_format((float) $totalTTC, 2, '.', ''), // Débit TTC
+                '0.00',                                   // Crédit
+                '',                                       // Lettrage
+                '',                                       // Date lettrage
+                $validDateFormat,
+                number_format((float) $totalTTC, 2, '.', ''),
+                'EUR',
+            ];
+            $output .= implode('|', $line1)."\n";
+
+            // Ligne 2 : Crédit ventes HT (707xxx)
+            $line2 = [
+                'VTE',
+                'Journal des ventes',
+                $ecritureNum,
+                $dateFormat,
+                '707000',                                 // Compte de ventes de services
+                'Prestations de services',
+                '',
+                '',
+                $invoiceNumber,
+                $dateFormat,
+                'Facture '.$invoiceNumber.' - '.$clientName,
+                '0.00',                                   // Débit
+                number_format((float) $totalHT, 2, '.', ''), // Crédit HT
+                '',
+                '',
+                $validDateFormat,
+                number_format((float) $totalHT, 2, '.', ''),
+                'EUR',
+            ];
+            $output .= implode('|', $line2)."\n";
+
+            // Ligne 3 : Crédit TVA (445xxx)
+            if ($tva > 0) {
+                $line3 = [
+                    'VTE',
+                    'Journal des ventes',
+                    $ecritureNum,
+                    $dateFormat,
+                    '445710',                             // TVA collectée
+                    'TVA collectée',
+                    '',
+                    '',
+                    $invoiceNumber,
+                    $dateFormat,
+                    'TVA facture '.$invoiceNumber,
+                    '0.00',                               // Débit
+                    number_format((float) $tva, 2, '.', ''), // Crédit TVA
+                    '',
+                    '',
+                    $validDateFormat,
+                    number_format((float) $tva, 2, '.', ''),
+                    'EUR',
+                ];
+                $output .= implode('|', $line3)."\n";
+            }
+        }
+
+        // Générer le fichier CSV
+        $filename = sprintf(
+            'export_fec_%s_%s.csv',
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d'),
+        );
+
+        $response = new Response($output);
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+
+        // Ajouter le BOM UTF-8 pour Excel
+        $response->setContent("\xEF\xBB\xBF".$output);
+
+        return $response;
+    }
 }

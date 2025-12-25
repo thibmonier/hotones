@@ -761,4 +761,86 @@ class TimesheetController extends AbstractController
 
         return $response;
     }
+
+    /**
+     * Exporte les temps du collaborateur au format PDF pour une période donnée.
+     */
+    #[Route('/export-pdf', name: 'timesheet_export_pdf', methods: ['GET'])]
+    public function exportPdf(Request $request, EntityManagerInterface $em, \App\Service\PdfGeneratorService $pdfGenerator): Response
+    {
+        $contributor = $em->getRepository(Contributor::class)->findByUser($this->getUser());
+        if (!$contributor) {
+            $this->addFlash('error', 'Collaborateur non trouvé');
+
+            return $this->redirectToRoute('timesheet_index');
+        }
+
+        // Récupérer les paramètres de filtrage
+        $startDate = $request->query->get('start_date');
+        $endDate   = $request->query->get('end_date');
+        $projectId = $request->query->get('project_id');
+
+        // Dates par défaut : mois en cours
+        if (!$startDate) {
+            $startDate = (new DateTime('first day of this month'))->format('Y-m-d');
+        }
+        if (!$endDate) {
+            $endDate = (new DateTime('last day of this month'))->format('Y-m-d');
+        }
+
+        $start = new DateTime($startDate);
+        $end   = new DateTime($endDate);
+
+        // Récupérer les temps
+        $timesheetRepo = $em->getRepository(Timesheet::class);
+        $timesheets    = $timesheetRepo->findByContributorAndDateRange($contributor, $start, $end);
+
+        // Filtrer par projet si spécifié
+        $project = null;
+        if ($projectId) {
+            $project    = $em->getRepository(Project::class)->find($projectId);
+            $timesheets = array_filter($timesheets, fn ($t) => $t->getProject()->getId() === (int) $projectId);
+        }
+
+        // Calculer les totaux
+        $totalHours  = 0;
+        $hoursPerDay = $contributor->getHoursPerDay();
+        foreach ($timesheets as $ts) {
+            $totalHours += (float) $ts->getHours();
+        }
+
+        // Grouper par projet pour le résumé
+        $projectSummary = [];
+        foreach ($timesheets as $ts) {
+            $projectName = $ts->getProject()->getName();
+            if (!isset($projectSummary[$projectName])) {
+                $projectSummary[$projectName] = 0;
+            }
+            $projectSummary[$projectName] += (float) $ts->getHours();
+        }
+
+        $filename = sprintf(
+            'temps_%s_%s_%s.pdf',
+            $contributor->getFirstName().'_'.$contributor->getLastName(),
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d'),
+        );
+
+        return $pdfGenerator->createPdfResponse(
+            'timesheet/export_pdf.html.twig',
+            [
+                'contributor'    => $contributor,
+                'timesheets'     => $timesheets,
+                'startDate'      => $start,
+                'endDate'        => $end,
+                'project'        => $project,
+                'totalHours'     => $totalHours,
+                'totalDays'      => round($totalHours / $hoursPerDay, 3),
+                'hoursPerDay'    => $hoursPerDay,
+                'projectSummary' => $projectSummary,
+                'generatedAt'    => new DateTime(),
+            ],
+            $filename,
+        );
+    }
 }
