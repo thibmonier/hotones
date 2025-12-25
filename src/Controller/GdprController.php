@@ -82,6 +82,16 @@ class GdprController extends AbstractController
     }
 
     /**
+     * Guide utilisateur RGPD.
+     * Documentation complète des droits et processus RGPD.
+     */
+    #[Route('/user-guide', name: 'gdpr_user_guide', methods: ['GET'])]
+    public function userGuide(): Response
+    {
+        return $this->render('gdpr/user_guide.html.twig');
+    }
+
+    /**
      * Page de gestion des données personnelles (droits RGPD).
      * Accès réservé aux utilisateurs connectés.
      */

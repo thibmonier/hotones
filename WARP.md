@@ -28,6 +28,8 @@ Ce fichier est le point d'entrée pour Warp. La documentation détaillée est or
 - Performance: docs/performance.md
 - Bonnes pratiques: docs/good-practices.md
 - Spécifications détaillées: docs/specs.md
+- **RGPD - Guide Utilisateur 🔒: docs/gdpr-user-guide.md**
+- **RGPD - Documentation Technique 🔐: docs/gdpr-technical.md**
 - Guide agents: AGENTS.md
 - Opérations Worker: docs/worker-operations.md
 - **Sprint 1 - Récapitulatif ✅: docs/sprint-1-recap.md**

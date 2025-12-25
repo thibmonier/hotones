@@ -1,0 +1,677 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Guide RGPD - Vos droits et données personnelles{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">Guide Utilisateur RGPD</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('gdpr_my_data') }}">Mes données</a></li>
+                        <li class="breadcrumb-item active">Guide RGPD</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            {# Table of contents #}
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Sommaire</h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="#droits">Vos Droits RGPD</a>
+                        <a class="nav-link ms-3" href="#droit-information">Droit à l'information</a>
+                        <a class="nav-link ms-3" href="#droit-acces">Droit d'accès</a>
+                        <a class="nav-link ms-3" href="#droit-portabilite">Droit à la portabilité</a>
+                        <a class="nav-link ms-3" href="#droit-oubli">Droit à l'oubli</a>
+                        <a class="nav-link" href="#processus-suppression">Processus de Suppression</a>
+                        <a class="nav-link ms-3" href="#etape1">Étape 1 : Demande</a>
+                        <a class="nav-link ms-3" href="#etape2">Étape 2 : Confirmation (48h)</a>
+                        <a class="nav-link ms-3" href="#etape3">Étape 3 : Période de grâce (30j)</a>
+                        <a class="nav-link ms-3" href="#etape4">Étape 4 : Suppression définitive</a>
+                        <a class="nav-link" href="#cookies">Gestion des Cookies</a>
+                        <a class="nav-link" href="#tracabilite">Traçabilité</a>
+                        <a class="nav-link" href="#delais">Délais et Garanties</a>
+                        <a class="nav-link" href="#contact">Contact et Support</a>
+                        <a class="nav-link" href="#faq">Questions Fréquentes</a>
+                    </nav>
+                    <div class="mt-3">
+                        <a href="{{ path('gdpr_my_data') }}" class="btn btn-primary btn-sm w-100">
+                            <i class="mdi mdi-account-cog"></i> Gérer mes données
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            {# Introduction #}
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-info border-0" role="alert">
+                        <h4 class="alert-heading"><i class="mdi mdi-shield-check"></i> Protection de vos données</h4>
+                        <p class="mb-0">
+                            HotOnes respecte le Règlement Général sur la Protection des Données (RGPD) et vous offre
+                            un contrôle total sur vos données personnelles. Ce guide détaille vos droits et comment les exercer.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {# Vos Droits RGPD #}
+            <div class="card" id="droits">
+                <div class="card-body">
+                    <h4 class="card-title mb-4"><i class="mdi mdi-scale-balance text-primary"></i> Vos Droits RGPD</h4>
+
+                    <div class="accordion" id="accordionDroits">
+                        {# Droit à l'information #}
+                        <div class="accordion-item" id="droit-information">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                    <i class="mdi mdi-information-outline me-2"></i> 1. Droit à l'information
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#accordionDroits">
+                                <div class="accordion-body">
+                                    <p>Vous avez le droit de savoir quelles données nous collectons et comment nous les utilisons.</p>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ path('privacy_policy') }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="mdi mdi-file-document"></i> Politique de confidentialité
+                                        </a>
+                                        <a href="{{ path('legal_notice') }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="mdi mdi-gavel"></i> Mentions légales
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Droit d'accès #}
+                        <div class="accordion-item" id="droit-acces">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                    <i class="mdi mdi-eye-outline me-2"></i> 2. Droit d'accès
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#accordionDroits">
+                                <div class="accordion-body">
+                                    <p>Vous avez le droit d'accéder à toutes vos données personnelles.</p>
+                                    <a href="{{ path('gdpr_my_data') }}" class="btn btn-sm btn-primary">
+                                        <i class="mdi mdi-account-box"></i> Consulter mes données
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Droit à la portabilité #}
+                        <div class="accordion-item" id="droit-portabilite">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                    <i class="mdi mdi-download-outline me-2"></i> 3. Droit à la portabilité
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#accordionDroits">
+                                <div class="accordion-body">
+                                    <p>Vous avez le droit de récupérer vos données dans un format structuré et lisible.</p>
+                                    <h6 class="mt-3">Données exportées :</h6>
+                                    <ul class="mb-3">
+                                        <li>Informations de compte (nom, email, rôles)</li>
+                                        <li>Données de collaborateur (si applicable)</li>
+                                        <li>Périodes d'emploi et profils</li>
+                                        <li>Timesheets et activités</li>
+                                        <li>Plannings et affectations</li>
+                                        <li>Historique des connexions</li>
+                                        <li>Consentements cookies</li>
+                                    </ul>
+                                    <div class="alert alert-success border-0">
+                                        <strong>Format :</strong> JSON (compatible avec la plupart des applications)
+                                    </div>
+                                    <a href="{{ path('gdpr_my_data') }}" class="btn btn-sm btn-success">
+                                        <i class="mdi mdi-database-export"></i> Exporter mes données
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Droit à l'oubli #}
+                        <div class="accordion-item" id="droit-oubli">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                    <i class="mdi mdi-delete-outline me-2"></i> 4. Droit à l'oubli (Suppression de compte)
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#accordionDroits">
+                                <div class="accordion-body">
+                                    <p>Vous avez le droit de demander la suppression définitive de votre compte et de vos données.</p>
+                                    <div class="alert alert-warning border-0">
+                                        <strong><i class="mdi mdi-alert"></i> Important :</strong>
+                                        Processus en 4 étapes avec période de grâce de 30 jours pour annulation.
+                                    </div>
+                                    <a href="#processus-suppression" class="btn btn-sm btn-outline-danger">
+                                        <i class="mdi mdi-information"></i> Voir le processus détaillé
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Processus de Suppression #}
+            <div class="card" id="processus-suppression">
+                <div class="card-body">
+                    <h4 class="card-title mb-4"><i class="mdi mdi-delete-forever text-danger"></i> Processus de Suppression de Compte</h4>
+
+                    {# Timeline #}
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="timeline-steps">
+                                {# Étape 1 #}
+                                <div class="timeline-step mb-4" id="etape1">
+                                    <div class="timeline-content">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <span class="badge bg-primary rounded-circle p-2">1</span>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h5>Demande initiale</h5>
+                                                <p class="text-muted mb-2">
+                                                    Accédez à <a href="{{ path('gdpr_my_data') }}">Mes données personnelles</a>,
+                                                    cliquez sur "Demander la suppression de mon compte" et confirmez.
+                                                </p>
+                                                <div class="alert alert-info border-0 mb-0">
+                                                    <strong>Ce qui se passe :</strong>
+                                                    <ul class="mb-0 mt-2">
+                                                        <li>Demande enregistrée dans le système</li>
+                                                        <li>Email de confirmation envoyé avec lien sécurisé</li>
+                                                        <li>Lien valide pendant <strong>48 heures</strong></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Étape 2 #}
+                                <div class="timeline-step mb-4" id="etape2">
+                                    <div class="timeline-content">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <span class="badge bg-warning rounded-circle p-2">2</span>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h5>Confirmation par email <span class="badge bg-warning">48h</span></h5>
+                                                <p class="text-muted mb-2">
+                                                    Ouvrez l'email "⚠️ Confirmation requise" et cliquez sur le lien dans les 48h.
+                                                </p>
+                                                <div class="alert alert-warning border-0">
+                                                    <strong><i class="mdi mdi-clock-alert"></i> Important :</strong>
+                                                    <ul class="mb-0 mt-2">
+                                                        <li>Si non confirmé sous 48h → demande expirée automatiquement</li>
+                                                        <li>Vous devrez refaire une nouvelle demande si nécessaire</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="alert alert-success border-0 mb-0">
+                                                    <strong>Après confirmation :</strong>
+                                                    <ul class="mb-0 mt-2">
+                                                        <li>Période de grâce de 30 jours commence</li>
+                                                        <li>Email "⏱️ Suppression confirmée" reçu</li>
+                                                        <li>Compte reste accessible et utilisable</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Étape 3 #}
+                                <div class="timeline-step mb-4" id="etape3">
+                                    <div class="timeline-content">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <span class="badge bg-info rounded-circle p-2">3</span>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h5>Période de grâce <span class="badge bg-info">30 jours</span></h5>
+                                                <p class="text-muted">30 jours calendaires à partir de la confirmation</p>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="alert alert-success border-0">
+                                                            <h6 class="alert-heading"><i class="mdi mdi-check-all"></i> Pendant cette période :</h6>
+                                                            <ul class="mb-0">
+                                                                <li>Compte entièrement fonctionnel</li>
+                                                                <li>Toutes fonctionnalités actives</li>
+                                                                <li>Données intactes et accessibles</li>
+                                                                <li><strong>Annulation possible à tout moment</strong></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="card border-success">
+                                                            <div class="card-body">
+                                                                <h6 class="card-title text-success"><i class="mdi mdi-undo-variant"></i> Annulation possible</h6>
+                                                                <ol class="mb-0">
+                                                                    <li>Accédez à <a href="{{ path('gdpr_my_data') }}">Mes données</a></li>
+                                                                    <li>Cliquez sur "Annuler la suppression"</li>
+                                                                    <li>Compte immédiatement préservé</li>
+                                                                </ol>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="alert alert-warning border-0 mt-3 mb-0">
+                                                    <strong><i class="mdi mdi-bell-alert"></i> Rappel automatique :</strong>
+                                                    Email "⚠️ Dernière chance" envoyé <strong>7 jours avant</strong> la suppression définitive.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Étape 4 #}
+                                <div class="timeline-step" id="etape4">
+                                    <div class="timeline-content">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <span class="badge bg-danger rounded-circle p-2">4</span>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h5 class="text-danger">Suppression définitive</h5>
+                                                <p class="text-muted">Automatiquement après les 30 jours de grâce</p>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="alert alert-danger border-0">
+                                                            <h6 class="alert-heading"><i class="mdi mdi-delete-forever"></i> Supprimé/Anonymisé :</h6>
+                                                            <ul class="mb-0">
+                                                                <li>Compte utilisateur</li>
+                                                                <li>Données personnelles (nom, email, tél.)</li>
+                                                                <li>Profil collaborateur</li>
+                                                                <li>Timesheets et activités</li>
+                                                                <li>Plannings futurs</li>
+                                                                <li>Consentements cookies</li>
+                                                                <li>Historique connexions</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="alert alert-secondary border-0">
+                                                            <h6 class="alert-heading"><i class="mdi mdi-archive"></i> Conservé (obligations légales) :</h6>
+                                                            <ul class="mb-0">
+                                                                <li>Données comptables/fiscales <span class="badge bg-secondary">10 ans</span></li>
+                                                                <li>Périodes d'emploi <span class="badge bg-secondary">anonymisées</span></li>
+                                                                <li>Logs système <span class="badge bg-secondary">anonymisés</span></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="alert alert-danger border-0 mb-0">
+                                                    <strong><i class="mdi mdi-alert-octagon"></i> Récupération impossible :</strong>
+                                                    <ul class="mb-0 mt-2">
+                                                        <li>Une fois effectuée, <strong>aucune récupération possible</strong></li>
+                                                        <li>Nouveau compte nécessaire pour revenir</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Gestion des Cookies #}
+            <div class="card" id="cookies">
+                <div class="card-body">
+                    <h4 class="card-title mb-4"><i class="mdi mdi-cookie text-primary"></i> Gestion des Cookies</h4>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 30%;">Type de cookies</th>
+                                    <th style="width: 50%;">Description</th>
+                                    <th style="width: 20%;">Optionnel ?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Essentiels</strong></td>
+                                    <td>
+                                        <ul class="mb-0">
+                                            <li>Gestion de session et authentification</li>
+                                            <li>Sécurité (CSRF, prévention attaques)</li>
+                                            <li>Fonctionnement technique du site</li>
+                                        </ul>
+                                    </td>
+                                    <td><span class="badge bg-danger">Obligatoires</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fonctionnels</strong></td>
+                                    <td>
+                                        <ul class="mb-0">
+                                            <li>Préférences utilisateur</li>
+                                            <li>Langue et paramètres d'affichage</li>
+                                            <li>Fonctionnalités avancées</li>
+                                        </ul>
+                                    </td>
+                                    <td><span class="badge bg-success">Optionnels</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Analytiques</strong></td>
+                                    <td>
+                                        <ul class="mb-0">
+                                            <li>Statistiques d'utilisation anonymes</li>
+                                            <li>Amélioration expérience utilisateur</li>
+                                            <li>Analyse des performances</li>
+                                        </ul>
+                                    </td>
+                                    <td><span class="badge bg-success">Optionnels</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info border-0">
+                        <strong><i class="mdi mdi-cog"></i> Modifier vos préférences :</strong>
+                        <p class="mb-0 mt-2">
+                            Accédez à <a href="{{ path('gdpr_my_data') }}">Mes données personnelles</a> →
+                            Section "Préférences de cookies" → Activez/désactivez les cookies optionnels.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {# Traçabilité #}
+            <div class="card" id="tracabilite">
+                <div class="card-body">
+                    <h4 class="card-title mb-4"><i class="mdi mdi-shield-check text-success"></i> Traçabilité et Transparence</h4>
+
+                    <h6>Ce que nous enregistrons pour chaque action RGPD :</h6>
+                    <ul>
+                        <li>Date et heure de l'action</li>
+                        <li>Adresse IP de l'utilisateur</li>
+                        <li>Navigateur utilisé (User-Agent)</li>
+                        <li>Détails de l'action effectuée</li>
+                    </ul>
+
+                    <div class="alert alert-success border-0">
+                        <strong><i class="mdi mdi-help-circle"></i> Pourquoi ?</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Prouver votre consentement en cas de litige</li>
+                            <li>Respecter nos obligations légales RGPD</li>
+                            <li>Traçabilité complète pour audit</li>
+                        </ul>
+                    </div>
+
+                    <p class="mb-0">
+                        <strong>Accès à votre historique :</strong>
+                        Disponible dans <a href="{{ path('gdpr_my_data') }}">Mes données personnelles</a>
+                        (consentements cookies, exports, demandes de suppression).
+                    </p>
+                </div>
+            </div>
+
+            {# Délais et Garanties #}
+            <div class="card" id="delais">
+                <div class="card-body">
+                    <h4 class="card-title mb-4"><i class="mdi mdi-clock-outline text-info"></i> Délais et Garanties</h4>
+
+                    <h6>Délais de traitement</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Délai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Export de données</td>
+                                    <td><span class="badge bg-success">Immédiat</span> (téléchargement instantané)</td>
+                                </tr>
+                                <tr>
+                                    <td>Demande de suppression</td>
+                                    <td>Confirmation email sous <span class="badge bg-info">5 minutes</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Lien de confirmation</td>
+                                    <td>Valide <span class="badge bg-warning">48 heures</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Période de grâce</td>
+                                    <td><span class="badge bg-primary">30 jours calendaires</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Suppression effective</td>
+                                    <td>Automatique après 30 jours</td>
+                                </tr>
+                                <tr>
+                                    <td>Rappel avant suppression</td>
+                                    <td><span class="badge bg-warning">7 jours</span> avant la date</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6>Garanties de sécurité</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-primary border-0">
+                                <h6 class="alert-heading"><i class="mdi mdi-lock"></i> Protection de vos données</h6>
+                                <ul class="mb-0">
+                                    <li>Chiffrement HTTPS</li>
+                                    <li>Mots de passe hashés (bcrypt)</li>
+                                    <li>Authentification 2FA disponible</li>
+                                    <li>Tokens sécurisés et uniques</li>
+                                    <li>Expiration automatique (48h)</li>
+                                    <li>Logs d'accès et d'actions</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-warning border-0">
+                                <h6 class="alert-heading"><i class="mdi mdi-shield-alert"></i> Protection contre les erreurs</h6>
+                                <ul class="mb-0">
+                                    <li>Période de grâce de 30 jours</li>
+                                    <li>Email de rappel avant suppression</li>
+                                    <li>Annulation possible à tout moment</li>
+                                    <li>Double confirmation (demande + email)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Contact et Support #}
+            <div class="card" id="contact">
+                <div class="card-body">
+                    <h4 class="card-title mb-4"><i class="mdi mdi-email-outline text-primary"></i> Contact et Support</h4>
+
+                    <div class="alert alert-info border-0">
+                        <h6 class="alert-heading"><i class="mdi mdi-account-tie"></i> Délégué à la Protection des Données (DPO)</h6>
+                        <p><strong>Email :</strong> <a href="mailto:dpo@hotones.example">dpo@hotones.example</a></p>
+
+                        <p class="mb-0"><strong>Quand nous contacter :</strong></p>
+                        <ul>
+                            <li>Questions sur le traitement de vos données</li>
+                            <li>Exercice de vos droits RGPD</li>
+                            <li>Réclamation concernant vos données</li>
+                            <li>Problème technique avec les fonctionnalités RGPD</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-secondary border-0 mb-0">
+                        <h6 class="alert-heading"><i class="mdi mdi-gavel"></i> Autorité de contrôle</h6>
+                        <p>En cas de litige non résolu, vous pouvez saisir la <strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés) :</p>
+                        <ul class="mb-0">
+                            <li>Site web : <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a></li>
+                            <li>Formulaire de plainte : <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener">www.cnil.fr/fr/plaintes</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            {# FAQ #}
+            <div class="card" id="faq">
+                <div class="card-body">
+                    <h4 class="card-title mb-4"><i class="mdi mdi-help-circle text-warning"></i> Questions Fréquentes (FAQ)</h4>
+
+                    <div class="accordion" id="accordionFAQ">
+                        {# Export de données #}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Dans quel format sont exportées mes données ?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    Format JSON, lisible par la plupart des applications et facilement convertible.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Puis-je exporter mes données plusieurs fois ?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    Oui, autant de fois que vous le souhaitez, sans limitation.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Que se passe-t-il si je ne confirme pas dans les 48h ?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    La demande expire automatiquement, votre compte reste actif. Vous pouvez refaire une demande.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Puis-je utiliser mon compte pendant la période de grâce ?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    Oui, votre compte reste entièrement fonctionnel pendant les 30 jours.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    Combien de fois puis-je annuler une suppression ?
+                                </button>
+                            </h2>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    Autant de fois que nécessaire pendant la période de grâce.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                    Puis-je récupérer mon compte après suppression définitive ?
+                                </button>
+                            </h2>
+                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    <span class="text-danger"><strong>Non, c'est impossible.</strong></span> La suppression est irréversible.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                                    Mes données comptables sont-elles supprimées ?
+                                </button>
+                            </h2>
+                            <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    Les données nécessaires aux obligations légales (factures, contrats) sont conservées anonymisées pendant 10 ans.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                                    Puis-je utiliser le site sans cookies ?
+                                </button>
+                            </h2>
+                            <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                                <div class="accordion-body">
+                                    Les cookies essentiels sont obligatoires pour le fonctionnement. Les cookies fonctionnels et analytiques sont optionnels.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Footer #}
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <p class="mb-2">
+                        <strong>HotOnes - Gestion d'agence digitale</strong><br>
+                        Conformément au RGPD (Règlement UE 2016/679)
+                    </p>
+                    <p class="text-muted mb-0 small">
+                        Dernière mise à jour : {{ 'now'|date('d/m/Y') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Smooth scroll pour les liens d'ancrage
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
