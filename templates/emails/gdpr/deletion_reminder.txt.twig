@@ -1,0 +1,42 @@
+⚠️ DERNIÈRE CHANCE - SUPPRESSION IMMINENTE
+=========================================
+
+Bonjour {{ user.fullName }},
+
+Ceci est un RAPPEL IMPORTANT concernant votre demande de suppression de compte.
+Votre compte sera définitivement supprimé dans :
+
+╔════════════════════════════════════╗
+║   {{ daysRemaining }} JOURS RESTANTS                    ║
+║                                    ║
+║   Suppression prévue le :          ║
+║   {{ scheduledDeletionDate|date('d/m/Y à H:i') }}           ║
+╚════════════════════════════════════╝
+
+⛔ APRÈS CETTE DATE, IL SERA IMPOSSIBLE DE RÉCUPÉRER :
+------------------------------------------------------
+• Votre compte et vos identifiants - Accès définitivement perdu
+• Vos données personnelles - Nom, email, profil
+• Votre historique d'activité - Timesheets, projets
+• Vos paramètres et préférences - Configuration personnalisée
+
+💚 VOUS SOUHAITEZ CONSERVER VOTRE COMPTE ?
+------------------------------------------
+Si vous avez changé d'avis ou si cette suppression était une erreur,
+vous pouvez ANNULER IMMÉDIATEMENT cette demande en visitant :
+
+{{ cancelUrl }}
+
+Ce lien d'annulation restera actif jusqu'au {{ scheduledDeletionDate|date('d/m/Y à H:i') }}
+
+ℹ️ SI VOUS NE FAITES RIEN
+-------------------------
+Votre compte sera automatiquement supprimé le {{ scheduledDeletionDate|date('d/m/Y à H:i') }}.
+Vous recevrez un email de confirmation une fois la suppression effectuée.
+
+---
+HotOnes - Gestion d'agence digitale
+Cet email est un rappel automatique de suppression de compte.
+Délégué à la Protection des Données : {{ dpoEmail }}
+
+Conformément au RGPD (Règlement Général sur la Protection des Données)

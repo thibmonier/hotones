@@ -1,0 +1,53 @@
+SUPPRESSION CONFIRMÉE - PÉRIODE DE GRÂCE DE 30 JOURS
+====================================================
+
+Bonjour {{ user.fullName }},
+
+Votre demande de suppression de compte a été confirmée. Une période de grâce
+de 30 JOURS commence maintenant, pendant laquelle vous pouvez annuler cette
+décision à tout moment.
+
+📅 SUPPRESSION DÉFINITIVE PROGRAMMÉE LE :
+{{ scheduledDeletionDate|date('d/m/Y à H:i') }}
+(Dans {{ daysRemaining }} jours)
+
+🕐 CHRONOLOGIE DE LA SUPPRESSION
+--------------------------------
+• Aujourd'hui ({{ confirmedDate|date('d/m/Y') }})
+  Début de la période de grâce de 30 jours
+
+• {{ reminderDate|date('d/m/Y') }}
+  Email de rappel (7 jours avant suppression)
+
+• {{ scheduledDeletionDate|date('d/m/Y') }}
+  Suppression définitive de votre compte
+
+🗑️ DONNÉES QUI SERONT SUPPRIMÉES
+---------------------------------
+- Votre compte utilisateur et vos identifiants
+- Vos informations personnelles (nom, email, etc.)
+- Votre profil collaborateur
+- Vos timesheets et données d'activité
+- Vos préférences et paramètres
+
+📋 DONNÉES CONSERVÉES (OBLIGATIONS LÉGALES)
+-------------------------------------------
+- Données comptables et de paie (10 ans)
+- Contrats de travail archivés (5 ans)
+- Factures et documents fiscaux
+
+Ces données sont anonymisées et conservées uniquement pour conformité légale.
+
+✋ VOUS AVEZ CHANGÉ D'AVIS ?
+---------------------------
+Vous pouvez annuler cette demande de suppression à tout moment pendant
+les 30 prochains jours en vous connectant à votre compte ou en visitant :
+
+{{ cancelUrl }}
+
+---
+HotOnes - Gestion d'agence digitale
+Cet email confirme votre demande de suppression de compte.
+Délégué à la Protection des Données : {{ dpoEmail }}
+
+Conformément au RGPD (Règlement Général sur la Protection des Données)

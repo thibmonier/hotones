@@ -8,8 +8,10 @@ use App\Entity\AccountDeletionRequest;
 use App\Entity\CookieConsent;
 use App\Repository\AccountDeletionRequestRepository;
 use App\Service\GdprDataExportService;
+use App\Service\GdprEmailService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -129,7 +131,8 @@ class GdprController extends AbstractController
     public function requestAccountDeletion(
         Request $request,
         EntityManagerInterface $em,
-        AccountDeletionRequestRepository $deletionRepository
+        AccountDeletionRequestRepository $deletionRepository,
+        GdprEmailService $emailService
     ): JsonResponse {
         $user = $this->getUser();
         if (!$user) {
@@ -153,24 +156,24 @@ class GdprController extends AbstractController
         $em->persist($deletionRequest);
         $em->flush();
 
-        // TODO: Envoyer l'email de confirmation avec le lien contenant le token
-        // Pour l'instant, on log le token (en production, cela serait envoyé par email)
-        $confirmationUrl = $this->generateUrl('gdpr_confirm_deletion', [
-            'token' => $deletionRequest->getConfirmationToken(),
-        ], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $this->container->get('logger')->info('Account deletion requested', [
-            'user_id'          => $user->getId(),
-            'email'            => $user->getEmail(),
-            'request_id'       => $deletionRequest->getId(),
-            'confirmation_url' => $confirmationUrl,
-        ]);
+        // Envoyer l'email de confirmation avec le lien contenant le token
+        try {
+            $emailService->sendDeletionRequestConfirmation($deletionRequest);
+            $message = 'Demande enregistrée. Consultez votre email pour confirmer (lien valide 48h).';
+        } catch (Exception $e) {
+            $this->container->get('logger')->error('Failed to send deletion request email', [
+                'user_id'    => $user->getId(),
+                'request_id' => $deletionRequest->getId(),
+                'error'      => $e->getMessage(),
+            ]);
+            $message = 'Demande enregistrée mais l\'email de confirmation n\'a pas pu être envoyé. Contactez le support.';
+        }
 
         $this->addFlash('info', 'Demande de suppression enregistrée. Vérifiez votre email pour confirmer (lien valide 48h).');
 
         return new JsonResponse([
             'success' => true,
-            'message' => 'Demande enregistrée. Consultez votre email pour confirmer.',
+            'message' => $message,
         ]);
     }
 
@@ -182,7 +185,8 @@ class GdprController extends AbstractController
     public function confirmAccountDeletion(
         string $token,
         EntityManagerInterface $em,
-        AccountDeletionRequestRepository $deletionRepository
+        AccountDeletionRequestRepository $deletionRepository,
+        GdprEmailService $emailService
     ): Response {
         $deletionRequest = $deletionRepository->findByConfirmationToken($token);
 
@@ -202,6 +206,17 @@ class GdprController extends AbstractController
         $deletionRequest->confirm();
         $em->flush();
 
+        // Envoyer l'email de confirmation (période de grâce commence)
+        try {
+            $emailService->sendDeletionConfirmed($deletionRequest);
+        } catch (Exception $e) {
+            $this->container->get('logger')->error('Failed to send deletion confirmed email', [
+                'user_id'    => $deletionRequest->getUser()->getId(),
+                'request_id' => $deletionRequest->getId(),
+                'error'      => $e->getMessage(),
+            ]);
+        }
+
         $this->addFlash('warning', sprintf(
             'Votre compte sera supprimé le %s. Vous pouvez annuler cette demande avant cette date.',
             $deletionRequest->getScheduledDeletionAt()->format('d/m/Y à H:i'),
@@ -216,7 +231,8 @@ class GdprController extends AbstractController
     #[Route('/cancel-account-deletion', name: 'gdpr_cancel_deletion', methods: ['POST'])]
     public function cancelAccountDeletion(
         EntityManagerInterface $em,
-        AccountDeletionRequestRepository $deletionRepository
+        AccountDeletionRequestRepository $deletionRepository,
+        GdprEmailService $emailService
     ): JsonResponse {
         $user = $this->getUser();
         if (!$user) {
@@ -241,6 +257,17 @@ class GdprController extends AbstractController
         // Annuler la demande
         $deletionRequest->cancel();
         $em->flush();
+
+        // Envoyer l'email de confirmation d'annulation
+        try {
+            $emailService->sendDeletionCancelled($deletionRequest);
+        } catch (Exception $e) {
+            $this->container->get('logger')->error('Failed to send deletion cancelled email', [
+                'user_id'    => $user->getId(),
+                'request_id' => $deletionRequest->getId(),
+                'error'      => $e->getMessage(),
+            ]);
+        }
 
         $this->addFlash('success', 'Votre demande de suppression de compte a été annulée.');
 

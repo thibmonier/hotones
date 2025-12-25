@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppression annulée - Votre compte est conservé</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #4CAF50;
+        }
+        .header h1 {
+            color: #4CAF50;
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px 0;
+        }
+        .success-box {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .success-box .icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .success-box .message {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .info-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .account-button {
+            display: inline-block;
+            padding: 14px 30px;
+            background-color: #2196F3;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .account-button:hover {
+            background-color: #1976D2;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>✅ Suppression annulée</h1>
+        </div>
+
+        <div class="content">
+            <p>Bonjour <strong>{{ user.fullName }}</strong>,</p>
+
+            <div class="success-box">
+                <div class="icon">🎉</div>
+                <div class="message">Votre compte est conservé !</div>
+                <div style="margin-top: 15px; font-size: 16px;">
+                    La demande de suppression a été annulée avec succès
+                </div>
+            </div>
+
+            <p>
+                Nous confirmons que votre demande de suppression de compte a été <strong>annulée</strong>
+                le {{ cancelledDate|date('d/m/Y à H:i') }}.
+            </p>
+
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #2e7d32;">✓ Votre compte reste actif</h3>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Toutes vos données sont conservées</li>
+                    <li>Votre accès reste inchangé</li>
+                    <li>Vos projets et timesheets sont toujours disponibles</li>
+                    <li>Aucune modification n'a été apportée à votre profil</li>
+                </ul>
+            </div>
+
+            <h3>🔐 Pour votre sécurité :</h3>
+            <p>
+                Si vous n'êtes <strong>pas à l'origine</strong> de cette annulation ou si vous
+                remarquez une activité suspecte sur votre compte :
+            </p>
+            <ol>
+                <li>Changez immédiatement votre mot de passe</li>
+                <li>Vérifiez l'activité récente de votre compte</li>
+                <li>Contactez-nous : <a href="mailto:{{ dpoEmail }}">{{ dpoEmail }}</a></li>
+            </ol>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ loginUrl }}" class="account-button">
+                    🔓 Accéder à mon compte
+                </a>
+            </div>
+
+            <div style="background-color: #e3f2fd; padding: 15px; border-radius: 4px; border-left: 4px solid #2196F3;">
+                <strong>💡 Pour information :</strong>
+                <p style="margin: 10px 0 0 0;">
+                    Si vous changez d'avis à l'avenir, vous pourrez toujours demander la suppression
+                    de votre compte depuis les paramètres RGPD de votre profil.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>HotOnes - Gestion d'agence digitale</strong><br>
+                Cet email confirme l'annulation de votre demande de suppression.<br>
+                Délégué à la Protection des Données : <a href="mailto:{{ dpoEmail }}">{{ dpoEmail }}</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 11px; color: #999;">
+                Conformément au RGPD (Règlement Général sur la Protection des Données)
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+DEMANDE DE SUPPRESSION DE COMPTE
+==================================
+
+Bonjour {{ user.fullName }},
+
+Nous avons bien reçu votre demande de suppression de compte et de vos données
+personnelles conformément à votre droit à l'effacement (droit à l'oubli) prévu
+par le RGPD.
+
+⚠️ ACTION REQUISE DANS LES 48 HEURES
+------------------------------------
+Pour des raisons de sécurité, vous devez confirmer cette demande en cliquant
+sur le lien ci-dessous. Ce lien expirera le {{ expiryDate|date('d/m/Y à H:i') }}.
+
+LIEN DE CONFIRMATION :
+{{ confirmationUrl }}
+
+📋 CE QUI SE PASSERA APRÈS CONFIRMATION
+----------------------------------------
+1. Période de grâce de 30 jours
+   Vous pourrez annuler votre demande pendant cette période
+
+2. Suppression définitive
+   Après 30 jours, votre compte sera définitivement supprimé
+
+3. Conservation légale
+   Certaines données (comptabilité, paie) seront conservées pour
+   obligations légales
+
+SI VOUS N'ÊTES PAS À L'ORIGINE DE CETTE DEMANDE
+------------------------------------------------
+- Ne cliquez pas sur le lien de confirmation
+- Changez votre mot de passe immédiatement
+- Contactez-nous : {{ dpoEmail }}
+
+---
+Ce lien de confirmation expirera automatiquement dans 48 heures.
+
+HotOnes - Gestion d'agence digitale
+Cet email a été envoyé suite à une demande de suppression de compte.
+Délégué à la Protection des Données : {{ dpoEmail }}
+
+Conformément au RGPD (Règlement Général sur la Protection des Données)
