@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\AccountDeletionRequest;
+use App\Entity\CookieConsent;
+use App\Repository\AccountDeletionRequestRepository;
+use App\Service\GdprDataExportService;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,26 +28,29 @@ class GdprController extends AbstractController
      * Appelé par le JavaScript de la bannière de cookies.
      */
     #[Route('/cookie-consent', name: 'cookie_consent_save', methods: ['POST'])]
-    public function saveCookieConsent(Request $request): JsonResponse
+    public function saveCookieConsent(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        // Log du consentement pour traçabilité RGPD
-        // En production, sauvegarder dans une table dédiée avec IP, User-Agent, timestamp
-        $consentLog = [
-            'timestamp'  => $data['timestamp']  ?? date('c'),
-            'version'    => $data['version']    ?? '1.0',
-            'essential'  => $data['essential']  ?? true,
-            'functional' => $data['functional'] ?? false,
-            'analytics'  => $data['analytics']  ?? false,
-            'ip'         => $request->getClientIp(),
-            'user_agent' => $request->headers->get('User-Agent'),
-            'user_id'    => $this->getUser()?->getId(),
-        ];
+        // Créer l'entité CookieConsent pour traçabilité RGPD
+        $consent = new CookieConsent();
+        $consent->setUser($this->getUser());
+        $consent->setEssential($data['essential'] ?? true);
+        $consent->setFunctional($data['functional'] ?? false);
+        $consent->setAnalytics($data['analytics'] ?? false);
+        $consent->setVersion($data['version'] ?? '1.0');
+        $consent->setIpAddress($request->getClientIp());
+        $consent->setUserAgent($request->headers->get('User-Agent'));
 
-        // TODO: Sauvegarder dans une table `cookie_consents` pour traçabilité complète
-        // Pour l'instant, on log juste dans les logs Symfony
-        $this->container->get('logger')->info('Cookie consent saved', $consentLog);
+        $em->persist($consent);
+        $em->flush();
+
+        // Log pour debugging
+        $this->container->get('logger')->info('Cookie consent saved', [
+            'consent_id' => $consent->getId(),
+            'user_id'    => $this->getUser()?->getId(),
+            'ip'         => $consent->getIpAddress(),
+        ]);
 
         return new JsonResponse([
             'success' => true,
@@ -94,25 +102,15 @@ class GdprController extends AbstractController
      * Format JSON conforme RGPD.
      */
     #[Route('/export-my-data', name: 'gdpr_export_data', methods: ['POST'])]
-    public function exportMyData(): Response
+    public function exportMyData(GdprDataExportService $exportService): Response
     {
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Non authentifié'], 401);
         }
 
-        // TODO: Implémenter l'export complet des données
-        // Doit inclure : profil, timesheets, projects, etc.
-        $userData = [
-            'export_date' => date('c'),
-            'user_id'     => $user->getId(),
-            'email'       => $user->getEmail(),
-            'first_name'  => $user->getFirstName(),
-            'last_name'   => $user->getLastName(),
-            'roles'       => $user->getRoles(),
-            'created_at'  => $user->getCreatedAt()?->format('c'),
-            // TODO: Ajouter toutes les données liées (timesheets, projets, etc.)
-        ];
+        // Export complet de toutes les données utilisateur
+        $userData = $exportService->exportUserData($user);
 
         $filename = sprintf('my_data_%s_%s.json', $user->getEmail(), date('Y-m-d'));
 
@@ -125,27 +123,130 @@ class GdprController extends AbstractController
 
     /**
      * Demande de suppression du compte (droit à l'oubli).
-     * Nécessite validation par email avant suppression définitive.
+     * Créé une demande et envoie un email de confirmation.
      */
     #[Route('/request-account-deletion', name: 'gdpr_request_deletion', methods: ['POST'])]
-    public function requestAccountDeletion(): JsonResponse
-    {
+    public function requestAccountDeletion(
+        Request $request,
+        EntityManagerInterface $em,
+        AccountDeletionRequestRepository $deletionRepository
+    ): JsonResponse {
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Non authentifié'], 401);
         }
 
-        // TODO: Implémenter le workflow de suppression
-        // 1. Envoyer un email de confirmation
-        // 2. Attendre validation (lien avec token)
-        // 3. Période de grâce de 30 jours
-        // 4. Suppression définitive ou anonymisation
+        // Vérifier s'il n'y a pas déjà une demande active
+        $existingRequest = $deletionRepository->findActiveDeletionRequestForUser($user);
+        if ($existingRequest) {
+            return new JsonResponse([
+                'success' => false,
+                'error'   => 'Une demande de suppression est déjà en cours pour votre compte.',
+            ], 400);
+        }
 
-        $this->addFlash('info', 'Une demande de suppression a été envoyée. Vous recevrez un email de confirmation.');
+        // Créer la demande de suppression
+        $deletionRequest = new AccountDeletionRequest();
+        $deletionRequest->setUser($user);
+        $deletionRequest->setIpAddress($request->getClientIp());
+
+        $em->persist($deletionRequest);
+        $em->flush();
+
+        // TODO: Envoyer l'email de confirmation avec le lien contenant le token
+        // Pour l'instant, on log le token (en production, cela serait envoyé par email)
+        $confirmationUrl = $this->generateUrl('gdpr_confirm_deletion', [
+            'token' => $deletionRequest->getConfirmationToken(),
+        ], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->container->get('logger')->info('Account deletion requested', [
+            'user_id'          => $user->getId(),
+            'email'            => $user->getEmail(),
+            'request_id'       => $deletionRequest->getId(),
+            'confirmation_url' => $confirmationUrl,
+        ]);
+
+        $this->addFlash('info', 'Demande de suppression enregistrée. Vérifiez votre email pour confirmer (lien valide 48h).');
 
         return new JsonResponse([
             'success' => true,
-            'message' => 'Demande de suppression enregistrée. Vérifiez votre email.',
+            'message' => 'Demande enregistrée. Consultez votre email pour confirmer.',
+        ]);
+    }
+
+    /**
+     * Confirmation de la demande de suppression (via lien email).
+     * Active la période de grâce de 30 jours.
+     */
+    #[Route('/confirm-account-deletion/{token}', name: 'gdpr_confirm_deletion', methods: ['GET'])]
+    public function confirmAccountDeletion(
+        string $token,
+        EntityManagerInterface $em,
+        AccountDeletionRequestRepository $deletionRepository
+    ): Response {
+        $deletionRequest = $deletionRepository->findByConfirmationToken($token);
+
+        if (!$deletionRequest) {
+            $this->addFlash('error', 'Lien de confirmation invalide ou expiré.');
+
+            return $this->redirectToRoute('home');
+        }
+
+        if ($deletionRequest->isConfirmationTokenExpired()) {
+            $this->addFlash('error', 'Le lien de confirmation a expiré (48h). Veuillez refaire une demande.');
+
+            return $this->redirectToRoute('gdpr_my_data');
+        }
+
+        // Confirmer la demande et planifier la suppression dans 30 jours
+        $deletionRequest->confirm();
+        $em->flush();
+
+        $this->addFlash('warning', sprintf(
+            'Votre compte sera supprimé le %s. Vous pouvez annuler cette demande avant cette date.',
+            $deletionRequest->getScheduledDeletionAt()->format('d/m/Y à H:i'),
+        ));
+
+        return $this->redirectToRoute('gdpr_my_data');
+    }
+
+    /**
+     * Annulation d'une demande de suppression (pendant la période de grâce).
+     */
+    #[Route('/cancel-account-deletion', name: 'gdpr_cancel_deletion', methods: ['POST'])]
+    public function cancelAccountDeletion(
+        EntityManagerInterface $em,
+        AccountDeletionRequestRepository $deletionRepository
+    ): JsonResponse {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Non authentifié'], 401);
+        }
+
+        $deletionRequest = $deletionRepository->findActiveDeletionRequestForUser($user);
+        if (!$deletionRequest) {
+            return new JsonResponse([
+                'success' => false,
+                'error'   => 'Aucune demande de suppression active trouvée.',
+            ], 404);
+        }
+
+        if (!$deletionRequest->isInGracePeriod()) {
+            return new JsonResponse([
+                'success' => false,
+                'error'   => 'Cette demande ne peut plus être annulée.',
+            ], 400);
+        }
+
+        // Annuler la demande
+        $deletionRequest->cancel();
+        $em->flush();
+
+        $this->addFlash('success', 'Votre demande de suppression de compte a été annulée.');
+
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Demande de suppression annulée avec succès.',
         ]);
     }
 }
