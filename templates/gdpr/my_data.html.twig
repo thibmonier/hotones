@@ -1,0 +1,305 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Mes Données Personnelles - RGPD{% endblock %}
+
+{% block content %}
+{{ component('breadcrumb', { title: 'Mes Données Personnelles', pagetitle: 'RGPD' }) }}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">
+                <i class="bx bx-shield-quarter text-success me-2"></i>
+                Mes Données Personnelles
+            </h4>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {# Carte informations personnelles #}
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bx bx-user me-1"></i>
+                    Informations Personnelles
+                </h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Nom complet :</dt>
+                    <dd class="col-sm-7">{{ user.fullName }}</dd>
+
+                    <dt class="col-sm-5">Email :</dt>
+                    <dd class="col-sm-7">{{ user.email }}</dd>
+
+                    <dt class="col-sm-5">Rôles :</dt>
+                    <dd class="col-sm-7">
+                        {% for role in user.roles %}
+                            <span class="badge bg-primary">{{ role }}</span>
+                        {% endfor %}
+                    </dd>
+
+                    <dt class="col-sm-5">Compte créé le :</dt>
+                    <dd class="col-sm-7">{{ user.createdAt|date('d/m/Y H:i') }}</dd>
+
+                    <dt class="col-sm-5">2FA activée :</dt>
+                    <dd class="col-sm-7">
+                        {% if user.isTotpAuthenticationEnabled %}
+                            <span class="badge bg-success">
+                                <i class="bx bx-check"></i> Oui
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="bx bx-x"></i> Non
+                            </span>
+                        {% endif %}
+                    </dd>
+                </dl>
+
+                <hr>
+
+                <div class="alert alert-info mb-0">
+                    <small>
+                        <i class="bx bx-info-circle me-1"></i>
+                        Pour modifier vos informations, accédez à votre
+                        <a href="{{ path('profile_edit') }}" class="alert-link">profil</a>.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Actions RGPD #}
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bx bx-shield me-1"></i>
+                    Vos Droits RGPD
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Conformément au RGPD, vous disposez de plusieurs droits sur vos données personnelles.
+                    Cliquez sur les actions ci-dessous pour les exercer.
+                </p>
+
+                {# Droit d'accès #}
+                <div class="gdpr-action mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <i class="bx bx-show text-primary me-1"></i>
+                                Droit d'Accès
+                            </h6>
+                            <p class="text-muted mb-0 small">
+                                Téléchargez une copie complète de toutes vos données personnelles au format JSON.
+                            </p>
+                        </div>
+                        <form method="post" action="{{ path('gdpr_export_data') }}" class="ms-3">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="bx bx-download me-1"></i>
+                                Télécharger mes données
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <hr>
+
+                {# Droit de rectification #}
+                <div class="gdpr-action mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <i class="bx bx-edit text-warning me-1"></i>
+                                Droit de Rectification
+                            </h6>
+                            <p class="text-muted mb-0 small">
+                                Corrigez vos données personnelles si elles sont inexactes ou incomplètes.
+                            </p>
+                        </div>
+                        <a href="{{ path('profile_edit') }}" class="btn btn-sm btn-outline-warning ms-3">
+                            <i class="bx bx-edit me-1"></i>
+                            Modifier mon profil
+                        </a>
+                    </div>
+                </div>
+
+                <hr>
+
+                {# Droit à la portabilité #}
+                <div class="gdpr-action mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <i class="bx bx-transfer text-info me-1"></i>
+                                Droit à la Portabilité
+                            </h6>
+                            <p class="text-muted mb-0 small">
+                                Recevez vos données dans un format structuré et lisible par machine (JSON).
+                            </p>
+                        </div>
+                        <form method="post" action="{{ path('gdpr_export_data') }}" class="ms-3">
+                            <button type="submit" class="btn btn-sm btn-outline-info">
+                                <i class="bx bx-export me-1"></i>
+                                Exporter (JSON)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <hr>
+
+                {# Droit d'opposition #}
+                <div class="gdpr-action mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <i class="bx bx-block text-secondary me-1"></i>
+                                Droit d'Opposition
+                            </h6>
+                            <p class="text-muted mb-0 small">
+                                Gérez vos préférences de cookies et de communication.
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary ms-3" data-bs-toggle="modal" data-bs-target="#cookieSettingsModal">
+                            <i class="bx bx-cog me-1"></i>
+                            Paramètres cookies
+                        </button>
+                    </div>
+                </div>
+
+                <hr>
+
+                {# Droit à l'effacement (droit à l'oubli) #}
+                <div class="gdpr-action">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <i class="bx bx-trash text-danger me-1"></i>
+                                Droit à l'Effacement (Droit à l'Oubli)
+                            </h6>
+                            <p class="text-muted mb-0 small">
+                                Demandez la suppression définitive de votre compte et de vos données personnelles.
+                                <br>
+                                <strong class="text-warning">
+                                    <i class="bx bx-error-circle me-1"></i>
+                                    Attention : Cette action est irréversible après validation.
+                                </strong>
+                            </p>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-3" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            <i class="bx bx-trash me-1"></i>
+                            Supprimer mon compte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Informations complémentaires #}
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bx bx-info-circle me-1"></i>
+                    Informations Complémentaires
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Conservation des données</h6>
+                <p class="text-muted small">
+                    Vos données sont conservées pendant la durée de votre contrat de travail + 5 ans
+                    (obligations légales). Les données comptables sont conservées 10 ans.
+                </p>
+
+                <h6 class="mt-3">Destinataires</h6>
+                <p class="text-muted small">
+                    Vos données sont accessibles uniquement au personnel autorisé (RH, managers, comptabilité)
+                    et à notre hébergeur (conformité RGPD garantie).
+                </p>
+
+                <h6 class="mt-3">Contact DPO</h6>
+                <p class="text-muted small mb-0">
+                    Pour toute question sur vos données personnelles, contactez notre Délégué à la
+                    Protection des Données : <a href="mailto:dpo@hotones.example">dpo@hotones.example</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal de confirmation de suppression #}
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bx bx-error-circle me-2"></i>
+                    Supprimer mon compte
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bx bx-error-circle me-2"></i>
+                    <strong>Attention !</strong> Cette action est définitive et irréversible.
+                </div>
+
+                <p><strong>Conséquences de la suppression :</strong></p>
+                <ul>
+                    <li>Votre compte sera désactivé immédiatement</li>
+                    <li>Un email de confirmation vous sera envoyé</li>
+                    <li>Période de grâce de 30 jours pour annuler</li>
+                    <li>Suppression définitive après 30 jours</li>
+                    <li>Certaines données seront conservées pour obligations légales (comptabilité, etc.)</li>
+                </ul>
+
+                <p class="mb-0">
+                    <strong>Êtes-vous absolument certain de vouloir supprimer votre compte ?</strong>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bx bx-x me-1"></i>
+                    Annuler
+                </button>
+                <form method="post" action="{{ path('gdpr_request_deletion') }}" id="delete-account-form">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bx bx-trash me-1"></i>
+                        Oui, supprimer mon compte
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('delete-account-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    fetch(this.action, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
+        } else {
+            alert('Erreur : ' + (data.error || 'Une erreur est survenue'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la demande de suppression');
+    });
+});
+</script>
+{% endblock %}

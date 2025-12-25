@@ -1,0 +1,329 @@
+{# Bannière de consentement cookies - Conformité RGPD #}
+<div id="cookie-consent-banner" class="cookie-consent-banner" style="display: none;">
+    <div class="cookie-consent-content">
+        <div class="cookie-consent-text">
+            <h5 class="mb-2">
+                <i class="bx bx-cookie me-2"></i>
+                Respect de votre vie privée
+            </h5>
+            <p class="mb-3">
+                Nous utilisons des cookies essentiels pour le bon fonctionnement de l'application
+                (authentification, sécurité). Aucun cookie de tracking ou publicitaire n'est utilisé.
+            </p>
+            <p class="mb-0 small text-muted">
+                En continuant, vous acceptez l'utilisation de ces cookies essentiels.
+                <a href="{{ path('privacy_policy') }}" class="text-primary">En savoir plus</a>
+            </p>
+        </div>
+        <div class="cookie-consent-actions">
+            <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="cookie-settings-btn">
+                <i class="bx bx-cog me-1"></i>
+                Paramètres
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-light me-2" id="cookie-refuse-btn">
+                Refuser tout
+            </button>
+            <button type="button" class="btn btn-sm btn-primary" id="cookie-accept-btn">
+                <i class="bx bx-check me-1"></i>
+                Tout accepter
+            </button>
+        </div>
+    </div>
+</div>
+
+{# Modal de paramétrage détaillé des cookies #}
+<div class="modal fade" id="cookieSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bx bx-cookie me-2"></i>
+                    Paramètres des cookies
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">
+                    Gérez vos préférences de cookies. Les cookies essentiels sont nécessaires
+                    au fonctionnement de l'application et ne peuvent pas être désactivés.
+                </p>
+
+                {# Cookies essentiels (obligatoires) #}
+                <div class="cookie-category mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">
+                                <i class="bx bx-shield text-success me-1"></i>
+                                Cookies essentiels
+                            </h6>
+                            <small class="text-muted">Nécessaires au fonctionnement</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="cookie-essential" checked disabled>
+                            <label class="form-check-label text-muted small" for="cookie-essential">
+                                Toujours actifs
+                            </label>
+                        </div>
+                    </div>
+                    <div class="alert alert-light mb-0">
+                        <small>
+                            <strong>Exemples :</strong> Session utilisateur, authentification 2FA,
+                            CSRF protection, préférences d'affichage.
+                        </small>
+                    </div>
+                </div>
+
+                {# Cookies fonctionnels (optionnels) #}
+                <div class="cookie-category mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">
+                                <i class="bx bx-cog text-primary me-1"></i>
+                                Cookies fonctionnels
+                            </h6>
+                            <small class="text-muted">Améliorent l'expérience utilisateur</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="cookie-functional" checked>
+                            <label class="form-check-label" for="cookie-functional"></label>
+                        </div>
+                    </div>
+                    <div class="alert alert-light mb-0">
+                        <small>
+                            <strong>Exemples :</strong> Mémorisation des filtres, préférences de tri,
+                            langue sélectionnée, thème (clair/sombre).
+                        </small>
+                    </div>
+                </div>
+
+                {# Cookies analytiques (désactivés par défaut) #}
+                <div class="cookie-category mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">
+                                <i class="bx bx-bar-chart text-info me-1"></i>
+                                Cookies analytiques
+                            </h6>
+                            <small class="text-muted">Statistiques anonymes d'utilisation</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="cookie-analytics">
+                            <label class="form-check-label" for="cookie-analytics"></label>
+                        </div>
+                    </div>
+                    <div class="alert alert-light mb-0">
+                        <small>
+                            <strong>Exemples :</strong> Pages visitées, temps passé, parcours utilisateur.
+                            <br><strong>Note :</strong> Actuellement désactivé (pas d'outil analytics configuré).
+                        </small>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mb-0">
+                    <i class="bx bx-info-circle me-1"></i>
+                    <small>
+                        <strong>Aucun cookie publicitaire ou de tracking tiers n'est utilisé.</strong>
+                        Vos données restent privées et sécurisées.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="cookie-save-settings-btn">
+                    <i class="bx bx-save me-1"></i>
+                    Enregistrer mes choix
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.cookie-consent-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #2c3e50;
+    color: white;
+    padding: 1.5rem;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 9999;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.cookie-consent-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.cookie-consent-text {
+    flex: 1;
+}
+
+.cookie-consent-text h5 {
+    color: white;
+    font-size: 1.1rem;
+}
+
+.cookie-consent-text p {
+    margin-bottom: 0;
+    color: rgba(255,255,255,0.9);
+    font-size: 0.95rem;
+}
+
+.cookie-consent-text a {
+    color: #3498db;
+    text-decoration: underline;
+}
+
+.cookie-consent-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.cookie-category {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+@media (max-width: 768px) {
+    .cookie-consent-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .cookie-consent-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const CONSENT_COOKIE_NAME = 'cookie_consent';
+    const CONSENT_EXPIRY_DAYS = 365;
+
+    const banner = document.getElementById('cookie-consent-banner');
+    const acceptBtn = document.getElementById('cookie-accept-btn');
+    const refuseBtn = document.getElementById('cookie-refuse-btn');
+    const settingsBtn = document.getElementById('cookie-settings-btn');
+    const saveSettingsBtn = document.getElementById('cookie-save-settings-btn');
+    const settingsModal = new bootstrap.Modal(document.getElementById('cookieSettingsModal'));
+
+    // Vérifier si le consentement a déjà été donné
+    const existingConsent = getCookie(CONSENT_COOKIE_NAME);
+
+    if (!existingConsent) {
+        // Afficher la bannière après un court délai
+        setTimeout(() => {
+            banner.style.display = 'block';
+        }, 1000);
+    }
+
+    // Accepter tous les cookies
+    acceptBtn.addEventListener('click', function() {
+        saveConsent({
+            essential: true,
+            functional: true,
+            analytics: false  // Désactivé par défaut
+        });
+        banner.style.display = 'none';
+    });
+
+    // Refuser tous les cookies non essentiels
+    refuseBtn.addEventListener('click', function() {
+        saveConsent({
+            essential: true,  // Toujours actifs
+            functional: false,
+            analytics: false
+        });
+        banner.style.display = 'none';
+    });
+
+    // Ouvrir les paramètres
+    settingsBtn.addEventListener('click', function() {
+        banner.style.display = 'none';
+        settingsModal.show();
+
+        // Charger les préférences actuelles
+        const consent = existingConsent ? JSON.parse(existingConsent) : {
+            essential: true,
+            functional: true,
+            analytics: false
+        };
+
+        document.getElementById('cookie-functional').checked = consent.functional;
+        document.getElementById('cookie-analytics').checked = consent.analytics;
+    });
+
+    // Sauvegarder les paramètres personnalisés
+    saveSettingsBtn.addEventListener('click', function() {
+        const consent = {
+            essential: true,
+            functional: document.getElementById('cookie-functional').checked,
+            analytics: document.getElementById('cookie-analytics').checked
+        };
+
+        saveConsent(consent);
+        settingsModal.hide();
+    });
+
+    // Fonctions utilitaires
+    function saveConsent(preferences) {
+        const consentData = {
+            ...preferences,
+            timestamp: new Date().toISOString(),
+            version: '1.0'
+        };
+
+        setCookie(CONSENT_COOKIE_NAME, JSON.stringify(consentData), CONSENT_EXPIRY_DAYS);
+
+        // Envoyer au serveur pour traçabilité (optionnel mais recommandé RGPD)
+        fetch('{{ path('cookie_consent_save') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(consentData)
+        }).catch(err => console.error('Erreur sauvegarde consentement:', err));
+
+        console.log('Préférences cookies sauvegardées:', consentData);
+    }
+
+    function setCookie(name, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/;SameSite=Strict";
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+});
+</script>

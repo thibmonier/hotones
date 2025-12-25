@@ -1,0 +1,321 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Politique de Confidentialité - RGPD{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-body p-5">
+                    <h1 class="mb-4">
+                        <i class="bx bx-shield-quarter text-success me-2"></i>
+                        Politique de Confidentialité
+                    </h1>
+
+                    <div class="alert alert-info mb-4">
+                        <i class="bx bx-info-circle me-2"></i>
+                        <strong>Dernière mise à jour :</strong> {{ last_updated|date('d/m/Y') }}
+                    </div>
+
+                    {# Introduction #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">1. Introduction</h2>
+                        <p>
+                            La présente politique de confidentialité décrit comment HotOnes collecte, utilise et protège
+                            vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD).
+                        </p>
+                        <p>
+                            <strong>Responsable du traitement :</strong> HotOnes<br>
+                            <strong>Contact DPO :</strong> <a href="mailto:dpo@hotones.example">dpo@hotones.example</a>
+                        </p>
+                    </section>
+
+                    {# Données collectées #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">2. Données Personnelles Collectées</h2>
+
+                        <h3 class="h5 mb-2">2.1 Données d'identification</h3>
+                        <ul>
+                            <li>Nom et prénom</li>
+                            <li>Adresse email professionnelle</li>
+                            <li>Numéro de téléphone (optionnel)</li>
+                            <li>Photo de profil (optionnel)</li>
+                        </ul>
+
+                        <h3 class="h5 mb-2 mt-3">2.2 Données professionnelles</h3>
+                        <ul>
+                            <li>Poste et fonction</li>
+                            <li>Compétences et profils</li>
+                            <li>Historique de travail (périodes d'emploi, salaires)</li>
+                            <li>Temps de travail et timesheets</li>
+                            <li>Projets et tâches assignés</li>
+                        </ul>
+
+                        <h3 class="h5 mb-2 mt-3">2.3 Données de connexion</h3>
+                        <ul>
+                            <li>Adresse IP</li>
+                            <li>Logs de connexion</li>
+                            <li>Historique d'authentification 2FA</li>
+                        </ul>
+                    </section>
+
+                    {# Finalités du traitement #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">3. Finalités du Traitement</h2>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Finalité</th>
+                                        <th>Base légale</th>
+                                        <th>Durée de conservation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Gestion des comptes utilisateurs</td>
+                                        <td>Exécution du contrat</td>
+                                        <td>Durée du contrat + 5 ans</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Suivi du temps de travail</td>
+                                        <td>Obligation légale</td>
+                                        <td>5 ans (obligation légale)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gestion de la paie</td>
+                                        <td>Exécution du contrat</td>
+                                        <td>10 ans (obligations comptables)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sécurité des systèmes</td>
+                                        <td>Intérêt légitime</td>
+                                        <td>1 an (logs)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amélioration de l'application</td>
+                                        <td>Consentement</td>
+                                        <td>Durée du consentement</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    {# Destinataires #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">4. Destinataires des Données</h2>
+                        <p>Vos données personnelles sont accessibles :</p>
+                        <ul>
+                            <li><strong>En interne :</strong> Personnel autorisé (RH, managers, comptabilité)</li>
+                            <li><strong>Prestataires :</strong> Hébergeur (conformité RGPD), maintenance système</li>
+                            <li><strong>Autorités :</strong> Sur demande légale uniquement</li>
+                        </ul>
+                        <p>
+                            <strong>Aucun transfert hors UE</strong> n'est effectué sans garanties appropriées.
+                        </p>
+                    </section>
+
+                    {# Vos droits #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">5. Vos Droits RGPD</h2>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bx bx-show text-primary me-1"></i>
+                                            Droit d'accès
+                                        </h5>
+                                        <p class="card-text small">
+                                            Obtenez une copie de toutes vos données personnelles.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bx bx-edit text-warning me-1"></i>
+                                            Droit de rectification
+                                        </h5>
+                                        <p class="card-text small">
+                                            Corrigez vos données inexactes ou incomplètes.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bx bx-trash text-danger me-1"></i>
+                                            Droit à l'effacement
+                                        </h5>
+                                        <p class="card-text small">
+                                            Demandez la suppression de vos données (sauf obligations légales).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bx bx-download text-success me-1"></i>
+                                            Droit à la portabilité
+                                        </h5>
+                                        <p class="card-text small">
+                                            Récupérez vos données dans un format structuré (JSON).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bx bx-block text-secondary me-1"></i>
+                                            Droit d'opposition
+                                        </h5>
+                                        <p class="card-text small">
+                                            Opposez-vous à certains traitements (marketing, profilage).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bx bx-pause text-info me-1"></i>
+                                            Droit à la limitation
+                                        </h5>
+                                        <p class="card-text small">
+                                            Limitez temporairement le traitement de vos données.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-primary mt-3">
+                            <i class="bx bx-info-circle me-2"></i>
+                            <strong>Exercez vos droits :</strong>
+                            {% if app.user %}
+                                <a href="{{ path('gdpr_my_data') }}" class="alert-link">Accédez à votre espace de gestion des données</a>
+                            {% else %}
+                                Connectez-vous pour gérer vos données ou contactez-nous à
+                                <a href="mailto:dpo@hotones.example" class="alert-link">dpo@hotones.example</a>
+                            {% endif %}
+                        </div>
+                    </section>
+
+                    {# Sécurité #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">6. Sécurité des Données</h2>
+                        <p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées :</p>
+                        <ul>
+                            <li><strong>Chiffrement :</strong> HTTPS (TLS 1.3), mots de passe hashés (Bcrypt)</li>
+                            <li><strong>Authentification :</strong> 2FA obligatoire pour certains rôles</li>
+                            <li><strong>Accès restreint :</strong> Principe du moindre privilège</li>
+                            <li><strong>Sauvegardes :</strong> Chiffrées et testées régulièrement</li>
+                            <li><strong>Monitoring :</strong> Détection d'anomalies et logs d'accès</li>
+                            <li><strong>Formation :</strong> Sensibilisation du personnel à la sécurité</li>
+                        </ul>
+                    </section>
+
+                    {# Cookies #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">7. Cookies et Traceurs</h2>
+                        <p>
+                            Nous utilisons uniquement des <strong>cookies essentiels</strong> au fonctionnement de l'application :
+                        </p>
+                        <ul>
+                            <li>Session utilisateur (PHPSESSID)</li>
+                            <li>Protection CSRF</li>
+                            <li>Authentification 2FA</li>
+                            <li>Préférences d'affichage</li>
+                        </ul>
+                        <p>
+                            <strong>Aucun cookie publicitaire ou de tracking tiers</strong> n'est utilisé.
+                            Vous pouvez gérer vos préférences de cookies à tout moment.
+                        </p>
+                    </section>
+
+                    {# Violations de données #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">8. Notification de Violation de Données</h2>
+                        <p>
+                            En cas de violation de données personnelles susceptible de présenter un risque pour vos droits :
+                        </p>
+                        <ul>
+                            <li>Notification à la CNIL sous 72 heures</li>
+                            <li>Information des personnes concernées dans les meilleurs délais</li>
+                            <li>Mesures correctives immédiates</li>
+                        </ul>
+                    </section>
+
+                    {# Contact #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">9. Contact et Réclamations</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Délégué à la Protection des Données (DPO)</h5>
+                                        <p class="mb-1"><strong>Email :</strong> <a href="mailto:dpo@hotones.example">dpo@hotones.example</a></p>
+                                        <p class="mb-0"><strong>Délai de réponse :</strong> 1 mois maximum</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-secondary">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Autorité de Contrôle</h5>
+                                        <p class="mb-1"><strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés)</p>
+                                        <p class="mb-0">
+                                            <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {# Modifications #}
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">10. Modifications de la Politique</h2>
+                        <p>
+                            Cette politique peut être modifiée pour refléter les évolutions légales ou de nos pratiques.
+                            Toute modification substantielle vous sera notifiée par email ou via l'application.
+                        </p>
+                    </section>
+
+                    <div class="text-center mt-5">
+                        <a href="{{ path('home') }}" class="btn btn-primary">
+                            <i class="bx bx-home me-1"></i>
+                            Retour à l'accueil
+                        </a>
+                        {% if app.user %}
+                            <a href="{{ path('gdpr_my_data') }}" class="btn btn-outline-primary ms-2">
+                                <i class="bx bx-shield me-1"></i>
+                                Gérer mes données
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
