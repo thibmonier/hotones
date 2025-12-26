@@ -34,7 +34,7 @@ class ProjectController extends AbstractController
 
         // Charger filtres depuis la session si aucun filtre explicite n'est fourni
         $queryAll   = $request->query->all();
-        $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'per_page', 'sort', 'dir', 'search'];
+        $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'service_category', 'per_page', 'sort', 'dir', 'search'];
         $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
         $saved      = $session->has('project_filters') ? (array) $session->get('project_filters') : [];
 
@@ -48,10 +48,11 @@ class ProjectController extends AbstractController
         $endDate   = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
 
         // Filtres additionnels
-        $filterProjectType = $hasFilter ? ($request->query->get('project_type') ?: null) : ($saved['project_type'] ?? null);
-        $filterStatus      = $hasFilter ? ($request->query->get('status') ?: null) : ($saved['status'] ?? 'active');
-        $filterTechnology  = $hasFilter ? ($request->query->get('technology') ? (int) $request->query->get('technology') : null) : (isset($saved['technology']) ? (int) $saved['technology'] : null);
-        $filterSearch      = $hasFilter ? ($request->query->get('search') ?: null) : ($saved['search'] ?? null);
+        $filterProjectType     = $hasFilter ? ($request->query->get('project_type') ?: null) : ($saved['project_type'] ?? null);
+        $filterStatus          = $hasFilter ? ($request->query->get('status') ?: null) : ($saved['status'] ?? 'active');
+        $filterTechnology      = $hasFilter ? ($request->query->get('technology') ? (int) $request->query->get('technology') : null) : (isset($saved['technology']) ? (int) $saved['technology'] : null);
+        $filterServiceCategory = $hasFilter ? ($request->query->get('service_category') ? (int) $request->query->get('service_category') : null) : (isset($saved['service_category']) ? (int) $saved['service_category'] : null);
+        $filterSearch          = $hasFilter ? ($request->query->get('search') ?: null) : ($saved['search'] ?? null);
 
         // Tri
         $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'name')) : ($saved['sort'] ?? 'name');
@@ -65,10 +66,10 @@ class ProjectController extends AbstractController
         $offset         = ($page - 1) * $perPage;
 
         // Total
-        $total = $projectRepo->countBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $filterSearch);
+        $total = $projectRepo->countBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $filterSearch, $filterServiceCategory);
 
         // Projets sur la période avec filtres (paginés)
-        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset, null, null, null, null, $filterSearch);
+        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset, null, null, null, $filterServiceCategory, $filterSearch);
 
         // Agrégats SQL en batch pour éviter le parcours objet
         $projectIds = array_map(fn ($p) => $p->getId(), $projects);
@@ -110,7 +111,7 @@ class ProjectController extends AbstractController
         }
 
         // KPIs période (réel basé sur timesheets) - doivent refléter TOUT l'ensemble filtré (pas seulement la page)
-        $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, null, null, null, null, null, null, null, null, $filterSearch);
+        $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, null, null, null, null, null, null, null, $filterServiceCategory, $filterSearch);
         $periodKpis         = $profitabilityService->calculatePeriodMetricsForProjects($allProjectsForKpis, $startDate, $endDate);
 
         $pagination = [
@@ -124,50 +125,54 @@ class ProjectController extends AbstractController
 
         // Options de filtres
         $filterOptions = [
-            'project_types' => $projectRepo->getDistinctProjectTypes(),
-            'statuses'      => $projectRepo->getDistinctStatuses(),
-            'technologies'  => $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
+            'project_types'      => $projectRepo->getDistinctProjectTypes(),
+            'statuses'           => $projectRepo->getDistinctStatuses(),
+            'technologies'       => $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
+            'service_categories' => $projectRepo->getDistinctServiceCategoriesBetweenDates($startDate, $endDate),
         ];
 
         // Sauvegarder les filtres en session
         $session->set('project_filters', [
-            'year'         => $year,
-            'start_date'   => $startDate->format('Y-m-d'),
-            'end_date'     => $endDate->format('Y-m-d'),
-            'project_type' => $filterProjectType,
-            'status'       => $filterStatus,
-            'technology'   => $filterTechnology,
-            'search'       => $filterSearch,
-            'per_page'     => $perPage,
-            'sort'         => $sort,
-            'dir'          => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
+            'year'             => $year,
+            'start_date'       => $startDate->format('Y-m-d'),
+            'end_date'         => $endDate->format('Y-m-d'),
+            'project_type'     => $filterProjectType,
+            'status'           => $filterStatus,
+            'technology'       => $filterTechnology,
+            'service_category' => $filterServiceCategory,
+            'search'           => $filterSearch,
+            'per_page'         => $perPage,
+            'sort'             => $sort,
+            'dir'              => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
         ]);
 
         return $this->render('project/index.html.twig', [
             'projects_with_metrics' => $projectsWithMetrics,
             'filters'               => [
-                'year'         => $year,
-                'start_date'   => $startDate,
-                'end_date'     => $endDate,
-                'project_type' => $filterProjectType,
-                'status'       => $filterStatus,
-                'technology'   => $filterTechnology,
-                'search'       => $filterSearch,
+                'year'             => $year,
+                'start_date'       => $startDate,
+                'end_date'         => $endDate,
+                'project_type'     => $filterProjectType,
+                'status'           => $filterStatus,
+                'technology'       => $filterTechnology,
+                'service_category' => $filterServiceCategory,
+                'search'           => $filterSearch,
             ],
             'filter_options' => $filterOptions,
             'period_kpis'    => $periodKpis,
             'pagination'     => $pagination,
             // Filtres pour URL (types simples)
             'filters_query' => [
-                'year'         => $year,
-                'start_date'   => $startDate->format('Y-m-d'),
-                'end_date'     => $endDate->format('Y-m-d'),
-                'project_type' => $filterProjectType,
-                'status'       => $filterStatus,
-                'technology'   => $filterTechnology,
-                'per_page'     => $perPage,
-                'sort'         => $sort,
-                'dir'          => $dir,
+                'year'             => $year,
+                'start_date'       => $startDate->format('Y-m-d'),
+                'end_date'         => $endDate->format('Y-m-d'),
+                'project_type'     => $filterProjectType,
+                'status'           => $filterStatus,
+                'technology'       => $filterTechnology,
+                'service_category' => $filterServiceCategory,
+                'per_page'         => $perPage,
+                'sort'             => $sort,
+                'dir'              => $dir,
             ],
             'sort' => $sort,
             'dir'  => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
@@ -400,13 +405,14 @@ class ProjectController extends AbstractController
         $startDate  = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
         $endDate    = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
 
-        $filterProjectType = $request->query->get('project_type', $saved['project_type'] ?? null) ?: null;
-        $filterStatus      = $request->query->get('status', $saved['status'] ?? null) ?: null;
-        $filterTechnology  = $request->query->getInt('technology', $saved['technology'] ?? 0) ?: null;
-        $sort              = (string) $request->query->get('sort', $saved['sort'] ?? 'name');
-        $dir               = (string) $request->query->get('dir', $saved['dir'] ?? 'ASC');
+        $filterProjectType     = $request->query->get('project_type', $saved['project_type'] ?? null) ?: null;
+        $filterStatus          = $request->query->get('status', $saved['status'] ?? null) ?: null;
+        $filterTechnology      = $request->query->getInt('technology', $saved['technology'] ?? 0) ?: null;
+        $filterServiceCategory = $request->query->getInt('service_category', $saved['service_category'] ?? 0) ?: null;
+        $sort                  = (string) $request->query->get('sort', $saved['sort'] ?? 'name');
+        $dir                   = (string) $request->query->get('dir', $saved['dir'] ?? 'ASC');
 
-        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, null, null);
+        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, null, null, null, null, null, $filterServiceCategory);
 
         // CSV headers
         $rows   = [];

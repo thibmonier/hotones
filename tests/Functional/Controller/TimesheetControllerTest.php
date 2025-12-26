@@ -306,6 +306,6 @@ class TimesheetControllerTest extends WebTestCase
         $client->request('GET', '/timesheet');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('.alert-warning');
-        $this->assertSelectorTextContains('.alert-warning', 'Aucun contributeur associé');
+        $this->assertSelectorTextContains('.alert-warning', 'Aucun collaborateur associé');
     }
 }

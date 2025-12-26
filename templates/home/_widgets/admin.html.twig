@@ -113,9 +113,12 @@
             <div class="card-header bg-warning bg-soft">
                 <h5 class="card-title mb-0">
                     <i class="bx bx-file me-2"></i>
-                    Devis en attente
+                    Devis en attente (T{{ currentQuarter }} {{ quarterStart|date('Y') }})
                     <span class="badge bg-warning ms-2">{{ pendingOrders|length }}</span>
                 </h5>
+                <p class="text-muted small mb-0 mt-1">
+                    Du {{ quarterStart|date('d/m/Y') }} au {{ quarterEnd|date('d/m/Y') }}
+                </p>
             </div>
             <div class="card-body">
                 <div class="list-group list-group-flush">
@@ -163,6 +166,27 @@
                         </a>
                     </div>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-xl-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning bg-soft">
+                <h5 class="card-title mb-0">
+                    <i class="bx bx-file me-2"></i>
+                    Devis en attente (T{{ currentQuarter }} {{ quarterStart|date('Y') }})
+                    <span class="badge bg-warning ms-2">0</span>
+                </h5>
+                <p class="text-muted small mb-0 mt-1">
+                    Du {{ quarterStart|date('d/m/Y') }} au {{ quarterEnd|date('d/m/Y') }}
+                </p>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success mb-0">
+                    <i class="bx bx-check-circle me-2"></i>
+                    Aucun devis en attente pour ce trimestre
+                </div>
             </div>
         </div>
     </div>

@@ -27,6 +27,7 @@
                         + (filters.project_type ? 1 : 0)
                         + (filters.status ? 1 : 0)
                         + (filters.technology ? 1 : 0)
+                        + (filters.service_category ? 1 : 0)
                         + (filters.search ? 1 : 0)
                         + (filters.start_date|date('Y-m-d') != (filters.year ~ '-01-01') ? 1 : 0)
                         + (filters.end_date|date('Y-m-d') != (filters.year ~ '-12-31') ? 1 : 0)
@@ -59,6 +60,10 @@
                     {% if filters.technology %}
                         {% set techObj = (filter_options.technologies|filter(t => t.id == filters.technology)|first) %}
                         {% set chips = chips|merge(['Technologie: ' ~ (techObj ? techObj.name : filters.technology)]) %}
+                    {% endif %}
+                    {% if filters.service_category %}
+                        {% set scObj = (filter_options.service_categories|filter(sc => sc.id == filters.service_category)|first) %}
+                        {% set chips = chips|merge(['Catégorie: ' ~ (scObj ? scObj.name : filters.service_category)]) %}
                     {% endif %}
                     {% set defaultStart = (filters.year ~ '-01-01') %}
                     {% set defaultEnd = (filters.year ~ '-12-31') %}
@@ -143,6 +148,15 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Catégorie</label>
+                            <select name="service_category" class="form-select">
+                                <option value="">Toutes</option>
+                                {% for sc in filter_options.service_categories %}
+                                    <option value="{{ sc.id }}" {{ filters.service_category == sc.id ? 'selected' : '' }}>{{ sc.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         <div class="col-12 mt-2 d-flex gap-2">
                             {% include 'components/button.html.twig' with {
                                 type: 'submit',
@@ -177,7 +191,7 @@
                         })();
                     </script>
                 </div>
-                {% set hasFilters = (filters.project_type) or (filters.status) or (filters.technology) or (filters.start_date|date('Y-m-d') != (filters.year ~ '-01-01')) or (filters.end_date|date('Y-m-d') != (filters.year ~ '-12-31')) or (sort != 'name') or (dir != 'ASC') or (pagination.per_page != 10) %}
+                {% set hasFilters = (filters.project_type) or (filters.status) or (filters.technology) or (filters.service_category) or (filters.start_date|date('Y-m-d') != (filters.year ~ '-01-01')) or (filters.end_date|date('Y-m-d') != (filters.year ~ '-12-31')) or (sort != 'name') or (dir != 'ASC') or (pagination.per_page != 10) %}
                 {% if hasFilters %}
                     <div class="small text-muted mt-2">
                         Filtres actifs · <a href="{{ path('project_index', { reset: 1 }) }}">Effacer</a>
@@ -255,6 +269,7 @@
                             <input type="hidden" name="project_type" value="{{ filters.project_type }}">
                             <input type="hidden" name="status" value="{{ filters.status }}">
                             <input type="hidden" name="technology" value="{{ filters.technology }}">
+                            <input type="hidden" name="service_category" value="{{ filters.service_category }}">
                             <label class="form-label mb-0 me-2">Par page</label>
                             <select name="per_page" class="form-select form-select-sm me-2" onchange="this.form.submit()">
                                 {% for n in [10,20,50,100] %}

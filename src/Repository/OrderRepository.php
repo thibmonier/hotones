@@ -130,6 +130,33 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
+     * Trouve les devis en attente dans une période donnée.
+     *
+     * @param DateTimeInterface $start Date de début de la période
+     * @param DateTimeInterface $end   Date de fin de la période
+     * @param int               $limit Nombre maximum de résultats
+     *
+     * @return Order[]
+     */
+    public function findPendingOrdersInPeriod(DateTimeInterface $start, DateTimeInterface $end, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.project', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->where('o.status = :status')
+            ->andWhere('o.createdAt BETWEEN :start AND :end')
+            ->setParameter('status', 'a_signer')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('o.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Charge un devis avec toutes ses relations pour l'affichage.
      */
     public function findOneWithRelations(int $id): ?Order

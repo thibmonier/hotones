@@ -374,7 +374,8 @@ class ProjectRepository extends ServiceEntityRepository
         ?string $status = null,
         ?string $projectType = null,
         ?int $technologyId = null,
-        ?string $search = null
+        ?string $search = null,
+        ?int $serviceCategoryId = null
     ): int {
         $qb = $this->createQueryBuilder('p')
             ->select('COUNT(DISTINCT p.id)')
@@ -393,6 +394,10 @@ class ProjectRepository extends ServiceEntityRepository
         }
         if ($technologyId) {
             $qb->andWhere('t.id = :tech')->setParameter('tech', $technologyId);
+        }
+        if ($serviceCategoryId) {
+            $qb->leftJoin('p.serviceCategory', 'sc');
+            $qb->andWhere('sc.id = :scId')->setParameter('scId', $serviceCategoryId);
         }
         if ($search) {
             $qb->andWhere('p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search')

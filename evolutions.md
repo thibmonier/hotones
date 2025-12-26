@@ -31,9 +31,10 @@ indiquer que l'achitecture cloud du service est hébergé intégralement en Euro
 
 pour chaque utilisateur, vérifier les pages présentes et utilisables en fonction de ses droits.
 
-## vérifier les droits utilisateurs
+## evolutions des collaborateurs/utilisateurs
 
 pour pouvoir vérifier l'ensemble des droits utilisateurs, il faudrait une commande pour créer à minima un utilisateur par profil/role
+il faudrait pouvoir fusionner les formulaires utilisateurs et collaborateurs. 
 
 ## finaliser la mise en place du backoffice
 
@@ -45,6 +46,15 @@ revoir les éléments présents dans le backoffice et ceux présents dans l'appl
 revoir les pages existantes pour ne conserver que les pages utiles
 
 ## prévoir l'intégration d'un PSP pour le paiement de l'abonnement 
+
+
+## qualité technique
+
+revoir la séparation MVC notamment l'absence de requetes dans les controlleurs (mais déportées dans les repositories)
+
+nettoyage et rangement de l'ensemble des templates (ils commencent à être nombreux)
+
+
 
 
 ---
