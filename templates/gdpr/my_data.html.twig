@@ -1,20 +1,25 @@
-{% extends 'layouts/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Mes Données Personnelles - RGPD{% endblock %}
 
-{% block content %}
-{{ component('breadcrumb', { title: 'Mes Données Personnelles', pagetitle: 'RGPD' }) }}
-
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0 font-size-18">
-                <i class="bx bx-shield-quarter text-success me-2"></i>
-                Mes Données Personnelles
-            </h4>
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">
+                    <i class="mdi mdi-shield-account text-success me-2"></i>
+                    Mes Données Personnelles
+                </h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item active">Mes données RGPD</li>
+                    </ol>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
 <div class="row">
     {# Carte informations personnelles #}
@@ -302,4 +307,99 @@ document.getElementById('delete-account-form')?.addEventListener('submit', funct
     });
 });
 </script>
+
+{# Modal de gestion des cookies #}
+<div class="modal fade" id="cookieSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bx bx-cookie me-2"></i>
+                    Préférences de cookies
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">
+                    Gérez vos préférences de cookies. Les cookies essentiels sont nécessaires au fonctionnement
+                    du site et ne peuvent pas être désactivés.
+                </p>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="essentialCookies" checked disabled>
+                    <label class="form-check-label" for="essentialCookies">
+                        <strong>Cookies essentiels</strong> <span class="badge bg-danger ms-2">Obligatoires</span>
+                        <p class="small text-muted mb-0">
+                            Nécessaires au fonctionnement (session, sécurité CSRF, authentification)
+                        </p>
+                    </label>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="functionalCookies">
+                    <label class="form-check-label" for="functionalCookies">
+                        <strong>Cookies fonctionnels</strong> <span class="badge bg-success ms-2">Optionnels</span>
+                        <p class="small text-muted mb-0">
+                            Préférences utilisateur, langue, paramètres d'affichage
+                        </p>
+                    </label>
+                </div>
+
+                <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" id="analyticsCookies">
+                    <label class="form-check-label" for="analyticsCookies">
+                        <strong>Cookies analytiques</strong> <span class="badge bg-success ms-2">Optionnels</span>
+                        <p class="small text-muted mb-0">
+                            Statistiques d'utilisation anonymes pour améliorer le service
+                        </p>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <button type="button" class="btn btn-primary" id="saveCookiePreferences">
+                    <i class="bx bx-save me-1"></i>
+                    Enregistrer mes préférences
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Gestion des préférences cookies
+document.getElementById('saveCookiePreferences')?.addEventListener('click', function() {
+    const preferences = {
+        essential: true,
+        functional: document.getElementById('functionalCookies').checked,
+        analytics: document.getElementById('analyticsCookies').checked,
+        version: '1.0'
+    };
+
+    fetch('{{ path('cookie_consent_save') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(preferences)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Vos préférences ont été enregistrées');
+            bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal')).hide();
+        } else {
+            alert('Erreur lors de l\'enregistrement');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue');
+    });
+});
+</script>
+</div>
 {% endblock %}
