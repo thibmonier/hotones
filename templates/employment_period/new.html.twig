@@ -24,7 +24,10 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-0">Informations générales</h4>
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-info-circle me-2"></i>
+                            Informations générales
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
@@ -157,7 +160,10 @@
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-0">Profils associés</h4>
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-briefcase me-2"></i>
+                            Profils associés
+                        </h5>
                     </div>
                     <div class="card-body">
                         {% if profiles %}
@@ -182,7 +188,10 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-0">Aide</h4>
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-help-circle me-2"></i>
+                            Aide
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div class="alert alert-info">
@@ -201,14 +210,11 @@
 
         <div class="row">
             <div class="col-12">
-                <div class="d-flex justify-content-between">
-                    <a href="{{ path('employment_period_index') }}" class="btn btn-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Annuler
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bx bx-save me-1"></i> Créer la période
-                    </button>
-                </div>
+                {% include 'components/form_buttons.html.twig' with {
+                    cancel_route: 'employment_period_index',
+                    submit_label: 'Créer',
+                    layout: 'horizontal'
+                } %}
             </div>
         </div>
     </form>
