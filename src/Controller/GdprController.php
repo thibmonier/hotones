@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\AccountDeletionRequest;
 use App\Entity\CookieConsent;
+use App\Entity\User;
 use App\Repository\AccountDeletionRequestRepository;
 use App\Service\GdprDataExportService;
 use App\Service\GdprEmailService;
@@ -34,9 +35,12 @@ class GdprController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
+        /** @var User|null $user */
+        $user = $this->getUser();
+
         // Créer l'entité CookieConsent pour traçabilité RGPD
         $consent = new CookieConsent();
-        $consent->setUser($this->getUser());
+        $consent->setUser($user);
         $consent->setEssential($data['essential'] ?? true);
         $consent->setFunctional($data['functional'] ?? false);
         $consent->setAnalytics($data['analytics'] ?? false);
@@ -50,7 +54,7 @@ class GdprController extends AbstractController
         // Log pour debugging
         $this->container->get('logger')->info('Cookie consent saved', [
             'consent_id' => $consent->getId(),
-            'user_id'    => $this->getUser()?->getId(),
+            'user_id'    => $user?->getId(),
             'ip'         => $consent->getIpAddress(),
         ]);
 
@@ -116,6 +120,7 @@ class GdprController extends AbstractController
     #[Route('/export-my-data', name: 'gdpr_export_data', methods: ['POST'])]
     public function exportMyData(GdprDataExportService $exportService): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Non authentifié'], 401);
@@ -144,6 +149,7 @@ class GdprController extends AbstractController
         AccountDeletionRequestRepository $deletionRepository,
         GdprEmailService $emailService
     ): JsonResponse {
+        /** @var User|null $user */
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Non authentifié'], 401);
@@ -244,6 +250,7 @@ class GdprController extends AbstractController
         AccountDeletionRequestRepository $deletionRepository,
         GdprEmailService $emailService
     ): JsonResponse {
+        /** @var User|null $user */
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Non authentifié'], 401);

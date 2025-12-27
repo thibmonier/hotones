@@ -74,7 +74,6 @@ class GdprDataExportService
             'totp_enabled'       => $user->isTotpAuthenticationEnabled(),
             'account_created_at' => $user->getCreatedAt()?->format('c'),
             'last_login_at'      => $user->getLastLoginAt()?->format('c'),
-            'last_activity_at'   => $user->getLastActivityAt()?->format('c'),
             'last_login_ip'      => $user->getLastLoginIp(),
         ];
     }
@@ -109,10 +108,9 @@ class GdprDataExportService
                 'period_id'            => $period->getId(),
                 'start_date'           => $period->getStartDate()?->format('Y-m-d'),
                 'end_date'             => $period->getEndDate()?->format('Y-m-d'),
-                'monthly_gross_salary' => $period->getMonthlyGrossSalary(),
+                'salary'               => $period->getSalary(),
                 'weekly_hours'         => $period->getWeeklyHours(),
                 'work_time_percentage' => $period->getWorkTimePercentage(),
-                'contract_type'        => $period->getContractType(),
                 'profiles'             => array_map(
                     fn ($profile) => $profile->getName(),
                     $period->getProfiles()->toArray(),
@@ -133,21 +131,19 @@ class GdprDataExportService
                 'timesheet_id' => $timesheet->getId(),
                 'date'         => $timesheet->getDate()?->format('Y-m-d'),
                 'hours'        => $timesheet->getHours(),
-                'days'         => $timesheet->getDays(),
-                'description'  => $timesheet->getDescription(),
+                'notes'        => $timesheet->getNotes(),
                 'project'      => $timesheet->getProject() ? [
                     'id'   => $timesheet->getProject()->getId(),
                     'name' => $timesheet->getProject()->getName(),
                 ] : null,
-                'project_task' => $timesheet->getProjectTask() ? [
-                    'id'    => $timesheet->getProjectTask()->getId(),
-                    'title' => $timesheet->getProjectTask()->getTitle(),
+                'task' => $timesheet->getTask() ? [
+                    'id'   => $timesheet->getTask()->getId(),
+                    'name' => $timesheet->getTask()->getName(),
                 ] : null,
-                'project_sub_task' => $timesheet->getProjectSubTask() ? [
-                    'id'    => $timesheet->getProjectSubTask()->getId(),
-                    'title' => $timesheet->getProjectSubTask()->getTitle(),
+                'sub_task' => $timesheet->getSubTask() ? [
+                    'id'    => $timesheet->getSubTask()->getId(),
+                    'title' => $timesheet->getSubTask()->getTitle(),
                 ] : null,
-                'created_at' => $timesheet->getCreatedAt()?->format('c'),
             ];
         }, $timesheets);
     }

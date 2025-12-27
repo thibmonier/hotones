@@ -494,8 +494,8 @@ class InvoiceController extends AbstractController
             $ecritureNum   = str_replace('-', '', $invoiceNumber); // Numéro écriture unique
             $clientCode    = $invoice->getClient() ? 'C'.str_pad((string) $invoice->getClient()->getId(), 6, '0', STR_PAD_LEFT) : 'C000000';
             $clientName    = $invoice->getClient() ? $invoice->getClient()->getName() : 'Client inconnu';
-            $totalHT       = $invoice->getTotalHt();
-            $totalTTC      = $invoice->getTotalTtc();
+            $totalHT       = $invoice->getAmountHt();
+            $totalTTC      = $invoice->getAmountTtc();
             $tva           = bcsub((string) $totalTTC, (string) $totalHT, 2);
 
             // Date au format YYYYMMDD
