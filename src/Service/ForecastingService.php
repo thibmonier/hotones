@@ -6,7 +6,6 @@ namespace App\Service;
 
 use App\Entity\FactForecast;
 use App\Repository\FactForecastRepository;
-use App\Repository\OrderRepository;
 use App\Repository\ProjectRepository;
 use App\Service\Analytics\DashboardReadService;
 use DateTime;
@@ -30,7 +29,6 @@ class ForecastingService
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly FactForecastRepository $forecastRepository,
-        private readonly OrderRepository $orderRepository,
         private readonly ProjectRepository $projectRepository,
         private readonly DashboardReadService $dashboardService,
     ) {

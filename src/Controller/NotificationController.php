@@ -6,7 +6,6 @@ use App\Entity\Notification;
 use App\Repository\NotificationRepository;
 use App\Service\NotificationService;
 use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,8 +19,7 @@ class NotificationController extends AbstractController
 {
     public function __construct(
         private readonly NotificationService $notificationService,
-        private readonly NotificationRepository $notificationRepository,
-        private readonly EntityManagerInterface $em
+        private readonly NotificationRepository $notificationRepository
     ) {
     }
 

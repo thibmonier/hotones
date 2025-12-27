@@ -6,7 +6,6 @@ namespace App\Service;
 
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
-use App\Repository\TimesheetRepository;
 use App\Repository\VacationRepository;
 use DateTime;
 use DateTimeInterface;
@@ -16,7 +15,6 @@ class HrMetricsService
     public function __construct(
         public ContributorRepository $contributorRepository,
         private EmploymentPeriodRepository $employmentPeriodRepository,
-        private TimesheetRepository $timesheetRepository,
         private VacationRepository $vacationRepository
     ) {
     }

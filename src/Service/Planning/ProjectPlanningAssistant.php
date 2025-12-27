@@ -27,8 +27,7 @@ class ProjectPlanningAssistant
         private readonly EntityManagerInterface $entityManager,
         private readonly ContributorRepository $contributorRepository,
         private readonly PlanningRepository $planningRepository,
-        private readonly VacationRepository $vacationRepository,
-        private readonly TaceAnalyzer $taceAnalyzer
+        private readonly VacationRepository $vacationRepository
     ) {
     }
 

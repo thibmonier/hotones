@@ -12,7 +12,6 @@ use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Provider de schedules pour les tâches de recalcul des métriques analytics.
@@ -20,9 +19,8 @@ use Symfony\Contracts\Cache\CacheInterface;
 #[AsSchedule('analytics')]
 class AnalyticsScheduleProvider implements ScheduleProviderInterface
 {
-    public function __construct(
-        private readonly CacheInterface $cache
-    ) {
+    public function __construct()
+    {
     }
 
     public function getSchedule(): Schedule

@@ -28,8 +28,8 @@ class WorkloadPredictionController extends AbstractController
     public function prediction(Request $request): Response
     {
         // Récupérer les filtres depuis la requête
-        $profileIds     = $request->query->all('profiles')     ?? [];
-        $contributorIds = $request->query->all('contributors') ?? [];
+        $profileIds     = $request->query->all('profiles');
+        $contributorIds = $request->query->all('contributors');
 
         // Convertir en entiers
         $profileIds     = array_map('intval', array_filter($profileIds, fn ($v) => $v !== null && $v !== ''));
