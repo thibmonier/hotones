@@ -3,25 +3,22 @@
 {% block title %}Nouveau devis{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Nouveau devis</h4>
-                <div class="page-title-right">
-                    <a href="{{ path('order_index') }}" class="btn btn-outline-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Retour à la liste
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'components/page_header.html.twig' with {
+        title: 'Nouveau devis',
+        breadcrumb: [
+            {label: 'Devis', path: 'order_index'}
+        ]
+    } %}
 
     {{ form_start(form) }}
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Informations du devis</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-file-blank me-2"></i>
+                        Informations du devis
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -84,12 +81,11 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end">
-                        <a href="{{ path('order_index') }}" class="btn btn-outline-secondary me-2">Annuler</a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bx bx-save me-1"></i> Créer le devis
-                        </button>
-                    </div>
+                    {% include 'components/form_buttons.html.twig' with {
+                        cancel_route: 'order_index',
+                        submit_label: 'Créer',
+                        layout: 'horizontal'
+                    } %}
                 </div>
             </div>
         </div>

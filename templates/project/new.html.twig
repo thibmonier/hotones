@@ -8,19 +8,12 @@
 {% endblock %}
 
 {% block content %}
-    {{ component('breadcrumb', { title: 'Nouveau projet', pagetitle: 'Projets' }) }}
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Nouveau projet</h4>
-                <div class="page-title-right">
-                    <a href="{{ path('project_index') }}" class="btn btn-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Retour
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'components/page_header.html.twig' with {
+        title: 'Nouveau projet',
+        breadcrumb: [
+            {label: 'Projets', path: 'project_index'}
+        ]
+    } %}
 
     {{ form_start(form) }}
 
@@ -28,7 +21,10 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Informations générales</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Informations générales
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -82,7 +78,10 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Achats et fournitures</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-shopping-bag me-2"></i>
+                        Achats et fournitures
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -98,7 +97,10 @@
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Équipe projet</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-group me-2"></i>
+                        Équipe projet
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -118,7 +120,10 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Catégorie de service</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-category me-2"></i>
+                        Catégorie de service
+                    </h5>
                 </div>
                 <div class="card-body">
                     {{ form_row(form.serviceCategory) }}
@@ -127,7 +132,10 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Technologies</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-code-alt me-2"></i>
+                        Technologies
+                    </h5>
                 </div>
                 <div class="card-body">
                     {{ form_row(form.technologies) }}
@@ -136,9 +144,11 @@
 
             <div class="card">
                 <div class="card-body">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bx bx-save me-1"></i> Créer le projet
-                    </button>
+                    {% include 'components/form_buttons.html.twig' with {
+                        cancel_route: 'project_index',
+                        submit_label: 'Créer',
+                        layout: 'vertical'
+                    } %}
                 </div>
             </div>
         </div>

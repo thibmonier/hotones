@@ -3,25 +3,26 @@
 {% block title %}Modifier {{ order.orderNumber }}{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Modifier le devis {{ order.orderNumber }}</h4>
-                <div class="page-title-right">
-                    <a href="{{ path('order_show', {'id': order.id}) }}" class="btn btn-outline-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Retour au devis
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'components/page_header.html.twig' with {
+        title: 'Modifier le devis',
+        breadcrumb: [
+            {label: 'Devis', path: 'order_index'},
+            {label: order.orderNumber, path: 'order_show', params: {id: order.id}}
+        ],
+        actions: [
+            {label: 'Voir le devis', path: 'order_show', params: {id: order.id}, icon: 'bx-show', class: 'btn-secondary'}
+        ]
+    } %}
 
     {{ form_start(form) }}
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Informations du devis</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-file-blank me-2"></i>
+                        Informations du devis
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -84,12 +85,12 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end">
-                        <a href="{{ path('order_show', {'id': order.id}) }}" class="btn btn-outline-secondary me-2">Annuler</a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bx bx-save me-1"></i> Enregistrer les modifications
-                        </button>
-                    </div>
+                    {% include 'components/form_buttons.html.twig' with {
+                        cancel_route: 'order_show',
+                        cancel_params: {id: order.id},
+                        submit_label: 'Enregistrer',
+                        layout: 'horizontal'
+                    } %}
                 </div>
             </div>
         </div>
@@ -99,7 +100,10 @@
         {% if order.contractType == 'forfait' %}
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title mb-0">Échéancier de paiement</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-calendar me-2"></i>
+                        Échéancier de paiement
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div id="schedule-box">
@@ -345,7 +349,10 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Informations</h4>
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-info-circle me-2"></i>
+                        Informations
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
