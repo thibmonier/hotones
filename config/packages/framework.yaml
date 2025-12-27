@@ -16,6 +16,17 @@ framework:
     #esi: true
     #fragments: true
 
+    # Rate limiting for login protection (brute-force prevention)
+    rate_limiter:
+        login:
+            policy: 'sliding_window'  # Fenêtre glissante (plus précis que fixed_window)
+            limit: 5  # Maximum 5 tentatives
+            interval: '15 minutes'  # Sur une période de 15 minutes
+        api_login:
+            policy: 'sliding_window'
+            limit: 10  # API peut avoir un peu plus de tentatives
+            interval: '15 minutes'
+
 when@test:
     framework:
         test: true
