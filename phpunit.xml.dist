@@ -51,13 +51,15 @@
     </testsuites>
 
     <!-- PHPUnit 10+/12: configure code coverage reports (optional) and sources separately -->
-    <!-- Code coverage enabled -->
+    <!-- Code coverage disabled by default - use phpunit.coverage.xml for CI/CD -->
+    <!--
     <coverage>
         <report>
             <clover outputFile="var/coverage/clover.xml"/>
             <html outputDirectory="var/coverage/html"/>
         </report>
     </coverage>
+    -->
 
     <source>
         <include>

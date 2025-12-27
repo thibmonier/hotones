@@ -8,3 +8,7 @@ framework:
             # Cache for Analytics dashboard (in-memory for tests)
             cache.analytics:
                 adapter: cache.adapter.array
+
+            # Cache for rate limiter (in-memory for tests)
+            cache.rate_limiter:
+                adapter: cache.adapter.array

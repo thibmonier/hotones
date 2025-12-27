@@ -156,7 +156,7 @@ class CheckPhpLimitsCommandTest extends TestCase
             $this->assertEquals(
                 $case['expected'],
                 $result,
-                "Failed for input: {$case['input']}"
+                "Failed for input: {$case['input']}",
             );
         }
     }

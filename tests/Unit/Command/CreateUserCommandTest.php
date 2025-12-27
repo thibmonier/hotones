@@ -9,6 +9,7 @@ use App\Entity\Contributor;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -25,10 +26,10 @@ class CreateUserCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager   = $this->createMock(EntityManagerInterface::class);
-        $this->passwordHasher  = $this->createMock(UserPasswordHasherInterface::class);
-        $this->command         = new CreateUserCommand($this->entityManager, $this->passwordHasher);
-        $this->commandTester   = new CommandTester($this->command);
+        $this->entityManager  = $this->createMock(EntityManagerInterface::class);
+        $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $this->command        = new CreateUserCommand($this->entityManager, $this->passwordHasher);
+        $this->commandTester  = new CommandTester($this->command);
     }
 
     public function testExecuteCreatesUserSuccessfully(): void
@@ -105,7 +106,7 @@ class CreateUserCommandTest extends TestCase
             ->willReturnCallback(function ($entity) use ($contributorId) {
                 if ($entity instanceof Contributor) {
                     // Simulate database assigning an ID after flush
-                    $reflection = new \ReflectionClass($entity);
+                    $reflection = new ReflectionClass($entity);
                     $property   = $reflection->getProperty('id');
                     $property->setValue($entity, $contributorId);
                 }
@@ -139,7 +140,7 @@ class CreateUserCommandTest extends TestCase
                 $this->callback(function ($user) {
                     return $user instanceof User && $user->getEmail() === 'hash@test.com';
                 }),
-                $plainPassword
+                $plainPassword,
             )
             ->willReturn($hashedPassword);
 
@@ -227,7 +228,7 @@ class CreateUserCommandTest extends TestCase
     {
         $this->passwordHasher->method('hashPassword')->willReturn('hashed');
 
-        $capturedUser       = null;
+        $capturedUser        = null;
         $capturedContributor = null;
 
         $this->entityManager

@@ -22,8 +22,8 @@ class TaceAnalyzerTest extends TestCase
         ?ContributorRepository $contributorRepository = null,
         ?StaffingMetricsRepository $staffingMetricsRepository = null
     ): TaceAnalyzer {
-        $contributorRepository       = $contributorRepository ?? $this->createMock(ContributorRepository::class);
-        $staffingMetricsRepository   = $staffingMetricsRepository ?? $this->createMock(StaffingMetricsRepository::class);
+        $contributorRepository     = $contributorRepository     ?? $this->createMock(ContributorRepository::class);
+        $staffingMetricsRepository = $staffingMetricsRepository ?? $this->createMock(StaffingMetricsRepository::class);
 
         return new TaceAnalyzer($contributorRepository, $staffingMetricsRepository);
     }
@@ -296,7 +296,7 @@ class TaceAnalyzerTest extends TestCase
                 }),
                 'weekly',
                 null,
-                $contributor
+                $contributor,
             )
             ->willReturn([]);
 
@@ -306,11 +306,11 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeAllContributorsCategorizesCorrectly(): void
     {
-        $optimalContributor      = $this->createMock(Contributor::class);
-        $overloadedContributor   = $this->createMock(Contributor::class);
+        $optimalContributor       = $this->createMock(Contributor::class);
+        $overloadedContributor    = $this->createMock(Contributor::class);
         $underutilizedContributor = $this->createMock(Contributor::class);
-        $criticalHighContributor = $this->createMock(Contributor::class);
-        $criticalLowContributor  = $this->createMock(Contributor::class);
+        $criticalHighContributor  = $this->createMock(Contributor::class);
+        $criticalLowContributor   = $this->createMock(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
         $contributorRepository->method('findBy')->willReturn([
@@ -347,7 +347,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $service   = $this->createService($contributorRepository, $staffingMetricsRepository);
@@ -389,7 +389,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
@@ -425,7 +425,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
@@ -461,7 +461,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);

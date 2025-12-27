@@ -8,6 +8,7 @@ use App\Entity\Project;
 use App\Repository\TimesheetRepository;
 use App\Service\BillingService;
 use DateTime;
+use DateTimeInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
@@ -265,7 +266,7 @@ class BillingServiceTest extends TestCase
         $this->assertArrayHasKey('order', $entry);
 
         // Verify types
-        $this->assertInstanceOf(\DateTimeInterface::class, $entry['date']);
+        $this->assertInstanceOf(DateTimeInterface::class, $entry['date']);
         $this->assertIsString($entry['label']);
         $this->assertIsFloat($entry['amount']);
         $this->assertEquals('forfait', $entry['type']);

@@ -6,7 +6,9 @@ namespace App\Tests\Unit\Command;
 
 use App\Command\DispatchMetricsRecalculationCommand;
 use App\Message\RecalculateMetricsMessage;
+use Exception;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Envelope;
@@ -36,7 +38,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->messageBus
             ->expects($this->exactly(17))
             ->method('dispatch')
-            ->willReturn(new Envelope(new \stdClass()));
+            ->willReturn(new Envelope(new stdClass()));
 
         $exitCode = $this->commandTester->execute([
             '--year' => (string) $year,
@@ -50,7 +52,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithYearDispatchesMonthlyMessages(): void
     {
-        $year             = 2023;
+        $year            = 2023;
         $dispatchedDates = [];
 
         $this->messageBus
@@ -87,7 +89,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithYearDispatchesQuarterlyMessages(): void
     {
-        $year             = 2023;
+        $year            = 2023;
         $dispatchedDates = [];
 
         $this->messageBus
@@ -119,7 +121,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithYearDispatchesYearlyMessage(): void
     {
-        $year             = 2023;
+        $year            = 2023;
         $dispatchedDates = [];
 
         $this->messageBus
@@ -214,7 +216,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithInvalidDateThrowsException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $this->commandTester->execute([
             '--date' => 'invalid-date',
@@ -238,7 +240,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
     {
         $this->messageBus
             ->method('dispatch')
-            ->willReturn(new Envelope(new \stdClass()));
+            ->willReturn(new Envelope(new stdClass()));
 
         // Test with year
         $exitCode = $this->commandTester->execute(['--year' => '2024']);
