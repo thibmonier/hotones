@@ -131,10 +131,7 @@ class LoadReferenceDataCommand extends Command
             }
 
             // Définir la description du profil
-            $description = $profilesDescriptions[$profileName] ?? '';
-            if ($description) {
-                $profile->setDescription($description);
-            }
+            $profile->setDescription($profilesDescriptions[$profileName]);
 
             $this->entityManager->persist($profile);
             $profiles[] = $profile;
@@ -198,7 +195,7 @@ class LoadReferenceDataCommand extends Command
             };
 
             $technology->setCategory($category);
-            $technology->setColor($colorsMap[$techName] ?? null);
+            $technology->setColor($colorsMap[$techName]);
             $technology->setActive(true);
 
             $this->entityManager->persist($technology);

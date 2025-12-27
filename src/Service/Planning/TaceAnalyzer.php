@@ -108,24 +108,10 @@ class TaceAnalyzer
         $count             = 0;
 
         foreach ($metrics as $metric) {
-            if ($metric->getTace() !== null) {
-                $totalTace         += (float) $metric->getTace();
-                $totalAvailability += (float) $metric->getAvailableDays();
-                $totalWorkload     += (float) $metric->getWorkedDays();
-                ++$count;
-            }
-        }
-
-        if ($count === 0) {
-            return [
-                'tace'            => null,
-                'availability'    => 0,
-                'workload'        => 0,
-                'status'          => 'no_data',
-                'severity'        => 0,
-                'deviation'       => 0,
-                'recommendations' => [],
-            ];
+            $totalTace         += (float) $metric->getTace();
+            $totalAvailability += (float) $metric->getAvailableDays();
+            $totalWorkload     += (float) $metric->getWorkedDays();
+            ++$count;
         }
 
         $avgTace         = $totalTace         / $count;

@@ -213,7 +213,7 @@ class PlanningController extends AbstractController
         }
         // Use the first active period's daily hours for simplicity
         foreach ($contributorDailyHours as $cid => $hours) {
-            $contributorDailyHours[$cid] = $hours[0] ?? 7.0;
+            $contributorDailyHours[$cid] = $hours[0];
         }
 
         // Calculate weekly staffing rate per contributor

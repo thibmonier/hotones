@@ -162,7 +162,7 @@ class WorkloadPredictionService
             }
         }
 
-        return (count($allOrders) > 0) ? ($signedCount / count($allOrders)) * 100 : 50;
+        return ($signedCount / count($allOrders)) * 100;
     }
 
     /**
@@ -189,7 +189,7 @@ class WorkloadPredictionService
             }
         }
 
-        return (count($orders) > 0) ? ($signedCount / count($orders)) * 100 : 50;
+        return ($signedCount / count($orders)) * 100;
     }
 
     /**

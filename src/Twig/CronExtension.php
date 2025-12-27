@@ -290,7 +290,7 @@ class CronExtension extends AbstractExtension
             $now  = new DateTimeImmutable('now', new DateTimeZone($tz));
             $next = $cron->getNextRunDate($now, 0, false);
 
-            return $next instanceof DateTimeImmutable ? $next : DateTimeImmutable::createFromMutable($next);
+            return DateTimeImmutable::createFromMutable($next);
         } catch (Throwable) {
             return null;
         }

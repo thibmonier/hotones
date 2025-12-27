@@ -291,7 +291,7 @@ class MetricsCalculationService
 
         while ($current <= $end) {
             $dayOfWeek = (int) $current->format('N'); // 1 (lundi) à 7 (dimanche)
-            if ($dayOfWeek >= 1 && $dayOfWeek <= 5) {
+            if ($dayOfWeek <= 5) {
                 ++$count;
             }
             $current->modify('+1 day');

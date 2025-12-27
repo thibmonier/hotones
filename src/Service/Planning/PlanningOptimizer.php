@@ -130,11 +130,7 @@ class PlanningOptimizer
         // Analyser les plannings pour identifier les projets à décharger
         $projectsWorkload = [];
         foreach ($plannings as $planning) {
-            $project = $planning->getProject();
-            if (!$project) {
-                continue;
-            }
-
+            $project   = $planning->getProject();
             $projectId = $project->getId();
             if (!isset($projectsWorkload[$projectId])) {
                 $projectsWorkload[$projectId] = [
@@ -351,10 +347,6 @@ class PlanningOptimizer
     {
         $start = $planning->getStartDate();
         $end   = $planning->getEndDate();
-
-        if (!$start || !$end) {
-            return 0;
-        }
 
         $days = $start->diff($end)->days + 1;
 

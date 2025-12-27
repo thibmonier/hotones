@@ -179,20 +179,24 @@ class InvoiceController extends AbstractController
         $invoice = new Invoice();
 
         // Pré-remplir si client ou projet fourni dans l'URL
-        if ($clientId = $request->query->get('client')) {
-            $client = $em->getRepository(Client::class)->find($clientId);
-            if ($client) {
-                $invoice->setClient($client);
-            }
-        }
+        $clientId  = $request->query->get('client');
+        $projectId = $request->query->get('project');
 
-        if ($projectId = $request->query->get('project')) {
+        if ($projectId) {
             $project = $em->getRepository(Project::class)->find($projectId);
             if ($project) {
                 $invoice->setProject($project);
-                if (!$invoice->getClient() && $project->getClient()) {
+                // Set client from project if not explicitly provided
+                if (!$clientId && $project->getClient()) {
                     $invoice->setClient($project->getClient());
                 }
+            }
+        }
+
+        if ($clientId) {
+            $client = $em->getRepository(Client::class)->find($clientId);
+            if ($client) {
+                $invoice->setClient($client);
             }
         }
 
@@ -450,12 +454,8 @@ class InvoiceController extends AbstractController
         if ($status) {
             $qb->andWhere('i.status = :status')->setParameter('status', $status);
         }
-        if ($start) {
-            $qb->andWhere('i.issuedAt >= :startDate')->setParameter('startDate', $start);
-        }
-        if ($end) {
-            $qb->andWhere('i.issuedAt <= :endDate')->setParameter('endDate', $end);
-        }
+        $qb->andWhere('i.issuedAt >= :startDate')->setParameter('startDate', $start);
+        $qb->andWhere('i.issuedAt <= :endDate')->setParameter('endDate', $end);
 
         $invoices = $qb->getQuery()->getResult();
 

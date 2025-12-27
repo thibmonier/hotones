@@ -231,7 +231,7 @@ class ProjectPlanningAssistant
         // Trier par score décroissant
         usort($scoredCandidates, fn ($a, $b) => $b['score'] <=> $a['score']);
 
-        return $scoredCandidates[0] ?? null;
+        return $scoredCandidates[0];
     }
 
     /**

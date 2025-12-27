@@ -46,7 +46,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function hasOverlappingPeriods(EmploymentPeriod $period, ?int $excludeId = null): bool
     {
-        if (!$period->getContributor() || !$period->getStartDate()) {
+        if (!$period->getContributor()) {
             return false;
         }
 
@@ -147,7 +147,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function calculatePeriodCost(EmploymentPeriod $period): ?float
     {
-        if (!$period->getCjm() || !$period->getStartDate()) {
+        if (!$period->getCjm()) {
             return null;
         }
 
@@ -168,7 +168,8 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
 
         while ($current <= $endDate) {
             // Exclure les weekends (samedi = 6, dimanche = 0)
-            if ($current->format('w') !== 0 && $current->format('w') !== 6) {
+            $dayOfWeek = $current->format('w');
+            if ($dayOfWeek !== '0' && $dayOfWeek !== '6') {
                 ++$workingDays;
             }
             $current->modify('+1 day');

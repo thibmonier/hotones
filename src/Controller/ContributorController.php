@@ -198,7 +198,7 @@ class ContributorController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 // Handle avatar upload
-                /** @var UploadedFile $avatarFile */
+                /** @var UploadedFile|null $avatarFile */
                 $avatarFile = $form->get('avatarFile')->getData();
                 if ($avatarFile) {
                     $contributor->setAvatarFilename($this->handleAvatarUpload($avatarFile));
@@ -442,7 +442,7 @@ class ContributorController extends AbstractController
                 $profiles[] = $prof->getName();
             }
             $rows[] = [
-                method_exists($c, 'getName') ? $c->getName() : trim(($c->getFirstName() ?: '').' '.($c->getLastName() ?: '')),
+                $c->getName() ?: trim(($c->getFirstName() ?: '').' '.($c->getLastName() ?: '')),
                 $c->getEmail() ?: '',
                 $c->getPhoneProfessional() ?: '',
                 $c->getPhonePersonal() ?: '',

@@ -391,7 +391,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
             $result[] = [
                 'period'             => $period,
                 'responseCount'      => $count,
-                'avgOverall'         => $count                        > 0 ? round($data['sumOverall'] / $count, 2) : null,
+                'avgOverall'         => round($data['sumOverall'] / $count, 2),
                 'avgProjects'        => $data['countProjects']        > 0 ? round($data['sumProjects'] / $data['countProjects'], 2) : null,
                 'avgTeam'            => $data['countTeam']            > 0 ? round($data['sumTeam'] / $data['countTeam'], 2) : null,
                 'avgWorkEnvironment' => $data['countWorkEnvironment'] > 0 ? round($data['sumWorkEnvironment'] / $data['countWorkEnvironment'], 2) : null,

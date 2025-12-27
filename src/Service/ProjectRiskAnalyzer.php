@@ -319,7 +319,7 @@ class ProjectRiskAnalyzer
             ];
         }
 
-        if ($progress >= 100 && $project->getStatus() !== 'completed') {
+        if ($progress >= 100) {
             return [
                 'type'     => 'completion_pending',
                 'severity' => 'low',

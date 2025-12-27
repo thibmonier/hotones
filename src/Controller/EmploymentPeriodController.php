@@ -36,7 +36,7 @@ class EmploymentPeriodController extends AbstractController
         // Charger filtres depuis la session si aucun filtre explicite n'est fourni
         $queryAll   = $request->query->all();
         $filterKeys = ['contributor', 'status', 'per_page', 'sort', 'dir'];
-        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $hasFilter  = (bool) count(array_intersect(array_keys($queryAll), $filterKeys));
         $saved      = $session->has('employment_period_filters') ? (array) $session->get('employment_period_filters') : [];
 
         // Filtres
@@ -207,7 +207,7 @@ class EmploymentPeriodController extends AbstractController
             $period->setSalary($salary !== '' ? (float) $salary : null);
 
             // Calculer automatiquement le CJM si un salaire est fourni
-            if ($period->getSalary() && $period->getStartDate()) {
+            if ($period->getSalary()) {
                 $year          = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
                 $period->setCjm((float) $calculatedCjm);
@@ -247,7 +247,7 @@ class EmploymentPeriodController extends AbstractController
                 $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
                 // Obtenir les informations de calcul CJM
-                $year              = $period->getStartDate() ? (int) $period->getStartDate()->format('Y') : (int) date('Y');
+                $year              = (int) $period->getStartDate()->format('Y');
                 $calculationReport = $cjmCalculatorService->getCalculationReport($year);
 
                 return $this->render('employment_period/new.html.twig', [
@@ -287,11 +287,8 @@ class EmploymentPeriodController extends AbstractController
     public function show(EmploymentPeriod $period, EmploymentPeriodRepository $employmentPeriodRepository): Response
     {
         // Calculer la durée en jours
-        $duration = null;
-        if ($period->getStartDate()) {
-            $endDate  = $period->getEndDate() ?? new DateTime();
-            $duration = $period->getStartDate()->diff($endDate)->days + 1;
-        }
+        $endDate  = $period->getEndDate() ?? new DateTime();
+        $duration = $period->getStartDate()->diff($endDate)->days + 1;
 
         // Calculer le coût total sur la période
         $totalCost = $employmentPeriodRepository->calculatePeriodCost($period);
@@ -328,7 +325,7 @@ class EmploymentPeriodController extends AbstractController
             $period->setSalary($salary !== '' ? (float) $salary : null);
 
             // Calculer automatiquement le CJM si un salaire est fourni
-            if ($period->getSalary() && $period->getStartDate()) {
+            if ($period->getSalary()) {
                 $year          = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
                 $period->setCjm((float) $calculatedCjm);
@@ -369,7 +366,7 @@ class EmploymentPeriodController extends AbstractController
                 $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
                 // Obtenir les informations de calcul CJM
-                $year              = $period->getStartDate() ? (int) $period->getStartDate()->format('Y') : (int) date('Y');
+                $year              = (int) $period->getStartDate()->format('Y');
                 $calculationReport = $cjmCalculatorService->getCalculationReport($year);
 
                 return $this->render('employment_period/edit.html.twig', [

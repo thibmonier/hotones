@@ -45,10 +45,7 @@ final class FactStaffingMetricsFactory extends PersistentObjectFactory
                 $factStaffingMetrics->calculateMetrics();
             })
             ->afterPersist(function (FactStaffingMetrics $factStaffingMetrics): void {
-                // Ensure dimTime is persisted
-                if ($factStaffingMetrics->getDimTime()) {
-                    // DimTime should already be persisted by cascade
-                }
+                // DimTime should already be persisted by cascade
             });
     }
 }

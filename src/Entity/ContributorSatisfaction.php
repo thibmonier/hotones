@@ -378,17 +378,13 @@ class ContributorSatisfaction
      */
     public function getAverageScore(): float
     {
-        $scores = array_filter([
+        $scores = [
             $this->overallScore,
             $this->projectsScore,
             $this->teamScore,
             $this->workEnvironmentScore,
             $this->workLifeBalanceScore,
-        ], fn ($score) => $score !== null);
-
-        if (count($scores) === 0) {
-            return 0.0;
-        }
+        ];
 
         return array_sum($scores) / count($scores);
     }

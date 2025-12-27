@@ -285,7 +285,7 @@ class HrMetricsService
 
         while ($current <= $end) {
             $dayOfWeek = (int) $current->format('N'); // 1 (lundi) à 7 (dimanche)
-            if ($dayOfWeek >= 1 && $dayOfWeek <= 5) { // Lundi à vendredi
+            if ($dayOfWeek <= 5) { // Lundi à vendredi
                 ++$workingDays;
             }
             $current->modify('+1 day');

@@ -88,7 +88,7 @@ class GenerateForecastTestDataCommand extends Command
             $monthName   = $monthDate->format('F Y');
 
             // Appliquer la saisonnalité
-            $projectCount = (int) round($projectsPerMonth * ($seasonality[$monthNumber] ?? 1.0));
+            $projectCount = (int) round($projectsPerMonth * $seasonality[$monthNumber]);
 
             $io->writeln(sprintf('📅 %s : génération de %d projets...', $monthName, $projectCount));
 

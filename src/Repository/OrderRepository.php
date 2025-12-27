@@ -422,7 +422,7 @@ class OrderRepository extends ServiceEntityRepository
 
         $total = $qbTotal->getQuery()->getSingleScalarResult();
 
-        if (!$total || $total === 0) {
+        if (!$total) {
             return 0.0;
         }
 

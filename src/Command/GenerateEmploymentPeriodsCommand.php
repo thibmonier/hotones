@@ -133,7 +133,7 @@ class GenerateEmploymentPeriodsCommand extends Command
             ++$created;
         }
 
-        if (!$dryRun && $created > 0) {
+        if (!$dryRun) {
             $this->entityManager->flush();
             $io->success(sprintf('Created %d employment period(s)', $created));
         } elseif ($dryRun) {

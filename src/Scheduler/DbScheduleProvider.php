@@ -5,9 +5,6 @@ namespace App\Scheduler;
 use App\Entity\SchedulerEntry;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
-
-use function is_array;
-
 use Symfony\Component\Scheduler\RecurringCommand;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
@@ -29,9 +26,6 @@ class DbScheduleProvider implements ScheduleProviderInterface
                 ->withDescription($entry->getName());
 
             $args = $entry->getPayload() ?? [];
-            if (!is_array($args)) {
-                $args = [];
-            }
 
             $schedule->add(
                 (new RecurringCommand($trigger, $entry->getCommand(), $args))

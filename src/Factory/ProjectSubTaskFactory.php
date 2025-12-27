@@ -37,9 +37,7 @@ final class ProjectSubTaskFactory extends PersistentObjectFactory
     {
         return $this->afterInstantiate(function (ProjectSubTask $subTask): void {
             // Ensure project is consistent with the task's project by using the setter
-            if ($subTask->getTask()) {
-                $subTask->setTask($subTask->getTask());
-            }
+            $subTask->setTask($subTask->getTask());
         });
     }
 

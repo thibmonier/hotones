@@ -35,7 +35,7 @@ class ProjectController extends AbstractController
         // Charger filtres depuis la session si aucun filtre explicite n'est fourni
         $queryAll   = $request->query->all();
         $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'service_category', 'per_page', 'sort', 'dir', 'search'];
-        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $hasFilter  = (bool) count(array_intersect(array_keys($queryAll), $filterKeys));
         $saved      = $session->has('project_filters') ? (array) $session->get('project_filters') : [];
 
         // Filtres période: année courante par défaut

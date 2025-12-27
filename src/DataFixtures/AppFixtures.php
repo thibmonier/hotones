@@ -114,7 +114,7 @@ class AppFixtures extends Fixture
             $allProjectTasks = $tasks; // array of ProjectTask objects
             foreach (range(1, random_int($V['timesheets_min'], $V['timesheets_max'])) as $i) {
                 $withTask = (bool) random_int(0, 1);
-                $task     = $withTask && count($allProjectTasks) > 0 ? $allProjectTasks[array_rand($allProjectTasks)] : null;
+                $task     = $withTask ? $allProjectTasks[array_rand($allProjectTasks)] : null;
 
                 // If task chosen, try to pick a subtask for it
                 $subTask = null;

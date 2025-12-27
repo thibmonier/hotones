@@ -131,7 +131,7 @@ class ForecastingService
             ->setParameter('startDate', $startDate)
             ->setParameter('statuses', ['in_progress', 'completed'])
             ->getQuery()
-            ->getResult() ?? [];
+            ->getResult();
 
         // Grouper par mois
         $monthlyRevenue = [];
