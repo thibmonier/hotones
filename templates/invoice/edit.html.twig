@@ -3,21 +3,16 @@
 {% block title %}Modifier la facture {{ invoice.invoiceNumber }}{% endblock %}
 
 {% block content %}
-    {{ component('breadcrumb', {
-        title: 'Modifier la facture ' ~ invoice.invoiceNumber,
-        pagetitle: 'Factures',
-        parent_route: 'invoice_show',
-        parent_params: {id: invoice.id},
-        parent_label: 'Détails de la facture'
-    }) }}
-
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Modifier la facture {{ invoice.invoiceNumber }}</h4>
-            </div>
-        </div>
-    </div>
+    {% include 'components/page_header.html.twig' with {
+        title: 'Modifier la facture',
+        breadcrumb: [
+            {label: 'Factures', path: 'invoice_index'},
+            {label: invoice.invoiceNumber, path: 'invoice_show', params: {id: invoice.id}}
+        ],
+        actions: [
+            {label: 'Voir la facture', path: 'invoice_show', params: {id: invoice.id}, icon: 'bx-show', class: 'btn-secondary'}
+        ]
+    } %}
 
     <div class="row">
         <div class="col-lg-8">
@@ -68,14 +63,12 @@
                             {{ form_row(form.internalNotes) }}
                         </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ path('invoice_show', {id: invoice.id}) }}" class="btn btn-light">
-                                <i class="bx bx-x me-1"></i> Annuler
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bx bx-save me-1"></i> Enregistrer les modifications
-                            </button>
-                        </div>
+                        {% include 'components/form_buttons.html.twig' with {
+                            cancel_route: 'invoice_show',
+                            cancel_params: {id: invoice.id},
+                            submit_label: 'Enregistrer',
+                            layout: 'horizontal'
+                        } %}
                     {{ form_end(form) }}
                 </div>
             </div>

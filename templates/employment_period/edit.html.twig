@@ -244,19 +244,16 @@
 
         <div class="row">
             <div class="col-12">
-                <div class="d-flex justify-content-between">
-                    <a href="{{ path('employment_period_show', {id: period.id}) }}" class="btn btn-outline-secondary">
-                        <i class="bx bx-x me-1"></i> Annuler
-                    </a>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-danger" onclick="confirmDelete()">
-                            <i class="bx bx-trash me-1"></i> Supprimer
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bx bx-save me-1"></i> Enregistrer
-                        </button>
-                    </div>
-                </div>
+                {% include 'components/form_buttons.html.twig' with {
+                    cancel_route: 'employment_period_show',
+                    cancel_params: {id: period.id},
+                    submit_label: 'Enregistrer',
+                    layout: 'horizontal',
+                    show_delete: true,
+                    delete_route: 'employment_period_delete',
+                    delete_params: {id: period.id},
+                    delete_confirm: 'Êtes-vous sûr de vouloir supprimer cette période d\'emploi ?'
+                } %}
             </div>
         </div>
     </form>

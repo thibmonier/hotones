@@ -209,25 +209,16 @@
                     </div>
 
                     <!-- Boutons d'action -->
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button type="button"
-                                class="btn btn-outline-danger"
-                                onclick="confirmDeleteTask()">
-                            <i class="bx bx-trash me-1"></i>
-                            Supprimer la tâche
-                        </button>
-
-                        <div class="d-flex gap-2">
-                            <a href="{{ path('project_details', {id: project.id}) }}" class="btn btn-light">
-                                <i class="bx bx-x me-1"></i>
-                                Annuler
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bx bx-save me-1"></i>
-                                Enregistrer
-                            </button>
-                        </div>
-                    </div>
+                    {% include 'components/form_buttons.html.twig' with {
+                        cancel_route: 'project_details',
+                        cancel_params: {id: project.id},
+                        submit_label: 'Enregistrer',
+                        layout: 'horizontal',
+                        show_delete: true,
+                        delete_route: 'project_task_delete',
+                        delete_params: {id: task.id},
+                        delete_confirm: 'Êtes-vous sûr de vouloir supprimer cette tâche ?'
+                    } %}
 
                     <!-- Formulaire caché pour la suppression -->
                     <form id="delete-form"
