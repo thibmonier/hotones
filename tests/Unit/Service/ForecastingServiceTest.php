@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
 use App\Repository\FactForecastRepository;
-use App\Repository\OrderRepository;
 use App\Repository\ProjectRepository;
 use App\Service\Analytics\DashboardReadService;
 use App\Service\ForecastingService;
@@ -29,14 +28,12 @@ class ForecastingServiceTest extends TestCase
     ): ForecastingService {
         $em                 = $this->createMock(EntityManagerInterface::class);
         $forecastRepository = $this->createMock(FactForecastRepository::class);
-        $orderRepository    = $this->createMock(OrderRepository::class);
         $projectRepository  = $projectRepository ?? $this->createMock(ProjectRepository::class);
         $dashboardService   = $this->createMock(DashboardReadService::class);
 
         return new ForecastingService(
             $em,
             $forecastRepository,
-            $orderRepository,
             $projectRepository,
             $dashboardService,
         );

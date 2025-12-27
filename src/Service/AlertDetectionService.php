@@ -101,7 +101,7 @@ class AlertDetectionService
             $prediction = $this->profitabilityPredictor->predictProfitability($project);
 
             // Skip if prediction not possible
-            if (!($prediction['canPredict'] ?? false)) {
+            if (!$prediction['canPredict']) {
                 continue;
             }
 
@@ -335,7 +335,7 @@ class AlertDetectionService
         $result    = [];
 
         foreach ($users as $user) {
-            if ($user && !in_array($user->getId(), $uniqueIds, true)) {
+            if (!in_array($user->getId(), $uniqueIds, true)) {
                 $uniqueIds[] = $user->getId();
                 $result[]    = $user;
             }

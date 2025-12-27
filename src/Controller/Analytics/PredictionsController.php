@@ -69,7 +69,7 @@ class PredictionsController extends AbstractController
         foreach ($projects as $project) {
             $prediction = $this->profitabilityPredictor->predictProfitability($project);
 
-            if ($prediction['canPredict'] ?? false) {
+            if ($prediction['canPredict']) {
                 $predictions[] = [
                     'project'    => $project,
                     'prediction' => $prediction,

@@ -66,6 +66,7 @@ class DashboardReadServiceTest extends TestCase
                 'totalSoldDays'       => '120.00',
                 'avgUtilization'      => '83.33',
             ]);
+        $query->method('getResult')->willReturn([]);
 
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
@@ -109,6 +110,7 @@ class DashboardReadServiceTest extends TestCase
                 'totalCosts'   => '0',
                 'grossMargin'  => '0',
             ]);
+        $query->method('getResult')->willReturn([]);
 
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();

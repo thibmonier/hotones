@@ -204,7 +204,7 @@ class SeedProjects2025Command extends Command
 
     private function createSignedOrderForProject(Project $project, array $profiles): void
     {
-        $createdAt = (clone $project->getStartDate()) ?: new DateTime('2025-01-15');
+        $createdAt = clone $project->getStartDate();
         $order     = new Order();
         $order->setProject($project)
             ->setOrderNumber($this->generateOrderNumberForDate($createdAt))
