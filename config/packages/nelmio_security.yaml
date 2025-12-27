@@ -1,7 +1,9 @@
 nelmio_security:
     # Signed cookies for additional protection
+    # Exclude session cookie (PHPSESSID) as it's already managed by Symfony
     signed_cookie:
-        names: ['*']
+        names: ['!PHPSESSID']
+        hash_algo: sha256
 
     # X-Frame-Options: Prevents clickjacking attacks
     clickjacking:
