@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Controller\Admin;
 
 use App\Entity\OnboardingTemplate;
 use App\Entity\Profile;
-use App\Entity\User;
+use App\Factory\UserFactory;
 use App\Repository\OnboardingTemplateRepository;
 use App\Repository\ProfileRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -30,22 +30,6 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $this->templateRepository = $container->get(OnboardingTemplateRepository::class);
         $this->profileRepository  = $container->get(ProfileRepository::class);
-    }
-
-    private function createAuthenticatedUser(string $role = 'ROLE_ADMIN'): User
-    {
-        $user = new User();
-        $user->setEmail('admin@example.com');
-        $user->setPassword('$2y$13$hashedpassword');
-        $user->setRoles([$role]);
-        $user->setFirstName('Admin');
-        $user->setLastName('User');
-
-        $em = static::getContainer()->get('doctrine')->getManager();
-        $em->persist($user);
-        $em->flush();
-
-        return $user;
     }
 
     private function createTemplate(string $name = 'Test Template'): OnboardingTemplate
@@ -74,7 +58,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testIndexRequiresAdminRole(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $this->client->loginUser($user);
 
         $this->client->request('GET', '/admin/onboarding-templates');
@@ -84,7 +68,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testIndexDisplaysTemplates(): void
     {
-        $user     = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Developer Onboarding');
 
         $this->client->loginUser($user);
@@ -97,7 +81,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testIndexShowsEmptyStateWhenNoTemplates(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
 
         $this->client->loginUser($user);
         $this->client->request('GET', '/admin/onboarding-templates');
@@ -109,7 +93,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testCreateRequiresAdminRole(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $this->client->loginUser($user);
 
         $this->client->request('GET', '/admin/onboarding-templates/create');
@@ -119,7 +103,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testCreateDisplaysForm(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
 
         $this->client->loginUser($user);
         $this->client->request('GET', '/admin/onboarding-templates/create');
@@ -133,7 +117,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testCreateSubmitWithValidData(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
 
         $this->client->loginUser($user);
 
@@ -166,7 +150,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testCreateRequiresName(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
 
         $this->client->loginUser($user);
 
@@ -188,7 +172,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testShowDisplaysTemplateDetails(): void
     {
-        $user     = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('QA Template');
 
         $this->client->loginUser($user);
@@ -202,7 +186,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testEditRequiresAdminRole(): void
     {
-        $user     = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user     = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $template = $this->createTemplate();
 
         $this->client->loginUser($user);
@@ -213,7 +197,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testEditDisplaysFormWithExistingData(): void
     {
-        $user     = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Edit Me');
 
         $this->client->loginUser($user);
@@ -226,7 +210,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testEditSubmitUpdatesTemplate(): void
     {
-        $user     = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Original Name');
 
         $this->client->loginUser($user);
@@ -264,7 +248,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testDuplicateCreatesNewTemplate(): void
     {
-        $user     = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Original Template');
 
         $this->client->loginUser($user);
@@ -289,7 +273,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testToggleChangesActiveStatus(): void
     {
-        $user     = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate();
         $template->setActive(true);
 
@@ -317,7 +301,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testDeleteRemovesTemplate(): void
     {
-        $user       = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user       = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template   = $this->createTemplate('Delete Me');
         $templateId = $template->getId();
 
@@ -341,7 +325,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testCreateWithProfile(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
 
         // Create a profile
         $profile = new Profile();

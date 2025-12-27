@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\Contributor;
 use App\Entity\PerformanceReview;
-use App\Entity\User;
+use App\Factory\UserFactory;
 use App\Repository\ContributorRepository;
 use App\Repository\PerformanceReviewRepository;
 use App\Repository\UserRepository;
@@ -24,7 +24,6 @@ class PerformanceReviewControllerTest extends WebTestCase
     private UserRepository $userRepository;
     private ContributorRepository $contributorRepository;
     private PerformanceReviewRepository $reviewRepository;
-    private static int $userCounter = 0;
 
     protected function setUp(): void
     {
@@ -34,23 +33,6 @@ class PerformanceReviewControllerTest extends WebTestCase
         $this->userRepository        = $container->get(UserRepository::class);
         $this->contributorRepository = $container->get(ContributorRepository::class);
         $this->reviewRepository      = $container->get(PerformanceReviewRepository::class);
-    }
-
-    private function createAuthenticatedUser(string $role = 'ROLE_MANAGER'): User
-    {
-        ++self::$userCounter;
-        $user = new User();
-        $user->setEmail('test'.self::$userCounter.'@example.com');
-        $user->setPassword('$2y$13$hashedpassword');
-        $user->setRoles([$role]);
-        $user->setFirstName('Test');
-        $user->setLastName('User');
-
-        $em = static::getContainer()->get('doctrine')->getManager();
-        $em->persist($user);
-        $em->flush();
-
-        return $user;
     }
 
     private function createContributor(string $firstName = 'John', string $lastName = 'Doe'): Contributor
@@ -66,7 +48,7 @@ class PerformanceReviewControllerTest extends WebTestCase
         return $contributor;
     }
 
-    private function createPerformanceReview(Contributor $contributor, User $manager, int $year = 2024): PerformanceReview
+    private function createPerformanceReview(Contributor $contributor, $manager, int $year = 2024): PerformanceReview
     {
         $review = new PerformanceReview();
         $review->setYear($year);
@@ -85,7 +67,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testIndexDisplaysReviews(): void
     {
-        $user        = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         // Create a review
@@ -104,7 +86,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testCreateRequiresManagerRole(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_INTERVENANT');
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $this->client->loginUser($user);
 
         $this->client->request('GET', '/performance-reviews/campaign/create');
@@ -114,7 +96,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testCreateDisplaysForm(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $this->client->loginUser($user);
 
         $this->client->request('GET', '/performance-reviews/campaign/create');
@@ -126,7 +108,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testCreateSubmitWithValidData(): void
     {
-        $user = $this->createAuthenticatedUser('ROLE_ADMIN');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $this->createContributor();
 
         $this->client->loginUser($user);
@@ -147,7 +129,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testShowRequiresAuthentication(): void
     {
-        $user        = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
         $review      = $this->createPerformanceReview($contributor, $user, 2024);
 
@@ -162,7 +144,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testShowDisplaysReviewDetails(): void
     {
-        $user        = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         $review = $this->createPerformanceReview($contributor, $user, 2024);
@@ -196,8 +178,8 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testValidateRequiresManagerRole(): void
     {
-        $user        = $this->createAuthenticatedUser('ROLE_INTERVENANT');
-        $manager     = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $manager     = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         $review = $this->createPerformanceReview($contributor, $manager, 2024);
@@ -215,7 +197,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testValidateChangesStatus(): void
     {
-        $user        = $this->createAuthenticatedUser('ROLE_MANAGER');
+        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         $review = $this->createPerformanceReview($contributor, $user, 2024);
