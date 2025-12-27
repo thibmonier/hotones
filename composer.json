@@ -26,6 +26,7 @@
         "league/flysystem-aws-s3-v3": "*",
         "lexik/jwt-authentication-bundle": "^3.2",
         "liip/imagine-bundle": "^2.16",
+        "nelmio/security-bundle": "^3.0@dev",
         "nyholm/psr7": "^1.8.2",
         "oneup/flysystem-bundle": "^4.14",
         "openai-php/client": "^0.18.0",

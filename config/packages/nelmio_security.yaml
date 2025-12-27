@@ -1,0 +1,31 @@
+nelmio_security:
+    # Signed cookies for additional protection
+    signed_cookie:
+        names: ['*']
+
+    # X-Frame-Options: Prevents clickjacking attacks
+    clickjacking:
+        paths:
+            '^/.*': DENY  # Deny all framing (most secure)
+
+    # X-Content-Type-Options: Prevents MIME sniffing
+    content_type:
+        nosniff: true
+
+    # Referrer-Policy: Controls referrer information
+    referrer_policy:
+        enabled: true
+        policies:
+            - 'strict-origin-when-cross-origin'
+
+    # Content-Security-Policy: Mitigates XSS attacks
+    # Note: CSP can be further customized via manual header in framework.yaml if needed
+    csp:
+        enabled: false  # Désactivé pour le moment (configuration via framework si nécessaire)
+
+    # HSTS: Force HTTPS (only in production)
+    forced_ssl:
+        enabled: false  # À activer en production via .env.prod.local (APP_FORCE_SSL=true)
+        hsts_max_age: 31536000  # 1 an (valeur recommandée)
+        hsts_subdomains: true   # Appliquer aux sous-domaines
+        hsts_preload: true      # Eligible pour HSTS preload list
