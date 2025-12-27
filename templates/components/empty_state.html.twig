@@ -1,0 +1,137 @@
+{#
+    Component Empty State
+
+    Affiche un état vide élégant avec illustration, titre, description et action
+
+    Paramètres:
+    - icon (requis): Icône Boxicons à afficher (ex: 'bx-folder-open')
+    - title (requis): Titre principal
+    - description (optionnel): Description/message
+    - action_label (optionnel): Label du bouton d'action
+    - action_path (optionnel): Route Symfony pour l'action
+    - action_params (optionnel): Paramètres pour la route
+    - action_icon (optionnel): Icône pour le bouton d'action
+    - secondary_action_label (optionnel): Label du bouton secondaire
+    - secondary_action_path (optionnel): Route pour le bouton secondaire
+    - illustration (optionnel): Type d'illustration ('folder', 'search', 'add', 'data', 'error')
+    - size (optionnel): Taille ('sm', 'md', 'lg') - défaut: 'md'
+
+    Exemple d'utilisation:
+    {% include 'components/empty_state.html.twig' with {
+        icon: 'bx-folder-open',
+        title: 'Aucun projet',
+        description: 'Vous n\'avez pas encore créé de projet. Commencez par créer votre premier projet.',
+        action_label: 'Créer un projet',
+        action_path: 'project_new',
+        action_icon: 'bx-plus',
+        illustration: 'folder'
+    } %}
+#}
+
+{% set size = size|default('md') %}
+{% set illustration = illustration|default('folder') %}
+
+{# Mapping des illustrations vers des icônes #}
+{% set illustration_icons = {
+    'folder': 'bx-folder-open',
+    'search': 'bx-search-alt',
+    'add': 'bx-plus-circle',
+    'data': 'bx-data',
+    'error': 'bx-error-circle',
+    'time': 'bx-time',
+    'user': 'bx-user',
+    'document': 'bx-file',
+    'filter': 'bx-filter-alt'
+} %}
+
+{% set display_icon = icon|default(illustration_icons[illustration]|default('bx-folder-open')) %}
+
+{# Classes de taille #}
+{% set size_classes = {
+    'sm': {
+        'container': 'py-4',
+        'icon': 'fs-1',
+        'title': 'fs-5',
+        'description': 'fs-6'
+    },
+    'md': {
+        'container': 'py-5',
+        'icon': 'fs-huge',
+        'title': 'fs-4',
+        'description': 'fs-6'
+    },
+    'lg': {
+        'container': 'py-6',
+        'icon': 'fs-huge-xl',
+        'title': 'fs-3',
+        'description': 'fs-5'
+    }
+} %}
+
+{% set current_size = size_classes[size] %}
+
+<div class="empty-state text-center {{ current_size.container }}">
+    <div class="empty-state-icon mb-4">
+        <i class="bx {{ display_icon }} {{ current_size.icon }} text-muted"></i>
+    </div>
+
+    <h3 class="empty-state-title {{ current_size.title }} fw-semibold mb-2">
+        {{ title }}
+    </h3>
+
+    {% if description is defined and description %}
+        <p class="empty-state-description {{ current_size.description }} text-muted mb-4 mx-auto" style="max-width: 500px;">
+            {{ description }}
+        </p>
+    {% endif %}
+
+    {% if action_label is defined and action_path is defined %}
+        <div class="empty-state-actions d-flex gap-2 justify-content-center">
+            <a href="{{ path(action_path, action_params|default({})) }}" class="btn btn-primary">
+                {% if action_icon is defined %}
+                    <i class="bx {{ action_icon }} me-1"></i>
+                {% endif %}
+                {{ action_label }}
+            </a>
+
+            {% if secondary_action_label is defined and secondary_action_path is defined %}
+                <a href="{{ path(secondary_action_path, secondary_action_params|default({})) }}" class="btn btn-outline-secondary">
+                    {{ secondary_action_label }}
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.empty-state {
+    padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+    opacity: 0.5;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.fs-huge {
+    font-size: 5rem !important;
+}
+
+.fs-huge-xl {
+    font-size: 7rem !important;
+}
+
+.empty-state:hover .empty-state-icon {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+</style>

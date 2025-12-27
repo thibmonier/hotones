@@ -1,0 +1,163 @@
+{#
+    Component Status Badge
+
+    Affiche un badge de statut coloré avec icône optionnelle
+
+    Paramètres:
+    - status (requis): Le statut à afficher
+    - type (optionnel): Type de badge ('project', 'order', 'task', 'payment', 'user', 'generic')
+    - size (optionnel): Taille du badge ('sm', 'md', 'lg') - défaut: 'md'
+    - icon (optionnel): Icône Boxicons à afficher (ex: 'bx-check')
+    - custom_class (optionnel): Classes CSS additionnelles
+
+    Exemple d'utilisation:
+    {% include 'components/status_badge.html.twig' with {
+        status: 'actif',
+        type: 'project',
+        size: 'sm',
+        icon: 'bx-check-circle'
+    } %}
+#}
+
+{% set type = type|default('generic') %}
+{% set size = size|default('md') %}
+
+{# Mapping des statuts vers des classes Bootstrap #}
+{% set status_map = {
+    'project': {
+        'actif': 'success',
+        'en_attente': 'warning',
+        'termine': 'secondary',
+        'archive': 'dark',
+        'en_pause': 'info'
+    },
+    'order': {
+        'brouillon': 'secondary',
+        'envoye': 'info',
+        'en_attente': 'warning',
+        'a_signer': 'warning',
+        'signe': 'success',
+        'gagne': 'success',
+        'perdu': 'danger',
+        'annule': 'dark'
+    },
+    'task': {
+        'a_faire': 'secondary',
+        'en_cours': 'primary',
+        'en_test': 'info',
+        'termine': 'success',
+        'bloque': 'danger'
+    },
+    'payment': {
+        'en_attente': 'warning',
+        'paye': 'success',
+        'en_retard': 'danger',
+        'annule': 'dark'
+    },
+    'user': {
+        'actif': 'success',
+        'inactif': 'secondary',
+        'suspendu': 'warning',
+        'bloque': 'danger'
+    },
+    'generic': {
+        'succes': 'success',
+        'info': 'info',
+        'avertissement': 'warning',
+        'erreur': 'danger',
+        'neutre': 'secondary',
+        'primaire': 'primary'
+    }
+} %}
+
+{# Mapping des labels affichés #}
+{% set label_map = {
+    'actif': 'Actif',
+    'en_attente': 'En attente',
+    'termine': 'Terminé',
+    'archive': 'Archivé',
+    'en_pause': 'En pause',
+    'brouillon': 'Brouillon',
+    'envoye': 'Envoyé',
+    'a_signer': 'À signer',
+    'signe': 'Signé',
+    'gagne': 'Gagné',
+    'perdu': 'Perdu',
+    'annule': 'Annulé',
+    'a_faire': 'À faire',
+    'en_cours': 'En cours',
+    'en_test': 'En test',
+    'bloque': 'Bloqué',
+    'paye': 'Payé',
+    'en_retard': 'En retard',
+    'inactif': 'Inactif',
+    'suspendu': 'Suspendu',
+    'succes': 'Succès',
+    'info': 'Information',
+    'avertissement': 'Avertissement',
+    'erreur': 'Erreur',
+    'neutre': 'Neutre',
+    'primaire': 'Primaire'
+} %}
+
+{# Icônes par défaut selon le statut #}
+{% set icon_map = {
+    'actif': 'bx-check-circle',
+    'en_attente': 'bx-time-five',
+    'termine': 'bx-check-double',
+    'archive': 'bx-archive',
+    'en_pause': 'bx-pause-circle',
+    'brouillon': 'bx-file',
+    'envoye': 'bx-send',
+    'a_signer': 'bx-pen',
+    'signe': 'bx-check-shield',
+    'gagne': 'bx-trophy',
+    'perdu': 'bx-x-circle',
+    'annule': 'bx-block',
+    'a_faire': 'bx-list-ul',
+    'en_cours': 'bx-loader-circle',
+    'en_test': 'bx-test-tube',
+    'bloque': 'bx-error-circle',
+    'paye': 'bx-money',
+    'en_retard': 'bx-alarm-exclamation',
+    'inactif': 'bx-minus-circle',
+    'suspendu': 'bx-pause',
+    'succes': 'bx-check',
+    'info': 'bx-info-circle',
+    'avertissement': 'bx-error',
+    'erreur': 'bx-x',
+    'neutre': 'bx-circle',
+    'primaire': 'bx-star'
+} %}
+
+{% set status_lower = status|lower|replace({' ': '_', 'é': 'e', 'è': 'e', 'à': 'a'}) %}
+{% set badge_class = status_map[type][status_lower]|default('secondary') %}
+{% set badge_label = label_map[status_lower]|default(status|capitalize) %}
+{% set badge_icon = icon|default(icon_map[status_lower]|default('bx-circle')) %}
+
+{# Taille du badge #}
+{% set size_class = '' %}
+{% if size == 'sm' %}
+    {% set size_class = 'badge-sm' %}
+{% elseif size == 'lg' %}
+    {% set size_class = 'badge-lg' %}
+{% endif %}
+
+<span class="badge bg-{{ badge_class }} {{ size_class }} {{ custom_class|default('') }}">
+    {% if badge_icon %}
+        <i class="bx {{ badge_icon }} me-1"></i>
+    {% endif %}
+    {{ badge_label }}
+</span>
+
+<style>
+.badge-sm {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.badge-lg {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+</style>

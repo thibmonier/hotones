@@ -1,0 +1,187 @@
+{#
+    Component Stats Card KPI
+
+    Affiche une carte de statistique/KPI avec icône, valeur, label et tendance optionnelle
+
+    Paramètres:
+    - value (requis): Valeur du KPI
+    - label (requis): Label du KPI
+    - icon (requis): Icône Boxicons (ex: 'bx-dollar-circle')
+    - color (optionnel): Couleur du thème ('primary', 'success', 'warning', 'danger', 'info', 'secondary') - défaut: 'primary'
+    - trend (optionnel): Tendance ('up', 'down', 'neutral')
+    - trend_value (optionnel): Valeur de la tendance (ex: '+12%', '-5%')
+    - trend_label (optionnel): Label de la tendance (ex: 'vs mois dernier')
+    - suffix (optionnel): Suffixe pour la valeur (ex: '€', '%', 'j')
+    - prefix (optionnel): Préfixe pour la valeur (ex: '+', '-')
+    - link (optionnel): Route Symfony pour rendre la carte cliquable
+    - link_params (optionnel): Paramètres pour la route
+    - size (optionnel): Taille ('sm', 'md', 'lg') - défaut: 'md'
+    - custom_class (optionnel): Classes CSS additionnelles
+
+    Exemple d'utilisation:
+    {% include 'components/stats_card.html.twig' with {
+        value: '125 450',
+        label: 'Chiffre d\'affaires',
+        icon: 'bx-dollar-circle',
+        color: 'success',
+        suffix: '€',
+        trend: 'up',
+        trend_value: '+12%',
+        trend_label: 'vs mois dernier',
+        link: 'analytics_dashboard'
+    } %}
+#}
+
+{% set color = color|default('primary') %}
+{% set size = size|default('md') %}
+
+{# Classes de taille #}
+{% set size_classes = {
+    'sm': {
+        'card': 'card-sm',
+        'value': 'fs-5',
+        'label': 'fs-7',
+        'icon': 'fs-3'
+    },
+    'md': {
+        'card': '',
+        'value': 'fs-4',
+        'label': 'fs-6',
+        'icon': 'fs-2'
+    },
+    'lg': {
+        'card': 'card-lg',
+        'value': 'fs-3',
+        'label': 'fs-5',
+        'icon': 'fs-1'
+    }
+} %}
+
+{% set current_size = size_classes[size] %}
+
+{# Mapping des couleurs vers des classes d'icône #}
+{% set icon_color_classes = {
+    'primary': 'text-primary',
+    'success': 'text-success',
+    'warning': 'text-warning',
+    'danger': 'text-danger',
+    'info': 'text-info',
+    'secondary': 'text-secondary'
+} %}
+
+{% set icon_class = icon_color_classes[color]|default('text-primary') %}
+
+{# Icônes de tendance #}
+{% set trend_icons = {
+    'up': 'bx-trending-up',
+    'down': 'bx-trending-down',
+    'neutral': 'bx-trending-neutral'
+} %}
+
+{% set trend_colors = {
+    'up': 'success',
+    'down': 'danger',
+    'neutral': 'secondary'
+} %}
+
+{% if link is defined and link %}
+<a href="{{ path(link, link_params|default({})) }}" class="text-decoration-none">
+{% endif %}
+
+<div class="card stats-card {{ current_size.card }} {{ custom_class|default('') }} h-100 hover-shadow">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+                <h6 class="text-muted mb-2 text-uppercase {{ current_size.label }}">
+                    {{ label }}
+                </h6>
+                <h3 class="mb-0 {{ current_size.value }} fw-bold">
+                    {% if prefix is defined %}{{ prefix }}{% endif %}{{ value }}{% if suffix is defined %}{{ suffix }}{% endif %}
+                </h3>
+
+                {% if trend is defined and trend_value is defined %}
+                    <div class="mt-2">
+                        <span class="badge bg-{{ trend_colors[trend]|default('secondary') }}-subtle text-{{ trend_colors[trend]|default('secondary') }}">
+                            <i class="bx {{ trend_icons[trend]|default('bx-trending-neutral') }} align-middle"></i>
+                            {{ trend_value }}
+                        </span>
+                        {% if trend_label is defined %}
+                            <small class="text-muted ms-1">{{ trend_label }}</small>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="stats-icon ms-3">
+                <div class="avatar-sm rounded-circle bg-{{ color }}-subtle d-flex align-items-center justify-content-center">
+                    <i class="bx {{ icon }} {{ current_size.icon }} {{ icon_class }}"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if link is defined and link %}
+</a>
+{% endif %}
+
+<style>
+.stats-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+
+.hover-shadow {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card-sm {
+    font-size: 0.875rem;
+}
+
+.card-sm .card-body {
+    padding: 1rem;
+}
+
+.card-lg .card-body {
+    padding: 1.5rem;
+}
+
+.avatar-sm {
+    width: 3rem;
+    height: 3rem;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+}
+
+.bg-success-subtle {
+    background-color: rgba(var(--bs-success-rgb), 0.1) !important;
+}
+
+.bg-warning-subtle {
+    background-color: rgba(var(--bs-warning-rgb), 0.1) !important;
+}
+
+.bg-danger-subtle {
+    background-color: rgba(var(--bs-danger-rgb), 0.1) !important;
+}
+
+.bg-info-subtle {
+    background-color: rgba(var(--bs-info-rgb), 0.1) !important;
+}
+
+.bg-secondary-subtle {
+    background-color: rgba(var(--bs-secondary-rgb), 0.1) !important;
+}
+
+.fs-7 {
+    font-size: 0.8rem !important;
+}
+</style>

@@ -987,7 +987,233 @@ Module pour validation temps réel des formulaires.
 
 ---
 
+### Nouveaux composants Phase 6 - Lot 9 (Décembre 2025)
+
+#### status_badge.html.twig
+
+**Fichier** : `templates/components/status_badge.html.twig`
+
+Badge de statut coloré avec icône automatique selon le type et le statut.
+
+```twig
+{% include 'components/status_badge.html.twig' with {
+    status: 'actif',
+    type: 'project',
+    size: 'md'
+} %}
+```
+
+**Paramètres** :
+- `status` (string, requis) : Statut à afficher
+- `type` (string, optionnel) : Type de badge - `project`, `order`, `task`, `payment`, `user`, `generic` (défaut)
+- `size` (string, optionnel) : Taille - `sm`, `md` (défaut), `lg`
+- `icon` (string, optionnel) : Icône Boxicons personnalisée (remplace l'icône par défaut)
+- `custom_class` (string, optionnel) : Classes CSS additionnelles
+
+**Types de statuts supportés** :
+- **Project** : `actif`, `en_attente`, `termine`, `archive`, `en_pause`
+- **Order** : `brouillon`, `envoye`, `en_attente`, `a_signer`, `signe`, `gagne`, `perdu`, `annule`
+- **Task** : `a_faire`, `en_cours`, `en_test`, `termine`, `bloque`
+- **Payment** : `en_attente`, `paye`, `en_retard`, `annule`
+- **User** : `actif`, `inactif`, `suspendu`, `bloque`
+- **Generic** : `succes`, `info`, `avertissement`, `erreur`, `neutre`, `primaire`
+
+**Exemples** :
+```twig
+{# Badge projet avec icône et couleur automatiques #}
+{% include 'components/status_badge.html.twig' with {
+    status: 'actif',
+    type: 'project'
+} %}
+
+{# Badge commande avec icône personnalisée #}
+{% include 'components/status_badge.html.twig' with {
+    status: 'signe',
+    type: 'order',
+    icon: 'bx-check-shield',
+    size: 'lg'
+} %}
+```
+
+#### empty_state.html.twig
+
+**Fichier** : `templates/components/empty_state.html.twig`
+
+État vide élégant avec animation, illustration, titre, description et actions.
+
+```twig
+{% include 'components/empty_state.html.twig' with {
+    icon: 'bx-folder-open',
+    title: 'Aucun projet',
+    description: 'Vous n\'avez pas encore créé de projet.',
+    action_label: 'Créer un projet',
+    action_path: 'project_new',
+    action_icon: 'bx-plus'
+} %}
+```
+
+**Paramètres** :
+- `icon` (string, requis) : Icône Boxicons principale
+- `title` (string, requis) : Titre de l'état vide
+- `description` (string, optionnel) : Description/message explicatif
+- `action_label` (string, optionnel) : Label du bouton d'action primaire
+- `action_path` (string, optionnel) : Route Symfony pour l'action primaire
+- `action_icon` (string, optionnel) : Icône du bouton d'action
+- `secondary_action_label` (string, optionnel) : Label du bouton secondaire
+- `secondary_action_path` (string, optionnel) : Route pour l'action secondaire
+- `illustration` (string, optionnel) : Type d'illustration - `folder`, `search`, `add`, `data`, `error`, `time`, `user`, `document`, `filter` (remplace `icon`)
+- `size` (string, optionnel) : Taille - `sm`, `md` (défaut), `lg`
+
+**Caractéristiques** :
+- Animation de flottement sur l'icône
+- Effet hover sur l'icône (changement d'opacité)
+- Responsive avec max-width automatique sur la description
+
+**Exemples** :
+```twig
+{# État vide simple #}
+{% include 'components/empty_state.html.twig' with {
+    icon: 'bx-search',
+    title: 'Aucun résultat',
+    description: 'Essayez avec d\'autres critères de recherche'
+} %}
+
+{# État vide avec action #}
+{% include 'components/empty_state.html.twig' with {
+    illustration: 'folder',
+    title: 'Aucun client',
+    description: 'Commencez par ajouter votre premier client.',
+    action_label: 'Ajouter un client',
+    action_path: 'client_new',
+    action_icon: 'bx-plus',
+    size: 'lg'
+} %}
+
+{# État vide avec actions multiples #}
+{% include 'components/empty_state.html.twig' with {
+    icon: 'bx-data',
+    title: 'Aucune donnée',
+    description: 'Importez des données ou créez-en manuellement.',
+    action_label: 'Importer',
+    action_path: 'data_import',
+    secondary_action_label: 'Créer manuellement',
+    secondary_action_path: 'data_new'
+} %}
+```
+
+#### stats_card.html.twig
+
+**Fichier** : `templates/components/stats_card.html.twig`
+
+Carte de statistique/KPI avec icône, valeur, label, tendance et lien optionnel.
+
+```twig
+{% include 'components/stats_card.html.twig' with {
+    value: '125 450',
+    label: 'Chiffre d\'affaires',
+    icon: 'bx-dollar-circle',
+    color: 'success',
+    suffix: '€',
+    trend: 'up',
+    trend_value: '+12%',
+    trend_label: 'vs mois dernier'
+} %}
+```
+
+**Paramètres** :
+- `value` (string/int, requis) : Valeur du KPI à afficher
+- `label` (string, requis) : Label du KPI
+- `icon` (string, requis) : Icône Boxicons
+- `color` (string, optionnel) : Couleur du thème - `primary` (défaut), `success`, `warning`, `danger`, `info`, `secondary`
+- `suffix` (string, optionnel) : Suffixe après la valeur (ex: `€`, `%`, `j`)
+- `prefix` (string, optionnel) : Préfixe avant la valeur (ex: `+`, `-`)
+- `trend` (string, optionnel) : Tendance - `up`, `down`, `neutral`
+- `trend_value` (string, optionnel) : Valeur de la tendance (ex: `+12%`, `-5%`)
+- `trend_label` (string, optionnel) : Label de la tendance (ex: `vs mois dernier`)
+- `link` (string, optionnel) : Route Symfony pour rendre la carte cliquable
+- `link_params` (object, optionnel) : Paramètres pour la route
+- `size` (string, optionnel) : Taille - `sm`, `md` (défaut), `lg`
+- `custom_class` (string, optionnel) : Classes CSS additionnelles
+
+**Caractéristiques** :
+- Effet hover avec élévation (translateY + box-shadow)
+- Icône dans un avatar coloré avec background subtle
+- Badge de tendance coloré automatiquement (vert/rouge/gris)
+- Carte entière cliquable si `link` défini
+- Responsive avec flexbox
+
+**Exemples** :
+```twig
+{# KPI simple #}
+{% include 'components/stats_card.html.twig' with {
+    value: '42',
+    label: 'Projets actifs',
+    icon: 'bx-folder-open',
+    color: 'primary'
+} %}
+
+{# KPI avec tendance #}
+{% include 'components/stats_card.html.twig' with {
+    value: '85 200',
+    label: 'Chiffre d\'affaires',
+    icon: 'bx-euro',
+    color: 'success',
+    suffix: '€',
+    trend: 'up',
+    trend_value: '+18%',
+    trend_label: 'vs année dernière'
+} %}
+
+{# KPI cliquable avec lien vers dashboard #}
+{% include 'components/stats_card.html.twig' with {
+    value: '2 450',
+    label: 'Heures facturables',
+    icon: 'bx-time',
+    color: 'info',
+    suffix: 'h',
+    trend: 'down',
+    trend_value: '-3%',
+    trend_label: 'vs mois dernier',
+    link: 'timesheet_index',
+    size: 'md'
+} %}
+
+{# Grid de KPIs (utilisation typique) #}
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        {% include 'components/stats_card.html.twig' with {
+            value: '125 450',
+            label: 'CA',
+            icon: 'bx-euro',
+            color: 'success',
+            suffix: '€',
+            trend: 'up',
+            trend_value: '+12%'
+        } %}
+    </div>
+    <div class="col-xl-3 col-md-6">
+        {% include 'components/stats_card.html.twig' with {
+            value: '42',
+            label: 'Projets',
+            icon: 'bx-folder',
+            color: 'primary'
+        } %}
+    </div>
+    {# ... autres KPIs #}
+</div>
+```
+
+---
+
 ## Changelog
+
+- **v1.2.0** (2025-12-27) : Phase 6 - Lot 9 Cohérence UX/UI (35% → 100%)
+  - Nouveaux components : status_badge, empty_state, stats_card
+  - Badges de statut intelligents avec couleurs et icônes automatiques
+  - États vides animés avec actions multiples
+  - Cartes KPI avec tendances et liens cliquables
+  - 11 composants réutilisables au total
+  - Documentation complète de tous les composants
 
 - **v1.1.0** (2025-11-26) : Phase 5 - Lot 15.5 Cohérence UX/UI
   - Nouveaux components : card_section, form_buttons
