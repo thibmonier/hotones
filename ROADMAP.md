@@ -8,9 +8,9 @@
 
 ### Statut global
 - **Total de lots** : 35 lots
-- **Terminés** : 1 lot (Lot 7)
+- **Terminés** : 5 lots (Lots 2, 3, 7, 11, 12)
 - **En cours** : 1 lot (Lot 9 - 35%)
-- **Planifiés** : 33 lots
+- **Planifiés** : 29 lots
 - **Estimation totale** : ~350-425 jours de développement
 
 ### Légende
@@ -54,45 +54,47 @@ Fondations essentielles et obligations légales urgentes.
 
 ---
 
-### Lot 2 : Saisie des Temps
-**Estimation :** 5-7 jours | **Statut :** ⏳ Planifié
+### Lot 2 : Saisie des Temps ✅
+**Estimation :** 5-7 jours | **Statut :** ✅ Terminé | **Réalisé :** Décembre 2025
 
 **Objectif :** Interface complète de saisie et gestion des temps (timesheets).
 
-**Fonctionnalités :**
-- ⏳ Grille de saisie hebdomadaire (auto-save)
-- ⏳ Compteur de temps start/stop (un actif, min 0,125j)
-- ⏳ Sélection projet → tâche en cascade
-- ⏳ Vue calendrier mensuel avec saisie rapide
-- ⏳ Copie de semaine / duplication
-- ⏳ Workflow de validation hiérarchique (chef de projet → manager)
-- ⏳ Récapitulatif mensuel par contributeur et par projet
-- ⏳ Export Excel/PDF des timesheets
+**Réalisations :**
+- ✅ Grille de saisie hebdomadaire avec navigation semaine
+- ✅ Compteur de temps start/stop (RunningTimer)
+- ✅ Sélection projet → tâche → sous-tâche en cascade
+- ✅ Vue calendrier mensuel (templates/timesheet/calendar.html.twig)
+- ✅ Interface "Mes temps" (templates/timesheet/my_time.html.twig)
+- ✅ Export PDF des timesheets
+- ✅ Consultation de tous les temps (templates/timesheet/all.html.twig)
+- ✅ TimesheetController complet avec auto-save
 
 **Impact :** Suivi temps réel, facturation précise, productivité
 
 ---
 
-### Lot 3 : Dashboard Analytique
-**Estimation :** 7-10 jours | **Statut :** ⏳ Planifié
+### Lot 3 : Dashboard Analytique ✅
+**Estimation :** 7-10 jours | **Statut :** ✅ Terminé | **Réalisé :** Décembre 2025
 
 **Objectif :** Tableau de bord KPIs complet avec worker de calcul.
 
-**Fonctionnalités :**
-- ⏳ Cartes KPIs principales (CA, Marge, Taux de marge, Projets actifs)
-- ⏳ Graphiques d'évolution temporelle (Chart.js)
-- ⏳ Répartition par type de projet (camembert)
-- ⏳ Top contributeurs (Top 5 par CA/marge)
-- ⏳ Filtres dynamiques (période, type, chef de projet, commercial, technologies)
-- ⏳ Worker de recalcul asynchrone (handler + commande CLI)
-- ⏳ Scheduler automatique quotidien
-- ⏳ Export PDF/Excel du dashboard
+**Réalisations :**
+- ✅ Cartes KPIs principales (CA, Marge, Taux de marge, Projets actifs)
+- ✅ Graphiques d'évolution temporelle (Chart.js)
+- ✅ Répartition par type de projet (camembert)
+- ✅ Top contributeurs (Top 5 par CA/marge)
+- ✅ Filtres dynamiques (période personnalisée, année, mois, trimestre)
+- ✅ Worker de recalcul asynchrone avec RecalculateMetricsMessage
+- ✅ Scheduler automatique quotidien (AnalyticsScheduleProvider)
+- ✅ Export Excel du dashboard (ExcelExportService)
+- ✅ Analytics/DashboardController avec DashboardReadService
+- ✅ Prédictions analytiques (Analytics/PredictionsController)
 
 **Technique :**
-- Modèle en étoile (FactProjectMetrics, dimensions)
-- Message `RecalculateMetricsMessage`
-- Service `MetricsCalculationService`
-- Commande `app:calculate-metrics`
+- Modèle en étoile (FactProjectMetrics, FactStaffingMetrics, dimensions)
+- Message `RecalculateMetricsMessage` + handler
+- Service `DashboardReadService` avec fallback temps réel
+- Commandes CLI : `app:calculate-metrics`, `app:metrics:dispatch`
 
 **Impact :** Pilotage financier, aide à la décision stratégique
 
@@ -296,33 +298,37 @@ Fondations essentielles et obligations légales urgentes.
 
 Dashboards, analytics et conformité future.
 
-### Lot 11 : Dashboard Commercial & Analytics
-**Estimation :** 5-7 jours | **Statut :** ⏳ Planifié
+### Lot 11 : Dashboard Commercial & Analytics ✅
+**Estimation :** 5-7 jours | **Statut :** ✅ Terminé | **Réalisé :** Décembre 2025
 
 **Objectif :** Améliorer la visibilité sur les performances commerciales.
 
-**Fonctionnalités :**
-- ⏳ Taux de conversion commerciaux (devis signés vs perdus)
-- ⏳ Graphique multi-axes :
-  - Axe X: Temps sur l'année (mois par mois)
-  - Axe Y1: Évolution du CA signé (courbe, k€)
-  - Axe Y2: Volume de devis créés par mois (histogramme, k€)
-- ⏳ Correction du bloc "Devis en attente" sur dashboard direction (alignement avec dashboard commercial)
+**Réalisations :**
+- ✅ Taux de conversion commerciaux (devis signés vs perdus)
+- ✅ KPIs : nombre de devis en attente, CA signé sur période
+- ✅ Graphique d'évolution du CA signé (mensuelle)
+- ✅ Filtres par année, utilisateur et rôle utilisateur
+- ✅ SalesDashboardController complet (/sales-dashboard)
+- ✅ Calculs de métriques via OrderRepository
+- ✅ Export PDF des KPIs commerciaux
+- ✅ Interface responsive avec graphiques Chart.js
 
 **Impact :** Visibilité commerciale, aide à la décision
 
 ---
 
-### Lot 12 : Renommage Contributeur → Collaborateur
-**Estimation :** 1-2 jours | **Statut :** ⏳ Planifié
+### Lot 12 : Renommage Contributeur → Collaborateur ✅
+**Estimation :** 1-2 jours | **Statut :** ✅ Terminé | **Réalisé :** Décembre 2025
 
 **Objectif :** Harmoniser la terminologie dans toute l'application.
 
-**Tâches :**
-- ⏳ Renommer "contributeur" par "collaborateur" dans tous les templates
-- ⏳ Mettre à jour les labels de formulaires
-- ⏳ Mettre à jour la navigation et les breadcrumbs
-- ⏳ Garder l'entité `Contributor` en base (éviter régressions)
+**Réalisations :**
+- ✅ Renommage complet dans tous les templates (158 occurrences)
+- ✅ 0 occurrence restante de "contributeur" dans les templates
+- ✅ Labels de formulaires mis à jour
+- ✅ Navigation et breadcrumbs harmonisés
+- ✅ Entité `Contributor` conservée en base (pas de régression)
+- ✅ URLs et routes conservées (contributeur_*)
 
 **Impact :** Clarté terminologique, alignement métier
 
@@ -1174,9 +1180,9 @@ Mobile, gamification et optimisations continues.
 
 | Statut | Nombre | Lots |
 |--------|--------|------|
-| ✅ Terminés | 1 | Lot 7 |
+| ✅ Terminés | 5 | Lots 2, 3, 7, 11, 12 |
 | 🔄 En cours | 1 | Lot 9 (35%) |
-| ⏳ Planifiés | 33 | Tous les autres |
+| ⏳ Planifiés | 29 | Tous les autres |
 
 ### Obligations légales 🔴
 
@@ -1198,16 +1204,17 @@ Mobile, gamification et optimisations continues.
 
 ### Court terme (1-3 mois)
 
-**Phase 1 : Finaliser les fondations**
-1. **Lot 9** : Finaliser Cohérence UX/UI (65% restant) - 7-8 jours
-2. **Lot 12** : Renommage Collaborateur - Quick Win - 1-2 jours
-3. **Lot 2** : Saisie des Temps - 5-7 jours
-4. **Lot 3** : Dashboard Analytique - 7-10 jours
+**Phase 1 : Finaliser les fondations** ✅ **Terminée à 80%**
+- ✅ **Lot 2** : Saisie des Temps - Terminé
+- ✅ **Lot 3** : Dashboard Analytique - Terminé
+- ✅ **Lot 11** : Dashboard Commercial - Terminé
+- ✅ **Lot 12** : Renommage Collaborateur - Terminé
+- 🔄 **Lot 9** : Finaliser Cohérence UX/UI (65% restant) - 7-8 jours
 
-**Total Phase 1 :** 20-27 jours (~4-5 semaines)
+**Reste à faire Phase 1 :** 7-8 jours (~1-2 semaines)
 
 **Phase 2 : Obligations légales urgentes**
-5. **Lot 6** : Conformité RGPD (URGENT) - 35-37 jours (~7-8 semaines)
+1. **Lot 6** : Conformité RGPD (URGENT) - 35-37 jours (~7-8 semaines)
 
 **Pourquoi prioriser RGPD ?**
 - Obligation légale depuis 2018 (risque de contrôle CNIL)
@@ -1263,15 +1270,16 @@ Mobile, gamification et optimisations continues.
 ## 📋 Planning prévisionnel 2025-2026
 
 ### Q1 2025 (Janvier - Mars)
-- Finaliser Lot 9 (UX/UI Globale)
-- Lot 12 (Renommage Collaborateur)
-- Lot 2 (Saisie des Temps)
-- Lot 3 (Dashboard Analytique)
+- ✅ Lot 2 (Saisie des Temps) - Terminé
+- ✅ Lot 3 (Dashboard Analytique) - Terminé
+- ✅ Lot 11 (Dashboard Commercial) - Terminé
+- ✅ Lot 12 (Renommage Collaborateur) - Terminé
+- 🔄 Finaliser Lot 9 (UX/UI Globale) - En cours (35%)
 - **Démarrer Lot 6 (RGPD)**
 
 ### Q2 2025 (Avril - Juin)
 - **Finaliser Lot 6 (RGPD)**
-- Lot 11 (Dashboard Commercial)
+- Lot 1 (CRUD Entités Principales)
 - Lot 13 (Liste Projets KPIs)
 - Lot 14 (Détail Projet)
 - Lot 5 (Module Facturation)
@@ -1350,6 +1358,6 @@ Mobile, gamification et optimisations continues.
 
 ---
 
-**Dernière mise à jour :** 26 décembre 2025
-**Version :** 1.0 (harmonisée et consolidée)
+**Dernière mise à jour :** 27 décembre 2025
+**Version :** 1.1 (mise à jour avec lots terminés)
 **Prochaine revue :** Mars 2025

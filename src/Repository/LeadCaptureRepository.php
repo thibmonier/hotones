@@ -88,7 +88,7 @@ class LeadCaptureRepository extends ServiceEntityRepository
     /**
      * Statistiques générales des leads.
      *
-     * @return array{total: int, withConsent: int, downloaded: int, avgDownloads: float}
+     * @return array{total: int, withConsent: int, downloaded: int, avgDownloads: float, consent_rate: float, download_rate: float, with_marketing_consent: int, avg_downloads: float}
      */
     public function getStats(): array
     {
@@ -116,11 +116,21 @@ class LeadCaptureRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
+        // Calcul des taux
+        $consentRate  = $total > 0 ? ($withConsent / $total) * 100 : 0;
+        $downloadRate = $total > 0 ? ($downloaded / $total)  * 100 : 0;
+
         return [
             'total'        => $total,
             'withConsent'  => $withConsent,
             'downloaded'   => $downloaded,
             'avgDownloads' => round($avgDownloads, 2),
+            // Clés calculées pour les taux
+            'consent_rate'  => round($consentRate, 2),
+            'download_rate' => round($downloadRate, 2),
+            // Alias snake_case pour compatibilité template
+            'with_marketing_consent' => $withConsent,
+            'avg_downloads'          => round($avgDownloads, 2),
         ];
     }
 }

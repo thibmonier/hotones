@@ -283,7 +283,16 @@ class CrmLeadController extends AbstractController
         $stats = $this->leadCaptureRepository->getStats();
 
         // Statistiques par source
-        $statsBySource = $this->leadCaptureRepository->countBySource();
+        $statsBySourceRaw = $this->leadCaptureRepository->countBySource();
+
+        // Convertir en format tableau pour le template
+        $statsBySource = [];
+        foreach ($statsBySourceRaw as $source => $count) {
+            $statsBySource[] = [
+                'source' => $source,
+                'count'  => $count,
+            ];
+        }
 
         // Statistiques par statut
         $qb = $this->leadCaptureRepository->createQueryBuilder('l')
@@ -296,7 +305,7 @@ class CrmLeadController extends AbstractController
 
         // Taux de conversion par source
         $conversionBySource = [];
-        foreach ($statsBySource as $source => $totalBySource) {
+        foreach ($statsBySourceRaw as $source => $totalBySource) {
             $convertedQb = $this->leadCaptureRepository->createQueryBuilder('l')
                 ->select('COUNT(l.id)')
                 ->where('l.source = :source')

@@ -1,25 +1,24 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}Lead: {{ lead.fullName }}{% endblock %}
 
-{% block body %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Détail du Lead</h4>
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Détail du Lead</h4>
 
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ path('dashboard_index') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ path('admin_crm_statistics') }}">CRM</a></li>
-                        <li class="breadcrumb-item"><a href="{{ path('admin_crm_leads_index') }}">Leads</a></li>
-                        <li class="breadcrumb-item active">{{ lead.fullName }}</li>
-                    </ol>
-                </div>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{{ path('home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('admin_crm_statistics') }}">CRM</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('admin_crm_leads_index') }}">Leads</a></li>
+                    <li class="breadcrumb-item active">{{ lead.fullName }}</li>
+                </ol>
             </div>
         </div>
     </div>
+</div>
 
     <div class="row">
         {# Colonne gauche - Informations du lead #}
@@ -286,7 +285,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <style>
 .timeline {
