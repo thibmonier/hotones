@@ -172,4 +172,103 @@ class BillingServiceTest extends TestCase
         $this->assertEquals('2023-02-15', $result[1]['date']->format('Y-m-d'));
         $this->assertEquals('2023-03-15', $result[2]['date']->format('Y-m-d'));
     }
+
+    public function testBuildProjectBillingRecapWithEmptyScheduleLabel()
+    {
+        $project = new Project();
+        $order   = new Order();
+        $order->setContractType('forfait');
+        $order->setProject($project);
+        $order->setTotalAmount(10000.00);
+
+        $schedule = new OrderPaymentSchedule();
+        $schedule->setBillingDate(new DateTime('2023-01-15'));
+        $schedule->setLabel(''); // Empty label
+
+        $order->addPaymentSchedule($schedule);
+        $project->addOrder($order);
+
+        $result = $this->billingService->buildProjectBillingRecap($project);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('Échéance', $result[0]['label']); // Should default to 'Échéance'
+    }
+
+    public function testBuildProjectBillingRecapWithNullRevenue()
+    {
+        $project    = new Project();
+        $regieOrder = new Order();
+        $regieOrder->setContractType('regie');
+        $regieOrder->setProject($project);
+
+        $project->addOrder($regieOrder);
+
+        // Mock timesheet with null revenue
+        $mockData = [
+            ['year' => 2023, 'month' => 3, 'revenue' => null],
+        ];
+
+        $this->timesheetRepositoryMock
+            ->method('getMonthlyRevenueForProjectUsingContributorTjm')
+            ->willReturn($mockData);
+
+        $result = $this->billingService->buildProjectBillingRecap($project);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals(0.0, $result[0]['amount']); // Null revenue becomes 0.0
+    }
+
+    public function testBuildProjectBillingRecapWithEmptyTimesheetData()
+    {
+        $project    = new Project();
+        $regieOrder = new Order();
+        $regieOrder->setContractType('regie');
+        $regieOrder->setProject($project);
+
+        $project->addOrder($regieOrder);
+
+        // Mock empty timesheet data
+        $this->timesheetRepositoryMock
+            ->method('getMonthlyRevenueForProjectUsingContributorTjm')
+            ->willReturn([]);
+
+        $result = $this->billingService->buildProjectBillingRecap($project);
+
+        $this->assertEmpty($result);
+    }
+
+    public function testBuildProjectBillingRecapArrayStructure()
+    {
+        $project = new Project();
+        $order   = new Order();
+        $order->setContractType('forfait');
+        $order->setProject($project);
+        $order->setTotalAmount(5000.00);
+
+        $schedule = new OrderPaymentSchedule();
+        $schedule->setBillingDate(new DateTime('2023-01-15'));
+        $schedule->setLabel('Test Payment');
+
+        $order->addPaymentSchedule($schedule);
+        $project->addOrder($order);
+
+        $result = $this->billingService->buildProjectBillingRecap($project);
+
+        $this->assertCount(1, $result);
+
+        // Verify exact array structure
+        $entry = $result[0];
+        $this->assertArrayHasKey('date', $entry);
+        $this->assertArrayHasKey('label', $entry);
+        $this->assertArrayHasKey('amount', $entry);
+        $this->assertArrayHasKey('type', $entry);
+        $this->assertArrayHasKey('order', $entry);
+
+        // Verify types
+        $this->assertInstanceOf(\DateTimeInterface::class, $entry['date']);
+        $this->assertIsString($entry['label']);
+        $this->assertIsFloat($entry['amount']);
+        $this->assertEquals('forfait', $entry['type']);
+        $this->assertSame($order, $entry['order']);
+    }
 }

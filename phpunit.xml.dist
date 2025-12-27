@@ -51,9 +51,7 @@
     </testsuites>
 
     <!-- PHPUnit 10+/12: configure code coverage reports (optional) and sources separately -->
-    <!-- Code coverage disabled by default (requires xdebug or pcov) -->
-    <!-- Uncomment to enable if coverage driver is available -->
-    <!--
+    <!-- Code coverage enabled -->
     <coverage>
         <report>
             <clover outputFile="var/coverage/clover.xml"/>
@@ -66,7 +64,6 @@
             <directory suffix=".php">src</directory>
         </include>
     </source>
-    -->
 
     <!-- Listeners are removed in PHPUnit 10+; use extensions instead -->
 
