@@ -7,11 +7,11 @@
 ## 📊 Vue d'ensemble
 
 ### Statut global
-- **Total de lots** : 35 lots
+- **Total de lots** : 36 lots
 - **Terminés** : 5 lots (Lots 2, 3, 7, 11, 12)
 - **En cours** : 1 lot (Lot 9 - 35%)
-- **Planifiés** : 29 lots
-- **Estimation totale** : ~350-425 jours de développement
+- **Planifiés** : 30 lots
+- **Estimation totale** : ~360-455 jours de développement
 
 ### Légende
 - ✅ Terminé et en production
@@ -314,6 +314,65 @@ Dashboards, analytics et conformité future.
 - ✅ Interface responsive avec graphiques Chart.js
 
 **Impact :** Visibilité commerciale, aide à la décision
+
+---
+
+### Lot 11bis : Sprint Technique & Consolidation
+**Estimation :** 10-14 jours | **Statut :** ⏳ Planifié
+
+**Objectif :** Consolider les fondations techniques, améliorer la qualité et réduire la dette technique avant les gros chantiers.
+
+**Contexte :**
+- Dette technique accumulée lors des lots 1-11
+- Risque d'accumulation de dette pendant les lots futurs
+- Nécessité de consolider les bases avant RGPD et transformation SAAS
+
+**Fonctionnalités :**
+
+**11bis.1 Audit & Documentation (2-3 jours)**
+- ⏳ Audit de la qualité du code actuel (PHPStan, PHP CS Fixer, Deptrac)
+- ⏳ Documentation architecture (composants, dépendances, design patterns)
+- ⏳ Identification des hotspots de dette technique
+- ⏳ Revue des performances actuelles (profiling Blackfire)
+- ⏳ Audit de sécurité (OWASP Top 10)
+
+**11bis.2 Qualité & Tests (3-4 jours)**
+- ⏳ Augmentation couverture tests à 60% (focus entités critiques)
+- ⏳ Tests unitaires Services métier (DashboardReadService, MetricsCalculationService)
+- ⏳ Tests d'intégration Repositories (OrderRepository, ProjectRepository)
+- ⏳ Tests fonctionnels Controllers critiques (timesheet, analytics)
+- ⏳ Configuration Infection pour mutation testing
+
+**11bis.3 Performance & Optimisation (2-3 jours)**
+- ⏳ Profiling Blackfire sur parcours critiques
+- ⏳ Optimisation requêtes N+1 identifiées
+- ⏳ Mise en place cache Redis (doctrine, HTTP)
+- ⏳ Indexation base de données (analyse explain)
+- ⏳ Optimisation chargement assets (lazy loading, code splitting)
+
+**11bis.4 Sécurité (2-3 jours)**
+- ⏳ Audit OWASP Top 10 (injection, XSS, CSRF, auth)
+- ⏳ Configuration headers de sécurité (CSP, HSTS, X-Frame-Options)
+- ⏳ Rotation secrets et clés API (Symfony Secrets)
+- ⏳ Revue permissions et voters
+- ⏳ Audit dépendances (composer audit, npm audit)
+
+**11bis.5 Infrastructure & DevOps (1-2 jours)**
+- ⏳ Optimisation images Docker (multi-stage builds)
+- ⏳ Configuration CI/CD (GitHub Actions ou GitLab CI)
+- ⏳ Mise en place monitoring (logs centralisés, APM)
+- ⏳ Documentation déploiement et rollback
+- ⏳ Scripts de backup et restauration base de données
+
+**ROI attendu :**
+- Réduction incidents production : -30%
+- Amélioration vélocité développement : +20%
+- Réduction temps de réponse : -40%
+- Confiance déploiements : +50%
+
+**Dépendances :** Idéalement après Lots 2, 3, 7, 11, 12 (fondations en place)
+
+**Impact :** Réduction dette technique, qualité code, performances, sécurité
 
 ---
 
@@ -1171,10 +1230,10 @@ Mobile, gamification et optimisations continues.
 | Priorité | Lots | Nombre | Estimation totale |
 |----------|------|--------|-------------------|
 | 🔥 Critique | Lots 1-10 | 10 | 85-104 jours |
-| 🎯 Haute | Lots 11-18 | 8 | 71-87 jours |
+| 🎯 Haute | Lots 11-18 (incl. 11bis) | 9 | 81-101 jours |
 | 🟡 Moyenne | Lots 19-28 | 10 | 128-160 jours |
 | 🟢 Basse | Lots 29-35 | 7 | 67-88 jours |
-| **TOTAL** | **35 lots** | **35** | **351-439 jours** |
+| **TOTAL** | **36 lots** | **36** | **361-453 jours** |
 
 ### Lots par statut
 
@@ -1212,6 +1271,16 @@ Mobile, gamification et optimisations continues.
 - 🔄 **Lot 9** : Finaliser Cohérence UX/UI (65% restant) - 7-8 jours
 
 **Reste à faire Phase 1 :** 7-8 jours (~1-2 semaines)
+
+**Phase 1bis : Consolidation technique (RECOMMANDÉ)**
+1. **Lot 11bis** : Sprint Technique & Consolidation - 10-14 jours (~2-3 semaines)
+
+**Pourquoi prioriser la consolidation technique ?**
+- Réduire la dette technique accumulée pendant les lots 1-12
+- Améliorer la qualité et les performances avant les gros chantiers (RGPD, SAAS)
+- Sécuriser l'application (OWASP Top 10)
+- Augmenter la couverture de tests (objectif 60%)
+- ROI immédiat : -30% incidents, +20% vélocité, -40% temps de réponse
 
 **Phase 2 : Obligations légales urgentes**
 1. **Lot 6** : Conformité RGPD (URGENT) - 35-37 jours (~7-8 semaines)
@@ -1275,6 +1344,7 @@ Mobile, gamification et optimisations continues.
 - ✅ Lot 11 (Dashboard Commercial) - Terminé
 - ✅ Lot 12 (Renommage Collaborateur) - Terminé
 - 🔄 Finaliser Lot 9 (UX/UI Globale) - En cours (35%)
+- **Lot 11bis (Sprint Technique & Consolidation) - RECOMMANDÉ**
 - **Démarrer Lot 6 (RGPD)**
 
 ### Q2 2025 (Avril - Juin)
@@ -1310,14 +1380,15 @@ Mobile, gamification et optimisations continues.
 
 ## 🎯 Axes stratégiques prioritaires
 
-1. **Conformité légale** : RGPD (urgent), e-facturation (anticiper 2027)
-2. **Fondations solides** : Saisie temps, analytics, facturation
-3. **Professionnalisation** : Dashboards, rapports, signature électronique
-4. **Transformation SAAS** : Multi-tenant pour nouveau business model
-5. **Automatisation** : Réduire les tâches manuelles répétitives
-6. **Analytics & Prédictif** : Anticiper les risques et opportunités
-7. **Ouverture** : API REST, intégrations, portail client
-8. **Qualité & Performance** : Tests, optimisations, modernisation stack
+1. **Consolidation technique** : Sprint technique (Lot 11bis) avant les gros chantiers
+2. **Conformité légale** : RGPD (urgent), e-facturation (anticiper 2027)
+3. **Fondations solides** : Saisie temps, analytics, facturation
+4. **Professionnalisation** : Dashboards, rapports, signature électronique
+5. **Transformation SAAS** : Multi-tenant pour nouveau business model
+6. **Automatisation** : Réduire les tâches manuelles répétitives
+7. **Analytics & Prédictif** : Anticiper les risques et opportunités
+8. **Ouverture** : API REST, intégrations, portail client
+9. **Qualité & Performance** : Tests, optimisations, modernisation stack
 
 ---
 
@@ -1359,5 +1430,5 @@ Mobile, gamification et optimisations continues.
 ---
 
 **Dernière mise à jour :** 27 décembre 2025
-**Version :** 1.1 (mise à jour avec lots terminés)
+**Version :** 1.2 (ajout Lot 11bis - Sprint Technique & Consolidation)
 **Prochaine revue :** Mars 2025
