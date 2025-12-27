@@ -119,7 +119,7 @@ readonly class DashboardReadService
             // Appliquer les filtres si fournis
             $this->applyFilters($qb, $filters);
 
-            $results = $qb->getQuery()->getResult() ?? [];
+            $results = $qb->getQuery()->getResult();
 
             // Si pas de données, fallback
             if (empty($results)) {
@@ -305,7 +305,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult() ?? [];
+        $results = $qb->getQuery()->getResult();
 
         // Formater en tableau associatif
         $byType = ['forfait' => 0, 'regie' => 0];
@@ -336,7 +336,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult() ?? [];
+        $results = $qb->getQuery()->getResult();
 
         // Formater en tableau associatif
         $byClientType = ['internal' => 0, 'client' => 0];
@@ -370,7 +370,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult() ?? [];
+        $results = $qb->getQuery()->getResult();
 
         // Formater en tableau associatif
         $byCategory = [];
@@ -409,7 +409,7 @@ readonly class DashboardReadService
 
         $this->applyFilters($qb, $filters);
 
-        $results = $qb->getQuery()->getResult() ?? [];
+        $results = $qb->getQuery()->getResult();
 
         // Formater pour le template
         return array_map(function ($row) {

@@ -67,7 +67,7 @@ class InvoiceGeneratorService
         $invoice->setStatus(Invoice::STATUS_DRAFT);
 
         // Calculer le montant de l'échéance
-        $amountHt = $schedule->computeAmount($order->getTotalAmount() ?? '0.00');
+        $amountHt = $schedule->computeAmount($order->getTotalAmount());
 
         // Créer la ligne de facturation
         $line = new InvoiceLine();

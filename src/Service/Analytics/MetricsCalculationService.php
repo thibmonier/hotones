@@ -329,7 +329,7 @@ readonly class MetricsCalculationService
         if (!$dimContributor) {
             $dimContributor = new DimContributor();
             $dimContributor->setUser($user)
-                ->setName($user->getFullName() ?? $user->getEmail())
+                ->setName($user->getFullName())
                 ->setRole($role)
                 ->setIsActive(true);
             $this->entityManager->persist($dimContributor);

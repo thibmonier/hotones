@@ -42,7 +42,7 @@ class ProjectTaskRepository extends ServiceEntityRepository
             ->where('t.project = :project')
             ->setParameter('project', $project)
             ->getQuery()
-            ->getSingleScalarResult() ?? 0;
+            ->getSingleScalarResult();
     }
 
     /**

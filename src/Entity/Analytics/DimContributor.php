@@ -51,7 +51,7 @@ class DimContributor
     {
         $this->user = $user;
         if ($user && (!isset($this->name) || $this->name === '')) {
-            $this->name = $user->getFullName() ?? $user->getEmail();
+            $this->name = $user->getFullName();
         }
         $this->updateCompositeKey();
 
