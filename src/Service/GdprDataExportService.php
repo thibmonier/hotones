@@ -6,7 +6,6 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\ContributorRepository;
-use App\Repository\CookieConsentRepository;
 use App\Repository\EmploymentPeriodRepository;
 use App\Repository\TimesheetRepository;
 use DateTimeImmutable;
@@ -23,7 +22,6 @@ class GdprDataExportService
         private readonly ContributorRepository $contributorRepository,
         private readonly EmploymentPeriodRepository $employmentPeriodRepository,
         private readonly TimesheetRepository $timesheetRepository,
-        private readonly CookieConsentRepository $cookieConsentRepository,
     ) {
     }
 
@@ -106,7 +104,7 @@ class GdprDataExportService
         return array_map(function ($period) {
             return [
                 'period_id'            => $period->getId(),
-                'start_date'           => $period->getStartDate()?->format('Y-m-d'),
+                'start_date'           => $period->getStartDate()->format('Y-m-d'),
                 'end_date'             => $period->getEndDate()?->format('Y-m-d'),
                 'salary'               => $period->getSalary(),
                 'weekly_hours'         => $period->getWeeklyHours(),
@@ -129,13 +127,13 @@ class GdprDataExportService
         return array_map(function ($timesheet) {
             return [
                 'timesheet_id' => $timesheet->getId(),
-                'date'         => $timesheet->getDate()?->format('Y-m-d'),
+                'date'         => $timesheet->getDate()->format('Y-m-d'),
                 'hours'        => $timesheet->getHours(),
                 'notes'        => $timesheet->getNotes(),
-                'project'      => $timesheet->getProject() ? [
+                'project'      => [
                     'id'   => $timesheet->getProject()->getId(),
                     'name' => $timesheet->getProject()->getName(),
-                ] : null,
+                ],
                 'task' => $timesheet->getTask() ? [
                     'id'   => $timesheet->getTask()->getId(),
                     'name' => $timesheet->getTask()->getName(),

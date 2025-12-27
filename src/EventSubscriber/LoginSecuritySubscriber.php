@@ -69,7 +69,7 @@ class LoginSecuritySubscriber implements EventSubscriberInterface
             'ip'                 => $ip,
             'user_agent'         => $request->headers->get('User-Agent'),
             'remaining_attempts' => $limit->getRemainingTokens(),
-            'retry_after'        => $limit->getRetryAfter()?->getTimestamp(),
+            'retry_after'        => $limit->getRetryAfter()->getTimestamp(),
         ]);
 
         // Si le rate limit est dépassé, bloquer
@@ -79,10 +79,10 @@ class LoginSecuritySubscriber implements EventSubscriberInterface
             $this->logger->error('Login rate limit exceeded', [
                 'username'            => $identifier,
                 'ip'                  => $ip,
-                'retry_after_seconds' => $retryAfter ? $retryAfter->getTimestamp() - time() : null,
+                'retry_after_seconds' => $retryAfter->getTimestamp() - time(),
             ]);
 
-            throw new TooManyRequestsHttpException($retryAfter?->getTimestamp(), sprintf('Trop de tentatives de connexion. Veuillez réessayer dans %d minutes.', $retryAfter ? (int) ceil(($retryAfter->getTimestamp() - time()) / 60) : 15));
+            throw new TooManyRequestsHttpException($retryAfter->getTimestamp(), sprintf('Trop de tentatives de connexion. Veuillez réessayer dans %d minutes.', (int) ceil(($retryAfter->getTimestamp() - time()) / 60)));
         }
     }
 
