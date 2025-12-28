@@ -56,13 +56,13 @@ class CspReportController extends AbstractController
 
         // Log the violation
         $this->logger->warning('CSP violation detected', [
-            'document_uri'       => $cspReport['document-uri']             ?? 'unknown',
+            'document_uri'       => $cspReport['document-uri']       ?? 'unknown',
             'violated_directive' => $cspReport['violated-directive'] ?? 'unknown',
-            'blocked_uri'        => $cspReport['blocked-uri']               ?? 'unknown',
-            'source_file'        => $cspReport['source-file']               ?? null,
-            'line_number'        => $cspReport['line-number']               ?? null,
-            'column_number'      => $cspReport['column-number']           ?? null,
-            'original_policy'    => $cspReport['original-policy']       ?? null,
+            'blocked_uri'        => $cspReport['blocked-uri']        ?? 'unknown',
+            'source_file'        => $cspReport['source-file']        ?? null,
+            'line_number'        => $cspReport['line-number']        ?? null,
+            'column_number'      => $cspReport['column-number']      ?? null,
+            'original_policy'    => $cspReport['original-policy']    ?? null,
             'user_agent'         => $request->headers->get('User-Agent'),
             'ip'                 => $request->getClientIp(),
         ]);
