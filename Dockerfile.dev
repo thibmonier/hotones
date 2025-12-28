@@ -1,7 +1,7 @@
 # Dockerfile pour développement
 # Inclut PHP + Node.js pour faciliter le développement
 
-FROM php:8.4-fpm-alpine
+FROM php:8.5-fpm-alpine
 
 # Install system dependencies including Node.js
 RUN apk add --no-cache \
@@ -19,6 +19,9 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     yarn \
+    autoconf \
+    g++ \
+    make \
   && docker-php-ext-configure intl \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && pecl install apcu \
@@ -27,14 +30,12 @@ RUN apk add --no-cache \
   && docker-php-ext-enable redis \
   && pecl install pcov \
   && docker-php-ext-enable pcov \
-  && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    intl \
-    opcache \
-    gd \
-    bcmath \
-    zip \
+  && docker-php-ext-install pdo \
+  && docker-php-ext-install pdo_mysql \
+  && docker-php-ext-install intl \
+  && docker-php-ext-install gd \
+  && docker-php-ext-install bcmath \
+  && docker-php-ext-install zip \
   && rm -rf /var/cache/apk/*
 
 # Install Composer

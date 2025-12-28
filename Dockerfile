@@ -20,7 +20,7 @@ RUN yarn build
 # ============================================
 # Stage 2: Production PHP + Nginx image
 # ============================================
-FROM php:8.4-fpm-alpine
+FROM php:8.5-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -37,20 +37,25 @@ RUN apk add --no-cache \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
+    # Build dependencies (will be removed after)
+    && apk add --no-cache --virtual .build-deps \
+    autoconf \
+    g++ \
+    make \
   && docker-php-ext-configure intl \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && pecl install apcu \
   && docker-php-ext-enable apcu \
   && pecl install redis \
   && docker-php-ext-enable redis \
-  && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    intl \
-    opcache \
-    gd \
-    bcmath \
-    zip \
+  && docker-php-ext-install pdo \
+  && docker-php-ext-install pdo_mysql \
+  && docker-php-ext-install intl \
+  && docker-php-ext-install gd \
+  && docker-php-ext-install bcmath \
+  && docker-php-ext-install zip \
+  # Remove build dependencies to keep image small
+  && apk del .build-deps \
   && rm -rf /var/cache/apk/*
 
 # Install Composer
