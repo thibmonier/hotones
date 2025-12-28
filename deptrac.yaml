@@ -175,6 +175,8 @@ deptrac:
   skip_violations:
     # Doctrine ORM entities reference their repository classes via attributes
     # This is metadata, not actual code dependency, so we skip it
+    App\Entity\AccountDeletionRequest:
+      - App\Repository\AccountDeletionRequestRepository
     App\Entity\Achievement:
       - App\Repository\AchievementRepository
     App\Entity\Analytics\FactStaffingMetrics:
@@ -197,6 +199,8 @@ deptrac:
       - App\Repository\ContributorSatisfactionRepository
     App\Entity\ContributorSkill:
       - App\Repository\ContributorSkillRepository
+    App\Entity\CookieConsent:
+      - App\Repository\CookieConsentRepository
     App\Entity\EmploymentPeriod:
       - App\Repository\EmploymentPeriodRepository
     App\Entity\ExpenseReport:
@@ -205,6 +209,8 @@ deptrac:
       - App\Repository\FactForecastRepository
     App\Entity\Invoice:
       - App\Repository\InvoiceRepository
+    App\Entity\LeadCapture:
+      - App\Repository\LeadCaptureRepository
     App\Entity\Notification:
       - App\Repository\NotificationRepository
     App\Entity\NotificationPreference:
@@ -235,14 +241,26 @@ deptrac:
       - App\Repository\ProjectSubTaskRepository
     App\Entity\ProjectTask:
       - App\Repository\ProjectTaskRepository
+    App\Entity\Provider:
+      - App\Repository\ProviderRepository
     App\Entity\RunningTimer:
       - App\Repository\RunningTimerRepository
+    App\Entity\SaasProvider:
+      - App\Repository\SaasProviderRepository
+    App\Entity\SaasService:
+      - App\Repository\SaasServiceRepository
+    App\Entity\SaasSubscription:
+      - App\Repository\SaasSubscriptionRepository
     App\Entity\Skill:
       - App\Repository\SkillRepository
+    App\Entity\Subscription:
+      - App\Repository\SubscriptionRepository
     App\Entity\Timesheet:
       - App\Repository\TimesheetRepository
     App\Entity\Vacation:
       - App\Repository\VacationRepository
+    App\Entity\Vendor:
+      - App\Repository\VendorRepository
     App\Entity\XpHistory:
       - App\Repository\XpHistoryRepository
 

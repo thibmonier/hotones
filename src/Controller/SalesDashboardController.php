@@ -14,13 +14,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Route('/sales-dashboard')]
 #[IsGranted('ROLE_CHEF_PROJET')]
 class SalesDashboardController extends AbstractController
 {
     #[Route('', name: 'sales_dashboard_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em): Response
+    public function index(Request $request, EntityManagerInterface $em, CacheInterface $cache): Response
     {
         $orderRepository = $em->getRepository(Order::class);
         $userRepository  = $em->getRepository(User::class);
@@ -36,23 +38,56 @@ class SalesDashboardController extends AbstractController
         $userRoleParam  = $request->query->get('user_role');
         $filterUserRole = ($userRoleParam !== null && $userRoleParam !== '') ? $userRoleParam : null;
 
-        // KPI 1: Nombre de devis en attente de signature
-        $pendingCount = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
+        // Créer une clé de cache basée sur les filtres
+        $cacheKey = sprintf(
+            'sales_dashboard_%s_%s_%s_%s',
+            $year,
+            $filterUserId   ?? 'all',
+            $filterUserRole ?? 'all',
+            $startDate->format('Y-m-d'),
+        );
 
-        // KPI 2: CA signé sur la période
-        $signedRevenue = $orderRepository->getSignedRevenueForPeriod($startDate, $endDate, $filterUserId, $filterUserRole);
+        // KPI 1: Nombre de devis en attente de signature (avec cache)
+        $pendingCount = $cache->get($cacheKey.'_pending', function (ItemInterface $item) use ($orderRepository, $filterUserId, $filterUserRole) {
+            $item->expiresAfter(900); // 15 minutes
 
-        // KPI 3: Taux de conversion
-        $conversionRate = $orderRepository->getConversionRate($startDate, $endDate, $filterUserId, $filterUserRole);
+            return $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
+        });
 
-        // KPI 4: Évolution du CA signé (mensuelle)
-        $revenueEvolution = $orderRepository->getRevenueEvolution($startDate, $endDate);
+        // KPI 2: CA signé sur la période (avec cache)
+        $signedRevenue = $cache->get($cacheKey.'_signed', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate, $filterUserId, $filterUserRole) {
+            $item->expiresAfter(900); // 15 minutes
 
-        // KPI 5: Évolution du volume de devis créés (mensuel)
-        $volumeEvolution = $orderRepository->getCreatedOrdersVolumeEvolution($startDate, $endDate);
+            return $orderRepository->getSignedRevenueForPeriod($startDate, $endDate, $filterUserId, $filterUserRole);
+        });
 
-        // KPI 6: Somme de CA par statut (filtrée par période)
-        $statsByStatus = $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
+        // KPI 3: Taux de conversion (avec cache)
+        $conversionRate = $cache->get($cacheKey.'_conversion', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate, $filterUserId, $filterUserRole) {
+            $item->expiresAfter(900); // 15 minutes
+
+            return $orderRepository->getConversionRate($startDate, $endDate, $filterUserId, $filterUserRole);
+        });
+
+        // KPI 4: Évolution du CA signé (mensuelle) (avec cache)
+        $revenueEvolution = $cache->get($cacheKey.'_evolution', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate) {
+            $item->expiresAfter(1800); // 30 minutes
+
+            return $orderRepository->getRevenueEvolution($startDate, $endDate);
+        });
+
+        // KPI 5: Évolution du volume de devis créés (mensuel) (avec cache)
+        $volumeEvolution = $cache->get($cacheKey.'_volume', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate) {
+            $item->expiresAfter(1800); // 30 minutes
+
+            return $orderRepository->getCreatedOrdersVolumeEvolution($startDate, $endDate);
+        });
+
+        // KPI 6: Somme de CA par statut (filtrée par période) (avec cache)
+        $statsByStatus = $cache->get($cacheKey.'_stats', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate, $filterUserId, $filterUserRole) {
+            $item->expiresAfter(900); // 15 minutes
+
+            return $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
+        });
 
         // Complément: Enrichir avec les labels et les devis manquants
         $statsWithLabels = [];

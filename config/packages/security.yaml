@@ -66,6 +66,7 @@ security:
         - { path: ^/legal$, roles: PUBLIC_ACCESS }
         - { path: ^/public, roles: PUBLIC_ACCESS }
         - { path: ^/status$, roles: PUBLIC_ACCESS }
+        - { path: ^/health, roles: PUBLIC_ACCESS }
         - { path: ^/sitemap, roles: PUBLIC_ACCESS }
         - { path: ^/robots\.txt$, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }

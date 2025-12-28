@@ -48,6 +48,17 @@ services:
             $fromEmail: '%app.mail.from_email%'
             $fromName: '%app.mail.from_name%'
 
+    # Monolog Processors
+    App\Monolog\Processor\ContextProcessor:
+        arguments:
+            $environment: '%kernel.environment%'
+        tags:
+            - { name: monolog.processor }
+
+    App\Monolog\Processor\PerformanceProcessor:
+        tags:
+            - { name: monolog.processor, channel: performance }
+
     # Lead Magnet Mailer Service
     App\Service\LeadMagnetMailer:
         arguments:

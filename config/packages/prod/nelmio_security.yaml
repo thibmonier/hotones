@@ -1,0 +1,5 @@
+nelmio_security:
+    # Enable HSTS (HTTP Strict Transport Security) in production
+    # Forces all connections to use HTTPS
+    forced_ssl:
+        enabled: true

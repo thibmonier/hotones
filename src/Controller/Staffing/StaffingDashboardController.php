@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Route('/staffing')]
 #[IsGranted('ROLE_USER')]
@@ -24,6 +26,7 @@ class StaffingDashboardController extends AbstractController
         private StaffingMetricsRepository $staffingRepo,
         private ContributorRepository $contributorRepo,
         private ManagerRegistry $doctrine,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -76,39 +79,71 @@ class StaffingDashboardController extends AbstractController
             $selectedContributor = $this->contributorRepo->find($contributorId);
         }
 
-        // Récupérer les métriques agrégées pour les graphiques
-        $metrics = $this->staffingRepo->getAggregatedMetricsByPeriod(
-            $startDate,
-            $endDate,
+        // Créer une clé de cache basée sur les paramètres
+        $cacheKey = sprintf(
+            'staffing_%s_%s_%s_%s_%s_%s',
+            $viewMode,
+            $startDate->format('Y-m-d'),
+            $endDate->format('Y-m-d'),
             $granularity,
-            $selectedProfile,
-            $selectedContributor,
+            $profileId     ?? 'all',
+            $contributorId ?? 'all',
         );
 
-        // Récupérer les métriques par profil
-        $metricsByProfile = $this->staffingRepo->getMetricsByProfile(
-            $startDate,
-            $endDate,
-            $granularity,
-            $selectedProfile,
-            $selectedContributor,
-        );
+        // Récupérer les métriques agrégées pour les graphiques (avec cache)
+        $metrics = $this->cache->get($cacheKey.'_metrics', function (ItemInterface $item) use ($startDate, $endDate, $granularity, $selectedProfile, $selectedContributor) {
+            $item->expiresAfter(1800); // 30 minutes
 
-        // Récupérer les métriques par collaborateur
-        $metricsByContributor = $this->staffingRepo->getMetricsByContributor(
-            $startDate,
-            $endDate,
-            $granularity,
-            $selectedProfile,
-            $selectedContributor,
-        );
+            return $this->staffingRepo->getAggregatedMetricsByPeriod(
+                $startDate,
+                $endDate,
+                $granularity,
+                $selectedProfile,
+                $selectedContributor,
+            );
+        });
 
-        // Données spécifiques pour la vue annuelle
+        // Récupérer les métriques par profil (avec cache)
+        $metricsByProfile = $this->cache->get($cacheKey.'_by_profile', function (ItemInterface $item) use ($startDate, $endDate, $granularity, $selectedProfile, $selectedContributor) {
+            $item->expiresAfter(1800); // 30 minutes
+
+            return $this->staffingRepo->getMetricsByProfile(
+                $startDate,
+                $endDate,
+                $granularity,
+                $selectedProfile,
+                $selectedContributor,
+            );
+        });
+
+        // Récupérer les métriques par collaborateur (avec cache)
+        $metricsByContributor = $this->cache->get($cacheKey.'_by_contributor', function (ItemInterface $item) use ($startDate, $endDate, $granularity, $selectedProfile, $selectedContributor) {
+            $item->expiresAfter(1800); // 30 minutes
+
+            return $this->staffingRepo->getMetricsByContributor(
+                $startDate,
+                $endDate,
+                $granularity,
+                $selectedProfile,
+                $selectedContributor,
+            );
+        });
+
+        // Données spécifiques pour la vue annuelle (avec cache)
         $weeklyOccupancy  = [];
         $weeklyGlobalTACE = [];
         if ($viewMode === 'annual') {
-            $weeklyOccupancy  = $this->staffingRepo->getWeeklyOccupancyByContributor($year, $selectedProfile);
-            $weeklyGlobalTACE = $this->staffingRepo->getWeeklyGlobalTACE($year, $selectedProfile);
+            $weeklyOccupancy = $this->cache->get($cacheKey.'_weekly_occupancy', function (ItemInterface $item) use ($year, $selectedProfile) {
+                $item->expiresAfter(1800); // 30 minutes
+
+                return $this->staffingRepo->getWeeklyOccupancyByContributor($year, $selectedProfile);
+            });
+
+            $weeklyGlobalTACE = $this->cache->get($cacheKey.'_weekly_tace', function (ItemInterface $item) use ($year, $selectedProfile) {
+                $item->expiresAfter(1800); // 30 minutes
+
+                return $this->staffingRepo->getWeeklyGlobalTACE($year, $selectedProfile);
+            });
         }
 
         // Récupérer les profils et collaborateurs actifs pour les filtres

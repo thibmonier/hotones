@@ -21,13 +21,72 @@ nelmio_security:
             - 'strict-origin-when-cross-origin'
 
     # Content-Security-Policy: Mitigates XSS attacks
-    # Note: CSP can be further customized via manual header in framework.yaml if needed
+    # Protects against XSS by restricting sources of executable scripts
     csp:
-        enabled: false  # Désactivé pour le moment (configuration via framework si nécessaire)
+        enabled: true
+        compat_headers: true
+        hash:
+            algorithm: sha256
+        report_endpoint:
+            log_channel: null
+            log_formatter: nelmio_security.csp_report.log_formatter
+            log_level: notice
+            filters:
+                domains: true
+                schemes: true
+                browser_bugs: true
+                injected_scripts: true
+            dismiss: []
+        # CSP directives configuration
+        # Note: nelmio/security-bundle uses 'enforce' and 'report' keys for directives
+        enforce:
+            default-src:
+                - "'self'"
+            script-src:
+                - "'self'"
+                - "'unsafe-inline'"  # Needed for Chart.js and inline handlers
+                - "cdn.jsdelivr.net"
+                - "'unsafe-eval'"    # Needed for some Chart.js features
+            style-src:
+                - "'self'"
+                - "'unsafe-inline'"  # Needed for Bootstrap
+                - "cdn.jsdelivr.net"
+            img-src:
+                - "'self'"
+                - "data:"
+                - "blob:"
+            font-src:
+                - "'self'"
+                - "data:"
+            connect-src:
+                - "'self'"
+            frame-ancestors:
+                - "'none'"
+            base-uri:
+                - "'self'"
+            form-action:
+                - "'self'"
+            object-src:
+                - "'none'"
+            upgrade-insecure-requests: true  # Upgrade HTTP to HTTPS automatically
+            block-all-mixed-content: true    # Block mixed content (HTTP on HTTPS page)
+            report-uri:
+                - "/csp/report"  # Endpoint for CSP violation reports
 
-    # HSTS: Force HTTPS (only in production)
+    # HSTS: Force HTTPS (disabled by default, enabled in prod config)
     forced_ssl:
-        enabled: false  # À activer en production via .env.prod.local (APP_FORCE_SSL=true)
+        enabled: false  # Overridden to true in config/packages/prod/nelmio_security.yaml
         hsts_max_age: 31536000  # 1 an (valeur recommandée)
         hsts_subdomains: true   # Appliquer aux sous-domaines
         hsts_preload: true      # Eligible pour HSTS preload list
+
+    # Permissions-Policy: Controls browser features and APIs
+    permissions_policy:
+        enabled: true
+        policies:
+            camera: []          # Deny all (no camera access)
+            microphone: []      # Deny all (no microphone access)
+            geolocation: []     # Deny all (no geolocation)
+            payment: []         # Deny all (no payment API)
+            usb: []             # Deny all (no USB access)
+            # fullscreen: ['self']  # Allow fullscreen from same origin if needed

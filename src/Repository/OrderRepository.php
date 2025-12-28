@@ -21,6 +21,7 @@ class OrderRepository extends ServiceEntityRepository
 
     /**
      * Trouve les devis avec filtres optionnels.
+     * Optimisé avec eager loading de la relation project.
      */
     public function findWithFilters(
         ?Project $project = null,
@@ -31,7 +32,10 @@ class OrderRepository extends ServiceEntityRepository
         ?int $offset = null
     ): array {
         $qb = $this->createQueryBuilder('o')
-            ->leftJoin('o.project', 'p');
+            ->leftJoin('o.project', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c');
 
         if ($project) {
             $qb->andWhere('o.project = :project')

@@ -140,10 +140,15 @@ class ProjectRepository extends ServiceEntityRepository
 
     /**
      * Récupère tous les projets triés par nom.
+     * Optimisé avec eager loading des relations client et serviceCategory.
      */
     public function findAllOrderedByName(): array
     {
         return $this->createQueryBuilder('p')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->addSelect('sc')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -151,10 +156,15 @@ class ProjectRepository extends ServiceEntityRepository
 
     /**
      * Récupère les projets actifs triés par nom.
+     * Optimisé avec eager loading des relations client et serviceCategory.
      */
     public function findActiveOrderedByName(): array
     {
         return $this->createQueryBuilder('p')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->addSelect('sc')
             ->where('p.status = :status')
             ->setParameter('status', 'active')
             ->orderBy('p.name', 'ASC')
@@ -546,6 +556,7 @@ class ProjectRepository extends ServiceEntityRepository
 
     /**
      * Recherche full-text dans les projets.
+     * Optimisé avec eager loading des relations client, serviceCategory et technologies.
      *
      * @return Project[]
      */
@@ -553,6 +564,13 @@ class ProjectRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->addSelect('sc')
+            ->leftJoin('p.technologies', 't')
+            ->addSelect('t')
+            ->leftJoin('p.projectManager', 'pm')
+            ->addSelect('pm')
             ->where('p.name LIKE :query')
             ->orWhere('p.description LIKE :query')
             ->orWhere('c.name LIKE :query')

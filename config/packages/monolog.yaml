@@ -1,6 +1,9 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - business # Business logic events (orders, profitability, time tracking)
+        - security # Security events (login, 2FA, authorization failures)
+        - performance # Performance monitoring (slow queries, cache hits/misses)
 
 when@dev:
     monolog:
@@ -10,14 +13,20 @@ when@dev:
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
                 channels: ["!event"]
-            # uncomment to get logging in your browser
-            # you may have to allow bigger header sizes in your Web server configuration
-            #firephp:
-            #    type: firephp
-            #    level: info
-            #chromephp:
-            #    type: chromephp
-            #    level: info
+                formatter: monolog.formatter.json
+            # Separate file for errors in development
+            errors:
+                type: stream
+                path: "%kernel.logs_dir%/errors.log"
+                level: error
+                formatter: monolog.formatter.json
+            # Separate file for business events
+            business:
+                type: stream
+                path: "%kernel.logs_dir%/business.log"
+                level: info
+                channels: [business]
+                formatter: monolog.formatter.json
             console:
                 type: console
                 process_psr_3_messages: false
@@ -40,6 +49,7 @@ when@test:
 when@prod:
     monolog:
         handlers:
+            # Main handler: only logs errors and above (with buffering)
             main:
                 type: fingers_crossed
                 action_level: error
@@ -50,6 +60,27 @@ when@prod:
                 type: stream
                 path: php://stderr
                 level: debug
+                formatter: monolog.formatter.json
+            # Business events: always logged (info and above)
+            business:
+                type: stream
+                path: php://stderr
+                level: info
+                channels: [business]
+                formatter: monolog.formatter.json
+            # Security events: always logged (info and above)
+            security:
+                type: stream
+                path: php://stderr
+                level: info
+                channels: [security]
+                formatter: monolog.formatter.json
+            # Performance monitoring: warning and above
+            performance:
+                type: stream
+                path: php://stderr
+                level: warning
+                channels: [performance]
                 formatter: monolog.formatter.json
             console:
                 type: console

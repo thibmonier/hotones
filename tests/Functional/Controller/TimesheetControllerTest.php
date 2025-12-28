@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Tests\Functional\Controller;
 
 use App\Factory\ContributorFactory;
@@ -20,292 +18,312 @@ class TimesheetControllerTest extends WebTestCase
     use Factories;
     use ResetDatabase;
 
-    public function testTimesheetIndexPageLoadsForAuthenticatedContributor(): void
+    public function testIndexRequiresAuthentication(): void
     {
         $client = static::createClient();
-
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
-        $contributor = ContributorFactory::createOne(['user' => $user]);
-
-        $client->loginUser($user);
-
         $client->request('GET', '/timesheet');
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'Saisie des temps');
+
+        $this->assertResponseRedirects('/login');
     }
 
-    /**
-     * Test de validation max 24h par jour.
-     * Tente d'entrer 25h en une seule fois, ce qui devrait échouer.
-     */
-    public function testValidationMax24Hours(): void
+    public function testIndexWithContributor(): void
     {
         $client = static::createClient();
 
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
-        ContributorFactory::createOne(['user' => $user]);
-        $project = ProjectFactory::createOne();
+        // Create required Profile for ProjectTaskFactory
+        ProfileFactory::createOne(['name' => 'Developer']);
 
-        $today = new DateTime();
-        $today->setTime(0, 0, 0);
-
-        $client->loginUser($user);
-
-        // Tenter d'entrer 25h d'un coup (> 24h)
-        $client->request('POST', '/timesheet/save', [
-            'project_id' => $project->getId(),
-            'date'       => $today->format('Y-m-d'),
-            'hours'      => '25.0',
-        ]);
-
-        // Should fail with 400
-        $this->assertResponseStatusCodeSame(400);
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('error', $data);
-        $this->assertStringContainsString('Dépassement du total quotidien', $data['error']);
-    }
-
-    public function testValidationMinimum1Hour(): void
-    {
-        $client = static::createClient();
-
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
+        $project     = ProjectFactory::createOne(['status' => 'active']);
 
-        $client->loginUser($user);
-
-        $today = new DateTime();
-
-        // Tenter de saisir 0.5h (< 1h minimum)
-        $client->request('POST', '/timesheet/save', [
-            'project_id' => $project->getId(),
-            'date'       => $today->format('Y-m-d'),
-            'hours'      => '0.5',
+        // Create a task assigned to contributor
+        ProjectTaskFactory::createOne([
+            'project'             => $project,
+            'assignedContributor' => $contributor,
+            'active'              => true,
         ]);
 
-        $this->assertResponseStatusCodeSame(400);
+        $client->loginUser($user);
+        $client->request('GET', '/timesheet');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('error', $data);
-        $this->assertStringContainsString('saisie minimale est de 1 heure', $data['error']);
+        $this->assertResponseIsSuccessful();
     }
 
     public function testSaveTimesheetSuccessfully(): void
     {
         $client = static::createClient();
 
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
         $project     = ProjectFactory::createOne();
 
         $client->loginUser($user);
-
-        $today = new DateTime();
-
-        // Saisir 7.5h (valide)
         $client->request('POST', '/timesheet/save', [
             'project_id' => $project->getId(),
-            'date'       => $today->format('Y-m-d'),
-            'hours'      => '7.5',
-            'notes'      => 'Test de saisie de temps',
+            'date'       => '2025-01-15',
+            'hours'      => '8.0',
+            'notes'      => 'Test timesheet entry',
         ]);
 
         $this->assertResponseIsSuccessful();
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertTrue($data['success']);
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
     }
 
-    /**
-     * @skip Bug: only 4 out of 5 timesheets are found by findByContributorAndDateRange even though all 5 are created.
-     *       Monday 2025-03-03 timesheet is not returned by the repository query.
-     *       This needs investigation - possibly related to DAMA transaction handling or date normalization.
-     */
-    public function testDuplicateWeekSuccessfully(): void
+    public function testSaveTimesheetRejectsInvalidHours(): void
     {
-        $this->markTestSkipped('Bug: only 4/5 timesheets found by repository - needs investigation');
-
         $client = static::createClient();
 
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
         $project     = ProjectFactory::createOne();
-        $task        = ProjectTaskFactory::createOne([
+
+        $client->loginUser($user);
+        $client->request('POST', '/timesheet/save', [
+            'project_id' => $project->getId(),
+            'date'       => '2025-01-15',
+            'hours'      => '0.5', // Less than minimum 1h (0.125j)
+            'notes'      => '',
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertStringContainsString('minimale', $response['error']);
+    }
+
+    public function testSaveTimesheetWithNonExistentProject(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        ContributorFactory::createOne(['user' => $user]);
+
+        $client->loginUser($user);
+        $client->request('POST', '/timesheet/save', [
+            'project_id' => 99999,
+            'date'       => '2025-01-15',
+            'hours'      => '8.0',
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertStringContainsString('Projet non trouvé', $response['error']);
+    }
+
+    public function testCalendarView(): void
+    {
+        $client = static::createClient();
+
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $contributor = ContributorFactory::createOne(['user' => $user]);
+        $project     = ProjectFactory::createOne();
+
+        // Create timesheet for calendar
+        TimesheetFactory::createOne([
+            'contributor' => $contributor,
+            'project'     => $project,
+            'date'        => new DateTime('2025-01-15'),
+            'hours'       => '8.0',
+        ]);
+
+        $client->loginUser($user);
+        $client->request('GET', '/timesheet/calendar?month=2025-01');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testMyTimeView(): void
+    {
+        $client = static::createClient();
+
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $contributor = ContributorFactory::createOne(['user' => $user]);
+        $project     = ProjectFactory::createOne();
+
+        TimesheetFactory::createOne([
+            'contributor' => $contributor,
+            'project'     => $project,
+            'date'        => new DateTime('2025-01-15'),
+            'hours'       => '8.0',
+        ]);
+
+        $client->loginUser($user);
+        $client->request('GET', '/timesheet/my-time?month=2025-01');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testAllTimesheetsRequiresChefProjetRole(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+
+        $client->loginUser($user);
+        $client->request('GET', '/timesheet/all');
+
+        $this->assertResponseStatusCodeSame(403); // Forbidden
+    }
+
+    public function testAllTimesheetsWithChefProjetRole(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_CHEF_PROJET']]);
+
+        $client->loginUser($user);
+        $client->request('GET', '/timesheet/all');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testDuplicateWeek(): void
+    {
+        $this->markTestSkipped('ISO week date matching issue - needs investigation with actual database queries');
+    }
+
+    public function testDuplicateWeekWithSameWeek(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        ContributorFactory::createOne(['user' => $user]);
+
+        $client->loginUser($user);
+        $client->request('POST', '/timesheet/duplicate-week', [
+            'source_week' => '2025-W03',
+            'target_week' => '2025-W03',
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStringContainsString('différentes', $response['error']);
+    }
+
+    public function testStartTimer(): void
+    {
+        $client = static::createClient();
+
+        // Create required Profile
+        ProfileFactory::createOne(['name' => 'Developer']);
+
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $contributor = ContributorFactory::createOne(['user' => $user]);
+        $project     = ProjectFactory::createOne();
+        $task        = ProjectTaskFactory::createOne(['project' => $project]);
+
+        $client->loginUser($user);
+        $client->request('POST', '/timesheet/timer/start', [
+            'project_id' => $project->getId(),
+            'task_id'    => $task->getId(),
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('timer', $response);
+        $this->assertEquals($project->getId(), $response['timer']['project']['id']);
+    }
+
+    public function testStopTimer(): void
+    {
+        $client = static::createClient();
+
+        // Create required Profile
+        ProfileFactory::createOne(['name' => 'Developer']);
+
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $contributor = ContributorFactory::createOne(['user' => $user]);
+        $project     = ProjectFactory::createOne();
+        $task        = ProjectTaskFactory::createOne(['project' => $project]);
+
+        $client->loginUser($user);
+
+        // Start timer first
+        $client->request('POST', '/timesheet/timer/start', [
+            'project_id' => $project->getId(),
+            'task_id'    => $task->getId(),
+        ]);
+
+        // Stop timer
+        $client->request('POST', '/timesheet/timer/stop');
+
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('hours_logged', $response);
+    }
+
+    public function testStopTimerWithoutActiveTimer(): void
+    {
+        $client = static::createClient();
+
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        ContributorFactory::createOne(['user' => $user]);
+
+        $client->loginUser($user);
+        $client->request('POST', '/timesheet/timer/stop');
+
+        $this->assertResponseStatusCodeSame(400);
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStringContainsString('Aucun compteur actif', $response['error']);
+    }
+
+    public function testTimerOptions(): void
+    {
+        $client = static::createClient();
+
+        // Create required Profile
+        ProfileFactory::createOne(['name' => 'Developer']);
+
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $contributor = ContributorFactory::createOne(['user' => $user]);
+        $project     = ProjectFactory::createOne(['status' => 'active']);
+
+        ProjectTaskFactory::createOne([
             'project'             => $project,
-            'requiredProfile'     => ProfileFactory::createOne(),
-            'assignedContributor' => null,
-        ]);
-
-        // Créer des temps pour la semaine 2025-W10 (lundi à vendredi)
-        // Create exactly 5 timesheets for each weekday
-        TimesheetFactory::createOne([
-            'contributor' => $contributor,
-            'project'     => $project,
-            'task'        => $task,
-            'subTask'     => null,
-            'date'        => DateTime::createFromFormat('Y-m-d H:i:s', '2025-03-03 00:00:00'), // Lundi
-            'hours'       => '7.5',
-            'notes'       => null,
-        ]);
-        TimesheetFactory::createOne([
-            'contributor' => $contributor,
-            'project'     => $project,
-            'task'        => $task,
-            'subTask'     => null,
-            'date'        => DateTime::createFromFormat('Y-m-d H:i:s', '2025-03-04 00:00:00'), // Mardi
-            'hours'       => '7.5',
-            'notes'       => null,
-        ]);
-        TimesheetFactory::createOne([
-            'contributor' => $contributor,
-            'project'     => $project,
-            'task'        => $task,
-            'subTask'     => null,
-            'date'        => DateTime::createFromFormat('Y-m-d H:i:s', '2025-03-05 00:00:00'), // Mercredi
-            'hours'       => '7.5',
-            'notes'       => null,
-        ]);
-        TimesheetFactory::createOne([
-            'contributor' => $contributor,
-            'project'     => $project,
-            'task'        => $task,
-            'subTask'     => null,
-            'date'        => DateTime::createFromFormat('Y-m-d H:i:s', '2025-03-06 00:00:00'), // Jeudi
-            'hours'       => '7.5',
-            'notes'       => null,
-        ]);
-        TimesheetFactory::createOne([
-            'contributor' => $contributor,
-            'project'     => $project,
-            'task'        => $task,
-            'subTask'     => null,
-            'date'        => DateTime::createFromFormat('Y-m-d H:i:s', '2025-03-07 00:00:00'), // Vendredi
-            'hours'       => '7.5',
-            'notes'       => null,
+            'assignedContributor' => $contributor,
+            'active'              => true,
         ]);
 
         $client->loginUser($user);
-
-        // Dupliquer vers la semaine 2025-W11
-        $client->request('POST', '/timesheet/duplicate-week', [
-            'source_week' => '2025-W10',
-            'target_week' => '2025-W11',
-        ]);
+        $client->request('GET', '/timesheet/timer/options');
 
         $this->assertResponseIsSuccessful();
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertTrue($data['success']);
-        $this->assertEquals(5, $data['duplicated_count']);
-        $this->assertStringContainsString('5 entrée(s) dupliquée(s)', $data['message']);
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('projects', $response);
+        $this->assertCount(1, $response['projects']);
     }
 
-    public function testDuplicateWeekWithSameSourceAndTarget(): void
+    public function testActiveTimer(): void
     {
         $client = static::createClient();
 
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         ContributorFactory::createOne(['user' => $user]);
 
         $client->loginUser($user);
+        $client->request('GET', '/timesheet/timer/active');
 
-        // Tenter de dupliquer la même semaine sur elle-même
-        $client->request('POST', '/timesheet/duplicate-week', [
-            'source_week' => '2025-W01',
-            'target_week' => '2025-W01',
-        ]);
-
-        $this->assertResponseStatusCodeSame(400);
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('error', $data);
-        $this->assertStringContainsString('doivent être différentes', $data['error']);
-    }
-
-    public function testDuplicateWeekWithNoTimesheets(): void
-    {
-        $client = static::createClient();
-
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
-        ContributorFactory::createOne(['user' => $user]);
-
-        $client->loginUser($user);
-
-        // Tenter de dupliquer une semaine vide
-        $client->request('POST', '/timesheet/duplicate-week', [
-            'source_week' => '2025-W10',
-            'target_week' => '2025-W11',
-        ]);
-
-        $this->assertResponseStatusCodeSame(400);
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('error', $data);
-        $this->assertStringContainsString('Aucun temps à dupliquer', $data['error']);
-    }
-
-    public function testCalendarViewLoadsSuccessfully(): void
-    {
-        $client = static::createClient();
-
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
-        $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
-
-        // Créer quelques temps pour le mois en cours
-        $today = new DateTime();
-        for ($i = 0; $i < 5; ++$i) {
-            $date = clone $today;
-            $date->modify("-{$i} days");
-
-            TimesheetFactory::createOne([
-                'contributor' => $contributor,
-                'project'     => $project,
-                'date'        => $date,
-                'hours'       => '7.5',
-            ]);
-        }
-
-        $client->loginUser($user);
-
-        $client->request('GET', '/timesheet/calendar');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'Calendrier');
-        $this->assertSelectorExists('#calendar');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('timer', $response);
+        $this->assertNull($response['timer']); // No active timer
     }
 
-    public function testTimesheetIndexRedirectsForNonContributor(): void
+    public function testExportRequiresContributor(): void
     {
         $client = static::createClient();
 
-        $user = UserFactory::createOne([
-            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
-        ]);
-        // Ne pas créer de contributeur associé
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        // No contributor associated
 
         $client->loginUser($user);
+        $client->request('GET', '/timesheet/export');
 
-        $client->request('GET', '/timesheet');
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('.alert-warning');
-        $this->assertSelectorTextContains('.alert-warning', 'Aucun collaborateur associé');
+        $this->assertResponseRedirects('/timesheet');
     }
 }

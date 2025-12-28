@@ -26,10 +26,17 @@ class TimesheetRepository extends ServiceEntityRepository
 
     /**
      * Récupère les temps d'un contributeur pour une période donnée.
+     * Optimisé avec eager loading des relations project et task.
      */
     public function findByContributorAndDateRange(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('t')
+            ->leftJoin('t.project', 'p')
+            ->addSelect('p')
+            ->leftJoin('t.task', 'ta')
+            ->addSelect('ta')
+            ->leftJoin('t.subTask', 'st')
+            ->addSelect('st')
             ->where('t.contributor = :contributor')
             ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('contributor', $contributor)
@@ -61,12 +68,19 @@ class TimesheetRepository extends ServiceEntityRepository
 
     /**
      * Récupère tous les temps pour une période avec filtrage optionnel par projet.
+     * Optimisé avec eager loading des relations project et contributor.
      */
     public function findForPeriodWithProject(DateTimeInterface $startDate, DateTimeInterface $endDate, ?Project $project = null): array
     {
         $qb = $this->createQueryBuilder('t')
             ->leftJoin('t.project', 'p')
+            ->addSelect('p')
             ->leftJoin('t.contributor', 'c')
+            ->addSelect('c')
+            ->leftJoin('t.task', 'ta')
+            ->addSelect('ta')
+            ->leftJoin('t.subTask', 'st')
+            ->addSelect('st')
             ->where('t.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
@@ -84,6 +98,7 @@ class TimesheetRepository extends ServiceEntityRepository
 
     /**
      * Récupère tous les temps pour une période et une liste de projets.
+     * Optimisé avec eager loading des relations project et contributor.
      */
     public function findForPeriodWithProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
     {
@@ -93,7 +108,13 @@ class TimesheetRepository extends ServiceEntityRepository
 
         return $this->createQueryBuilder('t')
             ->leftJoin('t.project', 'p')
+            ->addSelect('p')
             ->leftJoin('t.contributor', 'c')
+            ->addSelect('c')
+            ->leftJoin('t.task', 'ta')
+            ->addSelect('ta')
+            ->leftJoin('t.subTask', 'st')
+            ->addSelect('st')
             ->where('t.date BETWEEN :start AND :end')
             ->andWhere('p.id IN (:projectIds)')
             ->setParameter('start', $startDate)
