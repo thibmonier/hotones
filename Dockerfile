@@ -92,6 +92,7 @@ RUN composer install \
     --no-scripts \
     --classmap-authoritative \
     --apcu-autoloader \
+    --ignore-platform-req=php \
     && composer clear-cache
 
 # Install AssetMapper vendor files and compile assets

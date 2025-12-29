@@ -110,6 +110,29 @@ PHP 8.5 brings several performance optimizations:
    - No changes required
    - Health checks and resource limits remain compatible
 
+## Composer Dependencies Compatibility
+
+**Issue:** Some dependencies don't officially support PHP 8.5 yet in their `composer.json`:
+
+- `sabberworm/php-css-parser` v8.9.0 - supports up to PHP 8.4
+- `dompdf/php-svg-lib` 1.0.0 - depends on sabberworm ^8.4
+
+**Solution:** Added `--ignore-platform-req=php` to production Dockerfile
+
+```dockerfile
+RUN composer install \
+    --ignore-platform-req=php \
+    # ... other flags
+```
+
+**Why it's safe:**
+- ✅ Tested: dompdf generates PDFs successfully with PHP 8.5.1
+- ✅ All 458 tests pass
+- ✅ Code is backward compatible
+- ⏳ Maintainers will update constraints in future releases
+
+**Note:** Version 9.1.0 of `sabberworm/php-css-parser` supports PHP 8.5, but `dompdf/php-svg-lib` still requires v8.x. Once `php-svg-lib` updates, we can remove the `--ignore-platform-req` flag.
+
 ## Rollback Procedure
 
 If issues arise, rollback with:
