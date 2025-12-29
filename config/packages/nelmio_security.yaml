@@ -47,19 +47,33 @@ nelmio_security:
                 - "'unsafe-inline'"  # Needed for Chart.js and inline handlers
                 - "cdn.jsdelivr.net"
                 - "'unsafe-eval'"    # Needed for some Chart.js features
+                - "www.googletagmanager.com"  # Google Tag Manager
+                - "www.google-analytics.com"  # Google Analytics
+                - "*.googletagmanager.com"    # GTM subdomains
             style-src:
                 - "'self'"
                 - "'unsafe-inline'"  # Needed for Bootstrap
                 - "cdn.jsdelivr.net"
+                - "fonts.googleapis.com"  # Google Fonts CSS
             img-src:
                 - "'self'"
                 - "data:"
                 - "blob:"
+                - "www.googletagmanager.com"  # GTM pixels
+                - "www.google-analytics.com"  # GA pixels
+                - "*.r2.dev"                  # Cloudflare R2 CDN
+                - "*.r2.cloudflarestorage.com"  # Cloudflare R2 storage
             font-src:
                 - "'self'"
                 - "data:"
+                - "fonts.gstatic.com"  # Google Fonts files
+                - "fonts.googleapis.com"  # Google Fonts files (fallback)
             connect-src:
                 - "'self'"
+                - "www.googletagmanager.com"  # GTM API calls
+                - "www.google-analytics.com"  # GA API calls
+                - "*.r2.dev"                  # Cloudflare R2 CDN
+                - "*.r2.cloudflarestorage.com"  # Cloudflare R2 storage
             frame-ancestors:
                 - "'none'"
             base-uri:
