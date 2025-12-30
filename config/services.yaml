@@ -6,9 +6,6 @@
 parameters:
     app.mail.from_email: '%env(MAIL_FROM_ADDRESS)%'
     app.mail.from_name: '%env(MAIL_FROM_NAME)%'
-    app.ai.openai_key: '%env(OPENAI_API_KEY)%'
-    app.ai.anthropic_key: '%env(ANTHROPIC_API_KEY)%'
-    app.ai.gemini_key: '%env(GEMINI_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
