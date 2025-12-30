@@ -59,6 +59,7 @@ security:
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/2fa, roles: PUBLIC_ACCESS }
+        - { path: ^/csp/report$, roles: PUBLIC_ACCESS }  # CSP violation reports (browsers send anonymously)
         - { path: ^/features, roles: PUBLIC_ACCESS }
         - { path: ^/pricing$, roles: PUBLIC_ACCESS }
         - { path: ^/about$, roles: PUBLIC_ACCESS }
