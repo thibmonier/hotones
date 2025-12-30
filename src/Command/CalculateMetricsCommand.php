@@ -18,6 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'app:calculate-metrics',
     description: 'Calcule les métriques analytics pour une période donnée',
+    aliases: ['hotones:calculate-metrics'],
 )]
 class CalculateMetricsCommand extends Command
 {

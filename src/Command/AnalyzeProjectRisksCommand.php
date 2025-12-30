@@ -18,6 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'app:analyze-project-risks',
     description: 'Analyse les risques des projets actifs et affiche un rapport',
+    aliases: ['hotones:analyze-project-risks'],
 )]
 class AnalyzeProjectRisksCommand extends Command
 {

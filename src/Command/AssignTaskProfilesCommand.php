@@ -17,6 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'app:assign-task-profiles',
     description: 'Automatically assign profiles to project tasks based on their name',
+    aliases: ['hotones:assign-task-profiles'],
 )]
 class AssignTaskProfilesCommand extends Command
 {

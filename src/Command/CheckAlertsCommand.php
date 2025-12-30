@@ -14,6 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'app:check-alerts',
     description: 'Vérifie et déclenche les alertes (budget, marge, surcharge, paiements)',
+    aliases: ['hotones:check-alerts'],
 )]
 class CheckAlertsCommand extends Command
 {

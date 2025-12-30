@@ -13,6 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'app:check-php-limits',
     description: 'Affiche les limites PHP pour les uploads de fichiers',
+    aliases: ['hotones:check-php-limits'],
 )]
 class CheckPhpLimitsCommand extends Command
 {

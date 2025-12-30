@@ -54,7 +54,13 @@ revoir la séparation MVC notamment l'absence de requetes dans les controlleurs 
 
 nettoyage et rangement de l'ensemble des templates (ils commencent à être nombreux)
 
+## contenu des pages de features (publiques)
 
+les features doivent montrer :
+- l'utilisation de l'IA dans le quotidien et dans chaque outil
+- la conformité RGPD
+- l'anticipation de conformité avec la loi sur la facturation electronique
+- les connecteurs avec les outils principaux du marché pour la gestion de projet, le CRM, les outils comptables.
 
 
 ---

@@ -21,6 +21,7 @@ use Symfony\Component\Mime\Email;
 #[AsCommand(
     name: 'app:satisfaction:send-reminders',
     description: 'Envoie des rappels aux collaborateurs qui n\'ont pas saisi leur satisfaction mensuelle',
+    aliases: ['hotones:satisfaction:send-reminders'],
 )]
 class ContributorSatisfactionReminderCommand extends Command
 {

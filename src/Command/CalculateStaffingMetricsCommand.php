@@ -20,6 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'app:calculate-staffing-metrics',
     description: 'Calcule les métriques de staffing (taux de staffing et TACE) pour une période donnée',
+    aliases: ['hotones:calculate-staffing-metrics'],
 )]
 class CalculateStaffingMetricsCommand extends Command
 {

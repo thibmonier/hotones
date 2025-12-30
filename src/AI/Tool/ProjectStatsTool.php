@@ -46,7 +46,7 @@ final readonly class ProjectStatsTool
         }
 
         // Récupérer les projets du type demandé
-        $projects = $this->projectRepository->findBy(['type' => $projectType]);
+        $projects = $this->projectRepository->findBy(['projectType' => $projectType]);
 
         if (empty($projects)) {
             return [
@@ -75,7 +75,7 @@ final readonly class ProjectStatsTool
             }
 
             // Budget moyen
-            $totalBudget += $project->getBudget() ?? 0.0;
+            $totalBudget += (float) $project->getTotalSoldAmount();
 
             // Statuts les plus fréquents
             $status               = $project->getStatus();

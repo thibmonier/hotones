@@ -58,7 +58,7 @@ final readonly class AiAssistantService
             Message::ofUser($prompt),
         );
 
-        return $this->emailAgent->call($messages);
+        return (string) $this->emailAgent->call($messages);
     }
 
     /**

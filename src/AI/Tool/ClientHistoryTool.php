@@ -62,7 +62,7 @@ final readonly class ClientHistoryTool
                 fn ($project) => [
                     'name'   => $project->getName(),
                     'status' => $project->getStatus(),
-                    'type'   => $project->getType(),
+                    'type'   => $project->getProjectType(),
                 ],
                 $projects,
             ),

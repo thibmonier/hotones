@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(
     name: 'app:analytics:cache',
     description: 'Gestion du cache analytics (clear, warmup)',
+    aliases: ['hotones:analytics:cache'],
 )]
 class AnalyticsCacheCommand extends Command
 {

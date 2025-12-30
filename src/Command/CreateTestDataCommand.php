@@ -31,6 +31,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[AsCommand(
     name: 'app:create-test-data',
     description: 'Crée des contributeurs réels et optionnellement des données de test (projets, devis, tâches)',
+    aliases: ['hotones:create-test-data'],
 )]
 class CreateTestDataCommand extends Command
 {

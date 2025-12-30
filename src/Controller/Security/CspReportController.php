@@ -122,7 +122,7 @@ class CspReportController extends AbstractController
                     try {
                         $context      = json_decode($matches[2], true, 512, JSON_THROW_ON_ERROR);
                         $violations[] = [
-                            'timestamp'          => $matches[1]                    ?? 'unknown',
+                            'timestamp'          => $matches[1],
                             'document_uri'       => $context['document_uri']       ?? 'unknown',
                             'violated_directive' => $context['violated_directive'] ?? 'unknown',
                             'blocked_uri'        => $context['blocked_uri']        ?? 'unknown',
