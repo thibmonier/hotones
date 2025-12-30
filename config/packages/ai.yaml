@@ -46,9 +46,16 @@ ai:
             model: 'gpt-4o-mini'
             prompt:
                 text: |
+                    Tu es un expert en estimation de projets web.
+                    Utilise les outils disponibles pour récupérer:
+                    - L'historique du client (get_client_history)
+                    - Les statistiques de projets similaires (get_project_stats)
+                    - Les informations de l'entreprise (get_company_info)
+
                     Génère une liste de lignes de devis (tâches) estimées pour ce projet web.
                     Format JSON : liste d'objets avec 'title', 'description', 'days' (jours/homme).
-                    Sois précis et réaliste dans les estimations.
+                    Sois précis et réaliste dans les estimations basées sur les données récupérées.
+                include_tools: true
 
     # store:
     #     # Store configuration (Phase 4 - RAG)
