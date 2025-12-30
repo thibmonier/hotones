@@ -298,6 +298,7 @@
       <path value="$PROJECT_DIR$/vendor/symfony/ai-anthropic-platform" />
       <path value="$PROJECT_DIR$/vendor/symfony/ai-open-ai-platform" />
       <path value="$PROJECT_DIR$/vendor/symfony/ai-agent" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-store" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

@@ -50,11 +50,13 @@ nelmio_security:
                 - "www.googletagmanager.com"  # Google Tag Manager
                 - "www.google-analytics.com"  # Google Analytics
                 - "*.googletagmanager.com"    # GTM subdomains
+                - "unpkg.com"
             style-src:
                 - "'self'"
                 - "'unsafe-inline'"  # Needed for Bootstrap
                 - "cdn.jsdelivr.net"
                 - "fonts.googleapis.com"  # Google Fonts CSS
+                - "unpkg.com"
             img-src:
                 - "'self'"
                 - "data:"
@@ -63,17 +65,21 @@ nelmio_security:
                 - "www.google-analytics.com"  # GA pixels
                 - "*.r2.dev"                  # Cloudflare R2 CDN
                 - "*.r2.cloudflarestorage.com"  # Cloudflare R2 storage
+                - "picsum.photos"
+                - "*.picsum.photos"              # Picsum images
             font-src:
                 - "'self'"
                 - "data:"
                 - "fonts.gstatic.com"  # Google Fonts files
                 - "fonts.googleapis.com"  # Google Fonts files (fallback)
+                - "cdn.jsdelivr.net" # Bootstrap fonts
             connect-src:
                 - "'self'"
                 - "www.googletagmanager.com"  # GTM API calls
                 - "www.google-analytics.com"  # GA API calls
                 - "*.r2.dev"                  # Cloudflare R2 CDN
                 - "*.r2.cloudflarestorage.com"  # Cloudflare R2 storage
+                - "cdn.jsdelivr.net"
             frame-ancestors:
                 - "'none'"
             base-uri:

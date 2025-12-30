@@ -7,9 +7,11 @@ namespace App\Controller\Security;
 use JsonException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -22,7 +24,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class CspReportController extends AbstractController
 {
     public function __construct(
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment,
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
     ) {
     }
 
@@ -80,5 +86,95 @@ class CspReportController extends AbstractController
 
             return new JsonResponse(['status' => 'error', 'message' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    /**
+     * Affiche les violations CSP récentes (dev only).
+     *
+     * Endpoint de debug pour visualiser les violations CSP loggées.
+     * Disponible uniquement en environnement de développement.
+     */
+    #[Route('/violations', name: 'csp_violations', methods: ['GET'])]
+    public function violations(): Response
+    {
+        // Disponible uniquement en dev
+        if ($this->environment !== 'dev') {
+            throw new NotFoundHttpException('This endpoint is only available in dev environment');
+        }
+
+        $logFile = $this->projectDir.'/var/log/dev.log';
+
+        if (!file_exists($logFile)) {
+            return $this->render('security/csp_violations.html.twig', [
+                'violations' => [],
+                'error'      => 'Log file not found',
+            ]);
+        }
+
+        // Lire les 1000 dernières lignes du log (pour performance)
+        $lines = $this->tail($logFile, 1000);
+
+        $violations = [];
+        foreach ($lines as $line) {
+            if (str_contains($line, 'CSP Violation detected')) {
+                // Parser la ligne de log pour extraire les infos
+                if (preg_match('/\[(.*?)\].*CSP Violation detected.*context:\s*({.*})/s', $line, $matches)) {
+                    try {
+                        $context      = json_decode($matches[2], true, 512, JSON_THROW_ON_ERROR);
+                        $violations[] = [
+                            'timestamp'          => $matches[1]                    ?? 'unknown',
+                            'document_uri'       => $context['document_uri']       ?? 'unknown',
+                            'violated_directive' => $context['violated_directive'] ?? 'unknown',
+                            'blocked_uri'        => $context['blocked_uri']        ?? 'unknown',
+                            'source_file'        => $context['source_file']        ?? null,
+                            'line_number'        => $context['line_number']        ?? null,
+                        ];
+                    } catch (JsonException $e) {
+                        // Ignorer les lignes mal formées
+                        continue;
+                    }
+                }
+            }
+        }
+
+        // Inverser pour avoir les plus récentes en premier
+        $violations = array_reverse($violations);
+
+        return $this->render('security/csp_violations.html.twig', [
+            'violations' => $violations,
+            'error'      => null,
+        ]);
+    }
+
+    /**
+     * Lire les dernières lignes d'un fichier (équivalent tail -n).
+     *
+     * @return array<int, string>
+     */
+    private function tail(string $filepath, int $lines = 100): array
+    {
+        $handle = fopen($filepath, 'r');
+        if (!$handle) {
+            return [];
+        }
+
+        $buffer = 4096;
+        fseek($handle, -1, SEEK_END);
+        $output = '';
+        $chunk  = '';
+
+        while (ftell($handle) > 0 && substr_count($output, "\n") < $lines) {
+            $seek = min(ftell($handle), $buffer);
+            fseek($handle, -$seek, SEEK_CUR);
+            $chunk  = fread($handle, $seek) ?: '';
+            $output = $chunk.$output;
+            fseek($handle, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+        }
+
+        fclose($handle);
+
+        $output = explode("\n", $output);
+
+        return array_slice($output, -$lines);
     }
 }

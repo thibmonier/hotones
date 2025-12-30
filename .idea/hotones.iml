@@ -258,6 +258,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ai-gemini-platform" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ai-open-ai-platform" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ai-platform" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ai-store" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
