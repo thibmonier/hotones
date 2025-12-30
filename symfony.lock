@@ -230,6 +230,18 @@
             "ref": "1019e5c08d4821cb9b77f4891f8e9c31ff20ac6f"
         }
     },
+    "symfony/ai-bundle": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "917b2a3da78a22e9488e99e1847d1f019d18da76"
+        },
+        "files": [
+            "config/packages/ai.yaml"
+        ]
+    },
     "symfony/apache-pack": {
         "version": "1.0",
         "recipe": {

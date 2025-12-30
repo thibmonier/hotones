@@ -1,0 +1,59 @@
+ai:
+    platform:
+        # Configuration des plateformes IA
+        openai:
+            api_key: '%env(OPENAI_API_KEY)%'
+
+        anthropic:
+            api_key: '%env(ANTHROPIC_API_KEY)%'
+
+        gemini:
+            api_key: '%env(GEMINI_API_KEY)%'
+
+    agent:
+        # Agent par défaut pour tests
+        default:
+            platform: 'ai.platform.openai'
+            model: 'gpt-4o-mini'
+            prompt: |
+                Tu es un assistant expert pour une agence web.
+                Tu aides à générer des devis précis et professionnels.
+
+        # Agent d'analyse de sentiment client
+        sentiment_analyzer:
+            platform: 'ai.platform.anthropic'
+            model: 'claude-3-5-haiku-20241022'
+            prompt:
+                text: |
+                    Analyse le sentiment du texte suivant issu d'un client.
+                    Réponds uniquement en JSON avec les clés:
+                    - sentiment: positive, neutral, negative
+                    - score: 0-100
+                    - summary: court résumé
+
+        # Agent de génération de réponse email
+        email_responder:
+            platform: 'ai.platform.openai'
+            model: 'gpt-4o-mini'
+            prompt:
+                text: |
+                    Rédige une réponse professionnelle et empathique à cet email client.
+                    La réponse doit être courtoise, précise et orientée solution.
+
+        # Agent de génération de lignes de devis
+        quote_generator:
+            platform: 'ai.platform.openai'
+            model: 'gpt-4o-mini'
+            prompt:
+                text: |
+                    Génère une liste de lignes de devis (tâches) estimées pour ce projet web.
+                    Format JSON : liste d'objets avec 'title', 'description', 'days' (jours/homme).
+                    Sois précis et réaliste dans les estimations.
+
+    # store:
+    #     # Store configuration (Phase 4 - RAG)
+    #     # Commenté pour l'instant pour éviter l'erreur de dépendance manquante
+    #     chromadb:
+    #         default:
+    #             client: 'client.service.id'
+    #             collection: 'my_collection'
