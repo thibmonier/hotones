@@ -84,7 +84,7 @@ final readonly class ProjectStatsTool
 
         $totalProjects = count($projects);
         $avgDuration   = $projectsWithDates > 0 ? $totalDuration / $projectsWithDates : 0;
-        $avgBudget     = $totalProjects     > 0 ? $totalBudget       / $totalProjects : 0;
+        $avgBudget     = $totalProjects     > 0 ? $totalBudget   / $totalProjects : 0;
 
         // Trier les statuts par fréquence
         arsort($statusCount);
