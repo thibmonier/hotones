@@ -43,6 +43,7 @@
         "symfony/ai-bundle": "*",
         "symfony/ai-gemini-platform": "*",
         "symfony/ai-open-ai-platform": "*",
+        "symfony/ai-store": "^0.1.0",
         "symfony/apache-pack": "^1.0.1",
         "symfony/asset": "^8.0",
         "symfony/asset-mapper": "^8.0",

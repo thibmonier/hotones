@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "053faf3f895d068c7594551b2dc296db",
+    "content-hash": "f3388adf664b2cc2dfa684004a68f7a0",
     "packages": [
         {
             "name": "anthropic-ai/sdk",
@@ -8485,6 +8485,117 @@
                 }
             ],
             "time": "2025-12-23T09:50:52+00:00"
+        },
+        {
+            "name": "symfony/ai-store",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ai-store.git",
+                "reference": "7995a2adb7181faaf476d1599e6afae4f804880c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ai-store/zipball/7995a2adb7181faaf476d1599e6afae4f804880c",
+                "reference": "7995a2adb7181faaf476d1599e6afae4f804880c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "php": ">=8.2",
+                "psr/log": "^3.0",
+                "symfony/ai-platform": "^0.1",
+                "symfony/clock": "^7.3|^8.0",
+                "symfony/http-client": "^7.3|^8.0",
+                "symfony/polyfill-php83": "^1.32",
+                "symfony/uid": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^11.5.46",
+                "symfony/console": "^6.4|^7.1",
+                "symfony/dependency-injection": "^6.4|^7.1",
+                "symfony/dom-crawler": "^6.4|^7.1"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/ai",
+                    "name": "symfony/ai"
+                },
+                "branch-alias": {
+                    "dev-main": "0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\AI\\Store\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christopher Hertel",
+                    "email": "mail@christopher-hertel.de"
+                },
+                {
+                    "name": "Oskar Stark",
+                    "email": "oskarstark@googlemail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Low-level abstraction for storing and retrieving documents in a vector store.",
+            "keywords": [
+                "ai",
+                "azure",
+                "chromadb",
+                "clickhouse",
+                "cloudflare",
+                "elasticsearch",
+                "mariadb",
+                "meilisearch",
+                "milvus",
+                "mongodb",
+                "neo4j",
+                "opensearch",
+                "pinecone",
+                "postgres",
+                "qdrant",
+                "supabase",
+                "surrealdb",
+                "typesense",
+                "weaviate"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ai-store/tree/v0.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2025-12-23T21:53:21+00:00"
         },
         {
             "name": "symfony/apache-pack",

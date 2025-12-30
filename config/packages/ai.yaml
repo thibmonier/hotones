@@ -57,10 +57,24 @@ ai:
                     Sois précis et réaliste dans les estimations basées sur les données récupérées.
                 include_tools: true
 
+    # Vector Store pour RAG (Retrieval-Augmented Generation)
+    # Configuration commentée pour l'instant - nécessite configuration avancée
+    # Pour Sprint 3, on utilise une recherche simple dans les fichiers
     # store:
-    #     # Store configuration (Phase 4 - RAG)
-    #     # Commenté pour l'instant pour éviter l'erreur de dépendance manquante
-    #     chromadb:
-    #         default:
-    #             client: 'client.service.id'
-    #             collection: 'my_collection'
+    #     memory:
+    #         documentation:
+    #             strategy: 'cosine'
+    # vectorizer:
+    #     openai_embeddings:
+    #         platform: 'ai.platform.openai'
+    #         model:
+    #             name: 'text-embedding-3-small'
+    # indexer:
+    #     docs:
+    #         loader: 'text_file'
+    #         store: 'ai.store.memory.documentation'
+    #         vectorizer: 'ai.vectorizer.openai_embeddings'
+    # retriever:
+    #     docs:
+    #         store: 'ai.store.memory.documentation'
+    #         vectorizer: 'ai.vectorizer.openai_embeddings'
