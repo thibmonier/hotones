@@ -62,6 +62,8 @@ les features doivent montrer :
 - l'anticipation de conformité avec la loi sur la facturation electronique
 - les connecteurs avec les outils principaux du marché pour la gestion de projet, le CRM, les outils comptables.
 
+le design du site public doit évoluer ou repartir de 0.
+Il doit etre à l'image de Unit404, c'est à dire en version light, utilisant l'image de Unit404 comme mascotte un peu partout
 
 ---
 
