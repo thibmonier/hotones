@@ -1,6 +1,6 @@
 # 🗺️ HotOnes - Roadmap Produit Unifiée
 
-> **Version harmonisée** - Dernière mise à jour : 26 décembre 2025
+> **Version harmonisée** - Dernière mise à jour : 31 décembre 2025
 >
 > Cette roadmap consolidée remplace les versions précédentes et constitue **la référence unique** pour le planning produit HotOnes.
 
@@ -9,8 +9,8 @@
 ### Statut global
 - **Total de lots** : 36 lots
 - **Terminés** : 5 lots (Lots 2, 3, 7, 11, 12)
-- **En cours** : 1 lot (Lot 9 - 35%)
-- **Planifiés** : 30 lots
+- **En cours** : 2 lots (Lot 9 - 35%, Lot 11bis - 40%)
+- **Planifiés** : 29 lots
 - **Estimation totale** : ~360-455 jours de développement
 
 ### Légende
@@ -318,7 +318,8 @@ Dashboards, analytics et conformité future.
 ---
 
 ### Lot 11bis : Sprint Technique & Consolidation
-**Estimation :** 10-14 jours | **Statut :** ⏳ Planifié
+**Estimation :** 10-14 jours | **Statut :** 🔄 En cours (40% - Phase 11bis.1 terminée)
+**Début :** 28 décembre 2025
 
 **Objectif :** Consolider les fondations techniques, améliorer la qualité et réduire la dette technique avant les gros chantiers.
 
@@ -327,42 +328,73 @@ Dashboards, analytics et conformité future.
 - Risque d'accumulation de dette pendant les lots futurs
 - Nécessité de consolider les bases avant RGPD et transformation SAAS
 
-**Fonctionnalités :**
+**Réalisations :**
 
-**11bis.1 Audit & Documentation (2-3 jours)**
-- ⏳ Audit de la qualité du code actuel (PHPStan, PHP CS Fixer, Deptrac)
-- ⏳ Documentation architecture (composants, dépendances, design patterns)
-- ⏳ Identification des hotspots de dette technique
-- ⏳ Revue des performances actuelles (profiling Blackfire)
-- ⏳ Audit de sécurité (OWASP Top 10)
+**11bis.1 Audit & Documentation (2-3 jours)** ✅ **Terminé (100%)**
+- ✅ Audit de la qualité du code actuel (PHPStan niveau 3 : 0 erreur, PHP CS Fixer : 0 violation)
+- ✅ Correction violations Deptrac (9 → 0 violations)
+- ✅ Identification des hotspots de dette technique (6 hotspots documentés)
+- ✅ Audit de sécurité (OWASP Top 10 : score 6.5/10)
+- ✅ Audit dépendances (composer audit : 0 vulnérabilité, npm audit : 0 vulnérabilité)
+- ✅ Configuration CSP (Content Security Policy activée)
+- ✅ Migration PHP 8.5 / Symfony 8.0 (projet déjà migré)
+- ✅ Implémentation Symfony AI Bundle (3 sprints : sentiment, email, quote agents)
+- 🔄 Documentation architecture (diagrammes à finaliser)
+- ⏳ Revue des performances actuelles (profiling Blackfire - planifié)
 
-**11bis.2 Qualité & Tests (3-4 jours)**
-- ⏳ Augmentation couverture tests à 60% (focus entités critiques)
+**Documents générés :**
+- `technical-audit-lot11bis-2025-12-28.md` (audit qualité/sécurité)
+- `technical-debt-hotspots-2025-12-28.md` (6 hotspots priorisés)
+- `security-audit-owasp-2025-12-27.md` (audit OWASP)
+- `csp-configuration-2025-12-28.md` (configuration CSP)
+
+**Travaux en cours :**
+
+**11bis.2 Qualité & Tests (3-4 jours)** ⏳ **Planifié**
+- ⏳ Augmentation couverture tests de 15% à 60% (focus entités critiques)
 - ⏳ Tests unitaires Services métier (DashboardReadService, MetricsCalculationService)
 - ⏳ Tests d'intégration Repositories (OrderRepository, ProjectRepository)
 - ⏳ Tests fonctionnels Controllers critiques (timesheet, analytics)
 - ⏳ Configuration Infection pour mutation testing
 
-**11bis.3 Performance & Optimisation (2-3 jours)**
-- ⏳ Profiling Blackfire sur parcours critiques
+**11bis.3 Performance & Optimisation (2-3 jours)** ⏳ **Planifié**
+- ⏳ Profiling Blackfire sur parcours critiques (dashboard, timesheet, projets)
 - ⏳ Optimisation requêtes N+1 identifiées
 - ⏳ Mise en place cache Redis (doctrine, HTTP)
 - ⏳ Indexation base de données (analyse explain)
 - ⏳ Optimisation chargement assets (lazy loading, code splitting)
 
-**11bis.4 Sécurité (2-3 jours)**
-- ⏳ Audit OWASP Top 10 (injection, XSS, CSRF, auth)
-- ⏳ Configuration headers de sécurité (CSP, HSTS, X-Frame-Options)
+**11bis.4 Sécurité (2-3 jours)** 🔄 **Partiellement complété**
+- ✅ Audit OWASP Top 10 (score 6.5/10)
+- ✅ Configuration CSP (Content-Security-Policy activée avec nelmio/security-bundle)
+- ✅ Headers de sécurité configurés (X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+- ✅ Audit dépendances (0 vulnérabilité)
+- ⏳ HSTS (à activer en production)
 - ⏳ Rotation secrets et clés API (Symfony Secrets)
 - ⏳ Revue permissions et voters
-- ⏳ Audit dépendances (composer audit, npm audit)
+- ⏳ SRI (Subresource Integrity) pour CDN externes
 
-**11bis.5 Infrastructure & DevOps (1-2 jours)**
+**11bis.5 Infrastructure & DevOps (1-2 jours)** ⏳ **Planifié**
 - ⏳ Optimisation images Docker (multi-stage builds)
-- ⏳ Configuration CI/CD (GitHub Actions ou GitLab CI)
-- ⏳ Mise en place monitoring (logs centralisés, APM)
+- 🔄 Configuration CI/CD (GitHub Actions configuré, à optimiser)
+- ⏳ Mise en place monitoring (logs centralisés, APM Sentry)
 - ⏳ Documentation déploiement et rollback
 - ⏳ Scripts de backup et restauration base de données
+
+**État actuel (31 décembre 2025) :**
+- **Progression globale** : 40% (~4j sur 10-14j estimés)
+- **Phase 11bis.1** : ✅ 100% terminée
+- **Phase 11bis.2** : ⏳ 0% (planifiée)
+- **Phase 11bis.3** : ⏳ 0% (planifiée)
+- **Phase 11bis.4** : 🔄 30% (CSP configurée, audit complété)
+- **Phase 11bis.5** : ⏳ 0% (planifiée)
+
+**Prochaines étapes :**
+1. Finaliser documentation architecture (diagrammes Mermaid)
+2. Profiling Blackfire des parcours critiques
+3. Augmentation couverture tests à 60% (priorité #1)
+4. Optimisations performance basées sur profiling
+5. Activation HSTS en production
 
 **ROI attendu :**
 - Réduction incidents production : -30%
@@ -370,9 +402,11 @@ Dashboards, analytics et conformité future.
 - Réduction temps de réponse : -40%
 - Confiance déploiements : +50%
 
-**Dépendances :** Idéalement après Lots 2, 3, 7, 11, 12 (fondations en place)
+**Dépendances :** Idéalement après Lots 2, 3, 7, 11, 12 (fondations en place) ✅
 
 **Impact :** Réduction dette technique, qualité code, performances, sécurité
+
+**Rapport détaillé :** `docs/11-reports/lot11bis-progress-2025-12-28.md`
 
 ---
 
