@@ -225,14 +225,45 @@ Testing:
 - ✅ PHPStan passes (level 3)
 - ✅ Backup created (586KB)
 
+### Migration 10: Add company_id to Batch 8 (Final Tables) 🎉
+**File:** `migrations/Version20251231145000.php`
+**Status:** ✅ Completed & Tested
+**Commit:** a244d7e
+
+This is the **FINAL migration**, completing the database migration phase by adding company_id to the last 13 tables:
+
+**Batch 8A: Gamification (4 tables)**
+1. **badges** - all to default company (no FK)
+2. **achievements** - copy from contributors
+3. **xp_history** - copy from contributors
+4. **contributor_progress** - copy from contributors
+
+**Batch 8B: System & Misc (9 tables)**
+5. **account_deletion_requests** - copy from users
+6. **cookie_consents** - copy from users
+7. **contributor_satisfactions** - copy from contributors
+8. **nps_surveys** - copy from projects
+9. **onboarding_tasks** - copy from contributors
+10. **onboarding_templates** - copy from profiles, fallback to default
+11. **company_settings** - all to default company
+    - **SPECIAL:** Added UNIQUE constraint on company_id (one settings per company)
+12. **scheduler_entries** - all to default company (system-level)
+13. **lead_captures** - all to default company (marketing data)
+
+Special handling:
+- **onboarding_templates**: Rows without profile_id assigned to default company
+- **company_settings**: UNIQUE constraint ensures one settings record per company
+
+Testing:
+- ✅ Migration up successful (813.9ms, 67 SQL queries)
+- ✅ Rollback down tested (145.9ms, 40 SQL queries)
+- ✅ Re-migration confirmed (835.1ms, 67 SQL queries)
+- ✅ PHPStan passes (level 3)
+- ✅ Backup created (588KB)
+
 ---
 
-## 📋 Pending Migrations
-
-### Migration 10: Final Batch (System & Gamification)
-**Status:** 📝 Planned
-- Batch 8: Remaining 13 tables (gamification, system, misc)
-- Final validation and cleanup
+## 🎉 Phase 2.6 - Database Migrations: COMPLETE!
 
 ---
 
@@ -241,7 +272,7 @@ Testing:
 ### Backup Scripts
 ✅ `scripts/backup-database.sh` - Creates timestamped MySQL dumps
 ✅ `scripts/restore-database.sh` - Restores with metadata sync
-✅ Latest backup: `backups/lot23_migration9_final.sql` (586KB)
+✅ Latest backup: `backups/lot23_migration10_final.sql` (588KB)
 
 ### Documentation
 ✅ `docs/11-reports/lot-23-migration-guide.md` - Complete guide
@@ -252,7 +283,7 @@ Testing:
 
 ## 📊 Progress Summary
 
-**Phase 2.6 - Database Migrations:** 90% Complete (9/10 migrations)
+**Phase 2.6 - Database Migrations:** ✅ 100% COMPLETE (10/10 migrations)
 
 | Migration | Tables | Status | Reversible | Tested |
 |-----------|--------|--------|------------|--------|
@@ -265,9 +296,9 @@ Testing:
 | 7 - Batch 5 | 3 | ✅ | ✅ | ✅ |
 | 8 - Batch 6 | 7 | ✅ | ✅ | ✅ |
 | 9 - Batch 7 | 22 | ✅ | ✅ | ✅ |
-| 10 - Batch 8 | ~13 | 📝 | - | - |
+| 10 - Batch 8 | 13 | ✅ | ✅ | ✅ |
 
-**Total tables with company_id:** 51/64 (80%)
+**Total tables with company_id:** 64/64 (100%) 🎉
 
 ---
 
@@ -280,9 +311,12 @@ Testing:
 5. ✅ Migration 7 complete
 6. ✅ Migration 8 complete
 7. ✅ Migration 9 complete
-8. 🔜 Create Migration 10 (Batch 8 - Final 13 tables)
-9. Phase 2.5: Frontend tenant selection components
-10. Phase 3: Testing (API contract, E2E, security audit)
+8. ✅ Migration 10 complete - **ALL MIGRATIONS DONE!** 🎉
+9. 🔜 Phase 2.7: Entity updates (add CompanyOwnedInterface to all entities)
+10. Phase 2.8: Repository filters (add company scoping)
+11. Phase 2.9: Service layer updates
+12. Phase 2.5: Frontend tenant selection components
+13. Phase 3: Testing (API contract, E2E, security audit)
 
 ---
 
@@ -319,5 +353,6 @@ All migrations pass:
 
 ---
 
-**Last updated:** 2025-12-31 14:40
+**Last updated:** 2025-12-31 14:50
+**Status:** ✅ Phase 2.6 Complete - All database migrations executed successfully!
 **Author:** Claude Code (Lot 23 - Phase 2.6)
