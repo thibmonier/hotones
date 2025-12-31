@@ -68,13 +68,33 @@ Testing:
 - ✅ PHPStan passes
 - ✅ Backup created (567KB)
 
+### Migration 5: Add company_id to Batch 3 (Orders)
+**File:** `migrations/Version20251231124027.php`
+**Status:** ✅ Completed & Tested
+**Commit:** 268acb6
+
+Tables modified:
+1. **orders** - company_id from projects, or default if no project
+   - **CRITICAL:** order_number unique constraint changed from global to composite (order_number, company_id)
+2. **order_sections** - company_id from orders
+3. **order_lines** - company_id from orders (via sections double-hop)
+4. **order_payment_schedules** - company_id from orders
+
+Unique constraint changes:
+- Dropped: `UNIQ_E52FFDEE551F0F81` (order_number only)
+- Added: `order_number_company_unique` (order_number, company_id)
+- Allows different companies to use same order numbers
+
+Testing:
+- ✅ Migration up successful (242ms, 23 SQL queries)
+- ✅ Rollback down tested (60ms, 14 SQL queries)
+- ✅ Re-migration confirmed (117ms, 23 SQL queries)
+- ✅ PHPStan passes
+- ✅ Backup created (568KB)
+
 ---
 
 ## 📋 Pending Migrations
-
-### Migration 5: Add company_id to Batch 3 (Orders)
-**Status:** 📝 Planned
-**Tables:** orders (+ order_number unique constraint), order_sections, order_lines, order_payment_schedules
 
 ### Migrations 6-10: Remaining Batches
 **Status:** 📝 Planned
@@ -90,7 +110,7 @@ Testing:
 ### Backup Scripts
 ✅ `scripts/backup-database.sh` - Creates timestamped MySQL dumps
 ✅ `scripts/restore-database.sh` - Restores with metadata sync
-✅ Latest backup: `backups/lot23_migration4_final.sql` (567KB)
+✅ Latest backup: `backups/lot23_migration5_final.sql` (568KB)
 
 ### Documentation
 ✅ `docs/11-reports/lot-23-migration-guide.md` - Complete guide
@@ -101,7 +121,7 @@ Testing:
 
 ## 📊 Progress Summary
 
-**Phase 2.6 - Database Migrations:** 40% Complete (4/10 migrations)
+**Phase 2.6 - Database Migrations:** 50% Complete (5/10 migrations)
 
 | Migration | Tables | Status | Reversible | Tested |
 |-----------|--------|--------|------------|--------|
@@ -109,10 +129,10 @@ Testing:
 | 2 - Users | 1 | ✅ | ✅ | ✅ |
 | 3 - Batch 1 | 4 | ✅ | ✅ | ✅ |
 | 4 - Batch 2 | 5 | ✅ | ✅ | ✅ |
-| 5 - Batch 3 | 4 | 🔜 | - | - |
+| 5 - Batch 3 | 4 | ✅ | ✅ | ✅ |
 | 6-10 - Remaining | ~30 | 📝 | - | - |
 
-**Total tables with company_id:** 12/45 (26%)
+**Total tables with company_id:** 16/45 (35%)
 
 ---
 
@@ -120,10 +140,11 @@ Testing:
 
 1. ✅ Migration 3 complete
 2. ✅ Migration 4 complete
-3. 🔜 Create Migration 5 (Batch 3 - Orders)
-4. Continue with Migrations 6-10
-5. Phase 2.5: Frontend tenant selection components
-6. Phase 3: Testing (API contract, E2E, security audit)
+3. ✅ Migration 5 complete
+4. 🔜 Create Migration 6 (Batch 4 - Timesheets & Planning)
+5. Continue with Migrations 7-10
+6. Phase 2.5: Frontend tenant selection components
+7. Phase 3: Testing (API contract, E2E, security audit)
 
 ---
 
@@ -140,7 +161,7 @@ Testing:
 3. **Unique Constraints Modified:**
    - users.email: unique → unique(email, company_id)
    - profiles.name: unique → unique(name, company_id)
-   - orders.order_number: unique → unique(order_number, company_id) [pending]
+   - orders.order_number: unique → unique(order_number, company_id) ✅
 
 4. **Cascade Deletes:** All FK to companies(id) use ON DELETE CASCADE
 
@@ -157,5 +178,5 @@ All migrations pass:
 
 ---
 
-**Last updated:** 2025-12-31 11:05
+**Last updated:** 2025-12-31 13:45
 **Author:** Claude Code (Lot 23 - Phase 2.6)
