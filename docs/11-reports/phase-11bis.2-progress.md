@@ -113,16 +113,42 @@ Testing:
 - ✅ PHPStan passes
 - ✅ Backup created (571KB)
 
+### Migration 7: Add company_id to Batch 5 (Reference Data)
+**File:** `migrations/Version20251231125258.php`
+**Status:** ✅ Completed & Tested
+**Commit:** 4c02669
+
+Tables modified:
+1. **technologies** - all to default company (id=1)
+2. **service_categories** - all to default company (id=1)
+3. **skills** - all to default company (id=1)
+   - **CRITICAL:** skills.name unique constraint changed from global to composite (name, company_id)
+
+Unique constraint changes (skills):
+- Dropped: `UNIQ_D53116705E237E06` (name only)
+- Added: `skill_name_company_unique` (name, company_id)
+- Allows different companies to use same skill names
+
+Data propagation:
+- Reference data tables have no direct company relationships
+- All assigned to default company (id=1)
+
+Testing:
+- ✅ Migration up successful (81ms, 17 SQL queries)
+- ✅ Rollback down tested (37ms, 11 SQL queries)
+- ✅ Re-migration confirmed (68ms, 17 SQL queries)
+- ✅ PHPStan passes
+- ✅ Backup created (571KB)
+
 ---
 
 ## 📋 Pending Migrations
 
-### Migrations 6-10: Remaining Batches
+### Migrations 8-10: Remaining Batches
 **Status:** 📝 Planned
-- Batch 4: timesheets, planning
-- Batch 5: technologies, service_categories, skills
 - Batch 6: analytics (fact_*, dim_*)
-- Batch 7: notifications, HR, finance
+- Batch 7: notifications, HR, finance entities
+- Final validation and cleanup
 
 ---
 
@@ -131,7 +157,7 @@ Testing:
 ### Backup Scripts
 ✅ `scripts/backup-database.sh` - Creates timestamped MySQL dumps
 ✅ `scripts/restore-database.sh` - Restores with metadata sync
-✅ Latest backup: `backups/lot23_migration6_final.sql` (571KB)
+✅ Latest backup: `backups/lot23_migration7_final.sql` (571KB)
 
 ### Documentation
 ✅ `docs/11-reports/lot-23-migration-guide.md` - Complete guide
@@ -142,7 +168,7 @@ Testing:
 
 ## 📊 Progress Summary
 
-**Phase 2.6 - Database Migrations:** 60% Complete (6/10 migrations)
+**Phase 2.6 - Database Migrations:** 70% Complete (7/10 migrations)
 
 | Migration | Tables | Status | Reversible | Tested |
 |-----------|--------|--------|------------|--------|
@@ -152,9 +178,10 @@ Testing:
 | 4 - Batch 2 | 5 | ✅ | ✅ | ✅ |
 | 5 - Batch 3 | 4 | ✅ | ✅ | ✅ |
 | 6 - Batch 4 | 3 | ✅ | ✅ | ✅ |
-| 7-10 - Remaining | ~27 | 📝 | - | - |
+| 7 - Batch 5 | 3 | ✅ | ✅ | ✅ |
+| 8-10 - Remaining | ~24 | 📝 | - | - |
 
-**Total tables with company_id:** 19/45 (42%)
+**Total tables with company_id:** 22/45 (49%)
 
 ---
 
@@ -164,10 +191,11 @@ Testing:
 2. ✅ Migration 4 complete
 3. ✅ Migration 5 complete
 4. ✅ Migration 6 complete
-5. 🔜 Create Migration 7 (Batch 5 - Reference Data)
-6. Continue with Migrations 8-10
-7. Phase 2.5: Frontend tenant selection components
-8. Phase 3: Testing (API contract, E2E, security audit)
+5. ✅ Migration 7 complete
+6. 🔜 Create Migration 8 (Batch 6 - Analytics)
+7. Continue with Migrations 9-10
+8. Phase 2.5: Frontend tenant selection components
+9. Phase 3: Testing (API contract, E2E, security audit)
 
 ---
 
@@ -184,7 +212,8 @@ Testing:
 3. **Unique Constraints Modified:**
    - users.email: unique → unique(email, company_id)
    - profiles.name: unique → unique(name, company_id)
-   - orders.order_number: unique → unique(order_number, company_id) ✅
+   - orders.order_number: unique → unique(order_number, company_id)
+   - skills.name: unique → unique(name, company_id) ✅
 
 4. **Cascade Deletes:** All FK to companies(id) use ON DELETE CASCADE
 
@@ -201,5 +230,5 @@ All migrations pass:
 
 ---
 
-**Last updated:** 2025-12-31 13:50
+**Last updated:** 2025-12-31 13:55
 **Author:** Claude Code (Lot 23 - Phase 2.6)
