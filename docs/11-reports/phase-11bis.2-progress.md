@@ -92,6 +92,27 @@ Testing:
 - ✅ PHPStan passes
 - ✅ Backup created (568KB)
 
+### Migration 6: Add company_id to Batch 4 (Timesheets & Planning)
+**File:** `migrations/Version20251231124749.php`
+**Status:** ✅ Completed & Tested
+**Commit:** a4e1da4
+
+Tables modified:
+1. **timesheets** - company_id from contributors
+2. **vacations** - company_id from contributors
+3. **planning** - company_id from contributors
+
+Data propagation:
+- All three tables have contributor_id as required FK
+- Straightforward copy from contributors.company_id
+
+Testing:
+- ✅ Migration up successful (184ms, 15 SQL queries)
+- ✅ Rollback down tested (57ms, 9 SQL queries)
+- ✅ Re-migration confirmed (104ms, 15 SQL queries)
+- ✅ PHPStan passes
+- ✅ Backup created (571KB)
+
 ---
 
 ## 📋 Pending Migrations
@@ -110,7 +131,7 @@ Testing:
 ### Backup Scripts
 ✅ `scripts/backup-database.sh` - Creates timestamped MySQL dumps
 ✅ `scripts/restore-database.sh` - Restores with metadata sync
-✅ Latest backup: `backups/lot23_migration5_final.sql` (568KB)
+✅ Latest backup: `backups/lot23_migration6_final.sql` (571KB)
 
 ### Documentation
 ✅ `docs/11-reports/lot-23-migration-guide.md` - Complete guide
@@ -121,7 +142,7 @@ Testing:
 
 ## 📊 Progress Summary
 
-**Phase 2.6 - Database Migrations:** 50% Complete (5/10 migrations)
+**Phase 2.6 - Database Migrations:** 60% Complete (6/10 migrations)
 
 | Migration | Tables | Status | Reversible | Tested |
 |-----------|--------|--------|------------|--------|
@@ -130,9 +151,10 @@ Testing:
 | 3 - Batch 1 | 4 | ✅ | ✅ | ✅ |
 | 4 - Batch 2 | 5 | ✅ | ✅ | ✅ |
 | 5 - Batch 3 | 4 | ✅ | ✅ | ✅ |
-| 6-10 - Remaining | ~30 | 📝 | - | - |
+| 6 - Batch 4 | 3 | ✅ | ✅ | ✅ |
+| 7-10 - Remaining | ~27 | 📝 | - | - |
 
-**Total tables with company_id:** 16/45 (35%)
+**Total tables with company_id:** 19/45 (42%)
 
 ---
 
@@ -141,10 +163,11 @@ Testing:
 1. ✅ Migration 3 complete
 2. ✅ Migration 4 complete
 3. ✅ Migration 5 complete
-4. 🔜 Create Migration 6 (Batch 4 - Timesheets & Planning)
-5. Continue with Migrations 7-10
-6. Phase 2.5: Frontend tenant selection components
-7. Phase 3: Testing (API contract, E2E, security audit)
+4. ✅ Migration 6 complete
+5. 🔜 Create Migration 7 (Batch 5 - Reference Data)
+6. Continue with Migrations 8-10
+7. Phase 2.5: Frontend tenant selection components
+8. Phase 3: Testing (API contract, E2E, security audit)
 
 ---
 
@@ -178,5 +201,5 @@ All migrations pass:
 
 ---
 
-**Last updated:** 2025-12-31 13:45
+**Last updated:** 2025-12-31 13:50
 **Author:** Claude Code (Lot 23 - Phase 2.6)
