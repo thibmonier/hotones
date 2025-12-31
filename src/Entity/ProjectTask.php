@@ -231,8 +231,8 @@ class ProjectTask implements CompanyOwnedInterface
 
         // 1. Temps passé directement sur la tâche (sans sous-tâche spécifiée)
         foreach ($this->project->getTimesheets() as $timesheet) {
-            if ($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId() && $timesheet->getSubTask() === null) {
-                $totalHours = bcadd($totalHours, $timesheet->getHours(), 2);
+            if ($timesheet->task && $timesheet->task->getId() === $this->getId() && $timesheet->subTask === null) {
+                $totalHours = bcadd($totalHours, $timesheet->hours, 2);
             }
         }
 

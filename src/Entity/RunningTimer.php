@@ -8,13 +8,16 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\RunningTimerRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RunningTimerRepository::class)]
 #[ORM\Table(name: 'running_timers')]
+#[ORM\Index(name: 'idx_runningtimer_company', columns: ['company_id'])]
 #[ApiResource(
     operations: [
         new Get(security: "is_granted('ROLE_USER')"),
@@ -27,13 +30,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['timer:write']],
     paginationEnabled: false,
 )]
-class RunningTimer
+class RunningTimer implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['timer:read'])]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Contributor::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -143,5 +151,17 @@ class RunningTimer
     public function isActive(): bool
     {
         return $this->stoppedAt === null;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

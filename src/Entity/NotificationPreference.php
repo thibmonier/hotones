@@ -2,20 +2,28 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Enum\NotificationType;
 use App\Repository\NotificationPreferenceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NotificationPreferenceRepository::class)]
 #[ORM\Table(name: 'notification_preferences')]
 #[ORM\UniqueConstraint(name: 'user_event_unique', columns: ['user_id', 'event_type'])]
-class NotificationPreference
+#[ORM\Index(name: 'idx_notificationpreference_company', columns: ['company_id'])]
+class NotificationPreference implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -94,6 +102,18 @@ class NotificationPreference
     public function setWebhook(bool $webhook): self
     {
         $this->webhook = $webhook;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

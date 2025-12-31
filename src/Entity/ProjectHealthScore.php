@@ -4,21 +4,29 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ProjectHealthScoreRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectHealthScoreRepository::class)]
 #[ORM\Table(name: 'project_health_score')]
 #[ORM\Index(columns: ['project_id', 'calculated_at'], name: 'idx_project_date')]
 #[ORM\Index(columns: ['health_level'], name: 'idx_health_level')]
-class ProjectHealthScore
+#[ORM\Index(columns: ['company_id'], name: 'idx_projecthealthscore_company')]
+class ProjectHealthScore implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Project::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -227,6 +235,18 @@ class ProjectHealthScore
     public function setCalculatedAt(DateTimeImmutable $calculatedAt): static
     {
         $this->calculatedAt = $calculatedAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ProviderRepository;
 use DateTime;
 use DateTimeInterface;
@@ -11,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Canal de distribution/paiement pour les abonnements SaaS.
@@ -18,8 +20,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: ProviderRepository::class)]
 #[ORM\Table(name: 'saas_distribution_providers')]
+#[ORM\Index(name: 'idx_provider_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
-class Provider
+class Provider implements CompanyOwnedInterface
 {
     // Types de providers
     public const TYPE_APP_STORE         = 'app_store';
@@ -38,6 +41,11 @@ class Provider
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Nom du provider (ex: "Apple Store", "Google Play", "Stripe", "Direct").
@@ -204,5 +212,17 @@ class Provider
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

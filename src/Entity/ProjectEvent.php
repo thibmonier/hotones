@@ -4,21 +4,29 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ProjectEventRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectEventRepository::class)]
 #[ORM\Table(name: 'project_events')]
 #[ORM\Index(columns: ['project_id', 'created_at'], name: 'idx_project_created')]
 #[ORM\Index(columns: ['event_type'], name: 'idx_event_type')]
-class ProjectEvent
+#[ORM\Index(columns: ['company_id'], name: 'idx_projectevent_company')]
+class ProjectEvent implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Project::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -118,6 +126,18 @@ class ProjectEvent
     public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }
