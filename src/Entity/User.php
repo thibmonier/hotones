@@ -56,6 +56,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[Groups(['user:read'])]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private ?Company $company = null;
+
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email]
@@ -392,5 +397,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     public function isTotpEnabled(): ?bool
     {
         return $this->totpEnabled;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }
