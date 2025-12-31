@@ -168,13 +168,70 @@ Testing:
 - ✅ PHPStan passes
 - ✅ Backup created (580KB)
 
+### Migration 9: Add company_id to Batch 7 (Business Critical Tables)
+**File:** `migrations/Version20251231142500.php`
+**Status:** ✅ Completed & Tested
+**Commit:** f4dcea4
+
+This is the largest migration, adding company_id to 22 business-critical tables across 4 batches:
+
+**Batch 7A: Project & Finance (9 tables)**
+1. **project_events** - copy from projects
+2. **project_health_score** - copy from projects
+3. **project_technologies** - junction table (no id), copy from projects
+4. **project_technology_versions** - copy from projects
+5. **order_tasks** - copy from orders
+6. **running_timers** - copy from contributors (primary) OR projects (fallback)
+7. **invoices** - copy from clients (primary) OR projects (fallback)
+   - **CRITICAL:** invoice_number unique constraint changed to composite (invoice_number, company_id)
+8. **invoice_lines** - copy from invoices
+9. **expense_reports** - copy from contributors (primary) OR projects (fallback)
+
+**Batch 7B: HR & Employment (3 tables)**
+10. **employment_period_profiles** - junction table (no id), copy from employment_periods
+11. **contributor_profiles** - junction table (no id), copy from contributors
+12. **performance_reviews** - copy from contributors
+
+**Batch 7C: SaaS & Subscriptions (7 tables)**
+13. **saas_providers** - all to default company (no FK)
+14. **saas_services** - copy from saas_providers
+15. **saas_subscriptions** - copy from saas_services
+16. **saas_vendors** - all to default company (no FK)
+17. **saas_distribution_providers** - all to default company (no FK)
+18. **saas_subscriptions_v2** - copy from saas_vendors OR saas_distribution_providers (fallback)
+19. **billing_markers** - copy from orders
+
+**Batch 7D: Notifications (3 tables)**
+20. **notifications** - copy from users (recipient_id)
+21. **notification_preferences** - copy from users
+22. **notification_settings** - all to default company (global settings)
+    - **CRITICAL:** setting_key unique constraint changed to composite (setting_key, company_id)
+
+Unique constraint changes:
+- Dropped: `UNIQ_6A2F2F952DA68207` (invoice_number only)
+- Added: `invoice_number_company_unique` (invoice_number, company_id)
+- Dropped: `UNIQ_B05598605FA1E697` (setting_key only)
+- Added: `setting_key_company_unique` (setting_key, company_id)
+
+Junction tables (no id column):
+- project_technologies (project_id, technology_id composite PK)
+- employment_period_profiles (employment_period_id, profile_id composite PK)
+- contributor_profiles (contributor_id, profile_id composite PK)
+
+Testing:
+- ✅ Migration up successful (1838.7ms, 122 SQL queries)
+- ✅ Rollback down tested (218.2ms, 70 SQL queries)
+- ✅ Re-migration confirmed (735.1ms, 122 SQL queries)
+- ✅ PHPStan passes (level 3)
+- ✅ Backup created (586KB)
+
 ---
 
 ## 📋 Pending Migrations
 
-### Migrations 9-10: Final Batches
+### Migration 10: Final Batch (System & Gamification)
 **Status:** 📝 Planned
-- Batch 7: Remaining tables (notifications, HR, finance, misc)
+- Batch 8: Remaining 13 tables (gamification, system, misc)
 - Final validation and cleanup
 
 ---
@@ -184,7 +241,7 @@ Testing:
 ### Backup Scripts
 ✅ `scripts/backup-database.sh` - Creates timestamped MySQL dumps
 ✅ `scripts/restore-database.sh` - Restores with metadata sync
-✅ Latest backup: `backups/lot23_migration8_final.sql` (580KB)
+✅ Latest backup: `backups/lot23_migration9_final.sql` (586KB)
 
 ### Documentation
 ✅ `docs/11-reports/lot-23-migration-guide.md` - Complete guide
@@ -195,7 +252,7 @@ Testing:
 
 ## 📊 Progress Summary
 
-**Phase 2.6 - Database Migrations:** 80% Complete (8/10 migrations)
+**Phase 2.6 - Database Migrations:** 90% Complete (9/10 migrations)
 
 | Migration | Tables | Status | Reversible | Tested |
 |-----------|--------|--------|------------|--------|
@@ -207,9 +264,10 @@ Testing:
 | 6 - Batch 4 | 3 | ✅ | ✅ | ✅ |
 | 7 - Batch 5 | 3 | ✅ | ✅ | ✅ |
 | 8 - Batch 6 | 7 | ✅ | ✅ | ✅ |
-| 9-10 - Remaining | ~17 | 📝 | - | - |
+| 9 - Batch 7 | 22 | ✅ | ✅ | ✅ |
+| 10 - Batch 8 | ~13 | 📝 | - | - |
 
-**Total tables with company_id:** 29/45 (64%)
+**Total tables with company_id:** 51/64 (80%)
 
 ---
 
@@ -221,8 +279,8 @@ Testing:
 4. ✅ Migration 6 complete
 5. ✅ Migration 7 complete
 6. ✅ Migration 8 complete
-7. 🔜 Create Migration 9 (Batch 7 - Final tables)
-8. Continue with Migration 10 (validation/cleanup)
+7. ✅ Migration 9 complete
+8. 🔜 Create Migration 10 (Batch 8 - Final 13 tables)
 9. Phase 2.5: Frontend tenant selection components
 10. Phase 3: Testing (API contract, E2E, security audit)
 
@@ -242,7 +300,9 @@ Testing:
    - users.email: unique → unique(email, company_id)
    - profiles.name: unique → unique(name, company_id)
    - orders.order_number: unique → unique(order_number, company_id)
-   - skills.name: unique → unique(name, company_id) ✅
+   - skills.name: unique → unique(name, company_id)
+   - invoices.invoice_number: unique → unique(invoice_number, company_id)
+   - notification_settings.setting_key: unique → unique(setting_key, company_id)
 
 4. **Cascade Deletes:** All FK to companies(id) use ON DELETE CASCADE
 
@@ -259,5 +319,5 @@ All migrations pass:
 
 ---
 
-**Last updated:** 2025-12-31 14:01
+**Last updated:** 2025-12-31 14:40
 **Author:** Claude Code (Lot 23 - Phase 2.6)
