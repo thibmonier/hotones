@@ -65,6 +65,13 @@ les features doivent montrer :
 le design du site public doit évoluer ou repartir de 0.
 Il doit etre à l'image de Unit404, c'est à dire en version light, utilisant l'image de Unit404 comme mascotte un peu partout
 
+## ecran de suivi
+
+Je voudrais qu'il soit possible d'avoir un écran de suivi visible sur une télé dans les bureaux de la société.
+Cet écran montrerait des chiffres actualisés de l'agence, le nombre de projets actifs, les alertes et échéances communes (saisie des temps par exemple)
+
+
+
 ---
 
 
