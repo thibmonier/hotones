@@ -2,7 +2,7 @@
 
 **Branch:** `feature/lot-23-multi-tenant`
 **Started:** 2025-12-31
-**Last Updated:** 2025-12-31 10:45
+**Last Updated:** 2025-12-31 11:05
 
 ---
 
@@ -49,13 +49,28 @@ Testing:
 - ✅ PHPStan passes
 - ✅ Backup created (566KB)
 
+### Migration 4: Add company_id to Batch 2 (Projects)
+**File:** `migrations/Version20251231100120.php`
+**Status:** ✅ Completed & Tested
+**Commit:** e5cfb7f
+
+Tables modified:
+1. **clients** - all to default company (id=1)
+2. **projects** - company_id from clients, or default if no client
+3. **client_contacts** - company_id from clients
+4. **project_tasks** - company_id from projects
+5. **project_sub_tasks** - company_id from projects
+
+Testing:
+- ✅ Migration up successful (438ms, 26 SQL queries)
+- ✅ Rollback down tested (68ms, 15 SQL queries)
+- ✅ Re-migration confirmed (180ms)
+- ✅ PHPStan passes
+- ✅ Backup created (567KB)
+
 ---
 
 ## 📋 Pending Migrations
-
-### Migration 4: Add company_id to Batch 2 (Projects)
-**Status:** 🔜 Next
-**Tables:** projects, clients, client_contacts, project_tasks, project_sub_tasks
 
 ### Migration 5: Add company_id to Batch 3 (Orders)
 **Status:** 📝 Planned
@@ -75,7 +90,7 @@ Testing:
 ### Backup Scripts
 ✅ `scripts/backup-database.sh` - Creates timestamped MySQL dumps
 ✅ `scripts/restore-database.sh` - Restores with metadata sync
-✅ Latest backup: `backups/lot23_migration3_final.sql` (566KB)
+✅ Latest backup: `backups/lot23_migration4_final.sql` (567KB)
 
 ### Documentation
 ✅ `docs/11-reports/lot-23-migration-guide.md` - Complete guide
@@ -86,28 +101,29 @@ Testing:
 
 ## 📊 Progress Summary
 
-**Phase 2.6 - Database Migrations:** 30% Complete (3/10 migrations)
+**Phase 2.6 - Database Migrations:** 40% Complete (4/10 migrations)
 
 | Migration | Tables | Status | Reversible | Tested |
 |-----------|--------|--------|------------|--------|
 | 1 - Companies/BUs | 2 | ✅ | ✅ | ✅ |
 | 2 - Users | 1 | ✅ | ✅ | ✅ |
 | 3 - Batch 1 | 4 | ✅ | ✅ | ✅ |
-| 4 - Batch 2 | 5 | 🔜 | - | - |
-| 5 - Batch 3 | 4 | 📝 | - | - |
+| 4 - Batch 2 | 5 | ✅ | ✅ | ✅ |
+| 5 - Batch 3 | 4 | 🔜 | - | - |
 | 6-10 - Remaining | ~30 | 📝 | - | - |
 
-**Total tables with company_id:** 7/45 (15%)
+**Total tables with company_id:** 12/45 (26%)
 
 ---
 
 ## 🎯 Next Steps
 
 1. ✅ Migration 3 complete
-2. 🔜 Create Migration 4 (Batch 2 - Projects)
-3. Continue with Migrations 5-10
-4. Phase 2.5: Frontend tenant selection components
-5. Phase 3: Testing (API contract, E2E, security audit)
+2. ✅ Migration 4 complete
+3. 🔜 Create Migration 5 (Batch 3 - Orders)
+4. Continue with Migrations 6-10
+5. Phase 2.5: Frontend tenant selection components
+6. Phase 3: Testing (API contract, E2E, security audit)
 
 ---
 
@@ -141,5 +157,5 @@ All migrations pass:
 
 ---
 
-**Last updated:** 2025-12-31 10:45
+**Last updated:** 2025-12-31 11:05
 **Author:** Claude Code (Lot 23 - Phase 2.6)
