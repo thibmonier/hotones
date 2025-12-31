@@ -89,7 +89,7 @@ class ProjectController extends AbstractController
             ];
 
             // Ajouter l'achat projet (purchasesAmount)
-            $projectPurchases = $project->getPurchasesAmount() ?? '0';
+            $projectPurchases = $project->purchasesAmount ?? '0';
             $totalPurchases   = bcadd($agg['total_purchases'], $projectPurchases, 2);
 
             // Taux de marge

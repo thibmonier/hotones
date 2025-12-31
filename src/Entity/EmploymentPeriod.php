@@ -121,6 +121,46 @@ class EmploymentPeriod implements CompanyOwnedInterface
     }
 
     /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->startDate.
+     */
+    public function getStartDate(): DateTimeInterface
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->startDate = $date.
+     */
+    public function setStartDate(DateTimeInterface $startDate): self
+    {
+        $this->startDate = $startDate;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->endDate.
+     */
+    public function getEndDate(): ?DateTimeInterface
+    {
+        return $this->endDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->endDate = $date.
+     */
+    public function setEndDate(?DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Profile>
      */
     public function getProfiles(): Collection

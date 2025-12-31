@@ -39,8 +39,8 @@ class ProfitabilityService
         // IDs des projets concernés
         $projectIds = [];
         foreach ($projects as $p) {
-            if ($p instanceof Project && $p->getId() !== null) {
-                $projectIds[] = $p->getId();
+            if ($p instanceof Project && $p->id !== null) {
+                $projectIds[] = $p->id;
             }
         }
 
