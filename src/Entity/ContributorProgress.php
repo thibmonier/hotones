@@ -4,18 +4,26 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ContributorProgressRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ContributorProgressRepository::class)]
 #[ORM\Table(name: 'contributor_progress')]
-class ContributorProgress
+#[ORM\Index(name: 'idx_contributorprogress_company', columns: ['company_id'])]
+class ContributorProgress implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\OneToOne(targetEntity: Contributor::class)]
     #[ORM\JoinColumn(nullable: false, unique: true)]
@@ -200,6 +208,18 @@ class ContributorProgress
     public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

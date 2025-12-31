@@ -2,17 +2,25 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ClientContactRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClientContactRepository::class)]
 #[ORM\Table(name: 'client_contacts')]
-class ClientContact
+#[ORM\Index(name: 'idx_client_contact_company', columns: ['company_id'])]
+class ClientContact implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'contacts')]
     #[ORM\JoinColumn(nullable: false)]
@@ -143,5 +151,17 @@ class ClientContact
     public function getFullName(): string
     {
         return trim($this->firstName.' '.$this->lastName);
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

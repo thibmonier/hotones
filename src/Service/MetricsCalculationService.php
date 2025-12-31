@@ -8,6 +8,8 @@ use App\Repository\ContributorRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\TimesheetRepository;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use DateTimeInterface;
 
@@ -285,19 +287,20 @@ class MetricsCalculationService
      */
     private function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
-        $count   = 0;
-        $current = clone $startDate;
-        $end     = clone $endDate;
+        $period = new DatePeriod(
+            $startDate,
+            new DateInterval('P1D'),
+            (clone $endDate)->modify('+1 day'),
+        );
 
-        while ($current <= $end) {
-            $dayOfWeek = (int) $current->format('N'); // 1 (lundi) à 7 (dimanche)
-            if ($dayOfWeek <= 5) {
-                ++$count;
+        $workingDays = 0;
+        foreach ($period as $date) {
+            if ((int) $date->format('N') <= 5) {
+                ++$workingDays;
             }
-            $current->modify('+1 day');
         }
 
-        return $count;
+        return $workingDays;
     }
 
     /**

@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\InvoiceRepository;
 use DateTime;
 use DateTimeInterface;
@@ -18,6 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Facture (Invoice).
@@ -28,6 +30,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ORM\Table(name: 'invoices', indexes: [
+    new ORM\Index(name: 'idx_invoice_company', columns: ['company_id']),
     new ORM\Index(name: 'idx_invoice_number', columns: ['invoice_number']),
     new ORM\Index(name: 'idx_invoice_status', columns: ['status']),
     new ORM\Index(name: 'idx_invoice_issued_at', columns: ['issued_at']),
@@ -49,7 +52,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['invoice:write']],
     paginationItemsPerPage: 30,
 )]
-class Invoice
+class Invoice implements CompanyOwnedInterface
 {
     public const STATUS_DRAFT     = 'brouillon';
     public const STATUS_SENT      = 'envoyee';
@@ -70,6 +73,11 @@ class Invoice
     #[ORM\Column(type: 'integer')]
     #[Groups(['invoice:read'])]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Numéro unique de facture : F[année][mois][incrément].
@@ -498,6 +506,18 @@ class Invoice
     public function setUpdatedAt(DateTime $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

@@ -2,20 +2,28 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'order_sections', indexes: [
     new ORM\Index(name: 'idx_order_section_order', columns: ['order_id']),
+    new ORM\Index(name: 'idx_ordersection_company', columns: ['company_id']),
 ])]
-class OrderSection
+class OrderSection implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'sections')]
     #[ORM\JoinColumn(nullable: false)]
@@ -210,5 +218,17 @@ class OrderSection
         $totalMargin = $this->getTotalGrossMargin();
 
         return bcmul(bcdiv($totalMargin, $totalRevenue, 4), '100', 2);
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

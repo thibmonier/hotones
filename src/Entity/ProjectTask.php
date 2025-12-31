@@ -2,15 +2,18 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: \App\Repository\ProjectTaskRepository::class)]
 #[ORM\Table(name: 'project_tasks')]
-class ProjectTask
+#[ORM\Index(name: 'idx_projecttask_company', columns: ['company_id'])]
+class ProjectTask implements CompanyOwnedInterface
 {
     public const TYPE_AVV       = 'avv'; // Avant-vente
     public const TYPE_NON_VENDU = 'non_vendu'; // Non-vendu
@@ -20,6 +23,11 @@ class ProjectTask
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
@@ -597,5 +605,17 @@ class ProjectTask
     public function isActive(): ?bool
     {
         return $this->active;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

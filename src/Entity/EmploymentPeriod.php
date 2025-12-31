@@ -2,54 +2,112 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\EmploymentPeriodRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EmploymentPeriodRepository::class)]
 #[ORM\Table(name: 'employment_periods')]
-class EmploymentPeriod
+#[ORM\Index(name: 'idx_employment_period_company', columns: ['company_id'])]
+class EmploymentPeriod implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: Contributor::class, inversedBy: 'employmentPeriods')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?Contributor $contributor = null;
+    public ?Contributor $contributor = null {
+        get => $this->contributor;
+        set {
+            $this->contributor = $value;
+        }
+    }
 
     // Salaire mensuel brut en EUR (ou net selon votre besoin)
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $salary = null;
+    public ?string $salary = null {
+        get => $this->salary;
+        set {
+            $this->salary = $value !== null ? (string) $value : null;
+        }
+    }
 
     // Coût Journalier Moyen sur la période
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $cjm = null;
+    public ?string $cjm = null {
+        get => $this->cjm;
+        set {
+            $this->cjm = $value !== null ? (string) $value : null;
+        }
+    }
 
     // Taux Journalier Moyen (facturable client)
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $tjm = null;
+    public ?string $tjm = null {
+        get => $this->tjm;
+        set {
+            $this->tjm = $value !== null ? (string) $value : null;
+        }
+    }
 
     // Temps de travail hebdomadaire (par défaut 35h, peut aller jusqu'à 39h)
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2, options: ['default' => 35.00])]
-    private string $weeklyHours = '35.00';
+    public string $weeklyHours = '35.00' {
+        get => $this->weeklyHours;
+        set {
+            $this->weeklyHours = $value !== null ? (string) $value : '35.00';
+        }
+    }
 
     // Pourcentage temps de travail (100%, 90%, 80% pour temps partiel)
     #[ORM\Column(name: 'work_time_percentage', type: 'decimal', precision: 5, scale: 2, options: ['default' => 100.00])]
-    private string $workTimePercentage = '100.00';
+    public string $workTimePercentage = '100.00' {
+        get => $this->workTimePercentage;
+        set {
+            $this->workTimePercentage = $value !== null ? (string) $value : '100.00';
+        }
+    }
 
     #[ORM\Column(type: 'date')]
-    private DateTimeInterface $startDate;
+    public DateTimeInterface $startDate {
+        get => $this->startDate;
+        set {
+            $this->startDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?DateTimeInterface $endDate = null;
+    public ?DateTimeInterface $endDate = null {
+        get => $this->endDate;
+        set {
+            $this->endDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $notes = null;
+    public ?string $notes = null {
+        get => $this->notes;
+        set {
+            $this->notes = $value;
+        }
+    }
 
     #[ORM\ManyToMany(targetEntity: Profile::class)]
     #[ORM\JoinTable(name: 'employment_period_profiles')]
@@ -60,119 +118,6 @@ class EmploymentPeriod
         $this->profiles = new ArrayCollection();
         // Initialiser pour éviter les erreurs d'accès avant initialisation dans les vues
         $this->startDate = new DateTime();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getContributor(): ?Contributor
-    {
-        return $this->contributor;
-    }
-
-    public function setContributor(Contributor $contributor): self
-    {
-        $this->contributor = $contributor;
-
-        return $this;
-    }
-
-    public function getSalary(): ?string
-    {
-        return $this->salary;
-    }
-
-    public function setSalary(?float $salary): self
-    {
-        $this->salary = $salary !== null ? (string) $salary : null;
-
-        return $this;
-    }
-
-    public function getCjm(): ?string
-    {
-        return $this->cjm;
-    }
-
-    public function setCjm(?float $cjm): self
-    {
-        $this->cjm = $cjm !== null ? (string) $cjm : null;
-
-        return $this;
-    }
-
-    public function getTjm(): ?string
-    {
-        return $this->tjm;
-    }
-
-    public function setTjm(?float $tjm): self
-    {
-        $this->tjm = $tjm !== null ? (string) $tjm : null;
-
-        return $this;
-    }
-
-    public function getWeeklyHours(): string
-    {
-        return $this->weeklyHours;
-    }
-
-    public function setWeeklyHours(?float $weeklyHours): self
-    {
-        $this->weeklyHours = $weeklyHours !== null ? (string) $weeklyHours : '35.00';
-
-        return $this;
-    }
-
-    public function getStartDate(): DateTimeInterface
-    {
-        return $this->startDate;
-    }
-
-    public function setStartDate(DateTimeInterface $startDate): self
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    public function getEndDate(): ?DateTimeInterface
-    {
-        return $this->endDate;
-    }
-
-    public function setEndDate(?DateTimeInterface $endDate): self
-    {
-        $this->endDate = $endDate;
-
-        return $this;
-    }
-
-    public function getWorkTimePercentage(): string
-    {
-        return $this->workTimePercentage;
-    }
-
-    public function setWorkTimePercentage(?float $workTimePercentage): self
-    {
-        $this->workTimePercentage = $workTimePercentage !== null ? (string) $workTimePercentage : '100.00';
-
-        return $this;
-    }
-
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
-
-    public function setNotes(?string $notes): self
-    {
-        $this->notes = $notes;
-
-        return $this;
     }
 
     /**
@@ -300,9 +245,21 @@ class EmploymentPeriod
         if ($this->salary && !$this->cjm) {
             $calculatedCjm = $this->calculateCjmFromSalary();
             if ($calculatedCjm !== null) {
-                $this->setCjm($calculatedCjm);
+                $this->cjm = (string) $calculatedCjm;
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

@@ -2,15 +2,18 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\VacationRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: VacationRepository::class)]
 #[ORM\Table(name: 'vacations')]
-class Vacation
+#[ORM\Index(name: 'idx_vacation_company', columns: ['company_id'])]
+class Vacation implements CompanyOwnedInterface
 {
     public const TYPE_PAID_LEAVE          = 'conges_payes';
     public const TYPE_COMPENSATORY_REST   = 'repos_compensateur';
@@ -23,6 +26,11 @@ class Vacation
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Contributor::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -266,5 +274,17 @@ class Vacation
             self::TYPE_TRAINING            => 'Formation',
             self::TYPE_OTHER               => 'Autre',
         ];
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

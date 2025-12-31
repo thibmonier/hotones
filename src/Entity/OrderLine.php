@@ -2,181 +2,119 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'order_lines', indexes: [
     new ORM\Index(name: 'idx_order_line_section', columns: ['section_id']),
     new ORM\Index(name: 'idx_order_line_profile', columns: ['profile_id']),
     new ORM\Index(name: 'idx_order_line_type', columns: ['type']),
+    new ORM\Index(name: 'idx_orderline_company', columns: ['company_id']),
 ])]
-class OrderLine
+class OrderLine implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: OrderSection::class, inversedBy: 'lines')]
     #[ORM\JoinColumn(nullable: false)]
-    private OrderSection $section;
+    public OrderSection $section {
+        get => $this->section;
+        set {
+            $this->section = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 255)]
-    private string $description;
+    public string $description {
+        get => $this->description;
+        set {
+            $this->description = $value;
+        }
+    }
 
     #[ORM\Column(type: 'integer')]
-    private int $position = 0;
+    public int $position = 0 {
+        get => $this->position;
+        set {
+            $this->position = $value;
+        }
+    }
 
     // Profil pour les lignes de service (peut être null pour les achats)
     #[ORM\ManyToOne(targetEntity: Profile::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Profile $profile = null;
+    public ?Profile $profile = null {
+        get => $this->profile;
+        set {
+            $this->profile = $value;
+        }
+    }
 
     // TJM de vente pour cette ligne (si profil)
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $dailyRate = null;
+    public ?string $dailyRate = null {
+        get => $this->dailyRate;
+        set {
+            $this->dailyRate = $value;
+        }
+    }
 
     // Nombre de jours vendus (si profil)
     #[ORM\Column(type: 'decimal', precision: 8, scale: 2, nullable: true)]
-    private ?string $days = null;
+    public ?string $days = null {
+        get => $this->days;
+        set {
+            $this->days = $value;
+        }
+    }
 
     // Montant direct (pour les achats ou montants fixes)
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
-    private ?string $directAmount = null;
+    public ?string $directAmount = null {
+        get => $this->directAmount;
+        set {
+            $this->directAmount = $value;
+        }
+    }
 
     // Achat attaché à cette ligne
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
-    private ?string $attachedPurchaseAmount = null;
+    public ?string $attachedPurchaseAmount = null {
+        get => $this->attachedPurchaseAmount;
+        set {
+            $this->attachedPurchaseAmount = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 50)]
-    private string $type = 'service'; // service, purchase, fixed_amount
+    public string $type = 'service' { // service, purchase, fixed_amount
+        get => $this->type;
+        set {
+            $this->type = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $notes = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getSection(): OrderSection
-    {
-        return $this->section;
-    }
-
-    public function setSection(OrderSection $section): self
-    {
-        $this->section = $section;
-
-        return $this;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): self
-    {
-        $this->position = $position;
-
-        return $this;
-    }
-
-    public function getProfile(): ?Profile
-    {
-        return $this->profile;
-    }
-
-    public function setProfile(?Profile $profile): self
-    {
-        $this->profile = $profile;
-
-        return $this;
-    }
-
-    public function getDailyRate(): ?string
-    {
-        return $this->dailyRate;
-    }
-
-    public function setDailyRate(?string $dailyRate): self
-    {
-        $this->dailyRate = $dailyRate;
-
-        return $this;
-    }
-
-    public function getDays(): ?string
-    {
-        return $this->days;
-    }
-
-    public function setDays(?string $days): self
-    {
-        $this->days = $days;
-
-        return $this;
-    }
-
-    public function getDirectAmount(): ?string
-    {
-        return $this->directAmount;
-    }
-
-    public function setDirectAmount(?string $directAmount): self
-    {
-        $this->directAmount = $directAmount;
-
-        return $this;
-    }
-
-    public function getAttachedPurchaseAmount(): ?string
-    {
-        return $this->attachedPurchaseAmount;
-    }
-
-    public function setAttachedPurchaseAmount(?string $attachedPurchaseAmount): self
-    {
-        $this->attachedPurchaseAmount = $attachedPurchaseAmount;
-
-        return $this;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
-
-    public function setNotes(?string $notes): self
-    {
-        $this->notes = $notes;
-
-        return $this;
+    public ?string $notes = null {
+        get => $this->notes;
+        set {
+            $this->notes = $value;
+        }
     }
 
     /**
@@ -228,32 +166,38 @@ class OrderLine
     // Méthodes alias pour compatibilité avec le contrôleur
     public function getTjm(): ?string
     {
-        return $this->getDailyRate();
+        return $this->dailyRate;
     }
 
     public function setTjm(?string $tjm): self
     {
-        return $this->setDailyRate($tjm);
+        $this->dailyRate = $tjm;
+
+        return $this;
     }
 
     public function getPurchaseAmount(): ?string
     {
-        return $this->getAttachedPurchaseAmount();
+        return $this->attachedPurchaseAmount;
     }
 
     public function setPurchaseAmount(?string $purchaseAmount): self
     {
-        return $this->setAttachedPurchaseAmount($purchaseAmount);
+        $this->attachedPurchaseAmount = $purchaseAmount;
+
+        return $this;
     }
 
     public function getSortOrder(): int
     {
-        return $this->getPosition();
+        return $this->position;
     }
 
     public function setSortOrder(int $sortOrder): self
     {
-        return $this->setPosition($sortOrder);
+        $this->position = $sortOrder;
+
+        return $this;
     }
 
     /**
@@ -365,5 +309,17 @@ class OrderLine
         }
 
         return $task;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

@@ -6,6 +6,7 @@ use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\Technology;
 use App\Form\ProjectType as ProjectFormType;
+use App\Service\ProfitabilityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProjectController extends AbstractController
 {
     #[Route('', name: 'project_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em, \App\Service\ProfitabilityService $profitabilityService): Response
+    public function index(Request $request, EntityManagerInterface $em, ProfitabilityService $profitabilityService): Response
     {
         $projectRepo = $em->getRepository(Project::class);
 
@@ -72,13 +73,13 @@ class ProjectController extends AbstractController
         $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset, null, null, null, $filterServiceCategory, $filterSearch);
 
         // Agrégats SQL en batch pour éviter le parcours objet
-        $projectIds = array_map(fn ($p) => $p->getId(), $projects);
+        $projectIds = array_map(fn ($p) => $p->id, $projects);
         $aggregates = $projectRepo->getAggregatedMetricsFor($projectIds);
 
         // Construire la structure attendue par la vue
         $projectsWithMetrics = [];
         foreach ($projects as $project) {
-            $pid = $project->getId();
+            $pid = $project->id;
             $agg = $aggregates[$pid] ?? [
                 'total_revenue'       => '0',
                 'total_margin'        => '0',
@@ -214,9 +215,9 @@ class ProjectController extends AbstractController
         Request $request,
         int $id,
         EntityManagerInterface $em,
-        \App\Service\ProjectRiskAnalyzer $riskAnalyzer,
-        \App\Service\ProfitabilityPredictor $profitabilityPredictor,
-        \App\Repository\ProjectHealthScoreRepository $healthScoreRepo
+        ProjectRiskAnalyzer $riskAnalyzer,
+        ProfitabilityPredictor $profitabilityPredictor,
+        ProjectHealthScoreRepository $healthScoreRepo
     ): Response {
         $project = $em->getRepository(Project::class)->findOneWithRelations($id);
 
@@ -331,7 +332,7 @@ class ProjectController extends AbstractController
         $totalDays      = '0';
         $totalMargin    = '0';
         $totalCost      = '0';
-        $totalPurchases = $project->getPurchasesAmount() ?? '0';
+        $totalPurchases = $project->purchasesAmount ?? '0';
         $ordersByStatus = [];
         $ordersCount    = 0;
 
@@ -392,7 +393,7 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/export.csv', name: 'project_export_csv', methods: ['GET'])]
-    public function exportCsv(Request $request, EntityManagerInterface $em, \App\Service\ProfitabilityService $profitabilityService): Response
+    public function exportCsv(Request $request, EntityManagerInterface $em, ProfitabilityService $profitabilityService): Response
     {
         $projectRepo = $em->getRepository(Project::class);
         $session     = $request->getSession();

@@ -2,20 +2,28 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\BillingMarkerRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BillingMarkerRepository::class)]
 #[ORM\Table(name: 'billing_markers')]
 #[ORM\UniqueConstraint(name: 'uniq_marker_schedule', columns: ['schedule_id'])]
 #[ORM\UniqueConstraint(name: 'uniq_marker_regie_period', columns: ['order_id', 'year', 'month'])]
-class BillingMarker
+#[ORM\Index(name: 'idx_billingmarker_company', columns: ['company_id'])]
+class BillingMarker implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     // Option 1: rattachement à une échéance (forfait)
     #[ORM\OneToOne(targetEntity: OrderPaymentSchedule::class)]
@@ -142,6 +150,18 @@ class BillingMarker
     public function setComment(?string $comment): self
     {
         $this->comment = $comment;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

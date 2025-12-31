@@ -9,12 +9,14 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ProjectRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: 'projects', indexes: [
@@ -23,6 +25,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     new ORM\Index(name: 'idx_project_end_date', columns: ['end_date']),
     new ORM\Index(name: 'idx_project_type', columns: ['project_type']),
     new ORM\Index(name: 'idx_project_service_category', columns: ['service_category_id']),
+    new ORM\Index(name: 'idx_project_company', columns: ['company_id']),
 ])]
 #[ApiResource(
     operations: [
@@ -37,74 +40,154 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['project:write']],
     paginationItemsPerPage: 30,
 )]
-class Project
+class Project implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['project:read'])]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 180)]
     #[Groups(['project:read', 'project:write'])]
-    private string $name;
+    public string $name {
+        get => $this->name;
+        set {
+            $this->name = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: Client::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups(['project:read', 'project:write'])]
-    private ?Client $client = null;
+    public ?Client $client = null {
+        get => $this->client;
+        set {
+            $this->client = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['project:read', 'project:write'])]
-    private ?string $description = null;
+    public ?string $description = null {
+        get => $this->description;
+        set {
+            $this->description = $value;
+        }
+    }
 
     // Achats sur le projet (fournitures ou renfort externes)
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
     #[Groups(['project:read', 'project:write'])]
-    private ?string $purchasesAmount = null;
+    public ?string $purchasesAmount = null {
+        get => $this->purchasesAmount;
+        set {
+            $this->purchasesAmount = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['project:read', 'project:write'])]
-    private ?string $purchasesDescription = null;
+    public ?string $purchasesDescription = null {
+        get => $this->purchasesDescription;
+        set {
+            $this->purchasesDescription = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date', nullable: true)]
     #[Groups(['project:read', 'project:write'])]
-    private ?DateTimeInterface $startDate = null;
+    public ?DateTimeInterface $startDate = null {
+        get => $this->startDate;
+        set {
+            $this->startDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date', nullable: true)]
     #[Groups(['project:read', 'project:write'])]
-    private ?DateTimeInterface $endDate = null;
+    public ?DateTimeInterface $endDate = null {
+        get => $this->endDate;
+        set {
+            $this->endDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 20)]
     #[Groups(['project:read', 'project:write'])]
-    private string $status = 'active'; // active, completed, cancelled
+    public string $status = 'active' { // active, completed, cancelled
+        get => $this->status;
+        set {
+            $this->status = $value;
+        }
+    }
 
     // Type de projet (interne/externe)
     #[ORM\Column(type: 'boolean')]
     #[Groups(['project:read', 'project:write'])]
-    private bool $isInternal = false;
+    public bool $isInternal = false {
+        get => $this->isInternal;
+        set {
+            $this->isInternal = $value;
+        }
+    }
 
     // Type de projet (forfait ou régie)
     #[ORM\Column(type: 'string', length: 20)]
     #[Groups(['project:read', 'project:write'])]
-    private string $projectType = 'forfait'; // forfait, regie
+    public string $projectType = 'forfait' { // forfait, regie
+        get => $this->projectType;
+        set {
+            $this->projectType = $value;
+        }
+    }
 
     // Rôles projet - références vers User
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?User $keyAccountManager = null; // Commercial en charge du projet
+    public ?User $keyAccountManager = null { // Commercial en charge du projet
+        get => $this->keyAccountManager;
+        set {
+            $this->keyAccountManager = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?User $projectManager = null; // Chef de projet
+    public ?User $projectManager = null { // Chef de projet
+        get => $this->projectManager;
+        set {
+            $this->projectManager = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?User $projectDirector = null; // Directeur de projet
+    public ?User $projectDirector = null { // Directeur de projet
+        get => $this->projectDirector;
+        set {
+            $this->projectDirector = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?User $salesPerson = null; // Commercial ayant identifié le projet
+    public ?User $salesPerson = null { // Commercial ayant identifié le projet
+        get => $this->salesPerson;
+        set {
+            $this->salesPerson = $value;
+        }
+    }
 
     // Relations
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
@@ -122,7 +205,12 @@ class Project
     // Catégorie de service (Brand, E-commerce, etc.)
     #[ORM\ManyToOne(targetEntity: ServiceCategory::class, inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: true)]
-    private ?ServiceCategory $serviceCategory = null;
+    public ?ServiceCategory $serviceCategory = null {
+        get => $this->serviceCategory;
+        set {
+            $this->serviceCategory = $value;
+        }
+    }
 
     // Tâches du projet
     #[ORM\OneToMany(targetEntity: ProjectTask::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
@@ -135,19 +223,44 @@ class Project
 
     // Liens et accès techniques (Sprint 9)
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $repoLinks = null; // Liens gestionnaires de sources (un par ligne)
+    public ?string $repoLinks = null { // Liens gestionnaires de sources (un par ligne)
+        get => $this->repoLinks;
+        set {
+            $this->repoLinks = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $envLinks = null; // Liens environnements (un par ligne)
+    public ?string $envLinks = null { // Liens environnements (un par ligne)
+        get => $this->envLinks;
+        set {
+            $this->envLinks = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $dbAccess = null; // Informations d'accès BDD
+    public ?string $dbAccess = null { // Informations d'accès BDD
+        get => $this->dbAccess;
+        set {
+            $this->dbAccess = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $sshAccess = null; // Informations d'accès SSH
+    public ?string $sshAccess = null { // Informations d'accès SSH
+        get => $this->sshAccess;
+        set {
+            $this->sshAccess = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $ftpAccess = null; // Informations d'accès FTP
+    public ?string $ftpAccess = null { // Informations d'accès FTP
+        get => $this->ftpAccess;
+        set {
+            $this->ftpAccess = $value;
+        }
+    }
 
     public function __construct()
     {
@@ -158,185 +271,12 @@ class Project
         $this->timesheets          = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getClient(): ?Client
-    {
-        return $this->client;
-    }
-
-    public function setClient(?Client $client): self
-    {
-        $this->client = $client;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getPurchasesAmount(): ?string
-    {
-        return $this->purchasesAmount;
-    }
-
-    public function setPurchasesAmount(?string $purchasesAmount): self
-    {
-        $this->purchasesAmount = $purchasesAmount;
-
-        return $this;
-    }
-
-    public function getPurchasesDescription(): ?string
-    {
-        return $this->purchasesDescription;
-    }
-
-    public function setPurchasesDescription(?string $purchasesDescription): self
-    {
-        $this->purchasesDescription = $purchasesDescription;
-
-        return $this;
-    }
-
-    public function getStartDate(): ?DateTimeInterface
-    {
-        return $this->startDate;
-    }
-
-    public function setStartDate(?DateTimeInterface $startDate): self
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    public function getEndDate(): ?DateTimeInterface
-    {
-        return $this->endDate;
-    }
-
-    public function setEndDate(?DateTimeInterface $endDate): self
-    {
-        $this->endDate = $endDate;
-
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function getIsInternal(): bool
-    {
-        return $this->isInternal;
-    }
-
-    public function setIsInternal(bool $isInternal): self
-    {
-        $this->isInternal = $isInternal;
-
-        return $this;
-    }
-
-    public function getProjectType(): string
-    {
-        return $this->projectType;
-    }
-
-    public function setProjectType(string $projectType): self
-    {
-        $this->projectType = $projectType;
-
-        return $this;
-    }
-
-    public function getKeyAccountManager(): ?User
-    {
-        return $this->keyAccountManager;
-    }
-
-    public function setKeyAccountManager(?User $keyAccountManager): self
-    {
-        $this->keyAccountManager = $keyAccountManager;
-
-        return $this;
-    }
-
     /**
      * Alias pour getKeyAccountManager().
      */
     public function getKam(): ?User
     {
         return $this->keyAccountManager;
-    }
-
-    public function getProjectManager(): ?User
-    {
-        return $this->projectManager;
-    }
-
-    public function setProjectManager(?User $projectManager): self
-    {
-        $this->projectManager = $projectManager;
-
-        return $this;
-    }
-
-    public function getProjectDirector(): ?User
-    {
-        return $this->projectDirector;
-    }
-
-    public function setProjectDirector(?User $projectDirector): self
-    {
-        $this->projectDirector = $projectDirector;
-
-        return $this;
-    }
-
-    public function getSalesPerson(): ?User
-    {
-        return $this->salesPerson;
-    }
-
-    public function setSalesPerson(?User $salesPerson): self
-    {
-        $this->salesPerson = $salesPerson;
-
-        return $this;
     }
 
     public function getOrders(): Collection
@@ -348,7 +288,7 @@ class Project
     {
         if (!$this->orders->contains($order)) {
             $this->orders[] = $order;
-            $order->setProject($this);
+            $order->project = $this;
         }
 
         return $this;
@@ -357,8 +297,8 @@ class Project
     public function removeOrder(Order $order): self
     {
         if ($this->orders->removeElement($order)) {
-            if ($order->getProject() === $this) {
-                $order->setProject(null);
+            if ($order->project === $this) {
+                $order->project = null;
             }
         }
 
@@ -412,18 +352,6 @@ class Project
         return $this;
     }
 
-    public function getServiceCategory(): ?ServiceCategory
-    {
-        return $this->serviceCategory;
-    }
-
-    public function setServiceCategory(?ServiceCategory $serviceCategory): self
-    {
-        $this->serviceCategory = $serviceCategory;
-
-        return $this;
-    }
-
     // Gestion des tâches
     public function getTasks(): Collection
     {
@@ -463,8 +391,8 @@ class Project
         $validStatuses = ['signe', 'gagne', 'termine'];
 
         foreach ($this->orders as $order) {
-            if (in_array($order->getStatus(), $validStatuses, true)) {
-                $total = bcadd($total, $order->getTotalAmount(), 2);
+            if (in_array($order->status, $validStatuses, true)) {
+                $total = bcadd($total, $order->totalAmount, 2);
             }
         }
 
@@ -628,7 +556,7 @@ class Project
         foreach ($this->tasks as $task) {
             if ($task->getAssignedContributor() && $task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
                 $contributor   = $task->getAssignedContributor();
-                $contributorId = $contributor->getId();
+                $contributorId = $contributor->id;
 
                 if (!isset($contributors[$contributorId])) {
                     $contributors[$contributorId] = [
@@ -806,7 +734,7 @@ class Project
     {
         if (!$this->timesheets->contains($timesheet)) {
             $this->timesheets[] = $timesheet;
-            $timesheet->setProject($this);
+            $timesheet->project = $this;
         }
 
         return $this;
@@ -815,77 +743,23 @@ class Project
     public function removeTimesheet(Timesheet $timesheet): self
     {
         if ($this->timesheets->removeElement($timesheet)) {
-            if ($timesheet->getProject() === $this) {
-                $timesheet->setProject(null);
+            if ($timesheet->project === $this) {
+                $timesheet->project = null;
             }
         }
 
         return $this;
     }
 
-    // === Accès & Liens techniques ===
-    public function getRepoLinks(): ?string
+    public function getCompany(): Company
     {
-        return $this->repoLinks;
+        return $this->company;
     }
 
-    public function setRepoLinks(?string $repoLinks): self
+    public function setCompany(Company $company): self
     {
-        $this->repoLinks = $repoLinks;
+        $this->company = $company;
 
         return $this;
-    }
-
-    public function getEnvLinks(): ?string
-    {
-        return $this->envLinks;
-    }
-
-    public function setEnvLinks(?string $envLinks): self
-    {
-        $this->envLinks = $envLinks;
-
-        return $this;
-    }
-
-    public function getDbAccess(): ?string
-    {
-        return $this->dbAccess;
-    }
-
-    public function setDbAccess(?string $dbAccess): self
-    {
-        $this->dbAccess = $dbAccess;
-
-        return $this;
-    }
-
-    public function getSshAccess(): ?string
-    {
-        return $this->sshAccess;
-    }
-
-    public function setSshAccess(?string $sshAccess): self
-    {
-        $this->sshAccess = $sshAccess;
-
-        return $this;
-    }
-
-    public function getFtpAccess(): ?string
-    {
-        return $this->ftpAccess;
-    }
-
-    public function setFtpAccess(?string $ftpAccess): self
-    {
-        $this->ftpAccess = $ftpAccess;
-
-        return $this;
-    }
-
-    public function isInternal(): ?bool
-    {
-        return $this->isInternal;
     }
 }

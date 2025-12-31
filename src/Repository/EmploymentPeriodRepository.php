@@ -256,4 +256,32 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Trouve les périodes d'emploi pour une liste de contributeurs et une plage de dates.
+     *
+     * @param Contributor[] $contributors
+     *
+     * @return EmploymentPeriod[]
+     */
+    public function findByContributorsAndDateRange(array $contributors, DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    {
+        if (empty($contributors)) {
+            return [];
+        }
+
+        $contributorIds = array_map(fn (Contributor $c) => $c->getId(), $contributors);
+
+        return $this->createQueryBuilder('ep')
+            ->where('ep.contributor IN (:contributorIds)')
+            ->andWhere('ep.startDate <= :endDate')
+            ->andWhere('ep.endDate IS NULL OR ep.endDate >= :startDate')
+            ->setParameter('contributorIds', $contributorIds)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->leftJoin('ep.contributor', 'c')
+            ->addSelect('c')
+            ->getQuery()
+            ->getResult();
+    }
 }

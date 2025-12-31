@@ -26,6 +26,45 @@ mettre les vraies images
 ajouter une entrée "intégrateurs" qui permettrait d'accéder à la documentation de l'api
 indiquer que l'achitecture cloud du service est hébergé intégralement en Europe (RGPD compliant)
 
+### revoir la page pricing
+
+revoir la page de princing avec l'ensemble de ces nouveaux éléments : 
+
+Hotones est un ERP métier pour agences digitales avec IA embarquée. 
+
+_Avec un outil all-in-one qui remplace plusieurs solutions (CRM commercial + gestion de projet + compta analytique + RH + IA), tu peux justifier un pricing bien plus élevé :_
+
+Benchmark des solutions actuelles pour agences
+Une agence utilise typiquement :
+
+CRM/Commercial : Salesforce (50-150€/user) ou HubSpot (45-120€/user)
+Gestion de projet : Monday.com (10-20€/user), Asana (13-30€/user)
+Time tracking/rentabilité : Harvest (12€/user), Toggl (10-20€/user)
+Finance/tréso : Pennylane (30-60€/mois) + expert comptable
+RH : Lucca (5-15€/user)
+
+Coût total moyen : 80-200€/utilisateur/mois selon la stack complète
+Pricing recommandé pour Hotones (modèle par lots)
+
+| Formule | Users | Prix/mois | Modules inclus | Cible | 
+| Starter | 5-15 users | 299€ | Commercial + Projets + Facturation (IA limitée) | TPE/freelances structurés | 
+| Business | 16-50 users | 699€ | Tous modules + IA complète + Intégrations | PME, agences 20-40 personnes | 
+| Enterprise | 51-150 users | 1 299€ | Tous modules + IA avancée + Support dédié + Custom | Grosses agences |
+
+### contenu des pages de features (publiques)
+
+les features doivent montrer :
+- l'utilisation de l'IA dans le quotidien et dans chaque outil
+- la conformité RGPD
+- l'anticipation de conformité avec la loi sur la facturation electronique
+- les connecteurs avec les outils principaux du marché pour la gestion de projet, le CRM, les outils comptables.
+- le chatbot IA qui aide dans les tâches courantes
+
+### revoir le design des pages publiques
+
+le design du site public doit évoluer ou repartir de 0.
+Il doit etre à l'image de Unit404, c'est à dire en version light, utilisant l'image de Unit404 comme mascotte un peu partout
+
 
 ## revoir la cohérence du parcours
 
@@ -54,16 +93,6 @@ revoir la séparation MVC notamment l'absence de requetes dans les controlleurs 
 
 nettoyage et rangement de l'ensemble des templates (ils commencent à être nombreux)
 
-## contenu des pages de features (publiques)
-
-les features doivent montrer :
-- l'utilisation de l'IA dans le quotidien et dans chaque outil
-- la conformité RGPD
-- l'anticipation de conformité avec la loi sur la facturation electronique
-- les connecteurs avec les outils principaux du marché pour la gestion de projet, le CRM, les outils comptables.
-
-le design du site public doit évoluer ou repartir de 0.
-Il doit etre à l'image de Unit404, c'est à dire en version light, utilisant l'image de Unit404 comme mascotte un peu partout
 
 ## ecran de suivi
 

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\AccountDeletionRequestRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Demande de suppression de compte (droit à l'oubli RGPD).
@@ -18,8 +20,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['user_id'], name: 'idx_deletion_request_user')]
 #[ORM\Index(columns: ['status'], name: 'idx_deletion_request_status')]
 #[ORM\Index(columns: ['scheduled_deletion_at'], name: 'idx_deletion_scheduled')]
+#[ORM\Index(name: 'idx_accountdeletionrequest_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
-class AccountDeletionRequest
+class AccountDeletionRequest implements CompanyOwnedInterface
 {
     public const STATUS_PENDING   = 'pending';           // En attente de confirmation email
     public const STATUS_CONFIRMED = 'confirmed';       // Confirmé, période de grâce en cours
@@ -30,6 +33,11 @@ class AccountDeletionRequest
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Utilisateur concerné par la demande.
@@ -283,5 +291,17 @@ class AccountDeletionRequest
         $expiryDate = $this->requestedAt->modify('+48 hours');
 
         return $expiryDate < new DateTimeImmutable();
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\CookieConsentRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Entité de consentement cookies pour traçabilité RGPD.
@@ -18,13 +20,19 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['user_id'], name: 'idx_cookie_consent_user')]
 #[ORM\Index(columns: ['created_at'], name: 'idx_cookie_consent_created')]
 #[ORM\Index(columns: ['expires_at'], name: 'idx_cookie_consent_expires')]
+#[ORM\Index(name: 'idx_cookieconsent_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
-class CookieConsent
+class CookieConsent implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Utilisateur associé (null pour les visiteurs non authentifiés).
@@ -202,5 +210,17 @@ class CookieConsent
     public function isExpired(): bool
     {
         return $this->expiresAt < new DateTimeImmutable();
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }
