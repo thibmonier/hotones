@@ -140,14 +140,41 @@ Testing:
 - ✅ PHPStan passes
 - ✅ Backup created (571KB)
 
+### Migration 8: Add company_id to Batch 6 (Analytics)
+**File:** `migrations/Version20251231125836.php`
+**Status:** ✅ Completed & Tested
+**Commit:** 2b17005
+
+Dimension tables (4 total):
+1. **dim_time** - all to default company (temporal dimension)
+2. **dim_contributor** - copy from users via user_id, or default
+3. **dim_profile** - copy from profiles via profile_id, or default
+4. **dim_project_type** - all to default company (no FK)
+
+Fact tables (3 total):
+5. **fact_project_metrics** - copy from projects OR orders (fallback), or default
+6. **fact_staffing_metrics** - copy from contributors, or default
+7. **fact_forecast** - all to default company (no FK)
+
+Data propagation:
+- Complex fallback logic for fact_project_metrics (projects → orders → default)
+- Dimension tables copy from source entities when FK exists
+- Star schema maintains referential integrity with company isolation
+
+Testing:
+- ✅ Migration up successful (520ms, 40 SQL queries)
+- ✅ Rollback down tested (70ms, 21 SQL queries)
+- ✅ Re-migration confirmed (338ms, 40 SQL queries)
+- ✅ PHPStan passes
+- ✅ Backup created (580KB)
+
 ---
 
 ## 📋 Pending Migrations
 
-### Migrations 8-10: Remaining Batches
+### Migrations 9-10: Final Batches
 **Status:** 📝 Planned
-- Batch 6: analytics (fact_*, dim_*)
-- Batch 7: notifications, HR, finance entities
+- Batch 7: Remaining tables (notifications, HR, finance, misc)
 - Final validation and cleanup
 
 ---
@@ -157,7 +184,7 @@ Testing:
 ### Backup Scripts
 ✅ `scripts/backup-database.sh` - Creates timestamped MySQL dumps
 ✅ `scripts/restore-database.sh` - Restores with metadata sync
-✅ Latest backup: `backups/lot23_migration7_final.sql` (571KB)
+✅ Latest backup: `backups/lot23_migration8_final.sql` (580KB)
 
 ### Documentation
 ✅ `docs/11-reports/lot-23-migration-guide.md` - Complete guide
@@ -168,7 +195,7 @@ Testing:
 
 ## 📊 Progress Summary
 
-**Phase 2.6 - Database Migrations:** 70% Complete (7/10 migrations)
+**Phase 2.6 - Database Migrations:** 80% Complete (8/10 migrations)
 
 | Migration | Tables | Status | Reversible | Tested |
 |-----------|--------|--------|------------|--------|
@@ -179,9 +206,10 @@ Testing:
 | 5 - Batch 3 | 4 | ✅ | ✅ | ✅ |
 | 6 - Batch 4 | 3 | ✅ | ✅ | ✅ |
 | 7 - Batch 5 | 3 | ✅ | ✅ | ✅ |
-| 8-10 - Remaining | ~24 | 📝 | - | - |
+| 8 - Batch 6 | 7 | ✅ | ✅ | ✅ |
+| 9-10 - Remaining | ~17 | 📝 | - | - |
 
-**Total tables with company_id:** 22/45 (49%)
+**Total tables with company_id:** 29/45 (64%)
 
 ---
 
@@ -192,10 +220,11 @@ Testing:
 3. ✅ Migration 5 complete
 4. ✅ Migration 6 complete
 5. ✅ Migration 7 complete
-6. 🔜 Create Migration 8 (Batch 6 - Analytics)
-7. Continue with Migrations 9-10
-8. Phase 2.5: Frontend tenant selection components
-9. Phase 3: Testing (API contract, E2E, security audit)
+6. ✅ Migration 8 complete
+7. 🔜 Create Migration 9 (Batch 7 - Final tables)
+8. Continue with Migration 10 (validation/cleanup)
+9. Phase 2.5: Frontend tenant selection components
+10. Phase 3: Testing (API contract, E2E, security audit)
 
 ---
 
@@ -230,5 +259,5 @@ All migrations pass:
 
 ---
 
-**Last updated:** 2025-12-31 13:55
+**Last updated:** 2025-12-31 14:01
 **Author:** Claude Code (Lot 23 - Phase 2.6)
