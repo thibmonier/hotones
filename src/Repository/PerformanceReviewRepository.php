@@ -7,17 +7,19 @@ namespace App\Repository;
 use App\Entity\Contributor;
 use App\Entity\PerformanceReview;
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<PerformanceReview>
+ * @extends CompanyAwareRepository<PerformanceReview>
  */
-class PerformanceReviewRepository extends ServiceEntityRepository
+class PerformanceReviewRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, PerformanceReview::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, PerformanceReview::class, $companyContext);
     }
 
     /**
@@ -27,7 +29,7 @@ class PerformanceReviewRepository extends ServiceEntityRepository
      */
     public function findByYear(int $year): array
     {
-        return $this->createQueryBuilder('pr')
+        return $this->createCompanyQueryBuilder('pr')
             ->where('pr.year = :year')
             ->setParameter('year', $year)
             ->orderBy('pr.createdAt', 'DESC')
@@ -42,7 +44,7 @@ class PerformanceReviewRepository extends ServiceEntityRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('pr')
+        return $this->createCompanyQueryBuilder('pr')
             ->where('pr.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('pr.year', 'DESC')
@@ -57,7 +59,7 @@ class PerformanceReviewRepository extends ServiceEntityRepository
      */
     public function findByManager(User $manager): array
     {
-        return $this->createQueryBuilder('pr')
+        return $this->createCompanyQueryBuilder('pr')
             ->where('pr.manager = :manager')
             ->setParameter('manager', $manager)
             ->orderBy('pr.year', 'DESC')
@@ -73,7 +75,7 @@ class PerformanceReviewRepository extends ServiceEntityRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createQueryBuilder('pr')
+        return $this->createCompanyQueryBuilder('pr')
             ->where('pr.status = :status')
             ->setParameter('status', $status)
             ->orderBy('pr.createdAt', 'DESC')
@@ -88,7 +90,7 @@ class PerformanceReviewRepository extends ServiceEntityRepository
      */
     public function findPendingForContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('pr')
+        return $this->createCompanyQueryBuilder('pr')
             ->where('pr.contributor = :contributor')
             ->andWhere('pr.status != :validated')
             ->setParameter('contributor', $contributor)
@@ -103,7 +105,7 @@ class PerformanceReviewRepository extends ServiceEntityRepository
      */
     public function existsForContributorAndYear(Contributor $contributor, int $year): bool
     {
-        $count = $this->createQueryBuilder('pr')
+        $count = $this->createCompanyQueryBuilder('pr')
             ->select('COUNT(pr.id)')
             ->where('pr.contributor = :contributor')
             ->andWhere('pr.year = :year')
@@ -122,7 +124,7 @@ class PerformanceReviewRepository extends ServiceEntityRepository
      */
     public function getStatsByYear(int $year): array
     {
-        $results = $this->createQueryBuilder('pr')
+        $results = $this->createCompanyQueryBuilder('pr')
             ->select('pr.status, COUNT(pr.id) as count')
             ->where('pr.year = :year')
             ->setParameter('year', $year)

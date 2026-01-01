@@ -4,18 +4,20 @@ namespace App\Repository;
 
 use App\Entity\Notification;
 use App\Entity\User;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Notification>
+ * @extends CompanyAwareRepository<Notification>
  */
-class NotificationRepository extends ServiceEntityRepository
+class NotificationRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Notification::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Notification::class, $companyContext);
     }
 
     /**
@@ -25,7 +27,7 @@ class NotificationRepository extends ServiceEntityRepository
      */
     public function findUnreadByUser(User $user, ?int $limit = null): array
     {
-        $qb = $this->createQueryBuilder('n')
+        $qb = $this->createCompanyQueryBuilder('n')
             ->where('n.recipient = :user')
             ->andWhere('n.readAt IS NULL')
             ->setParameter('user', $user)
@@ -43,7 +45,7 @@ class NotificationRepository extends ServiceEntityRepository
      */
     public function countUnreadByUser(User $user): int
     {
-        return (int) $this->createQueryBuilder('n')
+        return (int) $this->createCompanyQueryBuilder('n')
             ->select('COUNT(n.id)')
             ->where('n.recipient = :user')
             ->andWhere('n.readAt IS NULL')
@@ -57,7 +59,7 @@ class NotificationRepository extends ServiceEntityRepository
      */
     public function markAllAsReadForUser(User $user): int
     {
-        return $this->createQueryBuilder('n')
+        return $this->createCompanyQueryBuilder('n')
             ->update()
             ->set('n.readAt', ':now')
             ->where('n.recipient = :user')
@@ -75,7 +77,7 @@ class NotificationRepository extends ServiceEntityRepository
     {
         $date = new DateTimeImmutable("-{$daysOld} days");
 
-        return $this->createQueryBuilder('n')
+        return $this->createCompanyQueryBuilder('n')
             ->delete()
             ->where('n.readAt IS NOT NULL')
             ->andWhere('n.readAt < :date')

@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\ProjectEvent;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ProjectEvent>
+ * @extends CompanyAwareRepository<ProjectEvent>
  */
-class ProjectEventRepository extends ServiceEntityRepository
+class ProjectEventRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ProjectEvent::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ProjectEvent::class, $companyContext);
     }
 
     /**
@@ -25,7 +27,7 @@ class ProjectEventRepository extends ServiceEntityRepository
      */
     public function findByProject(int $projectId, int $limit = 50): array
     {
-        return $this->createQueryBuilder('e')
+        return $this->createCompanyQueryBuilder('e')
             ->leftJoin('e.actor', 'u')
             ->addSelect('u')
             ->where('e.project = :projectId')

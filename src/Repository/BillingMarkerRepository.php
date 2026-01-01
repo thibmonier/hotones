@@ -5,18 +5,20 @@ namespace App\Repository;
 use App\Entity\BillingMarker;
 use App\Entity\Order;
 use App\Entity\OrderPaymentSchedule;
+use App\Security\CompanyContext;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<BillingMarker>
+ * @extends CompanyAwareRepository<BillingMarker>
  */
-class BillingMarkerRepository extends ServiceEntityRepository
+class BillingMarkerRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, BillingMarker::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, BillingMarker::class, $companyContext);
     }
 
     /**
@@ -26,7 +28,7 @@ class BillingMarkerRepository extends ServiceEntityRepository
      */
     public function getMonthMarkers(DateTimeInterface $monthStart, DateTimeInterface $monthEnd): array
     {
-        $qb = $this->createQueryBuilder('m')
+        $qb = $this->createCompanyQueryBuilder('m')
             ->leftJoin('m.schedule', 's')
             ->leftJoin('m.order', 'o')
             ->where('(s.id IS NOT NULL AND s.billingDate BETWEEN :start AND :end)'

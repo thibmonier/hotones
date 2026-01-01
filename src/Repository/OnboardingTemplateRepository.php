@@ -6,17 +6,19 @@ namespace App\Repository;
 
 use App\Entity\OnboardingTemplate;
 use App\Entity\Profile;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<OnboardingTemplate>
+ * @extends CompanyAwareRepository<OnboardingTemplate>
  */
-class OnboardingTemplateRepository extends ServiceEntityRepository
+class OnboardingTemplateRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, OnboardingTemplate::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, OnboardingTemplate::class, $companyContext);
     }
 
     /**
@@ -26,7 +28,7 @@ class OnboardingTemplateRepository extends ServiceEntityRepository
      */
     public function findActive(): array
     {
-        return $this->createQueryBuilder('ot')
+        return $this->createCompanyQueryBuilder('ot')
             ->where('ot.active = :active')
             ->setParameter('active', true)
             ->orderBy('ot.name', 'ASC')
@@ -39,7 +41,7 @@ class OnboardingTemplateRepository extends ServiceEntityRepository
      */
     public function findByProfile(Profile $profile): ?OnboardingTemplate
     {
-        return $this->createQueryBuilder('ot')
+        return $this->createCompanyQueryBuilder('ot')
             ->where('ot.profile = :profile')
             ->andWhere('ot.active = :active')
             ->setParameter('profile', $profile)
@@ -54,7 +56,7 @@ class OnboardingTemplateRepository extends ServiceEntityRepository
      */
     public function findDefault(): ?OnboardingTemplate
     {
-        return $this->createQueryBuilder('ot')
+        return $this->createCompanyQueryBuilder('ot')
             ->where('ot.profile IS NULL')
             ->andWhere('ot.active = :active')
             ->setParameter('active', true)

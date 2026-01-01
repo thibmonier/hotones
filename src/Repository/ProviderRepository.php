@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Provider;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Provider>
+ * @extends CompanyAwareRepository<Provider>
  */
-class ProviderRepository extends ServiceEntityRepository
+class ProviderRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Provider::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Provider::class, $companyContext);
     }
 
     /**
@@ -23,7 +25,7 @@ class ProviderRepository extends ServiceEntityRepository
      */
     public function findAllActive(): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->where('p.active = :active')
             ->setParameter('active', true)
             ->orderBy('p.name', 'ASC')
@@ -36,7 +38,7 @@ class ProviderRepository extends ServiceEntityRepository
      */
     public function findAll(): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -47,7 +49,7 @@ class ProviderRepository extends ServiceEntityRepository
      */
     public function findByType(string $type): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->where('p.type = :type')
             ->andWhere('p.active = :active')
             ->setParameter('type', $type)

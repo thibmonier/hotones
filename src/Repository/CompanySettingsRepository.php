@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\CompanySettings;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<CompanySettings>
+ * @extends CompanyAwareRepository<CompanySettings>
  */
-class CompanySettingsRepository extends ServiceEntityRepository
+class CompanySettingsRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, CompanySettings::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, CompanySettings::class, $companyContext);
     }
 
     /**

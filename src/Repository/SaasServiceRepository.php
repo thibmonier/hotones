@@ -6,17 +6,19 @@ namespace App\Repository;
 
 use App\Entity\SaasProvider;
 use App\Entity\SaasService;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<SaasService>
+ * @extends CompanyAwareRepository<SaasService>
  */
-class SaasServiceRepository extends ServiceEntityRepository
+class SaasServiceRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, SaasService::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, SaasService::class, $companyContext);
     }
 
     /**
@@ -26,7 +28,7 @@ class SaasServiceRepository extends ServiceEntityRepository
      */
     public function findActive(): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->where('s.active = :active')
             ->setParameter('active', true)
             ->orderBy('s.name', 'ASC')
@@ -41,7 +43,7 @@ class SaasServiceRepository extends ServiceEntityRepository
      */
     public function findByProvider(SaasProvider $provider): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->where('s.provider = :provider')
             ->setParameter('provider', $provider)
             ->orderBy('s.name', 'ASC')
@@ -56,7 +58,7 @@ class SaasServiceRepository extends ServiceEntityRepository
      */
     public function findByCategory(string $category): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->where('s.category = :category')
             ->setParameter('category', $category)
             ->orderBy('s.name', 'ASC')
@@ -71,7 +73,7 @@ class SaasServiceRepository extends ServiceEntityRepository
      */
     public function searchByName(string $search): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->where('s.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('s.name', 'ASC')
@@ -86,7 +88,7 @@ class SaasServiceRepository extends ServiceEntityRepository
      */
     public function findAllCategories(): array
     {
-        $result = $this->createQueryBuilder('s')
+        $result = $this->createCompanyQueryBuilder('s')
             ->select('DISTINCT s.category')
             ->where('s.category IS NOT NULL')
             ->orderBy('s.category', 'ASC')
@@ -103,7 +105,7 @@ class SaasServiceRepository extends ServiceEntityRepository
      */
     public function getServicesWithSubscriptionCount(): array
     {
-        $results = $this->createQueryBuilder('s')
+        $results = $this->createCompanyQueryBuilder('s')
             ->select('s', 'COUNT(sub.id) as subscriptionCount')
             ->leftJoin('s.subscriptions', 'sub')
             ->groupBy('s.id')

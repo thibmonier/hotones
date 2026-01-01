@@ -4,18 +4,20 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\ContributorSatisfaction;
+use App\Security\CompanyContext;
 use DateTime;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ContributorSatisfaction>
+ * @extends CompanyAwareRepository<ContributorSatisfaction>
  */
-class ContributorSatisfactionRepository extends ServiceEntityRepository
+class ContributorSatisfactionRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ContributorSatisfaction::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ContributorSatisfaction::class, $companyContext);
     }
 
     /**
@@ -35,7 +37,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->where('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('cs.year', 'DESC')
@@ -49,7 +51,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
      */
     public function findByPeriod(int $year, int $month): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->where('cs.year = :year')
             ->andWhere('cs.month = :month')
             ->setParameter('year', $year)
@@ -63,7 +65,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
      */
     public function findByYear(int $year): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->where('cs.year = :year')
             ->setParameter('year', $year)
             ->orderBy('cs.month', 'DESC')
@@ -76,7 +78,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
      */
     public function getAverageScoreByPeriod(int $year, int $month): ?float
     {
-        $result = $this->createQueryBuilder('cs')
+        $result = $this->createCompanyQueryBuilder('cs')
             ->select('AVG(cs.overallScore) as avg_score')
             ->where('cs.year = :year')
             ->andWhere('cs.month = :month')
@@ -93,7 +95,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
      */
     public function getAverageScoreByYear(int $year): ?float
     {
-        $result = $this->createQueryBuilder('cs')
+        $result = $this->createCompanyQueryBuilder('cs')
             ->select('AVG(cs.overallScore) as avg_score')
             ->where('cs.year = :year')
             ->setParameter('year', $year)
@@ -266,7 +268,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
      */
     public function getContributorTrend(Contributor $contributor, int $months = 12): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->where('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('cs.year', 'DESC')
@@ -281,7 +283,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
      */
     public function countByPeriod(int $year, int $month): int
     {
-        return (int) $this->createQueryBuilder('cs')
+        return (int) $this->createCompanyQueryBuilder('cs')
             ->select('COUNT(DISTINCT cs.contributor)')
             ->where('cs.year = :year')
             ->andWhere('cs.month = :month')
@@ -307,7 +309,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
         $startDate = (clone $endDate)->modify("-{$months} months");
 
         // Récupérer les contributeurs ayant travaillé sur le projet
-        $contributorIds = $this->createQueryBuilder('cs')
+        $contributorIds = $this->createCompanyQueryBuilder('cs')
             ->select('DISTINCT IDENTITY(t.contributor)')
             ->from(\App\Entity\Timesheet::class, 't')
             ->where('t.project = :projectId')
@@ -323,7 +325,7 @@ class ContributorSatisfactionRepository extends ServiceEntityRepository
         }
 
         // Récupérer les satisfactions de ces contributeurs pour la période
-        $qb = $this->createQueryBuilder('cs');
+        $qb = $this->createCompanyQueryBuilder('cs');
         $qb->where($qb->expr()->in('cs.contributor', ':contributorIds'))
             ->setParameter('contributorIds', $contributorIds)
             ->orderBy('cs.year', 'ASC')

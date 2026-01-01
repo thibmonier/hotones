@@ -6,18 +6,20 @@ namespace App\Repository;
 
 use App\Entity\Project;
 use App\Entity\ProjectHealthScore;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ProjectHealthScore>
+ * @extends CompanyAwareRepository<ProjectHealthScore>
  */
-class ProjectHealthScoreRepository extends ServiceEntityRepository
+class ProjectHealthScoreRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ProjectHealthScore::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ProjectHealthScore::class, $companyContext);
     }
 
     /**
@@ -25,7 +27,7 @@ class ProjectHealthScoreRepository extends ServiceEntityRepository
      */
     public function findLatestForProject(Project $project): ?ProjectHealthScore
     {
-        return $this->createQueryBuilder('phs')
+        return $this->createCompanyQueryBuilder('phs')
             ->where('phs.project = :project')
             ->setParameter('project', $project)
             ->orderBy('phs.calculatedAt', 'DESC')
@@ -43,7 +45,7 @@ class ProjectHealthScoreRepository extends ServiceEntityRepository
     {
         $since = new DateTimeImmutable("-{$days} days");
 
-        return $this->createQueryBuilder('phs')
+        return $this->createCompanyQueryBuilder('phs')
             ->where('phs.project = :project')
             ->andWhere('phs.calculatedAt >= :since')
             ->setParameter('project', $project)
@@ -61,11 +63,11 @@ class ProjectHealthScoreRepository extends ServiceEntityRepository
     public function findProjectsAtRisk(): array
     {
         // Get latest score for each project
-        $subQuery = $this->createQueryBuilder('phs2')
+        $subQuery = $this->createCompanyQueryBuilder('phs2')
             ->select('MAX(phs2.id)')
             ->where('phs2.project = phs.project');
 
-        return $this->createQueryBuilder('phs')
+        return $this->createCompanyQueryBuilder('phs')
             ->where($this->getEntityManager()->getExpressionBuilder()->in('phs.id', $subQuery->getDQL()))
             ->andWhere('phs.healthLevel IN (:levels)')
             ->setParameter('levels', ['warning', 'critical'])
@@ -80,11 +82,11 @@ class ProjectHealthScoreRepository extends ServiceEntityRepository
     public function countByHealthLevel(): array
     {
         // Get latest score for each project
-        $subQuery = $this->createQueryBuilder('phs2')
+        $subQuery = $this->createCompanyQueryBuilder('phs2')
             ->select('MAX(phs2.id)')
             ->groupBy('phs2.project');
 
-        $results = $this->createQueryBuilder('phs')
+        $results = $this->createCompanyQueryBuilder('phs')
             ->select('phs.healthLevel', 'COUNT(phs.id) as count')
             ->where($this->getEntityManager()->getExpressionBuilder()->in('phs.id', $subQuery->getDQL()))
             ->groupBy('phs.healthLevel')
