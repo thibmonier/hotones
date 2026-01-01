@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
 use App\Repository\TimesheetRepository;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -19,6 +20,7 @@ class GdprDataExportService
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly CompanyContext $companyContext,
         private readonly ContributorRepository $contributorRepository,
         private readonly EmploymentPeriodRepository $employmentPeriodRepository,
         private readonly TimesheetRepository $timesheetRepository,
@@ -149,11 +151,14 @@ class GdprDataExportService
     private function exportCookieConsents(User $user): array
     {
         // Get all consents for this user (including expired ones for full history)
+        $company  = $this->companyContext->getCurrentCompany();
         $qb       = $this->em->createQueryBuilder();
         $consents = $qb->select('c')
             ->from('App\Entity\CookieConsent', 'c')
             ->where('c.user = :user')
+            ->andWhere('c.company = :company')
             ->setParameter('user', $user)
+            ->setParameter('company', $company)
             ->orderBy('c.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
@@ -193,11 +198,14 @@ class GdprDataExportService
 
     private function calculateTotalHours($contributor): string
     {
-        $qb     = $this->em->createQueryBuilder();
-        $result = $qb->select('SUM(t.hours) as total')
+        $company = $this->companyContext->getCurrentCompany();
+        $qb      = $this->em->createQueryBuilder();
+        $result  = $qb->select('SUM(t.hours) as total')
             ->from('App\Entity\Timesheet', 't')
             ->where('t.contributor = :contributor')
+            ->andWhere('t.company = :company')
             ->setParameter('contributor', $contributor)
+            ->setParameter('company', $company)
             ->getQuery()
             ->getSingleScalarResult();
 
