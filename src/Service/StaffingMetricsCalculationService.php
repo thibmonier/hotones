@@ -12,6 +12,7 @@ use App\Entity\EmploymentPeriod;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
 use App\Repository\TimesheetRepository;
+use App\Security\CompanyContext;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
@@ -29,6 +30,7 @@ class StaffingMetricsCalculationService
 
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private CompanyContext $companyContext,
         private ContributorRepository $contributorRepo,
         private TimesheetRepository $timesheetRepo,
         private EmploymentPeriodRepository $employmentPeriodRepo
@@ -87,6 +89,7 @@ class StaffingMetricsCalculationService
 
                 // Créer l'entrée de fait
                 $fact = new FactStaffingMetrics();
+                $fact->setCompany($this->companyContext->getCurrentCompany());
                 $fact->setDimTime($dimTime);
                 $fact->setContributor($contributor);
                 $fact->setAvailableDays((string) $metrics['availableDays']);
@@ -312,6 +315,7 @@ class StaffingMetricsCalculationService
 
         if (!$dimTime) {
             $dimTime = new DimTime();
+            $dimTime->setCompany($this->companyContext->getCurrentCompany());
             $dimTime->setDate($date);
             $this->entityManager->persist($dimTime);
         }
@@ -346,6 +350,7 @@ class StaffingMetricsCalculationService
 
         if (!$dimProfile) {
             $dimProfile = new DimProfile();
+            $dimProfile->setCompany($this->companyContext->getCurrentCompany());
             $dimProfile->setProfile($profile);
             $dimProfile->setName($profile->getName());
             $dimProfile->setIsProductive(true); // Par défaut productif
