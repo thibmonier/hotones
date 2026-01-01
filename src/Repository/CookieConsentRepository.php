@@ -6,18 +6,20 @@ namespace App\Repository;
 
 use App\Entity\CookieConsent;
 use App\Entity\User;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<CookieConsent>
+ * @extends CompanyAwareRepository<CookieConsent>
  */
-class CookieConsentRepository extends ServiceEntityRepository
+class CookieConsentRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, CookieConsent::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, CookieConsent::class, $companyContext);
     }
 
     /**
@@ -29,7 +31,7 @@ class CookieConsentRepository extends ServiceEntityRepository
             return null;
         }
 
-        return $this->createQueryBuilder('c')
+        return $this->createCompanyQueryBuilder('c')
             ->where('c.user = :user')
             ->andWhere('c.expiresAt > :now')
             ->setParameter('user', $user)
@@ -45,7 +47,7 @@ class CookieConsentRepository extends ServiceEntityRepository
      */
     public function findExpiredConsents(): array
     {
-        return $this->createQueryBuilder('c')
+        return $this->createCompanyQueryBuilder('c')
             ->where('c.expiresAt < :now')
             ->setParameter('now', new DateTimeImmutable())
             ->getQuery()
@@ -58,10 +60,13 @@ class CookieConsentRepository extends ServiceEntityRepository
     public function deleteOldExpiredConsents(): int
     {
         $threshold = new DateTimeImmutable('-30 days');
+        $company   = $this->companyContext->getCurrentCompany();
 
         return $this->createQueryBuilder('c')
             ->delete()
-            ->where('c.expiresAt < :threshold')
+            ->where('c.company = :company')
+            ->andWhere('c.expiresAt < :threshold')
+            ->setParameter('company', $company)
             ->setParameter('threshold', $threshold)
             ->getQuery()
             ->execute();
@@ -72,7 +77,7 @@ class CookieConsentRepository extends ServiceEntityRepository
      */
     public function getConsentStatistics(): array
     {
-        $qb = $this->createQueryBuilder('c')
+        $qb = $this->createCompanyQueryBuilder('c')
             ->select(
                 'COUNT(c.id) as total',
                 'SUM(CASE WHEN c.functional = true THEN 1 ELSE 0 END) as functional',

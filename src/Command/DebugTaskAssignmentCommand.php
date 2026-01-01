@@ -6,6 +6,7 @@ namespace App\Command;
 
 use App\Entity\Contributor;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,7 +37,12 @@ class DebugTaskAssignmentCommand extends Command
         $contributorId = $input->getArgument('contributor_id');
 
         if ($contributorId) {
-            $contributor = $this->em->getRepository(Contributor::class)->find($contributorId);
+            // old code : $contributor = $this->em->getRepository(Contributor::class)->find($contributorId);
+            try {
+                $contributor = $this->em->getReference(Contributor::class, $contributorId);
+            } catch (ORMException $e) {
+                return Command::FAILURE;
+            }
             if (!$contributor) {
                 $io->error("Contributeur #$contributorId non trouvé");
 

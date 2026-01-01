@@ -1,4 +1,16 @@
 {
+    "ahmed-bhs/doctrine-doctor": {
+        "version": "1.9999999",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "0a0c0e3972f784e628c4f759d2fb446e9eeb4959"
+        },
+        "files": [
+            "config/packages/doctrine_doctor.yaml"
+        ]
+    },
     "api-platform/core": {
         "version": "4.2",
         "recipe": {
@@ -230,6 +242,18 @@
             "ref": "1019e5c08d4821cb9b77f4891f8e9c31ff20ac6f"
         }
     },
+    "symfony/ai-anthropic-platform": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "169d966953a6b9aeca111cb7f0ac2da72e050159"
+        },
+        "files": [
+            "config/packages/ai_anthropic_platform.yaml"
+        ]
+    },
     "symfony/ai-bundle": {
         "version": "0.1",
         "recipe": {
@@ -240,6 +264,30 @@
         },
         "files": [
             "config/packages/ai.yaml"
+        ]
+    },
+    "symfony/ai-gemini-platform": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "a6953d134a46a78354003b4dddf682f03ef886b2"
+        },
+        "files": [
+            "config/packages/ai_gemini_platform.yaml"
+        ]
+    },
+    "symfony/ai-open-ai-platform": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "4f925d48b69c145cde2286e2cabfc7bd5eb4aca9"
+        },
+        "files": [
+            "config/packages/ai_open_ai_platform.yaml"
         ]
     },
     "symfony/apache-pack": {

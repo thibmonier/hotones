@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Vacation;
+use App\Security\CompanyContext;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Vacation>
+ * @extends CompanyAwareRepository<Vacation>
  *
  * @method Vacation|null find($id, $lockMode = null, $lockVersion = null)
  * @method Vacation|null findOneBy(array $criteria, array $orderBy = null)
  * @method Vacation[]    findAll()
  * @method Vacation[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class VacationRepository extends ServiceEntityRepository
+class VacationRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Vacation::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Vacation::class, $companyContext);
     }
 
     /**
@@ -29,7 +31,7 @@ class VacationRepository extends ServiceEntityRepository
      */
     public function countApprovedDaysBetween(DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
-        $vacations = $this->createQueryBuilder('v')
+        $vacations = $this->createCompanyQueryBuilder('v')
             ->where('v.status = :approved')
             ->andWhere('v.startDate <= :endDate')
             ->andWhere('v.endDate >= :startDate')
@@ -68,7 +70,7 @@ class VacationRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('v')
+        return $this->createCompanyQueryBuilder('v')
             ->leftJoin('v.contributor', 'c')
             ->addSelect('c')
             ->where('v.contributor IN (:contributors)')

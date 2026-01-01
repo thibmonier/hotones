@@ -3,17 +3,19 @@
 namespace App\Repository;
 
 use App\Entity\Client;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Client>
+ * @extends CompanyAwareRepository<Client>
  */
-class ClientRepository extends ServiceEntityRepository
+class ClientRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Client::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Client::class, $companyContext);
     }
 
     /**
@@ -21,7 +23,7 @@ class ClientRepository extends ServiceEntityRepository
      */
     public function findAllOrderedByName(): array
     {
-        return $this->createQueryBuilder('c')
+        return $this->createCompanyQueryBuilder('c')
             ->orderBy('c.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -34,7 +36,7 @@ class ClientRepository extends ServiceEntityRepository
      */
     public function search(string $query, int $limit = 5): array
     {
-        return $this->createQueryBuilder('c')
+        return $this->createCompanyQueryBuilder('c')
             ->where('c.name LIKE :query')
             ->orWhere('c.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')

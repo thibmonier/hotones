@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Badge;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Badge>
+ * @extends CompanyAwareRepository<Badge>
  */
-class BadgeRepository extends ServiceEntityRepository
+class BadgeRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Badge::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Badge::class, $companyContext);
     }
 
     /**
@@ -25,7 +27,7 @@ class BadgeRepository extends ServiceEntityRepository
      */
     public function findAllActive(): array
     {
-        return $this->createQueryBuilder('b')
+        return $this->createCompanyQueryBuilder('b')
             ->where('b.active = :active')
             ->setParameter('active', true)
             ->orderBy('b.category', 'ASC')
@@ -41,7 +43,7 @@ class BadgeRepository extends ServiceEntityRepository
      */
     public function findByCategory(string $category): array
     {
-        return $this->createQueryBuilder('b')
+        return $this->createCompanyQueryBuilder('b')
             ->where('b.category = :category')
             ->andWhere('b.active = :active')
             ->setParameter('category', $category)
@@ -57,14 +59,14 @@ class BadgeRepository extends ServiceEntityRepository
     public function getBadgeStats(): array
     {
         return [
-            'total'       => $this->count(['active' => true]),
+            'total'       => $this->countForCurrentCompany(['active' => true]),
             'by_category' => $this->countByCategory(),
         ];
     }
 
     private function countByCategory(): array
     {
-        $results = $this->createQueryBuilder('b')
+        $results = $this->createCompanyQueryBuilder('b')
             ->select('b.category, COUNT(b.id) as count')
             ->where('b.active = :active')
             ->setParameter('active', true)

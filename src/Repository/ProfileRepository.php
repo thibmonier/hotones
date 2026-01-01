@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Profile;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Profile>
+ * @extends CompanyAwareRepository<Profile>
  */
-class ProfileRepository extends ServiceEntityRepository
+class ProfileRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Profile::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Profile::class, $companyContext);
     }
 }

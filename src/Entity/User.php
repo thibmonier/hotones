@@ -19,6 +19,7 @@ use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterfac
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\UserRepository')]
@@ -75,6 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     #[ORM\Column(type: 'string')]
     #[Groups(['user:write'])]
+    #[Ignore]
     private string $password;
 
     #[ORM\Column(type: 'string', length: 100)]
@@ -102,6 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     // 2FA TOTP
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Ignore]
     private ?string $totpSecret = null;
 
     #[ORM\Column(type: 'boolean')]
@@ -168,7 +171,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(#[SensitiveParameterAlias] string $password): self
     {
         $this->password = $password;
 
@@ -274,7 +277,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->totpSecret;
     }
 
-    public function setTotpSecret(?string $secret): self
+    public function setTotpSecret(#[SensitiveParameterAlias] ?string $secret): self
     {
         $this->totpSecret = $secret;
 
