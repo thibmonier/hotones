@@ -7,7 +7,9 @@ namespace App\Entity\Analytics;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\Entity\Company;
 use App\Entity\Contributor;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\StaffingMetricsRepository;
 use DateTime;
 use DateTimeInterface;
@@ -32,13 +34,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['staffing:read']],
     paginationItemsPerPage: 50,
 )]
-class FactStaffingMetrics
+class FactStaffingMetrics implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['staffing:read'])]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Company $company;
 
     // Clés étrangères vers les dimensions
     #[ORM\ManyToOne(targetEntity: DimTime::class, cascade: ['persist'])]
@@ -293,6 +299,18 @@ class FactStaffingMetrics
         } else {
             $this->tace = '0.00';
         }
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

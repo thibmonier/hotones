@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity\Analytics;
 
+use App\Entity\Company;
+use App\Entity\Interface\CompanyOwnedInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,12 +14,16 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'dim_project_type')]
-class DimProjectType
+class DimProjectType implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Company $company;
 
     #[ORM\Column(type: 'string', length: 20)]
     private string $projectType; // forfait, regie
@@ -131,6 +137,18 @@ class DimProjectType
     public function setCompositeKey(string $compositeKey): static
     {
         $this->compositeKey = $compositeKey;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

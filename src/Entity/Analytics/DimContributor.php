@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity\Analytics;
 
+use App\Entity\Company;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,12 +15,16 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'dim_contributor')]
-class DimContributor
+class DimContributor implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -139,6 +145,18 @@ class DimContributor
     public function setCompositeKey(string $compositeKey): static
     {
         $this->compositeKey = $compositeKey;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }
