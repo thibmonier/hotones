@@ -3,23 +3,25 @@
 namespace App\Repository;
 
 use App\Entity\Project;
+use App\Security\CompanyContext;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Project>
+ * @extends CompanyAwareRepository<Project>
  *
  * @method Project|null find($id, $lockMode = null, $lockVersion = null)
  * @method Project|null findOneBy(array $criteria, array $orderBy = null)
  * @method Project[]    findAll()
  * @method Project[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ProjectRepository extends ServiceEntityRepository
+class ProjectRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Project::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Project::class, $companyContext);
     }
 
     /**
@@ -33,7 +35,7 @@ class ProjectRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this->createCompanyQueryBuilder('p')
             ->select('p.id AS projectId')
             ->leftJoin('p.orders', 'o')
             ->leftJoin('o.sections', 's')
@@ -98,7 +100,7 @@ class ProjectRepository extends ServiceEntityRepository
         }
 
         // Achats au niveau projet
-        $qb1 = $this->createQueryBuilder('p')
+        $qb1 = $this->createCompanyQueryBuilder('p')
             ->select('COALESCE(SUM(p.purchasesAmount), 0) AS totalProjectPurchases')
             ->where('p.id IN (:ids)')
             ->setParameter('ids', $projectIds);
@@ -106,7 +108,7 @@ class ProjectRepository extends ServiceEntityRepository
         $projectPurchases = (string) ($row1['totalProjectPurchases'] ?? '0');
 
         // Achats attachés aux lignes de service
-        $qb2 = $this->createQueryBuilder('p')
+        $qb2 = $this->createCompanyQueryBuilder('p')
             ->select("COALESCE(SUM(CASE WHEN l.type = 'service' THEN COALESCE(l.attachedPurchaseAmount,0) ELSE 0 END), 0) AS totalLinePurchases")
             ->leftJoin('p.orders', 'o')
             ->leftJoin('o.sections', 's')
@@ -127,7 +129,7 @@ class ProjectRepository extends ServiceEntityRepository
     {
         $validStatuses = ['signe', 'gagne', 'termine', 'signed', 'won', 'completed'];
 
-        $result = $this->createQueryBuilder('p')
+        $result = $this->createCompanyQueryBuilder('p')
             ->select('COALESCE(SUM(o.totalAmount), 0) AS total')
             ->leftJoin('p.orders', 'o')
             ->where('o.status IN (:validStatuses)')
@@ -144,7 +146,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function findAllOrderedByName(): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
@@ -160,7 +162,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function findActiveOrderedByName(): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
@@ -178,7 +180,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function findRecentProjects(int $limit = 5): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.projectManager', 'pm')
@@ -196,7 +198,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function countActiveProjects(): int
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->where('p.status = :status')
             ->setParameter('status', 'active')
@@ -209,7 +211,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function getProjectsByStatus(): array
     {
-        $result = $this->createQueryBuilder('p')
+        $result = $this->createCompanyQueryBuilder('p')
             ->select('p.status, COUNT(p.id) as count')
             ->groupBy('p.status')
             ->getQuery()
@@ -228,7 +230,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function findOneWithRelations(int $id): ?Project
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
@@ -256,7 +258,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function searchProjects(string $query): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->where('p.name LIKE :query OR c.name LIKE :query')
@@ -275,7 +277,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function findActiveBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->where('p.status = :status')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
@@ -306,7 +308,7 @@ class ProjectRepository extends ServiceEntityRepository
         ?int $serviceCategoryId = null,
         ?string $search = null
     ): array {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.technologies', 't')
             ->addSelect('t')
             ->leftJoin('p.client', 'c')
@@ -387,7 +389,7 @@ class ProjectRepository extends ServiceEntityRepository
         ?string $search = null,
         ?int $serviceCategoryId = null
     ): int {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this->createCompanyQueryBuilder('p')
             ->select('COUNT(DISTINCT p.id)')
             ->leftJoin('p.technologies', 't')
             ->leftJoin('p.client', 'c')
@@ -423,7 +425,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function getDistinctProjectManagersBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $rows = $this->createCompanyQueryBuilder('p')
             ->select('pm.id AS id, pm.firstName AS firstName, pm.lastName AS lastName')
             ->leftJoin('p.projectManager', 'pm')
             ->where('pm.id IS NOT NULL')
@@ -450,7 +452,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function getDistinctSalesPersonsBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $rows = $this->createCompanyQueryBuilder('p')
             ->select('sp.id AS id, sp.firstName AS firstName, sp.lastName AS lastName')
             ->leftJoin('p.salesPerson', 'sp')
             ->where('sp.id IS NOT NULL')
@@ -477,7 +479,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function getDistinctTechnologiesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $rows = $this->createCompanyQueryBuilder('p')
             ->select('t.id AS id, t.name AS name')
             ->leftJoin('p.technologies', 't')
             ->where('t.id IS NOT NULL')
@@ -503,7 +505,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function getDistinctServiceCategoriesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $rows = $this->createCompanyQueryBuilder('p')
             ->select('sc.id AS id, sc.name AS name')
             ->leftJoin('p.serviceCategory', 'sc')
             ->where('sc.id IS NOT NULL')
@@ -529,7 +531,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function getDistinctProjectTypes(): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $rows = $this->createCompanyQueryBuilder('p')
             ->select('DISTINCT p.projectType AS type')
             ->where('p.projectType IS NOT NULL')
             ->orderBy('p.projectType', 'ASC')
@@ -544,7 +546,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function getDistinctStatuses(): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $rows = $this->createCompanyQueryBuilder('p')
             ->select('DISTINCT p.status AS status')
             ->where('p.status IS NOT NULL')
             ->orderBy('p.status', 'ASC')
@@ -562,7 +564,7 @@ class ProjectRepository extends ServiceEntityRepository
      */
     public function search(string $query, int $limit = 5): array
     {
-        return $this->createQueryBuilder('p')
+        return $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')

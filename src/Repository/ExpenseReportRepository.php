@@ -6,18 +6,20 @@ use App\Entity\Contributor;
 use App\Entity\ExpenseReport;
 use App\Entity\Order;
 use App\Entity\Project;
+use App\Security\CompanyContext;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ExpenseReport>
+ * @extends CompanyAwareRepository<ExpenseReport>
  */
-class ExpenseReportRepository extends ServiceEntityRepository
+class ExpenseReportRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ExpenseReport::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ExpenseReport::class, $companyContext);
     }
 
     /**
@@ -29,7 +31,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function findByContributor(Contributor $contributor, array $filters = []): array
     {
-        $qb = $this->createQueryBuilder('e')
+        $qb = $this->createCompanyQueryBuilder('e')
             ->where('e.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('e.expenseDate', 'DESC')
@@ -74,7 +76,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function findPending(): array
     {
-        return $this->createQueryBuilder('e')
+        return $this->createCompanyQueryBuilder('e')
             ->where('e.status = :status')
             ->setParameter('status', ExpenseReport::STATUS_PENDING)
             ->orderBy('e.expenseDate', 'ASC')
@@ -89,7 +91,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function findByProject(Project $project): array
     {
-        return $this->createQueryBuilder('e')
+        return $this->createCompanyQueryBuilder('e')
             ->where('e.project = :project')
             ->setParameter('project', $project)
             ->orderBy('e.expenseDate', 'DESC')
@@ -104,7 +106,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function findByOrder(Order $order): array
     {
-        return $this->createQueryBuilder('e')
+        return $this->createCompanyQueryBuilder('e')
             ->where('e.order = :order')
             ->setParameter('order', $order)
             ->orderBy('e.expenseDate', 'DESC')
@@ -119,7 +121,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function calculateTotalByCategory(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $results = $this->createQueryBuilder('e')
+        $results = $this->createCompanyQueryBuilder('e')
             ->select('e.category', 'SUM(e.amountTTC) as total', 'COUNT(e.id) as count')
             ->where('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -148,7 +150,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function calculateTotalRebillable(Order $order): string
     {
-        $result = $this->createQueryBuilder('e')
+        $result = $this->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC) as total')
             ->where('e.order = :order')
             ->andWhere('e.status IN (:statuses)')
@@ -167,7 +169,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function calculateStats(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $qb = $this->createQueryBuilder('e')
+        $qb = $this->createCompanyQueryBuilder('e')
             ->where('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->setParameter('start', $start)
@@ -179,7 +181,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         // Total validé (à rembourser)
-        $validated = $this->createQueryBuilder('e')
+        $validated = $this->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC)')
             ->where('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -191,7 +193,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         // Total en attente
-        $pending = $this->createQueryBuilder('e')
+        $pending = $this->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC)')
             ->where('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -222,7 +224,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function findTopContributors(DateTimeInterface $start, DateTimeInterface $end, int $limit = 5): array
     {
-        $results = $this->createQueryBuilder('e')
+        $results = $this->createCompanyQueryBuilder('e')
             ->select('IDENTITY(e.contributor) as contributor_id', 'SUM(e.amountTTC) as total', 'COUNT(e.id) as count')
             ->where('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -262,7 +264,7 @@ class ExpenseReportRepository extends ServiceEntityRepository
      */
     public function findAllWithFilters(array $filters = []): array
     {
-        $qb = $this->createQueryBuilder('e')
+        $qb = $this->createCompanyQueryBuilder('e')
             ->leftJoin('e.contributor', 'c')
             ->leftJoin('e.project', 'p')
             ->leftJoin('e.order', 'o')

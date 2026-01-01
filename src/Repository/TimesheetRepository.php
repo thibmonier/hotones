@@ -5,23 +5,25 @@ namespace App\Repository;
 use App\Entity\Contributor;
 use App\Entity\Project;
 use App\Entity\Timesheet;
+use App\Security\CompanyContext;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Timesheet>
+ * @extends CompanyAwareRepository<Timesheet>
  *
  * @method Timesheet|null find($id, $lockMode = null, $lockVersion = null)
  * @method Timesheet|null findOneBy(array $criteria, array $orderBy = null)
  * @method Timesheet[]    findAll()
  * @method Timesheet[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TimesheetRepository extends ServiceEntityRepository
+class TimesheetRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Timesheet::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Timesheet::class, $companyContext);
     }
 
     /**
@@ -30,7 +32,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function findByContributorAndDateRange(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
-        return $this->createQueryBuilder('t')
+        return $this->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.task', 'ta')
@@ -53,7 +55,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function findRecentByContributor(Contributor $contributor, int $limit = 5): array
     {
-        return $this->createQueryBuilder('t')
+        return $this->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.task', 'ta')
@@ -72,7 +74,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function findForPeriodWithProject(DateTimeInterface $startDate, DateTimeInterface $endDate, ?Project $project = null): array
     {
-        $qb = $this->createQueryBuilder('t')
+        $qb = $this->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.contributor', 'c')
@@ -106,7 +108,7 @@ class TimesheetRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('t')
+        return $this->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.contributor', 'c')
@@ -132,7 +134,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function getTotalHoursForMonth(DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
-        $result = $this->createQueryBuilder('t')
+        $result = $this->createCompanyQueryBuilder('t')
             ->select('SUM(t.hours)')
             ->where('t.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
@@ -148,7 +150,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function getHoursGroupedByProjectForContributor(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
-        $results = $this->createQueryBuilder('t')
+        $results = $this->createCompanyQueryBuilder('t')
             ->select('p.id AS projectId, p.name AS projectName, pc.name AS projectClientName, SUM(t.hours) AS totalHours')
             ->leftJoin('t.project', 'p')
             ->leftJoin('p.client', 'pc')
@@ -200,7 +202,7 @@ class TimesheetRepository extends ServiceEntityRepository
         ?\App\Entity\ProjectTask $task = null,
         ?\App\Entity\ProjectSubTask $subTask = null
     ): ?Timesheet {
-        $qb = $this->createQueryBuilder('t')
+        $qb = $this->createCompanyQueryBuilder('t')
             ->where('t.contributor = :contributor')
             ->andWhere('t.project = :project')
             ->andWhere('t.date = :date')
@@ -235,7 +237,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function getStatsPerContributor(DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
-        return $this->createQueryBuilder('t')
+        return $this->createCompanyQueryBuilder('t')
             ->select('CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')
             ->leftJoin('t.contributor', 'c')
             ->where('t.date BETWEEN :start AND :end')
@@ -256,7 +258,7 @@ class TimesheetRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('t')
+        return $this->createCompanyQueryBuilder('t')
             ->select('CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')
             ->leftJoin('t.contributor', 'c')
             ->leftJoin('t.project', 'p')
@@ -280,7 +282,7 @@ class TimesheetRepository extends ServiceEntityRepository
             return 0;
         }
 
-        $result = $this->createQueryBuilder('t')
+        $result = $this->createCompanyQueryBuilder('t')
             ->select('SUM(t.hours)')
             ->leftJoin('t.project', 'p')
             ->where('t.date BETWEEN :start AND :end')
@@ -299,7 +301,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function getMonthlyHoursForProject(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
     {
-        $qb = $this->createQueryBuilder('t')
+        $qb = $this->createCompanyQueryBuilder('t')
             ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours) as totalHours')
             ->where('t.project = :project')
             ->setParameter('project', $project)
@@ -323,7 +325,7 @@ class TimesheetRepository extends ServiceEntityRepository
      */
     public function getMonthlyRevenueForProjectUsingContributorTjm(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
     {
-        $qb = $this->createQueryBuilder('t')
+        $qb = $this->createCompanyQueryBuilder('t')
             ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours * (COALESCE(ep.tjm, 0)/8)) as revenue')
             ->leftJoin('t.contributor', 'c')
             ->leftJoin('App\\Entity\\EmploymentPeriod', 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
@@ -359,7 +361,7 @@ class TimesheetRepository extends ServiceEntityRepository
             ];
         }
 
-        $qb = $this->createQueryBuilder('t')
+        $qb = $this->createCompanyQueryBuilder('t')
             ->select('COALESCE(SUM(t.hours), 0) AS totalHours')
             ->addSelect('COALESCE(SUM(t.hours * ((COALESCE(ep.cjm, 0) * (COALESCE(ep.workTimePercentage, 100)/100)) / 8)), 0) AS totalHumanCost')
             ->addSelect('COALESCE(SUM(t.hours * (COALESCE(ep.tjm, 0) / 8)), 0) AS totalRevenue')
@@ -397,7 +399,7 @@ class TimesheetRepository extends ServiceEntityRepository
         DateTimeInterface $date,
         ?Timesheet $exclude = null
     ): float {
-        $qb = $this->createQueryBuilder('t')
+        $qb = $this->createCompanyQueryBuilder('t')
             ->select('COALESCE(SUM(t.hours), 0)')
             ->where('t.contributor = :contributor')
             ->andWhere('t.date = :date')
