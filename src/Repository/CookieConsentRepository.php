@@ -32,7 +32,7 @@ class CookieConsentRepository extends CompanyAwareRepository
         }
 
         return $this->createCompanyQueryBuilder('c')
-            ->where('c.user = :user')
+            ->andWhere('c.user = :user')
             ->andWhere('c.expiresAt > :now')
             ->setParameter('user', $user)
             ->setParameter('now', new DateTimeImmutable())
@@ -48,7 +48,7 @@ class CookieConsentRepository extends CompanyAwareRepository
     public function findExpiredConsents(): array
     {
         return $this->createCompanyQueryBuilder('c')
-            ->where('c.expiresAt < :now')
+            ->andWhere('c.expiresAt < :now')
             ->setParameter('now', new DateTimeImmutable())
             ->getQuery()
             ->getResult();
@@ -83,7 +83,7 @@ class CookieConsentRepository extends CompanyAwareRepository
                 'SUM(CASE WHEN c.functional = true THEN 1 ELSE 0 END) as functional',
                 'SUM(CASE WHEN c.analytics = true THEN 1 ELSE 0 END) as analytics',
             )
-            ->where('c.expiresAt > :now')
+            ->andWhere('c.expiresAt > :now')
             ->setParameter('now', new DateTimeImmutable());
 
         return $qb->getQuery()->getSingleResult();

@@ -37,8 +37,7 @@ class ClientRepository extends CompanyAwareRepository
     public function search(string $query, int $limit = 5): array
     {
         return $this->createCompanyQueryBuilder('c')
-            ->where('c.name LIKE :query')
-            ->orWhere('c.description LIKE :query')
+            ->andWhere('c.name LIKE :query OR c.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('c.name', 'ASC')
             ->setMaxResults($limit)

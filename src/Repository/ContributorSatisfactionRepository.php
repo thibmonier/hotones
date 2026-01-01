@@ -269,7 +269,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     public function getContributorTrend(Contributor $contributor, int $months = 12): array
     {
         return $this->createCompanyQueryBuilder('cs')
-            ->where('cs.contributor = :contributor')
+            ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('cs.year', 'DESC')
             ->addOrderBy('cs.month', 'DESC')
@@ -285,7 +285,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('cs')
             ->select('COUNT(DISTINCT cs.contributor)')
-            ->where('cs.year = :year')
+            ->andWhere('cs.year = :year')
             ->andWhere('cs.month = :month')
             ->setParameter('year', $year)
             ->setParameter('month', $month)

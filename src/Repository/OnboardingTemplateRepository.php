@@ -29,7 +29,7 @@ class OnboardingTemplateRepository extends CompanyAwareRepository
     public function findActive(): array
     {
         return $this->createCompanyQueryBuilder('ot')
-            ->where('ot.active = :active')
+            ->andWhere('ot.active = :active')
             ->setParameter('active', true)
             ->orderBy('ot.name', 'ASC')
             ->getQuery()
@@ -42,7 +42,7 @@ class OnboardingTemplateRepository extends CompanyAwareRepository
     public function findByProfile(Profile $profile): ?OnboardingTemplate
     {
         return $this->createCompanyQueryBuilder('ot')
-            ->where('ot.profile = :profile')
+            ->andWhere('ot.profile = :profile')
             ->andWhere('ot.active = :active')
             ->setParameter('profile', $profile)
             ->setParameter('active', true)
@@ -57,7 +57,7 @@ class OnboardingTemplateRepository extends CompanyAwareRepository
     public function findDefault(): ?OnboardingTemplate
     {
         return $this->createCompanyQueryBuilder('ot')
-            ->where('ot.profile IS NULL')
+            ->andWhere('ot.profile IS NULL')
             ->andWhere('ot.active = :active')
             ->setParameter('active', true)
             ->orderBy('ot.createdAt', 'ASC')

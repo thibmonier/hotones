@@ -30,7 +30,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
     public function findActive(): array
     {
         return $this->createCompanyQueryBuilder('sub')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->orderBy('sub.nextRenewalDate', 'ASC')
             ->getQuery()
@@ -45,7 +45,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
     public function findByStatus(string $status): array
     {
         return $this->createCompanyQueryBuilder('sub')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', $status)
             ->orderBy('sub.nextRenewalDate', 'ASC')
             ->getQuery()
@@ -79,7 +79,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
         $today->setTime(0, 0, 0);
 
         return $this->createCompanyQueryBuilder('sub')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->andWhere('sub.autoRenewal = :autoRenewal')
             ->andWhere('sub.nextRenewalDate <= :today')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
@@ -104,7 +104,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
         $futureDate->modify("+{$days} days");
 
         return $this->createCompanyQueryBuilder('sub')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->andWhere('sub.nextRenewalDate BETWEEN :today AND :futureDate')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->setParameter('today', $today)
@@ -174,7 +174,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('sub')
             ->select('sub.billingPeriod', 'COUNT(sub.id) as count')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->groupBy('sub.billingPeriod')
             ->getQuery()
@@ -195,7 +195,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('sub')
             ->select('COUNT(sub.id)')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->getQuery()
             ->getSingleScalarResult();
@@ -211,8 +211,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('sub')
             ->leftJoin('sub.service', 's')
             ->addSelect('s')
-            ->where('sub.customName LIKE :search')
-            ->orWhere('s.name LIKE :search')
+            ->andWhere('sub.customName LIKE :search OR s.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('sub.nextRenewalDate', 'ASC')
             ->getQuery()

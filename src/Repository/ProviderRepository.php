@@ -26,7 +26,7 @@ class ProviderRepository extends CompanyAwareRepository
     public function findAllActive(): array
     {
         return $this->createCompanyQueryBuilder('p')
-            ->where('p.active = :active')
+            ->andWhere('p.active = :active')
             ->setParameter('active', true)
             ->orderBy('p.name', 'ASC')
             ->getQuery()
@@ -50,7 +50,7 @@ class ProviderRepository extends CompanyAwareRepository
     public function findByType(string $type): array
     {
         return $this->createCompanyQueryBuilder('p')
-            ->where('p.type = :type')
+            ->andWhere('p.type = :type')
             ->andWhere('p.active = :active')
             ->setParameter('type', $type)
             ->setParameter('active', true)

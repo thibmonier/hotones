@@ -30,7 +30,7 @@ class OnboardingTaskRepository extends CompanyAwareRepository
     public function findByContributor(Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('ot')
-            ->where('ot.contributor = :contributor')
+            ->andWhere('ot.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ot.orderNum', 'ASC')
             ->getQuery()
@@ -45,7 +45,7 @@ class OnboardingTaskRepository extends CompanyAwareRepository
     public function findPendingForContributor(Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('ot')
-            ->where('ot.contributor = :contributor')
+            ->andWhere('ot.contributor = :contributor')
             ->andWhere('ot.status != :completed')
             ->setParameter('contributor', $contributor)
             ->setParameter('completed', 'termine')
@@ -63,7 +63,7 @@ class OnboardingTaskRepository extends CompanyAwareRepository
     public function findOverdueForContributor(Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('ot')
-            ->where('ot.contributor = :contributor')
+            ->andWhere('ot.contributor = :contributor')
             ->andWhere('ot.status != :completed')
             ->andWhere('ot.dueDate < :now')
             ->setParameter('contributor', $contributor)
@@ -81,7 +81,7 @@ class OnboardingTaskRepository extends CompanyAwareRepository
     {
         $qb = $this->createCompanyQueryBuilder('ot')
             ->select('COUNT(ot.id)')
-            ->where('ot.contributor = :contributor')
+            ->andWhere('ot.contributor = :contributor')
             ->setParameter('contributor', $contributor);
 
         $total = (int) $qb->getQuery()->getSingleScalarResult();

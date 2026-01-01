@@ -28,7 +28,7 @@ class BadgeRepository extends CompanyAwareRepository
     public function findAllActive(): array
     {
         return $this->createCompanyQueryBuilder('b')
-            ->where('b.active = :active')
+            ->andWhere('b.active = :active')
             ->setParameter('active', true)
             ->orderBy('b.category', 'ASC')
             ->addOrderBy('b.xpReward', 'ASC')
@@ -44,7 +44,7 @@ class BadgeRepository extends CompanyAwareRepository
     public function findByCategory(string $category): array
     {
         return $this->createCompanyQueryBuilder('b')
-            ->where('b.category = :category')
+            ->andWhere('b.category = :category')
             ->andWhere('b.active = :active')
             ->setParameter('category', $category)
             ->setParameter('active', true)
@@ -68,7 +68,7 @@ class BadgeRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('b')
             ->select('b.category, COUNT(b.id) as count')
-            ->where('b.active = :active')
+            ->andWhere('b.active = :active')
             ->setParameter('active', true)
             ->groupBy('b.category')
             ->getQuery()

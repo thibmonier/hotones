@@ -32,7 +32,7 @@ class VacationRepository extends CompanyAwareRepository
     public function countApprovedDaysBetween(DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
         $vacations = $this->createCompanyQueryBuilder('v')
-            ->where('v.status = :approved')
+            ->andWhere('v.status = :approved')
             ->andWhere('v.startDate <= :endDate')
             ->andWhere('v.endDate >= :startDate')
             ->setParameter('approved', 'approved')
@@ -73,7 +73,7 @@ class VacationRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('v')
             ->leftJoin('v.contributor', 'c')
             ->addSelect('c')
-            ->where('v.contributor IN (:contributors)')
+            ->andwhere('v.contributor IN (:contributors)')
             ->andWhere('v.status = :status')
             ->setParameter('contributors', $contributors)
             ->setParameter('status', 'pending')

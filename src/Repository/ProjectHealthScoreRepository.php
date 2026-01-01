@@ -28,7 +28,7 @@ class ProjectHealthScoreRepository extends CompanyAwareRepository
     public function findLatestForProject(Project $project): ?ProjectHealthScore
     {
         return $this->createCompanyQueryBuilder('phs')
-            ->where('phs.project = :project')
+            ->andWhere('phs.project = :project')
             ->setParameter('project', $project)
             ->orderBy('phs.calculatedAt', 'DESC')
             ->setMaxResults(1)
@@ -46,7 +46,7 @@ class ProjectHealthScoreRepository extends CompanyAwareRepository
         $since = new DateTimeImmutable("-{$days} days");
 
         return $this->createCompanyQueryBuilder('phs')
-            ->where('phs.project = :project')
+            ->andWhere('phs.project = :project')
             ->andWhere('phs.calculatedAt >= :since')
             ->setParameter('project', $project)
             ->setParameter('since', $since)

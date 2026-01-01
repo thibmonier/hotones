@@ -30,7 +30,7 @@ class PerformanceReviewRepository extends CompanyAwareRepository
     public function findByYear(int $year): array
     {
         return $this->createCompanyQueryBuilder('pr')
-            ->where('pr.year = :year')
+            ->andWhere('pr.year = :year')
             ->setParameter('year', $year)
             ->orderBy('pr.createdAt', 'DESC')
             ->getQuery()
@@ -45,7 +45,7 @@ class PerformanceReviewRepository extends CompanyAwareRepository
     public function findByContributor(Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('pr')
-            ->where('pr.contributor = :contributor')
+            ->andWhere('pr.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('pr.year', 'DESC')
             ->getQuery()
@@ -60,7 +60,7 @@ class PerformanceReviewRepository extends CompanyAwareRepository
     public function findByManager(User $manager): array
     {
         return $this->createCompanyQueryBuilder('pr')
-            ->where('pr.manager = :manager')
+            ->andWhere('pr.manager = :manager')
             ->setParameter('manager', $manager)
             ->orderBy('pr.year', 'DESC')
             ->addOrderBy('pr.createdAt', 'DESC')
@@ -76,7 +76,7 @@ class PerformanceReviewRepository extends CompanyAwareRepository
     public function findByStatus(string $status): array
     {
         return $this->createCompanyQueryBuilder('pr')
-            ->where('pr.status = :status')
+            ->andWhere('pr.status = :status')
             ->setParameter('status', $status)
             ->orderBy('pr.createdAt', 'DESC')
             ->getQuery()
@@ -91,7 +91,7 @@ class PerformanceReviewRepository extends CompanyAwareRepository
     public function findPendingForContributor(Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('pr')
-            ->where('pr.contributor = :contributor')
+            ->andWhere('pr.contributor = :contributor')
             ->andWhere('pr.status != :validated')
             ->setParameter('contributor', $contributor)
             ->setParameter('validated', 'validee')
@@ -107,7 +107,7 @@ class PerformanceReviewRepository extends CompanyAwareRepository
     {
         $count = $this->createCompanyQueryBuilder('pr')
             ->select('COUNT(pr.id)')
-            ->where('pr.contributor = :contributor')
+            ->andWhere('pr.contributor = :contributor')
             ->andWhere('pr.year = :year')
             ->setParameter('contributor', $contributor)
             ->setParameter('year', $year)
@@ -126,7 +126,7 @@ class PerformanceReviewRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('pr')
             ->select('pr.status, COUNT(pr.id) as count')
-            ->where('pr.year = :year')
+            ->andWhere('pr.year = :year')
             ->setParameter('year', $year)
             ->groupBy('pr.status')
             ->getQuery()

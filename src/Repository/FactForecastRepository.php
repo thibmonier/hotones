@@ -27,7 +27,7 @@ class FactForecastRepository extends CompanyAwareRepository
     public function findLatestForPeriod(DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd, string $scenario): ?FactForecast
     {
         return $this->createCompanyQueryBuilder('f')
-            ->where('f.periodStart = :start')
+            ->andWhere('f.periodStart = :start')
             ->andWhere('f.periodEnd = :end')
             ->andWhere('f.scenario = :scenario')
             ->setParameter('start', $periodStart)
@@ -47,7 +47,7 @@ class FactForecastRepository extends CompanyAwareRepository
     public function findByDateRange(DateTimeImmutable $start, DateTimeImmutable $end, ?string $scenario = null): array
     {
         $qb = $this->createCompanyQueryBuilder('f')
-            ->where('f.periodStart >= :start')
+            ->andWhere('f.periodStart >= :start')
             ->andWhere('f.periodEnd <= :end')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
@@ -69,7 +69,7 @@ class FactForecastRepository extends CompanyAwareRepository
     {
         $result = $this->createCompanyQueryBuilder('f')
             ->select('AVG(f.accuracy) as avg_accuracy')
-            ->where('f.scenario = :scenario')
+            ->andWhere('f.scenario = :scenario')
             ->andWhere('f.accuracy IS NOT NULL')
             ->andWhere('f.createdAt >= :since')
             ->setParameter('scenario', $scenario)

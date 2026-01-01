@@ -65,7 +65,7 @@ class LeadCaptureRepository extends CompanyAwareRepository
         $since = new DateTime("-{$days} days");
 
         return $this->createCompanyQueryBuilder('lc')
-            ->where('lc.createdAt >= :since')
+            ->andWhere('lc.createdAt >= :since')
             ->setParameter('since', $since)
             ->orderBy('lc.createdAt', 'DESC')
             ->getQuery()

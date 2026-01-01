@@ -45,7 +45,7 @@ class ContributorProgressRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('cp')
             ->leftJoin('cp.contributor', 'c')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->orderBy('cp.totalXp', 'DESC')
             ->setMaxResults($limit)
@@ -62,7 +62,7 @@ class ContributorProgressRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('cp')
             ->leftJoin('cp.contributor', 'c')
-            ->where('cp.level = :level')
+            ->andWhere('cp.level = :level')
             ->andWhere('c.active = :active')
             ->setParameter('level', $level)
             ->setParameter('active', true)
@@ -84,7 +84,7 @@ class ContributorProgressRepository extends CompanyAwareRepository
         $higherCount = $this->createCompanyQueryBuilder('cp')
             ->select('COUNT(cp.id)')
             ->leftJoin('cp.contributor', 'c')
-            ->where('cp.totalXp > :xp')
+            ->andWhere('cp.totalXp > :xp')
             ->andWhere('c.active = :active')
             ->setParameter('xp', $progress->getTotalXp())
             ->setParameter('active', true)
@@ -108,7 +108,7 @@ class ContributorProgressRepository extends CompanyAwareRepository
                 MAX(cp.totalXp) as max_xp
             ')
             ->leftJoin('cp.contributor', 'c')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->getQuery()
             ->getSingleResult();

@@ -53,7 +53,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         }
 
         $queryBuilder = $this->createCompanyQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
+            ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $period->getContributor());
 
         if ($excludeId) {
@@ -91,7 +91,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->addSelect('c')
-            ->where('ep.endDate IS NULL OR ep.endDate >= :now')
+            ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
             ->setParameter('now', $now)
             ->orderBy('ep.startDate', 'DESC')
             ->getQuery()
@@ -119,7 +119,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         $now = new DateTime();
 
         return $this->createCompanyQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
+            ->andWhere('ep.contributor = :contributor')
             ->andWhere('ep.startDate <= :now')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
             ->setParameter('contributor', $contributor)
@@ -196,7 +196,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         $now           = new DateTime();
         $activePeriods = $this->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
-            ->where('ep.endDate IS NULL OR ep.endDate >= :now')
+            ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
             ->setParameter('now', $now)
             ->getQuery()
             ->getSingleScalarResult();
@@ -222,7 +222,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
-            ->where('ep.endDate IS NOT NULL')
+            ->andWhere('ep.endDate IS NOT NULL')
             ->andWhere('ep.endDate >= :startDate')
             ->andWhere('ep.endDate <= :endDate')
             ->setParameter('startDate', $startDate)
@@ -238,7 +238,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
-            ->where('ep.startDate <= :date')
+            ->andWhere('ep.startDate <= :date')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :date')
             ->setParameter('date', $date)
             ->getQuery()
@@ -251,7 +251,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     public function findFirstByContributor(Contributor $contributor): ?EmploymentPeriod
     {
         return $this->createCompanyQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
+            ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ep.startDate', 'ASC')
             ->setMaxResults(1)
@@ -275,7 +275,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         $contributorIds = array_map(fn (Contributor $c) => $c->getId(), $contributors);
 
         return $this->createCompanyQueryBuilder('ep')
-            ->where('ep.contributor IN (:contributorIds)')
+            ->andWhere('ep.contributor IN (:contributorIds)')
             ->andWhere('ep.startDate <= :endDate')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :startDate')
             ->setParameter('contributorIds', $contributorIds)

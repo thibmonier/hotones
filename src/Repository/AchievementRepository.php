@@ -31,7 +31,7 @@ class AchievementRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('a')
             ->leftJoin('a.badge', 'b')
-            ->where('a.contributor = :contributor')
+            ->andWhere('a.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('a.unlockedAt', 'DESC')
             ->getQuery()
@@ -73,7 +73,7 @@ class AchievementRepository extends CompanyAwareRepository
     public function findUnnotified(): array
     {
         return $this->createCompanyQueryBuilder('a')
-            ->where('a.notified = :notified')
+            ->andWhere('a.notified = :notified')
             ->setParameter('notified', false)
             ->orderBy('a.unlockedAt', 'ASC')
             ->getQuery()

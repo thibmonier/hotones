@@ -41,7 +41,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->leftJoin('o.sections', 's')
             ->leftJoin('s.lines', 'l')
             ->leftJoin('l.profile', 'prof')
-            ->where('p.id IN (:ids)')
+            ->andWhere('p.id IN (:ids)')
             ->setParameter('ids', $projectIds)
             // Totaux
             ->addSelect(
@@ -102,7 +102,7 @@ class ProjectRepository extends CompanyAwareRepository
         // Achats au niveau projet
         $qb1 = $this->createCompanyQueryBuilder('p')
             ->select('COALESCE(SUM(p.purchasesAmount), 0) AS totalProjectPurchases')
-            ->where('p.id IN (:ids)')
+            ->andWhere('p.id IN (:ids)')
             ->setParameter('ids', $projectIds);
         $row1             = $qb1->getQuery()->getSingleResult();
         $projectPurchases = (string) ($row1['totalProjectPurchases'] ?? '0');
@@ -113,7 +113,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->leftJoin('p.orders', 'o')
             ->leftJoin('o.sections', 's')
             ->leftJoin('s.lines', 'l')
-            ->where('p.id IN (:ids)')
+            ->andWhere('p.id IN (:ids)')
             ->setParameter('ids', $projectIds);
         $row2          = $qb2->getQuery()->getSingleResult();
         $linePurchases = (string) ($row2['totalLinePurchases'] ?? '0');
@@ -132,7 +132,7 @@ class ProjectRepository extends CompanyAwareRepository
         $result = $this->createCompanyQueryBuilder('p')
             ->select('COALESCE(SUM(o.totalAmount), 0) AS total')
             ->leftJoin('p.orders', 'o')
-            ->where('o.status IN (:validStatuses)')
+            ->andWhere('o.status IN (:validStatuses)')
             ->setParameter('validStatuses', $validStatuses)
             ->getQuery()
             ->getSingleScalarResult();
@@ -167,7 +167,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
             ->addSelect('sc')
-            ->where('p.status = :status')
+            ->andWhere('p.status = :status')
             ->setParameter('status', 'active')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
@@ -200,7 +200,7 @@ class ProjectRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('p')
             ->select('COUNT(p.id)')
-            ->where('p.status = :status')
+            ->andWhere('p.status = :status')
             ->setParameter('status', 'active')
             ->getQuery()
             ->getSingleScalarResult();
@@ -247,7 +247,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->addSelect('pd')
             ->leftJoin('p.salesPerson', 'sp')
             ->addSelect('sp')
-            ->where('p.id = :id')
+            ->andWhere('p.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();
@@ -261,7 +261,7 @@ class ProjectRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
-            ->where('p.name LIKE :query OR c.name LIKE :query')
+            ->andWhere('p.name LIKE :query OR c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
@@ -278,7 +278,7 @@ class ProjectRepository extends CompanyAwareRepository
     public function findActiveBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
         return $this->createCompanyQueryBuilder('p')
-            ->where('p.status = :status')
+            ->andWhere('p.status = :status')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('status', 'active')
@@ -319,7 +319,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->addSelect('pm')
             ->leftJoin('p.salesPerson', 'sp')
             ->addSelect('sp')
-            ->where('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
             ->setParameter('end', $end);
@@ -393,7 +393,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->select('COUNT(DISTINCT p.id)')
             ->leftJoin('p.technologies', 't')
             ->leftJoin('p.client', 'c')
-            ->where('p.startDate IS NULL OR p.startDate <= :end')
+            ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
             ->setParameter('end', $end);
@@ -428,7 +428,7 @@ class ProjectRepository extends CompanyAwareRepository
         $rows = $this->createCompanyQueryBuilder('p')
             ->select('pm.id AS id, pm.firstName AS firstName, pm.lastName AS lastName')
             ->leftJoin('p.projectManager', 'pm')
-            ->where('pm.id IS NOT NULL')
+            ->andWhere('pm.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
@@ -455,7 +455,7 @@ class ProjectRepository extends CompanyAwareRepository
         $rows = $this->createCompanyQueryBuilder('p')
             ->select('sp.id AS id, sp.firstName AS firstName, sp.lastName AS lastName')
             ->leftJoin('p.salesPerson', 'sp')
-            ->where('sp.id IS NOT NULL')
+            ->andWhere('sp.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
@@ -482,7 +482,7 @@ class ProjectRepository extends CompanyAwareRepository
         $rows = $this->createCompanyQueryBuilder('p')
             ->select('t.id AS id, t.name AS name')
             ->leftJoin('p.technologies', 't')
-            ->where('t.id IS NOT NULL')
+            ->andWhere('t.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
@@ -508,7 +508,7 @@ class ProjectRepository extends CompanyAwareRepository
         $rows = $this->createCompanyQueryBuilder('p')
             ->select('sc.id AS id, sc.name AS name')
             ->leftJoin('p.serviceCategory', 'sc')
-            ->where('sc.id IS NOT NULL')
+            ->andWhere('sc.id IS NOT NULL')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
             ->setParameter('start', $start)
@@ -533,7 +533,7 @@ class ProjectRepository extends CompanyAwareRepository
     {
         $rows = $this->createCompanyQueryBuilder('p')
             ->select('DISTINCT p.projectType AS type')
-            ->where('p.projectType IS NOT NULL')
+            ->andWhere('p.projectType IS NOT NULL')
             ->orderBy('p.projectType', 'ASC')
             ->getQuery()
             ->getArrayResult();
@@ -548,7 +548,7 @@ class ProjectRepository extends CompanyAwareRepository
     {
         $rows = $this->createCompanyQueryBuilder('p')
             ->select('DISTINCT p.status AS status')
-            ->where('p.status IS NOT NULL')
+            ->andWhere('p.status IS NOT NULL')
             ->orderBy('p.status', 'ASC')
             ->getQuery()
             ->getArrayResult();
@@ -573,9 +573,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->addSelect('t')
             ->leftJoin('p.projectManager', 'pm')
             ->addSelect('pm')
-            ->where('p.name LIKE :query')
-            ->orWhere('p.description LIKE :query')
-            ->orWhere('c.name LIKE :query')
+            ->andWhere('p.name LIKE :query OR p.description LIKE :query OR c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.id', 'DESC')
             ->setMaxResults($limit)

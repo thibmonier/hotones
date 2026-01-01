@@ -28,7 +28,7 @@ class NotificationRepository extends CompanyAwareRepository
     public function findUnreadByUser(User $user, ?int $limit = null): array
     {
         $qb = $this->createCompanyQueryBuilder('n')
-            ->where('n.recipient = :user')
+            ->andWhere('n.recipient = :user')
             ->andWhere('n.readAt IS NULL')
             ->setParameter('user', $user)
             ->orderBy('n.createdAt', 'DESC');
@@ -47,7 +47,7 @@ class NotificationRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('n')
             ->select('COUNT(n.id)')
-            ->where('n.recipient = :user')
+            ->andWhere('n.recipient = :user')
             ->andWhere('n.readAt IS NULL')
             ->setParameter('user', $user)
             ->getQuery()
@@ -62,7 +62,7 @@ class NotificationRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('n')
             ->update()
             ->set('n.readAt', ':now')
-            ->where('n.recipient = :user')
+            ->andWhere('n.recipient = :user')
             ->andWhere('n.readAt IS NULL')
             ->setParameter('now', new DateTimeImmutable())
             ->setParameter('user', $user)
@@ -79,7 +79,7 @@ class NotificationRepository extends CompanyAwareRepository
 
         return $this->createCompanyQueryBuilder('n')
             ->delete()
-            ->where('n.readAt IS NOT NULL')
+            ->andWhere('n.readAt IS NOT NULL')
             ->andWhere('n.readAt < :date')
             ->setParameter('date', $date)
             ->getQuery()

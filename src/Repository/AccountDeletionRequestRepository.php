@@ -28,7 +28,7 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
     public function findActiveDeletionRequestForUser(User $user): ?AccountDeletionRequest
     {
         return $this->createCompanyQueryBuilder('adr')
-            ->where('adr.user = :user')
+            ->andWhere('adr.user = :user')
             ->andWhere('adr.status IN (:statuses)')
             ->setParameter('user', $user)
             ->setParameter('statuses', [
@@ -47,7 +47,7 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
     public function findDueDeletions(): array
     {
         return $this->createCompanyQueryBuilder('adr')
-            ->where('adr.status = :status')
+            ->andWhere('adr.status = :status')
             ->andWhere('adr.scheduledDeletionAt <= :now')
             ->setParameter('status', AccountDeletionRequest::STATUS_CONFIRMED)
             ->setParameter('now', new DateTimeImmutable())
@@ -63,7 +63,7 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
         $expiryThreshold = new DateTimeImmutable('-48 hours');
 
         return $this->createCompanyQueryBuilder('adr')
-            ->where('adr.status = :status')
+            ->andWhere('adr.status = :status')
             ->andWhere('adr.requestedAt < :threshold')
             ->setParameter('status', AccountDeletionRequest::STATUS_PENDING)
             ->setParameter('threshold', $expiryThreshold)
@@ -77,7 +77,7 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
     public function findByConfirmationToken(string $token): ?AccountDeletionRequest
     {
         return $this->createCompanyQueryBuilder('adr')
-            ->where('adr.confirmationToken = :token')
+            ->andWhere('adr.confirmationToken = :token')
             ->andWhere('adr.status = :status')
             ->setParameter('token', $token)
             ->setParameter('status', AccountDeletionRequest::STATUS_PENDING)

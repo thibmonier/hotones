@@ -29,7 +29,7 @@ class SaasServiceRepository extends CompanyAwareRepository
     public function findActive(): array
     {
         return $this->createCompanyQueryBuilder('s')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->orderBy('s.name', 'ASC')
             ->getQuery()
@@ -44,7 +44,7 @@ class SaasServiceRepository extends CompanyAwareRepository
     public function findByProvider(SaasProvider $provider): array
     {
         return $this->createCompanyQueryBuilder('s')
-            ->where('s.provider = :provider')
+            ->andWhere('s.provider = :provider')
             ->setParameter('provider', $provider)
             ->orderBy('s.name', 'ASC')
             ->getQuery()
@@ -59,7 +59,7 @@ class SaasServiceRepository extends CompanyAwareRepository
     public function findByCategory(string $category): array
     {
         return $this->createCompanyQueryBuilder('s')
-            ->where('s.category = :category')
+            ->andWhere('s.category = :category')
             ->setParameter('category', $category)
             ->orderBy('s.name', 'ASC')
             ->getQuery()
@@ -74,7 +74,7 @@ class SaasServiceRepository extends CompanyAwareRepository
     public function searchByName(string $search): array
     {
         return $this->createCompanyQueryBuilder('s')
-            ->where('s.name LIKE :search')
+            ->andWhere('s.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('s.name', 'ASC')
             ->getQuery()
@@ -90,7 +90,7 @@ class SaasServiceRepository extends CompanyAwareRepository
     {
         $result = $this->createCompanyQueryBuilder('s')
             ->select('DISTINCT s.category')
-            ->where('s.category IS NOT NULL')
+            ->andWhere('s.category IS NOT NULL')
             ->orderBy('s.category', 'ASC')
             ->getQuery()
             ->getScalarResult();

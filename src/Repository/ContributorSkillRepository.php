@@ -31,7 +31,7 @@ class ContributorSkillRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('cs')
             ->join('cs.skill', 's')
-            ->where('cs.contributor = :contributor')
+            ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('s.category', 'ASC')
             ->addOrderBy('s.name', 'ASC')
@@ -48,7 +48,7 @@ class ContributorSkillRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -88,7 +88,7 @@ class ContributorSkillRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -114,7 +114,7 @@ class ContributorSkillRepository extends CompanyAwareRepository
                 END as effectiveLevel',
                 'COUNT(cs.id) as count',
             )
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->groupBy('effectiveLevel')
             ->getQuery()
@@ -138,7 +138,7 @@ class ContributorSkillRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
             ->join('cs.skill', 's')
-            ->where('cs.managerAssessmentLevel IS NOT NULL')
+            ->andWhere('cs.managerAssessmentLevel IS NOT NULL')
             ->andWhere('cs.selfAssessmentLevel IS NOT NULL')
             ->andWhere('cs.managerAssessmentLevel != cs.selfAssessmentLevel')
             ->andWhere('c.active = :active')
@@ -163,7 +163,7 @@ class ContributorSkillRepository extends CompanyAwareRepository
                 END as effectiveLevel',
                 'COUNT(cs.id) as count',
             )
-            ->where('cs.contributor = :contributor')
+            ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->groupBy('effectiveLevel')
             ->getQuery()
@@ -186,7 +186,7 @@ class ContributorSkillRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)

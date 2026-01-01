@@ -26,7 +26,7 @@ class NpsSurveyRepository extends CompanyAwareRepository
     public function findByProject(Project $project): array
     {
         return $this->createCompanyQueryBuilder('n')
-            ->where('n.project = :project')
+            ->andWhere('n.project = :project')
             ->setParameter('project', $project)
             ->orderBy('n.sentAt', 'DESC')
             ->getQuery()
@@ -47,7 +47,7 @@ class NpsSurveyRepository extends CompanyAwareRepository
     public function findPendingByProject(Project $project): array
     {
         return $this->createCompanyQueryBuilder('n')
-            ->where('n.project = :project')
+            ->andWhere('n.project = :project')
             ->andWhere('n.status = :status')
             ->setParameter('project', $project)
             ->setParameter('status', NpsSurvey::STATUS_PENDING)
@@ -63,7 +63,7 @@ class NpsSurveyRepository extends CompanyAwareRepository
     public function calculateNpsScore(Project $project): ?float
     {
         $surveys = $this->createCompanyQueryBuilder('n')
-            ->where('n.project = :project')
+            ->andWhere('n.project = :project')
             ->andWhere('n.status = :status')
             ->andWhere('n.score IS NOT NULL')
             ->setParameter('project', $project)
@@ -98,7 +98,7 @@ class NpsSurveyRepository extends CompanyAwareRepository
     public function getStatsByProject(Project $project): array
     {
         $surveys = $this->createCompanyQueryBuilder('n')
-            ->where('n.project = :project')
+            ->andWhere('n.project = :project')
             ->andWhere('n.status = :status')
             ->andWhere('n.score IS NOT NULL')
             ->setParameter('project', $project)

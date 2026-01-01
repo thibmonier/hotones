@@ -28,7 +28,7 @@ class SkillRepository extends CompanyAwareRepository
     public function findActive(): array
     {
         return $this->createCompanyQueryBuilder('s')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->orderBy('s.name', 'ASC')
             ->getQuery()
@@ -43,7 +43,7 @@ class SkillRepository extends CompanyAwareRepository
     public function findByCategory(string $category): array
     {
         return $this->createCompanyQueryBuilder('s')
-            ->where('s.category = :category')
+            ->andWhere('s.category = :category')
             ->andWhere('s.active = :active')
             ->setParameter('category', $category)
             ->setParameter('active', true)
@@ -61,7 +61,7 @@ class SkillRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('s')
             ->select('s.category, COUNT(s.id) as count')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->groupBy('s.category')
             ->getQuery()
@@ -83,8 +83,7 @@ class SkillRepository extends CompanyAwareRepository
     public function search(string $query): array
     {
         return $this->createCompanyQueryBuilder('s')
-            ->where('s.name LIKE :query')
-            ->orWhere('s.description LIKE :query')
+            ->andWhere('s.name LIKE :query OR s.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->andWhere('s.active = :active')
             ->setParameter('active', true)
@@ -103,7 +102,7 @@ class SkillRepository extends CompanyAwareRepository
         $results = $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.contributorSkills', 'cs')
             ->select('s', 'COUNT(DISTINCT cs.contributor) as contributorCount')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->groupBy('s.id')
             ->orderBy('contributorCount', 'DESC')
@@ -133,7 +132,7 @@ class SkillRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.contributorSkills', 'cs')
             ->select('s', 'COUNT(DISTINCT cs.contributor) as HIDDEN contributorCount')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->groupBy('s.id')
             ->orderBy('contributorCount', 'DESC')

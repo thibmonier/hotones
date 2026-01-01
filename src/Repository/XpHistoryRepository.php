@@ -29,7 +29,7 @@ class XpHistoryRepository extends CompanyAwareRepository
     public function findByContributor(Contributor $contributor, int $limit = 50): array
     {
         return $this->createCompanyQueryBuilder('xh')
-            ->where('xh.contributor = :contributor')
+            ->andWhere('xh.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('xh.gainedAt', 'DESC')
             ->setMaxResults($limit)
@@ -45,7 +45,7 @@ class XpHistoryRepository extends CompanyAwareRepository
     public function findBySource(string $source, int $limit = 50): array
     {
         return $this->createCompanyQueryBuilder('xh')
-            ->where('xh.source = :source')
+            ->andWhere('xh.source = :source')
             ->setParameter('source', $source)
             ->orderBy('xh.gainedAt', 'DESC')
             ->setMaxResults($limit)
@@ -60,7 +60,7 @@ class XpHistoryRepository extends CompanyAwareRepository
     {
         $result = $this->createCompanyQueryBuilder('xh')
             ->select('SUM(xh.xpAmount)')
-            ->where('xh.contributor = :contributor')
+            ->andWhere('xh.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->getQuery()
             ->getSingleScalarResult();
@@ -75,7 +75,7 @@ class XpHistoryRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('xh')
             ->select('xh.source, SUM(xh.xpAmount) as total, COUNT(xh.id) as count')
-            ->where('xh.contributor = :contributor')
+            ->andWhere('xh.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->groupBy('xh.source')
             ->orderBy('total', 'DESC')
@@ -100,7 +100,7 @@ class XpHistoryRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('xh')
             ->select('MONTH(xh.gainedAt) as month, SUM(xh.xpAmount) as total')
-            ->where('xh.contributor = :contributor')
+            ->andWhere('xh.contributor = :contributor')
             ->andWhere('YEAR(xh.gainedAt) = :year')
             ->setParameter('contributor', $contributor)
             ->setParameter('year', $year)

@@ -32,7 +32,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     public function findByContributor(Contributor $contributor, array $filters = []): array
     {
         $qb = $this->createCompanyQueryBuilder('e')
-            ->where('e.contributor = :contributor')
+            ->andWhere('e.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('e.expenseDate', 'DESC')
             ->addOrderBy('e.createdAt', 'DESC');
@@ -77,7 +77,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     public function findPending(): array
     {
         return $this->createCompanyQueryBuilder('e')
-            ->where('e.status = :status')
+            ->andWhere('e.status = :status')
             ->setParameter('status', ExpenseReport::STATUS_PENDING)
             ->orderBy('e.expenseDate', 'ASC')
             ->getQuery()
@@ -92,7 +92,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     public function findByProject(Project $project): array
     {
         return $this->createCompanyQueryBuilder('e')
-            ->where('e.project = :project')
+            ->andWhere('e.project = :project')
             ->setParameter('project', $project)
             ->orderBy('e.expenseDate', 'DESC')
             ->getQuery()
@@ -107,7 +107,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     public function findByOrder(Order $order): array
     {
         return $this->createCompanyQueryBuilder('e')
-            ->where('e.order = :order')
+            ->andWhere('e.order = :order')
             ->setParameter('order', $order)
             ->orderBy('e.expenseDate', 'DESC')
             ->getQuery()
@@ -123,7 +123,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('e')
             ->select('e.category', 'SUM(e.amountTTC) as total', 'COUNT(e.id) as count')
-            ->where('e.expenseDate >= :start')
+            ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->andWhere('e.status IN (:statuses)')
             ->setParameter('start', $start)
@@ -152,7 +152,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     {
         $result = $this->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC) as total')
-            ->where('e.order = :order')
+            ->andWhere('e.order = :order')
             ->andWhere('e.status IN (:statuses)')
             ->setParameter('order', $order)
             ->setParameter('statuses', [ExpenseReport::STATUS_VALIDATED, ExpenseReport::STATUS_PAID])
@@ -170,7 +170,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     public function calculateStats(DateTimeInterface $start, DateTimeInterface $end): array
     {
         $qb = $this->createCompanyQueryBuilder('e')
-            ->where('e.expenseDate >= :start')
+            ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->setParameter('start', $start)
             ->setParameter('end', $end);
@@ -183,7 +183,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
         // Total validé (à rembourser)
         $validated = $this->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC)')
-            ->where('e.expenseDate >= :start')
+            ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->andWhere('e.status = :status')
             ->setParameter('start', $start)
@@ -195,7 +195,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
         // Total en attente
         $pending = $this->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC)')
-            ->where('e.expenseDate >= :start')
+            ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->andWhere('e.status = :status')
             ->setParameter('start', $start)
@@ -226,7 +226,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
     {
         $results = $this->createCompanyQueryBuilder('e')
             ->select('IDENTITY(e.contributor) as contributor_id', 'SUM(e.amountTTC) as total', 'COUNT(e.id) as count')
-            ->where('e.expenseDate >= :start')
+            ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->andWhere('e.status IN (:statuses)')
             ->setParameter('start', $start)

@@ -28,7 +28,7 @@ class SaasProviderRepository extends CompanyAwareRepository
     public function findActive(): array
     {
         return $this->createCompanyQueryBuilder('p')
-            ->where('p.active = :active')
+            ->andWhere('p.active = :active')
             ->setParameter('active', true)
             ->orderBy('p.name', 'ASC')
             ->getQuery()
@@ -43,7 +43,7 @@ class SaasProviderRepository extends CompanyAwareRepository
     public function searchByName(string $search): array
     {
         return $this->createCompanyQueryBuilder('p')
-            ->where('p.name LIKE :search')
+            ->andWhere('p.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('p.name', 'ASC')
             ->getQuery()

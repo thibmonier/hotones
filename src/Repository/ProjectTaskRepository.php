@@ -26,7 +26,7 @@ class ProjectTaskRepository extends CompanyAwareRepository
     public function findByProjectOrderedByPosition(Project $project): array
     {
         return $this->createCompanyQueryBuilder('t')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->orderBy('t.position', 'ASC')
             ->addOrderBy('t.id', 'ASC')
             ->setParameter('project', $project)
@@ -41,7 +41,7 @@ class ProjectTaskRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('t')
             ->select('MAX(t.position)')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->setParameter('project', $project)
             ->getQuery()
             ->getSingleScalarResult();
@@ -61,7 +61,7 @@ class ProjectTaskRepository extends CompanyAwareRepository
     public function findProfitableTasksByProject(Project $project): array
     {
         return $this->createCompanyQueryBuilder('t')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->andWhere('t.countsForProfitability = true')
             ->andWhere('t.type = :type')
             ->orderBy('t.position', 'ASC')
@@ -78,7 +78,7 @@ class ProjectTaskRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->andWhere('t.status = :status')
             ->andWhere('t.countsForProfitability = true')
             ->andWhere('t.type = :type')
@@ -96,7 +96,7 @@ class ProjectTaskRepository extends CompanyAwareRepository
     {
         return (int) $this->createCompanyQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->andWhere('t.countsForProfitability = true')
             ->andWhere('t.type = :type')
             ->setParameter('project', $project)
@@ -113,7 +113,7 @@ class ProjectTaskRepository extends CompanyAwareRepository
     public function findOverdueTasksByContributor(\App\Entity\Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('t')
-            ->where('t.assignedContributor = :contributor')
+            ->andWhere('t.assignedContributor = :contributor')
             ->andWhere('t.endDate < :today')
             ->andWhere('t.status != :status_completed')
             ->setParameter('contributor', $contributor)

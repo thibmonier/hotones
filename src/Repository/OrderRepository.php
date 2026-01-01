@@ -101,7 +101,7 @@ class OrderRepository extends CompanyAwareRepository
     public function findLastOrderNumberForMonth(string $year, string $month): ?Order
     {
         return $this->createCompanyQueryBuilder('o')
-            ->where('o.orderNumber LIKE :pattern')
+            ->andWhere('o.orderNumber LIKE :pattern')
             ->setParameter('pattern', "D{$year}{$month}%")
             ->orderBy('o.orderNumber', 'DESC')
             ->setMaxResults(1)
@@ -115,7 +115,7 @@ class OrderRepository extends CompanyAwareRepository
     public function findByProject(Project $project): array
     {
         return $this->createCompanyQueryBuilder('o')
-            ->where('o.project = :project')
+            ->andWhere('o.project = :project')
             ->orderBy('o.createdAt', 'DESC')
             ->setParameter('project', $project)
             ->getQuery()
@@ -128,7 +128,7 @@ class OrderRepository extends CompanyAwareRepository
     public function findByStatus(string $status): array
     {
         return $this->createCompanyQueryBuilder('o')
-            ->where('o.status = :status')
+            ->andWhere('o.status = :status')
             ->orderBy('o.createdAt', 'DESC')
             ->setParameter('status', $status)
             ->getQuery()
@@ -151,7 +151,7 @@ class OrderRepository extends CompanyAwareRepository
             ->addSelect('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
-            ->where('o.status = :status')
+            ->andWhere('o.status = :status')
             ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('status', 'a_signer')
             ->setParameter('start', $start)
@@ -176,7 +176,7 @@ class OrderRepository extends CompanyAwareRepository
             ->addSelect('l')
             ->leftJoin('o.paymentSchedules', 'ps')
             ->addSelect('ps')
-            ->where('o.id = :id')
+            ->andWhere('o.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();
@@ -195,7 +195,7 @@ class OrderRepository extends CompanyAwareRepository
             ->addSelect('s', 'l')
             ->leftJoin('o.sections', 's')
             ->leftJoin('s.lines', 'l')
-            ->where('o.project IN (:projects)')
+            ->andWhere('o.project IN (:projects)')
             ->setParameter('projects', $projects)
             ->getQuery()
             ->getResult();
@@ -208,7 +208,7 @@ class OrderRepository extends CompanyAwareRepository
     {
         $qb = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.status = :status')
+            ->andWhere('o.status = :status')
             ->setParameter('status', $status);
 
         if ($userId && $userRole) {
@@ -231,7 +231,7 @@ class OrderRepository extends CompanyAwareRepository
     {
         $result = $this->createCompanyQueryBuilder('o')
             ->select('SUM(o.totalAmount)')
-            ->where('o.status = :status')
+            ->andWhere('o.status = :status')
             ->setParameter('status', $status)
             ->getQuery()
             ->getSingleScalarResult();
@@ -285,7 +285,7 @@ class OrderRepository extends CompanyAwareRepository
     {
         $qb = $this->createCompanyQueryBuilder('o')
             ->select('SUM(o.totalAmount)')
-            ->where('o.status IN (:statuses)')
+            ->andWhere('o.status IN (:statuses)')
             ->andWhere('o.validatedAt BETWEEN :start AND :end')
             ->setParameter('statuses', ['signe', 'gagne', 'termine'])
             ->setParameter('start', $startDate)
@@ -412,7 +412,7 @@ class OrderRepository extends CompanyAwareRepository
     {
         $qbTotal = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.createdAt BETWEEN :start AND :end')
+            ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
 
@@ -434,7 +434,7 @@ class OrderRepository extends CompanyAwareRepository
 
         $qbSigned = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.createdAt BETWEEN :start AND :end')
+            ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->andWhere('o.status IN (:statuses)')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
@@ -488,7 +488,7 @@ class OrderRepository extends CompanyAwareRepository
     {
         $qb = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.createdAt BETWEEN :start AND :end')
+            ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
 
@@ -515,9 +515,7 @@ class OrderRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->leftJoin('p.client', 'c')
-            ->where('o.orderNumber LIKE :query')
-            ->orWhere('o.name LIKE :query')
-            ->orWhere('c.name LIKE :query')
+            ->andWhere('o.orderNumber LIKE :query OR o.name LIKE :query OR c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('o.id', 'DESC')
             ->setMaxResults($limit)

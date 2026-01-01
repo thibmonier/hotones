@@ -32,7 +32,7 @@ class ContributorRepository extends CompanyAwareRepository
     public function findActiveContributors(): array
     {
         return $this->createCompanyQueryBuilder('c')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->orderBy('c.lastName', 'ASC')
             ->addOrderBy('c.firstName', 'ASC')
@@ -47,7 +47,7 @@ class ContributorRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('c')
             ->innerJoin('c.profiles', 'p')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->andWhere('p = :profile')
             ->setParameter('active', true)
             ->setParameter('profile', $profile)
@@ -64,7 +64,7 @@ class ContributorRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('c')
             ->select('COUNT(c.id)')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->getQuery()
             ->getSingleScalarResult();
@@ -86,7 +86,7 @@ class ContributorRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('c')
             ->leftJoin('c.profiles', 'p')
             ->addSelect('p')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->orderBy('c.lastName', 'ASC')
             ->addOrderBy('c.firstName', 'ASC')
@@ -100,7 +100,7 @@ class ContributorRepository extends CompanyAwareRepository
     public function searchByName(string $query): array
     {
         return $this->createCompanyQueryBuilder('c')
-            ->where('c.firstName LIKE :query OR c.lastName LIKE :query')
+            ->andWhere('c.firstName LIKE :query OR c.lastName LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -118,7 +118,7 @@ class ContributorRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('c')
             ->leftJoin('c.timesheets', 't', 'WITH', 't.date BETWEEN :start AND :end')
             ->addSelect('COALESCE(SUM(t.hours), 0) as totalHours')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
