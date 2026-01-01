@@ -9,6 +9,7 @@ use App\Entity\PerformanceReview;
 use App\Entity\User;
 use App\Repository\ContributorRepository;
 use App\Repository\PerformanceReviewRepository;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -21,6 +22,7 @@ class PerformanceReviewService
         private readonly EntityManagerInterface $em,
         private readonly PerformanceReviewRepository $reviewRepository,
         private readonly ContributorRepository $contributorRepository,
+        private readonly CompanyContext $companyContext,
         private readonly MailerInterface $mailer,
     ) {
     }
@@ -62,6 +64,7 @@ class PerformanceReviewService
             }
 
             $review = new PerformanceReview();
+            $review->setCompany($this->companyContext->getCurrentCompany());
             $review->setYear($year);
             $review->setContributor($contributor);
             $review->setManager($manager);
