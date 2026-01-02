@@ -133,4 +133,144 @@ class Timesheet implements CompanyOwnedInterface
 
         return $this;
     }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->contributor.
+     */
+    public function getContributor(): Contributor
+    {
+        return $this->contributor;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->contributor = $value.
+     */
+    public function setContributor(Contributor $value): self
+    {
+        $this->contributor = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->project.
+     */
+    public function getProject(): Project
+    {
+        return $this->project;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->project = $value.
+     */
+    public function setProject(Project $value): self
+    {
+        $this->project = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->task.
+     */
+    public function getTask(): ?ProjectTask
+    {
+        return $this->task;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->task = $value.
+     */
+    public function setTask(?ProjectTask $value): self
+    {
+        $this->task = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->subTask.
+     */
+    public function getSubTask(): ?ProjectSubTask
+    {
+        return $this->subTask;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->subTask = $value.
+     */
+    public function setSubTask(?ProjectSubTask $value): self
+    {
+        $this->subTask = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->date.
+     */
+    public function getDate(): DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->date = $value.
+     */
+    public function setDate(DateTimeInterface $value): self
+    {
+        $this->date = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->hours.
+     */
+    public function getHours(): string
+    {
+        return $this->hours;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->hours = $value.
+     */
+    public function setHours(string $value): self
+    {
+        $this->hours = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->notes.
+     */
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->notes = $value.
+     */
+    public function setNotes(?string $value): self
+    {
+        $this->notes = $value;
+
+        return $this;
+    }
 }

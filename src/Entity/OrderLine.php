@@ -322,4 +322,204 @@ class OrderLine implements CompanyOwnedInterface
 
         return $this;
     }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->section.
+     */
+    public function getSection(): OrderSection
+    {
+        return $this->section;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->section = $value.
+     */
+    public function setSection(OrderSection $value): self
+    {
+        $this->section = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->description.
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->description = $value.
+     */
+    public function setDescription(string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->position.
+     */
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->position = $value.
+     */
+    public function setPosition(int $value): self
+    {
+        $this->position = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->profile.
+     */
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->profile = $value.
+     */
+    public function setProfile(?Profile $value): self
+    {
+        $this->profile = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->dailyRate.
+     */
+    public function getDailyRate(): ?string
+    {
+        return $this->dailyRate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->dailyRate = $value.
+     */
+    public function setDailyRate(?string $value): self
+    {
+        $this->dailyRate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->days.
+     */
+    public function getDays(): ?string
+    {
+        return $this->days;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->days = $value.
+     */
+    public function setDays(?string $value): self
+    {
+        $this->days = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->directAmount.
+     */
+    public function getDirectAmount(): ?string
+    {
+        return $this->directAmount;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->directAmount = $value.
+     */
+    public function setDirectAmount(?string $value): self
+    {
+        $this->directAmount = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->attachedPurchaseAmount.
+     */
+    public function getAttachedPurchaseAmount(): ?string
+    {
+        return $this->attachedPurchaseAmount;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->attachedPurchaseAmount = $value.
+     */
+    public function setAttachedPurchaseAmount(?string $value): self
+    {
+        $this->attachedPurchaseAmount = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->type.
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->type = $value.
+     */
+    public function setType(string $value): self
+    {
+        $this->type = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->notes.
+     */
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $orderLine->notes = $value.
+     */
+    public function setNotes(?string $value): self
+    {
+        $this->notes = $value;
+
+        return $this;
+    }
 }

@@ -479,6 +479,15 @@ class Contributor implements CompanyOwnedInterface
         return $this->contributorSkills->count();
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $contributor->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
     public function getCompany(): Company
     {
         return $this->company;
@@ -487,6 +496,306 @@ class Contributor implements CompanyOwnedInterface
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->firstName.
+     */
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->firstName = $value.
+     */
+    public function setFirstName(string $value): self
+    {
+        $this->firstName = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->lastName.
+     */
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->lastName = $value.
+     */
+    public function setLastName(string $value): self
+    {
+        $this->lastName = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->email.
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->email = $value.
+     */
+    public function setEmail(?string $value): self
+    {
+        $this->email = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phonePersonal.
+     */
+    public function getPhonePersonal(): ?string
+    {
+        return $this->phonePersonal;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phonePersonal = $value.
+     */
+    public function setPhonePersonal(?string $value): self
+    {
+        $this->phonePersonal = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phoneProfessional.
+     */
+    public function getPhoneProfessional(): ?string
+    {
+        return $this->phoneProfessional;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phoneProfessional = $value.
+     */
+    public function setPhoneProfessional(?string $value): self
+    {
+        $this->phoneProfessional = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->birthDate.
+     */
+    public function getBirthDate(): ?DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->birthDate = $value.
+     */
+    public function setBirthDate(?DateTimeInterface $value): self
+    {
+        $this->birthDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->gender.
+     */
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->gender = $value.
+     */
+    public function setGender(?string $value): self
+    {
+        $this->gender = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->address.
+     */
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->address = $value.
+     */
+    public function setAddress(?string $value): self
+    {
+        $this->address = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->avatarFilename.
+     */
+    public function getAvatarFilename(): ?string
+    {
+        return $this->avatarFilename;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->avatarFilename = $value.
+     */
+    public function setAvatarFilename(?string $value): self
+    {
+        $this->avatarFilename = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->notes.
+     */
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->notes = $value.
+     */
+    public function setNotes(?string $value): self
+    {
+        $this->notes = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->cjm.
+     */
+    public function getCjm(): ?string
+    {
+        return $this->cjm;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->cjm = $value.
+     */
+    public function setCjm(?string $value): self
+    {
+        $this->cjm = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->tjm.
+     */
+    public function getTjm(): ?string
+    {
+        return $this->tjm;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->tjm = $value.
+     */
+    public function setTjm(?string $value): self
+    {
+        $this->tjm = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->active.
+     */
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->active = $value.
+     */
+    public function setActive(bool $value): self
+    {
+        $this->active = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->user.
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->user = $value.
+     */
+    public function setUser(?User $value): self
+    {
+        $this->user = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->manager.
+     */
+    public function getManager(): ?Contributor
+    {
+        return $this->manager;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->manager = $value.
+     */
+    public function setManager(?Contributor $value): self
+    {
+        $this->manager = $value;
 
         return $this;
     }

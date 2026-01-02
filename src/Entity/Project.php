@@ -762,4 +762,422 @@ class Project implements CompanyOwnedInterface
 
         return $this;
     }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->name = $value.
+     */
+    public function setName(string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->client.
+     */
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->client = $value.
+     */
+    public function setClient(?Client $value): self
+    {
+        $this->client = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->description = $value.
+     */
+    public function setDescription(?string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->purchasesAmount.
+     */
+    public function getPurchasesAmount(): ?string
+    {
+        return $this->purchasesAmount;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->purchasesAmount = $value.
+     */
+    public function setPurchasesAmount(?string $value): self
+    {
+        $this->purchasesAmount = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->purchasesDescription.
+     */
+    public function getPurchasesDescription(): ?string
+    {
+        return $this->purchasesDescription;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->purchasesDescription = $value.
+     */
+    public function setPurchasesDescription(?string $value): self
+    {
+        $this->purchasesDescription = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->startDate.
+     */
+    public function getStartDate(): ?DateTimeInterface
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->startDate = $value.
+     */
+    public function setStartDate(?DateTimeInterface $value): self
+    {
+        $this->startDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->endDate.
+     */
+    public function getEndDate(): ?DateTimeInterface
+    {
+        return $this->endDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->endDate = $value.
+     */
+    public function setEndDate(?DateTimeInterface $value): self
+    {
+        $this->endDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->status.
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->status = $value.
+     */
+    public function setStatus(string $value): self
+    {
+        $this->status = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->isInternal.
+     */
+    public function getIsInternal(): bool
+    {
+        return $this->isInternal;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->isInternal = $value.
+     */
+    public function setIsInternal(bool $value): self
+    {
+        $this->isInternal = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->projectType.
+     */
+    public function getProjectType(): string
+    {
+        return $this->projectType;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->projectType = $value.
+     */
+    public function setProjectType(string $value): self
+    {
+        $this->projectType = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->keyAccountManager.
+     */
+    public function getKeyAccountManager(): ?User
+    {
+        return $this->keyAccountManager;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->keyAccountManager = $value.
+     */
+    public function setKeyAccountManager(?User $value): self
+    {
+        $this->keyAccountManager = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->projectManager.
+     */
+    public function getProjectManager(): ?User
+    {
+        return $this->projectManager;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->projectManager = $value.
+     */
+    public function setProjectManager(?User $value): self
+    {
+        $this->projectManager = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->projectDirector.
+     */
+    public function getProjectDirector(): ?User
+    {
+        return $this->projectDirector;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->projectDirector = $value.
+     */
+    public function setProjectDirector(?User $value): self
+    {
+        $this->projectDirector = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->salesPerson.
+     */
+    public function getSalesPerson(): ?User
+    {
+        return $this->salesPerson;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->salesPerson = $value.
+     */
+    public function setSalesPerson(?User $value): self
+    {
+        $this->salesPerson = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->serviceCategory.
+     */
+    public function getServiceCategory(): ?ServiceCategory
+    {
+        return $this->serviceCategory;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->serviceCategory = $value.
+     */
+    public function setServiceCategory(?ServiceCategory $value): self
+    {
+        $this->serviceCategory = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->repoLinks.
+     */
+    public function getRepoLinks(): ?string
+    {
+        return $this->repoLinks;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->repoLinks = $value.
+     */
+    public function setRepoLinks(?string $value): self
+    {
+        $this->repoLinks = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->envLinks.
+     */
+    public function getEnvLinks(): ?string
+    {
+        return $this->envLinks;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->envLinks = $value.
+     */
+    public function setEnvLinks(?string $value): self
+    {
+        $this->envLinks = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->dbAccess.
+     */
+    public function getDbAccess(): ?string
+    {
+        return $this->dbAccess;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->dbAccess = $value.
+     */
+    public function setDbAccess(?string $value): self
+    {
+        $this->dbAccess = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->sshAccess.
+     */
+    public function getSshAccess(): ?string
+    {
+        return $this->sshAccess;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->sshAccess = $value.
+     */
+    public function setSshAccess(?string $value): self
+    {
+        $this->sshAccess = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->ftpAccess.
+     */
+    public function getFtpAccess(): ?string
+    {
+        return $this->ftpAccess;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->ftpAccess = $value.
+     */
+    public function setFtpAccess(?string $value): self
+    {
+        $this->ftpAccess = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $project->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->isInternal.
+     */
+    public function isInternal(): bool
+    {
+        return $this->isInternal;
+    }
 }

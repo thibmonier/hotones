@@ -465,4 +465,324 @@ class Order implements CompanyOwnedInterface
 
         return $this;
     }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->name.
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->name = $value.
+     */
+    public function setName(?string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->description = $value.
+     */
+    public function setDescription(?string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingencyPercentage.
+     */
+    public function getContingencyPercentage(): ?string
+    {
+        return $this->contingencyPercentage;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingencyPercentage = $value.
+     */
+    public function setContingencyPercentage(?string $value): self
+    {
+        $this->contingencyPercentage = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validUntil.
+     */
+    public function getValidUntil(): ?DateTimeInterface
+    {
+        return $this->validUntil;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validUntil = $value.
+     */
+    public function setValidUntil(?DateTimeInterface $value): self
+    {
+        $this->validUntil = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->orderNumber.
+     */
+    public function getOrderNumber(): string
+    {
+        return $this->orderNumber;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->orderNumber = $value.
+     */
+    public function setOrderNumber(string $value): self
+    {
+        $this->orderNumber = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->notes.
+     */
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->notes = $value.
+     */
+    public function setNotes(?string $value): self
+    {
+        $this->notes = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceAmount.
+     */
+    public function getContingenceAmount(): ?string
+    {
+        return $this->contingenceAmount;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceAmount = $value.
+     */
+    public function setContingenceAmount(?string $value): self
+    {
+        $this->contingenceAmount = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceReason.
+     */
+    public function getContingenceReason(): ?string
+    {
+        return $this->contingenceReason;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceReason = $value.
+     */
+    public function setContingenceReason(?string $value): self
+    {
+        $this->contingenceReason = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->project.
+     */
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->project = $value.
+     */
+    public function setProject(?Project $value): self
+    {
+        $this->project = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->totalAmount.
+     */
+    public function getTotalAmount(): ?string
+    {
+        return $this->totalAmount;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->totalAmount = $value.
+     */
+    public function setTotalAmount(?string $value): self
+    {
+        $this->totalAmount = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->createdAt.
+     */
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->createdAt = $value.
+     */
+    public function setCreatedAt(DateTimeInterface $value): self
+    {
+        $this->createdAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validatedAt.
+     */
+    public function getValidatedAt(): ?DateTimeInterface
+    {
+        return $this->validatedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validatedAt = $value.
+     */
+    public function setValidatedAt(?DateTimeInterface $value): self
+    {
+        $this->validatedAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->status.
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->status = $value.
+     */
+    public function setStatus(string $value): self
+    {
+        $this->status = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contractType.
+     */
+    public function getContractType(): string
+    {
+        return $this->contractType;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contractType = $value.
+     */
+    public function setContractType(string $value): self
+    {
+        $this->contractType = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expensesRebillable.
+     */
+    public function getExpensesRebillable(): bool
+    {
+        return $this->expensesRebillable;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expensesRebillable = $value.
+     */
+    public function setExpensesRebillable(bool $value): self
+    {
+        $this->expensesRebillable = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expenseManagementFeeRate.
+     */
+    public function getExpenseManagementFeeRate(): string
+    {
+        return $this->expenseManagementFeeRate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expenseManagementFeeRate = $value.
+     */
+    public function setExpenseManagementFeeRate(string $value): self
+    {
+        $this->expenseManagementFeeRate = $value;
+
+        return $this;
+    }
 }

@@ -153,4 +153,133 @@ class Client implements Stringable, CompanyOwnedInterface
 
         return $this;
     }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->name = $value.
+     */
+    public function setName(string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->logoPath.
+     */
+    public function getLogoPath(): ?string
+    {
+        return $this->logoPath;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->logoPath = $value.
+     */
+    public function setLogoPath(?string $value): self
+    {
+        $this->logoPath = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->website.
+     */
+    public function getWebsite(): ?string
+    {
+        return $this->website;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->website = $value.
+     */
+    public function setWebsite(?string $value): self
+    {
+        $this->website = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->description = $value.
+     */
+    public function setDescription(?string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->serviceLevel.
+     */
+    public function getServiceLevel(): ?string
+    {
+        return $this->serviceLevel;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->serviceLevel = $value.
+     */
+    public function setServiceLevel(?string $value): self
+    {
+        $this->serviceLevel = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->serviceLevelMode.
+     */
+    public function getServiceLevelMode(): string
+    {
+        return $this->serviceLevelMode;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $client->serviceLevelMode = $value.
+     */
+    public function setServiceLevelMode(string $value): self
+    {
+        $this->serviceLevelMode = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $client->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 }

@@ -138,7 +138,7 @@ class ForecastingService
         // Grouper par mois
         $monthlyRevenue = [];
         foreach ($projects as $project) {
-            $month = $project->getStartDate()?->format('Y-m');
+            $month = $project->startDate?->format('Y-m');
             if (!$month) {
                 continue;
             }

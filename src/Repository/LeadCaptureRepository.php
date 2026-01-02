@@ -102,14 +102,14 @@ class LeadCaptureRepository extends CompanyAwareRepository
 
         $withConsent = (int) $this->createCompanyQueryBuilder('lc')
             ->select('COUNT(lc.id)')
-            ->where('lc.marketingConsent = :true')
+            ->andWhere('lc.marketingConsent = :true')
             ->setParameter('true', true)
             ->getQuery()
             ->getSingleScalarResult();
 
         $downloaded = (int) $this->createCompanyQueryBuilder('lc')
             ->select('COUNT(lc.id)')
-            ->where('lc.downloadedAt IS NOT NULL')
+            ->andWhere('lc.downloadedAt IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
 

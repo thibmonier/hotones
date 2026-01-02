@@ -60,8 +60,8 @@ class ProfitabilityServiceTest extends TestCase
         $employmentPeriod = (new EmploymentPeriod())
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
-            ->setCjm(400)
-            ->setTjm(800);
+            ->setCjm('400')
+            ->setTjm('800');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
         $regularTask = (new ProjectTask())
@@ -133,7 +133,7 @@ class ProfitabilityServiceTest extends TestCase
         $employmentPeriod = (new EmploymentPeriod())
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
-            ->setCjm(400);
+            ->setCjm('400');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
         $ts = (new Timesheet())
@@ -205,7 +205,7 @@ class ProfitabilityServiceTest extends TestCase
         $employmentPeriod = (new EmploymentPeriod())
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
-            ->setCjm(400);
+            ->setCjm('400');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
         // Billable task
@@ -337,7 +337,7 @@ class ProfitabilityServiceTest extends TestCase
         $employmentPeriod = (new EmploymentPeriod())
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
-            ->setCjm(400);
+            ->setCjm('400');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
         $billableTask = (new ProjectTask())
@@ -400,7 +400,7 @@ class ProfitabilityServiceTest extends TestCase
         $employmentPeriod = (new EmploymentPeriod())
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
-            ->setCjm(800); // High cost
+            ->setCjm('800'); // High cost
         $contributor->addEmploymentPeriod($employmentPeriod);
 
         $billableTask = (new ProjectTask())

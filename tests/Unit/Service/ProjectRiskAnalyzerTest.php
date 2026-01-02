@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
-use App\Repository\ProjectHealthScoreRepository;
+use App\Security\CompanyContext;
 use App\Service\ProjectRiskAnalyzer;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,10 +18,10 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     protected function setUp(): void
     {
-        $em                    = $this->createMock(EntityManagerInterface::class);
-        $healthScoreRepository = $this->createMock(ProjectHealthScoreRepository::class);
+        $em             = $this->createMock(EntityManagerInterface::class);
+        $companyContext = $this->createMock(CompanyContext::class);
 
-        $this->service = new ProjectRiskAnalyzer($em, $healthScoreRepository);
+        $this->service = new ProjectRiskAnalyzer($em, $companyContext);
     }
 
     public function testAnalyzeProjectReturnsHealthyScoreForGoodProject(): void

@@ -303,4 +303,144 @@ class EmploymentPeriod implements CompanyOwnedInterface
 
         return $this;
     }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->contributor.
+     */
+    public function getContributor(): ?Contributor
+    {
+        return $this->contributor;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->contributor = $value.
+     */
+    public function setContributor(?Contributor $contributor): self
+    {
+        $this->contributor = $contributor;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->salary.
+     */
+    public function getSalary(): ?string
+    {
+        return $this->salary;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->salary = $value.
+     */
+    public function setSalary(?string $salary): self
+    {
+        $this->salary = $salary;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->cjm.
+     */
+    public function getCjm(): ?string
+    {
+        return $this->cjm;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->cjm = $value.
+     */
+    public function setCjm(?string $cjm): self
+    {
+        $this->cjm = $cjm;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->tjm.
+     */
+    public function getTjm(): ?string
+    {
+        return $this->tjm;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->tjm = $value.
+     */
+    public function setTjm(?string $tjm): self
+    {
+        $this->tjm = $tjm;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->weeklyHours.
+     */
+    public function getWeeklyHours(): string
+    {
+        return $this->weeklyHours;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->weeklyHours = $value.
+     */
+    public function setWeeklyHours(string $weeklyHours): self
+    {
+        $this->weeklyHours = $weeklyHours;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->workTimePercentage.
+     */
+    public function getWorkTimePercentage(): string
+    {
+        return $this->workTimePercentage;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->workTimePercentage = $value.
+     */
+    public function setWorkTimePercentage(string $workTimePercentage): self
+    {
+        $this->workTimePercentage = $workTimePercentage;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->notes.
+     */
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->notes = $value.
+     */
+    public function setNotes(?string $notes): self
+    {
+        $this->notes = $notes;
+
+        return $this;
+    }
 }
