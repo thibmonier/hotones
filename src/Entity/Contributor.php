@@ -129,7 +129,7 @@ class Contributor implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     public ?string $cjm = null {
-        get => $this->getRelevantEmploymentPeriod()?->getCjm() ?? $this->cjm;
+        get => $this->getRelevantEmploymentPeriod()?->cjm ?? $this->cjm;
         set {
             $this->cjm = $value;
         }
@@ -137,7 +137,7 @@ class Contributor implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     public ?string $tjm = null {
-        get => $this->getRelevantEmploymentPeriod()?->getTjm() ?? $this->tjm;
+        get => $this->getRelevantEmploymentPeriod()?->tjm ?? $this->tjm;
         set {
             $this->tjm = $value;
         }
@@ -250,7 +250,7 @@ class Contributor implements CompanyOwnedInterface
     {
         $period = $this->getRelevantEmploymentPeriod();
 
-        return $period?->getSalary();
+        return $period?->salary;
     }
 
     public function getProfiles(): Collection
@@ -293,7 +293,7 @@ class Contributor implements CompanyOwnedInterface
     {
         if ($this->employmentPeriods->removeElement($employmentPeriod)) {
             // set the owning side to null (unless already changed)
-            if ($employmentPeriod->getContributor() === $this) {
+            if ($employmentPeriod->contributor === $this) {
                 $employmentPeriod->setContributor(null);
             }
         }
@@ -370,7 +370,7 @@ class Contributor implements CompanyOwnedInterface
         $now = new DateTime();
 
         foreach ($this->employmentPeriods as $period) {
-            if ($period->getStartDate() <= $now && ($period->getEndDate() === null || $period->getEndDate() >= $now)) {
+            if ($period->startDate <= $now && ($period->endDate === null || $period->endDate >= $now)) {
                 return $period;
             }
         }
@@ -402,7 +402,7 @@ class Contributor implements CompanyOwnedInterface
     {
         $period = $this->getCurrentEmploymentPeriod();
         if ($period) {
-            return (float) $period->getWeeklyHours();
+            return (float) $period->weeklyHours;
         }
 
         return 35.0; // Valeur par défaut
@@ -417,7 +417,7 @@ class Contributor implements CompanyOwnedInterface
     {
         $period = $this->getCurrentEmploymentPeriod();
         if ($period) {
-            return $period->getHoursPerDay();
+            return $period->hoursPerDay;
         }
 
         return 7.0; // Valeur par défaut pour 35h/5j

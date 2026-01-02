@@ -48,13 +48,13 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function hasOverlappingPeriods(EmploymentPeriod $period, ?int $excludeId = null): bool
     {
-        if (!$period->getContributor()) {
+        if (!$period->contributor) {
             return false;
         }
 
         $queryBuilder = $this->createCompanyQueryBuilder('ep')
             ->andWhere('ep.contributor = :contributor')
-            ->setParameter('contributor', $period->getContributor());
+            ->setParameter('contributor', $period->contributor);
 
         if ($excludeId) {
             $queryBuilder->andWhere('ep.id <> :excludeId')
@@ -62,20 +62,20 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         }
 
         // Vérifier les chevauchements
-        $endDate = $period->getEndDate();
+        $endDate = $period->endDate;
         if ($endDate) {
             // Période avec date de fin
             $queryBuilder->andWhere(
                 '(ep.startDate <= :endDate AND (ep.endDate IS NULL OR ep.endDate >= :startDate))',
             )
-            ->setParameter('startDate', $period->getStartDate())
+            ->setParameter('startDate', $period->startDate)
             ->setParameter('endDate', $endDate);
         } else {
             // Période ouverte (sans date de fin)
             $queryBuilder->andWhere(
                 '(ep.endDate IS NULL OR ep.endDate >= :startDate)',
             )
-            ->setParameter('startDate', $period->getStartDate());
+            ->setParameter('startDate', $period->startDate);
         }
 
         return $queryBuilder->getQuery()->getOneOrNullResult() !== null;
@@ -149,15 +149,15 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function calculatePeriodCost(EmploymentPeriod $period): ?float
     {
-        if (!$period->getCjm()) {
+        if (!$period->cjm) {
             return null;
         }
 
-        $endDate             = $period->getEndDate() ?? new DateTime();
-        $workingDays         = $this->calculateWorkingDays($period->getStartDate(), $endDate);
-        $adjustedWorkingDays = $workingDays * (floatval($period->getWorkTimePercentage()) / 100);
+        $endDate             = $period->endDate ?? new DateTime();
+        $workingDays         = $this->calculateWorkingDays($period->startDate, $endDate);
+        $adjustedWorkingDays = $workingDays * (floatval($period->workTimePercentage) / 100);
 
-        return $adjustedWorkingDays * floatval($period->getCjm());
+        return $adjustedWorkingDays * floatval($period->cjm);
     }
 
     /**

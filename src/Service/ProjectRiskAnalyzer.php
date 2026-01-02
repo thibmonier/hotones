@@ -144,7 +144,7 @@ class ProjectRiskAnalyzer
      */
     private function analyzeScheduleDelay(Project $project): ?array
     {
-        $endDate = $project->getEndDate();
+        $endDate = $project->endDate;
         if (!$endDate) {
             return null; // Pas de date de fin définie
         }
@@ -153,7 +153,7 @@ class ProjectRiskAnalyzer
         $progress = (float) $project->getGlobalProgress();
 
         // Projet terminé
-        if ($project->getStatus() === 'completed') {
+        if ($project->status === 'completed') {
             return null;
         }
 
@@ -174,7 +174,7 @@ class ProjectRiskAnalyzer
         }
 
         // Risque de retard (projeté)
-        $startDate = $project->getStartDate();
+        $startDate = $project->startDate;
         if ($startDate && $startDate <= $now) {
             $totalDuration = $startDate->diff($endDate)->days;
             $elapsed       = $startDate->diff($now)->days;
@@ -265,7 +265,7 @@ class ProjectRiskAnalyzer
      */
     private function analyzeTimesheetCompleteness(Project $project): ?array
     {
-        if ($project->getStatus() !== 'in_progress') {
+        if ($project->status !== 'in_progress') {
             return null;
         }
 
@@ -307,12 +307,12 @@ class ProjectRiskAnalyzer
         $progress = (float) $project->getGlobalProgress();
 
         // Projet ni terminé ni annulé
-        if (!in_array($project->getStatus(), ['in_progress', 'active'], true)) {
+        if (!in_array($project->status, ['in_progress', 'active'], true)) {
             return null;
         }
 
         // Vérifier si le projet est bloqué (0% ou 100% sans changement de statut)
-        if ($progress === 0.0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
+        if ($progress === 0.0 && $project->startDate < (new DateTime())->modify('-1 month')) {
             return [
                 'type'     => 'not_started',
                 'severity' => 'high',

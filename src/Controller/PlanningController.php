@@ -88,13 +88,13 @@ class PlanningController extends AbstractController
         $planningsByContributor = [];
         foreach ($plannings as $planning) {
             /** @var Planning $planning */
-            $cid                                  = $planning->getContributor()->getId();
+            $cid                                  = $planning->getContributor()->id;
             $project                              = $planning->getProject();
-            $pid                                  = $project->getId();
+            $pid                                  = $project->id;
             $planningsByContributor[$cid][$pid][] = $planning;
             $availableProjects[$pid]              = $project; // deduplicate by id
-            if ($project->getProjectManager()) {
-                $availableManagers[$project->getProjectManager()->getId()] = $project->getProjectManager();
+            if ($project->projectManager) {
+                $availableManagers[$project->projectManager->getId()] = $project->projectManager;
             }
         }
 
@@ -105,7 +105,7 @@ class PlanningController extends AbstractController
             if ($planning->getStatus() === 'cancelled') {
                 continue;
             }
-            $cid    = $planning->getContributor()->getId();
+            $cid    = $planning->getContributor()->id;
             $ps     = $planning->getStartDate() < $start ? clone $start : clone $planning->getStartDate();
             $pe     = $planning->getEndDate() > $end ? clone $end : clone $planning->getEndDate();
             $cursor = $ps;
@@ -203,9 +203,9 @@ class PlanningController extends AbstractController
         $contributorDailyHours = [];
         foreach ($employmentPeriods as $employmentPeriod) {
             /** @var EmploymentPeriod $employmentPeriod */
-            $cid         = $employmentPeriod->getContributor()->getId();
-            $weeklyHours = (float) $employmentPeriod->getWeeklyHours();
-            $workPct     = (float) $employmentPeriod->getWorkTimePercentage();
+            $cid         = $employmentPeriod->contributor->id;
+            $weeklyHours = (float) $employmentPeriod->weeklyHours;
+            $workPct     = (float) $employmentPeriod->workTimePercentage;
             // Daily hours = (weekly hours * work% / 100) / 5 days
             $dailyHours                    = ($weeklyHours * $workPct / 100) / 5;
             $contributorDailyHours[$cid]   = $contributorDailyHours[$cid] ?? [];
@@ -227,7 +227,7 @@ class PlanningController extends AbstractController
 
         $weeklyStaffing = [];
         foreach ($contributors as $contributor) {
-            $cid            = $contributor->getId();
+            $cid            = $contributor->id;
             $dailyHours     = $contributorDailyHours[$cid] ?? 7.0;
             $weeklyMaxHours = $dailyHours * 5; // 5 working days
             foreach ($weekGroups as $weekKey => $dates) {
@@ -250,7 +250,7 @@ class PlanningController extends AbstractController
         // Build grouped structure: one summary row per contributor + project rows
         $groups = [];
         foreach ($contributors as $contributor) {
-            $cid         = $contributor->getId();
+            $cid         = $contributor->id;
             $projectRows = [];
             if (isset($planningsByContributor[$cid])) {
                 foreach ($planningsByContributor[$cid] as $pid => $items) {

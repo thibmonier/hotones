@@ -38,7 +38,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     public function findByContributor(Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('cs')
-            ->where('cs.contributor = :contributor')
+            ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('cs.year', 'DESC')
             ->addOrderBy('cs.month', 'DESC')
@@ -52,7 +52,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     public function findByPeriod(int $year, int $month): array
     {
         return $this->createCompanyQueryBuilder('cs')
-            ->where('cs.year = :year')
+            ->andWhere('cs.year = :year')
             ->andWhere('cs.month = :month')
             ->setParameter('year', $year)
             ->setParameter('month', $month)
@@ -66,7 +66,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     public function findByYear(int $year): array
     {
         return $this->createCompanyQueryBuilder('cs')
-            ->where('cs.year = :year')
+            ->andWhere('cs.year = :year')
             ->setParameter('year', $year)
             ->orderBy('cs.month', 'DESC')
             ->getQuery()
@@ -80,7 +80,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     {
         $result = $this->createCompanyQueryBuilder('cs')
             ->select('AVG(cs.overallScore) as avg_score')
-            ->where('cs.year = :year')
+            ->andWhere('cs.year = :year')
             ->andWhere('cs.month = :month')
             ->setParameter('year', $year)
             ->setParameter('month', $month)
@@ -97,7 +97,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     {
         $result = $this->createCompanyQueryBuilder('cs')
             ->select('AVG(cs.overallScore) as avg_score')
-            ->where('cs.year = :year')
+            ->andWhere('cs.year = :year')
             ->setParameter('year', $year)
             ->getQuery()
             ->getSingleScalarResult();
