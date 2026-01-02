@@ -22,7 +22,7 @@ class RunningTimerRepository extends CompanyAwareRepository
     public function findActiveByContributor(Contributor $contributor): ?RunningTimer
     {
         return $this->createCompanyQueryBuilder('rt')
-            ->where('rt.contributor = :contributor')
+            ->andWhere('rt.contributor = :contributor')
             ->andWhere('rt.stoppedAt IS NULL')
             ->setParameter('contributor', $contributor)
             ->setMaxResults(1)

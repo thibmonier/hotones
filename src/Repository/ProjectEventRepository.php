@@ -30,7 +30,7 @@ class ProjectEventRepository extends CompanyAwareRepository
         return $this->createCompanyQueryBuilder('e')
             ->leftJoin('e.actor', 'u')
             ->addSelect('u')
-            ->where('e.project = :projectId')
+            ->andWhere('e.project = :projectId')
             ->setParameter('projectId', $projectId)
             ->orderBy('e.createdAt', 'DESC')
             ->setMaxResults($limit)

@@ -9,6 +9,8 @@ use App\Repository\AccountDeletionRequestRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use SensitiveParameter;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -56,6 +58,7 @@ class AccountDeletionRequest implements CompanyOwnedInterface
      * Token de confirmation (envoyé par email).
      */
     #[ORM\Column(type: Types::STRING, length: 64, unique: true)]
+    #[Ignore]
     private string $confirmationToken;
 
     /**
@@ -147,7 +150,7 @@ class AccountDeletionRequest implements CompanyOwnedInterface
         return $this->confirmationToken;
     }
 
-    public function setConfirmationToken(string $confirmationToken): static
+    public function setConfirmationToken(#[SensitiveParameter] string $confirmationToken): static
     {
         $this->confirmationToken = $confirmationToken;
 

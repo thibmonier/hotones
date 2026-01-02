@@ -26,7 +26,7 @@ class VendorRepository extends CompanyAwareRepository
     public function findAllActive(): array
     {
         return $this->createCompanyQueryBuilder('v')
-            ->where('v.active = :active')
+            ->andWhere('v.active = :active')
             ->setParameter('active', true)
             ->orderBy('v.name', 'ASC')
             ->getQuery()

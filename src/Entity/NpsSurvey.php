@@ -10,6 +10,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use SensitiveParameter;
 
 /**
  * Enquête de satisfaction client (Net Promoter Score).
@@ -43,6 +45,7 @@ class NpsSurvey implements CompanyOwnedInterface
      * Token unique pour accéder au formulaire publiquement.
      */
     #[ORM\Column(type: Types::STRING, length: 64, unique: true)]
+    #[Ignore]
     private ?string $token = null;
 
     /**
@@ -141,7 +144,7 @@ class NpsSurvey implements CompanyOwnedInterface
         return $this->token;
     }
 
-    public function setToken(string $token): self
+    public function setToken(#[SensitiveParameter] string $token): self
     {
         $this->token = $token;
 
