@@ -633,9 +633,14 @@ class HrMetricsServiceTest extends TestCase
 
     private function createContributorWithAge(int $age, string $gender): Contributor
     {
-        $contributor = $this->createMock(Contributor::class);
-        $contributor->method('getAge')->willReturn($age);
-        $contributor->method('getGender')->willReturn($gender);
+        // Use real Contributor object instead of mock to avoid property hooks issues
+        $contributor         = new Contributor();
+        $contributor->gender = $gender;
+
+        // Set birthDate to match the desired age
+        $birthDate = new DateTime();
+        $birthDate->modify(sprintf('-%d years', $age));
+        $contributor->birthDate = $birthDate;
 
         return $contributor;
     }

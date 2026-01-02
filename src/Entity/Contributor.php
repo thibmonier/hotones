@@ -751,6 +751,15 @@ class Contributor implements CompanyOwnedInterface
 
     /**
      * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->active.
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Compatibility method for existing code.
      * With PHP 8.4 property hooks, prefer direct access: $contributor->active = $value.
      */
     public function setActive(bool $value): self
