@@ -6,6 +6,7 @@ use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\Technology;
 use App\Form\ProjectType as ProjectFormType;
+use App\Security\CompanyContext;
 use App\Service\ProfitabilityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +21,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_INTERVENANT')]
 class ProjectController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'project_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, ProfitabilityService $profitabilityService): Response
     {
@@ -185,7 +191,9 @@ class ProjectController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $project = new Project();
-        $form    = $this->createForm(ProjectFormType::class, $project);
+        $project->setCompany($this->companyContext->getCurrentCompany());
+
+        $form = $this->createForm(ProjectFormType::class, $project);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

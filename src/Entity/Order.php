@@ -468,6 +468,15 @@ class Order implements CompanyOwnedInterface
 
     /**
      * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
      * With PHP 8.4 property hooks, prefer direct access: $order->name.
      */
     public function getName(): ?string

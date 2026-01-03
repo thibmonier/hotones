@@ -13,9 +13,11 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\Blameable;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -41,6 +43,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwoFactorInterface, CompanyOwnedInterface
 {
+    use Blameable;
+
     // Rôles métier
     public const string ROLE_INTERVENANT = 'ROLE_INTERVENANT';
     public const string ROLE_CHEF_PROJET = 'ROLE_CHEF_PROJET';
@@ -57,7 +61,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['user:read'])]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -68,7 +72,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[Assert\NotBlank]
     #[Assert\Email]
     #[Groups(['user:read', 'user:write'])]
-    private string $email;
+    public string $email {
+        get => $this->email;
+        set {
+            $this->email = $value;
+        }
+    }
 
     #[ORM\Column(type: 'json')]
     #[Groups(['user:read', 'user:write'])]
@@ -81,26 +90,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['user:read', 'user:write'])]
-    private string $firstName;
+    public string $firstName {
+        get => $this->firstName;
+        set {
+            $this->firstName = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['user:read', 'user:write'])]
-    private string $lastName;
+    public string $lastName {
+        get => $this->lastName;
+        set {
+            $this->lastName = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 32, nullable: true)]
-    private ?string $phone = null; // legacy, conservé pour compat
+    public ?string $phone = null {
+        get => $this->phone;
+        set {
+            $this->phone = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 32, nullable: true)]
-    private ?string $phoneWork = null;
+    public ?string $phoneWork = null {
+        get => $this->phoneWork;
+        set {
+            $this->phoneWork = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 32, nullable: true)]
-    private ?string $phonePersonal = null;
+    public ?string $phonePersonal = null {
+        get => $this->phonePersonal;
+        set {
+            $this->phonePersonal = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $address = null; // adresse personnelle
+    public ?string $address = null {
+        get => $this->address;
+        set {
+            $this->address = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $avatar = null; // path/URL
+    public ?string $avatar = null {
+        get => $this->avatar;
+        set {
+            $this->avatar = $value;
+        }
+    }
 
     // 2FA TOTP
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -112,43 +156,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     // Timestamps
     #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $createdAt;
+    public DateTimeImmutable $createdAt {
+        get => $this->createdAt;
+        set {
+            $this->createdAt = $value;
+        }
+    }
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $updatedAt = null;
+    public ?DateTimeImmutable $updatedAt = null {
+        get => $this->updatedAt;
+        set {
+            $this->updatedAt = $value;
+        }
+    }
 
     // Login tracking
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $lastLoginAt = null;
+    public ?DateTimeImmutable $lastLoginAt = null {
+        get => $this->lastLoginAt;
+        set {
+            $this->lastLoginAt = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
-    private ?string $lastLoginIp = null;
+    public ?string $lastLoginIp = null {
+        get => $this->lastLoginIp;
+        set {
+            $this->lastLoginIp = $value;
+        }
+    }
 
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->email;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
     }
 
     public function getRoles(): array
@@ -171,7 +218,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->password;
     }
 
-    public function setPassword(#[SensitiveParameterAlias] string $password): self
+    public function setPassword(#[SensitiveParameter] string $password): self
     {
         $this->password = $password;
 
@@ -180,90 +227,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     public function eraseCredentials(): void
     {
-    }
-
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    public function setFirstName(string $firstName): self
-    {
-        $this->firstName = $firstName;
-
-        return $this;
-    }
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    public function setLastName(string $lastName): self
-    {
-        $this->lastName = $lastName;
-
-        return $this;
-    }
-
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function setPhone(?string $phone): self
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function getPhoneWork(): ?string
-    {
-        return $this->phoneWork;
-    }
-
-    public function setPhoneWork(?string $phoneWork): self
-    {
-        $this->phoneWork = $phoneWork;
-
-        return $this;
-    }
-
-    public function getPhonePersonal(): ?string
-    {
-        return $this->phonePersonal;
-    }
-
-    public function setPhonePersonal(?string $phonePersonal): self
-    {
-        $this->phonePersonal = $phonePersonal;
-
-        return $this;
-    }
-
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(?string $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
-
-    public function getAvatar(): ?string
-    {
-        return $this->avatar;
-    }
-
-    public function setAvatar(?string $avatar): self
-    {
-        $this->avatar = $avatar;
-
-        return $this;
     }
 
     // 2FA implementation
@@ -277,7 +240,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->totpSecret;
     }
 
-    public function setTotpSecret(#[SensitiveParameterAlias] ?string $secret): self
+    public function setTotpSecret(#[SensitiveParameter] ?string $secret): self
     {
         $this->totpSecret = $secret;
 
@@ -287,31 +250,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     public function setTotpEnabled(bool $enabled): self
     {
         $this->totpEnabled = $enabled;
-
-        return $this;
-    }
-
-    // Timestamps getters/setters
-    public function getCreatedAt(): ?DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }
@@ -375,30 +313,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->firstName.' '.$this->lastName;
     }
 
-    public function getLastLoginAt(): ?DateTimeImmutable
-    {
-        return $this->lastLoginAt;
-    }
-
-    public function setLastLoginAt(?DateTimeImmutable $lastLoginAt): self
-    {
-        $this->lastLoginAt = $lastLoginAt;
-
-        return $this;
-    }
-
-    public function getLastLoginIp(): ?string
-    {
-        return $this->lastLoginIp;
-    }
-
-    public function setLastLoginIp(?string $lastLoginIp): self
-    {
-        $this->lastLoginIp = $lastLoginIp;
-
-        return $this;
-    }
-
     public function isTotpEnabled(): ?bool
     {
         return $this->totpEnabled;
@@ -412,6 +326,259 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    // ========================================
+    // Compatibility methods for existing code
+    // ========================================
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $user->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->email.
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->email = $value.
+     */
+    public function setEmail(string $value): self
+    {
+        $this->email = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->firstName.
+     */
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->firstName = $value.
+     */
+    public function setFirstName(string $value): self
+    {
+        $this->firstName = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->lastName.
+     */
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->lastName = $value.
+     */
+    public function setLastName(string $value): self
+    {
+        $this->lastName = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->phone.
+     */
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->phone = $value.
+     */
+    public function setPhone(?string $value): self
+    {
+        $this->phone = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->phoneWork.
+     */
+    public function getPhoneWork(): ?string
+    {
+        return $this->phoneWork;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->phoneWork = $value.
+     */
+    public function setPhoneWork(?string $value): self
+    {
+        $this->phoneWork = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->phonePersonal.
+     */
+    public function getPhonePersonal(): ?string
+    {
+        return $this->phonePersonal;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->phonePersonal = $value.
+     */
+    public function setPhonePersonal(?string $value): self
+    {
+        $this->phonePersonal = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->address.
+     */
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->address = $value.
+     */
+    public function setAddress(?string $value): self
+    {
+        $this->address = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->avatar.
+     */
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->avatar = $value.
+     */
+    public function setAvatar(?string $value): self
+    {
+        $this->avatar = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->createdAt.
+     */
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->createdAt = $value.
+     */
+    public function setCreatedAt(DateTimeImmutable $value): self
+    {
+        $this->createdAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->updatedAt.
+     */
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->updatedAt = $value.
+     */
+    public function setUpdatedAt(?DateTimeImmutable $value): self
+    {
+        $this->updatedAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->lastLoginAt.
+     */
+    public function getLastLoginAt(): ?DateTimeImmutable
+    {
+        return $this->lastLoginAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->lastLoginAt = $value.
+     */
+    public function setLastLoginAt(?DateTimeImmutable $value): self
+    {
+        $this->lastLoginAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->lastLoginIp.
+     */
+    public function getLastLoginIp(): ?string
+    {
+        return $this->lastLoginIp;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $user->lastLoginIp = $value.
+     */
+    public function setLastLoginIp(?string $value): self
+    {
+        $this->lastLoginIp = $value;
 
         return $this;
     }

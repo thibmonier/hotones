@@ -102,6 +102,7 @@ class GenerateEmploymentPeriodsCommand extends Command
 
         foreach ($contributorsToProcess as $contributor) {
             $period = new EmploymentPeriod();
+            $period->setCompany($contributor->getCompany());
             $period->setContributor($contributor);
             $period->setStartDate($startDate);
             if ($endDate) {

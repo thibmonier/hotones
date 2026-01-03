@@ -7,6 +7,7 @@ use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\RunningTimer;
 use App\Entity\Timesheet;
+use App\Security\CompanyContext;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +22,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_INTERVENANT')]
 class TimesheetController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'timesheet_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
@@ -168,6 +174,7 @@ class TimesheetController extends AbstractController
 
         if (!$timesheet) {
             $timesheet = new Timesheet();
+            $timesheet->setCompany($this->companyContext->getCurrentCompany());
             $timesheet->setContributor($contributor);
             $timesheet->setProject($project);
             $timesheet->setDate($date);
@@ -400,7 +407,8 @@ class TimesheetController extends AbstractController
 
             if (!$existing) {
                 $duplicate = new Timesheet();
-                $duplicate->setContributor($contributor)
+                $duplicate->setCompany($source->getCompany())
+                    ->setContributor($contributor)
                     ->setProject($source->getProject())
                     ->setTask($source->getTask())
                     ->setSubTask($source->getSubTask())
@@ -475,7 +483,8 @@ class TimesheetController extends AbstractController
 
         // Démarrer un nouveau timer
         $timer = new RunningTimer();
-        $timer->setContributor($contributor)
+        $timer->setCompany($this->companyContext->getCurrentCompany())
+            ->setContributor($contributor)
             ->setProject($project)
             ->setTask($task)
             ->setSubTask($subTask)
@@ -623,7 +632,8 @@ class TimesheetController extends AbstractController
             $em->persist($existing);
         } else {
             $t = new Timesheet();
-            $t->setContributor($timer->getContributor())
+            $t->setCompany($timer->getCompany())
+              ->setContributor($timer->getContributor())
               ->setProject($timer->getProject())
               ->setTask($timer->getTask())
               ->setSubTask($timer->getSubTask())

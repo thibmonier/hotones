@@ -9,6 +9,7 @@ use App\Entity\Invoice;
 use App\Entity\Project;
 use App\Form\InvoiceType;
 use App\Repository\InvoiceRepository;
+use App\Security\CompanyContext;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class InvoiceController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'invoice_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
@@ -177,6 +183,7 @@ class InvoiceController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em, InvoiceRepository $invoiceRepository): Response
     {
         $invoice = new Invoice();
+        $invoice->setCompany($this->companyContext->getCurrentCompany());
 
         // Pré-remplir si client ou projet fourni dans l'URL
         $clientId  = $request->query->get('client');

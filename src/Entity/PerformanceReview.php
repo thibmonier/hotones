@@ -22,7 +22,7 @@ class PerformanceReview implements CompanyOwnedInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -30,7 +30,12 @@ class PerformanceReview implements CompanyOwnedInterface
     private Company $company;
 
     #[ORM\Column(type: Types::INTEGER)]
-    private int $year;
+    public int $year {
+        get => $this->year;
+        set {
+            $this->year = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: Contributor::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -41,34 +46,84 @@ class PerformanceReview implements CompanyOwnedInterface
     private User $manager;
 
     #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $status = 'en_attente'; // en_attente, auto_eval_faite, eval_manager_faite, validee
+    public string $status = 'en_attente' {
+        get => $this->status;
+        set {
+            $this->status = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private ?array $selfEvaluation = null; // {achievements, strengths, improvements}
+    public ?array $selfEvaluation = null {
+        get => $this->selfEvaluation;
+        set {
+            $this->selfEvaluation = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private ?array $managerEvaluation = null; // {achievements, strengths, improvements, feedback}
+    public ?array $managerEvaluation = null {
+        get => $this->managerEvaluation;
+        set {
+            $this->managerEvaluation = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private ?array $objectives = null; // Array of SMART objectives for next year
+    public ?array $objectives = null {
+        get => $this->objectives;
+        set {
+            $this->objectives = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $overallRating = null; // 1-5 scale (optional)
+    public ?int $overallRating = null {
+        get => $this->overallRating;
+        set {
+            $this->overallRating = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?DateTimeImmutable $interviewDate = null;
+    public ?DateTimeImmutable $interviewDate = null {
+        get => $this->interviewDate;
+        set {
+            $this->interviewDate = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $comments = null;
+    public ?string $comments = null {
+        get => $this->comments;
+        set {
+            $this->comments = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $createdAt;
+    public DateTimeImmutable $createdAt {
+        get => $this->createdAt;
+        set {
+            $this->createdAt = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $updatedAt;
+    public DateTimeImmutable $updatedAt {
+        get => $this->updatedAt;
+        set {
+            $this->updatedAt = $value;
+        }
+    }
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?DateTimeImmutable $validatedAt = null;
+    public ?DateTimeImmutable $validatedAt = null {
+        get => $this->validatedAt;
+        set {
+            $this->validatedAt = $value;
+        }
+    }
 
     public function __construct()
     {
@@ -80,23 +135,6 @@ class PerformanceReview implements CompanyOwnedInterface
     public function preUpdate(): void
     {
         $this->updatedAt = new DateTimeImmutable();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getYear(): int
-    {
-        return $this->year;
-    }
-
-    public function setYear(int $year): self
-    {
-        $this->year = $year;
-
-        return $this;
     }
 
     public function getContributor(): Contributor
@@ -119,112 +157,6 @@ class PerformanceReview implements CompanyOwnedInterface
     public function setManager(User $manager): self
     {
         $this->manager = $manager;
-
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function getSelfEvaluation(): ?array
-    {
-        return $this->selfEvaluation;
-    }
-
-    public function setSelfEvaluation(?array $selfEvaluation): self
-    {
-        $this->selfEvaluation = $selfEvaluation;
-
-        return $this;
-    }
-
-    public function getManagerEvaluation(): ?array
-    {
-        return $this->managerEvaluation;
-    }
-
-    public function setManagerEvaluation(?array $managerEvaluation): self
-    {
-        $this->managerEvaluation = $managerEvaluation;
-
-        return $this;
-    }
-
-    public function getObjectives(): ?array
-    {
-        return $this->objectives;
-    }
-
-    public function setObjectives(?array $objectives): self
-    {
-        $this->objectives = $objectives;
-
-        return $this;
-    }
-
-    public function getOverallRating(): ?int
-    {
-        return $this->overallRating;
-    }
-
-    public function setOverallRating(?int $overallRating): self
-    {
-        $this->overallRating = $overallRating;
-
-        return $this;
-    }
-
-    public function getInterviewDate(): ?DateTimeImmutable
-    {
-        return $this->interviewDate;
-    }
-
-    public function setInterviewDate(?DateTimeImmutable $interviewDate): self
-    {
-        $this->interviewDate = $interviewDate;
-
-        return $this;
-    }
-
-    public function getComments(): ?string
-    {
-        return $this->comments;
-    }
-
-    public function setComments(?string $comments): self
-    {
-        $this->comments = $comments;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function getValidatedAt(): ?DateTimeImmutable
-    {
-        return $this->validatedAt;
-    }
-
-    public function setValidatedAt(?DateTimeImmutable $validatedAt): self
-    {
-        $this->validatedAt = $validatedAt;
 
         return $this;
     }
@@ -299,20 +231,6 @@ class PerformanceReview implements CompanyOwnedInterface
         };
     }
 
-    public function setCreatedAt(DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function setUpdatedAt(DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
     public function getCompany(): Company
     {
         return $this->company;
@@ -321,6 +239,235 @@ class PerformanceReview implements CompanyOwnedInterface
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $review->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->year.
+     */
+    public function getYear(): int
+    {
+        return $this->year;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->year = $value.
+     */
+    public function setYear(int $value): self
+    {
+        $this->year = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->status.
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->status = $value.
+     */
+    public function setStatus(string $value): self
+    {
+        $this->status = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->selfEvaluation.
+     */
+    public function getSelfEvaluation(): ?array
+    {
+        return $this->selfEvaluation;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->selfEvaluation = $value.
+     */
+    public function setSelfEvaluation(?array $value): self
+    {
+        $this->selfEvaluation = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->managerEvaluation.
+     */
+    public function getManagerEvaluation(): ?array
+    {
+        return $this->managerEvaluation;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->managerEvaluation = $value.
+     */
+    public function setManagerEvaluation(?array $value): self
+    {
+        $this->managerEvaluation = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->objectives.
+     */
+    public function getObjectives(): ?array
+    {
+        return $this->objectives;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->objectives = $value.
+     */
+    public function setObjectives(?array $value): self
+    {
+        $this->objectives = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->overallRating.
+     */
+    public function getOverallRating(): ?int
+    {
+        return $this->overallRating;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->overallRating = $value.
+     */
+    public function setOverallRating(?int $value): self
+    {
+        $this->overallRating = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->interviewDate.
+     */
+    public function getInterviewDate(): ?DateTimeImmutable
+    {
+        return $this->interviewDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->interviewDate = $value.
+     */
+    public function setInterviewDate(?DateTimeImmutable $value): self
+    {
+        $this->interviewDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->comments.
+     */
+    public function getComments(): ?string
+    {
+        return $this->comments;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->comments = $value.
+     */
+    public function setComments(?string $value): self
+    {
+        $this->comments = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->createdAt.
+     */
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->createdAt = $value.
+     */
+    public function setCreatedAt(DateTimeImmutable $value): self
+    {
+        $this->createdAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->updatedAt.
+     */
+    public function getUpdatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->updatedAt = $value.
+     */
+    public function setUpdatedAt(DateTimeImmutable $value): self
+    {
+        $this->updatedAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->validatedAt.
+     */
+    public function getValidatedAt(): ?DateTimeImmutable
+    {
+        return $this->validatedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $review->validatedAt = $value.
+     */
+    public function setValidatedAt(?DateTimeImmutable $value): self
+    {
+        $this->validatedAt = $value;
 
         return $this;
     }

@@ -80,6 +80,8 @@ il faudrait pouvoir fusionner les formulaires utilisateurs et collaborateurs.
 revoir l'accès au lien (seuls les administrateurs ont accès et ils devraient pouvoir y accéder depuis le header et non pas dasn le menu latéral)
 revoir les éléments présents dans le backoffice et ceux présents dans l'application
 
+Il faudrait pouvoir administrer les sociétés clientes depuis le backoffice (CRUD company)
+
 ## cohérence ux
 
 revoir les pages existantes pour ne conserver que les pages utiles

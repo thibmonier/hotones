@@ -7,6 +7,7 @@ use App\Entity\ExpenseReport;
 use App\Form\ExpenseReportType;
 use App\Repository\ContributorRepository;
 use App\Repository\ExpenseReportRepository;
+use App\Security\CompanyContext;
 use App\Service\ExpenseReportService;
 use App\Service\SecureFileUploadService;
 use DateTime;
@@ -28,6 +29,7 @@ class ExpenseReportController extends AbstractController
         private ExpenseReportService $service,
         private EntityManagerInterface $em,
         private SecureFileUploadService $uploadService,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -76,6 +78,7 @@ class ExpenseReportController extends AbstractController
         }
 
         $expense = new ExpenseReport();
+        $expense->setCompany($contributor->getCompany());
         $expense->setContributor($contributor);
         $form = $this->createForm(ExpenseReportType::class, $expense);
         $form->handleRequest($request);

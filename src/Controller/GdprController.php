@@ -8,6 +8,7 @@ use App\Entity\AccountDeletionRequest;
 use App\Entity\CookieConsent;
 use App\Entity\User;
 use App\Repository\AccountDeletionRequestRepository;
+use App\Security\CompanyContext;
 use App\Service\GdprDataExportService;
 use App\Service\GdprEmailService;
 use DateTime;
@@ -26,6 +27,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/gdpr')]
 class GdprController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     /**
      * Sauvegarde le consentement cookies de l'utilisateur.
      * Appelé par le JavaScript de la bannière de cookies.
@@ -40,6 +46,7 @@ class GdprController extends AbstractController
 
         // Créer l'entité CookieConsent pour traçabilité RGPD
         $consent = new CookieConsent();
+        $consent->setCompany($this->companyContext->getCurrentCompany());
         $consent->setUser($user);
         $consent->setEssential($data['essential'] ?? true);
         $consent->setFunctional($data['functional'] ?? false);

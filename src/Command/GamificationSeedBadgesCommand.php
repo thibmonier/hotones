@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Badge;
+use App\Entity\Company;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -24,17 +26,42 @@ class GamificationSeedBadgesCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
         $io->title('Création des badges par défaut');
 
+        // Récupérer la Company
+        $companyId = $input->getOption('company-id');
+        if ($companyId) {
+            $company = $this->entityManager->getRepository(Company::class)->find($companyId);
+            if (!$company) {
+                $io->error(sprintf('Company avec ID %d introuvable', $companyId));
+
+                return Command::FAILURE;
+            }
+        } else {
+            $company = $this->entityManager->getRepository(Company::class)->findOneBy([]);
+            if (!$company) {
+                $io->error('Aucune Company trouvée. Créez d\'abord une Company.');
+
+                return Command::FAILURE;
+            }
+            $io->note(sprintf('Utilisation de la Company: %s (ID: %d)', $company->getName(), $company->getId()));
+        }
+
         $badges  = $this->getDefaultBadges();
         $created = 0;
 
         foreach ($badges as $badgeData) {
             $badge = new Badge();
+            $badge->setCompany($company);
             $badge->setName($badgeData['name']);
             $badge->setDescription($badgeData['description']);
             $badge->setIcon($badgeData['icon']);

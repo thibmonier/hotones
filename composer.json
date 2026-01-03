@@ -38,6 +38,7 @@
         "scheb/2fa-bundle": ">=8.1.0",
         "scheb/2fa-totp": ">=8.1.0",
         "sentry/sentry-symfony": "^5.8.3",
+        "stof/doctrine-extensions-bundle": "^1.15",
         "symfony/ai-agent": "^0.1.0",
         "symfony/ai-anthropic-platform": ">=0.1",
         "symfony/ai-bundle": ">=0.1",

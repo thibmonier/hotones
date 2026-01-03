@@ -16,24 +16,49 @@ class Technology implements CompanyOwnedInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull]
-    private Company $company;
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 100)]
-    private string $name;
+    public string $name = '' {
+        get => $this->name;
+        set {
+            $this->name = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 50)]
-    private string $category; // framework, cms, library, tool, hosting, etc.
+    public string $category = '' {
+        get => $this->category;
+        set {
+            $this->category = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 7, nullable: true)]
-    private ?string $color = null; // Couleur hexadécimale pour l'affichage
+    public ?string $color = null {
+        get => $this->color;
+        set {
+            $this->color = $value;
+        }
+    }
 
     #[ORM\Column(type: 'boolean')]
-    private bool $active = true;
+    public bool $active = true {
+        get => $this->active;
+        set {
+            $this->active = $value;
+        }
+    }
 
     // Relation avec les projets
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'technologies')]
@@ -44,59 +69,7 @@ class Technology implements CompanyOwnedInterface
         $this->projects = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getCategory(): string
-    {
-        return $this->category;
-    }
-
-    public function setCategory(string $category): self
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->color;
-    }
-
-    public function setColor(?string $color): self
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
-    public function getActive(): bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
+    /** @return Collection<int, Project> */
     public function getProjects(): Collection
     {
         return $this->projects;
@@ -134,6 +107,95 @@ class Technology implements CompanyOwnedInterface
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $technology->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->name = $value.
+     */
+    public function setName(string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->category.
+     */
+    public function getCategory(): string
+    {
+        return $this->category;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->category = $value.
+     */
+    public function setCategory(string $value): self
+    {
+        $this->category = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->color.
+     */
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->color = $value.
+     */
+    public function setColor(?string $value): self
+    {
+        $this->color = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->active.
+     */
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $technology->active = $value.
+     */
+    public function setActive(bool $value): self
+    {
+        $this->active = $value;
 
         return $this;
     }

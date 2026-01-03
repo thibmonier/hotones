@@ -10,7 +10,10 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Error;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -65,7 +68,7 @@ class Company
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     // ===========================
     // Core Identity
@@ -74,7 +77,12 @@ class Company
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 255)]
-    private string $name;
+    public string $name {
+        get => $this->name;
+        set {
+            $this->name = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank]
@@ -83,10 +91,20 @@ class Company
         pattern: '/^[a-z0-9-]+$/',
         message: 'Slug can only contain lowercase letters, numbers, and hyphens',
     )]
-    private string $slug;
+    public string $slug {
+        get => $this->slug;
+        set {
+            $this->slug = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $description = null;
+    public ?string $description = null {
+        get => $this->description;
+        set {
+            $this->description = $value;
+        }
+    }
 
     // ===========================
     // Ownership
@@ -101,6 +119,7 @@ class Company
     // Subscription & Status
     // ===========================
 
+    // Note: status uses private property because setStatus() has special logic for suspendedAt
     #[ORM\Column(type: 'string', length: 50)]
     #[Assert\Choice(choices: [
         self::STATUS_ACTIVE,
@@ -116,7 +135,12 @@ class Company
         self::TIER_PROFESSIONAL,
         self::TIER_ENTERPRISE,
     ])]
-    private string $subscriptionTier = self::TIER_PROFESSIONAL;
+    public string $subscriptionTier = self::TIER_PROFESSIONAL {
+        get => $this->subscriptionTier;
+        set {
+            $this->subscriptionTier = $value;
+        }
+    }
 
     // ===========================
     // Subscription Limits
@@ -124,15 +148,30 @@ class Company
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Positive]
-    private ?int $maxUsers = null;
+    public ?int $maxUsers = null {
+        get => $this->maxUsers;
+        set {
+            $this->maxUsers = $value;
+        }
+    }
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Positive]
-    private ?int $maxProjects = null;
+    public ?int $maxProjects = null {
+        get => $this->maxProjects;
+        set {
+            $this->maxProjects = $value;
+        }
+    }
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Positive]
-    private ?int $maxStorageMb = null;
+    public ?int $maxStorageMb = null {
+        get => $this->maxStorageMb;
+        set {
+            $this->maxStorageMb = $value;
+        }
+    }
 
     // ===========================
     // Billing Configuration
@@ -140,29 +179,54 @@ class Company
 
     #[ORM\Column(type: 'date')]
     #[Assert\NotNull]
-    private DateTimeInterface $billingStartDate;
+    public DateTimeInterface $billingStartDate {
+        get => $this->billingStartDate;
+        set {
+            $this->billingStartDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Range(min: 1, max: 28)]
-    private int $billingDayOfMonth = 1;
+    public int $billingDayOfMonth = 1 {
+        get => $this->billingDayOfMonth;
+        set {
+            $this->billingDayOfMonth = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 3)]
     #[Assert\Currency]
-    private string $currency = 'EUR';
+    public string $currency = 'EUR' {
+        get => $this->currency;
+        set {
+            $this->currency = $value;
+        }
+    }
 
     // ===========================
     // Company-specific Settings (JSON)
     // ===========================
 
     #[ORM\Column(type: 'json')]
-    private array $settings = [];
+    public array $settings = [] {
+        get => $this->settings;
+        set {
+            $this->settings = $value;
+        }
+    }
 
     // ===========================
     // Feature Flags (JSON)
     // ===========================
 
     #[ORM\Column(type: 'json')]
-    private array $enabledFeatures = [];
+    public array $enabledFeatures = [] {
+        get => $this->enabledFeatures;
+        set {
+            $this->enabledFeatures = $value;
+        }
+    }
 
     // ===========================
     // Company Settings (formerly CompanySettings entity)
@@ -170,35 +234,77 @@ class Company
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 4)]
     #[Assert\Positive]
-    private string $structureCostCoefficient = '1.3500';
+    public string $structureCostCoefficient = '1.3500' {
+        get => $this->structureCostCoefficient;
+        set {
+            $this->structureCostCoefficient = $value;
+        }
+    }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 4)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 4)]
     #[Assert\Positive]
-    private string $employerChargesCoefficient = '1.4500';
+    public string $employerChargesCoefficient = '1.4500' {
+        get => $this->employerChargesCoefficient;
+        set {
+            $this->employerChargesCoefficient = $value;
+        }
+    }
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Range(min: 0, max: 50)]
-    private int $annualPaidLeaveDays = 25;
+    public int $annualPaidLeaveDays = 25 {
+        get => $this->annualPaidLeaveDays;
+        set {
+            $this->annualPaidLeaveDays = $value;
+        }
+    }
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: Types::INTEGER)]
     #[Assert\Range(min: 0, max: 30)]
-    private int $annualRttDays = 10;
+    public int $annualRttDays = 10 {
+        get => $this->annualRttDays;
+        set {
+            $this->annualRttDays = $value;
+        }
+    }
 
     // ===========================
     // Timestamps
     // ===========================
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $createdAt;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    #[Gedmo\Timestampable]
+    public DateTimeImmutable $createdAt {
+        get => $this->createdAt;
+        set {
+            $this->createdAt = $value;
+        }
+    }
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $updatedAt = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Gedmo\Timestampable]
+    public ?DateTimeImmutable $updatedAt = null {
+        get => $this->updatedAt;
+        set {
+            $this->updatedAt = $value;
+        }
+    }
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $suspendedAt = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    public ?DateTimeImmutable $suspendedAt = null {
+        get => $this->suspendedAt;
+        set {
+            $this->suspendedAt = $value;
+        }
+    }
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $trialEndsAt = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    public ?DateTimeImmutable $trialEndsAt = null {
+        get => $this->trialEndsAt;
+        set {
+            $this->trialEndsAt = $value;
+        }
+    }
 
     // ===========================
     // Relationships (OneToMany with CASCADE DELETE)
@@ -240,7 +346,11 @@ class Company
         $this->updatedAt = $this->createdAt;
 
         // Set billing start date to today if not set
-        if (!isset($this->billingStartDate)) {
+        try {
+            // Try to access the property - if uninitialized, it will throw
+            $test = $this->billingStartDate;
+        } catch (Error) {
+            // Property not initialized, set default value
             $this->billingStartDate = new DateTime();
         }
     }
@@ -290,7 +400,9 @@ class Company
     public function enableFeature(string $feature): self
     {
         if (!in_array($feature, $this->enabledFeatures, true)) {
-            $this->enabledFeatures[] = $feature;
+            $features              = $this->enabledFeatures;
+            $features[]            = $feature;
+            $this->enabledFeatures = $features;
         }
 
         return $this;
@@ -338,7 +450,9 @@ class Company
      */
     public function setSetting(string $key, mixed $value): self
     {
-        $this->settings[$key] = $value;
+        $settings       = $this->settings;
+        $settings[$key] = $value;
+        $this->settings = $settings;
 
         return $this;
     }
@@ -358,49 +472,8 @@ class Company
     }
 
     // ===========================
-    // Getters & Setters
+    // Relationship Getters & Setters
     // ===========================
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(string $slug): self
-    {
-        $this->slug = $slug;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
 
     public function getOwner(): User
     {
@@ -414,6 +487,8 @@ class Company
         return $this;
     }
 
+    // Note: getStatus() and setStatus() remain as traditional methods
+    // because setStatus() has special business logic (suspendedAt timestamp)
     public function getStatus(): string
     {
         return $this->status;
@@ -427,189 +502,6 @@ class Company
         if ($status === self::STATUS_SUSPENDED && $this->suspendedAt === null) {
             $this->suspendedAt = new DateTimeImmutable();
         }
-
-        return $this;
-    }
-
-    public function getSubscriptionTier(): string
-    {
-        return $this->subscriptionTier;
-    }
-
-    public function setSubscriptionTier(string $subscriptionTier): self
-    {
-        $this->subscriptionTier = $subscriptionTier;
-
-        return $this;
-    }
-
-    public function getMaxUsers(): ?int
-    {
-        return $this->maxUsers;
-    }
-
-    public function setMaxUsers(?int $maxUsers): self
-    {
-        $this->maxUsers = $maxUsers;
-
-        return $this;
-    }
-
-    public function getMaxProjects(): ?int
-    {
-        return $this->maxProjects;
-    }
-
-    public function setMaxProjects(?int $maxProjects): self
-    {
-        $this->maxProjects = $maxProjects;
-
-        return $this;
-    }
-
-    public function getMaxStorageMb(): ?int
-    {
-        return $this->maxStorageMb;
-    }
-
-    public function setMaxStorageMb(?int $maxStorageMb): self
-    {
-        $this->maxStorageMb = $maxStorageMb;
-
-        return $this;
-    }
-
-    public function getBillingStartDate(): DateTimeInterface
-    {
-        return $this->billingStartDate;
-    }
-
-    public function setBillingStartDate(DateTimeInterface $billingStartDate): self
-    {
-        $this->billingStartDate = $billingStartDate;
-
-        return $this;
-    }
-
-    public function getBillingDayOfMonth(): int
-    {
-        return $this->billingDayOfMonth;
-    }
-
-    public function setBillingDayOfMonth(int $billingDayOfMonth): self
-    {
-        $this->billingDayOfMonth = $billingDayOfMonth;
-
-        return $this;
-    }
-
-    public function getCurrency(): string
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(string $currency): self
-    {
-        $this->currency = $currency;
-
-        return $this;
-    }
-
-    public function getSettings(): array
-    {
-        return $this->settings;
-    }
-
-    public function setSettings(array $settings): self
-    {
-        $this->settings = $settings;
-
-        return $this;
-    }
-
-    public function getEnabledFeatures(): array
-    {
-        return $this->enabledFeatures;
-    }
-
-    public function setEnabledFeatures(array $enabledFeatures): self
-    {
-        $this->enabledFeatures = $enabledFeatures;
-
-        return $this;
-    }
-
-    public function getStructureCostCoefficient(): string
-    {
-        return $this->structureCostCoefficient;
-    }
-
-    public function setStructureCostCoefficient(string $structureCostCoefficient): self
-    {
-        $this->structureCostCoefficient = $structureCostCoefficient;
-
-        return $this;
-    }
-
-    public function getEmployerChargesCoefficient(): string
-    {
-        return $this->employerChargesCoefficient;
-    }
-
-    public function setEmployerChargesCoefficient(string $employerChargesCoefficient): self
-    {
-        $this->employerChargesCoefficient = $employerChargesCoefficient;
-
-        return $this;
-    }
-
-    public function getAnnualPaidLeaveDays(): int
-    {
-        return $this->annualPaidLeaveDays;
-    }
-
-    public function setAnnualPaidLeaveDays(int $annualPaidLeaveDays): self
-    {
-        $this->annualPaidLeaveDays = $annualPaidLeaveDays;
-
-        return $this;
-    }
-
-    public function getAnnualRttDays(): int
-    {
-        return $this->annualRttDays;
-    }
-
-    public function setAnnualRttDays(int $annualRttDays): self
-    {
-        $this->annualRttDays = $annualRttDays;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function getSuspendedAt(): ?DateTimeImmutable
-    {
-        return $this->suspendedAt;
-    }
-
-    public function getTrialEndsAt(): ?DateTimeImmutable
-    {
-        return $this->trialEndsAt;
-    }
-
-    public function setTrialEndsAt(?DateTimeImmutable $trialEndsAt): self
-    {
-        $this->trialEndsAt = $trialEndsAt;
 
         return $this;
     }
@@ -681,5 +573,385 @@ class Company
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    // ===========================
+    // Compatibility Methods
+    // ===========================
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $company->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->name = $value.
+     */
+    public function setName(string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->slug.
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->slug = $value.
+     */
+    public function setSlug(string $value): self
+    {
+        $this->slug = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->description = $value.
+     */
+    public function setDescription(?string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->subscriptionTier.
+     */
+    public function getSubscriptionTier(): string
+    {
+        return $this->subscriptionTier;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->subscriptionTier = $value.
+     */
+    public function setSubscriptionTier(string $value): self
+    {
+        $this->subscriptionTier = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->maxUsers.
+     */
+    public function getMaxUsers(): ?int
+    {
+        return $this->maxUsers;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->maxUsers = $value.
+     */
+    public function setMaxUsers(?int $value): self
+    {
+        $this->maxUsers = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->maxProjects.
+     */
+    public function getMaxProjects(): ?int
+    {
+        return $this->maxProjects;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->maxProjects = $value.
+     */
+    public function setMaxProjects(?int $value): self
+    {
+        $this->maxProjects = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->maxStorageMb.
+     */
+    public function getMaxStorageMb(): ?int
+    {
+        return $this->maxStorageMb;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->maxStorageMb = $value.
+     */
+    public function setMaxStorageMb(?int $value): self
+    {
+        $this->maxStorageMb = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->billingStartDate.
+     */
+    public function getBillingStartDate(): DateTimeInterface
+    {
+        return $this->billingStartDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->billingStartDate = $value.
+     */
+    public function setBillingStartDate(DateTimeInterface $value): self
+    {
+        $this->billingStartDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->billingDayOfMonth.
+     */
+    public function getBillingDayOfMonth(): int
+    {
+        return $this->billingDayOfMonth;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->billingDayOfMonth = $value.
+     */
+    public function setBillingDayOfMonth(int $value): self
+    {
+        $this->billingDayOfMonth = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->currency.
+     */
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->currency = $value.
+     */
+    public function setCurrency(string $value): self
+    {
+        $this->currency = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->settings.
+     */
+    public function getSettings(): array
+    {
+        return $this->settings;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->settings = $value.
+     */
+    public function setSettings(array $value): self
+    {
+        $this->settings = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->enabledFeatures.
+     */
+    public function getEnabledFeatures(): array
+    {
+        return $this->enabledFeatures;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->enabledFeatures = $value.
+     */
+    public function setEnabledFeatures(array $value): self
+    {
+        $this->enabledFeatures = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->structureCostCoefficient.
+     */
+    public function getStructureCostCoefficient(): string
+    {
+        return $this->structureCostCoefficient;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->structureCostCoefficient = $value.
+     */
+    public function setStructureCostCoefficient(string $value): self
+    {
+        $this->structureCostCoefficient = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->employerChargesCoefficient.
+     */
+    public function getEmployerChargesCoefficient(): string
+    {
+        return $this->employerChargesCoefficient;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->employerChargesCoefficient = $value.
+     */
+    public function setEmployerChargesCoefficient(string $value): self
+    {
+        $this->employerChargesCoefficient = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->annualPaidLeaveDays.
+     */
+    public function getAnnualPaidLeaveDays(): int
+    {
+        return $this->annualPaidLeaveDays;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->annualPaidLeaveDays = $value.
+     */
+    public function setAnnualPaidLeaveDays(int $value): self
+    {
+        $this->annualPaidLeaveDays = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->annualRttDays.
+     */
+    public function getAnnualRttDays(): int
+    {
+        return $this->annualRttDays;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->annualRttDays = $value.
+     */
+    public function setAnnualRttDays(int $value): self
+    {
+        $this->annualRttDays = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->createdAt.
+     */
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->updatedAt.
+     */
+    public function getUpdatedAt(): ?DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->suspendedAt.
+     */
+    public function getSuspendedAt(): ?DateTimeImmutable
+    {
+        return $this->suspendedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->trialEndsAt.
+     */
+    public function getTrialEndsAt(): ?DateTimeImmutable
+    {
+        return $this->trialEndsAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $company->trialEndsAt = $value.
+     */
+    public function setTrialEndsAt(?DateTimeImmutable $value): self
+    {
+        $this->trialEndsAt = $value;
+
+        return $this;
     }
 }

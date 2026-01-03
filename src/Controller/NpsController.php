@@ -8,6 +8,7 @@ use App\Entity\NpsSurvey;
 use App\Entity\Project;
 use App\Form\NpsSurveyType;
 use App\Repository\NpsSurveyRepository;
+use App\Security\CompanyContext;
 use App\Service\NpsMailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -25,6 +26,7 @@ class NpsController extends AbstractController
         private readonly NpsSurveyRepository $npsSurveyRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly NpsMailerService $npsMailerService,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -105,7 +107,8 @@ class NpsController extends AbstractController
     public function new(Request $request): Response
     {
         $survey = new NpsSurvey();
-        $form   = $this->createForm(NpsSurveyType::class, $survey);
+        $survey->setCompany($this->companyContext->getCurrentCompany());
+        $form = $this->createForm(NpsSurveyType::class, $survey);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

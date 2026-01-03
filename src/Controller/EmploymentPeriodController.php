@@ -7,6 +7,7 @@ use App\Entity\EmploymentPeriod;
 use App\Entity\Profile;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
+use App\Security\CompanyContext;
 use App\Service\CjmCalculatorService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +23,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_MANAGER')]
 class EmploymentPeriodController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'employment_period_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator, ContributorRepository $contributorRepository): Response
     {
@@ -176,6 +182,7 @@ class EmploymentPeriodController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository, CjmCalculatorService $cjmCalculatorService): Response
     {
         $period = new EmploymentPeriod();
+        $period->setCompany($this->companyContext->getCurrentCompany());
 
         // Pré-sélectionner le collaborateur si fourni dans l'URL
         if ($contributorId = $request->query->get('contributor')) {

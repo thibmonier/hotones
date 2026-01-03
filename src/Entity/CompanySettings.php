@@ -23,7 +23,7 @@ class CompanySettings implements CompanyOwnedInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -36,7 +36,12 @@ class CompanySettings implements CompanyOwnedInterface
      * Représente les coûts fixes de l'entreprise (locaux, équipements, etc.).
      */
     #[ORM\Column(type: 'decimal', precision: 10, scale: 4)]
-    private string $structureCostCoefficient = '1.35';
+    public string $structureCostCoefficient = '1.35' {
+        get => $this->structureCostCoefficient;
+        set {
+            $this->structureCostCoefficient = $value;
+        }
+    }
 
     /**
      * Coefficient de charges patronales
@@ -44,21 +49,36 @@ class CompanySettings implements CompanyOwnedInterface
      * Représente les charges sociales patronales.
      */
     #[ORM\Column(type: 'decimal', precision: 10, scale: 4)]
-    private string $employerChargesCoefficient = '1.45';
+    public string $employerChargesCoefficient = '1.45' {
+        get => $this->employerChargesCoefficient;
+        set {
+            $this->employerChargesCoefficient = $value;
+        }
+    }
 
     /**
      * Nombre de jours de congés payés par an
      * Défaut : 25 jours (légal en France).
      */
     #[ORM\Column]
-    private int $annualPaidLeaveDays = 25;
+    public int $annualPaidLeaveDays = 25 {
+        get => $this->annualPaidLeaveDays;
+        set {
+            $this->annualPaidLeaveDays = $value;
+        }
+    }
 
     /**
      * Nombre de jours de RTT par an
      * Défaut : 10 jours.
      */
     #[ORM\Column]
-    private int $annualRttDays = 10;
+    public int $annualRttDays = 10 {
+        get => $this->annualRttDays;
+        set {
+            $this->annualRttDays = $value;
+        }
+    }
 
     /**
      * Dates de mise à jour.
@@ -77,35 +97,6 @@ class CompanySettings implements CompanyOwnedInterface
         $this->updatedAt = new DateTime();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getStructureCostCoefficient(): string
-    {
-        return $this->structureCostCoefficient;
-    }
-
-    public function setStructureCostCoefficient(string $structureCostCoefficient): self
-    {
-        $this->structureCostCoefficient = $structureCostCoefficient;
-
-        return $this;
-    }
-
-    public function getEmployerChargesCoefficient(): string
-    {
-        return $this->employerChargesCoefficient;
-    }
-
-    public function setEmployerChargesCoefficient(string $employerChargesCoefficient): self
-    {
-        $this->employerChargesCoefficient = $employerChargesCoefficient;
-
-        return $this;
-    }
-
     /**
      * Calcule le coefficient de charge global
      * Coefficient global = coûts de structure × charges patronales.
@@ -113,30 +104,6 @@ class CompanySettings implements CompanyOwnedInterface
     public function getGlobalChargeCoefficient(): string
     {
         return bcmul($this->structureCostCoefficient, $this->employerChargesCoefficient, 4);
-    }
-
-    public function getAnnualPaidLeaveDays(): int
-    {
-        return $this->annualPaidLeaveDays;
-    }
-
-    public function setAnnualPaidLeaveDays(int $annualPaidLeaveDays): self
-    {
-        $this->annualPaidLeaveDays = $annualPaidLeaveDays;
-
-        return $this;
-    }
-
-    public function getAnnualRttDays(): int
-    {
-        return $this->annualRttDays;
-    }
-
-    public function setAnnualRttDays(int $annualRttDays): self
-    {
-        $this->annualRttDays = $annualRttDays;
-
-        return $this;
     }
 
     public function getUpdatedAt(): DateTimeInterface
@@ -159,6 +126,95 @@ class CompanySettings implements CompanyOwnedInterface
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $settings->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->structureCostCoefficient.
+     */
+    public function getStructureCostCoefficient(): string
+    {
+        return $this->structureCostCoefficient;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->structureCostCoefficient = $value.
+     */
+    public function setStructureCostCoefficient(string $value): self
+    {
+        $this->structureCostCoefficient = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->employerChargesCoefficient.
+     */
+    public function getEmployerChargesCoefficient(): string
+    {
+        return $this->employerChargesCoefficient;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->employerChargesCoefficient = $value.
+     */
+    public function setEmployerChargesCoefficient(string $value): self
+    {
+        $this->employerChargesCoefficient = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->annualPaidLeaveDays.
+     */
+    public function getAnnualPaidLeaveDays(): int
+    {
+        return $this->annualPaidLeaveDays;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->annualPaidLeaveDays = $value.
+     */
+    public function setAnnualPaidLeaveDays(int $value): self
+    {
+        $this->annualPaidLeaveDays = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->annualRttDays.
+     */
+    public function getAnnualRttDays(): int
+    {
+        return $this->annualRttDays;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $settings->annualRttDays = $value.
+     */
+    public function setAnnualRttDays(int $value): self
+    {
+        $this->annualRttDays = $value;
 
         return $this;
     }

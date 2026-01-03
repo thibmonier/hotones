@@ -22,7 +22,7 @@ class ProjectTask implements CompanyOwnedInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -39,38 +39,84 @@ class ProjectTask implements CompanyOwnedInterface
     private ?OrderLine $orderLine = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private string $name;
+    public string $name {
+        get => $this->name;
+        set {
+            $this->name = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $description = null;
+    public ?string $description = null {
+        get => $this->description;
+        set {
+            $this->description = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 20)]
-    private string $type = self::TYPE_REGULAR;
+    public string $type = self::TYPE_REGULAR {
+        get => $this->type ?? self::TYPE_REGULAR;
+        set {
+            $this->type = $value;
+        }
+    }
 
     // Les tâches AVV et non-vendu sont automatiquement créées
     #[ORM\Column(type: 'boolean')]
-    private bool $isDefault = false;
+    public bool $isDefault = false {
+        get => $this->isDefault;
+        set {
+            $this->isDefault = $value;
+        }
+    }
 
     // Les tâches par défaut ne comptent pas dans la rentabilité
     #[ORM\Column(type: 'boolean')]
-    private bool $countsForProfitability = true;
+    public bool $countsForProfitability = true {
+        get => $this->countsForProfitability;
+        set {
+            $this->countsForProfitability = $value;
+        }
+    }
 
     #[ORM\Column(type: 'integer')]
-    private int $position = 0;
+    public int $position = 0 {
+        get => $this->position;
+        set {
+            $this->position = $value;
+        }
+    }
 
     #[ORM\Column(type: 'boolean')]
-    private bool $active = true;
+    public bool $active = true {
+        get => $this->active;
+        set {
+            $this->active = $value;
+        }
+    }
 
     // Estimations de temps
     #[ORM\Column(name: 'estimated_hours_sold', type: 'integer', nullable: true)]
-    private ?int $estimatedHoursSold = null; // Heures vendues au client
+    public ?int $estimatedHoursSold = null {
+        get => $this->estimatedHoursSold;
+        set {
+            $this->estimatedHoursSold = $value;
+        }
+    }
 
+    // Heures réévaluées pendant le projet (private property for custom getter logic)
     #[ORM\Column(name: 'estimated_hours_revised', type: 'integer', nullable: true)]
-    private ?int $estimatedHoursRevised = null; // Heures réévaluées pendant le projet
+    private ?int $estimatedHoursRevisedInternal = null;
 
     // Avancement de la tâche (0-100%)
     #[ORM\Column(name: 'progress_percentage', type: 'integer')]
-    private int $progressPercentage = 0;
+    public int $progressPercentage = 0 {
+        get => $this->progressPercentage ?? 0;
+        set {
+            $this->progressPercentage = $value;
+        }
+    }
 
     // Contributeur assigné à la tâche
     #[ORM\ManyToOne(targetEntity: Contributor::class)]
@@ -84,18 +130,38 @@ class ProjectTask implements CompanyOwnedInterface
 
     // Tarif journalier pour cette tâche (peut différer du TJM standard)
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $dailyRate = null;
+    public ?string $dailyRate = null {
+        get => $this->dailyRate;
+        set {
+            $this->dailyRate = $value;
+        }
+    }
 
     // Dates de début et fin prévues
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?DateTimeInterface $startDate = null;
+    public ?DateTimeInterface $startDate = null {
+        get => $this->startDate;
+        set {
+            $this->startDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?DateTimeInterface $endDate = null;
+    public ?DateTimeInterface $endDate = null {
+        get => $this->endDate;
+        set {
+            $this->endDate = $value;
+        }
+    }
 
     // Statut de la tâche
     #[ORM\Column(type: 'string', length: 20)]
-    private string $status = 'not_started'; // not_started, in_progress, completed, on_hold
+    public string $status = 'not_started' {
+        get => $this->status ?? 'not_started';
+        set {
+            $this->status = $value;
+        }
+    }
 
     // Note: Les temps sont liés au projet global, pas aux tâches spécifiques
     // pour simplifier le modèle actuel
@@ -106,11 +172,6 @@ class ProjectTask implements CompanyOwnedInterface
     public function __construct()
     {
         $this->subTasks = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getProject(): Project
@@ -133,90 +194,6 @@ class ProjectTask implements CompanyOwnedInterface
     public function setOrderLine(?OrderLine $orderLine): self
     {
         $this->orderLine = $orderLine;
-
-        return $this;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getType(): string
-    {
-        return $this->type ?? self::TYPE_REGULAR;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getIsDefault(): bool
-    {
-        return $this->isDefault;
-    }
-
-    public function setIsDefault(bool $isDefault): self
-    {
-        $this->isDefault = $isDefault;
-
-        return $this;
-    }
-
-    public function getCountsForProfitability(): bool
-    {
-        return $this->countsForProfitability;
-    }
-
-    public function setCountsForProfitability(bool $countsForProfitability): self
-    {
-        $this->countsForProfitability = $countsForProfitability;
-
-        return $this;
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): self
-    {
-        $this->position = $position;
-
-        return $this;
-    }
-
-    public function getActive(): bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
 
         return $this;
     }
@@ -277,85 +254,29 @@ class ProjectTask implements CompanyOwnedInterface
         // Tâche AVV
         $avvTask = new self();
         $avvTask->setProject($project);
-        $avvTask->setName('AVV - Avant-vente');
-        $avvTask->setDescription('Temps passé en avant-vente (ne compte pas dans la rentabilité)');
-        $avvTask->setType(self::TYPE_AVV);
-        $avvTask->setIsDefault(true);
-        $avvTask->setCountsForProfitability(false);
-        $avvTask->setPosition(1);
-        $tasks[] = $avvTask;
+        $avvTask->name                   = 'AVV - Avant-vente';
+        $avvTask->description            = 'Temps passé en avant-vente (ne compte pas dans la rentabilité)';
+        $avvTask->type                   = self::TYPE_AVV;
+        $avvTask->isDefault              = true;
+        $avvTask->countsForProfitability = false;
+        $avvTask->position               = 1;
+        $tasks[]                         = $avvTask;
 
         // Tâche Non-vendu
         $nonVenduTask = new self();
         $nonVenduTask->setProject($project);
-        $nonVenduTask->setName('Non-vendu');
-        $nonVenduTask->setDescription('Temps passé non-vendu (ne compte pas dans la rentabilité)');
-        $nonVenduTask->setType(self::TYPE_NON_VENDU);
-        $nonVenduTask->setIsDefault(true);
-        $nonVenduTask->setCountsForProfitability(false);
-        $nonVenduTask->setPosition(2);
-        $tasks[] = $nonVenduTask;
+        $nonVenduTask->name                   = 'Non-vendu';
+        $nonVenduTask->description            = 'Temps passé non-vendu (ne compte pas dans la rentabilité)';
+        $nonVenduTask->type                   = self::TYPE_NON_VENDU;
+        $nonVenduTask->isDefault              = true;
+        $nonVenduTask->countsForProfitability = false;
+        $nonVenduTask->position               = 2;
+        $tasks[]                              = $nonVenduTask;
 
         return $tasks;
     }
 
-    // Getters et setters pour les nouvelles propriétés
-    public function getEstimatedHoursSold(): ?int
-    {
-        return $this->estimatedHoursSold;
-    }
-
-    public function setEstimatedHoursSold(?int $estimatedHoursSold): self
-    {
-        $this->estimatedHoursSold = $estimatedHoursSold;
-
-        return $this;
-    }
-
-    /**
-     * Retourne le temps révisé total : somme des temps révisés des sous-tâches + temps propre de la tâche.
-     * Si aucune sous-tâche et aucun temps révisé propre, retourne null.
-     */
-    public function getEstimatedHoursRevised(): ?int
-    {
-        // Si on a des sous-tâches, on agrège leur temps
-        if (!$this->subTasks->isEmpty()) {
-            $totalFromSubTasks = '0';
-            foreach ($this->subTasks as $subTask) {
-                $totalFromSubTasks = bcadd($totalFromSubTasks, $subTask->getInitialEstimatedHours(), 2);
-            }
-
-            // Ajouter le temps propre de la tâche si présent
-            if ($this->estimatedHoursRevised !== null) {
-                $totalFromSubTasks = bcadd($totalFromSubTasks, (string) $this->estimatedHoursRevised, 2);
-            }
-
-            return (int) round((float) $totalFromSubTasks);
-        }
-
-        // Pas de sous-tâches : retourner le temps révisé propre
-        return $this->estimatedHoursRevised;
-    }
-
-    public function setEstimatedHoursRevised(?int $estimatedHoursRevised): self
-    {
-        $this->estimatedHoursRevised = $estimatedHoursRevised;
-
-        return $this;
-    }
-
-    public function getProgressPercentage(): int
-    {
-        return $this->progressPercentage ?? 0;
-    }
-
-    public function setProgressPercentage(int $progressPercentage): self
-    {
-        $this->progressPercentage = $progressPercentage;
-
-        return $this;
-    }
-
+    // Getters et setters pour les relations
     public function getAssignedContributor(): ?Contributor
     {
         return $this->assignedContributor;
@@ -380,50 +301,34 @@ class ProjectTask implements CompanyOwnedInterface
         return $this;
     }
 
-    public function getDailyRate(): ?string
+    /**
+     * Retourne le temps révisé total : somme des temps révisés des sous-tâches + temps propre de la tâche.
+     * Si aucune sous-tâche et aucun temps révisé propre, retourne null.
+     */
+    public function getEstimatedHoursRevised(): ?int
     {
-        return $this->dailyRate;
+        // Si on a des sous-tâches, on agrège leur temps
+        if (!$this->subTasks->isEmpty()) {
+            $totalFromSubTasks = '0';
+            foreach ($this->subTasks as $subTask) {
+                $totalFromSubTasks = bcadd($totalFromSubTasks, $subTask->getInitialEstimatedHours(), 2);
+            }
+
+            // Ajouter le temps propre de la tâche si présent
+            if ($this->estimatedHoursRevisedInternal !== null) {
+                $totalFromSubTasks = bcadd($totalFromSubTasks, (string) $this->estimatedHoursRevisedInternal, 2);
+            }
+
+            return (int) round((float) $totalFromSubTasks);
+        }
+
+        // Pas de sous-tâches : retourner le temps révisé propre
+        return $this->estimatedHoursRevisedInternal;
     }
 
-    public function setDailyRate(?string $dailyRate): self
+    public function setEstimatedHoursRevised(?int $estimatedHoursRevised): self
     {
-        $this->dailyRate = $dailyRate;
-
-        return $this;
-    }
-
-    public function getStartDate(): ?DateTimeInterface
-    {
-        return $this->startDate;
-    }
-
-    public function setStartDate(?DateTimeInterface $startDate): self
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    public function getEndDate(): ?DateTimeInterface
-    {
-        return $this->endDate;
-    }
-
-    public function setEndDate(?DateTimeInterface $endDate): self
-    {
-        $this->endDate = $endDate;
-
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status ?? 'not_started';
-    }
-
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
+        $this->estimatedHoursRevisedInternal = $estimatedHoursRevised;
 
         return $this;
     }
@@ -447,7 +352,7 @@ class ProjectTask implements CompanyOwnedInterface
      */
     public function getRemainingHours(): string
     {
-        $estimatedHours = (string) ($this->estimatedHoursRevised ?? $this->estimatedHoursSold ?? 0);
+        $estimatedHours = (string) ($this->getEstimatedHoursRevised() ?? $this->estimatedHoursSold ?? 0);
         $spentHours     = $this->getTotalHours();
         $remaining      = bcsub($estimatedHours, $spentHours, 2);
 
@@ -472,7 +377,8 @@ class ProjectTask implements CompanyOwnedInterface
      */
     public function getEstimatedCost(): string
     {
-        if (!$this->assignedContributor || !$this->estimatedHoursRevised) {
+        $estimatedHoursRevised = $this->getEstimatedHoursRevised();
+        if (!$this->assignedContributor || !$estimatedHoursRevised) {
             return '0.00';
         }
         $cjm = $this->assignedContributor->getCjm();
@@ -481,7 +387,7 @@ class ProjectTask implements CompanyOwnedInterface
         }
         $hourlyRate = bcdiv($cjm, '8', 4);
 
-        return bcmul((string) $this->estimatedHoursRevised, $hourlyRate, 2);
+        return bcmul((string) $estimatedHoursRevised, $hourlyRate, 2);
     }
 
     /**
@@ -615,6 +521,280 @@ class ProjectTask implements CompanyOwnedInterface
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    // ==================== Compatibility methods ====================
+    // These methods exist for backward compatibility with existing code.
+    // With PHP 8.4/8.5 property hooks, prefer direct property access.
+    // Example: $task->name instead of $task->getName()
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $task->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->name = $value.
+     */
+    public function setName(string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->description = $value.
+     */
+    public function setDescription(?string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->type.
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->type = $value.
+     */
+    public function setType(string $value): self
+    {
+        $this->type = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->isDefault.
+     */
+    public function getIsDefault(): bool
+    {
+        return $this->isDefault;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->isDefault = $value.
+     */
+    public function setIsDefault(bool $value): self
+    {
+        $this->isDefault = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->countsForProfitability.
+     */
+    public function getCountsForProfitability(): bool
+    {
+        return $this->countsForProfitability;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->countsForProfitability = $value.
+     */
+    public function setCountsForProfitability(bool $value): self
+    {
+        $this->countsForProfitability = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->position.
+     */
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->position = $value.
+     */
+    public function setPosition(int $value): self
+    {
+        $this->position = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->active.
+     */
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->active = $value.
+     */
+    public function setActive(bool $value): self
+    {
+        $this->active = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->estimatedHoursSold.
+     */
+    public function getEstimatedHoursSold(): ?int
+    {
+        return $this->estimatedHoursSold;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->estimatedHoursSold = $value.
+     */
+    public function setEstimatedHoursSold(?int $value): self
+    {
+        $this->estimatedHoursSold = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->progressPercentage.
+     */
+    public function getProgressPercentage(): int
+    {
+        return $this->progressPercentage;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->progressPercentage = $value.
+     */
+    public function setProgressPercentage(int $value): self
+    {
+        $this->progressPercentage = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->dailyRate.
+     */
+    public function getDailyRate(): ?string
+    {
+        return $this->dailyRate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->dailyRate = $value.
+     */
+    public function setDailyRate(?string $value): self
+    {
+        $this->dailyRate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->startDate.
+     */
+    public function getStartDate(): ?DateTimeInterface
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->startDate = $value.
+     */
+    public function setStartDate(?DateTimeInterface $value): self
+    {
+        $this->startDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->endDate.
+     */
+    public function getEndDate(): ?DateTimeInterface
+    {
+        return $this->endDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->endDate = $value.
+     */
+    public function setEndDate(?DateTimeInterface $value): self
+    {
+        $this->endDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->status.
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $task->status = $value.
+     */
+    public function setStatus(string $value): self
+    {
+        $this->status = $value;
 
         return $this;
     }

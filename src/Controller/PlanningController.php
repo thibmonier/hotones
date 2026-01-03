@@ -8,6 +8,7 @@ use App\Entity\Planning;
 use App\Entity\Timesheet;
 use App\Entity\Vacation;
 use App\Repository\ContributorRepository;
+use App\Security\CompanyContext;
 use App\Service\Planning\TaceAnalyzer;
 use DateInterval;
 use DatePeriod;
@@ -25,6 +26,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_CHEF_PROJET')]
 class PlanningController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'planning_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, ContributorRepository $contributorRepo, TaceAnalyzer $taceAnalyzer): Response
     {
@@ -336,6 +342,7 @@ class PlanningController extends AbstractController
 
         // Create new planning
         $planning = new Planning();
+        $planning->setCompany($this->companyContext->getCurrentCompany());
         $planning->setContributor($contributor);
         $planning->setProject($project);
         $planning->setStartDate(new DateTime($data['startDate']));
@@ -497,6 +504,7 @@ class PlanningController extends AbstractController
 
         // Create the second part (from splitDate to endDate)
         $planning2 = new Planning();
+        $planning2->setCompany($planning->getCompany());
         $planning2->setContributor($planning->getContributor());
         $planning2->setProject($planning->getProject());
         $planning2->setStartDate($splitDate);

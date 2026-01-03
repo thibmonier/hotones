@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Contributor;
 use App\Form\ContributorType;
 use App\Repository\ContributorRepository;
+use App\Security\CompanyContext;
 use App\Service\SecureFileUploadService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +30,7 @@ class ContributorController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SecureFileUploadService $uploadService,
         private readonly LoggerInterface $logger,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -192,7 +194,8 @@ class ContributorController extends AbstractController
     public function new(Request $request): Response
     {
         $contributor = new Contributor();
-        $form        = $this->createForm(ContributorType::class, $contributor);
+        $contributor->setCompany($this->companyContext->getCurrentCompany());
+        $form = $this->createForm(ContributorType::class, $contributor);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

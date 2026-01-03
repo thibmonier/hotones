@@ -25,7 +25,7 @@ class Vacation implements CompanyOwnedInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -37,29 +37,69 @@ class Vacation implements CompanyOwnedInterface
     private Contributor $contributor;
 
     #[ORM\Column(type: 'date')]
-    private DateTimeInterface $startDate;
+    public DateTimeInterface $startDate {
+        get => $this->startDate;
+        set {
+            $this->startDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date')]
-    private DateTimeInterface $endDate;
+    public DateTimeInterface $endDate {
+        get => $this->endDate;
+        set {
+            $this->endDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 50)]
-    private string $type = self::TYPE_PAID_LEAVE;
+    public string $type = self::TYPE_PAID_LEAVE {
+        get => $this->type;
+        set {
+            $this->type = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $reason = null;
+    public ?string $reason = null {
+        get => $this->reason;
+        set {
+            $this->reason = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 20)]
-    private string $status = 'pending'; // pending, approved, rejected
+    public string $status = 'pending' {
+        get => $this->status;
+        set {
+            $this->status = $value;
+        }
+    }
 
     // Nombre d'heures par jour d'absence (par défaut 8h = journée complète)
     #[ORM\Column(type: 'decimal', precision: 4, scale: 2)]
-    private string $dailyHours = '8.00';
+    public string $dailyHours = '8.00' {
+        get => $this->dailyHours;
+        set {
+            $this->dailyHours = $value;
+        }
+    }
 
     #[ORM\Column(type: 'datetime')]
-    private DateTimeInterface $createdAt;
+    public DateTimeInterface $createdAt {
+        get => $this->createdAt;
+        set {
+            $this->createdAt = $value;
+        }
+    }
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?DateTimeInterface $approvedAt = null;
+    public ?DateTimeInterface $approvedAt = null {
+        get => $this->approvedAt;
+        set {
+            $this->approvedAt = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -70,11 +110,6 @@ class Vacation implements CompanyOwnedInterface
         $this->createdAt = new DateTime();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getContributor(): Contributor
     {
         return $this->contributor;
@@ -83,102 +118,6 @@ class Vacation implements CompanyOwnedInterface
     public function setContributor(Contributor $contributor): self
     {
         $this->contributor = $contributor;
-
-        return $this;
-    }
-
-    public function getStartDate(): DateTimeInterface
-    {
-        return $this->startDate;
-    }
-
-    public function setStartDate(DateTimeInterface $startDate): self
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    public function getEndDate(): DateTimeInterface
-    {
-        return $this->endDate;
-    }
-
-    public function setEndDate(DateTimeInterface $endDate): self
-    {
-        $this->endDate = $endDate;
-
-        return $this;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getReason(): ?string
-    {
-        return $this->reason;
-    }
-
-    public function setReason(?string $reason): self
-    {
-        $this->reason = $reason;
-
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function getDailyHours(): string
-    {
-        return $this->dailyHours;
-    }
-
-    public function setDailyHours(string $dailyHours): self
-    {
-        $this->dailyHours = $dailyHours;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getApprovedAt(): ?DateTimeInterface
-    {
-        return $this->approvedAt;
-    }
-
-    public function setApprovedAt(?DateTimeInterface $approvedAt): self
-    {
-        $this->approvedAt = $approvedAt;
 
         return $this;
     }
@@ -284,6 +223,175 @@ class Vacation implements CompanyOwnedInterface
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $vacation->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->startDate.
+     */
+    public function getStartDate(): DateTimeInterface
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->startDate = $value.
+     */
+    public function setStartDate(DateTimeInterface $value): self
+    {
+        $this->startDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->endDate.
+     */
+    public function getEndDate(): DateTimeInterface
+    {
+        return $this->endDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->endDate = $value.
+     */
+    public function setEndDate(DateTimeInterface $value): self
+    {
+        $this->endDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->type.
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->type = $value.
+     */
+    public function setType(string $value): self
+    {
+        $this->type = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->reason.
+     */
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->reason = $value.
+     */
+    public function setReason(?string $value): self
+    {
+        $this->reason = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->status.
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->status = $value.
+     */
+    public function setStatus(string $value): self
+    {
+        $this->status = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->dailyHours.
+     */
+    public function getDailyHours(): string
+    {
+        return $this->dailyHours;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->dailyHours = $value.
+     */
+    public function setDailyHours(string $value): self
+    {
+        $this->dailyHours = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->createdAt.
+     */
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->createdAt = $value.
+     */
+    public function setCreatedAt(DateTimeInterface $value): self
+    {
+        $this->createdAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->approvedAt.
+     */
+    public function getApprovedAt(): ?DateTimeInterface
+    {
+        return $this->approvedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $vacation->approvedAt = $value.
+     */
+    public function setApprovedAt(?DateTimeInterface $value): self
+    {
+        $this->approvedAt = $value;
 
         return $this;
     }

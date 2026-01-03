@@ -9,6 +9,7 @@ use App\Form\VacationRequestType;
 use App\Message\VacationNotificationMessage;
 use App\Repository\ContributorRepository;
 use App\Repository\VacationRepository;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,8 @@ class VacationRequestController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly VacationRepository $vacationRepository,
         private readonly ContributorRepository $contributorRepository,
-        private readonly MessageBusInterface $messageBus
+        private readonly MessageBusInterface $messageBus,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -72,6 +74,7 @@ class VacationRequestController extends AbstractController
         }
 
         $vacation = new Vacation();
+        $vacation->setCompany($contributor->getCompany());
         $vacation->setContributor($contributor);
         $vacation->setStatus('pending');
 

@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\LeadCapture;
 use App\Form\LeadCaptureType;
 use App\Repository\LeadCaptureRepository;
+use App\Security\CompanyContext;
 use App\Service\LeadMagnetMailer;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -25,6 +26,7 @@ class LeadMagnetController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly LeadCaptureRepository $leadCaptureRepository,
         private readonly LeadMagnetMailer $leadMagnetMailer,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -52,6 +54,7 @@ class LeadMagnetController extends AbstractController
         }
 
         $leadCapture = new LeadCapture();
+        $leadCapture->setCompany($this->companyContext->getCurrentCompany());
         $leadCapture->setSource($source);
         $leadCapture->setContentType('guide-kpis');
 

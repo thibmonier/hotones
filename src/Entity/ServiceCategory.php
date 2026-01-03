@@ -16,24 +16,50 @@ class ServiceCategory implements CompanyOwnedInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull]
-    private Company $company;
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 100)]
-    private string $name;
+    public string $name = '' {
+        get => $this->name;
+        set {
+            $this->name = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $description = null;
+    public ?string $description = null {
+        get => $this->description;
+        set {
+            $this->description = $value;
+        }
+    }
 
+    // Couleur hexadécimale pour l'affichage
     #[ORM\Column(type: 'string', length: 7, nullable: true)]
-    private ?string $color = null; // Couleur hexadécimale pour l'affichage
+    public ?string $color = null {
+        get => $this->color;
+        set {
+            $this->color = $value;
+        }
+    }
 
     #[ORM\Column(type: 'boolean')]
-    private bool $active = true;
+    public bool $active = true {
+        get => $this->active;
+        set {
+            $this->active = $value;
+        }
+    }
 
     // Relation avec les projets
     #[ORM\OneToMany(mappedBy: 'serviceCategory', targetEntity: Project::class)]
@@ -44,59 +70,7 @@ class ServiceCategory implements CompanyOwnedInterface
         $this->projects = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->color;
-    }
-
-    public function setColor(?string $color): self
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
-    public function getActive(): bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
+    /** @return Collection<int, Project> */
     public function getProjects(): Collection
     {
         return $this->projects;
@@ -123,7 +97,7 @@ class ServiceCategory implements CompanyOwnedInterface
         return $this;
     }
 
-    public function isActive(): ?bool
+    public function isActive(): bool
     {
         return $this->active;
     }
@@ -136,6 +110,95 @@ class ServiceCategory implements CompanyOwnedInterface
     public function setCompany(Company $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $serviceCategory->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->name = $value.
+     */
+    public function setName(string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->description = $value.
+     */
+    public function setDescription(?string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->color.
+     */
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->color = $value.
+     */
+    public function setColor(?string $value): self
+    {
+        $this->color = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->active.
+     */
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $serviceCategory->active = $value.
+     */
+    public function setActive(bool $value): self
+    {
+        $this->active = $value;
 
         return $this;
     }
