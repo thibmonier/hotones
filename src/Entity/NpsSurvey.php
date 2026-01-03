@@ -7,6 +7,8 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\Blameable;
+use Gedmo\Timestampable\Traits\Timestampable;
 use InvalidArgumentException;
 
 /**
@@ -17,6 +19,9 @@ use InvalidArgumentException;
 #[ORM\HasLifecycleCallbacks]
 class NpsSurvey
 {
+    use Timestampable;
+    use Blameable;
+
     // Statuts possibles
     public const STATUS_PENDING   = 'pending';      // En attente de réponse
     public const STATUS_COMPLETED = 'completed';  // Répondu
@@ -88,27 +93,12 @@ class NpsSurvey
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?DateTimeInterface $expiresAt = null;
 
-    /**
-     * Date de création.
-     */
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?DateTimeInterface $createdAt = null;
-
     public function __construct()
     {
-        $this->createdAt = new DateTime();
-        $this->sentAt    = new DateTime();
-        $this->token     = bin2hex(random_bytes(32));
+        $this->sentAt = new DateTime();
+        $this->token  = bin2hex(random_bytes(32));
         // Par défaut, expire après 30 jours
         $this->expiresAt = (new DateTime())->modify('+30 days');
-    }
-
-    #[ORM\PrePersist]
-    public function setCreatedAtValue(): void
-    {
-        if ($this->createdAt === null) {
-            $this->createdAt = new DateTime();
-        }
     }
 
     public function getId(): ?int

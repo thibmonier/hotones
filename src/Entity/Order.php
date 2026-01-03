@@ -14,6 +14,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: \App\Repository\OrderRepository::class)]
@@ -94,7 +95,12 @@ class Order
     private ?string $totalAmount = '0.00';
 
     #[ORM\Column(type: 'date')]
+    #[Gedmo\Timestampable(on: 'create')]
     private DateTimeInterface $createdAt;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Gedmo\Timestampable(on: 'update')]
+    private ?DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
     private ?DateTimeInterface $validatedAt = null;
@@ -136,7 +142,6 @@ class Order
         $this->sections         = new ArrayCollection();
         $this->paymentSchedules = new ArrayCollection();
         $this->expenseReports   = new ArrayCollection();
-        $this->createdAt        = new DateTime();
     }
 
     public function getId(): ?int
@@ -272,6 +277,18 @@ class Order
     public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

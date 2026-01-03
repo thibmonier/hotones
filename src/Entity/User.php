@@ -10,14 +10,17 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\Blameable;
+use Gedmo\Timestampable\Traits\Timestampable;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\UserRepository')]
@@ -38,6 +41,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwoFactorInterface
 {
+    use Timestampable;
+    use Blameable;
+
     // Rôles métier
     public const string ROLE_INTERVENANT = 'ROLE_INTERVENANT';
     public const string ROLE_CHEF_PROJET = 'ROLE_CHEF_PROJET';
@@ -68,6 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     #[ORM\Column(type: 'string')]
     #[Groups(['user:write'])]
+    #[Ignore]
     private string $password;
 
     #[ORM\Column(type: 'string', length: 100)]
@@ -95,17 +102,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     // 2FA TOTP
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Ignore]
     private ?string $totpSecret = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $totpEnabled = false;
-
-    // Timestamps
-    #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $createdAt;
-
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $updatedAt = null;
 
     // Login tracking
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
@@ -161,7 +162,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(#[SensitiveParameter] string $password): self
     {
         $this->password = $password;
 
@@ -267,7 +268,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->totpSecret;
     }
 
-    public function setTotpSecret(?string $secret): self
+    public function setTotpSecret(#[SensitiveParameter] ?string $secret): self
     {
         $this->totpSecret = $secret;
 
@@ -279,44 +280,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         $this->totpEnabled = $enabled;
 
         return $this;
-    }
-
-    // Timestamps getters/setters
-    public function getCreatedAt(): ?DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = $this->createdAt;
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Scheb 2FA v7 methods

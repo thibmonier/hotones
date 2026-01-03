@@ -10,6 +10,7 @@ use App\Entity\Timesheet;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -438,14 +439,22 @@ class TimesheetController extends AbstractController
         $taskId    = $request->request->get('task_id');
         $subTaskId = $request->request->get('sub_task_id');
 
-        $project = $em->getRepository(Project::class)->find($projectId);
+        try {
+            $project = $em->getReference(Project::class, $projectId);
+        } catch (ORMException $e) {
+            return new JsonResponse(['error' => 'Projet non trouvé'], 400);
+        }
         if (!$project) {
             return new JsonResponse(['error' => 'Projet non trouvé'], 400);
         }
 
         $task = null;
         if ($taskId) {
-            $task = $em->getRepository(ProjectTask::class)->find($taskId);
+            try {
+                $task = $em->getReference(ProjectTask::class, $taskId);
+            } catch (ORMException $e) {
+                return new JsonResponse(['error' => 'Tâche non trouvée'], 400);
+            }
             if (!$task) {
                 return new JsonResponse(['error' => 'Tâche non trouvée'], 400);
             }
