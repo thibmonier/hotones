@@ -109,9 +109,10 @@ class WorkloadPredictionService
         }
 
         // Facteur 3 : Âge du devis (pénalité si ancien)
-        $createdAt = $order->createdAt;
+        $createdAt = $order->getCreatedAt();
+        $daysOld   = 0;
         if ($createdAt !== null) {
-            $daysOld = new DateTime()->diff($createdAt)->days;
+            $daysOld = (new DateTime())->diff($createdAt)->days;
             if ($daysOld > 60) {
                 $probability -= 20; // Très ancien
             } elseif ($daysOld > 30) {

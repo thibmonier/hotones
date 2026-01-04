@@ -137,15 +137,17 @@ class ForecastingService
 
         // Grouper par mois
         $monthlyRevenue = [];
-        foreach ($projects as $project) {
-            $month = $project->startDate?->format('Y-m');
-            if (!$month) {
-                continue;
+        if (!is_null($projects)) {
+            foreach ($projects as $project) {
+                $month = $project->startDate?->format('Y-m');
+                if (!$month) {
+                    continue;
+                }
+                if (!isset($monthlyRevenue[$month])) {
+                    $monthlyRevenue[$month] = 0;
+                }
+                $monthlyRevenue[$month] += $project->getTotalSoldAmount();
             }
-            if (!isset($monthlyRevenue[$month])) {
-                $monthlyRevenue[$month] = 0;
-            }
-            $monthlyRevenue[$month] += $project->getTotalSoldAmount();
         }
 
         ksort($monthlyRevenue);

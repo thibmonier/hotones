@@ -81,8 +81,8 @@ class EntityCreationTest extends KernelTestCase
         $user->setCompany($company);
         $user->setEmail('test@test.com');
         $user->setPassword('password');
-        $user->setFirstName('Test');
-        $user->setLastName('User');
+        $user->firstName = 'Test';
+        $user->lastName  = 'User';
         $user->setRoles(['ROLE_USER', 'ROLE_SUPERADMIN']); // SUPERADMIN required for switchCompany()
 
         // Persist user so it can be used as ProjectEvent.actor

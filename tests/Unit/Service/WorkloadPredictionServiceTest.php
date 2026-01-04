@@ -12,7 +12,7 @@ use App\Entity\Profile;
 use App\Repository\ContributorRepository;
 use App\Repository\OrderRepository;
 use App\Service\WorkloadPredictionService;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -87,7 +87,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $order->setOrderNumber('DEV-2025-001');
         $order->setName('Projet Test');
         $order->setStatus('a_signer');
-        $order->createdAt = new DateTime();
+        $order->setCreatedAt(new DateTimeImmutable());
         $order->addSection($section);
 
         $orderRepository
@@ -177,7 +177,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $order = new Order();
         $order->setOrderNumber('DEV-2025-001');
         $order->setStatus('a_signer');
-        $order->createdAt = new DateTime();
+        $order->setCreatedAt(new DateTimeImmutable());
         $order->addSection($section);
 
         $orderRepository

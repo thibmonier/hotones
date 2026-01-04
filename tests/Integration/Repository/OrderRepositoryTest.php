@@ -12,6 +12,7 @@ use App\Entity\Project;
 use App\Repository\OrderRepository;
 use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -329,8 +330,8 @@ class OrderRepositoryTest extends KernelTestCase
         $order2  = $this->createOrder($project, 'Order 2', 'signe', 2000.0);
 
         // Modify creation dates
-        $order1->createdAt = new DateTime('2024-01-15');
-        $order2->createdAt = new DateTime('2024-02-15');
+        $order1->setCreatedAt(new DateTimeImmutable('2024-01-15'));
+        $order2->setCreatedAt(new DateTimeImmutable('2024-02-15'));
         $this->entityManager->flush();
 
         // Act
@@ -418,20 +419,20 @@ class OrderRepositoryTest extends KernelTestCase
         $project = $this->createProject('Test Project');
 
         // 2023 orders
-        $order2023a              = $this->createOrder($project, 'Order 2023-1', 'signe', 1000.0);
-        $order2023a->createdAt   = new DateTime('2023-03-01');
+        $order2023a = $this->createOrder($project, 'Order 2023-1', 'signe', 1000.0);
+        $order2023a->setCreatedAt(new DateTimeImmutable('2023-03-01'));
         $order2023a->validatedAt = new DateTime('2023-03-15');
 
-        $order2023b            = $this->createOrder($project, 'Order 2023-2', 'draft', 500.0);
-        $order2023b->createdAt = new DateTime('2023-06-01');
+        $order2023b = $this->createOrder($project, 'Order 2023-2', 'draft', 500.0);
+        $order2023b->setCreatedAt(new DateTimeImmutable('2023-06-01'));
 
         // 2024 orders
-        $order2024a              = $this->createOrder($project, 'Order 2024-1', 'signe', 2000.0);
-        $order2024a->createdAt   = new DateTime('2024-03-01');
+        $order2024a = $this->createOrder($project, 'Order 2024-1', 'signe', 2000.0);
+        $order2024a->setCreatedAt(new DateTimeImmutable('2024-03-01'));
         $order2024a->validatedAt = new DateTime('2024-03-15');
 
-        $order2024b              = $this->createOrder($project, 'Order 2024-2', 'signe', 3000.0);
-        $order2024b->createdAt   = new DateTime('2024-06-01');
+        $order2024b = $this->createOrder($project, 'Order 2024-2', 'signe', 3000.0);
+        $order2024b->setCreatedAt(new DateTimeImmutable('2024-06-01'));
         $order2024b->validatedAt = new DateTime('2024-06-15');
 
         $this->entityManager->flush();
@@ -456,9 +457,9 @@ class OrderRepositoryTest extends KernelTestCase
         $order2  = $this->createOrder($project, 'Order 2');
         $order3  = $this->createOrder($project, 'Order 3');
 
-        $order1->createdAt = new DateTime('2024-01-15');
-        $order2->createdAt = new DateTime('2024-02-15');
-        $order3->createdAt = new DateTime('2024-03-15');
+        $order1->setCreatedAt(new DateTimeImmutable('2024-01-15'));
+        $order2->setCreatedAt(new DateTimeImmutable('2024-02-15'));
+        $order3->setCreatedAt(new DateTimeImmutable('2024-03-15'));
         $this->entityManager->flush();
 
         // Act
