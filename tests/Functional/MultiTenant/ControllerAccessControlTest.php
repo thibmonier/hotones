@@ -112,10 +112,12 @@ class ControllerAccessControlTest extends WebTestCase
         ProjectFactory::createMany(3, [
             'company' => $company1,
             'name'    => 'Project Alpha',
+            'status'  => 'active',
         ]);
         ProjectFactory::createMany(2, [
             'company' => $company2,
             'name'    => 'Project Beta',
+            'status'  => 'active',
         ]);
 
         // Login en tant qu'utilisateur de Company 1
@@ -174,8 +176,8 @@ class ControllerAccessControlTest extends WebTestCase
         ['company' => $company2, 'user' => $user2] = $this->createCompanyWithUser('Company Beta', 'user2@beta.com');
 
         // Créer des projets
-        ProjectFactory::createMany(5, ['company' => $company1]);
-        ProjectFactory::createMany(3, ['company' => $company2]);
+        ProjectFactory::createMany(5, ['company' => $company1, 'status' => 'active']);
+        ProjectFactory::createMany(3, ['company' => $company2, 'status' => 'active']);
 
         // User 1 voit 5 projets
         $this->loginAs($user1);
