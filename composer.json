@@ -210,11 +210,5 @@
             "require": "^8.0",
             "docker": true
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/thibmonier/doctrine-doctor"
-        }
-    ]
+    }
 }
