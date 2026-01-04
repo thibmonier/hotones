@@ -104,7 +104,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     public function findByContributor(Contributor $contributor): array
     {
         return $this->createCompanyQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
+            ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ep.startDate', 'DESC')
             ->getQuery()
@@ -204,7 +204,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         // Coût moyen des CJM
         $avgCjm = $this->createCompanyQueryBuilder('ep')
             ->select('AVG(ep.cjm)')
-            ->where('ep.cjm IS NOT NULL')
+            ->andWhere('ep.cjm IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
 

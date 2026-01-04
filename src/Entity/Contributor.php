@@ -417,7 +417,7 @@ class Contributor implements CompanyOwnedInterface
     {
         $period = $this->getCurrentEmploymentPeriod();
         if ($period) {
-            return $period->hoursPerDay;
+            return $period->getHoursPerDay();
         }
 
         return 7.0; // Valeur par défaut pour 35h/5j

@@ -121,7 +121,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
         $crawler = $this->client->request('GET', '/performance-reviews/campaign/create');
         $form    = $crawler->selectButton('Créer la campagne')->form([
-            'year' => '2024',
+            'year' => '2025',
         ]);
 
         $this->client->submit($form);

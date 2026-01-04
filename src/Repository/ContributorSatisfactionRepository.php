@@ -309,12 +309,15 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
         $startDate = (clone $endDate)->modify("-{$months} months");
 
         // Récupérer les contributeurs ayant travaillé sur le projet
-        $contributorIds = $this->createCompanyQueryBuilder('cs')
+        $company        = $this->companyContext->getCurrentCompany();
+        $contributorIds = $this->getEntityManager()->createQueryBuilder()
             ->select('DISTINCT IDENTITY(t.contributor)')
             ->from(\App\Entity\Timesheet::class, 't')
             ->where('t.project = :projectId')
+            ->andWhere('t.company = :company')
             ->andWhere('t.date BETWEEN :startDate AND :endDate')
             ->setParameter('projectId', $projectId)
+            ->setParameter('company', $company)
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
             ->getQuery()

@@ -195,8 +195,15 @@ class ClientController extends AbstractController
     }
 
     #[Route('/{id}', name: 'client_show', methods: ['GET'])]
-    public function show(Client $client): Response
+    public function show(int $id, EntityManagerInterface $em): Response
     {
+        // Use repository findOneByIdForCompany() which filters by company
+        $client = $em->getRepository(Client::class)->findOneByIdForCompany($id);
+
+        if (!$client) {
+            throw $this->createNotFoundException('Client non trouvé');
+        }
+
         return $this->render('client/show.html.twig', [
             'client' => $client,
         ]);

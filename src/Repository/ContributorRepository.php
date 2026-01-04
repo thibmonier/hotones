@@ -201,9 +201,7 @@ class ContributorRepository extends CompanyAwareRepository
     {
         return $this->createCompanyQueryBuilder('c')
             ->leftJoin('c.user', 'u')
-            ->where('c.firstName LIKE :query')
-            ->orWhere('c.lastName LIKE :query')
-            ->orWhere('u.email LIKE :query')
+            ->andWhere('c.firstName LIKE :query OR c.lastName LIKE :query OR u.email LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('c.lastName', 'ASC')
             ->addOrderBy('c.firstName', 'ASC')

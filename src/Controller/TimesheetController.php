@@ -137,9 +137,11 @@ class TimesheetController extends AbstractController
             ], 400);
         }
 
-        // Optimisation: getReference() crée un proxy sans SELECT
-        // Si le projet n'existe pas, l'erreur sera levée au flush() par la contrainte FK
-        $project = $em->getReference(Project::class, $projectId);
+        // Valider que le projet existe
+        $project = $em->getRepository(Project::class)->find($projectId);
+        if (!$project) {
+            return new JsonResponse(['error' => 'Projet non trouvé'], 400);
+        }
 
         $task = null;
         if ($taskId) {

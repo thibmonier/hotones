@@ -146,7 +146,7 @@ class ControllerAccessControlTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         // Soumettre le formulaire (simplifié - ajustez selon vos champs réels)
-        $form = $crawler->selectButton('Enregistrer')->form([
+        $form = $crawler->selectButton('Créer')->form([
             'project[name]'        => 'New Project',
             'project[projectType]' => 'forfait',
             'project[status]'      => 'active',
