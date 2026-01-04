@@ -40,7 +40,6 @@
   </component>
   <component name="PhpCodeSniffer">
     <phpcs_settings>
-      <phpcs_by_interpreter asDefaultInterpreter="true" interpreter_id="6e3a2303-9d6d-4f71-8751-7a5a36033790" timeout="30000" />
       <PhpCSConfiguration beautifier_path="$PROJECT_DIR$/vendor/bin/phpcbf" tool_path="$PROJECT_DIR$/vendor/bin/phpcs" />
     </phpcs_settings>
   </component>
@@ -295,10 +294,15 @@
       <path value="$PROJECT_DIR$/vendor/twig/string-extra" />
       <path value="$PROJECT_DIR$/vendor/twig/twig" />
       <path value="$PROJECT_DIR$/vendor/ua-parser/uap-php" />
-      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
-      <path value="$PROJECT_DIR$/vendor/willdurand/negotiation" />
-      <path value="$PROJECT_DIR$/vendor/zenstruck/assert" />
-      <path value="$PROJECT_DIR$/vendor/zenstruck/foundry" />
+      <path value="$PROJECT_DIR$/vendor/nelmio/security-bundle" />
+      <path value="$PROJECT_DIR$/vendor/oskarstark/enum-helper" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-platform" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-bundle" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-gemini-platform" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-anthropic-platform" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-open-ai-platform" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-agent" />
+      <path value="$PROJECT_DIR$/vendor/symfony/ai-store" />
       <path value="$PROJECT_DIR$/vendor/phpmyadmin/sql-parser" />
       <path value="$PROJECT_DIR$/vendor/ahmed-bhs/doctrine-doctor" />
       <path value="$PROJECT_DIR$/vendor/stof/doctrine-extensions-bundle" />

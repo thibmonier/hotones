@@ -1,0 +1,3 @@
+doctrine_doctor:
+    # Enable or disable the bundle entirely
+    enabled: false

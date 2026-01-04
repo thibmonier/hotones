@@ -7,12 +7,14 @@ use App\Entity\User;
 use App\Security\CompanyContext;
 use App\Service\SecureFileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Exception;
 use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -42,7 +44,8 @@ class AdminUserController extends AbstractController
     }
 
     /**
-     * @throws RandomException
+     * @throws NotFoundHttpException
+     * @throws ORMException
      */
     #[Route('/{id}/edit', name: 'admin_users_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
     public function edit(
@@ -51,7 +54,7 @@ class AdminUserController extends AbstractController
         EntityManagerInterface $em,
         SecureFileUploadService $uploadService
     ): Response {
-        $user = $em->getRepository(User::class)->find($id);
+        $user = $em->getReference(User::class, $id);
         if (!$user) {
             throw $this->createNotFoundException();
         }

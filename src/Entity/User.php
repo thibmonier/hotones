@@ -11,9 +11,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Entity\Interface\CompanyOwnedInterface;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\Blameable;
+use Gedmo\Timestampable\Traits\Timestampable;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
@@ -43,6 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwoFactorInterface, CompanyOwnedInterface
 {
+    use Timestampable;
     use Blameable;
 
     // Rôles métier
@@ -153,23 +154,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     #[ORM\Column(type: 'boolean')]
     private bool $totpEnabled = false;
-
-    // Timestamps
-    #[ORM\Column(type: 'datetime_immutable')]
-    public DateTimeImmutable $createdAt {
-        get => $this->createdAt;
-        set {
-            $this->createdAt = $value;
-        }
-    }
-
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    public ?DateTimeImmutable $updatedAt = null {
-        get => $this->updatedAt;
-        set {
-            $this->updatedAt = $value;
-        }
-    }
 
     // Login tracking
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
@@ -372,11 +356,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->firstName;
     }
 
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->firstName = $value.
-     */
-    public function setFirstName(string $value): self
+    public function setTotpSecret(#[SensitiveParameter] ?string $secret): self
     {
         $this->firstName = $value;
 
@@ -403,71 +383,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this;
     }
 
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->phone.
-     */
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->phone = $value.
-     */
-    public function setPhone(?string $value): self
-    {
-        $this->phone = $value;
-
-        return $this;
-    }
-
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->phoneWork.
-     */
-    public function getPhoneWork(): ?string
-    {
-        return $this->phoneWork;
-    }
-
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->phoneWork = $value.
-     */
-    public function setPhoneWork(?string $value): self
-    {
-        $this->phoneWork = $value;
-
-        return $this;
-    }
-
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->phonePersonal.
-     */
-    public function getPhonePersonal(): ?string
-    {
-        return $this->phonePersonal;
-    }
-
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->phonePersonal = $value.
-     */
-    public function setPhonePersonal(?string $value): self
-    {
-        $this->phonePersonal = $value;
-
-        return $this;
-    }
-
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $user->address.
-     */
-    public function getAddress(): ?string
+    // Scheb 2FA v7 methods
+    public function getTotpAuthenticationUsername(): string
     {
         return $this->address;
     }

@@ -8,6 +8,8 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\Blameable;
+use Gedmo\Timestampable\Traits\Timestampable;
 use InvalidArgumentException;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,6 +23,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class NpsSurvey implements CompanyOwnedInterface
 {
+    use Timestampable;
+    use Blameable;
+
     // Statuts possibles
     public const STATUS_PENDING   = 'pending';      // En attente de réponse
     public const STATUS_COMPLETED = 'completed';  // Répondu
@@ -146,32 +151,17 @@ class NpsSurvey implements CompanyOwnedInterface
         }
     }
 
-    /**
-     * Date de création.
-     */
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    public ?DateTimeInterface $createdAt = null {
-        get => $this->createdAt;
-        set {
-            $this->createdAt = $value;
-        }
-    }
-
     public function __construct()
     {
-        $this->createdAt = new DateTime();
-        $this->sentAt    = new DateTime();
-        $this->token     = bin2hex(random_bytes(32));
+        $this->sentAt = new DateTime();
+        $this->token  = bin2hex(random_bytes(32));
         // Par défaut, expire après 30 jours
         $this->expiresAt = (new DateTime())->modify('+30 days');
     }
 
-    #[ORM\PrePersist]
-    public function setCreatedAtValue(): void
+    public function getId(): ?int
     {
-        if ($this->createdAt === null) {
-            $this->createdAt = new DateTime();
-        }
+        return $this->id;
     }
 
     public function getProject(): ?Project

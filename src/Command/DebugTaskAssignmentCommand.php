@@ -37,12 +37,7 @@ class DebugTaskAssignmentCommand extends Command
         $contributorId = $input->getArgument('contributor_id');
 
         if ($contributorId) {
-            // old code : $contributor = $this->em->getRepository(Contributor::class)->find($contributorId);
-            try {
-                $contributor = $this->em->getReference(Contributor::class, $contributorId);
-            } catch (ORMException $e) {
-                return Command::FAILURE;
-            }
+            $contributor = $this->em->getReference(Contributor::class, $contributorId);
             if (!$contributor) {
                 $io->error("Contributeur #$contributorId non trouvé");
 

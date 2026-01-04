@@ -15,6 +15,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -158,12 +159,12 @@ class Order implements CompanyOwnedInterface
     }
 
     #[ORM\Column(type: 'date')]
-    public DateTimeInterface $createdAt {
-        get => $this->createdAt;
-        set {
-            $this->createdAt = $value;
-        }
-    }
+    #[Gedmo\Timestampable(on: 'create')]
+    private DateTimeInterface $createdAt;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Gedmo\Timestampable(on: 'update')]
+    private ?DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
     public ?DateTimeInterface $validatedAt = null {
@@ -236,7 +237,6 @@ class Order implements CompanyOwnedInterface
         $this->sections         = new ArrayCollection();
         $this->paymentSchedules = new ArrayCollection();
         $this->expenseReports   = new ArrayCollection();
-        $this->createdAt        = new DateTime();
     }
 
     public function getTasks(): Collection
@@ -466,11 +466,19 @@ class Order implements CompanyOwnedInterface
         return $this;
     }
 
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $order->id.
-     */
-    public function getId(): ?int
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getValidatedAt(): ?DateTimeInterface
     {
         return $this->id;
     }
