@@ -65,6 +65,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         // Period 2: Feb 1 - Feb 28 (no overlap)
         $period2 = new EmploymentPeriod();
+        $period2->setCompany($this->getTestCompany());
         $period2->setContributor($contributor);
         $period2->setStartDate(new DateTime('2025-02-01'));
         $period2->setEndDate(new DateTime('2025-02-28'));
@@ -83,6 +84,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         // Period 2: Jan 15 - Feb 15 (overlaps with Period 1)
         $period2 = new EmploymentPeriod();
+        $period2->setCompany($this->getTestCompany());
         $period2->setContributor($contributor);
         $period2->setStartDate(new DateTime('2025-01-15'));
         $period2->setEndDate(new DateTime('2025-02-15'));
@@ -101,6 +103,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         // Period 2: Feb 1 - Feb 28 (overlaps because Period 1 is open)
         $period2 = new EmploymentPeriod();
+        $period2->setCompany($this->getTestCompany());
         $period2->setContributor($contributor);
         $period2->setStartDate(new DateTime('2025-02-01'));
         $period2->setEndDate(new DateTime('2025-02-28'));
@@ -184,6 +187,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         // Create contributor WITHOUT using factory to avoid auto-created active period
         $em          = static::getContainer()->get('doctrine')->getManager();
         $contributor = new \App\Entity\Contributor();
+        $contributor->setCompany($this->getTestCompany());
         $contributor->setFirstName('Test');
         $contributor->setLastName('User');
         $em->persist($contributor);
@@ -381,6 +385,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $em = static::getContainer()->get('doctrine')->getManager();
 
         $period = new EmploymentPeriod();
+        $period->setCompany($this->getTestCompany());
         $period->setContributor($contributor);
         $period->setStartDate(new DateTime($startDate));
 

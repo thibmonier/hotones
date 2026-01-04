@@ -9,6 +9,7 @@ use App\Entity\Analytics\FactProjectMetrics;
 use App\Factory\DimProjectTypeFactory;
 use App\Factory\DimTimeFactory;
 use App\Service\Analytics\DashboardReadService;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -24,6 +25,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private EntityManagerInterface $entityManager;
     private DashboardReadService $dashboardReadService;
@@ -33,6 +35,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         self::bootKernel();
         $this->entityManager        = static::getContainer()->get(EntityManagerInterface::class);
         $this->dashboardReadService = static::getContainer()->get(DashboardReadService::class);
+        $this->setUpMultiTenant();
     }
 
     public function testDimTimeCanBeCreatedAndQueried(): void
@@ -71,6 +74,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         ]);
 
         $fact1 = (new FactProjectMetrics())
+            ->setCompany($this->getTestCompany())
             ->setDimTime($dimTime1)
             ->setDimProjectType($dimProjectType)
             ->setGranularity('monthly')
@@ -85,6 +89,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         $this->entityManager->persist($fact1);
 
         $fact2 = (new FactProjectMetrics())
+            ->setCompany($this->getTestCompany())
             ->setDimTime($dimTime2)
             ->setDimProjectType($dimProjectType)
             ->setGranularity('monthly')
@@ -128,6 +133,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         ]);
 
         $fact = (new FactProjectMetrics())
+            ->setCompany($this->getTestCompany())
             ->setDimTime($dimTime)
             ->setDimProjectType($dimProjectType)
             ->setGranularity('monthly')
@@ -184,6 +190,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
             ]);
 
             $fact = (new FactProjectMetrics())
+                ->setCompany($this->getTestCompany())
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
                 ->setGranularity('monthly')
@@ -223,6 +230,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
             ]);
 
             $fact = (new FactProjectMetrics())
+                ->setCompany($this->getTestCompany())
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
                 ->setGranularity('daily')

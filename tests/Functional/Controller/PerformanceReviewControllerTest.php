@@ -10,6 +10,7 @@ use App\Factory\UserFactory;
 use App\Repository\ContributorRepository;
 use App\Repository\PerformanceReviewRepository;
 use App\Repository\UserRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -19,6 +20,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private KernelBrowser $client;
     private UserRepository $userRepository;
@@ -33,6 +35,8 @@ class PerformanceReviewControllerTest extends WebTestCase
         $this->userRepository        = $container->get(UserRepository::class);
         $this->contributorRepository = $container->get(ContributorRepository::class);
         $this->reviewRepository      = $container->get(PerformanceReviewRepository::class);
+
+        $this->setUpMultiTenant();
     }
 
     private function createContributor(string $firstName = 'John', string $lastName = 'Doe'): Contributor
@@ -40,6 +44,7 @@ class PerformanceReviewControllerTest extends WebTestCase
         $contributor = new Contributor();
         $contributor->setFirstName($firstName);
         $contributor->setLastName($lastName);
+        $contributor->setCompany($this->getTestCompany());
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($contributor);
@@ -54,6 +59,7 @@ class PerformanceReviewControllerTest extends WebTestCase
         $review->setYear($year);
         $review->setContributor($contributor);
         $review->setManager($manager);
+        $review->setCompany($this->getTestCompany());
 
         return $review;
     }

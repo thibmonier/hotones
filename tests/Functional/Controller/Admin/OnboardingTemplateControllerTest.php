@@ -335,6 +335,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $profile = new Profile();
         $profile->setName('Developer');
         $profile->setDescription('Development profile');
+        $profile->setCompany($this->getTestCompany());
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($profile);

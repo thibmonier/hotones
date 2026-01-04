@@ -127,6 +127,7 @@ class VacationRepositoryTest extends KernelTestCase
         $em = static::getContainer()->get('doctrine')->getManager();
 
         $vacation = new Vacation();
+        $vacation->setCompany($this->getTestCompany());
         $vacation->setContributor($contributor);
         $vacation->setStartDate(new DateTime($startDate));
         $vacation->setEndDate(new DateTime($endDate));
