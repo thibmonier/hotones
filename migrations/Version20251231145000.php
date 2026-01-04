@@ -454,33 +454,36 @@ final class Version20251231145000 extends AbstractMigration
         // TABLE 13: lead_captures
         // -----------------------------------------------------------------
 
-        $this->addSql(<<<'SQL'
-            ALTER TABLE lead_captures
-            ADD company_id INT NULL AFTER id
-        SQL);
+        // Check if table exists before modifying (table may not exist in all environments)
+        if ($schema->hasTable('lead_captures')) {
+            $this->addSql(<<<'SQL'
+                ALTER TABLE lead_captures
+                ADD company_id INT NULL AFTER id
+            SQL);
 
-        // All lead captures to default company (marketing data)
-        $this->addSql(<<<'SQL'
-            UPDATE lead_captures
-            SET company_id = 1
-            WHERE company_id IS NULL
-        SQL);
+            // All lead captures to default company (marketing data)
+            $this->addSql(<<<'SQL'
+                UPDATE lead_captures
+                SET company_id = 1
+                WHERE company_id IS NULL
+            SQL);
 
-        $this->addSql(<<<'SQL'
-            ALTER TABLE lead_captures
-            MODIFY company_id INT NOT NULL
-        SQL);
+            $this->addSql(<<<'SQL'
+                ALTER TABLE lead_captures
+                MODIFY company_id INT NOT NULL
+            SQL);
 
-        $this->addSql(<<<'SQL'
-            CREATE INDEX idx_lead_capture_company ON lead_captures (company_id)
-        SQL);
+            $this->addSql(<<<'SQL'
+                CREATE INDEX idx_lead_capture_company ON lead_captures (company_id)
+            SQL);
 
-        $this->addSql(<<<'SQL'
-            ALTER TABLE lead_captures
-            ADD CONSTRAINT fk_lead_capture_company
-            FOREIGN KEY (company_id) REFERENCES companies(id)
-            ON DELETE CASCADE
-        SQL);
+            $this->addSql(<<<'SQL'
+                ALTER TABLE lead_captures
+                ADD CONSTRAINT fk_lead_capture_company
+                FOREIGN KEY (company_id) REFERENCES companies(id)
+                ON DELETE CASCADE
+            SQL);
+        }
     }
 
     public function down(Schema $schema): void
@@ -493,19 +496,22 @@ final class Version20251231145000 extends AbstractMigration
         // REVERSE TABLE 13: lead_captures
         // -----------------------------------------------------------------
 
-        $this->addSql(<<<'SQL'
-            ALTER TABLE lead_captures
-            DROP FOREIGN KEY fk_lead_capture_company
-        SQL);
+        // Check if table exists before modifying (table may not exist in all environments)
+        if ($schema->hasTable('lead_captures')) {
+            $this->addSql(<<<'SQL'
+                ALTER TABLE lead_captures
+                DROP FOREIGN KEY fk_lead_capture_company
+            SQL);
 
-        $this->addSql(<<<'SQL'
-            DROP INDEX idx_lead_capture_company ON lead_captures
-        SQL);
+            $this->addSql(<<<'SQL'
+                DROP INDEX idx_lead_capture_company ON lead_captures
+            SQL);
 
-        $this->addSql(<<<'SQL'
-            ALTER TABLE lead_captures
-            DROP COLUMN company_id
-        SQL);
+            $this->addSql(<<<'SQL'
+                ALTER TABLE lead_captures
+                DROP COLUMN company_id
+            SQL);
+        }
 
         // -----------------------------------------------------------------
         // REVERSE TABLE 12: scheduler_entries
