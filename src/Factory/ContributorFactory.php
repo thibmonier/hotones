@@ -4,6 +4,8 @@ namespace App\Factory;
 
 use App\Entity\Contributor;
 use App\Entity\EmploymentPeriod;
+use App\Exception\CompanyContextMissingException;
+use App\Security\CompanyContext;
 use DateTime;
 use Faker\Generator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
@@ -13,13 +15,29 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ContributorFactory extends PersistentObjectFactory
 {
+    private ?CompanyContext $companyContext = null;
+
+    public function __construct(CompanyContext $companyContext)
+    {
+        parent::__construct();
+        $this->companyContext = $companyContext;
+    }
+
     protected function defaults(): array|callable
     {
         /** @var Generator $faker */
         $faker = self::faker();
 
+        // Try to get company from context (for multi-tenant tests), fallback to creating new company
+        $company = null;
+        try {
+            $company = $this->companyContext?->getCurrentCompany();
+        } catch (CompanyContextMissingException) {
+            // No authenticated user - will create new company
+        }
+
         return [
-            'company'           => CompanyFactory::new(), // Multi-tenant: required field
+            'company'           => $company ?? CompanyFactory::new(),
             'firstName'         => $faker->firstName(),
             'lastName'          => $faker->lastName(),
             'email'             => $faker->optional()->safeEmail(),

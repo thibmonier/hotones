@@ -3,6 +3,8 @@
 namespace App\Factory;
 
 use App\Entity\ProjectSubTask;
+use App\Exception\CompanyContextMissingException;
+use App\Security\CompanyContext;
 use Faker\Generator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -11,6 +13,14 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ProjectSubTaskFactory extends PersistentObjectFactory
 {
+    private ?CompanyContext $companyContext = null;
+
+    public function __construct(CompanyContext $companyContext)
+    {
+        parent::__construct();
+        $this->companyContext = $companyContext;
+    }
+
     protected function defaults(): array|callable
     {
         /** @var Generator $faker */
@@ -21,7 +31,16 @@ final class ProjectSubTaskFactory extends PersistentObjectFactory
             ? (string) $faker->randomFloat(2, 0, (float) $initial)
             : '0.00';
 
+        // Try to get company from context (for multi-tenant tests), fallback to creating new company
+        $company = null;
+        try {
+            $company = $this->companyContext?->getCurrentCompany();
+        } catch (CompanyContextMissingException) {
+            // No authenticated user - will create new company
+        }
+
         return [
+            'company'               => $company ?? CompanyFactory::new(),
             'project'               => ProjectFactory::random(), // will be aligned with task in initialize()
             'task'                  => ProjectTaskFactory::random(),
             'assignee'              => $faker->boolean(60) ? ContributorFactory::random() : null,

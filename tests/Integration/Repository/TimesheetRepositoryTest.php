@@ -6,6 +6,7 @@ use App\Factory\ContributorFactory;
 use App\Factory\ProjectFactory;
 use App\Factory\TimesheetFactory;
 use App\Repository\TimesheetRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -15,6 +16,7 @@ class TimesheetRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private TimesheetRepository $repository;
 
@@ -22,6 +24,7 @@ class TimesheetRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(TimesheetRepository::class);
+        $this->setUpMultiTenant();
     }
 
     public function testGetTotalHoursForMonth(): void

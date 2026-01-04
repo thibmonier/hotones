@@ -6,6 +6,7 @@ use App\Entity\EmploymentPeriod;
 use App\Factory\ContributorFactory;
 use App\Factory\ProfileFactory;
 use App\Repository\EmploymentPeriodRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -15,6 +16,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private EmploymentPeriodRepository $repository;
 
@@ -22,6 +24,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(EmploymentPeriodRepository::class);
+        $this->setUpMultiTenant();
     }
 
     public function testFindWithOptionalContributorFilterWithNoFilter(): void

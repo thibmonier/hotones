@@ -10,6 +10,7 @@ use App\Entity\OrderLine;
 use App\Entity\OrderSection;
 use App\Entity\Project;
 use App\Repository\OrderRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -20,6 +21,7 @@ class OrderRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private EntityManagerInterface $entityManager;
     private OrderRepository $repository;
@@ -29,6 +31,7 @@ class OrderRepositoryTest extends KernelTestCase
         self::bootKernel();
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $this->repository    = $this->entityManager->getRepository(Order::class);
+        $this->setUpMultiTenant();
     }
 
     protected function tearDown(): void

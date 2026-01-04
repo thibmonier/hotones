@@ -5,6 +5,7 @@ namespace App\Tests\Integration\Repository;
 use App\Entity\Vacation;
 use App\Factory\ContributorFactory;
 use App\Repository\VacationRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -14,6 +15,7 @@ class VacationRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private VacationRepository $repository;
 
@@ -21,6 +23,7 @@ class VacationRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(VacationRepository::class);
+        $this->setUpMultiTenant();
     }
 
     public function testCountApprovedDaysBetween(): void
