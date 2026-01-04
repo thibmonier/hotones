@@ -356,13 +356,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->firstName;
     }
 
-    public function setTotpSecret(#[SensitiveParameter] ?string $secret): self
-    {
-        $this->firstName = $value;
-
-        return $this;
-    }
-
     /**
      * Compatibility method for existing code.
      * With PHP 8.4 property hooks, prefer direct access: $user->lastName.
@@ -381,12 +374,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         $this->lastName = $value;
 
         return $this;
-    }
-
-    // Scheb 2FA v7 methods
-    public function getTotpAuthenticationUsername(): string
-    {
-        return $this->address;
     }
 
     /**

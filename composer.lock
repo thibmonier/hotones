@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6a805a6ef652c7cd6a6e468cd2c2d2bc",
+    "content-hash": "30ab04f0c98f47418f63d35a7ff375bf",
     "packages": [
         {
             "name": "anthropic-ai/sdk",
@@ -2227,16 +2227,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v4.27.5",
+            "version": "v4.27.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "4853f50f91ac6fe9b88e770292390b18fc61a1ef"
+                "reference": "ece70f2111f006262cd30af16dc10b1720704e10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/4853f50f91ac6fe9b88e770292390b18fc61a1ef",
-                "reference": "4853f50f91ac6fe9b88e770292390b18fc61a1ef",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/ece70f2111f006262cd30af16dc10b1720704e10",
+                "reference": "ece70f2111f006262cd30af16dc10b1720704e10",
                 "shasum": ""
             },
             "require": {
@@ -2268,6 +2268,9 @@
                 "twig/extra-bundle": "^3.17",
                 "twig/html-extra": "^3.17",
                 "twig/twig": "^3.20"
+            },
+            "conflict": {
+                "symfony/error-handler": "<5.4.35"
             },
             "require-dev": {
                 "doctrine/doctrine-fixtures-bundle": "^3.4|3.5.x-dev|^4.0",
@@ -2317,7 +2320,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.27.5"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.27.6"
             },
             "funding": [
                 {
@@ -2325,7 +2328,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-11T18:39:30+00:00"
+            "time": "2026-01-04T09:25:06+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -7451,7 +7454,7 @@
         },
         {
             "name": "scheb/2fa-bundle",
-            "version": "v8.1.0",
+            "version": "v8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scheb/2fa-bundle.git",
@@ -7513,28 +7516,28 @@
                 "two-step"
             ],
             "support": {
-                "source": "https://github.com/scheb/2fa-bundle/tree/v8.1.0"
+                "source": "https://github.com/scheb/2fa-bundle/tree/v8.2.0"
             },
             "time": "2025-12-28T17:41:25+00:00"
         },
         {
             "name": "scheb/2fa-totp",
-            "version": "v8.1.0",
+            "version": "v8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scheb/2fa-totp.git",
-                "reference": "70001b72cc84d7dd0cd57e8ef4a65ddd8590e0c3"
+                "reference": "fbbad291a6ac094796aa1c5938e555ee48e8e941"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scheb/2fa-totp/zipball/70001b72cc84d7dd0cd57e8ef4a65ddd8590e0c3",
-                "reference": "70001b72cc84d7dd0cd57e8ef4a65ddd8590e0c3",
+                "url": "https://api.github.com/repos/scheb/2fa-totp/zipball/fbbad291a6ac094796aa1c5938e555ee48e8e941",
+                "reference": "fbbad291a6ac094796aa1c5938e555ee48e8e941",
                 "shasum": ""
             },
             "require": {
                 "php": "~8.4.0 || ~8.5.0",
                 "scheb/2fa-bundle": "self.version",
-                "spomky-labs/otphp": "^11.3"
+                "spomky-labs/otphp": "^11.4"
             },
             "suggest": {
                 "symfony/validator": "Needed if you want to use the TOTP validator constraint"
@@ -7566,9 +7569,9 @@
                 "two-step"
             ],
             "support": {
-                "source": "https://github.com/scheb/2fa-totp/tree/v8.1.0"
+                "source": "https://github.com/scheb/2fa-totp/tree/v8.2.0"
             },
-            "time": "2025-12-04T16:37:52+00:00"
+            "time": "2026-01-04T13:15:38+00:00"
         },
         {
             "name": "sentry/sentry",
@@ -16849,16 +16852,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.92.3",
+            "version": "v3.92.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8"
+                "reference": "9e7488b19403423e02e8403cc1eb596baf4673b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8",
-                "reference": "2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/9e7488b19403423e02e8403cc1eb596baf4673b0",
+                "reference": "9e7488b19403423e02e8403cc1eb596baf4673b0",
                 "shasum": ""
             },
             "require": {
@@ -16890,17 +16893,17 @@
             },
             "require-dev": {
                 "facile-it/paraunit": "^1.3.1 || ^2.7",
-                "infection/infection": "^0.31.0",
-                "justinrainbow/json-schema": "^6.5",
-                "keradus/cli-executor": "^2.2",
+                "infection/infection": "^0.31",
+                "justinrainbow/json-schema": "^6.6",
+                "keradus/cli-executor": "^2.3",
                 "mikey179/vfsstream": "^1.6.12",
                 "php-coveralls/php-coveralls": "^2.9",
                 "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.6",
                 "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.6",
-                "phpunit/phpunit": "^9.6.25 || ^10.5.53 || ^11.5.34",
+                "phpunit/phpunit": "^9.6.31 || ^10.5.60 || ^11.5.46",
                 "symfony/polyfill-php85": "^1.33",
-                "symfony/var-dumper": "^5.4.48 || ^6.4.24 || ^7.3.2 || ^8.0",
-                "symfony/yaml": "^5.4.45 || ^6.4.24 || ^7.3.2 || ^8.0"
+                "symfony/var-dumper": "^5.4.48 || ^6.4.26 || ^7.4.0 || ^8.0",
+                "symfony/yaml": "^5.4.45 || ^6.4.30 || ^7.4.1 || ^8.0"
             },
             "suggest": {
                 "ext-dom": "For handling output formats in XML",
@@ -16941,7 +16944,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.3"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.4"
             },
             "funding": [
                 {
@@ -16949,7 +16952,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-18T10:45:02+00:00"
+            "time": "2026-01-04T00:38:52+00:00"
         },
         {
             "name": "infection/abstract-testframework-adapter",
@@ -17134,12 +17137,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/infection.git",
-                "reference": "11f8319723d6fb2bbfed8ef8f7db1907dc2319d7"
+                "reference": "eac118e98f319dae7c8b5e25ea647b8ca136fa40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/infection/zipball/11f8319723d6fb2bbfed8ef8f7db1907dc2319d7",
-                "reference": "11f8319723d6fb2bbfed8ef8f7db1907dc2319d7",
+                "url": "https://api.github.com/repos/infection/infection/zipball/eac118e98f319dae7c8b5e25ea647b8ca136fa40",
+                "reference": "eac118e98f319dae7c8b5e25ea647b8ca136fa40",
                 "shasum": ""
             },
             "require": {
@@ -17263,7 +17266,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-01-03T12:34:15+00:00"
+            "time": "2026-01-04T08:51:27+00:00"
         },
         {
             "name": "infection/mutator",
@@ -19130,16 +19133,16 @@
         },
         {
             "name": "sanmai/di-container",
-            "version": "0.1.7",
+            "version": "0.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/di-container.git",
-                "reference": "f6c0de5f1c31d303148e46107284a16948b4736a"
+                "reference": "f7ea6a00692608f785fc0eabb1c54f5349d973e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/di-container/zipball/f6c0de5f1c31d303148e46107284a16948b4736a",
-                "reference": "f6c0de5f1c31d303148e46107284a16948b4736a",
+                "url": "https://api.github.com/repos/sanmai/di-container/zipball/f7ea6a00692608f785fc0eabb1c54f5349d973e9",
+                "reference": "f7ea6a00692608f785fc0eabb1c54f5349d973e9",
                 "shasum": ""
             },
             "require": {
@@ -19193,7 +19196,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sanmai/di-container/issues",
-                "source": "https://github.com/sanmai/di-container/tree/0.1.7"
+                "source": "https://github.com/sanmai/di-container/tree/0.1.8"
             },
             "funding": [
                 {
@@ -19201,7 +19204,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-03T10:21:40+00:00"
+            "time": "2026-01-03T14:10:40+00:00"
         },
         {
             "name": "sanmai/duoclock",

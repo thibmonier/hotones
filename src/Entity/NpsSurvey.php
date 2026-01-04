@@ -255,15 +255,6 @@ class NpsSurvey implements CompanyOwnedInterface
 
     /**
      * Compatibility method for existing code.
-     * With PHP 8.4 public private(set), prefer direct access: $survey->id.
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * Compatibility method for existing code.
      * With PHP 8.4 property hooks, prefer direct access: $survey->token.
      */
     public function getToken(): ?string

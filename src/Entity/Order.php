@@ -705,26 +705,6 @@ class Order implements CompanyOwnedInterface
 
     /**
      * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $order->validatedAt.
-     */
-    public function getValidatedAt(): ?DateTimeInterface
-    {
-        return $this->validatedAt;
-    }
-
-    /**
-     * Compatibility method for existing code.
-     * With PHP 8.4 property hooks, prefer direct access: $order->validatedAt = $value.
-     */
-    public function setValidatedAt(?DateTimeInterface $value): self
-    {
-        $this->validatedAt = $value;
-
-        return $this;
-    }
-
-    /**
-     * Compatibility method for existing code.
      * With PHP 8.4 property hooks, prefer direct access: $order->status.
      */
     public function getStatus(): string
