@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\FactForecast;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<FactForecast>
+ * @extends CompanyAwareRepository<FactForecast>
  */
-class FactForecastRepository extends ServiceEntityRepository
+class FactForecastRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, FactForecast::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, FactForecast::class, $companyContext);
     }
 
     /**
@@ -24,8 +26,8 @@ class FactForecastRepository extends ServiceEntityRepository
      */
     public function findLatestForPeriod(DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd, string $scenario): ?FactForecast
     {
-        return $this->createQueryBuilder('f')
-            ->where('f.periodStart = :start')
+        return $this->createCompanyQueryBuilder('f')
+            ->andWhere('f.periodStart = :start')
             ->andWhere('f.periodEnd = :end')
             ->andWhere('f.scenario = :scenario')
             ->setParameter('start', $periodStart)
@@ -44,8 +46,8 @@ class FactForecastRepository extends ServiceEntityRepository
      */
     public function findByDateRange(DateTimeImmutable $start, DateTimeImmutable $end, ?string $scenario = null): array
     {
-        $qb = $this->createQueryBuilder('f')
-            ->where('f.periodStart >= :start')
+        $qb = $this->createCompanyQueryBuilder('f')
+            ->andWhere('f.periodStart >= :start')
             ->andWhere('f.periodEnd <= :end')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
@@ -65,9 +67,9 @@ class FactForecastRepository extends ServiceEntityRepository
      */
     public function calculateAverageAccuracy(string $scenario, int $months = 6): ?float
     {
-        $result = $this->createQueryBuilder('f')
+        $result = $this->createCompanyQueryBuilder('f')
             ->select('AVG(f.accuracy) as avg_accuracy')
-            ->where('f.scenario = :scenario')
+            ->andWhere('f.scenario = :scenario')
             ->andWhere('f.accuracy IS NOT NULL')
             ->andWhere('f.createdAt >= :since')
             ->setParameter('scenario', $scenario)

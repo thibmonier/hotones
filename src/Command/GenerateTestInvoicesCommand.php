@@ -78,6 +78,7 @@ class GenerateTestInvoicesCommand extends Command
 
             $invoice->setClient($client);
             $invoice->setProject($project);
+            $invoice->setCompany($project->getCompany());
 
             // Numéro de facture unique
             $invoiceNumber = sprintf('FAC-TEST-%s-%03d', $today->format('Ym'), $i + 1 + time() % 100);

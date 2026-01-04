@@ -12,6 +12,7 @@ use App\Entity\Order;
 use App\Entity\Project;
 use App\Entity\Timesheet;
 use App\Entity\User;
+use App\Security\CompanyContext;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +27,7 @@ readonly class MetricsCalculationService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private CompanyContext $companyContext,
         private LoggerInterface $logger
     ) {
     }
@@ -274,6 +276,7 @@ readonly class MetricsCalculationService
 
         if (!$dimTime) {
             $dimTime = new DimTime();
+            $dimTime->setCompany($this->companyContext->getCurrentCompany());
             $dimTime->setDate($date);
             $this->entityManager->persist($dimTime);
             // Flush to ensure identifier is generated before usage in queries
@@ -303,6 +306,7 @@ readonly class MetricsCalculationService
 
         if (!$dimProjectType) {
             $dimProjectType = new DimProjectType();
+            $dimProjectType->setCompany($this->companyContext->getCurrentCompany());
             $dimProjectType->setProjectType($project->getProjectType())
                 ->setServiceCategory($serviceCategory)
                 ->setStatus($project->getStatus())
@@ -328,6 +332,7 @@ readonly class MetricsCalculationService
 
         if (!$dimContributor) {
             $dimContributor = new DimContributor();
+            $dimContributor->setCompany($this->companyContext->getCurrentCompany());
             $dimContributor->setUser($user)
                 ->setName($user->getFullName())
                 ->setRole($role)
@@ -385,6 +390,7 @@ readonly class MetricsCalculationService
 
         if (!$metrics) {
             $metrics = new FactProjectMetrics();
+            $metrics->setCompany($this->companyContext->getCurrentCompany());
             $metrics->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
                 ->setDimProjectManager($dimProjectManager)

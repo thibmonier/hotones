@@ -346,6 +346,13 @@ class ProjectPlanningAssistant
             ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :date)')
             ->setParameter('contributor', $contributor)
             ->setParameter('date', $date)
+            // TODO : Query uses LIMIT with a fetch-joined collection.
+            // This causes LIMIT to apply to SQL rows instead of entities, resulting in partially hydrated collections (silent data loss).
+            //
+            // Problem: If the main entity has multiple related items, only some will be loaded.
+            // For example, if a Pet has 4 pictures and you use setMaxResults(1), only 1 picture will be loaded instead of 4.
+            //
+            // Solution: Use Doctrine's Paginator which executes 2 queries to properly handle collection joins.
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

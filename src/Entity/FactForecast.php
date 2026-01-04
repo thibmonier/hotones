@@ -4,22 +4,30 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\FactForecastRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FactForecastRepository::class)]
 #[ORM\Table(name: 'fact_forecast')]
 #[ORM\Index(columns: ['period_start', 'period_end'], name: 'idx_period')]
 #[ORM\Index(columns: ['scenario'], name: 'idx_scenario')]
 #[ORM\Index(columns: ['created_at'], name: 'idx_created_at')]
-class FactForecast
+#[ORM\Index(columns: ['company_id'], name: 'idx_factforecast_company')]
+class FactForecast implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private DateTimeImmutable $periodStart;
@@ -198,6 +206,18 @@ class FactForecast
     public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Invoice;
+use App\Security\CompanyContext;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Invoice>
+ * @extends CompanyAwareRepository<Invoice>
  */
-class InvoiceRepository extends ServiceEntityRepository
+class InvoiceRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Invoice::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Invoice::class, $companyContext);
     }
 
     /**
@@ -31,9 +33,9 @@ class InvoiceRepository extends ServiceEntityRepository
         $prefix = sprintf('F%s%s', $year, $month);
 
         // Récupérer le dernier numéro du mois
-        $qb = $this->createQueryBuilder('i');
+        $qb = $this->createCompanyQueryBuilder('i');
         $qb->select('i.invoiceNumber')
-            ->where('i.invoiceNumber LIKE :prefix')
+            ->andWhere('i.invoiceNumber LIKE :prefix')
             ->setParameter('prefix', $prefix.'%')
             ->orderBy('i.invoiceNumber', 'DESC')
             ->setMaxResults(1);
@@ -59,8 +61,8 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function findOverdueInvoices(): array
     {
-        $qb = $this->createQueryBuilder('i');
-        $qb->where('i.status != :statusPaid')
+        $qb = $this->createCompanyQueryBuilder('i');
+        $qb->andWhere('i.status != :statusPaid')
             ->andWhere('i.status != :statusCancelled')
             ->andWhere('i.dueDate < CURRENT_DATE()')
             ->setParameter('statusPaid', Invoice::STATUS_PAID)
@@ -77,8 +79,8 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function findUpcomingInvoices(int $days = 30): array
     {
-        $qb = $this->createQueryBuilder('i');
-        $qb->where('i.status = :statusSent')
+        $qb = $this->createCompanyQueryBuilder('i');
+        $qb->andWhere('i.status = :statusSent')
             ->andWhere('i.dueDate BETWEEN CURRENT_DATE() AND DATE_ADD(CURRENT_DATE(), :days, \'day\')')
             ->setParameter('statusSent', Invoice::STATUS_SENT)
             ->setParameter('days', $days)
@@ -94,8 +96,8 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createQueryBuilder('i')
-            ->where('i.status = :status')
+        return $this->createCompanyQueryBuilder('i')
+            ->andWhere('i.status = :status')
             ->setParameter('status', $status)
             ->orderBy('i.issuedAt', 'DESC')
             ->getQuery()
@@ -109,8 +111,8 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function findByClient(int $clientId): array
     {
-        return $this->createQueryBuilder('i')
-            ->where('i.client = :clientId')
+        return $this->createCompanyQueryBuilder('i')
+            ->andWhere('i.client = :clientId')
             ->setParameter('clientId', $clientId)
             ->orderBy('i.issuedAt', 'DESC')
             ->getQuery()
@@ -122,9 +124,9 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function calculateTotalRevenue(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): string
     {
-        $qb = $this->createQueryBuilder('i');
+        $qb = $this->createCompanyQueryBuilder('i');
         $qb->select('SUM(i.amountHt) as total')
-            ->where('i.status IN (:statuses)')
+            ->andWhere('i.status IN (:statuses)')
             ->setParameter('statuses', [Invoice::STATUS_SENT, Invoice::STATUS_PAID, Invoice::STATUS_OVERDUE]);
 
         if ($startDate) {
@@ -147,9 +149,9 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function calculatePaidRevenue(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): string
     {
-        $qb = $this->createQueryBuilder('i');
+        $qb = $this->createCompanyQueryBuilder('i');
         $qb->select('SUM(i.amountHt) as total')
-            ->where('i.status = :statusPaid')
+            ->andWhere('i.status = :statusPaid')
             ->setParameter('statusPaid', Invoice::STATUS_PAID);
 
         if ($startDate) {
@@ -172,9 +174,9 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function calculateAveragePaymentDelay(): float
     {
-        $qb = $this->createQueryBuilder('i');
+        $qb = $this->createCompanyQueryBuilder('i');
         $qb->select('AVG(DATEDIFF(i.paidAt, i.issuedAt)) as avgDelay')
-            ->where('i.status = :statusPaid')
+            ->andWhere('i.status = :statusPaid')
             ->setParameter('statusPaid', Invoice::STATUS_PAID);
 
         $result = $qb->getQuery()->getSingleScalarResult();
@@ -190,8 +192,8 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function findInvoicesNeedingReminder(): array
     {
-        $qb = $this->createQueryBuilder('i');
-        $qb->where('i.status = :statusSent OR i.status = :statusOverdue')
+        $qb = $this->createCompanyQueryBuilder('i');
+        $qb->andWhere('i.status = :statusSent OR i.status = :statusOverdue')
             ->andWhere('i.dueDate < CURRENT_DATE()')
             ->andWhere('(DATEDIFF(CURRENT_DATE(), i.dueDate) = 30 OR DATEDIFF(CURRENT_DATE(), i.dueDate) = 45 OR DATEDIFF(CURRENT_DATE(), i.dueDate) = 60)')
             ->setParameter('statusSent', Invoice::STATUS_SENT)

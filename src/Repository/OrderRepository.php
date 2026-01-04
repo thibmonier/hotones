@@ -4,19 +4,21 @@ namespace App\Repository;
 
 use App\Entity\Order;
 use App\Entity\Project;
+use App\Security\CompanyContext;
 use DateTime;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Order>
+ * @extends CompanyAwareRepository<Order>
  */
-class OrderRepository extends ServiceEntityRepository
+class OrderRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Order::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Order::class, $companyContext);
     }
 
     /**
@@ -31,7 +33,7 @@ class OrderRepository extends ServiceEntityRepository
         ?int $limit = null,
         ?int $offset = null
     ): array {
-        $qb = $this->createQueryBuilder('o')
+        $qb = $this->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->leftJoin('p.client', 'c')
@@ -76,7 +78,7 @@ class OrderRepository extends ServiceEntityRepository
 
     public function countWithFilters(?Project $project = null, ?string $status = null): int
     {
-        $qb = $this->createQueryBuilder('o')
+        $qb = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(DISTINCT o.id)')
             ->leftJoin('o.project', 'p');
 
@@ -98,8 +100,8 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function findLastOrderNumberForMonth(string $year, string $month): ?Order
     {
-        return $this->createQueryBuilder('o')
-            ->where('o.orderNumber LIKE :pattern')
+        return $this->createCompanyQueryBuilder('o')
+            ->andWhere('o.orderNumber LIKE :pattern')
             ->setParameter('pattern', "D{$year}{$month}%")
             ->orderBy('o.orderNumber', 'DESC')
             ->setMaxResults(1)
@@ -112,8 +114,8 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function findByProject(Project $project): array
     {
-        return $this->createQueryBuilder('o')
-            ->where('o.project = :project')
+        return $this->createCompanyQueryBuilder('o')
+            ->andWhere('o.project = :project')
             ->orderBy('o.createdAt', 'DESC')
             ->setParameter('project', $project)
             ->getQuery()
@@ -125,8 +127,8 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createQueryBuilder('o')
-            ->where('o.status = :status')
+        return $this->createCompanyQueryBuilder('o')
+            ->andWhere('o.status = :status')
             ->orderBy('o.createdAt', 'DESC')
             ->setParameter('status', $status)
             ->getQuery()
@@ -144,12 +146,12 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function findPendingOrdersInPeriod(DateTimeInterface $start, DateTimeInterface $end, int $limit = 5): array
     {
-        return $this->createQueryBuilder('o')
+        return $this->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
-            ->where('o.status = :status')
+            ->andWhere('o.status = :status')
             ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('status', 'a_signer')
             ->setParameter('start', $start)
@@ -165,7 +167,7 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function findOneWithRelations(int $id): ?Order
     {
-        return $this->createQueryBuilder('o')
+        return $this->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->leftJoin('o.sections', 's')
@@ -174,7 +176,7 @@ class OrderRepository extends ServiceEntityRepository
             ->addSelect('l')
             ->leftJoin('o.paymentSchedules', 'ps')
             ->addSelect('ps')
-            ->where('o.id = :id')
+            ->andWhere('o.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();
@@ -189,11 +191,11 @@ class OrderRepository extends ServiceEntityRepository
             return;
         }
 
-        $this->createQueryBuilder('o')
+        $this->createCompanyQueryBuilder('o')
             ->addSelect('s', 'l')
             ->leftJoin('o.sections', 's')
             ->leftJoin('s.lines', 'l')
-            ->where('o.project IN (:projects)')
+            ->andWhere('o.project IN (:projects)')
             ->setParameter('projects', $projects)
             ->getQuery()
             ->getResult();
@@ -204,9 +206,9 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function countByStatus(string $status, ?int $userId = null, ?string $userRole = null): int
     {
-        $qb = $this->createQueryBuilder('o')
+        $qb = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.status = :status')
+            ->andWhere('o.status = :status')
             ->setParameter('status', $status);
 
         if ($userId && $userRole) {
@@ -227,9 +229,9 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function getTotalAmountByStatus(string $status): float
     {
-        $result = $this->createQueryBuilder('o')
+        $result = $this->createCompanyQueryBuilder('o')
             ->select('SUM(o.totalAmount)')
-            ->where('o.status = :status')
+            ->andWhere('o.status = :status')
             ->setParameter('status', $status)
             ->getQuery()
             ->getSingleScalarResult();
@@ -242,7 +244,7 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function getStatsByStatus(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, ?int $userId = null, ?string $userRole = null): array
     {
-        $qb = $this->createQueryBuilder('o')
+        $qb = $this->createCompanyQueryBuilder('o')
             ->select('o.status, COUNT(o.id) as count, SUM(o.totalAmount) as total')
             ->groupBy('o.status');
 
@@ -281,9 +283,9 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function getSignedRevenueForPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): float
     {
-        $qb = $this->createQueryBuilder('o')
+        $qb = $this->createCompanyQueryBuilder('o')
             ->select('SUM(o.totalAmount)')
-            ->where('o.status IN (:statuses)')
+            ->andWhere('o.status IN (:statuses)')
             ->andWhere('o.validatedAt BETWEEN :start AND :end')
             ->setParameter('statuses', ['signe', 'gagne', 'termine'])
             ->setParameter('start', $startDate)
@@ -393,7 +395,7 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function getRecentOrders(int $limit = 10): array
     {
-        return $this->createQueryBuilder('o')
+        return $this->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->orderBy('o.createdAt', 'DESC')
@@ -408,9 +410,9 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function getConversionRate(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): float
     {
-        $qbTotal = $this->createQueryBuilder('o')
+        $qbTotal = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.createdAt BETWEEN :start AND :end')
+            ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
 
@@ -430,9 +432,9 @@ class OrderRepository extends ServiceEntityRepository
             return 0.0;
         }
 
-        $qbSigned = $this->createQueryBuilder('o')
+        $qbSigned = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.createdAt BETWEEN :start AND :end')
+            ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->andWhere('o.status IN (:statuses)')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
@@ -484,9 +486,9 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function countOrdersInPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): int
     {
-        $qb = $this->createQueryBuilder('o')
+        $qb = $this->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
-            ->where('o.createdAt BETWEEN :start AND :end')
+            ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
 
@@ -510,12 +512,10 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function search(string $query, int $limit = 5): array
     {
-        return $this->createQueryBuilder('o')
+        return $this->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->leftJoin('p.client', 'c')
-            ->where('o.orderNumber LIKE :query')
-            ->orWhere('o.name LIKE :query')
-            ->orWhere('c.name LIKE :query')
+            ->andWhere('o.orderNumber LIKE :query OR o.name LIKE :query OR c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('o.id', 'DESC')
             ->setMaxResults($limit)

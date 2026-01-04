@@ -98,6 +98,7 @@ class ProjectEventSubscriber
     private function createEvent(Project $project, string $type, string $description, ?array $data = null): void
     {
         $event = new ProjectEvent();
+        $event->setCompany($project->getCompany()); // Multi-tenant: inherit company from project
         $event->setProject($project);
         $event->setEventType($type);
         $event->setDescription($description);

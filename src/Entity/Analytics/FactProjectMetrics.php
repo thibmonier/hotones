@@ -7,6 +7,8 @@ namespace App\Entity\Analytics;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\Entity\Company;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Entity\Order;
 use App\Entity\Project;
 use DateTime;
@@ -32,13 +34,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['metrics:read']],
     paginationItemsPerPage: 50,
 )]
-class FactProjectMetrics
+class FactProjectMetrics implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['metrics:read'])]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Company $company;
 
     // Clés étrangères vers les dimensions
     #[ORM\ManyToOne(targetEntity: DimTime::class)]
@@ -505,6 +511,18 @@ class FactProjectMetrics
         } else {
             $this->marginPercentage = '0.00';
         }
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

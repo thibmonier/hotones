@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Vendor;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Vendor>
+ * @extends CompanyAwareRepository<Vendor>
  */
-class VendorRepository extends ServiceEntityRepository
+class VendorRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Vendor::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Vendor::class, $companyContext);
     }
 
     /**
@@ -23,8 +25,8 @@ class VendorRepository extends ServiceEntityRepository
      */
     public function findAllActive(): array
     {
-        return $this->createQueryBuilder('v')
-            ->where('v.active = :active')
+        return $this->createCompanyQueryBuilder('v')
+            ->andWhere('v.active = :active')
             ->setParameter('active', true)
             ->orderBy('v.name', 'ASC')
             ->getQuery()
@@ -36,7 +38,7 @@ class VendorRepository extends ServiceEntityRepository
      */
     public function findAll(): array
     {
-        return $this->createQueryBuilder('v')
+        return $this->createCompanyQueryBuilder('v')
             ->orderBy('v.name', 'ASC')
             ->getQuery()
             ->getResult();

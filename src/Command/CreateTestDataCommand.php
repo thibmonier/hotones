@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Client;
+use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Entity\Planning;
 use App\Entity\Profile;
@@ -78,6 +79,12 @@ class CreateTestDataCommand extends Command
                 InputOption::VALUE_NONE,
                 'Générer également des données de test (projets, devis, tâches)',
             )
+            ->addOption(
+                'company-id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'ID de la Company (utilise la première si non spécifié)',
+            )
             ->setHelp('
 Cette commande crée les contributeurs selon la répartition définie.
 Utilisez --with-test-data pour générer également des projets, devis et tâches fictifs.
@@ -103,6 +110,25 @@ Répartition des contributeurs :
 
         $io->title('Création des données'.($withTestData ? ' de test' : ''));
 
+        // Récupérer la Company
+        $companyId = $input->getOption('company-id');
+        if ($companyId) {
+            $company = $this->entityManager->getRepository(Company::class)->find($companyId);
+            if (!$company) {
+                $io->error(sprintf('Company avec ID %d introuvable', $companyId));
+
+                return Command::FAILURE;
+            }
+        } else {
+            $company = $this->entityManager->getRepository(Company::class)->findOneBy([]);
+            if (!$company) {
+                $io->error('Aucune Company trouvée. Créez d\'abord une Company.');
+
+                return Command::FAILURE;
+            }
+            $io->note(sprintf('Utilisation de la Company: %s (ID: %d)', $company->getName(), $company->getId()));
+        }
+
         try {
             // 1. Vérifier que les données de référence existent
             $this->checkReferenceData($io);
@@ -111,26 +137,26 @@ Répartition des contributeurs :
             $users = $this->createUsers($io);
 
             // 3. Créer les contributeurs avec la bonne répartition
-            $contributors = $this->createContributorsWithDistribution($io);
+            $contributors = $this->createContributorsWithDistribution($io, $company);
 
             if ($withTestData) {
                 // 4. Créer des catégories de service
                 $categories = $this->createServiceCategories($io);
 
                 // 5. Créer des clients
-                $clients = $this->createClients($io, $users);
+                $clients = $this->createClients($io, $users, $company);
 
                 // 6. Créer des projets
-                $projects = $this->createProjects($io, $clients, $users, $categories);
+                $projects = $this->createProjects($io, $clients, $users, $categories, $company);
 
                 // 7. Créer des tâches de projet
-                $this->createProjectTasks($io, $projects, $contributors);
+                $this->createProjectTasks($io, $projects, $contributors, $company);
 
                 // 9. Créer des feuilles de temps
-                $this->createTimesheets($io, $projects, $contributors);
+                $this->createTimesheets($io, $projects, $contributors, $company);
 
                 // 10. Créer du planning prévisionnel
-                $this->createPlannings($io, $projects, $contributors);
+                $this->createPlannings($io, $projects, $contributors, $company);
             }
 
             $this->entityManager->flush();
@@ -197,7 +223,7 @@ Répartition des contributeurs :
         return $users;
     }
 
-    private function createContributorsWithDistribution(SymfonyStyle $io): array
+    private function createContributorsWithDistribution(SymfonyStyle $io, Company $company): array
     {
         $io->section('Création des contributeurs selon la répartition');
 
@@ -232,6 +258,7 @@ Répartition des contributeurs :
 
                 if (!$contributor) {
                     $contributor = new Contributor();
+                    $contributor->setCompany($company);
                     $contributor->setFirstName($firstName);
                     $contributor->setLastName($lastName);
                     $io->writeln("✓ Contributeur créé : $firstName $lastName ($profileName)");
@@ -299,7 +326,7 @@ Répartition des contributeurs :
         return $categories;
     }
 
-    private function createClients(SymfonyStyle $io, array $users): array
+    private function createClients(SymfonyStyle $io, array $users, Company $company): array
     {
         $io->section('Création des clients');
 
@@ -317,6 +344,7 @@ Répartition des contributeurs :
             $client = $repo->findOneBy(['name' => $name]);
             if (!$client) {
                 $client = new Client();
+                $client->setCompany($company);
                 $client->setName($name);
                 $io->writeln("✓ Client créé : $name");
             } else {
@@ -332,7 +360,7 @@ Répartition des contributeurs :
     /**
      * @throws Exception
      */
-    private function createProjects(SymfonyStyle $io, array $clients, array $users, array $categories): array
+    private function createProjects(SymfonyStyle $io, array $clients, array $users, array $categories, Company $company): array
     {
         $io->section('Création des projets');
 
@@ -392,6 +420,7 @@ Répartition des contributeurs :
             $project = $repo->findOneBy(['name' => $data['name']]);
             if (!$project) {
                 $project = new Project();
+                $project->setCompany($company);
                 $project->setName($data['name']);
                 $io->writeln("✓ Projet créé : {$data['name']}");
             } else {
@@ -432,7 +461,7 @@ Répartition des contributeurs :
         return $projects;
     }
 
-    private function createProjectTasks(SymfonyStyle $io, array $projects, array $contributors): void
+    private function createProjectTasks(SymfonyStyle $io, array $projects, array $contributors, Company $company): void
     {
         $io->section('Création des tâches de projet');
 
@@ -466,6 +495,7 @@ Répartition des contributeurs :
                 $task = $taskRepo->findOneBy(['project' => $project, 'name' => $taskData['name']]);
                 if (!$task) {
                     $task = new ProjectTask();
+                    $task->setCompany($project->getCompany());
                     $task->setProject($project);
                     $task->setName($taskData['name']);
                     $io->writeln("  ✓ Tâche créée : {$project->getName()} -> {$taskData['name']}");
@@ -518,7 +548,7 @@ Répartition des contributeurs :
         return $contributorsByProfile['développeur fullstack'][0] ?? $contributors[array_rand($contributors)];
     }
 
-    private function createTimesheets(SymfonyStyle $io, array $projects, array $contributors): void
+    private function createTimesheets(SymfonyStyle $io, array $projects, array $contributors, Company $company): void
     {
         $io->section('Création des feuilles de temps');
 
@@ -546,6 +576,7 @@ Répartition des contributeurs :
                     $hours = (string) (4 + (rand(0, 40) / 10)); // 4.0 à 8.0
 
                     $timesheet = new Timesheet();
+                    $timesheet->setCompany($project->getCompany());
                     $timesheet->setContributor($contributor);
                     $timesheet->setProject($project);
                     $timesheet->setDate($date);
@@ -561,7 +592,7 @@ Répartition des contributeurs :
         $io->writeln("✓ $timesheetsCreated feuilles de temps créées");
     }
 
-    private function createPlannings(SymfonyStyle $io, array $projects, array $contributors): void
+    private function createPlannings(SymfonyStyle $io, array $projects, array $contributors, Company $company): void
     {
         $io->section('Création des plannings prévisionnels');
 
@@ -590,6 +621,7 @@ Répartition des contributeurs :
                     $end   = (clone $start)->modify('+'.max(0, $days - 1).' days');
 
                     $planning = new Planning();
+                    $planning->setCompany($project->getCompany());
                     $planning->setContributor($contributor);
                     $planning->setProject($project);
                     $planning->setStartDate($start);

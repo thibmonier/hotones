@@ -3,8 +3,13 @@
 namespace App\Factory;
 
 use App\Entity\User;
+use App\Exception\CompanyContextMissingException;
+use App\Security\CompanyContext;
 use Faker\Generator;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+use function Zenstruck\Foundry\lazy;
+
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -12,9 +17,14 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class UserFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
-    {
+    private ?CompanyContext $companyContext = null;
+
+    public function __construct(
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        CompanyContext $companyContext
+    ) {
         parent::__construct();
+        $this->companyContext = $companyContext;
     }
 
     protected function defaults(): array|callable
@@ -22,9 +32,18 @@ final class UserFactory extends PersistentObjectFactory
         /** @var Generator $faker */
         $faker = self::faker();
 
+        // Try to get company from context (for multi-tenant tests), fallback to creating new company
+        $company = null;
+        try {
+            $company = $this->companyContext?->getCurrentCompany();
+        } catch (CompanyContextMissingException) {
+            // No authenticated user - will create new company
+        }
+
         return [
-            'email' => $faker->unique()->safeEmail(),
-            'roles' => [],
+            'company' => $company ?? lazy(fn () => CompanyFactory::createOne()),
+            'email'   => $faker->unique()->safeEmail(),
+            'roles'   => [],
             // Set a plain password; it will be hashed in initialize().
             'password'      => 'password',
             'firstName'     => $faker->firstName(),

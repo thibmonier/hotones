@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Form\ProjectTaskType;
+use App\Security\CompanyContext;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +23,7 @@ class ProjectDetailController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private \App\Service\ProfitabilityService $profitabilityService,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -85,6 +87,7 @@ class ProjectDetailController extends AbstractController
     public function newTask(Project $project, Request $request): Response
     {
         $task = new ProjectTask();
+        $task->setCompany($project->getCompany());
         $task->setProject($project);
         $task->setType(ProjectTask::TYPE_REGULAR);
         $task->setCountsForProfitability(true);

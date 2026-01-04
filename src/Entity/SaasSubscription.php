@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\SaasSubscriptionRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Abonnement à un service SaaS.
@@ -19,7 +21,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['service_id'], name: 'idx_saas_subscription_service')]
 #[ORM\Index(columns: ['status'], name: 'idx_saas_subscription_status')]
 #[ORM\Index(columns: ['next_renewal_date'], name: 'idx_saas_subscription_renewal')]
-class SaasSubscription
+#[ORM\Index(columns: ['company_id'], name: 'idx_saassubscription_company')]
+class SaasSubscription implements CompanyOwnedInterface
 {
     // Périodicités de facturation
     public const BILLING_MONTHLY = 'monthly';
@@ -47,6 +50,11 @@ class SaasSubscription
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Service SaaS auquel on est abonné.
@@ -481,5 +489,17 @@ class SaasSubscription
     public function __toString(): string
     {
         return $this->getDisplayName();
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

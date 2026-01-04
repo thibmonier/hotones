@@ -6,18 +6,20 @@ namespace App\Repository;
 
 use App\Entity\SaasService;
 use App\Entity\SaasSubscription;
+use App\Security\CompanyContext;
 use DateTime;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<SaasSubscription>
+ * @extends CompanyAwareRepository<SaasSubscription>
  */
-class SaasSubscriptionRepository extends ServiceEntityRepository
+class SaasSubscriptionRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, SaasSubscription::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, SaasSubscription::class, $companyContext);
     }
 
     /**
@@ -27,8 +29,8 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
      */
     public function findActive(): array
     {
-        return $this->createQueryBuilder('sub')
-            ->where('sub.status = :status')
+        return $this->createCompanyQueryBuilder('sub')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->orderBy('sub.nextRenewalDate', 'ASC')
             ->getQuery()
@@ -42,8 +44,8 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createQueryBuilder('sub')
-            ->where('sub.status = :status')
+        return $this->createCompanyQueryBuilder('sub')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', $status)
             ->orderBy('sub.nextRenewalDate', 'ASC')
             ->getQuery()
@@ -57,7 +59,7 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
      */
     public function findByService(SaasService $service): array
     {
-        return $this->createQueryBuilder('sub')
+        return $this->createCompanyQueryBuilder('sub')
             ->where('sub.service = :service')
             ->setParameter('service', $service)
             ->orderBy('sub.startDate', 'DESC')
@@ -76,8 +78,8 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
         $today = new DateTime();
         $today->setTime(0, 0, 0);
 
-        return $this->createQueryBuilder('sub')
-            ->where('sub.status = :status')
+        return $this->createCompanyQueryBuilder('sub')
+            ->andWhere('sub.status = :status')
             ->andWhere('sub.autoRenewal = :autoRenewal')
             ->andWhere('sub.nextRenewalDate <= :today')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
@@ -101,8 +103,8 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
         $futureDate = clone $today;
         $futureDate->modify("+{$days} days");
 
-        return $this->createQueryBuilder('sub')
-            ->where('sub.status = :status')
+        return $this->createCompanyQueryBuilder('sub')
+            ->andWhere('sub.status = :status')
             ->andWhere('sub.nextRenewalDate BETWEEN :today AND :futureDate')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->setParameter('today', $today)
@@ -149,7 +151,7 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
      */
     public function getStatsByStatus(): array
     {
-        $results = $this->createQueryBuilder('sub')
+        $results = $this->createCompanyQueryBuilder('sub')
             ->select('sub.status', 'COUNT(sub.id) as count')
             ->groupBy('sub.status')
             ->getQuery()
@@ -170,9 +172,9 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
      */
     public function getStatsByBillingPeriod(): array
     {
-        $results = $this->createQueryBuilder('sub')
+        $results = $this->createCompanyQueryBuilder('sub')
             ->select('sub.billingPeriod', 'COUNT(sub.id) as count')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->groupBy('sub.billingPeriod')
             ->getQuery()
@@ -191,9 +193,9 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
      */
     public function countActive(): int
     {
-        return (int) $this->createQueryBuilder('sub')
+        return (int) $this->createCompanyQueryBuilder('sub')
             ->select('COUNT(sub.id)')
-            ->where('sub.status = :status')
+            ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->getQuery()
             ->getSingleScalarResult();
@@ -206,11 +208,10 @@ class SaasSubscriptionRepository extends ServiceEntityRepository
      */
     public function searchByName(string $search): array
     {
-        return $this->createQueryBuilder('sub')
+        return $this->createCompanyQueryBuilder('sub')
             ->leftJoin('sub.service', 's')
             ->addSelect('s')
-            ->where('sub.customName LIKE :search')
-            ->orWhere('s.name LIKE :search')
+            ->andWhere('sub.customName LIKE :search OR s.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('sub.nextRenewalDate', 'ASC')
             ->getQuery()

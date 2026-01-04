@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<User>
+ * @extends CompanyAwareRepository<User>
  */
-class UserRepository extends ServiceEntityRepository
+class UserRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, User::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, User::class, $companyContext);
     }
 
     /**
@@ -25,7 +27,7 @@ class UserRepository extends ServiceEntityRepository
      */
     public function findByRole(string $role): array
     {
-        return $this->createQueryBuilder('u')
+        return $this->createCompanyQueryBuilder('u')
             ->andWhere('u.roles LIKE :role')
             ->setParameter('role', '%"'.$role.'"%')
             ->getQuery()

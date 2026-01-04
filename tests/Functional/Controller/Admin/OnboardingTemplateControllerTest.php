@@ -9,6 +9,7 @@ use App\Entity\Profile;
 use App\Factory\UserFactory;
 use App\Repository\OnboardingTemplateRepository;
 use App\Repository\ProfileRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -18,6 +19,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private KernelBrowser $client;
     private OnboardingTemplateRepository $templateRepository;
@@ -30,11 +32,13 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $this->templateRepository = $container->get(OnboardingTemplateRepository::class);
         $this->profileRepository  = $container->get(ProfileRepository::class);
+        $this->setUpMultiTenant();
     }
 
     private function createTemplate(string $name = 'Test Template'): OnboardingTemplate
     {
         $template = new OnboardingTemplate();
+        $template->setCompany($this->getTestCompany());
         $template->setName($name);
         $template->setDescription('Test description');
         $template->setActive(true);
@@ -331,6 +335,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $profile = new Profile();
         $profile->setName('Developer');
         $profile->setDescription('Development profile');
+        $profile->setCompany($this->getTestCompany());
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($profile);

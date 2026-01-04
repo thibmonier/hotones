@@ -10,6 +10,7 @@ use App\Entity\OrderLine;
 use App\Entity\OrderSection;
 use App\Entity\Project;
 use App\Repository\OrderRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -20,6 +21,7 @@ class OrderRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private EntityManagerInterface $entityManager;
     private OrderRepository $repository;
@@ -29,6 +31,7 @@ class OrderRepositoryTest extends KernelTestCase
         self::bootKernel();
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $this->repository    = $this->entityManager->getRepository(Order::class);
+        $this->setUpMultiTenant();
     }
 
     protected function tearDown(): void
@@ -210,12 +213,14 @@ class OrderRepositoryTest extends KernelTestCase
         $order   = $this->createOrder($project, 'Order 1');
 
         $section = new OrderSection();
+        $section->setCompany($this->getTestCompany());
         $section->setOrder($order);
         $section->setTitle('Section 1');
         $section->setPosition(1);
         $this->entityManager->persist($section);
 
         $line = new OrderLine();
+        $line->setCompany($this->getTestCompany());
         $line->setSection($section);
         $line->setDescription('Line 1');
         $line->setType('service');
@@ -518,6 +523,7 @@ class OrderRepositoryTest extends KernelTestCase
     private function createClient(string $name): Client
     {
         $client = new Client();
+        $client->setCompany($this->getTestCompany());
         $client->setName($name);
         $this->entityManager->persist($client);
         $this->entityManager->flush();
@@ -528,10 +534,12 @@ class OrderRepositoryTest extends KernelTestCase
     private function createProject(string $name): Project
     {
         $client = new Client();
+        $client->setCompany($this->getTestCompany());
         $client->setName('Test Client');
         $this->entityManager->persist($client);
 
         $project = new Project();
+        $project->setCompany($this->getTestCompany());
         $project->setName($name);
         $project->setClient($client);
         $project->setProjectType('forfait');
@@ -545,6 +553,7 @@ class OrderRepositoryTest extends KernelTestCase
     private function createProjectWithClient(string $name, Client $client): Project
     {
         $project = new Project();
+        $project->setCompany($this->getTestCompany());
         $project->setName($name);
         $project->setClient($client);
         $project->setProjectType('forfait');
@@ -558,6 +567,7 @@ class OrderRepositoryTest extends KernelTestCase
     private function createOrder(Project $project, string $name, string $status = 'draft', float $totalAmount = 0.0): Order
     {
         $order = new Order();
+        $order->setCompany($this->getTestCompany());
         $order->setProject($project);
         $order->setName($name);
         $order->setStatus($status);

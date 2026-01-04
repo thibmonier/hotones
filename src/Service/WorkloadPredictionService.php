@@ -89,16 +89,16 @@ class WorkloadPredictionService
      */
     private function analyzeOrder(Order $order, array $profileIds = [], array $contributorIds = []): array
     {
-        $project     = $order->getProject();
-        $client      = $project?->getClient();
-        $salesPerson = $project?->getSalesPerson();
+        $project     = $order->project;
+        $client      = $project?->client;
+        $salesPerson = $project?->salesPerson;
 
         // Calcul de la probabilité de gain basée sur plusieurs facteurs
         $probability = 50; // Base 50%
 
         // Facteur 1 : Historique client (taux de conversion)
         if ($client) {
-            $clientConversionRate = $this->getClientConversionRate($client->getId());
+            $clientConversionRate = $this->getClientConversionRate($client->id);
             $probability += ($clientConversionRate - 50) * 0.3; // Poids 30%
         }
 
@@ -109,7 +109,7 @@ class WorkloadPredictionService
         }
 
         // Facteur 3 : Âge du devis (pénalité si ancien)
-        $daysOld = (new DateTime())->diff($order->getCreatedAt())->days;
+        $daysOld = (new DateTime())->diff($order->createdAt)->days;
         if ($daysOld > 60) {
             $probability -= 20; // Très ancien
         } elseif ($daysOld > 30) {
@@ -119,7 +119,7 @@ class WorkloadPredictionService
         }
 
         // Facteur 4 : Montant du devis (les gros montants ont moins de chance)
-        $amount = (float) $order->getTotalAmount();
+        $amount = (float) $order->totalAmount;
         if ($amount > 100000) {
             $probability -= 15;
         } elseif ($amount > 50000) {
@@ -140,8 +140,8 @@ class WorkloadPredictionService
             'totalDays'      => $totalDays,
             'amount'         => $amount,
             'daysOld'        => $daysOld,
-            'client'         => $client?->getName()  ?? 'N/A',
-            'project'        => $project?->getName() ?? 'N/A',
+            'client'         => $client?->name  ?? 'N/A',
+            'project'        => $project?->name ?? 'N/A',
         ];
     }
 
@@ -214,7 +214,7 @@ class WorkloadPredictionService
         foreach ($order->getSections() as $section) {
             foreach ($section->getLines() as $line) {
                 // Ne compter que les lignes de type "service"
-                if ($line->getType() !== 'service' || !$line->getDays()) {
+                if ($line->type !== 'service' || !$line->days) {
                     continue;
                 }
 
@@ -225,7 +225,7 @@ class WorkloadPredictionService
                     }
                 }
 
-                $totalDays += (float) $line->getDays();
+                $totalDays += (float) $line->days;
             }
         }
 
@@ -357,13 +357,13 @@ class WorkloadPredictionService
      */
     private function addConfirmedWorkloadToMonth(array &$workloadByMonth, Order $order, array $profileIds = [], array $contributorIds = []): void
     {
-        $project = $order->getProject();
-        if (!$project || !$project->getStartDate()) {
+        $project = $order->project;
+        if (!$project || !$project->startDate) {
             return;
         }
 
-        $startDate = $project->getStartDate();
-        $endDate   = $project->getEndDate();
+        $startDate = $project->startDate;
+        $endDate   = $project->endDate;
 
         if (!$endDate) {
             // Si pas de date de fin, prévoir 3 mois par défaut

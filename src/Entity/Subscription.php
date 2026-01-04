@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\SubscriptionRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Abonnement SaaS.
@@ -21,7 +23,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['provider_id'], name: 'idx_subscription_provider')]
 #[ORM\Index(columns: ['status'], name: 'idx_subscription_status')]
 #[ORM\Index(columns: ['next_renewal_date'], name: 'idx_subscription_renewal')]
-class Subscription
+#[ORM\Index(columns: ['company_id'], name: 'idx_subscription_company')]
+class Subscription implements CompanyOwnedInterface
 {
     // Périodicités de facturation
     public const BILLING_MONTHLY = 'monthly';
@@ -49,6 +52,11 @@ class Subscription
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Nom de l'abonnement (ex: "Disney+", "Netflix Premium").
@@ -591,5 +599,17 @@ class Subscription
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

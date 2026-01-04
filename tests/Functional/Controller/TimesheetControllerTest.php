@@ -279,12 +279,16 @@ class TimesheetControllerTest extends WebTestCase
         // Create required Profile
         ProfileFactory::createOne(['name' => 'Developer']);
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
-        $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne(['status' => 'active']);
+        // Create a single company and ensure all entities use it
+        $company = \App\Factory\CompanyFactory::createOne();
+
+        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT'], 'company' => $company]);
+        $contributor = ContributorFactory::createOne(['user' => $user, 'company' => $company]);
+        $project     = ProjectFactory::createOne(['status' => 'active', 'company' => $company]);
 
         ProjectTaskFactory::createOne([
             'project'             => $project,
+            'company'             => $company,
             'assignedContributor' => $contributor,
             'active'              => true,
         ]);

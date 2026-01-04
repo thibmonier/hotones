@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Badge;
 use App\Repository\BadgeRepository;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,7 @@ class BadgeController extends AbstractController
     public function __construct(
         private readonly BadgeRepository $badgeRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -41,6 +43,7 @@ class BadgeController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $badge = new Badge();
+            $badge->setCompany($this->companyContext->getCurrentCompany());
             $badge->setName($request->request->get('name'));
             $badge->setDescription($request->request->get('description'));
             $badge->setIcon($request->request->get('icon'));

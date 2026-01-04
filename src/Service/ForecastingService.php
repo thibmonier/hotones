@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\FactForecast;
 use App\Repository\FactForecastRepository;
 use App\Repository\ProjectRepository;
+use App\Security\CompanyContext;
 use App\Service\Analytics\DashboardReadService;
 use DateTime;
 use DateTimeImmutable;
@@ -28,6 +29,7 @@ class ForecastingService
 
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly CompanyContext $companyContext,
         private readonly FactForecastRepository $forecastRepository,
         private readonly ProjectRepository $projectRepository,
         private readonly DashboardReadService $dashboardService,
@@ -136,7 +138,7 @@ class ForecastingService
         // Grouper par mois
         $monthlyRevenue = [];
         foreach ($projects as $project) {
-            $month = $project->getStartDate()?->format('Y-m');
+            $month = $project->startDate?->format('Y-m');
             if (!$month) {
                 continue;
             }
@@ -427,6 +429,7 @@ class ForecastingService
         $confidenceMax   = bcmul($predictedRevenue, (string) (1 + $confidenceRange), 2);
 
         $forecast = new FactForecast();
+        $forecast->setCompany($this->companyContext->getCurrentCompany());
         $forecast->setPeriodStart($periodStart);
         $forecast->setPeriodEnd($periodEnd);
         $forecast->setScenario($scenario);

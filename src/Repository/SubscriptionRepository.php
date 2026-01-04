@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Subscription;
+use App\Security\CompanyContext;
 use DateTime;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Subscription>
+ * @extends CompanyAwareRepository<Subscription>
  */
-class SubscriptionRepository extends ServiceEntityRepository
+class SubscriptionRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Subscription::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Subscription::class, $companyContext);
     }
 
     /**
@@ -24,11 +26,11 @@ class SubscriptionRepository extends ServiceEntityRepository
      */
     public function findAllActive(): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->andWhere('s.status = :status')
             ->setParameter('active', true)
             ->setParameter('status', Subscription::STATUS_ACTIVE)
@@ -43,7 +45,7 @@ class SubscriptionRepository extends ServiceEntityRepository
      */
     public function findAll(): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
@@ -58,11 +60,11 @@ class SubscriptionRepository extends ServiceEntityRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
-            ->where('s.status = :status')
+            ->andWhere('s.status = :status')
             ->setParameter('status', $status)
             ->orderBy('v.name', 'ASC')
             ->addOrderBy('s.name', 'ASC')
@@ -78,11 +80,11 @@ class SubscriptionRepository extends ServiceEntityRepository
         $today   = new DateTime();
         $endDate = (clone $today)->modify("+{$days} days");
 
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
-            ->where('s.status = :status')
+            ->andWhere('s.status = :status')
             ->andWhere('s.nextRenewalDate IS NOT NULL')
             ->andWhere('s.nextRenewalDate BETWEEN :today AND :endDate')
             ->setParameter('status', Subscription::STATUS_ACTIVE)
@@ -128,7 +130,7 @@ class SubscriptionRepository extends ServiceEntityRepository
      */
     public function getCountByStatus(): array
     {
-        $qb = $this->createQueryBuilder('s');
+        $qb = $this->createCompanyQueryBuilder('s');
 
         $result = $qb
             ->select('s.status', 'COUNT(s.id) as count')
@@ -185,9 +187,9 @@ class SubscriptionRepository extends ServiceEntityRepository
      */
     public function countActive(): int
     {
-        return (int) $this->createQueryBuilder('s')
+        return (int) $this->createCompanyQueryBuilder('s')
             ->select('COUNT(s.id)')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->andWhere('s.status = :status')
             ->setParameter('active', true)
             ->setParameter('status', Subscription::STATUS_ACTIVE)
@@ -200,11 +202,11 @@ class SubscriptionRepository extends ServiceEntityRepository
      */
     public function findDueForRenewal(): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
-            ->where('s.status = :status')
+            ->andWhere('s.status = :status')
             ->andWhere('s.autoRenewal = :autoRenewal')
             ->andWhere('s.nextRenewalDate IS NOT NULL')
             ->andWhere('s.nextRenewalDate <= :today')
@@ -221,11 +223,11 @@ class SubscriptionRepository extends ServiceEntityRepository
      */
     public function getStatsByBillingPeriod(): array
     {
-        $qb = $this->createQueryBuilder('s');
+        $qb = $this->createCompanyQueryBuilder('s');
 
         $result = $qb
             ->select('s.billingPeriod', 'COUNT(s.id) as count')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->andWhere('s.status = :status')
             ->setParameter('active', true)
             ->setParameter('status', Subscription::STATUS_ACTIVE)

@@ -6,6 +6,11 @@ use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\Technology;
 use App\Form\ProjectType as ProjectFormType;
+use App\Repository\ProjectHealthScoreRepository;
+use App\Security\CompanyContext;
+use App\Service\ProfitabilityPredictor;
+use App\Service\ProfitabilityService;
+use App\Service\ProjectRiskAnalyzer;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -19,8 +24,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_INTERVENANT')]
 class ProjectController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'project_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em, \App\Service\ProfitabilityService $profitabilityService): Response
+    public function index(Request $request, EntityManagerInterface $em, ProfitabilityService $profitabilityService): Response
     {
         $projectRepo = $em->getRepository(Project::class);
 
@@ -72,13 +82,13 @@ class ProjectController extends AbstractController
         $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset, null, null, null, $filterServiceCategory, $filterSearch);
 
         // Agrégats SQL en batch pour éviter le parcours objet
-        $projectIds = array_map(fn ($p) => $p->getId(), $projects);
+        $projectIds = array_map(fn ($p) => $p->id, $projects);
         $aggregates = $projectRepo->getAggregatedMetricsFor($projectIds);
 
         // Construire la structure attendue par la vue
         $projectsWithMetrics = [];
         foreach ($projects as $project) {
-            $pid = $project->getId();
+            $pid = $project->id;
             $agg = $aggregates[$pid] ?? [
                 'total_revenue'       => '0',
                 'total_margin'        => '0',
@@ -88,7 +98,7 @@ class ProjectController extends AbstractController
             ];
 
             // Ajouter l'achat projet (purchasesAmount)
-            $projectPurchases = $project->getPurchasesAmount() ?? '0';
+            $projectPurchases = $project->purchasesAmount ?? '0';
             $totalPurchases   = bcadd($agg['total_purchases'], $projectPurchases, 2);
 
             // Taux de marge
@@ -184,7 +194,9 @@ class ProjectController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $project = new Project();
-        $form    = $this->createForm(ProjectFormType::class, $project);
+        $project->setCompany($this->companyContext->getCurrentCompany());
+
+        $form = $this->createForm(ProjectFormType::class, $project);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -214,9 +226,9 @@ class ProjectController extends AbstractController
         Request $request,
         int $id,
         EntityManagerInterface $em,
-        \App\Service\ProjectRiskAnalyzer $riskAnalyzer,
-        \App\Service\ProfitabilityPredictor $profitabilityPredictor,
-        \App\Repository\ProjectHealthScoreRepository $healthScoreRepo
+        ProjectRiskAnalyzer $riskAnalyzer,
+        ProfitabilityPredictor $profitabilityPredictor,
+        ProjectHealthScoreRepository $healthScoreRepo
     ): Response {
         $project = $em->getRepository(Project::class)->findOneWithRelations($id);
 
@@ -331,7 +343,7 @@ class ProjectController extends AbstractController
         $totalDays      = '0';
         $totalMargin    = '0';
         $totalCost      = '0';
-        $totalPurchases = $project->getPurchasesAmount() ?? '0';
+        $totalPurchases = $project->purchasesAmount ?? '0';
         $ordersByStatus = [];
         $ordersCount    = 0;
 
@@ -392,7 +404,7 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/export.csv', name: 'project_export_csv', methods: ['GET'])]
-    public function exportCsv(Request $request, EntityManagerInterface $em, \App\Service\ProfitabilityService $profitabilityService): Response
+    public function exportCsv(Request $request, EntityManagerInterface $em, ProfitabilityService $profitabilityService): Response
     {
         $projectRepo = $em->getRepository(Project::class);
         $session     = $request->getSession();

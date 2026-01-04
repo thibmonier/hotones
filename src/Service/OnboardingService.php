@@ -10,6 +10,7 @@ use App\Entity\OnboardingTask;
 use App\Entity\OnboardingTemplate;
 use App\Repository\OnboardingTaskRepository;
 use App\Repository\OnboardingTemplateRepository;
+use App\Security\CompanyContext;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +19,7 @@ class OnboardingService
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly CompanyContext $companyContext,
         private readonly OnboardingTemplateRepository $templateRepository,
         private readonly OnboardingTaskRepository $taskRepository,
     ) {
@@ -73,6 +75,7 @@ class OnboardingService
 
         foreach ($tasks as $taskDef) {
             $task = new OnboardingTask();
+            $task->setCompany($this->companyContext->getCurrentCompany());
             $task->setContributor($contributor);
             $task->setTemplate($template);
             $task->setTitle($taskDef['title'] ?? 'Sans titre');
@@ -234,6 +237,7 @@ class OnboardingService
         array $tasks
     ): OnboardingTemplate {
         $template = new OnboardingTemplate();
+        $template->setCompany($this->companyContext->getCurrentCompany());
         $template->setName($name);
         $template->setDescription($description);
 
@@ -272,6 +276,7 @@ class OnboardingService
     public function duplicateTemplate(OnboardingTemplate $sourceTemplate, string $newName, ?int $profileId = null): OnboardingTemplate
     {
         $newTemplate = new OnboardingTemplate();
+        $newTemplate->setCompany($this->companyContext->getCurrentCompany());
         $newTemplate->setName($newName);
         $newTemplate->setDescription($sourceTemplate->getDescription());
         $newTemplate->setTasks($sourceTemplate->getTasks());

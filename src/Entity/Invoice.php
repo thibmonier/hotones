@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\InvoiceRepository;
 use DateTime;
 use DateTimeInterface;
@@ -18,6 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Facture (Invoice).
@@ -28,6 +30,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ORM\Table(name: 'invoices', indexes: [
+    new ORM\Index(name: 'idx_invoice_company', columns: ['company_id']),
     new ORM\Index(name: 'idx_invoice_number', columns: ['invoice_number']),
     new ORM\Index(name: 'idx_invoice_status', columns: ['status']),
     new ORM\Index(name: 'idx_invoice_issued_at', columns: ['issued_at']),
@@ -49,7 +52,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['invoice:write']],
     paginationItemsPerPage: 30,
 )]
-class Invoice
+class Invoice implements CompanyOwnedInterface
 {
     public const STATUS_DRAFT     = 'brouillon';
     public const STATUS_SENT      = 'envoyee';
@@ -69,7 +72,12 @@ class Invoice
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['invoice:read'])]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Numéro unique de facture : F[année][mois][incrément].
@@ -77,74 +85,129 @@ class Invoice
      */
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Groups(['invoice:read'])]
-    private string $invoiceNumber;
+    public string $invoiceNumber {
+        get => $this->invoiceNumber;
+        set {
+            $this->invoiceNumber = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 20)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private string $status = self::STATUS_DRAFT;
+    public string $status = self::STATUS_DRAFT {
+        get => $this->status;
+        set {
+            $this->status = $value;
+        }
+    }
 
     /**
      * Date d'émission de la facture.
      */
     #[ORM\Column(type: 'date')]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private DateTimeInterface $issuedAt;
+    public DateTimeInterface $issuedAt {
+        get => $this->issuedAt;
+        set {
+            $this->issuedAt = $value;
+        }
+    }
 
     /**
      * Date d'échéance de paiement.
      */
     #[ORM\Column(type: 'date')]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private DateTimeInterface $dueDate;
+    public DateTimeInterface $dueDate {
+        get => $this->dueDate;
+        set {
+            $this->dueDate = $value;
+        }
+    }
 
     /**
      * Date effective de paiement (null si non payée).
      */
     #[ORM\Column(type: 'date', nullable: true)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private ?DateTimeInterface $paidAt = null;
+    public ?DateTimeInterface $paidAt = null {
+        get => $this->paidAt;
+        set {
+            $this->paidAt = $value;
+        }
+    }
 
     /**
      * Montant total HT.
      */
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private string $amountHt = '0.00';
+    public string $amountHt = '0.00' {
+        get => $this->amountHt;
+        set {
+            $this->amountHt = $value;
+        }
+    }
 
     /**
      * Montant TVA.
      */
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private string $amountTva = '0.00';
+    public string $amountTva = '0.00' {
+        get => $this->amountTva;
+        set {
+            $this->amountTva = $value;
+        }
+    }
 
     /**
      * Taux de TVA appliqué (%).
      */
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private string $tvaRate = '20.00';
+    public string $tvaRate = '20.00' {
+        get => $this->tvaRate;
+        set {
+            $this->tvaRate = $value;
+        }
+    }
 
     /**
      * Montant total TTC.
      */
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private string $amountTtc = '0.00';
+    public string $amountTtc = '0.00' {
+        get => $this->amountTtc;
+        set {
+            $this->amountTtc = $value;
+        }
+    }
 
     /**
      * Notes internes (non affichées sur le PDF).
      */
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private ?string $internalNotes = null;
+    public ?string $internalNotes = null {
+        get => $this->internalNotes;
+        set {
+            $this->internalNotes = $value;
+        }
+    }
 
     /**
      * Conditions de paiement (affichées sur le PDF).
      */
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['invoice:read', 'invoice:write'])]
-    private ?string $paymentTerms = null;
+    public ?string $paymentTerms = null {
+        get => $this->paymentTerms;
+        set {
+            $this->paymentTerms = $value;
+        }
+    }
 
     // Relations
     /**
@@ -189,10 +252,20 @@ class Invoice
 
     // Timestamps
     #[ORM\Column(type: 'datetime')]
-    private DateTimeInterface $createdAt;
+    public DateTimeInterface $createdAt {
+        get => $this->createdAt;
+        set {
+            $this->createdAt = $value;
+        }
+    }
 
     #[ORM\Column(type: 'datetime')]
-    private DateTimeInterface $updatedAt;
+    public DateTimeInterface $updatedAt {
+        get => $this->updatedAt;
+        set {
+            $this->updatedAt = $value;
+        }
+    }
 
     public function __construct()
     {
@@ -259,144 +332,6 @@ class Invoice
     {
         $this->status = self::STATUS_PAID;
         $this->paidAt = $paidAt ?? new DateTime();
-
-        return $this;
-    }
-
-    // Getters & Setters
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getInvoiceNumber(): string
-    {
-        return $this->invoiceNumber;
-    }
-
-    public function setInvoiceNumber(string $invoiceNumber): self
-    {
-        $this->invoiceNumber = $invoiceNumber;
-
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function getIssuedAt(): DateTimeInterface
-    {
-        return $this->issuedAt;
-    }
-
-    public function setIssuedAt(DateTimeInterface $issuedAt): self
-    {
-        $this->issuedAt = $issuedAt;
-
-        return $this;
-    }
-
-    public function getDueDate(): DateTimeInterface
-    {
-        return $this->dueDate;
-    }
-
-    public function setDueDate(DateTimeInterface $dueDate): self
-    {
-        $this->dueDate = $dueDate;
-
-        return $this;
-    }
-
-    public function getPaidAt(): ?DateTimeInterface
-    {
-        return $this->paidAt;
-    }
-
-    public function setPaidAt(?DateTimeInterface $paidAt): self
-    {
-        $this->paidAt = $paidAt;
-
-        return $this;
-    }
-
-    public function getAmountHt(): string
-    {
-        return $this->amountHt;
-    }
-
-    public function setAmountHt(string $amountHt): self
-    {
-        $this->amountHt = $amountHt;
-
-        return $this;
-    }
-
-    public function getAmountTva(): string
-    {
-        return $this->amountTva;
-    }
-
-    public function setAmountTva(string $amountTva): self
-    {
-        $this->amountTva = $amountTva;
-
-        return $this;
-    }
-
-    public function getTvaRate(): string
-    {
-        return $this->tvaRate;
-    }
-
-    public function setTvaRate(string $tvaRate): self
-    {
-        $this->tvaRate = $tvaRate;
-
-        return $this;
-    }
-
-    public function getAmountTtc(): string
-    {
-        return $this->amountTtc;
-    }
-
-    public function setAmountTtc(string $amountTtc): self
-    {
-        $this->amountTtc = $amountTtc;
-
-        return $this;
-    }
-
-    public function getInternalNotes(): ?string
-    {
-        return $this->internalNotes;
-    }
-
-    public function setInternalNotes(?string $internalNotes): self
-    {
-        $this->internalNotes = $internalNotes;
-
-        return $this;
-    }
-
-    public function getPaymentTerms(): ?string
-    {
-        return $this->paymentTerms;
-    }
-
-    public function setPaymentTerms(?string $paymentTerms): self
-    {
-        $this->paymentTerms = $paymentTerms;
 
         return $this;
     }
@@ -478,26 +413,283 @@ class Invoice
         return $this;
     }
 
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $invoice->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->invoiceNumber.
+     */
+    public function getInvoiceNumber(): string
+    {
+        return $this->invoiceNumber;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->invoiceNumber = $value.
+     */
+    public function setInvoiceNumber(string $value): self
+    {
+        $this->invoiceNumber = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->status.
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->status = $value.
+     */
+    public function setStatus(string $value): self
+    {
+        $this->status = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->issuedAt.
+     */
+    public function getIssuedAt(): DateTimeInterface
+    {
+        return $this->issuedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->issuedAt = $value.
+     */
+    public function setIssuedAt(DateTimeInterface $value): self
+    {
+        $this->issuedAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->dueDate.
+     */
+    public function getDueDate(): DateTimeInterface
+    {
+        return $this->dueDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->dueDate = $value.
+     */
+    public function setDueDate(DateTimeInterface $value): self
+    {
+        $this->dueDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->paidAt.
+     */
+    public function getPaidAt(): ?DateTimeInterface
+    {
+        return $this->paidAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->paidAt = $value.
+     */
+    public function setPaidAt(?DateTimeInterface $value): self
+    {
+        $this->paidAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->amountHt.
+     */
+    public function getAmountHt(): string
+    {
+        return $this->amountHt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->amountHt = $value.
+     */
+    public function setAmountHt(string $value): self
+    {
+        $this->amountHt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->amountTva.
+     */
+    public function getAmountTva(): string
+    {
+        return $this->amountTva;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->amountTva = $value.
+     */
+    public function setAmountTva(string $value): self
+    {
+        $this->amountTva = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->tvaRate.
+     */
+    public function getTvaRate(): string
+    {
+        return $this->tvaRate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->tvaRate = $value.
+     */
+    public function setTvaRate(string $value): self
+    {
+        $this->tvaRate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->amountTtc.
+     */
+    public function getAmountTtc(): string
+    {
+        return $this->amountTtc;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->amountTtc = $value.
+     */
+    public function setAmountTtc(string $value): self
+    {
+        $this->amountTtc = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->internalNotes.
+     */
+    public function getInternalNotes(): ?string
+    {
+        return $this->internalNotes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->internalNotes = $value.
+     */
+    public function setInternalNotes(?string $value): self
+    {
+        $this->internalNotes = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->paymentTerms.
+     */
+    public function getPaymentTerms(): ?string
+    {
+        return $this->paymentTerms;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->paymentTerms = $value.
+     */
+    public function setPaymentTerms(?string $value): self
+    {
+        $this->paymentTerms = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->createdAt.
+     */
     public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->createdAt = $value.
+     */
+    public function setCreatedAt(DateTime $value): static
+    {
+        $this->createdAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->updatedAt.
+     */
     public function getUpdatedAt(): DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt): static
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $invoice->updatedAt = $value.
+     */
+    public function setUpdatedAt(DateTime $value): static
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function setUpdatedAt(DateTime $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
+        $this->updatedAt = $value;
 
         return $this;
     }

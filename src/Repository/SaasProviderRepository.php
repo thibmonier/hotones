@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\SaasProvider;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<SaasProvider>
+ * @extends CompanyAwareRepository<SaasProvider>
  */
-class SaasProviderRepository extends ServiceEntityRepository
+class SaasProviderRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, SaasProvider::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, SaasProvider::class, $companyContext);
     }
 
     /**
@@ -25,8 +27,8 @@ class SaasProviderRepository extends ServiceEntityRepository
      */
     public function findActive(): array
     {
-        return $this->createQueryBuilder('p')
-            ->where('p.active = :active')
+        return $this->createCompanyQueryBuilder('p')
+            ->andWhere('p.active = :active')
             ->setParameter('active', true)
             ->orderBy('p.name', 'ASC')
             ->getQuery()
@@ -40,8 +42,8 @@ class SaasProviderRepository extends ServiceEntityRepository
      */
     public function searchByName(string $search): array
     {
-        return $this->createQueryBuilder('p')
-            ->where('p.name LIKE :search')
+        return $this->createCompanyQueryBuilder('p')
+            ->andWhere('p.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
@@ -55,7 +57,7 @@ class SaasProviderRepository extends ServiceEntityRepository
      */
     public function getProvidersWithServiceCount(): array
     {
-        $results = $this->createQueryBuilder('p')
+        $results = $this->createCompanyQueryBuilder('p')
             ->select('p', 'COUNT(s.id) as serviceCount')
             ->leftJoin('p.services', 's')
             ->groupBy('p.id')

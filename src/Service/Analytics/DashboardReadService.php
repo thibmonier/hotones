@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Analytics;
 
 use App\Entity\Analytics\FactProjectMetrics;
+use App\Security\CompanyContext;
 use App\Service\MetricsCalculationService as RealTimeMetricsService;
 use DateTime;
 use DateTimeInterface;
@@ -24,6 +25,7 @@ readonly class DashboardReadService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private RealTimeMetricsService $realTimeService,
+        private CompanyContext $companyContext,
         private LoggerInterface $logger,
         private CacheInterface $analyticsCache
     ) {
@@ -96,7 +98,8 @@ readonly class DashboardReadService
             $startDate = (clone $endDate)->modify("-{$months} months")->modify('first day of this month');
 
             // Lire depuis le modèle en étoile
-            $qb = $this->entityManager->createQueryBuilder();
+            $company = $this->companyContext->getCurrentCompany();
+            $qb      = $this->entityManager->createQueryBuilder();
             $qb->select(
                 'dt.year',
                 'dt.month',
@@ -109,9 +112,11 @@ readonly class DashboardReadService
                 ->join('f.dimTime', 'dt')
                 ->where('dt.date BETWEEN :start AND :end')
                 ->andWhere('f.granularity = :granularity')
+                ->andWhere('f.company = :company')
                 ->setParameter('start', $startDate)
                 ->setParameter('end', $endDate)
                 ->setParameter('granularity', 'monthly')
+                ->setParameter('company', $company)
                 ->groupBy('dt.year', 'dt.month', 'dt.monthName')
                 ->orderBy('dt.year', 'ASC')
                 ->addOrderBy('dt.month', 'ASC');
@@ -151,7 +156,8 @@ readonly class DashboardReadService
         $startDate ??= new DateTime('first day of January this year');
         $endDate   ??= new DateTime();
 
-        $qb = $this->entityManager->createQueryBuilder();
+        $company = $this->companyContext->getCurrentCompany();
+        $qb      = $this->entityManager->createQueryBuilder();
         $qb->select(
             'SUM(f.totalRevenue) as totalRevenue',
             'SUM(f.totalCosts) as totalCosts',
@@ -174,8 +180,10 @@ readonly class DashboardReadService
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
             ->where('dt.date BETWEEN :start AND :end')
+            ->andWhere('f.company = :company')
             ->setParameter('start', $startDate)
-            ->setParameter('end', $endDate);
+            ->setParameter('end', $endDate)
+            ->setParameter('company', $company);
 
         // Appliquer les filtres
         $this->applyFilters($qb, $filters);
@@ -290,7 +298,8 @@ readonly class DashboardReadService
      */
     private function getProjectsByType(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $company = $this->companyContext->getCurrentCompany();
+        $qb      = $this->entityManager->createQueryBuilder();
         $qb->select(
             'dpt.projectType as type',
             'SUM(f.projectCount) as count',
@@ -299,8 +308,10 @@ readonly class DashboardReadService
             ->join('f.dimTime', 'dt')
             ->join('f.dimProjectType', 'dpt')
             ->where('dt.date BETWEEN :start AND :end')
+            ->andWhere('f.company = :company')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
+            ->setParameter('company', $company)
             ->groupBy('dpt.projectType');
 
         $this->applyFilters($qb, $filters);
@@ -321,7 +332,8 @@ readonly class DashboardReadService
      */
     private function getProjectsByClientType(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $company = $this->companyContext->getCurrentCompany();
+        $qb      = $this->entityManager->createQueryBuilder();
         $qb->select(
             'dpt.isInternal',
             'SUM(f.projectCount) as count',
@@ -330,8 +342,10 @@ readonly class DashboardReadService
             ->join('f.dimTime', 'dt')
             ->join('f.dimProjectType', 'dpt')
             ->where('dt.date BETWEEN :start AND :end')
+            ->andWhere('f.company = :company')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
+            ->setParameter('company', $company)
             ->groupBy('dpt.isInternal');
 
         $this->applyFilters($qb, $filters);
@@ -353,7 +367,8 @@ readonly class DashboardReadService
      */
     private function getProjectsByCategory(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $company = $this->companyContext->getCurrentCompany();
+        $qb      = $this->entityManager->createQueryBuilder();
         $qb->select(
             'dpt.serviceCategory as category',
             'SUM(f.projectCount) as count',
@@ -363,8 +378,10 @@ readonly class DashboardReadService
             ->join('f.dimProjectType', 'dpt')
             ->where('dt.date BETWEEN :start AND :end')
             ->andWhere('dpt.serviceCategory IS NOT NULL')
+            ->andWhere('f.company = :company')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
+            ->setParameter('company', $company)
             ->groupBy('dpt.serviceCategory')
             ->orderBy('count', 'DESC');
 
@@ -388,7 +405,8 @@ readonly class DashboardReadService
      */
     private function getTopContributors(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters, int $limit = 5): array
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $company = $this->companyContext->getCurrentCompany();
+        $qb      = $this->entityManager->createQueryBuilder();
         $qb->select(
             'dc.id',
             'dc.name',
@@ -401,8 +419,10 @@ readonly class DashboardReadService
             ->leftJoin('f.dimProjectManager', 'dc')
             ->where('dt.date BETWEEN :start AND :end')
             ->andWhere('dc.id IS NOT NULL')
+            ->andWhere('f.company = :company')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
+            ->setParameter('company', $company)
             ->groupBy('dc.id', 'dc.name')
             ->orderBy('totalRevenue', 'DESC')
             ->setMaxResults($limit);

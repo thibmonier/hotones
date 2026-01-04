@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ContributorSkillRepository;
 use DateTime;
 use DateTimeInterface;
@@ -14,12 +15,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ContributorSkillRepository::class)]
 #[ORM\Table(name: 'contributor_skills')]
 #[ORM\UniqueConstraint(name: 'contributor_skill_unique', columns: ['contributor_id', 'skill_id'])]
+#[ORM\Index(name: 'idx_contributorskill_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(
     fields: ['contributor', 'skill'],
     message: 'Ce contributeur possède déjà cette compétence',
 )]
-class ContributorSkill
+class ContributorSkill implements CompanyOwnedInterface
 {
     public const LEVEL_BEGINNER     = 1;
     public const LEVEL_INTERMEDIATE = 2;
@@ -37,6 +39,11 @@ class ContributorSkill
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Contributor::class, inversedBy: 'contributorSkills')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -259,6 +266,18 @@ class ContributorSkill
     public function setUpdatedAt(DateTime $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

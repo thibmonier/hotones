@@ -9,6 +9,7 @@ use App\Entity\PerformanceReview;
 use App\Entity\User;
 use App\Repository\ContributorRepository;
 use App\Repository\PerformanceReviewRepository;
+use App\Security\CompanyContext;
 use App\Service\PerformanceReviewService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +21,7 @@ class PerformanceReviewServiceTest extends TestCase
     private EntityManagerInterface $em;
     private PerformanceReviewRepository $reviewRepository;
     private ContributorRepository $contributorRepository;
+    private CompanyContext $companyContext;
     private MailerInterface $mailer;
     private PerformanceReviewService $service;
 
@@ -28,11 +30,13 @@ class PerformanceReviewServiceTest extends TestCase
         $this->em                    = $this->createMock(EntityManagerInterface::class);
         $this->reviewRepository      = $this->createMock(PerformanceReviewRepository::class);
         $this->contributorRepository = $this->createMock(ContributorRepository::class);
+        $this->companyContext        = $this->createMock(CompanyContext::class);
         $this->mailer                = $this->createMock(MailerInterface::class);
         $this->service               = new PerformanceReviewService(
             $this->em,
             $this->reviewRepository,
             $this->contributorRepository,
+            $this->companyContext,
             $this->mailer,
         );
     }

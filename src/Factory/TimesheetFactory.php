@@ -3,6 +3,8 @@
 namespace App\Factory;
 
 use App\Entity\Timesheet;
+use App\Exception\CompanyContextMissingException;
+use App\Security\CompanyContext;
 use Faker\Generator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -11,6 +13,14 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class TimesheetFactory extends PersistentObjectFactory
 {
+    private ?CompanyContext $companyContext = null;
+
+    public function __construct(CompanyContext $companyContext)
+    {
+        parent::__construct();
+        $this->companyContext = $companyContext;
+    }
+
     protected function defaults(): array|callable
     {
         /** @var Generator $faker */
@@ -18,7 +28,16 @@ final class TimesheetFactory extends PersistentObjectFactory
 
         $date = $faker->dateTimeBetween('-3 months', 'now');
 
+        // Try to get company from context (for multi-tenant tests), fallback to creating new company
+        $company = null;
+        try {
+            $company = $this->companyContext?->getCurrentCompany();
+        } catch (CompanyContextMissingException) {
+            // No authenticated user - will create new company
+        }
+
         return [
+            'company'     => $company ?? CompanyFactory::new(),
             'contributor' => ContributorFactory::random(),
             'project'     => ProjectFactory::random(),
             'task'        => null,

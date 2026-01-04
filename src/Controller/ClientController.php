@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Client;
 use App\Entity\ClientContact;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,6 +20,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_INTERVENANT')]
 class ClientController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'client_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
@@ -144,6 +150,7 @@ class ClientController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $client = new Client();
+        $client->setCompany($this->companyContext->getCurrentCompany());
 
         if ($request->isMethod('POST')) {
             $client->setName($request->request->get('name'));
@@ -188,8 +195,15 @@ class ClientController extends AbstractController
     }
 
     #[Route('/{id}', name: 'client_show', methods: ['GET'])]
-    public function show(Client $client): Response
+    public function show(int $id, EntityManagerInterface $em): Response
     {
+        // Use repository findOneByIdForCompany() which filters by company
+        $client = $em->getRepository(Client::class)->findOneByIdForCompany($id);
+
+        if (!$client) {
+            throw $this->createNotFoundException('Client non trouvé');
+        }
+
         return $this->render('client/show.html.twig', [
             'client' => $client,
         ]);
@@ -259,6 +273,7 @@ class ClientController extends AbstractController
     {
         $contact = new ClientContact();
         $contact->setClient($client);
+        $contact->setCompany($client->getCompany());
 
         if ($request->isMethod('POST')) {
             $contact->setLastName($request->request->get('last_name'));

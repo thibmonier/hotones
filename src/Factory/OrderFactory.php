@@ -3,6 +3,8 @@
 namespace App\Factory;
 
 use App\Entity\Order;
+use App\Exception\CompanyContextMissingException;
+use App\Security\CompanyContext;
 use Faker\Generator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -11,13 +13,30 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class OrderFactory extends PersistentObjectFactory
 {
+    private ?CompanyContext $companyContext = null;
+
+    public function __construct(CompanyContext $companyContext)
+    {
+        parent::__construct();
+        $this->companyContext = $companyContext;
+    }
+
     protected function defaults(): array|callable
     {
         /** @var Generator $faker */
         $faker = self::faker();
         $date  = $faker->dateTimeBetween('-1 year', 'now');
 
+        // Try to get company from context (for multi-tenant tests), fallback to creating new company
+        $company = null;
+        try {
+            $company = $this->companyContext?->getCurrentCompany();
+        } catch (CompanyContextMissingException) {
+            // No authenticated user - will create new company
+        }
+
         return [
+            'company'     => $company ?? CompanyFactory::new(),
             'project'     => ProjectFactory::random(),
             'name'        => $faker->sentence(3),
             'description' => $faker->optional()->paragraph(2, true),

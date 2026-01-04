@@ -130,11 +130,11 @@ class AssignTaskProfilesCommand extends Command
                 continue;
             }
 
-            $profile = $this->findMatchingProfile($task->getName(), $profiles);
+            $profile = $this->findMatchingProfile($task->name, $profiles);
 
             if ($profile === null) {
                 ++$noMatch;
-                $io->text(sprintf('  ⚠ No match: "%s"', $task->getName()));
+                $io->text(sprintf('  ⚠ No match: "%s"', $task->name));
                 continue;
             }
 
@@ -147,7 +147,7 @@ class AssignTaskProfilesCommand extends Command
             $io->text(sprintf(
                 '  ✓ %s"%s" → %s',
                 $dryRun ? '[DRY RUN] ' : '',
-                $task->getName(),
+                $task->name,
                 $profile->getName(),
             ));
         }

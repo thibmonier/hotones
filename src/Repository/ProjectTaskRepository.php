@@ -4,18 +4,20 @@ namespace App\Repository;
 
 use App\Entity\Project;
 use App\Entity\ProjectTask;
+use App\Security\CompanyContext;
 use DateTime;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ProjectTask>
+ * @extends CompanyAwareRepository<ProjectTask>
  */
-class ProjectTaskRepository extends ServiceEntityRepository
+class ProjectTaskRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ProjectTask::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ProjectTask::class, $companyContext);
     }
 
     /**
@@ -23,8 +25,8 @@ class ProjectTaskRepository extends ServiceEntityRepository
      */
     public function findByProjectOrderedByPosition(Project $project): array
     {
-        return $this->createQueryBuilder('t')
-            ->where('t.project = :project')
+        return $this->createCompanyQueryBuilder('t')
+            ->andWhere('t.project = :project')
             ->orderBy('t.position', 'ASC')
             ->addOrderBy('t.id', 'ASC')
             ->setParameter('project', $project)
@@ -37,9 +39,9 @@ class ProjectTaskRepository extends ServiceEntityRepository
      */
     public function findMaxPositionForProject(Project $project): int
     {
-        return (int) $this->createQueryBuilder('t')
+        return (int) $this->createCompanyQueryBuilder('t')
             ->select('MAX(t.position)')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->setParameter('project', $project)
             ->getQuery()
             ->getSingleScalarResult();
@@ -58,8 +60,8 @@ class ProjectTaskRepository extends ServiceEntityRepository
      */
     public function findProfitableTasksByProject(Project $project): array
     {
-        return $this->createQueryBuilder('t')
-            ->where('t.project = :project')
+        return $this->createCompanyQueryBuilder('t')
+            ->andWhere('t.project = :project')
             ->andWhere('t.countsForProfitability = true')
             ->andWhere('t.type = :type')
             ->orderBy('t.position', 'ASC')
@@ -74,9 +76,9 @@ class ProjectTaskRepository extends ServiceEntityRepository
      */
     public function countProfitableTasksByStatus(Project $project, string $status): int
     {
-        return (int) $this->createQueryBuilder('t')
+        return (int) $this->createCompanyQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->andWhere('t.status = :status')
             ->andWhere('t.countsForProfitability = true')
             ->andWhere('t.type = :type')
@@ -92,9 +94,9 @@ class ProjectTaskRepository extends ServiceEntityRepository
      */
     public function countProfitableTasks(Project $project): int
     {
-        return (int) $this->createQueryBuilder('t')
+        return (int) $this->createCompanyQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.project = :project')
+            ->andWhere('t.project = :project')
             ->andWhere('t.countsForProfitability = true')
             ->andWhere('t.type = :type')
             ->setParameter('project', $project)
@@ -110,8 +112,8 @@ class ProjectTaskRepository extends ServiceEntityRepository
      */
     public function findOverdueTasksByContributor(\App\Entity\Contributor $contributor): array
     {
-        return $this->createQueryBuilder('t')
-            ->where('t.assignedContributor = :contributor')
+        return $this->createCompanyQueryBuilder('t')
+            ->andWhere('t.assignedContributor = :contributor')
             ->andWhere('t.endDate < :today')
             ->andWhere('t.status != :status_completed')
             ->setParameter('contributor', $contributor)

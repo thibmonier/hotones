@@ -9,12 +9,14 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Interface\CompanyOwnedInterface;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: \App\Repository\OrderRepository::class)]
 #[ORM\Table(name: 'orders', indexes: [
@@ -22,6 +24,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     new ORM\Index(name: 'idx_order_status', columns: ['status']),
     new ORM\Index(name: 'idx_order_created_at', columns: ['created_at']),
     new ORM\Index(name: 'idx_order_validated_at', columns: ['validated_at']),
+    new ORM\Index(name: 'idx_order_company', columns: ['company_id']),
 ])]
 #[ApiResource(
     operations: [
@@ -36,7 +39,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['order:write']],
     paginationItemsPerPage: 30,
 )]
-class Order
+class Order implements CompanyOwnedInterface
 {
     public const STATUS_OPTIONS = [
         'a_signer'  => 'À signer',
@@ -52,59 +55,146 @@ class Order
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['order:read'])]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 180, nullable: true)]
     #[Groups(['order:read', 'order:write'])]
-    private ?string $name = null;
+    public ?string $name = null {
+        get => $this->name;
+        set {
+            $this->name = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['order:read', 'order:write'])]
-    private ?string $description = null;
+    public ?string $description = null {
+        get => $this->description;
+        set {
+            $this->description = $value;
+        }
+    }
 
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)]
     #[Groups(['order:read', 'order:write'])]
-    private ?string $contingencyPercentage = null;
+    public ?string $contingencyPercentage = null {
+        get => $this->contingencyPercentage;
+        set {
+            $this->contingencyPercentage = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date', nullable: true)]
     #[Groups(['order:read', 'order:write'])]
-    private ?DateTimeInterface $validUntil = null;
+    public ?DateTimeInterface $validUntil = null {
+        get => $this->validUntil;
+        set {
+            $this->validUntil = $value;
+        }
+    }
 
     // Numéro unique du devis D[année][mois][numéro incrémental]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Groups(['order:read'])]
-    private string $orderNumber;
+    public string $orderNumber {
+        get => $this->orderNumber;
+        set {
+            $this->orderNumber = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $notes = null;
+    public ?string $notes = null {
+        get => $this->notes;
+        set {
+            $this->notes = $value;
+        }
+    }
 
     // Contingence (retenue sur la marge)
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
-    private ?string $contingenceAmount = null;
+    public ?string $contingenceAmount = null {
+        get => $this->contingenceAmount;
+        set {
+            $this->contingenceAmount = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $contingenceReason = null;
+    public ?string $contingenceReason = null {
+        get => $this->contingenceReason;
+        set {
+            $this->contingenceReason = $value;
+        }
+    }
 
     // Relations
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Project $project = null;
+    public ?Project $project = null {
+        get => $this->project;
+        set {
+            $this->project = $value;
+        }
+    }
+
     // Montant total HT du devis
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2, nullable: true)]
-    private ?string $totalAmount = '0.00';
+    public ?string $totalAmount = '0.00' {
+        get => $this->totalAmount ?? '0.00';
+        set {
+            $this->totalAmount = $value ?? '0.00';
+        }
+    }
 
     #[ORM\Column(type: 'date')]
-    private DateTimeInterface $createdAt;
+    public DateTimeInterface $createdAt {
+        get => $this->createdAt;
+        set {
+            $this->createdAt = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?DateTimeInterface $validatedAt = null;
+    public ?DateTimeInterface $validatedAt = null {
+        get => $this->validatedAt;
+        set {
+            $this->validatedAt = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 20)]
-    private string $status = 'a_signer'; // a_signer, gagne, signe, perdu, termine, standby, abandonne
+    public string $status = 'a_signer' { // a_signer, gagne, signe, perdu, termine, standby, abandonne
+        get => $this->status;
+        set {
+            $oldStatus    = $this->status;
+            $this->status = $value;
+
+            // Définir automatiquement validated_at lors du passage à un statut validé
+            if ($oldStatus !== $value && in_array($value, ['signe', 'gagne', 'termine'], true) && $this->validatedAt === null) {
+                $this->validatedAt = new DateTime();
+            }
+        }
+    }
 
     // Type de contractualisation du devis: forfait (échéancier) ou regie (temps passé)
     #[ORM\Column(type: 'string', length: 20, options: ['default' => 'forfait'])]
-    private string $contractType = 'forfait'; // forfait, regie
+    public string $contractType = 'forfait' { // forfait, regie
+        get => $this->contractType;
+        set {
+            $this->contractType = $value;
+        }
+    }
 
     // Relation vers les tâches du devis (ancienne structure)
     #[ORM\OneToMany(targetEntity: OrderTask::class, mappedBy: 'order', cascade: ['persist', 'remove'])]
@@ -122,10 +212,20 @@ class Order
 
     // Gestion des notes de frais refacturables
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private bool $expensesRebillable = false;
+    public bool $expensesRebillable = false {
+        get => $this->expensesRebillable;
+        set {
+            $this->expensesRebillable = $value;
+        }
+    }
 
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2, options: ['default' => '0.00'])]
-    private string $expenseManagementFeeRate = '0.00';
+    public string $expenseManagementFeeRate = '0.00' {
+        get => $this->expenseManagementFeeRate;
+        set {
+            $this->expenseManagementFeeRate = $value;
+        }
+    }
 
     #[ORM\OneToMany(targetEntity: ExpenseReport::class, mappedBy: 'order')]
     private Collection $expenseReports;
@@ -137,185 +237,6 @@ class Order
         $this->paymentSchedules = new ArrayCollection();
         $this->expenseReports   = new ArrayCollection();
         $this->createdAt        = new DateTime();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(?string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getContingencyPercentage(): ?string
-    {
-        return $this->contingencyPercentage;
-    }
-
-    public function setContingencyPercentage(?string $contingencyPercentage): self
-    {
-        $this->contingencyPercentage = $contingencyPercentage;
-
-        return $this;
-    }
-
-    public function getValidUntil(): ?DateTimeInterface
-    {
-        return $this->validUntil;
-    }
-
-    public function setValidUntil(?DateTimeInterface $validUntil): self
-    {
-        $this->validUntil = $validUntil;
-
-        return $this;
-    }
-
-    public function getOrderNumber(): string
-    {
-        return $this->orderNumber;
-    }
-
-    public function setOrderNumber(string $orderNumber): self
-    {
-        $this->orderNumber = $orderNumber;
-
-        return $this;
-    }
-
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
-
-    public function setNotes(?string $notes): self
-    {
-        $this->notes = $notes;
-
-        return $this;
-    }
-
-    public function getContingenceAmount(): ?string
-    {
-        return $this->contingenceAmount;
-    }
-
-    public function setContingenceAmount(?string $contingenceAmount): self
-    {
-        $this->contingenceAmount = $contingenceAmount;
-
-        return $this;
-    }
-
-    public function getContingenceReason(): ?string
-    {
-        return $this->contingenceReason;
-    }
-
-    public function setContingenceReason(?string $contingenceReason): self
-    {
-        $this->contingenceReason = $contingenceReason;
-
-        return $this;
-    }
-
-    public function getProject(): ?Project
-    {
-        return $this->project;
-    }
-
-    public function setProject(?Project $project): self
-    {
-        $this->project = $project;
-
-        return $this;
-    }
-
-    public function getTotalAmount(): string
-    {
-        return $this->totalAmount ?? '0.00';
-    }
-
-    public function setTotalAmount(?string $totalAmount): self
-    {
-        $this->totalAmount = $totalAmount ?? '0.00';
-
-        return $this;
-    }
-
-    public function getCreatedAt(): DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getValidatedAt(): ?DateTimeInterface
-    {
-        return $this->validatedAt;
-    }
-
-    public function setValidatedAt(?DateTimeInterface $validatedAt): self
-    {
-        $this->validatedAt = $validatedAt;
-
-        return $this;
-    }
-
-    public function getContractType(): string
-    {
-        return $this->contractType;
-    }
-
-    public function setContractType(string $contractType): self
-    {
-        $this->contractType = $contractType;
-
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): self
-    {
-        $oldStatus    = $this->status;
-        $this->status = $status;
-
-        // Définir automatiquement validated_at lors du passage à un statut validé
-        if ($oldStatus !== $status && in_array($status, ['signe', 'gagne', 'termine'], true) && $this->validatedAt === null) {
-            $this->validatedAt = new DateTime();
-        }
-
-        return $this;
     }
 
     public function getTasks(): Collection
@@ -465,30 +386,6 @@ class Order
 
     // === Gestion des notes de frais ===
 
-    public function isExpensesRebillable(): bool
-    {
-        return $this->expensesRebillable;
-    }
-
-    public function setExpensesRebillable(bool $expensesRebillable): self
-    {
-        $this->expensesRebillable = $expensesRebillable;
-
-        return $this;
-    }
-
-    public function getExpenseManagementFeeRate(): string
-    {
-        return $this->expenseManagementFeeRate;
-    }
-
-    public function setExpenseManagementFeeRate(string $expenseManagementFeeRate): self
-    {
-        $this->expenseManagementFeeRate = $expenseManagementFeeRate;
-
-        return $this;
-    }
-
     public function getExpenseReports(): Collection
     {
         return $this->expenseReports;
@@ -555,5 +452,346 @@ class Order
         }
 
         return bcsub($this->getTotalRebillableExpenses(), $this->getTotalValidatedExpenses(), 2);
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->name.
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->name = $value.
+     */
+    public function setName(?string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->description = $value.
+     */
+    public function setDescription(?string $value): self
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingencyPercentage.
+     */
+    public function getContingencyPercentage(): ?string
+    {
+        return $this->contingencyPercentage;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingencyPercentage = $value.
+     */
+    public function setContingencyPercentage(?string $value): self
+    {
+        $this->contingencyPercentage = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validUntil.
+     */
+    public function getValidUntil(): ?DateTimeInterface
+    {
+        return $this->validUntil;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validUntil = $value.
+     */
+    public function setValidUntil(?DateTimeInterface $value): self
+    {
+        $this->validUntil = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->orderNumber.
+     */
+    public function getOrderNumber(): string
+    {
+        return $this->orderNumber;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->orderNumber = $value.
+     */
+    public function setOrderNumber(string $value): self
+    {
+        $this->orderNumber = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->notes.
+     */
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->notes = $value.
+     */
+    public function setNotes(?string $value): self
+    {
+        $this->notes = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceAmount.
+     */
+    public function getContingenceAmount(): ?string
+    {
+        return $this->contingenceAmount;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceAmount = $value.
+     */
+    public function setContingenceAmount(?string $value): self
+    {
+        $this->contingenceAmount = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceReason.
+     */
+    public function getContingenceReason(): ?string
+    {
+        return $this->contingenceReason;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contingenceReason = $value.
+     */
+    public function setContingenceReason(?string $value): self
+    {
+        $this->contingenceReason = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->project.
+     */
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->project = $value.
+     */
+    public function setProject(?Project $value): self
+    {
+        $this->project = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->totalAmount.
+     */
+    public function getTotalAmount(): ?string
+    {
+        return $this->totalAmount;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->totalAmount = $value.
+     */
+    public function setTotalAmount(?string $value): self
+    {
+        $this->totalAmount = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->createdAt.
+     */
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->createdAt = $value.
+     */
+    public function setCreatedAt(DateTimeInterface $value): self
+    {
+        $this->createdAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validatedAt.
+     */
+    public function getValidatedAt(): ?DateTimeInterface
+    {
+        return $this->validatedAt;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->validatedAt = $value.
+     */
+    public function setValidatedAt(?DateTimeInterface $value): self
+    {
+        $this->validatedAt = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->status.
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->status = $value.
+     */
+    public function setStatus(string $value): self
+    {
+        $this->status = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contractType.
+     */
+    public function getContractType(): string
+    {
+        return $this->contractType;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->contractType = $value.
+     */
+    public function setContractType(string $value): self
+    {
+        $this->contractType = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expensesRebillable.
+     */
+    public function getExpensesRebillable(): bool
+    {
+        return $this->expensesRebillable;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expensesRebillable = $value.
+     */
+    public function setExpensesRebillable(bool $value): self
+    {
+        $this->expensesRebillable = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expenseManagementFeeRate.
+     */
+    public function getExpenseManagementFeeRate(): string
+    {
+        return $this->expenseManagementFeeRate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $order->expenseManagementFeeRate = $value.
+     */
+    public function setExpenseManagementFeeRate(string $value): self
+    {
+        $this->expenseManagementFeeRate = $value;
+
+        return $this;
     }
 }

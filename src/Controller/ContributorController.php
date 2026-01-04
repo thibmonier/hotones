@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Contributor;
 use App\Form\ContributorType;
 use App\Repository\ContributorRepository;
+use App\Security\CompanyContext;
 use App\Service\SecureFileUploadService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +30,7 @@ class ContributorController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SecureFileUploadService $uploadService,
         private readonly LoggerInterface $logger,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -142,8 +144,8 @@ class ContributorController extends AbstractController
         $cjmValues = [];
         $tjmValues = [];
         foreach ($allContributors as $contributor) {
-            $cjm = $contributor->getCjm();
-            $tjm = $contributor->getTjm();
+            $cjm = $contributor->cjm;
+            $tjm = $contributor->tjm;
             if ($cjm !== null) {
                 $cjmValues[] = (float) $cjm;
             }
@@ -192,7 +194,8 @@ class ContributorController extends AbstractController
     public function new(Request $request): Response
     {
         $contributor = new Contributor();
-        $form        = $this->createForm(ContributorType::class, $contributor);
+        $contributor->setCompany($this->companyContext->getCurrentCompany());
+        $form = $this->createForm(ContributorType::class, $contributor);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -201,7 +204,7 @@ class ContributorController extends AbstractController
                 /** @var UploadedFile|null $avatarFile */
                 $avatarFile = $form->get('avatarFile')->getData();
                 if ($avatarFile) {
-                    $contributor->setAvatarFilename($this->handleAvatarUpload($avatarFile));
+                    $contributor->avatarFilename = $this->handleAvatarUpload($avatarFile);
                 }
 
                 $this->entityManager->persist($contributor);
@@ -209,7 +212,7 @@ class ContributorController extends AbstractController
 
                 $this->addFlash('success', 'Le collaborateur a été créé avec succès.');
 
-                return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
+                return $this->redirectToRoute('contributor_show', ['id' => $contributor->id]);
             } catch (RuntimeException $e) {
                 $this->addFlash('error', $e->getMessage());
             }
@@ -267,7 +270,7 @@ class ContributorController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $this->logger->info('Début édition collaborateur', [
-                    'contributor_id' => $contributor->getId(),
+                    'contributor_id' => $contributor->id,
                     'has_avatar'     => $form->get('avatarFile')->getData() !== null,
                 ]);
 
@@ -275,8 +278,8 @@ class ContributorController extends AbstractController
                 /** @var UploadedFile $avatarFile */
                 $avatarFile = $form->get('avatarFile')->getData();
                 if ($avatarFile) {
-                    $filename = $this->handleAvatarUpload($avatarFile);
-                    $contributor->setAvatarFilename($filename);
+                    $filename                    = $this->handleAvatarUpload($avatarFile);
+                    $contributor->avatarFilename = $filename;
                     $this->logger->info('Avatar uploadé', ['filename' => $filename]);
                 }
 
@@ -285,7 +288,7 @@ class ContributorController extends AbstractController
                 $this->logger->info('Collaborateur modifié avec succès');
                 $this->addFlash('success', 'Le collaborateur a été modifié avec succès.');
 
-                return $this->redirectToRoute('contributor_show', ['id' => $contributor->getId()]);
+                return $this->redirectToRoute('contributor_show', ['id' => $contributor->id]);
             } catch (RuntimeException $e) {
                 $this->logger->error('Erreur modification collaborateur', [
                     'message' => $e->getMessage(),
@@ -348,9 +351,9 @@ class ContributorController extends AbstractController
     #[IsGranted('ROLE_MANAGER')]
     public function delete(Request $request, Contributor $contributor): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$contributor->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$contributor->id, $request->request->get('_token'))) {
             // Soft delete - marquer comme inactif au lieu de supprimer
-            $contributor->setActive(false);
+            $contributor->active = false;
             $this->entityManager->flush();
             $this->addFlash('success', 'Collaborateur désactivé avec succès');
         }
@@ -442,14 +445,14 @@ class ContributorController extends AbstractController
                 $profiles[] = $prof->getName();
             }
             $rows[] = [
-                $c->getName() ?: trim(($c->getFirstName() ?: '').' '.($c->getLastName() ?: '')),
-                $c->getEmail() ?: '',
-                $c->getPhoneProfessional() ?: '',
-                $c->getPhonePersonal() ?: '',
-                $c->isActive() ? 'Oui' : 'Non',
+                $c->getName() ?: trim(($c->firstName ?: '').' '.($c->lastName ?: '')),
+                $c->email ?: '',
+                $c->phoneProfessional ?: '',
+                $c->phonePersonal ?: '',
+                $c->active ? 'Oui' : 'Non',
                 implode('|', $profiles),
-                $c->getCjm() ?: '',
-                $c->getTjm() ?: '',
+                $c->cjm ?: '',
+                $c->tjm ?: '',
             ];
         }
 

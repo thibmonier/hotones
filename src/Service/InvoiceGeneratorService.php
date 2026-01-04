@@ -10,6 +10,7 @@ use App\Entity\OrderPaymentSchedule;
 use App\Entity\Project;
 use App\Repository\InvoiceRepository;
 use App\Repository\TimesheetRepository;
+use App\Security\CompanyContext;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,6 +30,7 @@ class InvoiceGeneratorService
         private readonly EntityManagerInterface $entityManager,
         private readonly InvoiceRepository $invoiceRepository,
         private readonly TimesheetRepository $timesheetRepository,
+        private readonly CompanyContext $companyContext,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -57,6 +59,7 @@ class InvoiceGeneratorService
 
         // Créer la facture
         $invoice = new Invoice();
+        $invoice->setCompany($this->companyContext->getCurrentCompany());
         $invoice->setInvoiceNumber($this->invoiceRepository->generateNextInvoiceNumber($schedule->getBillingDate()));
         $invoice->setIssuedAt($schedule->getBillingDate());
         $invoice->setDueDate((clone $schedule->getBillingDate())->modify('+30 days')); // Échéance par défaut : 30 jours
@@ -71,6 +74,7 @@ class InvoiceGeneratorService
 
         // Créer la ligne de facturation
         $line = new InvoiceLine();
+        $line->setCompany($this->companyContext->getCurrentCompany());
         $line->setDescription($schedule->getLabel() ?? sprintf('Échéance %s - %s', $schedule->getBillingDate()->format('d/m/Y'), $order->getName() ?? $project->getName()));
         $line->setQuantity('1.00');
         $line->setUnit('forfait');
@@ -165,6 +169,7 @@ class InvoiceGeneratorService
 
         // Créer la facture
         $invoice = new Invoice();
+        $invoice->setCompany($this->companyContext->getCurrentCompany());
         $invoice->setInvoiceNumber($this->invoiceRepository->generateNextInvoiceNumber($endDate));
         $invoice->setIssuedAt($endDate);
         $invoice->setDueDate((clone $endDate)->modify('+30 days')); // Échéance par défaut : 30 jours
@@ -186,6 +191,7 @@ class InvoiceGeneratorService
             $lineAmountHt = bcmul((string) $hours, bcdiv($tjm, '8', 4), 2);
 
             $line = new InvoiceLine();
+            $line->setCompany($this->companyContext->getCurrentCompany());
             $line->setDescription(sprintf(
                 '%s - %s à %s (%s heures / %.2f jours)',
                 $contributorName,

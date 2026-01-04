@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'order_payment_schedules')]
-class OrderPaymentSchedule
+#[ORM\Index(name: 'idx_orderpaymentschedule_company', columns: ['company_id'])]
+class OrderPaymentSchedule implements CompanyOwnedInterface
 {
     public const TYPE_PERCENT = 'percent';
     public const TYPE_FIXED   = 'fixed';
@@ -16,6 +19,11 @@ class OrderPaymentSchedule
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'paymentSchedules')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -129,5 +137,17 @@ class OrderPaymentSchedule
         $ratio = bcdiv($pct, '100', 6);
 
         return bcmul($orderTotal, $ratio, 2);
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

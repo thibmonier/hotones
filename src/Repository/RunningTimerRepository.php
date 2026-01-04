@@ -4,23 +4,25 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\RunningTimer;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<RunningTimer>
+ * @extends CompanyAwareRepository<RunningTimer>
  */
-class RunningTimerRepository extends ServiceEntityRepository
+class RunningTimerRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, RunningTimer::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, RunningTimer::class, $companyContext);
     }
 
     public function findActiveByContributor(Contributor $contributor): ?RunningTimer
     {
-        return $this->createQueryBuilder('rt')
-            ->where('rt.contributor = :contributor')
+        return $this->createCompanyQueryBuilder('rt')
+            ->andWhere('rt.contributor = :contributor')
             ->andWhere('rt.stoppedAt IS NULL')
             ->setParameter('contributor', $contributor)
             ->setMaxResults(1)

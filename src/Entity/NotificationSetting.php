@@ -2,18 +2,26 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\NotificationSettingRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NotificationSettingRepository::class)]
 #[ORM\Table(name: 'notification_settings')]
-class NotificationSetting
+#[ORM\Index(name: 'idx_notificationsetting_company', columns: ['company_id'])]
+class NotificationSetting implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\Column(type: Types::STRING, length: 100, unique: true)]
     private string $settingKey;
@@ -46,6 +54,18 @@ class NotificationSetting
     public function setSettingValue(array $settingValue): self
     {
         $this->settingValue = $settingValue;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

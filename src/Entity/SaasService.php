@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\SaasServiceRepository;
 use DateTime;
 use DateTimeInterface;
@@ -11,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Service SaaS proposé (ex: Google Workspace, Slack Premium, GitHub Team, etc.).
@@ -19,12 +21,18 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'saas_services')]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Index(columns: ['provider_id'], name: 'idx_saas_service_provider')]
-class SaasService
+#[ORM\Index(columns: ['company_id'], name: 'idx_saasservice_company')]
+class SaasService implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Nom du service.
@@ -318,5 +326,17 @@ class SaasService
     public function __toString(): string
     {
         return $this->name.($this->provider ? ' ('.$this->provider->getName().')' : '');
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

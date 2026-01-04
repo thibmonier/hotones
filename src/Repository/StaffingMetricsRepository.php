@@ -7,15 +7,17 @@ namespace App\Repository;
 use App\Entity\Analytics\FactStaffingMetrics;
 use App\Entity\Contributor;
 use App\Entity\Profile;
+use App\Security\CompanyContext;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class StaffingMetricsRepository extends ServiceEntityRepository
+class StaffingMetricsRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, FactStaffingMetrics::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, FactStaffingMetrics::class, $companyContext);
     }
 
     /**
@@ -36,9 +38,9 @@ class StaffingMetricsRepository extends ServiceEntityRepository
         ?Profile $profile = null,
         ?Contributor $contributor = null
     ): array {
-        $qb = $this->createQueryBuilder('fsm')
+        $qb = $this->createCompanyQueryBuilder('fsm')
             ->join('fsm.dimTime', 'dt')
-            ->where('dt.date >= :startDate')
+            ->andWhere('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
             ->andWhere('fsm.granularity = :granularity')
             ->setParameter('startDate', $startDate)
@@ -81,7 +83,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
         ?Profile $profile = null,
         ?Contributor $contributor = null
     ): array {
-        $qb = $this->createQueryBuilder('fsm')
+        $qb = $this->createCompanyQueryBuilder('fsm')
             ->select(
                 'dt.yearMonth as yearMonth',
                 'AVG(fsm.staffingRate) as staffingRate',
@@ -90,7 +92,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             )
             ->join('fsm.dimTime', 'dt')
             ->leftJoin('fsm.dimProfile', 'dp')
-            ->where('dt.date >= :startDate')
+            ->andWhere('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
             ->andWhere('fsm.granularity = :granularity')
             ->setParameter('startDate', $startDate)
@@ -138,7 +140,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
         ?Profile $profile = null,
         ?Contributor $contributor = null
     ): array {
-        $qb = $this->createQueryBuilder('fsm')
+        $qb = $this->createCompanyQueryBuilder('fsm')
             ->select(
                 'dp.name as profileName',
                 'AVG(fsm.staffingRate) as staffingRate',
@@ -146,7 +148,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             )
             ->join('fsm.dimTime', 'dt')
             ->join('fsm.dimProfile', 'dp')
-            ->where('dt.date >= :startDate')
+            ->andWhere('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
             ->andWhere('fsm.granularity = :granularity')
             ->andWhere('dp.isProductive = true')
@@ -191,7 +193,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
         ?Profile $profile = null,
         ?Contributor $contributor = null
     ): array {
-        $qb = $this->createQueryBuilder('fsm')
+        $qb = $this->createCompanyQueryBuilder('fsm')
             ->select(
                 'c.id as contributorId',
                 'CONCAT(c.firstName, \' \' , c.lastName) as contributorName',
@@ -201,7 +203,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             ->join('fsm.dimTime', 'dt')
             ->join('fsm.contributor', 'c')
             ->leftJoin('fsm.dimProfile', 'dp')
-            ->where('dt.date >= :startDate')
+            ->andWhere('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
             ->andWhere('fsm.granularity = :granularity')
             ->andWhere('fsm.contributor IS NOT NULL')
@@ -236,10 +238,10 @@ class StaffingMetricsRepository extends ServiceEntityRepository
      */
     public function deleteForPeriod(DateTimeInterface $date, string $granularity): void
     {
-        $this->createQueryBuilder('fsm')
+        $this->createCompanyQueryBuilder('fsm')
             ->delete()
             ->join('fsm.dimTime', 'dt')
-            ->where('dt.date = :date')
+            ->andWhere('dt.date = :date')
             ->andWhere('fsm.granularity = :granularity')
             ->setParameter('date', $date)
             ->setParameter('granularity', $granularity)
@@ -257,10 +259,10 @@ class StaffingMetricsRepository extends ServiceEntityRepository
     public function deleteForDateRange(DateTimeInterface $startDate, DateTimeInterface $endDate, string $granularity): int
     {
         // D'abord, récupérer les IDs des métriques à supprimer (DQL DELETE ne supporte pas les JOINs)
-        $ids = $this->createQueryBuilder('fsm')
+        $ids = $this->createCompanyQueryBuilder('fsm')
             ->select('fsm.id')
             ->join('fsm.dimTime', 'dt')
-            ->where('dt.date >= :startDate')
+            ->andWhere('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
             ->andWhere('fsm.granularity = :granularity')
             ->setParameter('startDate', $startDate)
@@ -277,7 +279,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
         $idList = array_map(fn ($row) => $row['id'], $ids);
 
         // Supprimer par IDs
-        $result = $this->createQueryBuilder('fsm')
+        $result = $this->createCompanyQueryBuilder('fsm')
             ->delete()
             ->where('fsm.id IN (:ids)')
             ->setParameter('ids', $idList)
@@ -295,10 +297,10 @@ class StaffingMetricsRepository extends ServiceEntityRepository
      */
     public function existsForPeriod(DateTimeInterface $date, string $granularity): bool
     {
-        $count = $this->createQueryBuilder('fsm')
+        $count = $this->createCompanyQueryBuilder('fsm')
             ->select('COUNT(fsm.id)')
             ->join('fsm.dimTime', 'dt')
-            ->where('dt.date = :date')
+            ->andWhere('dt.date = :date')
             ->andWhere('fsm.granularity = :granularity')
             ->setParameter('date', $date)
             ->setParameter('granularity', $granularity)
@@ -329,7 +331,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
      */
     public function getWeeklyOccupancyByContributor(int $year, ?Profile $profile = null): array
     {
-        $qb = $this->createQueryBuilder('fsm')
+        $qb = $this->createCompanyQueryBuilder('fsm')
             ->select(
                 'c.id as contributorId',
                 'CONCAT(c.firstName, \' \', c.lastName) as contributorName',
@@ -341,7 +343,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             )
             ->join('fsm.dimTime', 'dt')
             ->join('fsm.contributor', 'c')
-            ->where('dt.year = :year')
+            ->andWhere('dt.year = :year')
             ->andWhere('fsm.granularity = :granularity')
             ->andWhere('fsm.contributor IS NOT NULL')
             ->setParameter('year', $year)
@@ -401,7 +403,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
      */
     public function getWeeklyGlobalTACE(int $year, ?Profile $profile = null): array
     {
-        $qb = $this->createQueryBuilder('fsm')
+        $qb = $this->createCompanyQueryBuilder('fsm')
             ->select(
                 'dt.date as weekDate',
                 'AVG(fsm.tace) as tace',
@@ -411,7 +413,7 @@ class StaffingMetricsRepository extends ServiceEntityRepository
             )
             ->join('fsm.dimTime', 'dt')
             ->leftJoin('fsm.dimProfile', 'dp')
-            ->where('dt.year = :year')
+            ->andWhere('dt.year = :year')
             ->andWhere('fsm.granularity = :granularity')
             ->setParameter('year', $year)
             ->setParameter('granularity', 'weekly')

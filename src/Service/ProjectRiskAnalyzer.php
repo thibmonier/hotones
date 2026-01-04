@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Entity\Project;
 use App\Entity\ProjectHealthScore;
+use App\Security\CompanyContext;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -17,7 +18,8 @@ class ProjectRiskAnalyzer
     private const WEIGHT_QUALITY  = 0.10;   // 10%
 
     public function __construct(
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -412,6 +414,7 @@ class ProjectRiskAnalyzer
 
         // Create and persist health score
         $healthScore = new ProjectHealthScore();
+        $healthScore->setCompany($this->companyContext->getCurrentCompany());
         $healthScore->setProject($project);
         $healthScore->setScore($overallScore);
         $healthScore->setHealthLevel($healthLevel);

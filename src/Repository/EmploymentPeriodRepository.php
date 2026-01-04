@@ -4,24 +4,26 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\EmploymentPeriod;
+use App\Security\CompanyContext;
 use DateTime;
 use DateTimeInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<EmploymentPeriod>
+ * @extends CompanyAwareRepository<EmploymentPeriod>
  *
  * @method EmploymentPeriod|null find($id, $lockMode = null, $lockVersion = null)
  * @method EmploymentPeriod|null findOneBy(array $criteria, array $orderBy = null)
  * @method EmploymentPeriod[]    findAll()
  * @method EmploymentPeriod[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class EmploymentPeriodRepository extends ServiceEntityRepository
+class EmploymentPeriodRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, EmploymentPeriod::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, EmploymentPeriod::class, $companyContext);
     }
 
     /**
@@ -29,7 +31,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function findWithOptionalContributorFilter(?int $contributorId = null): array
     {
-        $queryBuilder = $this->createQueryBuilder('ep')
+        $queryBuilder = $this->createCompanyQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->orderBy('ep.startDate', 'DESC');
 
@@ -46,13 +48,13 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function hasOverlappingPeriods(EmploymentPeriod $period, ?int $excludeId = null): bool
     {
-        if (!$period->getContributor()) {
+        if (!$period->contributor) {
             return false;
         }
 
-        $queryBuilder = $this->createQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
-            ->setParameter('contributor', $period->getContributor());
+        $queryBuilder = $this->createCompanyQueryBuilder('ep')
+            ->andWhere('ep.contributor = :contributor')
+            ->setParameter('contributor', $period->contributor);
 
         if ($excludeId) {
             $queryBuilder->andWhere('ep.id <> :excludeId')
@@ -60,20 +62,20 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
         }
 
         // Vérifier les chevauchements
-        $endDate = $period->getEndDate();
+        $endDate = $period->endDate;
         if ($endDate) {
             // Période avec date de fin
             $queryBuilder->andWhere(
                 '(ep.startDate <= :endDate AND (ep.endDate IS NULL OR ep.endDate >= :startDate))',
             )
-            ->setParameter('startDate', $period->getStartDate())
+            ->setParameter('startDate', $period->startDate)
             ->setParameter('endDate', $endDate);
         } else {
             // Période ouverte (sans date de fin)
             $queryBuilder->andWhere(
                 '(ep.endDate IS NULL OR ep.endDate >= :startDate)',
             )
-            ->setParameter('startDate', $period->getStartDate());
+            ->setParameter('startDate', $period->startDate);
         }
 
         return $queryBuilder->getQuery()->getOneOrNullResult() !== null;
@@ -86,10 +88,10 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     {
         $now = new DateTime();
 
-        return $this->createQueryBuilder('ep')
+        return $this->createCompanyQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->addSelect('c')
-            ->where('ep.endDate IS NULL OR ep.endDate >= :now')
+            ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
             ->setParameter('now', $now)
             ->orderBy('ep.startDate', 'DESC')
             ->getQuery()
@@ -101,8 +103,8 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
+        return $this->createCompanyQueryBuilder('ep')
+            ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ep.startDate', 'DESC')
             ->getQuery()
@@ -116,8 +118,8 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
     {
         $now = new DateTime();
 
-        return $this->createQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
+        return $this->createCompanyQueryBuilder('ep')
+            ->andWhere('ep.contributor = :contributor')
             ->andWhere('ep.startDate <= :now')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
             ->setParameter('contributor', $contributor)
@@ -133,7 +135,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function findWithProfiles(): array
     {
-        return $this->createQueryBuilder('ep')
+        return $this->createCompanyQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->leftJoin('ep.profiles', 'p')
             ->addSelect('c', 'p')
@@ -147,15 +149,15 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function calculatePeriodCost(EmploymentPeriod $period): ?float
     {
-        if (!$period->getCjm()) {
+        if (!$period->cjm) {
             return null;
         }
 
-        $endDate             = $period->getEndDate() ?? new DateTime();
-        $workingDays         = $this->calculateWorkingDays($period->getStartDate(), $endDate);
-        $adjustedWorkingDays = $workingDays * (floatval($period->getWorkTimePercentage()) / 100);
+        $endDate             = $period->endDate ?? new DateTime();
+        $workingDays         = $this->calculateWorkingDays($period->startDate, $endDate);
+        $adjustedWorkingDays = $workingDays * (floatval($period->workTimePercentage) / 100);
 
-        return $adjustedWorkingDays * floatval($period->getCjm());
+        return $adjustedWorkingDays * floatval($period->cjm);
     }
 
     /**
@@ -183,7 +185,7 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function getStatistics(): array
     {
-        $qb = $this->createQueryBuilder('ep');
+        $qb = $this->createCompanyQueryBuilder('ep');
 
         // Total des périodes
         $totalPeriods = $qb->select('COUNT(ep.id)')
@@ -192,17 +194,17 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
 
         // Périodes actives
         $now           = new DateTime();
-        $activePeriods = $this->createQueryBuilder('ep')
+        $activePeriods = $this->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
-            ->where('ep.endDate IS NULL OR ep.endDate >= :now')
+            ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
             ->setParameter('now', $now)
             ->getQuery()
             ->getSingleScalarResult();
 
         // Coût moyen des CJM
-        $avgCjm = $this->createQueryBuilder('ep')
+        $avgCjm = $this->createCompanyQueryBuilder('ep')
             ->select('AVG(ep.cjm)')
-            ->where('ep.cjm IS NOT NULL')
+            ->andWhere('ep.cjm IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -218,9 +220,9 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function countDepartures(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
-        return (int) $this->createQueryBuilder('ep')
+        return (int) $this->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
-            ->where('ep.endDate IS NOT NULL')
+            ->andWhere('ep.endDate IS NOT NULL')
             ->andWhere('ep.endDate >= :startDate')
             ->andWhere('ep.endDate <= :endDate')
             ->setParameter('startDate', $startDate)
@@ -234,9 +236,9 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function countActiveAt(DateTimeInterface $date): int
     {
-        return (int) $this->createQueryBuilder('ep')
+        return (int) $this->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
-            ->where('ep.startDate <= :date')
+            ->andWhere('ep.startDate <= :date')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :date')
             ->setParameter('date', $date)
             ->getQuery()
@@ -248,12 +250,40 @@ class EmploymentPeriodRepository extends ServiceEntityRepository
      */
     public function findFirstByContributor(Contributor $contributor): ?EmploymentPeriod
     {
-        return $this->createQueryBuilder('ep')
-            ->where('ep.contributor = :contributor')
+        return $this->createCompanyQueryBuilder('ep')
+            ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ep.startDate', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Trouve les périodes d'emploi pour une liste de contributeurs et une plage de dates.
+     *
+     * @param Contributor[] $contributors
+     *
+     * @return EmploymentPeriod[]
+     */
+    public function findByContributorsAndDateRange(array $contributors, DateTimeInterface $startDate, DateTimeInterface $endDate): array
+    {
+        if (empty($contributors)) {
+            return [];
+        }
+
+        $contributorIds = array_map(fn (Contributor $c) => $c->getId(), $contributors);
+
+        return $this->createCompanyQueryBuilder('ep')
+            ->andWhere('ep.contributor IN (:contributorIds)')
+            ->andWhere('ep.startDate <= :endDate')
+            ->andWhere('ep.endDate IS NULL OR ep.endDate >= :startDate')
+            ->setParameter('contributorIds', $contributorIds)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->leftJoin('ep.contributor', 'c')
+            ->addSelect('c')
+            ->getQuery()
+            ->getResult();
     }
 }

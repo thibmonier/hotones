@@ -7,6 +7,7 @@ namespace App\Service\Planning;
 use App\Entity\Contributor;
 use App\Entity\Planning as PlanningEntity;
 use App\Repository\ProjectRepository;
+use App\Security\CompanyContext;
 
 use function count;
 
@@ -22,6 +23,7 @@ class PlanningOptimizer
     public function __construct(
         private readonly TaceAnalyzer $taceAnalyzer,
         private readonly EntityManagerInterface $entityManager,
+        private readonly CompanyContext $companyContext,
         private readonly ProjectRepository $projectRepository
     ) {
     }
@@ -435,6 +437,7 @@ class PlanningOptimizer
 
         // Créer un planning de 4h/jour sur la période
         $planning = new PlanningEntity();
+        $planning->setCompany($this->companyContext->getCurrentCompany());
         $planning->setContributor($contributor);
         $planning->setProject($project);
         $planning->setStartDate($startDate);
@@ -513,6 +516,7 @@ class PlanningOptimizer
 
         // Créer un planning pour le contributeur cible
         $newPlanning = new PlanningEntity();
+        $newPlanning->setCompany($this->companyContext->getCurrentCompany());
         $newPlanning->setContributor($targetContributor);
         $newPlanning->setProject($project);
         $newPlanning->setStartDate($startDate);

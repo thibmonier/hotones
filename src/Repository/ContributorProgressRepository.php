@@ -6,17 +6,19 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\ContributorProgress;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ContributorProgress>
+ * @extends CompanyAwareRepository<ContributorProgress>
  */
-class ContributorProgressRepository extends ServiceEntityRepository
+class ContributorProgressRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ContributorProgress::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ContributorProgress::class, $companyContext);
     }
 
     /**
@@ -41,9 +43,9 @@ class ContributorProgressRepository extends ServiceEntityRepository
      */
     public function getLeaderboard(int $limit = 10): array
     {
-        return $this->createQueryBuilder('cp')
+        return $this->createCompanyQueryBuilder('cp')
             ->leftJoin('cp.contributor', 'c')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->orderBy('cp.totalXp', 'DESC')
             ->setMaxResults($limit)
@@ -58,9 +60,9 @@ class ContributorProgressRepository extends ServiceEntityRepository
      */
     public function findByLevel(int $level): array
     {
-        return $this->createQueryBuilder('cp')
+        return $this->createCompanyQueryBuilder('cp')
             ->leftJoin('cp.contributor', 'c')
-            ->where('cp.level = :level')
+            ->andWhere('cp.level = :level')
             ->andWhere('c.active = :active')
             ->setParameter('level', $level)
             ->setParameter('active', true)
@@ -79,10 +81,10 @@ class ContributorProgressRepository extends ServiceEntityRepository
             return 0;
         }
 
-        $higherCount = $this->createQueryBuilder('cp')
+        $higherCount = $this->createCompanyQueryBuilder('cp')
             ->select('COUNT(cp.id)')
             ->leftJoin('cp.contributor', 'c')
-            ->where('cp.totalXp > :xp')
+            ->andWhere('cp.totalXp > :xp')
             ->andWhere('c.active = :active')
             ->setParameter('xp', $progress->getTotalXp())
             ->setParameter('active', true)
@@ -97,7 +99,7 @@ class ContributorProgressRepository extends ServiceEntityRepository
      */
     public function getGlobalStats(): array
     {
-        $stats = $this->createQueryBuilder('cp')
+        $stats = $this->createCompanyQueryBuilder('cp')
             ->select('
                 COUNT(cp.id) as total_players,
                 AVG(cp.level) as average_level,
@@ -106,7 +108,7 @@ class ContributorProgressRepository extends ServiceEntityRepository
                 MAX(cp.totalXp) as max_xp
             ')
             ->leftJoin('cp.contributor', 'c')
-            ->where('c.active = :active')
+            ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->getQuery()
             ->getSingleResult();

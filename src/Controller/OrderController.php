@@ -12,6 +12,7 @@ use App\Entity\ProjectTask;
 use App\Enum\OrderStatus;
 use App\Event\QuoteStatusChangedEvent;
 use App\Form\OrderType as OrderFormType;
+use App\Security\CompanyContext;
 
 use function array_key_exists;
 
@@ -28,6 +29,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_CHEF_PROJET')]
 class OrderController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'order_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
@@ -98,6 +104,7 @@ class OrderController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $order = new Order();
+        $order->setCompany($this->companyContext->getCurrentCompany());
 
         // Pré-sélectionner le projet si fourni dans l'URL
         if ($projectId = $request->query->get('project')) {
@@ -235,6 +242,7 @@ class OrderController extends AbstractController
     {
         $section = new OrderSection();
         $section->setOrder($order);
+        $section->setCompany($order->getCompany());
         $section->setName($request->request->get('section_name'));
         $section->setDescription($request->request->get('section_description'));
         $section->setSortOrder($order->getSections()->count() + 1);
@@ -332,13 +340,12 @@ class OrderController extends AbstractController
 
         $line = new OrderLine();
         $line->setSection($section);
+        $line->setCompany($section->getOrder()->getCompany());
         $line->setDescription($request->request->get('line_description'));
 
         if ($profileId = $request->request->get('profile_id')) {
-            $profile = $em->getRepository(Profile::class)->find($profileId);
-            if ($profile) {
-                $line->setProfile($profile);
-            }
+            // Optimisation: getReference() crée un proxy sans SELECT
+            $line->setProfile($em->getReference(Profile::class, $profileId));
         }
 
         $tjm = $request->request->get('tjm');
@@ -391,10 +398,8 @@ class OrderController extends AbstractController
         $line->setDescription($request->request->get('line_description'));
 
         if ($profileId = $request->request->get('profile_id')) {
-            $profile = $em->getRepository(Profile::class)->find($profileId);
-            if ($profile) {
-                $line->setProfile($profile);
-            }
+            // Optimisation: getReference() crée un proxy sans SELECT
+            $line->setProfile($em->getReference(Profile::class, $profileId));
         } else {
             $line->setProfile(null);
         }
@@ -454,6 +459,7 @@ class OrderController extends AbstractController
     public function duplicate(Order $originalOrder, EntityManagerInterface $em): Response
     {
         $newOrder = new Order();
+        $newOrder->setCompany($originalOrder->getCompany());
         $newOrder->setOrderNumber($this->generateOrderNumber($em));
         $newOrder->setProject($originalOrder->getProject());
         $newOrder->setStatus('draft');
@@ -467,6 +473,7 @@ class OrderController extends AbstractController
         foreach ($originalOrder->getSections() as $originalSection) {
             $newSection = new OrderSection();
             $newSection->setOrder($newOrder);
+            $newSection->setCompany($newOrder->getCompany());
             $newSection->setName($originalSection->getName());
             $newSection->setDescription($originalSection->getDescription());
             $newSection->setSortOrder($originalSection->getSortOrder());
@@ -476,6 +483,7 @@ class OrderController extends AbstractController
             foreach ($originalSection->getLines() as $originalLine) {
                 $newLine = new OrderLine();
                 $newLine->setSection($newSection);
+                $newLine->setCompany($newSection->getCompany());
                 $newLine->setDescription($originalLine->getDescription());
                 $newLine->setProfile($originalLine->getProfile());
                 $newLine->setTjm($originalLine->getTjm());

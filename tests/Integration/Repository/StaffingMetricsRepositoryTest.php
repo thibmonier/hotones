@@ -8,6 +8,7 @@ use App\Factory\DimTimeFactory;
 use App\Factory\FactStaffingMetricsFactory;
 use App\Factory\ProfileFactory;
 use App\Repository\StaffingMetricsRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -17,6 +18,7 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private StaffingMetricsRepository $repository;
 
@@ -24,6 +26,7 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(StaffingMetricsRepository::class);
+        $this->setUpMultiTenant();
     }
 
     public function testGetWeeklyOccupancyByContributor(): void

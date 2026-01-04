@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ContributorRepository;
 use DateTime;
 use DateTimeInterface;
@@ -12,9 +13,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ContributorRepository::class)]
 #[ORM\Table(name: 'contributors')]
+#[ORM\Index(name: 'idx_contributor_company', columns: ['company_id'])]
 #[ApiResource(
     operations: [
         new Get(security: "is_granted('ROLE_USER')"),
@@ -23,65 +26,150 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['contributor:read']],
     paginationItemsPerPage: 30,
 )]
-class Contributor
+class Contributor implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['contributor:read'])]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['contributor:read'])]
-    private string $firstName;
+    public string $firstName {
+        get => $this->firstName;
+        set {
+            $this->firstName = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['contributor:read'])]
-    private string $lastName;
+    public string $lastName {
+        get => $this->lastName;
+        set {
+            $this->lastName = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['contributor:read'])]
-    private ?string $email = null;
+    public ?string $email = null {
+        get => $this->email;
+        set {
+            $this->email = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
-    private ?string $phonePersonal = null;
+    public ?string $phonePersonal = null {
+        get => $this->phonePersonal;
+        set {
+            $this->phonePersonal = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
-    private ?string $phoneProfessional = null;
+    public ?string $phoneProfessional = null {
+        get => $this->phoneProfessional;
+        set {
+            $this->phoneProfessional = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private ?DateTimeInterface $birthDate = null;
+    public ?DateTimeInterface $birthDate = null {
+        get => $this->birthDate;
+        set {
+            $this->birthDate = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    private ?string $gender = null; // 'male', 'female', 'other'
+    public ?string $gender = null { // 'male', 'female', 'other'
+        get => $this->gender;
+        set {
+            $this->gender = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $address = null;
+    public ?string $address = null {
+        get => $this->address;
+        set {
+            $this->address = $value;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $avatarFilename = null;
+    public ?string $avatarFilename = null {
+        get => $this->avatarFilename;
+        set {
+            $this->avatarFilename = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $notes = null;
+    public ?string $notes = null {
+        get => $this->notes;
+        set {
+            $this->notes = $value;
+        }
+    }
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $cjm = null;
+    public ?string $cjm = null {
+        get => $this->getRelevantEmploymentPeriod()?->cjm ?? $this->cjm;
+        set {
+            $this->cjm = $value;
+        }
+    }
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $tjm = null;
+    public ?string $tjm = null {
+        get => $this->getRelevantEmploymentPeriod()?->tjm ?? $this->tjm;
+        set {
+            $this->tjm = $value;
+        }
+    }
 
     #[ORM\Column(type: 'boolean')]
-    private bool $active = true;
+    public bool $active = true {
+        get => $this->active;
+        set {
+            $this->active = $value;
+        }
+    }
 
     // Relation avec l'utilisateur (optionnel)
     #[ORM\OneToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?User $user = null;
+    public ?User $user = null {
+        get => $this->user;
+        set {
+            $this->user = $value;
+        }
+    }
 
     // Manager responsable de ce contributeur
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'managedContributors')]
     #[ORM\JoinColumn(name: 'manager_id', nullable: true, onDelete: 'SET NULL')]
-    private ?Contributor $manager = null;
+    public ?Contributor $manager = null {
+        get => $this->manager;
+        set {
+            $this->manager = $value;
+        }
+    }
 
     // Contributeurs gérés par ce manager
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'manager')]
@@ -114,35 +202,6 @@ class Contributor
         $this->contributorSkills   = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    public function setFirstName(string $firstName): self
-    {
-        $this->firstName = $firstName;
-
-        return $this;
-    }
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    public function setLastName(string $lastName): self
-    {
-        $this->lastName = $lastName;
-
-        return $this;
-    }
-
     public function getName(): string
     {
         return trim($this->firstName.' '.$this->lastName);
@@ -154,54 +213,6 @@ class Contributor
     public function getFullName(): string
     {
         return $this->getName();
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(?string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    public function getPhonePersonal(): ?string
-    {
-        return $this->phonePersonal;
-    }
-
-    public function setPhonePersonal(?string $phonePersonal): self
-    {
-        $this->phonePersonal = $phonePersonal;
-
-        return $this;
-    }
-
-    public function getPhoneProfessional(): ?string
-    {
-        return $this->phoneProfessional;
-    }
-
-    public function setPhoneProfessional(?string $phoneProfessional): self
-    {
-        $this->phoneProfessional = $phoneProfessional;
-
-        return $this;
-    }
-
-    public function getBirthDate(): ?DateTimeInterface
-    {
-        return $this->birthDate;
-    }
-
-    public function setBirthDate(?DateTimeInterface $birthDate): self
-    {
-        $this->birthDate = $birthDate;
-
-        return $this;
     }
 
     /**
@@ -219,18 +230,6 @@ class Contributor
         return $interval->y;
     }
 
-    public function getGender(): ?string
-    {
-        return $this->gender;
-    }
-
-    public function setGender(?string $gender): self
-    {
-        $this->gender = $gender;
-
-        return $this;
-    }
-
     /**
      * Retourne le libellé du genre en français.
      */
@@ -244,86 +243,6 @@ class Contributor
         };
     }
 
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(?string $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
-
-    public function getAvatarFilename(): ?string
-    {
-        return $this->avatarFilename;
-    }
-
-    public function setAvatarFilename(?string $avatarFilename): self
-    {
-        $this->avatarFilename = $avatarFilename;
-
-        return $this;
-    }
-
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
-
-    public function setNotes(?string $notes): self
-    {
-        $this->notes = $notes;
-
-        return $this;
-    }
-
-    /**
-     * Récupère le CJM depuis la période d'emploi active ou la plus récente.
-     * Sinon, retourne la valeur par défaut du contributeur.
-     */
-    public function getCjm(): ?string
-    {
-        $period = $this->getRelevantEmploymentPeriod();
-
-        return $period?->getCjm() ?? $this->cjm;
-    }
-
-    /**
-     * Définit le CJM par défaut du contributeur.
-     * Note: Ce CJM peut être surchargé par les périodes d'emploi.
-     */
-    public function setCjm(?string $cjm): self
-    {
-        $this->cjm = $cjm;
-
-        return $this;
-    }
-
-    /**
-     * Récupère le TJM depuis la période d'emploi active ou la plus récente.
-     * Sinon, retourne la valeur par défaut du contributeur.
-     */
-    public function getTjm(): ?string
-    {
-        $period = $this->getRelevantEmploymentPeriod();
-
-        return $period?->getTjm() ?? $this->tjm;
-    }
-
-    /**
-     * Définit le TJM par défaut du contributeur.
-     * Note: Ce TJM peut être surchargé par les périodes d'emploi.
-     */
-    public function setTjm(?string $tjm): self
-    {
-        $this->tjm = $tjm;
-
-        return $this;
-    }
-
     /**
      * Récupère le salaire mensuel depuis la période d'emploi active ou la plus récente.
      */
@@ -331,31 +250,7 @@ class Contributor
     {
         $period = $this->getRelevantEmploymentPeriod();
 
-        return $period?->getSalary();
-    }
-
-    public function isActive(): bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
+        return $period?->salary;
     }
 
     public function getProfiles(): Collection
@@ -398,7 +293,7 @@ class Contributor
     {
         if ($this->employmentPeriods->removeElement($employmentPeriod)) {
             // set the owning side to null (unless already changed)
-            if ($employmentPeriod->getContributor() === $this) {
+            if ($employmentPeriod->contributor === $this) {
                 $employmentPeriod->setContributor(null);
             }
         }
@@ -429,18 +324,6 @@ class Contributor
                 $timesheet->setContributor(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getManager(): ?Contributor
-    {
-        return $this->manager;
-    }
-
-    public function setManager(?Contributor $manager): self
-    {
-        $this->manager = $manager;
 
         return $this;
     }
@@ -487,7 +370,7 @@ class Contributor
         $now = new DateTime();
 
         foreach ($this->employmentPeriods as $period) {
-            if ($period->getStartDate() <= $now && ($period->getEndDate() === null || $period->getEndDate() >= $now)) {
+            if ($period->startDate <= $now && ($period->endDate === null || $period->endDate >= $now)) {
                 return $period;
             }
         }
@@ -519,7 +402,7 @@ class Contributor
     {
         $period = $this->getCurrentEmploymentPeriod();
         if ($period) {
-            return (float) $period->getWeeklyHours();
+            return (float) $period->weeklyHours;
         }
 
         return 35.0; // Valeur par défaut
@@ -594,5 +477,335 @@ class Contributor
     public function getSkillsCount(): int
     {
         return $this->contributorSkills->count();
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 public private(set), prefer direct access: $contributor->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->firstName.
+     */
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->firstName = $value.
+     */
+    public function setFirstName(string $value): self
+    {
+        $this->firstName = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->lastName.
+     */
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->lastName = $value.
+     */
+    public function setLastName(string $value): self
+    {
+        $this->lastName = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->email.
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->email = $value.
+     */
+    public function setEmail(?string $value): self
+    {
+        $this->email = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phonePersonal.
+     */
+    public function getPhonePersonal(): ?string
+    {
+        return $this->phonePersonal;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phonePersonal = $value.
+     */
+    public function setPhonePersonal(?string $value): self
+    {
+        $this->phonePersonal = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phoneProfessional.
+     */
+    public function getPhoneProfessional(): ?string
+    {
+        return $this->phoneProfessional;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->phoneProfessional = $value.
+     */
+    public function setPhoneProfessional(?string $value): self
+    {
+        $this->phoneProfessional = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->birthDate.
+     */
+    public function getBirthDate(): ?DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->birthDate = $value.
+     */
+    public function setBirthDate(?DateTimeInterface $value): self
+    {
+        $this->birthDate = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->gender.
+     */
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->gender = $value.
+     */
+    public function setGender(?string $value): self
+    {
+        $this->gender = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->address.
+     */
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->address = $value.
+     */
+    public function setAddress(?string $value): self
+    {
+        $this->address = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->avatarFilename.
+     */
+    public function getAvatarFilename(): ?string
+    {
+        return $this->avatarFilename;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->avatarFilename = $value.
+     */
+    public function setAvatarFilename(?string $value): self
+    {
+        $this->avatarFilename = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->notes.
+     */
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->notes = $value.
+     */
+    public function setNotes(?string $value): self
+    {
+        $this->notes = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->cjm.
+     */
+    public function getCjm(): ?string
+    {
+        return $this->cjm;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->cjm = $value.
+     */
+    public function setCjm(?string $value): self
+    {
+        $this->cjm = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->tjm.
+     */
+    public function getTjm(): ?string
+    {
+        return $this->tjm;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->tjm = $value.
+     */
+    public function setTjm(?string $value): self
+    {
+        $this->tjm = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->active.
+     */
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->active.
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->active = $value.
+     */
+    public function setActive(bool $value): self
+    {
+        $this->active = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->user.
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->user = $value.
+     */
+    public function setUser(?User $value): self
+    {
+        $this->user = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->manager.
+     */
+    public function getManager(): ?Contributor
+    {
+        return $this->manager;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->manager = $value.
+     */
+    public function setManager(?Contributor $value): self
+    {
+        $this->manager = $value;
+
+        return $this;
     }
 }

@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Skill;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Skill>
+ * @extends CompanyAwareRepository<Skill>
  */
-class SkillRepository extends ServiceEntityRepository
+class SkillRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Skill::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Skill::class, $companyContext);
     }
 
     /**
@@ -25,8 +27,8 @@ class SkillRepository extends ServiceEntityRepository
      */
     public function findActive(): array
     {
-        return $this->createQueryBuilder('s')
-            ->where('s.active = :active')
+        return $this->createCompanyQueryBuilder('s')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->orderBy('s.name', 'ASC')
             ->getQuery()
@@ -40,8 +42,8 @@ class SkillRepository extends ServiceEntityRepository
      */
     public function findByCategory(string $category): array
     {
-        return $this->createQueryBuilder('s')
-            ->where('s.category = :category')
+        return $this->createCompanyQueryBuilder('s')
+            ->andWhere('s.category = :category')
             ->andWhere('s.active = :active')
             ->setParameter('category', $category)
             ->setParameter('active', true)
@@ -57,9 +59,9 @@ class SkillRepository extends ServiceEntityRepository
      */
     public function countByCategory(): array
     {
-        $results = $this->createQueryBuilder('s')
+        $results = $this->createCompanyQueryBuilder('s')
             ->select('s.category, COUNT(s.id) as count')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->groupBy('s.category')
             ->getQuery()
@@ -80,9 +82,8 @@ class SkillRepository extends ServiceEntityRepository
      */
     public function search(string $query): array
     {
-        return $this->createQueryBuilder('s')
-            ->where('s.name LIKE :query')
-            ->orWhere('s.description LIKE :query')
+        return $this->createCompanyQueryBuilder('s')
+            ->andWhere('s.name LIKE :query OR s.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->andWhere('s.active = :active')
             ->setParameter('active', true)
@@ -98,10 +99,10 @@ class SkillRepository extends ServiceEntityRepository
      */
     public function findWithContributorCount(): array
     {
-        $results = $this->createQueryBuilder('s')
+        $results = $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.contributorSkills', 'cs')
             ->select('s', 'COUNT(DISTINCT cs.contributor) as contributorCount')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->groupBy('s.id')
             ->orderBy('contributorCount', 'DESC')
@@ -128,10 +129,10 @@ class SkillRepository extends ServiceEntityRepository
      */
     public function findMostPopular(int $limit = 10): array
     {
-        return $this->createQueryBuilder('s')
+        return $this->createCompanyQueryBuilder('s')
             ->leftJoin('s.contributorSkills', 'cs')
             ->select('s', 'COUNT(DISTINCT cs.contributor) as HIDDEN contributorCount')
-            ->where('s.active = :active')
+            ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->groupBy('s.id')
             ->orderBy('contributorCount', 'DESC')

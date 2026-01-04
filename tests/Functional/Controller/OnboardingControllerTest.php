@@ -10,6 +10,7 @@ use App\Factory\UserFactory;
 use App\Repository\ContributorRepository;
 use App\Repository\OnboardingTaskRepository;
 use App\Repository\UserRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,6 +21,7 @@ class OnboardingControllerTest extends WebTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private KernelBrowser $client;
     private UserRepository $userRepository;
@@ -34,6 +36,8 @@ class OnboardingControllerTest extends WebTestCase
         $this->userRepository        = $container->get(UserRepository::class);
         $this->contributorRepository = $container->get(ContributorRepository::class);
         $this->taskRepository        = $container->get(OnboardingTaskRepository::class);
+
+        $this->setUpMultiTenant();
     }
 
     private function createContributor($user, string $firstName = 'John', string $lastName = 'Doe'): Contributor
@@ -42,6 +46,7 @@ class OnboardingControllerTest extends WebTestCase
         $contributor->setFirstName($firstName);
         $contributor->setLastName($lastName);
         $contributor->setUser($user);
+        $contributor->setCompany($this->getTestCompany());
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($contributor);
@@ -61,6 +66,7 @@ class OnboardingControllerTest extends WebTestCase
         $task->setAssignedTo('contributor');
         $task->setDaysAfterStart(0);
         $task->setDueDate(new DateTimeImmutable('+7 days'));
+        $task->setCompany($this->getTestCompany());
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($task);

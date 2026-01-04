@@ -4,22 +4,30 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\OnboardingTaskRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OnboardingTaskRepository::class)]
 #[ORM\Table(name: 'onboarding_tasks')]
 #[ORM\Index(columns: ['status'], name: 'idx_onboarding_task_status')]
 #[ORM\Index(columns: ['due_date'], name: 'idx_onboarding_task_due_date')]
+#[ORM\Index(columns: ['company_id'], name: 'idx_onboardingtask_company')]
 #[ORM\HasLifecycleCallbacks]
-class OnboardingTask
+class OnboardingTask implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Contributor::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -327,6 +335,18 @@ class OnboardingTask
     public function setUpdatedAt(DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

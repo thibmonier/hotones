@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ExpenseReportRepository;
 use DateTime;
 use DateTimeInterface;
@@ -13,9 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     new ORM\Index(name: 'idx_expense_status', columns: ['status']),
     new ORM\Index(name: 'idx_expense_date', columns: ['expense_date']),
     new ORM\Index(name: 'idx_expense_contributor', columns: ['contributor_id']),
+    new ORM\Index(name: 'idx_expensereport_company', columns: ['company_id']),
 ])]
 #[ORM\HasLifecycleCallbacks]
-class ExpenseReport
+class ExpenseReport implements CompanyOwnedInterface
 {
     public const STATUS_DRAFT     = 'draft';
     public const STATUS_PENDING   = 'pending';
@@ -60,6 +62,11 @@ class ExpenseReport
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Contributor::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -466,6 +473,18 @@ class ExpenseReport
     public function setAmountTTC(string $amountTTC): static
     {
         $this->amountTTC = $amountTTC;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }
