@@ -109,17 +109,20 @@ class WorkloadPredictionService
         }
 
         // Facteur 3 : Âge du devis (pénalité si ancien)
-        $daysOld = (new DateTime())->diff($order->createdAt)->days;
-        if ($daysOld > 60) {
-            $probability -= 20; // Très ancien
-        } elseif ($daysOld > 30) {
-            $probability -= 10; // Ancien
-        } elseif ($daysOld < 7) {
-            $probability += 5; // Très récent
+        $createdAt = $order->createdAt;
+        if ($createdAt !== null) {
+            $daysOld = new DateTime()->diff($createdAt)->days;
+            if ($daysOld > 60) {
+                $probability -= 20; // Très ancien
+            } elseif ($daysOld > 30) {
+                $probability -= 10; // Ancien
+            } elseif ($daysOld < 7) {
+                $probability += 5; // Très récent
+            }
         }
 
         // Facteur 4 : Montant du devis (les gros montants ont moins de chance)
-        $amount = (float) $order->totalAmount;
+        $amount = (float) $order->getTotalAmount();
         if ($amount > 100000) {
             $probability -= 15;
         } elseif ($amount > 50000) {

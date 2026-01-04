@@ -54,9 +54,9 @@ class OrderRepositoryTest extends KernelTestCase
         // Assert
         $this->assertGreaterThanOrEqual(2, count($results));
         // Just verify both orders exist in results
-        $ids = array_map(fn ($o) => $o->getId(), $results);
-        $this->assertContains($order1->getId(), $ids);
-        $this->assertContains($order2->getId(), $ids);
+        $ids = array_map(fn ($o) => $o->id, $results);
+        $this->assertContains($order1->id, $ids);
+        $this->assertContains($order2->id, $ids);
     }
 
     public function testFindWithFiltersWithProject(): void
@@ -72,7 +72,7 @@ class OrderRepositoryTest extends KernelTestCase
 
         // Assert
         $this->assertCount(1, $results);
-        $this->assertEquals($order1->getId(), $results[0]->getId());
+        $this->assertEquals($order1->id, $results[0]->id);
     }
 
     public function testFindWithFiltersWithStatus(): void
@@ -87,7 +87,7 @@ class OrderRepositoryTest extends KernelTestCase
 
         // Assert
         $this->assertCount(1, $results);
-        $this->assertEquals($order2->getId(), $results[0]->getId());
+        $this->assertEquals($order2->id, $results[0]->id);
     }
 
     public function testFindWithFiltersSorting(): void
@@ -101,15 +101,15 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithFilters(sortField: 'name', sortDir: 'ASC');
 
         // Assert
-        $this->assertEquals($order1->getId(), $results[0]->getId());
-        $this->assertEquals($order2->getId(), $results[1]->getId());
+        $this->assertEquals($order1->id, $results[0]->id);
+        $this->assertEquals($order2->id, $results[1]->id);
 
         // Act - Sort by total
         $results = $this->repository->findWithFilters(sortField: 'total', sortDir: 'DESC');
 
         // Assert
-        $this->assertEquals($order2->getId(), $results[0]->getId());
-        $this->assertEquals($order1->getId(), $results[1]->getId());
+        $this->assertEquals($order2->id, $results[0]->id);
+        $this->assertEquals($order1->id, $results[1]->id);
     }
 
     public function testFindWithFiltersPagination(): void
@@ -232,7 +232,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->entityManager->clear(); // Clear to force fresh query
 
         // Act
-        $result = $this->repository->findOneWithRelations($order->getId());
+        $result = $this->repository->findOneWithRelations($order->id);
 
         // Assert
         $this->assertNotNull($result);
@@ -329,8 +329,8 @@ class OrderRepositoryTest extends KernelTestCase
         $order2  = $this->createOrder($project, 'Order 2', 'signe', 2000.0);
 
         // Modify creation dates
-        $order1->setCreatedAt(new DateTime('2024-01-15'));
-        $order2->setCreatedAt(new DateTime('2024-02-15'));
+        $order1->createdAt = new DateTime('2024-01-15');
+        $order2->createdAt = new DateTime('2024-02-15');
         $this->entityManager->flush();
 
         // Act
@@ -352,8 +352,8 @@ class OrderRepositoryTest extends KernelTestCase
         $order2  = $this->createOrder($project, 'Order 2', 'gagne', 2000.0);
         $order3  = $this->createOrder($project, 'Order 3', 'draft', 500.0);
 
-        $order1->setValidatedAt(new DateTime('2024-01-15'));
-        $order2->setValidatedAt(new DateTime('2024-01-20'));
+        $order1->validatedAt = new DateTime('2024-01-15');
+        $order2->validatedAt = new DateTime('2024-01-20');
         $this->entityManager->flush();
 
         // Act
@@ -418,21 +418,21 @@ class OrderRepositoryTest extends KernelTestCase
         $project = $this->createProject('Test Project');
 
         // 2023 orders
-        $order2023a = $this->createOrder($project, 'Order 2023-1', 'signe', 1000.0);
-        $order2023a->setCreatedAt(new DateTime('2023-03-01'));
-        $order2023a->setValidatedAt(new DateTime('2023-03-15'));
+        $order2023a              = $this->createOrder($project, 'Order 2023-1', 'signe', 1000.0);
+        $order2023a->createdAt   = new DateTime('2023-03-01');
+        $order2023a->validatedAt = new DateTime('2023-03-15');
 
-        $order2023b = $this->createOrder($project, 'Order 2023-2', 'draft', 500.0);
-        $order2023b->setCreatedAt(new DateTime('2023-06-01'));
+        $order2023b            = $this->createOrder($project, 'Order 2023-2', 'draft', 500.0);
+        $order2023b->createdAt = new DateTime('2023-06-01');
 
         // 2024 orders
-        $order2024a = $this->createOrder($project, 'Order 2024-1', 'signe', 2000.0);
-        $order2024a->setCreatedAt(new DateTime('2024-03-01'));
-        $order2024a->setValidatedAt(new DateTime('2024-03-15'));
+        $order2024a              = $this->createOrder($project, 'Order 2024-1', 'signe', 2000.0);
+        $order2024a->createdAt   = new DateTime('2024-03-01');
+        $order2024a->validatedAt = new DateTime('2024-03-15');
 
-        $order2024b = $this->createOrder($project, 'Order 2024-2', 'signe', 3000.0);
-        $order2024b->setCreatedAt(new DateTime('2024-06-01'));
-        $order2024b->setValidatedAt(new DateTime('2024-06-15'));
+        $order2024b              = $this->createOrder($project, 'Order 2024-2', 'signe', 3000.0);
+        $order2024b->createdAt   = new DateTime('2024-06-01');
+        $order2024b->validatedAt = new DateTime('2024-06-15');
 
         $this->entityManager->flush();
 
@@ -456,9 +456,9 @@ class OrderRepositoryTest extends KernelTestCase
         $order2  = $this->createOrder($project, 'Order 2');
         $order3  = $this->createOrder($project, 'Order 3');
 
-        $order1->setCreatedAt(new DateTime('2024-01-15'));
-        $order2->setCreatedAt(new DateTime('2024-02-15'));
-        $order3->setCreatedAt(new DateTime('2024-03-15'));
+        $order1->createdAt = new DateTime('2024-01-15');
+        $order2->createdAt = new DateTime('2024-02-15');
+        $order3->createdAt = new DateTime('2024-03-15');
         $this->entityManager->flush();
 
         // Act
@@ -493,10 +493,10 @@ class OrderRepositoryTest extends KernelTestCase
 
         // Assert
         $this->assertCount(1, $results1);
-        $this->assertEquals($order1->getId(), $results1[0]->getId());
+        $this->assertEquals($order1->id, $results1[0]->id);
 
         $this->assertCount(1, $results2);
-        $this->assertEquals($order1->getId(), $results2[0]->getId());
+        $this->assertEquals($order1->id, $results2[0]->id);
 
         $this->assertCount(2, $results3);
     }
@@ -564,8 +564,12 @@ class OrderRepositoryTest extends KernelTestCase
         return $project;
     }
 
-    private function createOrder(Project $project, string $name, string $status = 'draft', float $totalAmount = 0.0): Order
-    {
+    private function createOrder(
+        Project $project,
+        string $name,
+        string $status = 'draft',
+        float $totalAmount = 0.0
+    ): Order {
         $order = new Order();
         $order->setCompany($this->getTestCompany());
         $order->setProject($project);

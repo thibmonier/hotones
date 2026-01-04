@@ -5,6 +5,7 @@ namespace App\Factory;
 use App\Entity\Order;
 use App\Exception\CompanyContextMissingException;
 use App\Security\CompanyContext;
+use DateTimeImmutable;
 use Faker\Generator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -25,7 +26,7 @@ final class OrderFactory extends PersistentObjectFactory
     {
         /** @var Generator $faker */
         $faker = self::faker();
-        $date  = $faker->dateTimeBetween('-1 year', 'now');
+        $date  = DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', 'now'));
 
         // Try to get company from context (for multi-tenant tests), fallback to creating new company
         $company = null;
@@ -34,6 +35,8 @@ final class OrderFactory extends PersistentObjectFactory
         } catch (CompanyContextMissingException) {
             // No authenticated user - will create new company
         }
+
+        $validatedAtTemp = $faker->optional()->dateTimeBetween($date, '+4 months');
 
         return [
             'company'     => $company ?? CompanyFactory::new(),
@@ -50,7 +53,7 @@ final class OrderFactory extends PersistentObjectFactory
             // provisional, may be updated by fixtures after creating tasks/sections
             'totalAmount' => (string) $faker->randomFloat(2, 1000, 50000),
             'createdAt'   => $date,
-            'validatedAt' => $faker->optional()->dateTimeBetween($date, '+4 months'),
+            'validatedAt' => $validatedAtTemp ? DateTimeImmutable::createFromMutable($validatedAtTemp) : null,
             'status'      => $this->pickWeighted([
                 'a_signer' => 10,
                 'gagne'    => 20,

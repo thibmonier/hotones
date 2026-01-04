@@ -231,8 +231,8 @@ class ControllerAccessControlTest extends WebTestCase
         $user->setCompany($company);
         $user->setEmail($email);
         $user->setPassword($hasher->hashPassword($user, 'password'));
-        $user->setFirstName('Test');
-        $user->setLastName('User');
+        $user->firstName = 'Test';
+        $user->lastName  = 'User';
         $user->setRoles($roles);
         $em->persist($user);
 

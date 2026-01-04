@@ -68,8 +68,8 @@ trait MultiTenantTestTrait
         $user->setCompany($company);
         $user->setEmail('test@test.com');
         $user->setPassword('password');
-        $user->setFirstName('Test');
-        $user->setLastName('User');
+        $user->firstName = 'Test';
+        $user->lastName  = 'User';
         $user->setRoles($roles);
 
         $em = $this->getEntityManager();

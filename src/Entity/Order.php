@@ -15,6 +15,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\Blameable;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -42,6 +43,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class Order implements CompanyOwnedInterface
 {
+    use Blameable;
+
     public const STATUS_OPTIONS = [
         'a_signer'  => 'À signer',
         'gagne'     => 'Gagné',
@@ -158,14 +161,6 @@ class Order implements CompanyOwnedInterface
         }
     }
 
-    #[ORM\Column(type: 'date')]
-    #[Gedmo\Timestampable(on: 'create')]
-    private DateTimeInterface $createdAt;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Gedmo\Timestampable(on: 'update')]
-    private ?DateTimeInterface $updatedAt = null;
-
     #[ORM\Column(type: 'date', nullable: true)]
     public ?DateTimeInterface $validatedAt = null {
         get => $this->validatedAt;
@@ -173,6 +168,14 @@ class Order implements CompanyOwnedInterface
             $this->validatedAt = $value;
         }
     }
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Gedmo\Timestampable(on: 'create')]
+    protected ?DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Gedmo\Timestampable(on: 'update')]
+    protected ?DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: 'string', length: 20)]
     public string $status = 'a_signer' { // a_signer, gagne, signe, perdu, termine, standby, abandonne
@@ -687,7 +690,7 @@ class Order implements CompanyOwnedInterface
      * Compatibility method for existing code.
      * With PHP 8.4 property hooks, prefer direct access: $order->createdAt.
      */
-    public function getCreatedAt(): DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->createdAt;
     }

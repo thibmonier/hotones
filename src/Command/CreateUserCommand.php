@@ -31,10 +31,10 @@ class CreateUserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $user = new User();
-        $user->setEmail($input->getArgument('email'))
-            ->setFirstName($input->getArgument('firstName'))
-            ->setLastName($input->getArgument('lastName'))
-            ->setRoles(['ROLE_USER']);
+        $user->setEmail($input->getArgument('email'));
+        $user->firstName = $input->getArgument('firstName');
+        $user->lastName  = $input->getArgument('lastName');
+        $user->setRoles(['ROLE_USER']);
         $user->setPassword($this->hasher->hashPassword($user, $input->getArgument('password')));
         $this->em->persist($user);
         $this->em->flush();

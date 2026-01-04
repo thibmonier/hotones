@@ -9,7 +9,7 @@ use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\Blameable;
-use Gedmo\Timestampable\Traits\Timestampable;
+use Gedmo\Mapping\Annotation as Gedmo;
 use InvalidArgumentException;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,7 +23,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class NpsSurvey implements CompanyOwnedInterface
 {
-    use Timestampable;
     use Blameable;
 
     // Statuts possibles
@@ -106,6 +105,14 @@ class NpsSurvey implements CompanyOwnedInterface
             $this->comment = $value;
         }
     }
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Gedmo\Timestampable(on: 'create')]
+    protected ?DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Gedmo\Timestampable(on: 'update')]
+    protected ?DateTimeInterface $updatedAt = null;
 
     /**
      * Statut de l'enquête.

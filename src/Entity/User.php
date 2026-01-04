@@ -11,9 +11,10 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Entity\Interface\CompanyOwnedInterface;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\Blameable;
-use Gedmo\Timestampable\Traits\Timestampable;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
@@ -43,7 +44,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwoFactorInterface, CompanyOwnedInterface
 {
-    use Timestampable;
     use Blameable;
 
     // Rôles métier
@@ -138,6 +138,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
             $this->address = $value;
         }
     }
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Gedmo\Timestampable(on: 'create')]
+    protected ?DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Gedmo\Timestampable(on: 'update')]
+    protected ?DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     public ?string $avatar = null {
