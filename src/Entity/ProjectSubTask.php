@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ProjectSubTaskRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectSubTaskRepository::class)]
 #[ORM\Table(name: 'project_sub_tasks')]
-class ProjectSubTask
+#[ORM\Index(name: 'idx_projectsubtask_company', columns: ['company_id'])]
+class ProjectSubTask implements CompanyOwnedInterface
 {
     public const STATUS_TODO        = 'todo';
     public const STATUS_IN_PROGRESS = 'in_progress';
@@ -22,6 +25,11 @@ class ProjectSubTask
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Project::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -234,5 +242,17 @@ class ProjectSubTask
             self::STATUS_DONE        => 'Terminé',
             self::STATUS_BLOCKED     => 'Bloqué',
         ];
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

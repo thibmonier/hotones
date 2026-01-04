@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\LeadCapture;
+use App\Security\CompanyContext;
 use DateTime;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<LeadCapture>
+ * @extends CompanyAwareRepository<LeadCapture>
  *
  * @method LeadCapture|null find($id, $lockMode = null, $lockVersion = null)
  * @method LeadCapture|null findOneBy(array $criteria, array $orderBy = null)
  * @method LeadCapture[]    findAll()
  * @method LeadCapture[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class LeadCaptureRepository extends ServiceEntityRepository
+class LeadCaptureRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, LeadCapture::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, LeadCapture::class, $companyContext);
     }
 
     /**
@@ -39,7 +41,7 @@ class LeadCaptureRepository extends ServiceEntityRepository
      */
     public function countBySource(): array
     {
-        $result = $this->createQueryBuilder('lc')
+        $result = $this->createCompanyQueryBuilder('lc')
             ->select('lc.source', 'COUNT(lc.id) as total')
             ->groupBy('lc.source')
             ->getQuery()
@@ -62,8 +64,8 @@ class LeadCaptureRepository extends ServiceEntityRepository
     {
         $since = new DateTime("-{$days} days");
 
-        return $this->createQueryBuilder('lc')
-            ->where('lc.createdAt >= :since')
+        return $this->createCompanyQueryBuilder('lc')
+            ->andWhere('lc.createdAt >= :since')
             ->setParameter('since', $since)
             ->orderBy('lc.createdAt', 'DESC')
             ->getQuery()
@@ -77,7 +79,7 @@ class LeadCaptureRepository extends ServiceEntityRepository
      */
     public function findWithMarketingConsent(): array
     {
-        return $this->createQueryBuilder('lc')
+        return $this->createCompanyQueryBuilder('lc')
             ->where('lc.marketingConsent = :consent')
             ->setParameter('consent', true)
             ->orderBy('lc.createdAt', 'DESC')
@@ -92,26 +94,26 @@ class LeadCaptureRepository extends ServiceEntityRepository
      */
     public function getStats(): array
     {
-        $qb = $this->createQueryBuilder('lc');
+        $qb = $this->createCompanyQueryBuilder('lc');
 
         $total = (int) $qb->select('COUNT(lc.id)')
             ->getQuery()
             ->getSingleScalarResult();
 
-        $withConsent = (int) $this->createQueryBuilder('lc')
+        $withConsent = (int) $this->createCompanyQueryBuilder('lc')
             ->select('COUNT(lc.id)')
-            ->where('lc.marketingConsent = :true')
+            ->andWhere('lc.marketingConsent = :true')
             ->setParameter('true', true)
             ->getQuery()
             ->getSingleScalarResult();
 
-        $downloaded = (int) $this->createQueryBuilder('lc')
+        $downloaded = (int) $this->createCompanyQueryBuilder('lc')
             ->select('COUNT(lc.id)')
-            ->where('lc.downloadedAt IS NOT NULL')
+            ->andWhere('lc.downloadedAt IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
 
-        $avgDownloads = (float) $this->createQueryBuilder('lc')
+        $avgDownloads = (float) $this->createCompanyQueryBuilder('lc')
             ->select('AVG(lc.downloadCount)')
             ->getQuery()
             ->getSingleScalarResult();

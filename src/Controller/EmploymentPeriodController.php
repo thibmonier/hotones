@@ -7,6 +7,7 @@ use App\Entity\EmploymentPeriod;
 use App\Entity\Profile;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
+use App\Security\CompanyContext;
 use App\Service\CjmCalculatorService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +23,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_MANAGER')]
 class EmploymentPeriodController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'employment_period_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator, ContributorRepository $contributorRepository): Response
     {
@@ -143,22 +149,22 @@ class EmploymentPeriodController extends AbstractController
         $csv = "Collaborateur;Date début;Date fin;Profils;Salaire;CJM;TJM;Heures/semaine;Temps de travail;Statut\n";
         foreach ($periods as $period) {
             $profiles = [];
-            foreach ($period->getProfiles() as $profile) {
+            foreach ($period->profiles as $profile) {
                 $profiles[] = $profile->getName();
             }
 
             $csv .= sprintf(
                 "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n",
-                $period->getContributor()->getName(),
-                $period->getStartDate()->format('d/m/Y'),
-                $period->getEndDate() ? $period->getEndDate()->format('d/m/Y') : 'En cours',
+                $period->contributor->getName(),
+                $period->startDate->format('d/m/Y'),
+                $period->endDate ? $period->endDate->format('d/m/Y') : 'En cours',
                 implode(', ', $profiles),
-                $period->getSalary() ? number_format($period->getSalary(), 0, ',', ' ').' €' : '',
-                $period->getCjm() ? number_format($period->getCjm(), 0, ',', ' ').' €' : '',
-                $period->getTjm() ? number_format($period->getTjm(), 0, ',', ' ').' €' : '',
-                $period->getWeeklyHours().'h',
-                $period->getWorkTimePercentage().'%',
-                $period->getEndDate() === null || $period->getEndDate() >= new DateTime() ? 'Actif' : 'Terminé',
+                $period->salary ? number_format($period->salary, 0, ',', ' ').' €' : '',
+                $period->cjm ? number_format($period->cjm, 0, ',', ' ').' €' : '',
+                $period->tjm ? number_format($period->tjm, 0, ',', ' ').' €' : '',
+                $period->weeklyHours.'h',
+                $period->workTimePercentage.'%',
+                $period->endDate === null || $period->endDate >= new DateTime() ? 'Actif' : 'Terminé',
             );
         }
 
@@ -176,6 +182,7 @@ class EmploymentPeriodController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository, CjmCalculatorService $cjmCalculatorService): Response
     {
         $period = new EmploymentPeriod();
+        $period->setCompany($this->companyContext->getCurrentCompany());
 
         // Pré-sélectionner le collaborateur si fourni dans l'URL
         if ($contributorId = $request->query->get('contributor')) {
@@ -254,7 +261,7 @@ class EmploymentPeriodController extends AbstractController
                     'period'                => $period,
                     'contributors'          => $contributors,
                     'profiles'              => $profiles,
-                    'selectedContributorId' => $period->getContributor() ? $period->getContributor()->getId() : null,
+                    'selectedContributorId' => $period->contributor ? $period->contributor->getId() : null,
                     'calculationReport'     => $calculationReport,
                 ]);
             }
@@ -278,7 +285,7 @@ class EmploymentPeriodController extends AbstractController
             'period'                => $period,
             'contributors'          => $contributors,
             'profiles'              => $profiles,
-            'selectedContributorId' => $period->getContributor() ? $period->getContributor()->getId() : null,
+            'selectedContributorId' => $period->contributor ? $period->contributor->getId() : null,
             'calculationReport'     => $calculationReport,
         ]);
     }
@@ -287,8 +294,8 @@ class EmploymentPeriodController extends AbstractController
     public function show(EmploymentPeriod $period, EmploymentPeriodRepository $employmentPeriodRepository): Response
     {
         // Calculer la durée en jours
-        $endDate  = $period->getEndDate() ?? new DateTime();
-        $duration = $period->getStartDate()->diff($endDate)->days + 1;
+        $endDate  = $period->endDate ?? new DateTime();
+        $duration = $period->startDate->diff($endDate)->days + 1;
 
         // Calculer le coût total sur la période
         $totalCost = $employmentPeriodRepository->calculatePeriodCost($period);
@@ -345,7 +352,7 @@ class EmploymentPeriodController extends AbstractController
             $period->setWorkTimePercentage($workTimePercentage !== '' ? (float) $workTimePercentage : 100.0);
 
             // Gestion des profils
-            $period->getProfiles()->clear();
+            $period->profiles->clear();
             $profileIds = $request->request->all('profiles');
             if (!empty($profileIds)) {
                 foreach ($profileIds as $profileId) {

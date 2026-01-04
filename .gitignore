@@ -57,3 +57,5 @@ yarn-error.log
 ###> deptrac/deptrac ###
 /.deptrac.cache
 ###< deptrac/deptrac ###
+/public/sitemap.default.xml
+/public/sitemap.xml

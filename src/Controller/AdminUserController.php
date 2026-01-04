@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Contributor;
 use App\Entity\User;
+use App\Security\CompanyContext;
 use App\Service\SecureFileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
@@ -22,6 +23,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_MANAGER')]
 class AdminUserController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'admin_users')]
     public function index(EntityManagerInterface $em): Response
     {
@@ -127,6 +133,7 @@ class AdminUserController extends AbstractController
 
             // auto-link contributor
             $contributor = new Contributor();
+            $contributor->setCompany($this->companyContext->getCurrentCompany());
             $contributor->setFirstName($firstName)
                 ->setLastName($lastName)
                 ->setEmail($email)

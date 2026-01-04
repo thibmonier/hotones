@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity\Analytics;
 
+use App\Entity\Company;
+use App\Entity\Interface\CompanyOwnedInterface;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,12 +15,16 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'dim_time')]
-class DimTime
+class DimTime implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Company $company;
 
     #[ORM\Column(name: 'date_value', type: 'date', unique: true)]
     private DateTimeInterface $date;
@@ -157,6 +163,18 @@ class DimTime
     public function setQuarterName(string $quarterName): static
     {
         $this->quarterName = $quarterName;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Service\Analytics;
 use App\Entity\Analytics\DimTime;
 use App\Entity\Project;
 use App\Repository\ProjectRepository;
+use App\Security\CompanyContext;
 use App\Service\Analytics\MetricsCalculationService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,16 +22,19 @@ use Psr\Log\LoggerInterface;
 class MetricsCalculationServiceTest extends TestCase
 {
     private EntityManagerInterface|MockObject $entityManager;
+    private CompanyContext|MockObject $companyContext;
     private LoggerInterface|MockObject $logger;
     private MetricsCalculationService $service;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->logger        = $this->createMock(LoggerInterface::class);
+        $this->entityManager  = $this->createMock(EntityManagerInterface::class);
+        $this->companyContext = $this->createMock(CompanyContext::class);
+        $this->logger         = $this->createMock(LoggerInterface::class);
 
         $this->service = new MetricsCalculationService(
             $this->entityManager,
+            $this->companyContext,
             $this->logger,
         );
     }

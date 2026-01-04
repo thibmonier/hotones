@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\ExpenseReport;
 use App\Entity\Order;
 use App\Entity\User;
+use App\Security\CompanyContext;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,6 +15,7 @@ class ExpenseReportService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private CompanyContext $companyContext,
     ) {
     }
 
@@ -25,6 +27,7 @@ class ExpenseReportService
     public function create(array $data, User $user): ExpenseReport
     {
         $expense = new ExpenseReport();
+        $expense->setCompany($this->companyContext->getCurrentCompany());
 
         // Définir le contributeur
         if (isset($data['contributor'])) {
@@ -248,7 +251,8 @@ class ExpenseReportService
      */
     public function calculateContributorStats(int $contributorId, DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $company = $this->companyContext->getCurrentCompany();
+        $qb      = $this->entityManager->createQueryBuilder();
 
         // Total des frais
         $total = $qb->select('SUM(e.amountTTC)')
@@ -256,9 +260,11 @@ class ExpenseReportService
             ->where('e.contributor = :contributor')
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
+            ->andWhere('e.company = :company')
             ->setParameter('contributor', $contributorId)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->setParameter('company', $company)
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -270,10 +276,12 @@ class ExpenseReportService
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->andWhere('e.status = :status')
+            ->andWhere('e.company = :company')
             ->setParameter('contributor', $contributorId)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->setParameter('status', ExpenseReport::STATUS_VALIDATED)
+            ->setParameter('company', $company)
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -284,9 +292,11 @@ class ExpenseReportService
             ->where('e.contributor = :contributor')
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
+            ->andWhere('e.company = :company')
             ->setParameter('contributor', $contributorId)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->setParameter('company', $company)
             ->groupBy('e.category')
             ->getQuery()
             ->getResult();

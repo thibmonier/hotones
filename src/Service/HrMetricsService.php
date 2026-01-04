@@ -107,7 +107,7 @@ class HrMetricsService
                 continue;
             }
 
-            $yearsOfService = $firstPeriod->getStartDate()->diff($now)->days / 365;
+            $yearsOfService = $firstPeriod->startDate->diff($now)->days / 365;
             $totalSeniority += $yearsOfService;
 
             // Catégoriser
@@ -200,7 +200,7 @@ class HrMetricsService
             ++$ageRanges[$range];
 
             // Compter par genre
-            $gender = $contributor->getGender() ?? 'other';
+            $gender = $contributor->gender ?? 'other';
             if (isset($genderCounts[$gender])) {
                 ++$genderCounts[$gender];
                 ++$ageRangesByGender[$gender][$range];

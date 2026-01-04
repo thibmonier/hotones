@@ -140,7 +140,7 @@ class EmploymentPeriodType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $period = $event->getData();
 
-            if ($period->getEndDate() && $period->getEndDate() < $period->getStartDate()) {
+            if ($period->endDate && $period->endDate < $period->startDate) {
                 $event->getForm()->get('endDate')->addError(
                     new \Symfony\Component\Form\FormError('La date de fin doit être postérieure à la date de début'),
                 );

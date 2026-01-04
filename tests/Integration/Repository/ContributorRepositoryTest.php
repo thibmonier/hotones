@@ -9,6 +9,7 @@ use App\Factory\ProjectTaskFactory;
 use App\Factory\TimesheetFactory;
 use App\Factory\UserFactory;
 use App\Repository\ContributorRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -18,6 +19,7 @@ class ContributorRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private ContributorRepository $repository;
 
@@ -25,6 +27,7 @@ class ContributorRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(ContributorRepository::class);
+        $this->setUpMultiTenant();
     }
 
     public function testFindActiveContributors(): void

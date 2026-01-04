@@ -10,7 +10,9 @@ use App\Entity\Analytics\FactStaffingMetrics;
 use App\Entity\Contributor;
 use App\Entity\EmploymentPeriod;
 use App\Repository\ContributorRepository;
+use App\Repository\EmploymentPeriodRepository;
 use App\Repository\TimesheetRepository;
+use App\Security\CompanyContext;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
@@ -23,10 +25,15 @@ use InvalidArgumentException;
  */
 class StaffingMetricsCalculationService
 {
+    // Cache pour les dimensions temporelles
+    private array $dimTimeCache = [];
+
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private CompanyContext $companyContext,
         private ContributorRepository $contributorRepo,
-        private TimesheetRepository $timesheetRepo
+        private TimesheetRepository $timesheetRepo,
+        private EmploymentPeriodRepository $employmentPeriodRepo
     ) {
     }
 
@@ -47,26 +54,42 @@ class StaffingMetricsCalculationService
         // Générer les périodes selon la granularité
         $periods = $this->generatePeriods($startDate, $endDate, $granularity);
 
+        // Récupérer tous les contributeurs actifs pendant la période globale
+        $contributors = $this->contributorRepo->findActiveContributors();
+
+        // Batch load TOUS les employment periods en une requête pour la période globale
+        $employmentPeriods = $this->employmentPeriodRepo
+            ->findByContributorsAndDateRange($contributors, $startDate, $endDate);
+
+        // Index par contributor ID pour lookup O(1)
+        $periodsByContributor = [];
+        foreach ($employmentPeriods as $period) {
+            if ($period->getContributor()) {
+                $periodsByContributor[$period->getContributor()->getId()][] = $period;
+            }
+        }
+
         foreach ($periods as $period) {
-            // Récupérer ou créer la dimension temporelle
-            $dimTime = $this->getOrCreateDimTime($period);
+            // Récupérer ou créer la dimension temporelle (avec cache local)
+            $periodKey = $period->format('Y-m-d');
+            $dimTime   = $this->dimTimeCache[$periodKey]
+                ??= $this->getOrCreateDimTime($period);
 
             // Calculer le début et la fin de la période selon la granularité
             $periodStart = clone $period;
             $periodEnd   = $this->calculatePeriodEnd($period, $granularity);
 
-            // Récupérer tous les contributeurs actifs pendant la période
-            $contributors = $this->contributorRepo->findActiveContributors();
-
             foreach ($contributors as $contributor) {
-                // Récupérer la période d'emploi active pour ce contributeur
-                $employmentPeriod = $this->getActiveEmploymentPeriod($contributor, $period);
+                // Récupérer la période d'emploi active pour ce contributeur depuis l'index
+                $contributorPeriods = $periodsByContributor[$contributor->getId()] ?? [];
+                $employmentPeriod   = $this->findActivePeriod($contributorPeriods, $period);
 
                 // Calculer les métriques pour ce contributeur sur cette période
                 $metrics = $this->calculateMetricsForContributor($contributor, $periodStart, $periodEnd, $employmentPeriod);
 
                 // Créer l'entrée de fait
                 $fact = new FactStaffingMetrics();
+                $fact->setCompany($this->companyContext->getCurrentCompany());
                 $fact->setDimTime($dimTime);
                 $fact->setContributor($contributor);
                 $fact->setAvailableDays((string) $metrics['availableDays']);
@@ -100,6 +123,22 @@ class StaffingMetricsCalculationService
         $this->entityManager->flush();
 
         return $metricsCreated;
+    }
+
+    /**
+     * Trouve la période d'emploi active dans une liste préchargée.
+     *
+     * @param EmploymentPeriod[] $periods
+     */
+    private function findActivePeriod(array $periods, DateTimeInterface $date): ?EmploymentPeriod
+    {
+        foreach ($periods as $period) {
+            if ($period->isActiveAt($date)) {
+                return $period;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -276,6 +315,7 @@ class StaffingMetricsCalculationService
 
         if (!$dimTime) {
             $dimTime = new DimTime();
+            $dimTime->setCompany($this->companyContext->getCurrentCompany());
             $dimTime->setDate($date);
             $this->entityManager->persist($dimTime);
         }
@@ -310,6 +350,7 @@ class StaffingMetricsCalculationService
 
         if (!$dimProfile) {
             $dimProfile = new DimProfile();
+            $dimProfile->setCompany($this->companyContext->getCurrentCompany());
             $dimProfile->setProfile($profile);
             $dimProfile->setName($profile->getName());
             $dimProfile->setIsProductive(true); // Par défaut productif
@@ -320,22 +361,6 @@ class StaffingMetricsCalculationService
         }
 
         return $dimProfile;
-    }
-
-    /**
-     * Récupère la période d'emploi active pour un contributeur à une date donnée.
-     */
-    private function getActiveEmploymentPeriod(Contributor $contributor, DateTimeInterface $date): ?EmploymentPeriod
-    {
-        $employmentPeriods = $contributor->getEmploymentPeriods();
-
-        foreach ($employmentPeriods as $period) {
-            if ($period->isActiveAt($date)) {
-                return $period;
-            }
-        }
-
-        return null;
     }
 
     /**

@@ -42,19 +42,16 @@ class ExcelExportService
         // Onglet 2: Évolution mensuelle
         $this->createMonthlyEvolutionSheet($spreadsheet, $monthlyEvolution);
 
-        // Onglet 3: Répartition par type (si disponible)
-        if (isset($kpis['projectsByType']) && !empty($kpis['projectsByType'])) {
-            $this->createProjectTypeSheet($spreadsheet, $kpis['projectsByType']);
-        }
+        $sheets = [
+            'projectsByType'     => 'createProjectTypeSheet',
+            'projectsByCategory' => 'createProjectCategorySheet',
+            'topContributors'    => 'createTopContributorsSheet',
+        ];
 
-        // Onglet 4: Répartition par catégorie (si disponible)
-        if (isset($kpis['projectsByCategory']) && !empty($kpis['projectsByCategory'])) {
-            $this->createProjectCategorySheet($spreadsheet, $kpis['projectsByCategory']);
-        }
-
-        // Onglet 5: Top contributeurs (si disponible)
-        if (isset($kpis['topContributors']) && !empty($kpis['topContributors'])) {
-            $this->createTopContributorsSheet($spreadsheet, $kpis['topContributors']);
+        foreach ($sheets as $key => $method) {
+            if (!empty($kpis[$key] ?? null)) {
+                $this->$method($spreadsheet, $kpis[$key]);
+            }
         }
 
         // Générer le fichier

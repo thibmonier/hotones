@@ -56,7 +56,7 @@ class BillingController extends AbstractController
 
         $regieEntries = [];
         foreach ($ordersRegie as $order) {
-            $project = $order->getProject();
+            $project = $order->project;
             $rows    = $timesheets->getMonthlyRevenueForProjectUsingContributorTjm($project, $start, $end);
             foreach ($rows as $r) {
                 $regieEntries[] = [
@@ -80,7 +80,7 @@ class BillingController extends AbstractController
                 'date'     => $s->getBillingDate(),
                 'type'     => 'forfait',
                 'order'    => $o,
-                'project'  => $o->getProject(),
+                'project'  => $o->project,
                 'label'    => $s->getLabel() ?: 'Échéance',
                 'amount'   => (float) $s->computeAmount($o->calculateTotalFromSections()),
                 'schedule' => $s,

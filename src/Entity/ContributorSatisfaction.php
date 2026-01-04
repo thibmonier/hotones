@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ContributorSatisfactionRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Satisfaction mensuelle d'un collaborateur.
@@ -16,13 +18,19 @@ use InvalidArgumentException;
 #[ORM\Entity(repositoryClass: ContributorSatisfactionRepository::class)]
 #[ORM\Table(name: 'contributor_satisfactions')]
 #[ORM\UniqueConstraint(name: 'unique_contributor_period', columns: ['contributor_id', 'year', 'month'])]
+#[ORM\Index(name: 'idx_contributorsatisfaction_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
-class ContributorSatisfaction
+class ContributorSatisfaction implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\ManyToOne(targetEntity: Contributor::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -399,6 +407,18 @@ class ContributorSatisfaction
     public function setUpdatedAt(DateTime $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

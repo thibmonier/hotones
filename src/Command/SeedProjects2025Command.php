@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Entity\Order;
 use App\Entity\OrderLine;
@@ -44,7 +45,8 @@ class SeedProjects2025Command extends Command
     {
         $this
             ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Nombre de projets à générer', '50')
-            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année de génération', '2025');
+            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année de génération', '2025')
+            ->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -55,18 +57,37 @@ class SeedProjects2025Command extends Command
 
         $io->title("Génération de $count projets de test pour $year");
 
+        // Récupérer la Company
+        $companyId = $input->getOption('company-id');
+        if ($companyId) {
+            $company = $this->em->getRepository(Company::class)->find($companyId);
+            if (!$company) {
+                $io->error(sprintf('Company avec ID %d introuvable', $companyId));
+
+                return Command::FAILURE;
+            }
+        } else {
+            $company = $this->em->getRepository(Company::class)->findOneBy([]);
+            if (!$company) {
+                $io->error('Aucune Company trouvée. Créez d\'abord une Company.');
+
+                return Command::FAILURE;
+            }
+            $io->note(sprintf('Utilisation de la Company: %s (ID: %d)', $company->getName(), $company->getId()));
+        }
+
         try {
             // Pré-requis (profils, contributeurs, technos)
             $profiles     = $this->ensureProfiles($io);
-            $contributors = $this->ensureContributors($io, $profiles);
+            $contributors = $this->ensureContributors($io, $profiles, $company);
             $technos      = $this->ensureTechnologies($io);
 
             // Génération des projets
-            $projects = $this->createProjects($io, $year, $count, $technos);
+            $projects = $this->createProjects($io, $year, $count, $technos, $company);
 
             // Pour chaque projet: devis signé + tâches + temps passés
             foreach ($projects as $project) {
-                $this->createSignedOrderForProject($project, $profiles);
+                $this->createSignedOrderForProject($project, $profiles, $company);
                 $this->createTasksForProject($project, $profiles, $contributors);
                 $this->createTimesheetsForProject($project, $contributors, $year);
             }
@@ -103,7 +124,7 @@ class SeedProjects2025Command extends Command
         return $profiles;
     }
 
-    private function ensureContributors(SymfonyStyle $io, array $profiles): array
+    private function ensureContributors(SymfonyStyle $io, array $profiles, Company $company): array
     {
         $repo     = $this->em->getRepository(Contributor::class);
         $existing = $repo->findBy(['active' => true]);
@@ -124,6 +145,7 @@ class SeedProjects2025Command extends Command
             $c = $repo->findOneBy(['firstName' => $firstName, 'lastName' => $lastName]);
             if (!$c) {
                 $c = new Contributor();
+                $c->setCompany($company);
                 $c->setFirstName($firstName)->setLastName($lastName)->setActive(true)->setCjm((string) (400 + ($i % 4) * 50).'.00');
                 // Associer 1 profil
                 if (isset($profiles[$i % count($profiles)])) {
@@ -161,11 +183,12 @@ class SeedProjects2025Command extends Command
         return $created;
     }
 
-    private function createProjects(SymfonyStyle $io, int $year, int $count, array $technos): array
+    private function createProjects(SymfonyStyle $io, int $year, int $count, array $technos, Company $company): array
     {
         $projects = [];
         for ($i = 1; $i <= $count; ++$i) {
             $project = new Project();
+            $project->setCompany($company);
             $project->setName(sprintf('Projet Test %d #%02d', $year, $i));
             $project->setDescription('Projet de test généré automatiquement.');
             $project->setProjectType(rand(0, 1) ? 'forfait' : 'regie');
@@ -202,10 +225,11 @@ class SeedProjects2025Command extends Command
         return $projects;
     }
 
-    private function createSignedOrderForProject(Project $project, array $profiles): void
+    private function createSignedOrderForProject(Project $project, array $profiles, Company $company): void
     {
         $createdAt = clone $project->getStartDate();
         $order     = new Order();
+        $order->setCompany($project->getCompany());
         $order->setProject($project)
             ->setOrderNumber($this->generateOrderNumberForDate($createdAt))
             ->setStatus(rand(0, 1) ? 'signe' : 'gagne')
@@ -214,6 +238,7 @@ class SeedProjects2025Command extends Command
 
         // Section prestations
         $section = new OrderSection();
+        $section->setCompany($project->getCompany());
         $section->setOrder($order)
             ->setName('Prestations')
             ->setSortOrder(1);
@@ -222,6 +247,7 @@ class SeedProjects2025Command extends Command
         $numLines = rand(2, 4);
         for ($i = 0; $i < $numLines; ++$i) {
             $line = new OrderLine();
+            $line->setCompany($project->getCompany());
             $line->setSection($section)
                 ->setDescription('Prestation #'.($i + 1))
                 ->setPosition($i + 1)
@@ -240,11 +266,13 @@ class SeedProjects2025Command extends Command
         // Éventuelle section achats
         if (rand(0, 1)) {
             $sec2 = new OrderSection();
+            $sec2->setCompany($project->getCompany());
             $sec2->setOrder($order)
                 ->setName('Achats')
                 ->setSortOrder(2);
 
             $purchase = new OrderLine();
+            $purchase->setCompany($project->getCompany());
             $purchase->setSection($sec2)
                 ->setDescription('Licence annuelle')
                 ->setType('fixed_amount')
@@ -272,6 +300,7 @@ class SeedProjects2025Command extends Command
         $numTasks  = rand(3, 6);
         for ($i = 0; $i < $numTasks; ++$i) {
             $task = new ProjectTask();
+            $task->setCompany($project->getCompany());
             $task->setProject($project)
                 ->setName('Tâche #'.($i + 1))
                 ->setType(ProjectTask::TYPE_REGULAR)
@@ -315,6 +344,7 @@ class SeedProjects2025Command extends Command
             }
 
             $timesheet = new Timesheet();
+            $timesheet->setCompany($project->getCompany());
             $timesheet->setContributor($contributors[array_rand($contributors)])
                 ->setProject($project)
                 ->setDate($date)

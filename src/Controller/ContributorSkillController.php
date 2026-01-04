@@ -8,6 +8,7 @@ use App\Entity\Contributor;
 use App\Entity\ContributorSkill;
 use App\Form\ContributorSkillType;
 use App\Repository\ContributorSkillRepository;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,8 @@ class ContributorSkillController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private ContributorSkillRepository $contributorSkillRepository
+        private ContributorSkillRepository $contributorSkillRepository,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -52,6 +54,7 @@ class ContributorSkillController extends AbstractController
         }
 
         $contributorSkill = new ContributorSkill();
+        $contributorSkill->setCompany($contributor->getCompany());
         $contributorSkill->setContributor($contributor);
 
         $form = $this->createForm(ContributorSkillType::class, $contributorSkill);

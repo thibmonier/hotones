@@ -7,17 +7,19 @@ namespace App\Repository;
 use App\Entity\Achievement;
 use App\Entity\Badge;
 use App\Entity\Contributor;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Achievement>
+ * @extends CompanyAwareRepository<Achievement>
  */
-class AchievementRepository extends ServiceEntityRepository
+class AchievementRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Achievement::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, Achievement::class, $companyContext);
     }
 
     /**
@@ -27,9 +29,9 @@ class AchievementRepository extends ServiceEntityRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('a')
+        return $this->createCompanyQueryBuilder('a')
             ->leftJoin('a.badge', 'b')
-            ->where('a.contributor = :contributor')
+            ->andWhere('a.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('a.unlockedAt', 'DESC')
             ->getQuery()
@@ -41,7 +43,7 @@ class AchievementRepository extends ServiceEntityRepository
      */
     public function hasAchievement(Contributor $contributor, Badge $badge): bool
     {
-        return $this->count([
+        return $this->countForCurrentCompany([
             'contributor' => $contributor,
             'badge'       => $badge,
         ]) > 0;
@@ -54,7 +56,7 @@ class AchievementRepository extends ServiceEntityRepository
      */
     public function findRecentAchievements(int $limit = 10): array
     {
-        return $this->createQueryBuilder('a')
+        return $this->createCompanyQueryBuilder('a')
             ->leftJoin('a.contributor', 'c')
             ->leftJoin('a.badge', 'b')
             ->orderBy('a.unlockedAt', 'DESC')
@@ -70,8 +72,8 @@ class AchievementRepository extends ServiceEntityRepository
      */
     public function findUnnotified(): array
     {
-        return $this->createQueryBuilder('a')
-            ->where('a.notified = :notified')
+        return $this->createCompanyQueryBuilder('a')
+            ->andWhere('a.notified = :notified')
             ->setParameter('notified', false)
             ->orderBy('a.unlockedAt', 'ASC')
             ->getQuery()
@@ -83,6 +85,6 @@ class AchievementRepository extends ServiceEntityRepository
      */
     public function countByContributor(Contributor $contributor): int
     {
-        return $this->count(['contributor' => $contributor]);
+        return $this->countForCurrentCompany(['contributor' => $contributor]);
     }
 }

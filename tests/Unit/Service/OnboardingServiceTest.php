@@ -11,6 +11,7 @@ use App\Entity\OnboardingTemplate;
 use App\Entity\Profile;
 use App\Repository\OnboardingTaskRepository;
 use App\Repository\OnboardingTemplateRepository;
+use App\Security\CompanyContext;
 use App\Service\OnboardingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 class OnboardingServiceTest extends TestCase
 {
     private EntityManagerInterface $em;
+    private CompanyContext $companyContext;
     private OnboardingTaskRepository $taskRepository;
     private OnboardingTemplateRepository $templateRepository;
     private OnboardingService $service;
@@ -26,10 +28,12 @@ class OnboardingServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->em                 = $this->createMock(EntityManagerInterface::class);
+        $this->companyContext     = $this->createMock(CompanyContext::class);
         $this->templateRepository = $this->createMock(OnboardingTemplateRepository::class);
         $this->taskRepository     = $this->createMock(OnboardingTaskRepository::class);
         $this->service            = new OnboardingService(
             $this->em,
+            $this->companyContext,
             $this->templateRepository,
             $this->taskRepository,
         );

@@ -6,18 +6,20 @@ namespace App\Repository;
 
 use App\Entity\AccountDeletionRequest;
 use App\Entity\User;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<AccountDeletionRequest>
+ * @extends CompanyAwareRepository<AccountDeletionRequest>
  */
-class AccountDeletionRequestRepository extends ServiceEntityRepository
+class AccountDeletionRequestRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, AccountDeletionRequest::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, AccountDeletionRequest::class, $companyContext);
     }
 
     /**
@@ -25,8 +27,8 @@ class AccountDeletionRequestRepository extends ServiceEntityRepository
      */
     public function findActiveDeletionRequestForUser(User $user): ?AccountDeletionRequest
     {
-        return $this->createQueryBuilder('adr')
-            ->where('adr.user = :user')
+        return $this->createCompanyQueryBuilder('adr')
+            ->andWhere('adr.user = :user')
             ->andWhere('adr.status IN (:statuses)')
             ->setParameter('user', $user)
             ->setParameter('statuses', [
@@ -44,8 +46,8 @@ class AccountDeletionRequestRepository extends ServiceEntityRepository
      */
     public function findDueDeletions(): array
     {
-        return $this->createQueryBuilder('adr')
-            ->where('adr.status = :status')
+        return $this->createCompanyQueryBuilder('adr')
+            ->andWhere('adr.status = :status')
             ->andWhere('adr.scheduledDeletionAt <= :now')
             ->setParameter('status', AccountDeletionRequest::STATUS_CONFIRMED)
             ->setParameter('now', new DateTimeImmutable())
@@ -60,8 +62,8 @@ class AccountDeletionRequestRepository extends ServiceEntityRepository
     {
         $expiryThreshold = new DateTimeImmutable('-48 hours');
 
-        return $this->createQueryBuilder('adr')
-            ->where('adr.status = :status')
+        return $this->createCompanyQueryBuilder('adr')
+            ->andWhere('adr.status = :status')
             ->andWhere('adr.requestedAt < :threshold')
             ->setParameter('status', AccountDeletionRequest::STATUS_PENDING)
             ->setParameter('threshold', $expiryThreshold)
@@ -74,8 +76,8 @@ class AccountDeletionRequestRepository extends ServiceEntityRepository
      */
     public function findByConfirmationToken(string $token): ?AccountDeletionRequest
     {
-        return $this->createQueryBuilder('adr')
-            ->where('adr.confirmationToken = :token')
+        return $this->createCompanyQueryBuilder('adr')
+            ->andWhere('adr.confirmationToken = :token')
             ->andWhere('adr.status = :status')
             ->setParameter('token', $token)
             ->setParameter('status', AccountDeletionRequest::STATUS_PENDING)

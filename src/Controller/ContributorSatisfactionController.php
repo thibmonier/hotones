@@ -8,6 +8,7 @@ use App\Entity\ContributorSatisfaction;
 use App\Form\ContributorSatisfactionType;
 use App\Repository\ContributorRepository;
 use App\Repository\ContributorSatisfactionRepository;
+use App\Security\CompanyContext;
 use App\Service\GamificationService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,7 @@ class ContributorSatisfactionController extends AbstractController
         private readonly ContributorRepository $contributorRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly GamificationService $gamificationService,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -90,6 +92,7 @@ class ContributorSatisfactionController extends AbstractController
 
         if (!$satisfaction) {
             $satisfaction = new ContributorSatisfaction();
+            $satisfaction->setCompany($this->companyContext->getCurrentCompany());
             $satisfaction->setContributor($contributor);
             $satisfaction->setYear($year);
             $satisfaction->setMonth($month);

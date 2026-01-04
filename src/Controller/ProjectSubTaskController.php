@@ -56,11 +56,10 @@ class ProjectSubTaskController extends AbstractController
 
         $subTask->setStatus($status);
         // Apply positions batch if provided
+        // Optimisation: getReference() évite N SELECT queries (N = nombre de sous-tâches)
         foreach ($positions as $id => $pos) {
-            $st = $this->em->getRepository(ProjectSubTask::class)->find((int) $id);
-            if ($st) {
-                $st->setPosition((int) $pos);
-            }
+            $st = $this->em->getReference(ProjectSubTask::class, (int) $id);
+            $st->setPosition((int) $pos);
         }
         $subTask->setUpdatedAt(new DateTimeImmutable());
 

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\LeadCaptureRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Lead capturé via un formulaire de téléchargement (lead magnet).
@@ -19,7 +21,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['email'], name: 'idx_lead_email')]
 #[ORM\Index(columns: ['source'], name: 'idx_lead_source')]
 #[ORM\Index(columns: ['created_at'], name: 'idx_lead_created_at')]
-class LeadCapture
+#[ORM\Index(columns: ['company_id'], name: 'idx_leadcapture_company')]
+class LeadCapture implements CompanyOwnedInterface
 {
     // Sources possibles
     public const SOURCE_HOMEPAGE  = 'homepage';
@@ -41,6 +44,11 @@ class LeadCapture
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
+
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $email = '';
 
@@ -50,8 +58,8 @@ class LeadCapture
     #[ORM\Column(type: Types::STRING, length: 100)]
     private string $lastName = '';
 
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $company = null;
+    #[ORM\Column(name: 'company', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $companyName = null;
 
     #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
     private ?string $phone = null;
@@ -193,14 +201,14 @@ class LeadCapture
         return trim($this->firstName.' '.$this->lastName);
     }
 
-    public function getCompany(): ?string
+    public function getCompanyName(): ?string
     {
-        return $this->company;
+        return $this->companyName;
     }
 
-    public function setCompany(?string $company): self
+    public function setCompanyName(?string $companyName): self
     {
-        $this->company = $company;
+        $this->companyName = $companyName;
 
         return $this;
     }
@@ -448,5 +456,17 @@ class LeadCapture
             && $this->getDaysSinceCreation() >= 7
             && $this->status !== self::STATUS_CONVERTED
             && $this->status !== self::STATUS_LOST;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

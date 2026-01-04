@@ -7,17 +7,19 @@ namespace App\Repository;
 use App\Entity\Contributor;
 use App\Entity\ContributorSkill;
 use App\Entity\Skill;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ContributorSkill>
+ * @extends CompanyAwareRepository<ContributorSkill>
  */
-class ContributorSkillRepository extends ServiceEntityRepository
+class ContributorSkillRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ContributorSkill::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ContributorSkill::class, $companyContext);
     }
 
     /**
@@ -27,9 +29,9 @@ class ContributorSkillRepository extends ServiceEntityRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->join('cs.skill', 's')
-            ->where('cs.contributor = :contributor')
+            ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('s.category', 'ASC')
             ->addOrderBy('s.name', 'ASC')
@@ -44,9 +46,9 @@ class ContributorSkillRepository extends ServiceEntityRepository
      */
     public function findBySkill(Skill $skill): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -84,9 +86,9 @@ class ContributorSkillRepository extends ServiceEntityRepository
      */
     public function findExpertsBySkill(Skill $skill): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -104,7 +106,7 @@ class ContributorSkillRepository extends ServiceEntityRepository
      */
     public function getLevelDistributionForSkill(Skill $skill): array
     {
-        $results = $this->createQueryBuilder('cs')
+        $results = $this->createCompanyQueryBuilder('cs')
             ->select(
                 'CASE
                     WHEN cs.managerAssessmentLevel IS NOT NULL THEN cs.managerAssessmentLevel
@@ -112,7 +114,7 @@ class ContributorSkillRepository extends ServiceEntityRepository
                 END as effectiveLevel',
                 'COUNT(cs.id) as count',
             )
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->groupBy('effectiveLevel')
             ->getQuery()
@@ -133,10 +135,10 @@ class ContributorSkillRepository extends ServiceEntityRepository
      */
     public function findAssessmentGaps(): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
             ->join('cs.skill', 's')
-            ->where('cs.managerAssessmentLevel IS NOT NULL')
+            ->andWhere('cs.managerAssessmentLevel IS NOT NULL')
             ->andWhere('cs.selfAssessmentLevel IS NOT NULL')
             ->andWhere('cs.managerAssessmentLevel != cs.selfAssessmentLevel')
             ->andWhere('c.active = :active')
@@ -153,7 +155,7 @@ class ContributorSkillRepository extends ServiceEntityRepository
      */
     public function countByLevelForContributor(Contributor $contributor): array
     {
-        $results = $this->createQueryBuilder('cs')
+        $results = $this->createCompanyQueryBuilder('cs')
             ->select(
                 'CASE
                     WHEN cs.managerAssessmentLevel IS NOT NULL THEN cs.managerAssessmentLevel
@@ -161,7 +163,7 @@ class ContributorSkillRepository extends ServiceEntityRepository
                 END as effectiveLevel',
                 'COUNT(cs.id) as count',
             )
-            ->where('cs.contributor = :contributor')
+            ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->groupBy('effectiveLevel')
             ->getQuery()
@@ -182,9 +184,9 @@ class ContributorSkillRepository extends ServiceEntityRepository
      */
     public function findBySkillAndMinLevel(Skill $skill, int $minLevel): array
     {
-        return $this->createQueryBuilder('cs')
+        return $this->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
-            ->where('cs.skill = :skill')
+            ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)

@@ -3,13 +3,13 @@
 namespace App\Repository;
 
 use App\Entity\NotificationSetting;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<NotificationSetting>
+ * @extends CompanyAwareRepository<NotificationSetting>
  */
-class NotificationSettingRepository extends ServiceEntityRepository
+class NotificationSettingRepository extends CompanyAwareRepository
 {
     // Clés de configuration prédéfinies
     public const KEY_BUDGET_ALERT_THRESHOLD     = 'budget_alert_threshold'; // Pourcentage (défaut: 80)
@@ -18,9 +18,11 @@ class NotificationSettingRepository extends ServiceEntityRepository
     public const KEY_WEBHOOK_TOKEN              = 'webhook_token'; // Token d'authentification
     public const KEY_TIMESHEET_WEEKLY_TOLERANCE = 'timesheet_weekly_tolerance'; // Tolérance (0.15 = 15%)
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, NotificationSetting::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, NotificationSetting::class, $companyContext);
     }
 
     /**

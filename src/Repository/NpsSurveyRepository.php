@@ -4,18 +4,20 @@ namespace App\Repository;
 
 use App\Entity\NpsSurvey;
 use App\Entity\Project;
+use App\Security\CompanyContext;
 use DateTime;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<NpsSurvey>
+ * @extends CompanyAwareRepository<NpsSurvey>
  */
-class NpsSurveyRepository extends ServiceEntityRepository
+class NpsSurveyRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, NpsSurvey::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, NpsSurvey::class, $companyContext);
     }
 
     /**
@@ -23,8 +25,8 @@ class NpsSurveyRepository extends ServiceEntityRepository
      */
     public function findByProject(Project $project): array
     {
-        return $this->createQueryBuilder('n')
-            ->where('n.project = :project')
+        return $this->createCompanyQueryBuilder('n')
+            ->andWhere('n.project = :project')
             ->setParameter('project', $project)
             ->orderBy('n.sentAt', 'DESC')
             ->getQuery()
@@ -44,8 +46,8 @@ class NpsSurveyRepository extends ServiceEntityRepository
      */
     public function findPendingByProject(Project $project): array
     {
-        return $this->createQueryBuilder('n')
-            ->where('n.project = :project')
+        return $this->createCompanyQueryBuilder('n')
+            ->andWhere('n.project = :project')
             ->andWhere('n.status = :status')
             ->setParameter('project', $project)
             ->setParameter('status', NpsSurvey::STATUS_PENDING)
@@ -60,8 +62,8 @@ class NpsSurveyRepository extends ServiceEntityRepository
      */
     public function calculateNpsScore(Project $project): ?float
     {
-        $surveys = $this->createQueryBuilder('n')
-            ->where('n.project = :project')
+        $surveys = $this->createCompanyQueryBuilder('n')
+            ->andWhere('n.project = :project')
             ->andWhere('n.status = :status')
             ->andWhere('n.score IS NOT NULL')
             ->setParameter('project', $project)
@@ -95,8 +97,8 @@ class NpsSurveyRepository extends ServiceEntityRepository
      */
     public function getStatsByProject(Project $project): array
     {
-        $surveys = $this->createQueryBuilder('n')
-            ->where('n.project = :project')
+        $surveys = $this->createCompanyQueryBuilder('n')
+            ->andWhere('n.project = :project')
             ->andWhere('n.status = :status')
             ->andWhere('n.score IS NOT NULL')
             ->setParameter('project', $project)
@@ -150,7 +152,7 @@ class NpsSurveyRepository extends ServiceEntityRepository
      */
     public function markExpiredSurveysAsExpired(): int
     {
-        return $this->createQueryBuilder('n')
+        return $this->createCompanyQueryBuilder('n')
             ->update()
             ->set('n.status', ':expiredStatus')
             ->where('n.status = :pendingStatus')

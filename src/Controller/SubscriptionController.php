@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\SaasSubscription;
 use App\Form\SaasSubscriptionType;
 use App\Repository\SaasSubscriptionRepository;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,6 +20,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class SubscriptionController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'subscription_index', methods: ['GET'])]
     public function index(
         Request $request,
@@ -142,7 +148,8 @@ class SubscriptionController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $subscription = new SaasSubscription();
-        $form         = $this->createForm(SaasSubscriptionType::class, $subscription);
+        $subscription->setCompany($this->companyContext->getCurrentCompany());
+        $form = $this->createForm(SaasSubscriptionType::class, $subscription);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

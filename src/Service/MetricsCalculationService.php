@@ -8,6 +8,8 @@ use App\Repository\ContributorRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\TimesheetRepository;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use DateTimeInterface;
 
@@ -107,27 +109,27 @@ class MetricsCalculationService
 
         foreach ($projectsInPeriod as $project) {
             // Statuts
-            if ($project->getStatus() === 'active') {
+            if ($project->status === 'active') {
                 ++$activeCount;
-            } elseif ($project->getStatus() === 'completed') {
+            } elseif ($project->status === 'completed') {
                 ++$completedCount;
             }
 
             // Types
-            if ($project->getProjectType() === 'forfait') {
+            if ($project->projectType === 'forfait') {
                 ++$forfaitCount;
             } else {
                 ++$regieCount;
             }
 
-            if ($project->getIsInternal()) {
+            if ($project->isInternal) {
                 ++$internalCount;
             } else {
                 ++$clientCount;
             }
 
             // Catégorie de service
-            $sc = $project->getServiceCategory();
+            $sc = $project->serviceCategory;
             if ($sc) {
                 $name                         = $sc->getName();
                 $serviceCategoryCounts[$name] = ($serviceCategoryCounts[$name] ?? 0) + 1;
@@ -161,7 +163,7 @@ class MetricsCalculationService
     {
         // Restreindre aux projets filtrés si des filtres sont fournis
         $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
-        $projectIds = array_map(static fn ($p) => $p->getId(), $projects);
+        $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
         $qb = $this->orderRepo->createQueryBuilder('o')
             ->where('o.createdAt BETWEEN :start AND :end')
@@ -224,7 +226,7 @@ class MetricsCalculationService
 
         // Restreindre aux projets filtrés si applicable
         $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
-        $projectIds = array_map(static fn ($p) => $p->getId(), $projects);
+        $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
         if (!empty($projectIds)) {
             $topContributors = $this->timesheetRepo->getStatsPerContributorForProjects($startDate, $endDate, $projectIds);
@@ -248,7 +250,7 @@ class MetricsCalculationService
     {
         // Restreindre les heures aux projets filtrés si applicable
         $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
-        $projectIds = array_map(static fn ($p) => $p->getId(), $projects);
+        $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
         if (!empty($projectIds)) {
             $totalHours = $this->timesheetRepo->getTotalHoursForPeriodAndProjects($startDate, $endDate, $projectIds);
@@ -285,19 +287,20 @@ class MetricsCalculationService
      */
     private function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
-        $count   = 0;
-        $current = clone $startDate;
-        $end     = clone $endDate;
+        $period = new DatePeriod(
+            $startDate,
+            new DateInterval('P1D'),
+            (clone $endDate)->modify('+1 day'),
+        );
 
-        while ($current <= $end) {
-            $dayOfWeek = (int) $current->format('N'); // 1 (lundi) à 7 (dimanche)
-            if ($dayOfWeek <= 5) {
-                ++$count;
+        $workingDays = 0;
+        foreach ($period as $date) {
+            if ((int) $date->format('N') <= 5) {
+                ++$workingDays;
             }
-            $current->modify('+1 day');
         }
 
-        return $count;
+        return $workingDays;
     }
 
     /**

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
-use App\Repository\ProjectHealthScoreRepository;
+use App\Security\CompanyContext;
 use App\Service\ProjectRiskAnalyzer;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,10 +18,10 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     protected function setUp(): void
     {
-        $em                    = $this->createMock(EntityManagerInterface::class);
-        $healthScoreRepository = $this->createMock(ProjectHealthScoreRepository::class);
+        $em             = $this->createMock(EntityManagerInterface::class);
+        $companyContext = $this->createMock(CompanyContext::class);
 
-        $this->service = new ProjectRiskAnalyzer($em, $healthScoreRepository);
+        $this->service = new ProjectRiskAnalyzer($em, $companyContext);
     }
 
     public function testAnalyzeProjectReturnsHealthyScoreForGoodProject(): void
@@ -73,14 +73,17 @@ class ProjectRiskAnalyzerTest extends TestCase
     public function testAnalyzeProjectDetectsScheduleDelay(): void
     {
         $project = $this->createMock(Project::class);
+
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('350');
         $project->method('getTotalSoldAmount')->willReturn('100000');
         $project->method('getGlobalProgress')->willReturn('50');
-        $project->method('getStatus')->willReturn('in_progress'); // Not completed
+        $project->method('getTimesheets')->willReturn(new ArrayCollection());
+
+        // Mock getters for properties
+        $project->method('getStatus')->willReturn('in_progress');
         $project->method('getEndDate')->willReturn(new DateTime('-15 days')); // Already passed
         $project->method('getStartDate')->willReturn(new DateTime('-3 months'));
-        $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         $result = $this->service->analyzeProject($project);
 
@@ -113,14 +116,17 @@ class ProjectRiskAnalyzerTest extends TestCase
     public function testAnalyzeProjectDetectsMissingTimesheets(): void
     {
         $project = $this->createMock(Project::class);
+
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('350');
         $project->method('getTotalSoldAmount')->willReturn('100000');
         $project->method('getGlobalProgress')->willReturn('50');
+        $project->method('getTimesheets')->willReturn(new ArrayCollection()); // No timesheets
+
+        // Mock getters for properties
         $project->method('getStatus')->willReturn('in_progress');
         $project->method('getEndDate')->willReturn(new DateTime('+2 months'));
         $project->method('getStartDate')->willReturn(new DateTime('-1 month'));
-        $project->method('getTimesheets')->willReturn(new ArrayCollection()); // No timesheets
 
         $result = $this->service->analyzeProject($project);
 
@@ -132,14 +138,17 @@ class ProjectRiskAnalyzerTest extends TestCase
     public function testAnalyzeProjectDetectsStagnation(): void
     {
         $project = $this->createMock(Project::class);
+
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('0'); // No hours spent
         $project->method('getTotalSoldAmount')->willReturn('100000');
         $project->method('getGlobalProgress')->willReturn('0'); // 0% progress
+        $project->method('getTimesheets')->willReturn(new ArrayCollection());
+
+        // Mock getters for properties
         $project->method('getStatus')->willReturn('active');
         $project->method('getEndDate')->willReturn(new DateTime('+2 months'));
         $project->method('getStartDate')->willReturn(new DateTime('-2 months')); // Started 2 months ago
-        $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         $result = $this->service->analyzeProject($project);
 
@@ -219,10 +228,12 @@ class ProjectRiskAnalyzerTest extends TestCase
 
         $project->method('getTotalSoldAmount')->willReturn('100000');
         $project->method('getGlobalProgress')->willReturn('50');
+        $project->method('getTimesheets')->willReturn(new ArrayCollection());
+
+        // Mock getters for properties
         $project->method('getStatus')->willReturn('in_progress');
         $project->method('getEndDate')->willReturn(new DateTime('+1 month'));
         $project->method('getStartDate')->willReturn(new DateTime('-1 month'));
-        $project->method('getTimesheets')->willReturn(new ArrayCollection());
 
         return $project;
     }

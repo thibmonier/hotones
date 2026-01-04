@@ -3,16 +3,18 @@
 namespace App\Repository;
 
 use App\Entity\ClientContact;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ClientContact>
+ * @extends CompanyAwareRepository<ClientContact>
  */
-class ClientContactRepository extends ServiceEntityRepository
+class ClientContactRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ClientContact::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, ClientContact::class, $companyContext);
     }
 }

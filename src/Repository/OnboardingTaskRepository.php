@@ -6,18 +6,20 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\OnboardingTask;
+use App\Security\CompanyContext;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<OnboardingTask>
+ * @extends CompanyAwareRepository<OnboardingTask>
  */
-class OnboardingTaskRepository extends ServiceEntityRepository
+class OnboardingTaskRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, OnboardingTask::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, OnboardingTask::class, $companyContext);
     }
 
     /**
@@ -27,8 +29,8 @@ class OnboardingTaskRepository extends ServiceEntityRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('ot')
-            ->where('ot.contributor = :contributor')
+        return $this->createCompanyQueryBuilder('ot')
+            ->andWhere('ot.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ot.orderNum', 'ASC')
             ->getQuery()
@@ -42,8 +44,8 @@ class OnboardingTaskRepository extends ServiceEntityRepository
      */
     public function findPendingForContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('ot')
-            ->where('ot.contributor = :contributor')
+        return $this->createCompanyQueryBuilder('ot')
+            ->andWhere('ot.contributor = :contributor')
             ->andWhere('ot.status != :completed')
             ->setParameter('contributor', $contributor)
             ->setParameter('completed', 'termine')
@@ -60,8 +62,8 @@ class OnboardingTaskRepository extends ServiceEntityRepository
      */
     public function findOverdueForContributor(Contributor $contributor): array
     {
-        return $this->createQueryBuilder('ot')
-            ->where('ot.contributor = :contributor')
+        return $this->createCompanyQueryBuilder('ot')
+            ->andWhere('ot.contributor = :contributor')
             ->andWhere('ot.status != :completed')
             ->andWhere('ot.dueDate < :now')
             ->setParameter('contributor', $contributor)
@@ -77,9 +79,9 @@ class OnboardingTaskRepository extends ServiceEntityRepository
      */
     public function calculateProgress(Contributor $contributor): int
     {
-        $qb = $this->createQueryBuilder('ot')
+        $qb = $this->createCompanyQueryBuilder('ot')
             ->select('COUNT(ot.id)')
-            ->where('ot.contributor = :contributor')
+            ->andWhere('ot.contributor = :contributor')
             ->setParameter('contributor', $contributor);
 
         $total = (int) $qb->getQuery()->getSingleScalarResult();
@@ -104,7 +106,7 @@ class OnboardingTaskRepository extends ServiceEntityRepository
      */
     public function getTeamStatistics(array $contributorIds = []): array
     {
-        $qb = $this->createQueryBuilder('ot')
+        $qb = $this->createCompanyQueryBuilder('ot')
             ->leftJoin('ot.contributor', 'c')
             ->select('IDENTITY(ot.contributor) as contributor_id')
             ->addSelect('CONCAT(c.firstName, \' \', c.lastName) as contributor_name')

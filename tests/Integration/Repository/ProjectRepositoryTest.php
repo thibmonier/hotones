@@ -7,6 +7,7 @@ use App\Factory\OrderFactory;
 use App\Factory\ProjectFactory;
 use App\Factory\UserFactory;
 use App\Repository\ProjectRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -16,6 +17,7 @@ class ProjectRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private ProjectRepository $repository;
 
@@ -23,6 +25,7 @@ class ProjectRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(ProjectRepository::class);
+        $this->setUpMultiTenant();
     }
 
     public function testCountActiveProjectsAndStatusStats(): void

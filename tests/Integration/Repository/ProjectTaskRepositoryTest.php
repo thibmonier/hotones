@@ -8,6 +8,7 @@ use App\Factory\ProfileFactory;
 use App\Factory\ProjectFactory;
 use App\Factory\ProjectTaskFactory;
 use App\Repository\ProjectTaskRepository;
+use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -17,6 +18,7 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
+    use MultiTenantTestTrait;
 
     private ProjectTaskRepository $repository;
 
@@ -24,6 +26,7 @@ class ProjectTaskRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(ProjectTaskRepository::class);
+        $this->setUpMultiTenant();
 
         // ProjectTaskFactory requires Profile and Contributor
         ProfileFactory::createOne(['name' => 'Developer']);

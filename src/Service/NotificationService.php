@@ -8,6 +8,7 @@ use App\Enum\NotificationType;
 use App\Event\NotificationEvent;
 use App\Repository\NotificationPreferenceRepository;
 use App\Repository\NotificationRepository;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -17,6 +18,7 @@ class NotificationService
         private readonly EntityManagerInterface $em,
         private readonly NotificationRepository $notificationRepository,
         private readonly NotificationPreferenceRepository $preferenceRepository,
+        private readonly CompanyContext $companyContext,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -34,6 +36,7 @@ class NotificationService
         ?int $entityId = null
     ): Notification {
         $notification = new Notification();
+        $notification->setCompany($this->companyContext->getCurrentCompany());
         $notification->setRecipient($recipient);
         $notification->setType($type);
         $notification->setTitle($title);

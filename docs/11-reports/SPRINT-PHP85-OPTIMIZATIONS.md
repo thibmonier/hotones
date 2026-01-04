@@ -68,9 +68,10 @@ public string $name {
 - ✅ Tester les fixtures/factories
 
 **Checklist:**
-- [ ] Timesheet.php - 6 propriétés simples (~90 lignes réduites)
-- [ ] Order.php - 8 propriétés simples (~120 lignes réduites)
-- [ ] OrderLine.php - 5 propriétés simples (~75 lignes réduites)
+- [x] Timesheet.php - 6 propriétés simples (~90 lignes réduites)
+- [x] Order.php - 8 propriétés simples (~120 lignes réduites)
+- [x] OrderLine.php - 5 propriétés simples (~75 lignes réduites)
+- [x] Client.php - 6 propriétés simples (~60 lignes réduites)
 - [ ] Exécuter `composer test-unit`
 - [ ] Exécuter `composer test-functional`
 
@@ -92,7 +93,7 @@ public string $name {
 **Réduction estimée:** ~120 lignes
 
 **Checklist:**
-- [ ] Convertir les 7 propriétés en property hooks
+- [x] Convertir les 7 propriétés en property hooks
 - [ ] Tester l'hydratation Doctrine
 - [ ] Vérifier les relations OneToMany/ManyToOne
 - [ ] Tests ProjectRepository existants
@@ -125,8 +126,8 @@ public string|null $cjm {
 **Réduction estimée:** ~180 lignes
 
 **Checklist:**
-- [ ] 9 propriétés simples converties
-- [ ] 2 propriétés calculées (cjm, tjm) converties
+- [x] 9 propriétés simples converties
+- [x] 2 propriétés calculées (cjm, tjm) converties
 - [ ] Tests ContributorService
 - [ ] Tests StaffingMetricsCalculationService
 
@@ -158,7 +159,7 @@ public string|null $salary {
 **Propriétés concernées:** salary, cjm, tjm, annualGrossSalary (~40 lignes réduites)
 
 **Checklist:**
-- [ ] Convertir 4 propriétés avec coercion
+- [x] Convertir 4 propriétés avec coercion
 - [ ] Tests EmploymentPeriodRepository
 - [ ] Vérifier le calcul des métriques
 
@@ -200,9 +201,13 @@ public private(set) ?int $id = null;
 **Checklist:**
 - [ ] Script automatique pour convertir tous les ID
 - [ ] User.php (ligne 57)
-- [ ] Project.php
-- [ ] Contributor.php
-- [ ] Timesheet.php
+- [x] Project.php
+- [x] Contributor.php
+- [x] Timesheet.php
+- [x] Order.php
+- [x] OrderLine.php
+- [x] EmploymentPeriod.php
+- [x] Client.php
 - [ ] ~50 autres entities
 - [ ] Tests d'intégration complets
 
@@ -286,9 +291,9 @@ foreach ($periods as $period) {
 **Gain estimé:** 50-70% de réduction des requêtes (de 100+ à ~5 requêtes)
 
 **Checklist:**
-- [ ] Créer méthode `findByContributorsAndDateRange` dans repository
-- [ ] Implémenter identity map pour DimTime/DimProfile
-- [ ] Caching des résultats de calcul (Redis)
+- [x] Créer méthode `findByContributorsAndDateRange` dans repository
+- [x] Implémenter identity map pour DimTime/DimProfile
+- [x] Caching des résultats de calcul (Redis)
 - [ ] Benchmark avant/après avec Blackfire
 - [ ] Tests de charge avec 100+ contributors
 
@@ -415,7 +420,7 @@ private function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInte
 **Gain estimé:** 20-30% plus rapide
 
 **Checklist:**
-- [ ] Convertir vers DatePeriod
+- [x] Convertir vers DatePeriod
 - [ ] Tests avec différentes plages de dates
 - [ ] Vérifier les edge cases (weekend, jours fériés)
 
@@ -454,7 +459,7 @@ foreach ($sheets as $key => $method) {
 ```
 
 **Checklist:**
-- [ ] Refactoriser en boucle
+- [x] Refactoriser en boucle
 - [ ] Tests Excel export complets
 
 ---
@@ -721,28 +726,28 @@ composer check-all
 ## Checklist globale du sprint
 
 ### Préparation
-- [ ] Créer branche `feature/php85-optimizations`
+- [x] Créer branche `feature/php85-optimizations`
 - [ ] Backup de la DB de dev
 - [ ] Documenter les métriques baseline
 - [ ] Planifier les reviews de code
 
 ### Phase 1 (Semaine 1)
-- [ ] ✅ Tâche 1.1 : Entities simples
-- [ ] ✅ Tâche 1.2 : Project.php
-- [ ] ✅ Tâche 1.3 : Contributor.php
-- [ ] ✅ Tâche 1.4 : EmploymentPeriod.php
+- [x] ✅ Tâche 1.1 : Entities simples
+- [x] ✅ Tâche 1.2 : Project.php
+- [x] ✅ Tâche 1.3 : Contributor.php
+- [x] ✅ Tâche 1.4 : EmploymentPeriod.php
 - [ ] 📊 Métriques : ~500 lignes réduites
 
 ### Phase 2 (Semaine 2)
-- [ ] ✅ Tâche 2.1 : IDs en lecture seule
+- [x] ✅ Tâche 2.1 : IDs en lecture seule
 - [ ] ✅ Tâche 2.2 : Timestamps
 - [ ] 📊 Métriques : 5-10% gain performance
 
 ### Phase 3 (Semaine 3)
-- [ ] ✅ Tâche 3.1 : StaffingMetrics N+1
+- [x] ✅ Tâche 3.1 : StaffingMetrics N+1
 - [ ] ✅ Tâche 3.2 : Project caching
-- [ ] ✅ Tâche 3.3 : Date calculations
-- [ ] ✅ Tâche 3.4 : Excel iterations
+- [x] ✅ Tâche 3.3 : Date calculations
+- [x] ✅ Tâche 3.4 : Excel iterations
 - [ ] 📊 Métriques : 50-70% réduction requêtes
 
 ### Phase 4 (Semaine 4)

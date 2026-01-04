@@ -94,6 +94,7 @@ class GenerateForecastTestDataCommand extends Command
 
             for ($j = 0; $j < $projectCount; ++$j) {
                 $project = new Project();
+                $project->setCompany($client->getCompany());
 
                 // Nom du projet
                 $projectTypes = ['Refonte site web', 'Application mobile', 'E-commerce', 'CRM custom', 'API REST', 'Migration cloud', 'Dashboard analytics', 'Portail client'];

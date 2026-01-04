@@ -12,7 +12,6 @@ use App\Repository\EmploymentPeriodRepository;
 use App\Repository\VacationRepository;
 use App\Service\HrMetricsService;
 use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -623,19 +622,25 @@ class HrMetricsServiceTest extends TestCase
 
     private function createEmploymentPeriodStartedYearsAgo(float $yearsAgo): EmploymentPeriod
     {
-        $period    = $this->createMock(EmploymentPeriod::class);
+        // Use real EmploymentPeriod object instead of mock to avoid PHPUnit property hooks conflict
+        $period    = new EmploymentPeriod();
         $startDate = new DateTime();
         $startDate->modify(sprintf('-%d days', (int) ($yearsAgo * 365)));
-        $period->method('getStartDate')->willReturn($startDate);
+        $period->startDate = $startDate;
 
         return $period;
     }
 
     private function createContributorWithAge(int $age, string $gender): Contributor
     {
-        $contributor = $this->createMock(Contributor::class);
-        $contributor->method('getAge')->willReturn($age);
-        $contributor->method('getGender')->willReturn($gender);
+        // Use real Contributor object instead of mock to avoid property hooks issues
+        $contributor         = new Contributor();
+        $contributor->gender = $gender;
+
+        // Set birthDate to match the desired age
+        $birthDate = new DateTime();
+        $birthDate->modify(sprintf('-%d years', $age));
+        $contributor->birthDate = $birthDate;
 
         return $contributor;
     }
@@ -650,8 +655,11 @@ class HrMetricsServiceTest extends TestCase
 
     private function createContributorWithProfiles(array $profiles): Contributor
     {
-        $period = $this->createMock(EmploymentPeriod::class);
-        $period->method('getProfiles')->willReturn(new ArrayCollection($profiles));
+        // Use real EmploymentPeriod object instead of mock to avoid PHPUnit property hooks conflict
+        $period = new EmploymentPeriod();
+        foreach ($profiles as $profile) {
+            $period->addProfile($profile);
+        }
 
         $contributor = $this->createMock(Contributor::class);
         $contributor->method('getCurrentEmploymentPeriod')->willReturn($period);

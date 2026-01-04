@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use Cron\CronExpression;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,12 +10,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'scheduler_entries')]
-class SchedulerEntry
+#[ORM\Index(name: 'idx_schedulerentry_company', columns: ['company_id'])]
+class SchedulerEntry implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     #[ORM\Column(type: 'string', length: 150)]
     #[Assert\NotBlank]
@@ -158,6 +165,18 @@ class SchedulerEntry
     public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

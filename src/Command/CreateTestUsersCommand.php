@@ -2,12 +2,14 @@
 
 namespace App\Command;
 
+use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -66,11 +68,36 @@ class CreateTestUsersCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
         $io->title('Creating test users');
+
+        // Récupérer la Company
+        $companyId = $input->getOption('company-id');
+        if ($companyId) {
+            $company = $this->em->getRepository(Company::class)->find($companyId);
+            if (!$company) {
+                $io->error(sprintf('Company avec ID %d introuvable', $companyId));
+
+                return Command::FAILURE;
+            }
+        } else {
+            $company = $this->em->getRepository(Company::class)->findOneBy([]);
+            if (!$company) {
+                $io->error('Aucune Company trouvée. Créez d\'abord une Company.');
+
+                return Command::FAILURE;
+            }
+            $io->note(sprintf('Utilisation de la Company: %s (ID: %d)', $company->getName(), $company->getId()));
+        }
+
         $io->info('Password for all users: '.self::DEFAULT_PASSWORD);
 
         $createdUsers = [];
@@ -104,6 +131,7 @@ class CreateTestUsersCommand extends Command
 
             // Create linked Contributor
             $contributor = new Contributor();
+            $contributor->setCompany($company);
             $contributor->setFirstName($user->getFirstName())
                 ->setLastName($user->getLastName())
                 ->setEmail($user->getEmail())

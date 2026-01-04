@@ -8,157 +8,277 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\TimesheetRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TimesheetRepository::class)]
 #[ORM\Table(name: 'timesheets', indexes: [
     new ORM\Index(name: 'idx_timesheet_project', columns: ['project_id']),
     new ORM\Index(name: 'idx_timesheet_contributor', columns: ['contributor_id']),
     new ORM\Index(name: 'idx_timesheet_date', columns: ['date']),
+    new ORM\Index(name: 'idx_timesheet_company', columns: ['company_id']),
 ])]
 #[ApiResource(
     operations: [
         new Get(security: "is_granted('ROLE_USER')"),
         new GetCollection(security: "is_granted('ROLE_USER')"),
         new Post(security: "is_granted('ROLE_INTERVENANT')"),
-        new Put(security: "is_granted('ROLE_INTERVENANT') and object.getContributor().getUser() == user"),
-        new Delete(security: "is_granted('ROLE_CHEF_PROJET') or (is_granted('ROLE_INTERVENANT') and object.getContributor().getUser() == user)"),
+        new Put(security: "is_granted('ROLE_INTERVENANT') and object.contributor.getUser() == user"),
+        new Delete(security: "is_granted('ROLE_CHEF_PROJET') or (is_granted('ROLE_INTERVENANT') and object.contributor.getUser() == user)"),
     ],
     normalizationContext: ['groups' => ['timesheet:read']],
     denormalizationContext: ['groups' => ['timesheet:write']],
     paginationItemsPerPage: 50,
 )]
-class Timesheet
+class Timesheet implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['timesheet:read'])]
-    private ?int $id = null;
+    public private(set) ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    public Company $company {
+        get => $this->company;
+        set {
+            $this->company = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: Contributor::class, inversedBy: 'timesheets')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups(['timesheet:read', 'timesheet:write'])]
-    private Contributor $contributor;
+    public Contributor $contributor {
+        get => $this->contributor;
+        set {
+            $this->contributor = $value;
+        }
+    }
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'timesheets')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups(['timesheet:read', 'timesheet:write'])]
-    private Project $project;
+    public Project $project {
+        get => $this->project;
+        set {
+            $this->project = $value;
+        }
+    }
 
     // Lien optionnel vers une tâche du projet
     #[ORM\ManyToOne(targetEntity: ProjectTask::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups(['timesheet:read', 'timesheet:write'])]
-    private ?ProjectTask $task = null;
+    public ?ProjectTask $task = null {
+        get => $this->task;
+        set {
+            $this->task = $value;
+        }
+    }
 
     // Lien optionnel vers une sous-tâche du projet
     #[ORM\ManyToOne(targetEntity: ProjectSubTask::class)]
     #[ORM\JoinColumn(name: 'sub_task_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     #[Groups(['timesheet:read', 'timesheet:write'])]
-    private ?ProjectSubTask $subTask = null;
+    public ?ProjectSubTask $subTask = null {
+        get => $this->subTask;
+        set {
+            $this->subTask = $value;
+        }
+    }
 
     #[ORM\Column(type: 'date')]
     #[Groups(['timesheet:read', 'timesheet:write'])]
-    private DateTimeInterface $date;
+    public DateTimeInterface $date {
+        get => $this->date;
+        set {
+            $this->date = $value;
+        }
+    }
 
     // Durée en heures (ex: 7.5)
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
     #[Groups(['timesheet:read', 'timesheet:write'])]
-    private string $hours;
+    public string $hours {
+        get => $this->hours;
+        set {
+            $this->hours = $value;
+        }
+    }
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['timesheet:read', 'timesheet:write'])]
-    private ?string $notes = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
+    public ?string $notes = null {
+        get => $this->notes;
+        set {
+            $this->notes = $value;
+        }
     }
 
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->contributor.
+     */
     public function getContributor(): Contributor
     {
         return $this->contributor;
     }
 
-    public function setContributor(Contributor $contributor): self
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->contributor = $value.
+     */
+    public function setContributor(Contributor $value): self
     {
-        $this->contributor = $contributor;
+        $this->contributor = $value;
 
         return $this;
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->project.
+     */
     public function getProject(): Project
     {
         return $this->project;
     }
 
-    public function setProject(Project $project): self
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->project = $value.
+     */
+    public function setProject(Project $value): self
     {
-        $this->project = $project;
+        $this->project = $value;
 
         return $this;
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->task.
+     */
     public function getTask(): ?ProjectTask
     {
         return $this->task;
     }
 
-    public function setTask(?ProjectTask $task): self
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->task = $value.
+     */
+    public function setTask(?ProjectTask $value): self
     {
-        $this->task = $task;
+        $this->task = $value;
 
         return $this;
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->subTask.
+     */
     public function getSubTask(): ?ProjectSubTask
     {
         return $this->subTask;
     }
 
-    public function setSubTask(?ProjectSubTask $subTask): self
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->subTask = $value.
+     */
+    public function setSubTask(?ProjectSubTask $value): self
     {
-        $this->subTask = $subTask;
+        $this->subTask = $value;
 
         return $this;
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->date.
+     */
     public function getDate(): DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(DateTimeInterface $date): self
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->date = $value.
+     */
+    public function setDate(DateTimeInterface $value): self
     {
-        $this->date = $date;
+        $this->date = $value;
 
         return $this;
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->hours.
+     */
     public function getHours(): string
     {
         return $this->hours;
     }
 
-    public function setHours(string $hours): self
+    /**
+     * Compatibility method for existing code and PHPStan.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->id.
+     */
+    public function getId(): ?int
     {
-        $this->hours = $hours;
+        return $this->id;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->hours = $value.
+     */
+    public function setHours(string $value): self
+    {
+        $this->hours = $value;
 
         return $this;
     }
 
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->notes.
+     */
     public function getNotes(): ?string
     {
         return $this->notes;
     }
 
-    public function setNotes(?string $notes): self
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->notes = $value.
+     */
+    public function setNotes(?string $value): self
     {
-        $this->notes = $notes;
+        $this->notes = $value;
 
         return $this;
     }

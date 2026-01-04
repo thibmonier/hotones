@@ -13,6 +13,7 @@ use App\Repository\AchievementRepository;
 use App\Repository\BadgeRepository;
 use App\Repository\ContributorProgressRepository;
 use App\Repository\XpHistoryRepository;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -26,6 +27,7 @@ class GamificationService
         private readonly BadgeRepository $badgeRepository,
         private readonly AchievementRepository $achievementRepository,
         private readonly XpHistoryRepository $xpHistoryRepository,
+        private readonly CompanyContext $companyContext,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -57,6 +59,7 @@ class GamificationService
 
         // Créer l'entrée d'historique
         $history = new XpHistory();
+        $history->setCompany($this->companyContext->getCurrentCompany());
         $history->setContributor($contributor);
         $history->setXpAmount($xpAmount);
         $history->setSource($source);
@@ -135,6 +138,7 @@ class GamificationService
         }
 
         $achievement = new Achievement();
+        $achievement->setCompany($this->companyContext->getCurrentCompany());
         $achievement->setContributor($contributor);
         $achievement->setBadge($badge);
 

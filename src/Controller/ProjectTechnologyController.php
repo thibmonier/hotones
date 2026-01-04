@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Entity\ProjectTechnology;
 use App\Form\ProjectTechnologyType;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,11 +17,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_CHEF_PROJET')]
 class ProjectTechnologyController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('/{id}/tech', name: 'project_tech_index', methods: ['GET', 'POST'])]
     public function manage(Project $project, Request $request, EntityManagerInterface $em): Response
     {
         // Formulaire d'ajout
         $pt = new ProjectTechnology();
+        $pt->setCompany($project->getCompany());
         $pt->setProject($project);
         $form = $this->createForm(ProjectTechnologyType::class, $pt);
         $form->handleRequest($request);

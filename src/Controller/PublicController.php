@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PublicController extends AbstractController
 {
-    #[Route('/', name: 'public_homepage')]
+    #[Route('/', name: 'public_homepage', options: ['sitemap' => true])]
     public function homepage(): Response
     {
         // Redirect authenticated users to the app
@@ -22,55 +22,55 @@ class PublicController extends AbstractController
         return $this->render('public/homepage.html.twig');
     }
 
-    #[Route('/features', name: 'public_features')]
+    #[Route('/features', name: 'public_features', options: ['sitemap' => true])]
     public function features(): Response
     {
         return $this->render('public/features.html.twig');
     }
 
-    #[Route('/features/time-tracking', name: 'public_features_time_tracking')]
+    #[Route('/features/time-tracking', name: 'public_features_time_tracking', options: ['sitemap' => true])]
     public function featureTimeTracking(): Response
     {
         return $this->render('public/features/time_tracking.html.twig');
     }
 
-    #[Route('/features/project-management', name: 'public_features_project_management')]
+    #[Route('/features/project-management', name: 'public_features_project_management', options: ['sitemap' => true])]
     public function featureProjectManagement(): Response
     {
         return $this->render('public/features/project_management.html.twig');
     }
 
-    #[Route('/features/analytics', name: 'public_features_analytics')]
+    #[Route('/features/analytics', name: 'public_features_analytics', options: ['sitemap' => true])]
     public function featureAnalytics(): Response
     {
         return $this->render('public/features/analytics.html.twig');
     }
 
-    #[Route('/features/planning', name: 'public_features_planning')]
+    #[Route('/features/planning', name: 'public_features_planning', options: ['sitemap' => true])]
     public function featurePlanning(): Response
     {
         return $this->render('public/features/planning.html.twig');
     }
 
-    #[Route('/pricing', name: 'public_pricing')]
+    #[Route('/pricing', name: 'public_pricing', options: ['sitemap' => true])]
     public function pricing(): Response
     {
         return $this->render('public/pricing.html.twig');
     }
 
-    #[Route('/about', name: 'public_about')]
+    #[Route('/about', name: 'public_about', options: ['sitemap' => true])]
     public function about(): Response
     {
         return $this->render('public/about.html.twig');
     }
 
-    #[Route('/legal', name: 'public_legal')]
+    #[Route('/legal', name: 'public_legal', options: ['sitemap' => true])]
     public function legal(): Response
     {
         return $this->render('public/legal.html.twig');
     }
 
-    #[Route('/contact', name: 'public_contact')]
+    #[Route('/contact', name: 'public_contact', options: ['sitemap' => true])]
     public function contact(Request $request): Response
     {
         // For now, just display the form

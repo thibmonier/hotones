@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Service\Analytics;
 
+use App\Security\CompanyContext;
 use App\Service\Analytics\DashboardReadService;
 use App\Service\MetricsCalculationService as RealTimeService;
 use DateTime;
@@ -22,6 +23,7 @@ class DashboardReadServiceTest extends TestCase
 {
     private EntityManagerInterface|MockObject $entityManager;
     private RealTimeService|MockObject $realTimeService;
+    private CompanyContext|MockObject $companyContext;
     private LoggerInterface|MockObject $logger;
     private CacheInterface|MockObject $cache;
     private DashboardReadService $service;
@@ -30,12 +32,14 @@ class DashboardReadServiceTest extends TestCase
     {
         $this->entityManager   = $this->createMock(EntityManagerInterface::class);
         $this->realTimeService = $this->createMock(RealTimeService::class);
+        $this->companyContext  = $this->createMock(CompanyContext::class);
         $this->logger          = $this->createMock(LoggerInterface::class);
         $this->cache           = $this->createMock(CacheInterface::class);
 
         $this->service = new DashboardReadService(
             $this->entityManager,
             $this->realTimeService,
+            $this->companyContext,
             $this->logger,
             $this->cache,
         );

@@ -5,17 +5,19 @@ namespace App\Repository;
 use App\Entity\NotificationPreference;
 use App\Entity\User;
 use App\Enum\NotificationType;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<NotificationPreference>
+ * @extends CompanyAwareRepository<NotificationPreference>
  */
-class NotificationPreferenceRepository extends ServiceEntityRepository
+class NotificationPreferenceRepository extends CompanyAwareRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, NotificationPreference::class);
+    public function __construct(
+        ManagerRegistry $registry,
+        CompanyContext $companyContext
+    ) {
+        parent::__construct($registry, NotificationPreference::class, $companyContext);
     }
 
     /**

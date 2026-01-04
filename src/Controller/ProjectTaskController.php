@@ -10,6 +10,7 @@ use App\Entity\ProjectTask;
 use App\Form\ProjectSubTaskType;
 use App\Form\ProjectTaskType;
 use App\Repository\ProjectTaskRepository;
+use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,8 @@ class ProjectTaskController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private ProjectTaskRepository $taskRepo
+        private ProjectTaskRepository $taskRepo,
+        private readonly CompanyContext $companyContext
     ) {
     }
 
@@ -56,6 +58,7 @@ class ProjectTaskController extends AbstractController
         }
 
         $task = new ProjectTask();
+        $task->setCompany($project->getCompany());
         $task->setProject($project);
 
         // Définir la position par défaut
@@ -149,6 +152,7 @@ class ProjectTaskController extends AbstractController
         }
 
         $subTask = new ProjectSubTask();
+        $subTask->setCompany($task->getCompany());
         $subTask->setTask($task);
 
         // Position par défaut

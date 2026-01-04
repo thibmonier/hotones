@@ -9,6 +9,7 @@ use App\Entity\Invoice;
 use App\Entity\Project;
 use App\Form\InvoiceType;
 use App\Repository\InvoiceRepository;
+use App\Security\CompanyContext;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class InvoiceController extends AbstractController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext
+    ) {
+    }
+
     #[Route('', name: 'invoice_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
@@ -44,8 +50,9 @@ class InvoiceController extends AbstractController
         $startDate = $hasFilter ? ($request->query->get('start_date') ?? null) : ($saved['start_date'] ?? null);
         $endDate   = $hasFilter ? ($request->query->get('end_date') ?? null) : ($saved['end_date'] ?? null);
 
-        $client  = $clientId ? $em->getRepository(Client::class)->find($clientId) : null;
-        $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
+        // Optimisation: getReference() pour les filtres QueryBuilder (accepte les proxies)
+        $client  = $clientId ? $em->getReference(Client::class, $clientId) : null;
+        $project = $projectId ? $em->getReference(Project::class, $projectId) : null;
 
         // Tri
         $sort = $hasFilter ? ($request->query->get('sort') ?? ($saved['sort'] ?? 'issuedAt')) : ($saved['sort'] ?? 'issuedAt');
@@ -177,6 +184,7 @@ class InvoiceController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em, InvoiceRepository $invoiceRepository): Response
     {
         $invoice = new Invoice();
+        $invoice->setCompany($this->companyContext->getCurrentCompany());
 
         // Pré-remplir si client ou projet fourni dans l'URL
         $clientId  = $request->query->get('client');

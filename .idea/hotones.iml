@@ -259,6 +259,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ai-open-ai-platform" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ai-platform" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ai-store" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ahmed-bhs/doctrine-doctor" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpmyadmin/sql-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/stof/doctrine-extensions-bundle" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

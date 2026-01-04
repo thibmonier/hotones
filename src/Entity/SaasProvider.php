@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\SaasProviderRepository;
 use DateTime;
 use DateTimeInterface;
@@ -11,19 +12,26 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Fournisseur de services SaaS (ex: Google, Microsoft, Adobe, Stripe, etc.).
  */
 #[ORM\Entity(repositoryClass: SaasProviderRepository::class)]
 #[ORM\Table(name: 'saas_providers')]
+#[ORM\Index(name: 'idx_saasprovider_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
-class SaasProvider
+class SaasProvider implements CompanyOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
+    private Company $company;
 
     /**
      * Nom du fournisseur.
@@ -244,5 +252,17 @@ class SaasProvider
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }
