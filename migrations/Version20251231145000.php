@@ -454,8 +454,8 @@ final class Version20251231145000 extends AbstractMigration
         // TABLE 13: lead_captures
         // -----------------------------------------------------------------
 
-        // Check if table exists before modifying (table may not exist in all environments)
-        if ($schema->hasTable('lead_captures')) {
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        if ($this->connection->createSchemaManager()->tablesExist(['lead_captures'])) {
             $this->addSql(<<<'SQL'
                 ALTER TABLE lead_captures
                 ADD company_id INT NULL AFTER id
@@ -496,8 +496,8 @@ final class Version20251231145000 extends AbstractMigration
         // REVERSE TABLE 13: lead_captures
         // -----------------------------------------------------------------
 
-        // Check if table exists before modifying (table may not exist in all environments)
-        if ($schema->hasTable('lead_captures')) {
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        if ($this->connection->createSchemaManager()->tablesExist(['lead_captures'])) {
             $this->addSql(<<<'SQL'
                 ALTER TABLE lead_captures
                 DROP FOREIGN KEY fk_lead_capture_company

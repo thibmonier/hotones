@@ -21,8 +21,8 @@ final class Version20260101211909 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
 
-        // Check if table exists before modifying (table may not exist in all environments)
-        $leadCapturesExists = $schema->hasTable('lead_captures');
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        $leadCapturesExists = $this->connection->createSchemaManager()->tablesExist(['lead_captures']);
 
         $this->addSql('ALTER TABLE account_deletion_requests RENAME INDEX idx_account_deletion_request_company TO idx_accountdeletionrequest_company');
         $this->addSql('ALTER TABLE billing_markers RENAME INDEX idx_billing_marker_company TO idx_billingmarker_company');
@@ -119,8 +119,8 @@ final class Version20260101211909 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
 
-        // Check if table exists before modifying (table may not exist in all environments)
-        $leadCapturesExists = $schema->hasTable('lead_captures');
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        $leadCapturesExists = $this->connection->createSchemaManager()->tablesExist(['lead_captures']);
 
         $this->addSql('ALTER TABLE account_deletion_requests RENAME INDEX idx_accountdeletionrequest_company TO idx_account_deletion_request_company');
         $this->addSql('ALTER TABLE billing_markers RENAME INDEX idx_billingmarker_company TO idx_billing_marker_company');

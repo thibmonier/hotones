@@ -19,8 +19,8 @@ final class Version20251219185551 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Check if table exists before modifying (table may not exist in all environments)
-        $tableExists = $schema->hasTable('lead_captures');
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        $tableExists = $this->connection->createSchemaManager()->tablesExist(['lead_captures']);
 
         if ($tableExists) {
             // Add nurturing tracking fields
@@ -30,8 +30,8 @@ final class Version20251219185551 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // Check if table exists before modifying (table may not exist in all environments)
-        $tableExists = $schema->hasTable('lead_captures');
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        $tableExists = $this->connection->createSchemaManager()->tablesExist(['lead_captures']);
 
         if ($tableExists) {
             // Remove nurturing tracking fields
