@@ -137,10 +137,9 @@ class TimesheetController extends AbstractController
             ], 400);
         }
 
-        $project = $em->getRepository(Project::class)->find($projectId);
-        if (!$project) {
-            return new JsonResponse(['error' => 'Projet non trouvé'], 400);
-        }
+        // Optimisation: getReference() crée un proxy sans SELECT
+        // Si le projet n'existe pas, l'erreur sera levée au flush() par la contrainte FK
+        $project = $em->getReference(Project::class, $projectId);
 
         $task = null;
         if ($taskId) {
@@ -808,7 +807,8 @@ class TimesheetController extends AbstractController
         // Filtrer par projet si spécifié
         $project = null;
         if ($projectId) {
-            $project    = $em->getRepository(Project::class)->find($projectId);
+            // Optimisation: getReference() crée un proxy sans SELECT
+            $project    = $em->getReference(Project::class, $projectId);
             $timesheets = array_filter($timesheets, fn ($t) => $t->getProject()->getId() === (int) $projectId);
         }
 

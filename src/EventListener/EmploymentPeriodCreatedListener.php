@@ -62,7 +62,7 @@ class EmploymentPeriodCreatedListener
                 'Failed to create onboarding tasks automatically',
                 [
                     'contributor_id'       => $contributor->getId(),
-                    'employment_period_id' => $employmentPeriod->getId(),
+                    'employment_period_id' => $employmentPeriod->id, // PHP 8.4 property hook
                     'error'                => $e->getMessage(),
                 ],
             );

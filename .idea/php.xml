@@ -10,7 +10,6 @@
   <component name="MessDetector">
     <phpmd_settings>
       <MessDetectorConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpmd" />
-      <phpmd_by_interpreter asDefaultInterpreter="true" interpreter_id="6e3a2303-9d6d-4f71-8751-7a5a36033790" tool_path="/Users/tmonier/Projects/hotones/vendor/bin/phpmd" timeout="30000" />
     </phpmd_settings>
   </component>
   <component name="MessDetectorOptionsConfiguration">
@@ -41,8 +40,8 @@
   </component>
   <component name="PhpCodeSniffer">
     <phpcs_settings>
+      <phpcs_by_interpreter asDefaultInterpreter="true" interpreter_id="6e3a2303-9d6d-4f71-8751-7a5a36033790" timeout="30000" />
       <PhpCSConfiguration beautifier_path="$PROJECT_DIR$/vendor/bin/phpcbf" tool_path="$PROJECT_DIR$/vendor/bin/phpcs" />
-      <phpcs_by_interpreter asDefaultInterpreter="true" interpreter_id="6e3a2303-9d6d-4f71-8751-7a5a36033790" beautifier_path="$PROJECT_DIR$/vendor/bin/phpcbf" tool_path="/Users/tmonier/Projects/hotones/vendor/bin/phpcs" timeout="30000" />
     </phpcs_settings>
   </component>
   <component name="PhpIncludePathManager">

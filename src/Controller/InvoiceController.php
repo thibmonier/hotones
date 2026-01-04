@@ -50,8 +50,9 @@ class InvoiceController extends AbstractController
         $startDate = $hasFilter ? ($request->query->get('start_date') ?? null) : ($saved['start_date'] ?? null);
         $endDate   = $hasFilter ? ($request->query->get('end_date') ?? null) : ($saved['end_date'] ?? null);
 
-        $client  = $clientId ? $em->getRepository(Client::class)->find($clientId) : null;
-        $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
+        // Optimisation: getReference() pour les filtres QueryBuilder (accepte les proxies)
+        $client  = $clientId ? $em->getReference(Client::class, $clientId) : null;
+        $project = $projectId ? $em->getReference(Project::class, $projectId) : null;
 
         // Tri
         $sort = $hasFilter ? ($request->query->get('sort') ?? ($saved['sort'] ?? 'issuedAt')) : ($saved['sort'] ?? 'issuedAt');

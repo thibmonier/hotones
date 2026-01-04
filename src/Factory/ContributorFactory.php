@@ -19,6 +19,7 @@ final class ContributorFactory extends PersistentObjectFactory
         $faker = self::faker();
 
         return [
+            'company'           => CompanyFactory::new(), // Multi-tenant: required field
             'firstName'         => $faker->firstName(),
             'lastName'          => $faker->lastName(),
             'email'             => $faker->optional()->safeEmail(),
@@ -40,6 +41,7 @@ final class ContributorFactory extends PersistentObjectFactory
             $faker            = self::faker();
             $employmentPeriod = new EmploymentPeriod();
             $employmentPeriod
+                ->setCompany($contributor->getCompany()) // Multi-tenant: inherit company from contributor
                 ->setContributor($contributor)
                 ->setStartDate(new DateTime('-6 months'))
                 ->setCjm((float) $faker->numberBetween(300, 700))

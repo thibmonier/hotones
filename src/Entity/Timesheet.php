@@ -244,6 +244,15 @@ class Timesheet implements CompanyOwnedInterface
     }
 
     /**
+     * Compatibility method for existing code and PHPStan.
+     * With PHP 8.4 property hooks, prefer direct access: $timesheet->id.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
      * Compatibility method for existing code.
      * With PHP 8.4 property hooks, prefer direct access: $timesheet->hours = $value.
      */

@@ -111,9 +111,8 @@ class Company
     // ===========================
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'RESTRICT')]
-    #[Assert\NotNull]
-    private User $owner;
+    #[ORM\JoinColumn(nullable: true, onDelete: 'RESTRICT')]
+    private ?User $owner = null;
 
     // ===========================
     // Subscription & Status
@@ -475,12 +474,12 @@ class Company
     // Relationship Getters & Setters
     // ===========================
 
-    public function getOwner(): User
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
-    public function setOwner(User $owner): self
+    public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
 

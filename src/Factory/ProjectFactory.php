@@ -18,6 +18,7 @@ final class ProjectFactory extends PersistentObjectFactory
 
         return [
             'name'                 => $faker->company(),
+            'company'              => CompanyFactory::new(), // Multi-tenant: required field
             'client'               => null, // set in fixtures with ClientFactory::random()
             'description'          => $faker->optional()->paragraphs(3, true),
             'purchasesAmount'      => $faker->optional()->randomFloat(2, 100, 5000),

@@ -1,0 +1,175 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^QueryBuilder\: \[Semantical Error\] line 0, col 247 near ''company LIKE''\: Error\: Invalid PathExpression\. Must be a StateFieldPathExpression\.$#'
+			identifier: doctrine.dql
+			count: 1
+			path: src/Controller/Admin/CrmLeadController.php
+
+		-
+			message: '#^Property App\\Controller\\ContributorSkillController\:\:\$companyContext is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/ContributorSkillController.php
+
+		-
+			message: '#^Access to private property App\\Entity\\EmploymentPeriod\:\:\$profiles\.$#'
+			identifier: property.private
+			count: 2
+			path: src/Controller/EmploymentPeriodController.php
+
+		-
+			message: '#^Property App\\Controller\\ExpenseReportController\:\:\$companyContext is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/ExpenseReportController.php
+
+		-
+			message: '#^Call to method analyzeProject\(\) on an unknown class App\\Controller\\ProjectRiskAnalyzer\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/ProjectController.php
+
+		-
+			message: '#^Call to method findLatestForProject\(\) on an unknown class App\\Controller\\ProjectHealthScoreRepository\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/ProjectController.php
+
+		-
+			message: '#^Call to method predictProfitability\(\) on an unknown class App\\Controller\\ProfitabilityPredictor\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/ProjectController.php
+
+		-
+			message: '#^Parameter \$healthScoreRepo of method App\\Controller\\ProjectController\:\:show\(\) has invalid type App\\Controller\\ProjectHealthScoreRepository\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/ProjectController.php
+
+		-
+			message: '#^Parameter \$profitabilityPredictor of method App\\Controller\\ProjectController\:\:show\(\) has invalid type App\\Controller\\ProfitabilityPredictor\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/ProjectController.php
+
+		-
+			message: '#^Parameter \$riskAnalyzer of method App\\Controller\\ProjectController\:\:show\(\) has invalid type App\\Controller\\ProjectRiskAnalyzer\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/ProjectController.php
+
+		-
+			message: '#^Property App\\Controller\\ProjectDetailController\:\:\$companyContext is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/ProjectDetailController.php
+
+		-
+			message: '#^Property App\\Controller\\ProjectTaskController\:\:\$companyContext is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/ProjectTaskController.php
+
+		-
+			message: '#^Property App\\Controller\\ProjectTechnologyController\:\:\$companyContext is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/ProjectTechnologyController.php
+
+		-
+			message: '#^Property App\\Controller\\VacationRequestController\:\:\$companyContext is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/VacationRequestController.php
+
+		-
+			message: '#^Attribute class Symfony\\Component\\Serializer\\Annotation\\Ignore does not exist\.$#'
+			identifier: attribute.notFound
+			count: 1
+			path: src/Entity/AccountDeletionRequest.php
+
+		-
+			message: '#^Access to an undefined property App\\Entity\\EmploymentPeriod\:\:\$hoursPerDay\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entity/Contributor.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>cjm" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Entity/Contributor.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>tjm" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Entity/Contributor.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 2
+			path: src/Entity/EmploymentPeriod.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Order\:\:isExpensesRebillable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Entity/ExpenseReport.php
+
+		-
+			message: '#^Attribute class App\\Entity\\SensitiveParameter does not exist\.$#'
+			identifier: attribute.notFound
+			count: 1
+			path: src/Entity/NpsSurvey.php
+
+		-
+			message: '#^Property App\\Entity\\Timesheet\:\:\$project \(App\\Entity\\Project\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Entity/Project.php
+
+		-
+			message: '#^Call to method Doctrine\\ORM\\QueryBuilder\:\:andWhere\(\) with incorrect case\: andwhere$#'
+			identifier: method.nameCase
+			count: 1
+			path: src/Repository/VacationRepository.php
+
+		-
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
+			count: 1
+			path: src/Security/CompanyContext.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: src/Security/CompanyContext.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: src/Security/CompanyContext.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Service\\ExcelExportService\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: src/Service/ExcelExportService.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Order\:\:isExpensesRebillable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/ExpenseReportService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: src/Service/WorkloadPredictionService.php

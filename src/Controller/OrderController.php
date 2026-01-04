@@ -344,10 +344,8 @@ class OrderController extends AbstractController
         $line->setDescription($request->request->get('line_description'));
 
         if ($profileId = $request->request->get('profile_id')) {
-            $profile = $em->getRepository(Profile::class)->find($profileId);
-            if ($profile) {
-                $line->setProfile($profile);
-            }
+            // Optimisation: getReference() crée un proxy sans SELECT
+            $line->setProfile($em->getReference(Profile::class, $profileId));
         }
 
         $tjm = $request->request->get('tjm');
@@ -400,10 +398,8 @@ class OrderController extends AbstractController
         $line->setDescription($request->request->get('line_description'));
 
         if ($profileId = $request->request->get('profile_id')) {
-            $profile = $em->getRepository(Profile::class)->find($profileId);
-            if ($profile) {
-                $line->setProfile($profile);
-            }
+            // Optimisation: getReference() crée un proxy sans SELECT
+            $line->setProfile($em->getReference(Profile::class, $profileId));
         } else {
             $line->setProfile(null);
         }

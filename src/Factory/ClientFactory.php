@@ -17,6 +17,7 @@ final class ClientFactory extends PersistentObjectFactory
         $faker = self::faker();
 
         return [
+            'company'     => CompanyFactory::new(), // Multi-tenant: required field
             'name'        => $faker->company(),
             'logoPath'    => null,
             'website'     => $faker->optional()->url(),

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Project;
 use App\Security\CompanyContext;
 use DateTimeInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -374,7 +375,11 @@ class ProjectRepository extends CompanyAwareRepository
             $qb->setMaxResults($limit);
         }
 
-        return $qb->getQuery()->getResult();
+        // Use Paginator for collection joins to avoid partial hydration (data loss)
+        // Technologies is a ManyToMany collection - setMaxResults alone would cause issues
+        $paginator = new Paginator($qb, true);
+
+        return iterator_to_array($paginator);
     }
 
     /**
@@ -564,7 +569,7 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function search(string $query, int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        $qb = $this->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
@@ -576,9 +581,13 @@ class ProjectRepository extends CompanyAwareRepository
             ->andWhere('p.name LIKE :query OR p.description LIKE :query OR c.name LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('p.id', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        // Use Paginator for collection joins to avoid partial hydration (data loss)
+        // Technologies is a ManyToMany collection - setMaxResults alone would cause issues
+        $paginator = new Paginator($qb, true);
+
+        return iterator_to_array($paginator);
     }
 
     /**
