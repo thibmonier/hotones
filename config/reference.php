@@ -3044,7 +3044,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nelmio_security?: NelmioSecurityConfig,
  *     ai?: AiConfig,
  *     stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
- *     doctrine_doctor?: DoctrineDoctorConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -3106,7 +3105,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nelmio_security?: NelmioSecurityConfig,
  *         ai?: AiConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
- *         doctrine_doctor?: DoctrineDoctorConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -3138,7 +3136,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nelmio_security?: NelmioSecurityConfig,
  *         ai?: AiConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
- *         doctrine_doctor?: DoctrineDoctorConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

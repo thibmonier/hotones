@@ -32,5 +32,5 @@ return [
     Nelmio\SecurityBundle\NelmioSecurityBundle::class => ['all' => true],
     Symfony\AI\AiBundle\AiBundle::class => ['all' => true],
     Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle::class => ['all' => true],
-    AhmedBhs\DoctrineDoctor\DoctrineDoctorBundle::class => ['all' => true],
+    AhmedBhs\DoctrineDoctor\DoctrineDoctorBundle::class => ['dev' => true],
 ];
