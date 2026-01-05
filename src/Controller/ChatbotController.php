@@ -63,23 +63,23 @@ class ChatbotController extends AbstractController
     }
 
     /**
-     * Appelle l'API IA avec fallback : OpenAI > Anthropic > Gemini.
+     * Appelle l'API IA avec fallback : Anthropic > OpenAI > Gemini.
      */
     private function callAI(string $userMessage): string
     {
-        // Priorité 1 : OpenAI
-        if (!empty($this->openAiKey)) {
-            try {
-                return $this->callOpenAI($userMessage);
-            } catch (Exception $e) {
-                // Fallback vers Anthropic
-            }
-        }
-
-        // Priorité 2 : Anthropic
+        // Priorité 1 : Anthropic
         if (!empty($this->anthropicApiKey)) {
             try {
                 return $this->callAnthropic($userMessage);
+            } catch (Exception $e) {
+                // Fallback vers OpenAI
+            }
+        }
+
+        // Priorité 2 : OpenAI
+        if (!empty($this->openAiKey)) {
+            try {
+                return $this->callOpenAI($userMessage);
             } catch (Exception $e) {
                 // Fallback vers Gemini
             }

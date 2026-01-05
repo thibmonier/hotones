@@ -14,7 +14,14 @@ final class Version20260101211909 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Smart migration: Rename indexes only if they exist with old names';
+    }
+
+    private function indexExists(string $table, string $indexName): bool
+    {
+        $schemaManager = $this->connection->createSchemaManager();
+        $indexes = $schemaManager->listTableIndexes($table);
+        return isset($indexes[strtolower($indexName)]);
     }
 
     public function up(Schema $schema): void
@@ -24,17 +31,54 @@ final class Version20260101211909 extends AbstractMigration
         // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
         $leadCapturesExists = $this->connection->createSchemaManager()->tablesExist(['lead_captures']);
 
-        $this->addSql('ALTER TABLE account_deletion_requests RENAME INDEX idx_account_deletion_request_company TO idx_accountdeletionrequest_company');
-        $this->addSql('ALTER TABLE billing_markers RENAME INDEX idx_billing_marker_company TO idx_billingmarker_company');
-        $this->addSql('DROP INDEX company_settings_company_unique ON company_settings');
-        $this->addSql('ALTER TABLE company_settings RENAME INDEX idx_company_settings_company TO idx_companysettings_company');
-        $this->addSql('ALTER TABLE contributor_progress RENAME INDEX idx_contributor_progress_company TO idx_contributorprogress_company');
-        $this->addSql('ALTER TABLE contributor_satisfactions RENAME INDEX idx_contributor_satisfaction_company TO idx_contributorsatisfaction_company');
-        $this->addSql('ALTER TABLE contributor_skills RENAME INDEX idx_contributor_skill_company TO idx_contributorskill_company');
-        $this->addSql('ALTER TABLE contributor_profiles DROP FOREIGN KEY `fk_contributor_profile_company`');
-        $this->addSql('DROP INDEX idx_contributor_profile_company ON contributor_profiles');
-        $this->addSql('ALTER TABLE contributor_profiles DROP company_id');
-        $this->addSql('ALTER TABLE cookie_consents RENAME INDEX idx_cookie_consent_company TO idx_cookieconsent_company');
+        // Conditional index renames - only rename if old index exists
+        if ($this->indexExists('account_deletion_requests', 'idx_account_deletion_request_company')) {
+            $this->addSql('ALTER TABLE account_deletion_requests RENAME INDEX idx_account_deletion_request_company TO idx_accountdeletionrequest_company');
+        }
+
+        if ($this->indexExists('billing_markers', 'idx_billing_marker_company')) {
+            $this->addSql('ALTER TABLE billing_markers RENAME INDEX idx_billing_marker_company TO idx_billingmarker_company');
+        }
+        // Drop unique constraint if exists
+        if ($this->indexExists('company_settings', 'company_settings_company_unique')) {
+            $this->addSql('DROP INDEX company_settings_company_unique ON company_settings');
+        }
+
+        if ($this->indexExists('company_settings', 'idx_company_settings_company')) {
+            $this->addSql('ALTER TABLE company_settings RENAME INDEX idx_company_settings_company TO idx_companysettings_company');
+        }
+
+        if ($this->indexExists('contributor_progress', 'idx_contributor_progress_company')) {
+            $this->addSql('ALTER TABLE contributor_progress RENAME INDEX idx_contributor_progress_company TO idx_contributorprogress_company');
+        }
+
+        if ($this->indexExists('contributor_satisfactions', 'idx_contributor_satisfaction_company')) {
+            $this->addSql('ALTER TABLE contributor_satisfactions RENAME INDEX idx_contributor_satisfaction_company TO idx_contributorsatisfaction_company');
+        }
+
+        if ($this->indexExists('contributor_skills', 'idx_contributor_skill_company')) {
+            $this->addSql('ALTER TABLE contributor_skills RENAME INDEX idx_contributor_skill_company TO idx_contributorskill_company');
+        }
+        // Only drop foreign key and index if they exist
+        try {
+            $this->addSql('ALTER TABLE contributor_profiles DROP FOREIGN KEY `fk_contributor_profile_company`');
+        } catch (\Exception $e) {
+            // Foreign key might not exist, continue
+        }
+
+        if ($this->indexExists('contributor_profiles', 'idx_contributor_profile_company')) {
+            $this->addSql('DROP INDEX idx_contributor_profile_company ON contributor_profiles');
+        }
+
+        // Only drop column if it exists
+        $columns = $this->connection->createSchemaManager()->listTableColumns('contributor_profiles');
+        if (isset($columns['company_id'])) {
+            $this->addSql('ALTER TABLE contributor_profiles DROP company_id');
+        }
+
+        if ($this->indexExists('cookie_consents', 'idx_cookie_consent_company')) {
+            $this->addSql('ALTER TABLE cookie_consents RENAME INDEX idx_cookie_consent_company TO idx_cookieconsent_company');
+        }
         $this->addSql('ALTER TABLE dim_contributor DROP FOREIGN KEY `fk_dim_contributor_company`');
         $this->addSql('ALTER TABLE dim_contributor ADD CONSTRAINT FK_8BC20A2C979B1AD6 FOREIGN KEY (company_id) REFERENCES companies (id)');
         $this->addSql('ALTER TABLE dim_contributor RENAME INDEX idx_dim_contributor_company TO IDX_8BC20A2C979B1AD6');
