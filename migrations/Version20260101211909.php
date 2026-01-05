@@ -20,6 +20,10 @@ final class Version20260101211909 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        $leadCapturesExists = $this->connection->createSchemaManager()->tablesExist(['lead_captures']);
+
         $this->addSql('ALTER TABLE account_deletion_requests RENAME INDEX idx_account_deletion_request_company TO idx_accountdeletionrequest_company');
         $this->addSql('ALTER TABLE billing_markers RENAME INDEX idx_billing_marker_company TO idx_billingmarker_company');
         $this->addSql('DROP INDEX company_settings_company_unique ON company_settings');
@@ -58,7 +62,12 @@ final class Version20260101211909 extends AbstractMigration
         $this->addSql('DROP INDEX invoice_number_company_unique ON invoices');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_6A2F2F952DA68207 ON invoices (invoice_number)');
         $this->addSql('ALTER TABLE invoices RENAME INDEX idx_invoice_company TO IDX_6A2F2F95979B1AD6');
-        $this->addSql('ALTER TABLE lead_captures RENAME INDEX idx_lead_capture_company TO idx_leadcapture_company');
+
+        // Only rename index if table exists
+        if ($leadCapturesExists) {
+            $this->addSql('ALTER TABLE lead_captures RENAME INDEX idx_lead_capture_company TO idx_leadcapture_company');
+        }
+
         $this->addSql('ALTER TABLE notification_preferences RENAME INDEX idx_notification_preference_company TO idx_notificationpreference_company');
         $this->addSql('DROP INDEX setting_key_company_unique ON notification_settings');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_B05598605FA1E697 ON notification_settings (setting_key)');
@@ -109,6 +118,10 @@ final class Version20260101211909 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+
+        // Check if table exists by querying database directly (schema diff doesn't reflect actual DB state)
+        $leadCapturesExists = $this->connection->createSchemaManager()->tablesExist(['lead_captures']);
+
         $this->addSql('ALTER TABLE account_deletion_requests RENAME INDEX idx_accountdeletionrequest_company TO idx_account_deletion_request_company');
         $this->addSql('ALTER TABLE billing_markers RENAME INDEX idx_billingmarker_company TO idx_billing_marker_company');
         $this->addSql('CREATE UNIQUE INDEX company_settings_company_unique ON company_settings (company_id)');
@@ -147,7 +160,12 @@ final class Version20260101211909 extends AbstractMigration
         $this->addSql('DROP INDEX UNIQ_6A2F2F952DA68207 ON invoices');
         $this->addSql('CREATE UNIQUE INDEX invoice_number_company_unique ON invoices (invoice_number, company_id)');
         $this->addSql('ALTER TABLE invoices RENAME INDEX idx_6a2f2f95979b1ad6 TO idx_invoice_company');
-        $this->addSql('ALTER TABLE lead_captures RENAME INDEX idx_leadcapture_company TO idx_lead_capture_company');
+
+        // Only rename index if table exists
+        if ($leadCapturesExists) {
+            $this->addSql('ALTER TABLE lead_captures RENAME INDEX idx_leadcapture_company TO idx_lead_capture_company');
+        }
+
         $this->addSql('DROP INDEX IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750 ON messenger_messages');
         $this->addSql('CREATE INDEX IDX_75EA56E016BA31DB ON messenger_messages (delivered_at)');
         $this->addSql('CREATE INDEX IDX_75EA56E0FB7336F0 ON messenger_messages (queue_name)');
