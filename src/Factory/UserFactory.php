@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class UserFactory extends PersistentObjectFactory
 {
-    private ?CompanyContext $companyContext = null;
+    private ?CompanyContext $companyContext;
 
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,

@@ -125,7 +125,7 @@ class OrderController extends AbstractController
 
             $this->addFlash('success', 'Devis créé avec succès');
 
-            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+            return $this->redirectToRoute('order_show', ['id' => $order->id]);
         }
 
         return $this->render('order/new.html.twig', [
@@ -213,7 +213,7 @@ class OrderController extends AbstractController
 
             $this->addFlash('success', 'Devis modifié avec succès');
 
-            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+            return $this->redirectToRoute('order_show', ['id' => $order->id]);
         }
 
         return $this->render('order/edit.html.twig', [
@@ -252,7 +252,7 @@ class OrderController extends AbstractController
 
         $this->addFlash('success', 'Section ajoutée avec succès');
 
-        return $this->redirectToRoute('order_sections', ['id' => $order->getId()]);
+        return $this->redirectToRoute('order_sections', ['id' => $order->id]);
     }
 
     #[Route('/{id}/generate-tasks', name: 'order_generate_tasks', methods: ['POST'])]
@@ -267,17 +267,17 @@ class OrderController extends AbstractController
 
         // Vérifier le token CSRF
         $token = $request->request->get('_token');
-        if (!$this->isCsrfTokenValid('generate_tasks_'.$order->getId(), $token)) {
+        if (!$this->isCsrfTokenValid('generate_tasks_'.$order->id, $token)) {
             $this->addFlash('error', 'Token CSRF invalide');
 
-            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+            return $this->redirectToRoute('order_show', ['id' => $order->id]);
         }
 
         $project = $order->getProject();
         if (!$project) {
             $this->addFlash('error', 'Le devis n\'est attaché à aucun projet');
 
-            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+            return $this->redirectToRoute('order_show', ['id' => $order->id]);
         }
 
         // Parcourir toutes les sections et lignes pour générer les tâches
@@ -324,7 +324,7 @@ class OrderController extends AbstractController
             $this->addFlash('info', 'Aucune tâche créée. Toutes les lignes sont déjà liées à des tâches ou ne sont pas éligibles.');
         }
 
-        return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+        return $this->redirectToRoute('order_show', ['id' => $order->id]);
     }
 
     #[Route('/{orderId}/section/{sectionId}/add-line', name: 'order_add_line', methods: ['POST'])]
@@ -499,14 +499,14 @@ class OrderController extends AbstractController
 
         $this->addFlash('success', 'Devis dupliqué avec succès');
 
-        return $this->redirectToRoute('order_show', ['id' => $newOrder->getId()]);
+        return $this->redirectToRoute('order_show', ['id' => $newOrder->id]);
     }
 
     #[Route('/{id}/delete', name: 'order_delete', methods: ['POST'])]
     #[IsGranted('ROLE_MANAGER')]
     public function delete(Request $request, Order $order, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$order->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$order->id, $request->request->get('_token'))) {
             $em->remove($order);
             $em->flush();
             $this->addFlash('success', 'Devis supprimé avec succès');
@@ -523,17 +523,17 @@ class OrderController extends AbstractController
         EntityManagerInterface $em,
         EventDispatcherInterface $eventDispatcher
     ): Response {
-        if (!$this->isCsrfTokenValid('status'.$order->getId(), $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('status'.$order->id, $request->request->get('_token'))) {
             $this->addFlash('danger', 'Action non autorisée (CSRF).');
 
-            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+            return $this->redirectToRoute('order_show', ['id' => $order->id]);
         }
 
         $statusString = (string) $request->request->get('status');
         if (!array_key_exists($statusString, Order::STATUS_OPTIONS)) {
             $this->addFlash('danger', 'Statut invalide.');
 
-            return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+            return $this->redirectToRoute('order_show', ['id' => $order->id]);
         }
 
         $oldStatus = $order->getStatus();
@@ -568,7 +568,7 @@ class OrderController extends AbstractController
 
         $this->addFlash('success', 'Statut du devis mis à jour.');
 
-        return $this->redirectToRoute('order_show', ['id' => $order->getId()]);
+        return $this->redirectToRoute('order_show', ['id' => $order->id]);
     }
 
     #[Route('/api/profile/{id}', name: 'api_profile_info', methods: ['GET'])]
@@ -618,7 +618,7 @@ class OrderController extends AbstractController
     #[Route('/{id}/schedule/add', name: 'order_schedule_add', methods: ['POST'])]
     public function addSchedule(Request $request, Order $order, EntityManagerInterface $em): Response
     {
-        if (!$this->isCsrfTokenValid('schedule_add_'.$order->getId(), $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('schedule_add_'.$order->id, $request->request->get('_token'))) {
             return $this->json(['error' => 'Token CSRF invalide'], 422);
         }
 
@@ -635,7 +635,7 @@ class OrderController extends AbstractController
         if (!$billingDate) {
             $this->addFlash('danger', 'La date de facturation est requise.');
 
-            return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+            return $this->redirectToRoute('order_edit', ['id' => $order->id]);
         }
 
         $schedule = new OrderPaymentSchedule();
@@ -661,7 +661,7 @@ class OrderController extends AbstractController
             $this->addFlash('warning', sprintf('Échéance ajoutée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format((float) $scheduled, 2, ',', ' ')));
         }
 
-        return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+        return $this->redirectToRoute('order_edit', ['id' => $order->id]);
     }
 
     #[Route('/{orderId}/schedule/{scheduleId}/delete', name: 'order_schedule_delete', methods: ['POST'])]
@@ -669,7 +669,7 @@ class OrderController extends AbstractController
     {
         $order    = $em->getRepository(Order::class)->find($orderId);
         $schedule = $em->getRepository(OrderPaymentSchedule::class)->find($scheduleId);
-        if (!$order || !$schedule || $schedule->getOrder()->getId() !== $order->getId()) {
+        if (!$order || !$schedule || $schedule->getOrder()->id !== $order->id) {
             throw $this->createNotFoundException();
         }
 
@@ -683,7 +683,7 @@ class OrderController extends AbstractController
             $this->addFlash('warning', sprintf('Échéance supprimée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format((float) $scheduled, 2, ',', ' ')));
         }
 
-        return $this->redirectToRoute('order_edit', ['id' => $order->getId()]);
+        return $this->redirectToRoute('order_edit', ['id' => $order->id]);
     }
 
     #[Route('/export.csv', name: 'order_export_csv', methods: ['GET'])]

@@ -55,13 +55,13 @@ class QuoteStatusChangedEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'order_id'        => $order->getId(),
+                'order_id'        => $order->id,
                 'order_reference' => $order->getReference(),
                 'status'          => $newStatus->value,
                 'amount'          => $order->calculateTotal(),
             ],
             entityType: 'Order',
-            entityId: $order->getId(),
+            entityId: $order->id,
         );
     }
 

@@ -233,8 +233,9 @@ class SeedProjects2025Command extends Command
         $order->setProject($project)
             ->setOrderNumber($this->generateOrderNumberForDate($createdAt))
             ->setStatus(rand(0, 1) ? 'signe' : 'gagne')
-            ->setCreatedAt($createdAt)
-            ->setValidatedAt((clone $createdAt)->modify('+'.rand(1, 30).' days'));
+            ->setCreatedAt($createdAt);
+
+        $order->validatedAt = (clone $createdAt)->modify('+'.rand(1, 30).' days');
 
         // Section prestations
         $section = new OrderSection();

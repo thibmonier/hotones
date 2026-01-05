@@ -13,7 +13,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class TimesheetFactory extends PersistentObjectFactory
 {
-    private ?CompanyContext $companyContext = null;
+    private ?CompanyContext $companyContext;
 
     public function __construct(CompanyContext $companyContext)
     {
@@ -23,7 +23,6 @@ final class TimesheetFactory extends PersistentObjectFactory
 
     protected function defaults(): array|callable
     {
-        /** @var Generator $faker */
         $faker = self::faker();
 
         $date = $faker->dateTimeBetween('-3 months', 'now');

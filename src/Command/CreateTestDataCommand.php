@@ -212,7 +212,7 @@ Répartition des contributeurs :
             } else {
                 $io->writeln("• Utilisateur existant : {$data['email']}");
             }
-            $user->setFirstName($data['firstName']);
+            $user->firstName = $data['firstName'];
             $user->setLastName($data['lastName']);
             $user->setRoles($data['roles']);
             $user->setPassword($this->passwordHasher->hashPassword($user, 'test123'));

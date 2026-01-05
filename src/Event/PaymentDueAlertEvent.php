@@ -29,13 +29,13 @@ class PaymentDueAlertEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'order_id'        => $order->getId(),
+                'order_id'        => $order->id,
                 'order_reference' => $order->getReference(),
                 'due_date'        => $dueDate->format('Y-m-d'),
                 'days_until_due'  => $daysUntilDue,
             ],
             entityType: 'Order',
-            entityId: $order->getId(),
+            entityId: $order->id,
         );
     }
 

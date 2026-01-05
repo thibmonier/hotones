@@ -95,7 +95,7 @@ class InvoiceGeneratorService
             $this->logger->info('Invoice generated from payment schedule', [
                 'invoice_number'      => $invoice->getInvoiceNumber(),
                 'payment_schedule_id' => $schedule->getId(),
-                'order_id'            => $order->getId(),
+                'order_id'            => $order->id,
                 'amount_ht'           => $invoice->getAmountHt(),
             ]);
         }

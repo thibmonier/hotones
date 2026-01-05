@@ -61,11 +61,11 @@ class AdminUserController extends AbstractController
 
         if ($request->isMethod('POST')) {
             // core data
-            $user->setFirstName((string) $request->request->get('first_name'));
+            $user->firstName = (string) $request->request->get('first_name');
             $user->setLastName((string) $request->request->get('last_name'));
             $user->setEmail((string) $request->request->get('email'));
-            $user->setPhoneWork($request->request->get('phone_work'));
-            $user->setPhonePersonal($request->request->get('phone_personal'));
+            $user->phoneWork     = $request->request->get('phone_work');
+            $user->phonePersonal = $request->request->get('phone_personal');
             $user->setAddress($request->request->get('address'));
 
             // roles
@@ -112,9 +112,9 @@ class AdminUserController extends AbstractController
 
             $user = new User();
             $user->setEmail($email)
-                ->setFirstName($firstName)
                 ->setLastName($lastName)
                 ->setRoles(['ROLE_USER']);
+            $user->firstName = $firstName;
             $user->setPassword($hasher->hashPassword($user, $password));
             $em->persist($user);
             $em->flush();

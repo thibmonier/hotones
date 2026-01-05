@@ -483,7 +483,7 @@ class Order implements CompanyOwnedInterface
 
     public function getValidatedAt(): ?DateTimeInterface
     {
-        return $this->id;
+        return $this->validatedAt;
     }
 
     /**

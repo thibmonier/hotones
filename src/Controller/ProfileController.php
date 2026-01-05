@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Contributor;
+use App\Entity\EmploymentPeriod;
 use App\Entity\User;
 use App\Service\SecureFileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,10 +25,10 @@ class ProfileController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $contributor       = $em->getRepository(\App\Entity\Contributor::class)->findOneBy(['user' => $user]);
+        $contributor       = $em->getRepository(Contributor::class)->findOneBy(['user' => $user]);
         $employmentPeriods = [];
         if ($contributor) {
-            $employmentPeriods = $em->getRepository(\App\Entity\EmploymentPeriod::class)->findByContributor($contributor);
+            $employmentPeriods = $em->getRepository(EmploymentPeriod::class)->findByContributor($contributor);
         }
 
         return $this->render('profile/profile.html.twig', [
@@ -47,11 +49,11 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
 
         if ($request->isMethod('POST')) {
-            $user->setFirstName($request->request->get('first_name'));
+            $user->firstName = $request->request->get('first_name');
             $user->setLastName($request->request->get('last_name'));
             $user->setEmail($request->request->get('email'));
-            $user->setPhoneWork($request->request->get('phone_work'));
-            $user->setPhonePersonal($request->request->get('phone_personal'));
+            $user->phoneWork     = $request->request->get('phone_work');
+            $user->phonePersonal = $request->request->get('phone_personal');
             $user->setAddress($request->request->get('address'));
 
             /** @var UploadedFile|null $avatarFile */

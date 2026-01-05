@@ -119,8 +119,6 @@ class CreateTestUsersCommand extends Command
             // Create User
             $user = new User();
             $user->setEmail($userData['email'])
-                ->setFirstName($userData['firstName'])
-                ->setLastName($userData['lastName'])
                 ->setRoles($userData['roles']);
 
             $hashedPassword = $this->hasher->hashPassword($user, self::DEFAULT_PASSWORD);

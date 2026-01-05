@@ -14,7 +14,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ProfileFactory extends PersistentObjectFactory
 {
-    private ?CompanyContext $companyContext = null;
+    private ?CompanyContext $companyContext;
 
     public function __construct(CompanyContext $companyContext)
     {

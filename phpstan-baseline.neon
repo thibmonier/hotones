@@ -25,42 +25,6 @@ parameters:
 			path: src/Controller/ExpenseReportController.php
 
 		-
-			message: '#^Call to method analyzeProject\(\) on an unknown class App\\Controller\\ProjectRiskAnalyzer\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/ProjectController.php
-
-		-
-			message: '#^Call to method findLatestForProject\(\) on an unknown class App\\Controller\\ProjectHealthScoreRepository\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/ProjectController.php
-
-		-
-			message: '#^Call to method predictProfitability\(\) on an unknown class App\\Controller\\ProfitabilityPredictor\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/ProjectController.php
-
-		-
-			message: '#^Parameter \$healthScoreRepo of method App\\Controller\\ProjectController\:\:show\(\) has invalid type App\\Controller\\ProjectHealthScoreRepository\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/ProjectController.php
-
-		-
-			message: '#^Parameter \$profitabilityPredictor of method App\\Controller\\ProjectController\:\:show\(\) has invalid type App\\Controller\\ProfitabilityPredictor\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/ProjectController.php
-
-		-
-			message: '#^Parameter \$riskAnalyzer of method App\\Controller\\ProjectController\:\:show\(\) has invalid type App\\Controller\\ProjectRiskAnalyzer\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/ProjectController.php
-
-		-
 			message: '#^Property App\\Controller\\ProjectDetailController\:\:\$companyContext is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -89,12 +53,6 @@ parameters:
 			identifier: attribute.notFound
 			count: 1
 			path: src/Entity/AccountDeletionRequest.php
-
-		-
-			message: '#^Access to an undefined property App\\Entity\\EmploymentPeriod\:\:\$hoursPerDay\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Entity/Contributor.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>cjm" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
@@ -131,6 +89,90 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: src/Entity/Project.php
+
+		-
+			message: '#^Property App\\Factory\\ClientFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/ClientFactory.php
+
+		-
+			message: '#^Property App\\Factory\\ContributorFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/ContributorFactory.php
+
+		-
+			message: '#^Property App\\Factory\\DimProfileFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/DimProfileFactory.php
+
+		-
+			message: '#^Property App\\Factory\\DimProjectTypeFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/DimProjectTypeFactory.php
+
+		-
+			message: '#^Property App\\Factory\\DimTimeFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/DimTimeFactory.php
+
+		-
+			message: '#^Property App\\Factory\\FactStaffingMetricsFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/FactStaffingMetricsFactory.php
+
+		-
+			message: '#^Property App\\Factory\\OrderFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/OrderFactory.php
+
+		-
+			message: '#^Property App\\Factory\\OrderTaskFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/OrderTaskFactory.php
+
+		-
+			message: '#^Property App\\Factory\\ProfileFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/ProfileFactory.php
+
+		-
+			message: '#^Property App\\Factory\\ProjectFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/ProjectFactory.php
+
+		-
+			message: '#^Property App\\Factory\\ProjectSubTaskFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/ProjectSubTaskFactory.php
+
+		-
+			message: '#^Property App\\Factory\\ProjectTaskFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/ProjectTaskFactory.php
+
+		-
+			message: '#^Property App\\Factory\\TimesheetFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/TimesheetFactory.php
+
+		-
+			message: '#^Property App\\Factory\\UserFactory\:\:\$companyContext \(App\\Security\\CompanyContext\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Factory/UserFactory.php
 
 		-
 			message: '#^Call to method Doctrine\\ORM\\QueryBuilder\:\:andWhere\(\) with incorrect case\: andwhere$#'
