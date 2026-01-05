@@ -45,35 +45,24 @@ final class Version20260105073000 extends AbstractMigration
             'providers',
             'saas_providers',
             'saas_services',
-            'saas_subscriptions_v2',
+            'saas_subscriptions',      // SaasSubscription entity
+            'saas_subscriptions_v2',   // Subscription entity
             'scheduler_entries',
             'skills',
+            'users',                   // User entity
             'vendors',
         ];
 
-        foreach ($tablesToFix as $table) {
-            // Check if column exists before adding
-            $this->addSql("
-                SET @column_exists = (
-                    SELECT COUNT(*)
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_SCHEMA = DATABASE()
-                    AND TABLE_NAME = '{$table}'
-                    AND COLUMN_NAME = 'updated_at'
-                )
-            ");
+        // Use Doctrine Schema API to safely add columns only if they don't exist
+        foreach ($tablesToFix as $tableName) {
+            $table = $schema->getTable($tableName);
 
-            $this->addSql("
-                SET @sql = IF(
-                    @column_exists = 0,
-                    'ALTER TABLE {$table} ADD updated_at DATETIME DEFAULT NULL COMMENT ''(DC2Type:datetime_immutable)''',
-                    'SELECT ''Column updated_at already exists in {$table}'''
-                )
-            ");
-
-            $this->addSql("PREPARE stmt FROM @sql");
-            $this->addSql("EXECUTE stmt");
-            $this->addSql("DEALLOCATE PREPARE stmt");
+            if (!$table->hasColumn('updated_at')) {
+                $table->addColumn('updated_at', 'datetime_immutable', [
+                    'notnull' => false,
+                    'default' => null,
+                ]);
+            }
         }
     }
 
