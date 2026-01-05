@@ -55,6 +55,11 @@ final class Version20260105073000 extends AbstractMigration
 
         // Use Doctrine Schema API to safely add columns only if they don't exist
         foreach ($tablesToFix as $tableName) {
+            // Skip if table doesn't exist in schema
+            if (!$schema->hasTable($tableName)) {
+                continue;
+            }
+
             $table = $schema->getTable($tableName);
 
             if (!$table->hasColumn('updated_at')) {
