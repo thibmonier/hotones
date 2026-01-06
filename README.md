@@ -19,7 +19,7 @@
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=thibmonier_hotones&metric=sqale_index&token=9ebe0aa73ad9ade642d0ec52a9c9bfa7436a8a12)](https://sonarcloud.io/summary/new_code?id=thibmonier_hotones)
 
 ### Stack
-[![PHP Version](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.5-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
 [![Symfony Version](https://img.shields.io/badge/Symfony-8.0-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-11.4-003545?style=flat&logo=mariadb&logoColor=white)](https://mariadb.org/)
 
@@ -31,7 +31,7 @@ Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en 
 - Performance: docs/performance.md
 
 ## Stack
-- Backend: Symfony 7.3, PHP 8.4
+- Backend: Symfony 8.0.1, PHP 8.5
 - DB: MariaDB 11.4 (Docker)
 - Frontend: Twig + Bootstrap 5 (thème Skote)
 - Assets: Webpack Encore + Sass
