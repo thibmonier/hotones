@@ -39,15 +39,20 @@ class BlameableSubscriber implements EventSubscriberInterface
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         // Find first available user as system user for CLI context
-        $systemUser = $this->entityManager->getRepository(User::class)->findOneBy([], ['id' => 'ASC']);
+        try {
+            $systemUser = $this->entityManager->getRepository(User::class)->findOneBy([], ['id' => 'ASC']);
 
-        if ($systemUser) {
-            // Create a token for the system user to satisfy Blameable listener
-            $token = new UsernamePasswordToken($systemUser, 'cli', $systemUser->getRoles());
-            $this->tokenStorage->setToken($token);
+            if ($systemUser) {
+                // Create a token for the system user to satisfy Blameable listener
+                $token = new UsernamePasswordToken($systemUser, 'cli', $systemUser->getRoles());
+                $this->tokenStorage->setToken($token);
 
-            // Also set the user value directly on the listener
-            $this->blameableListener->setUserValue($systemUser);
+                // Also set the user value directly on the listener
+                $this->blameableListener->setUserValue($systemUser);
+            }
+        } catch (\Doctrine\DBAL\Exception\TableNotFoundException) {
+            // Table doesn't exist yet (e.g., during test database setup)
+            // Silently ignore - the blameable listener will handle the absence of a user
         }
     }
 }
