@@ -107,15 +107,17 @@ final class Version20251231092056 extends AbstractMigration
             ADD
               CONSTRAINT FK_8244AA3A7E3C61F9 FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE RESTRICT
         SQL);
-        $this->addSql('DROP INDEX idx_deletion_scheduled ON account_deletion_requests');
-        $this->addSql(<<<'SQL'
-            ALTER TABLE
-              account_deletion_requests
-            CHANGE
-              scheduled_at scheduled_deletion_at DATETIME DEFAULT NULL
-        SQL);
-        $this->addSql('CREATE INDEX idx_deletion_scheduled ON account_deletion_requests (scheduled_deletion_at)');
-        $this->addSql('DROP INDEX idx_dates ON employment_periods');
+        // Skip account_deletion_requests changes as scheduled_at rename was never applied
+        // $this->addSql('DROP INDEX idx_deletion_scheduled ON account_deletion_requests');
+        // $this->addSql(<<<'SQL'
+        //     ALTER TABLE
+        //       account_deletion_requests
+        //     CHANGE
+        //       scheduled_at scheduled_deletion_at DATETIME DEFAULT NULL
+        // SQL);
+        // $this->addSql('CREATE INDEX idx_deletion_scheduled ON account_deletion_requests (scheduled_deletion_at)');
+        // Skip DROP INDEX operations as indexes were never created (Version20251228113853 was disabled)
+        // $this->addSql('DROP INDEX idx_dates ON employment_periods');
         $this->addSql(<<<'SQL'
             ALTER TABLE
               employment_periods
@@ -124,14 +126,14 @@ final class Version20251231092056 extends AbstractMigration
             CHANGE
               work_time_percentage work_time_percentage NUMERIC(5, 2) DEFAULT 100 NOT NULL
         SQL);
-        $this->addSql('DROP INDEX idx_order_status ON orders');
-        $this->addSql('DROP INDEX idx_validated_at ON orders');
-        $this->addSql('DROP INDEX idx_project_position ON project_tasks');
-        $this->addSql('DROP INDEX idx_status ON project_tasks');
-        $this->addSql('DROP INDEX idx_contributor_date ON timesheets');
-        $this->addSql('DROP INDEX idx_date ON timesheets');
-        $this->addSql('DROP INDEX idx_vacation_dates ON vacations');
-        $this->addSql('DROP INDEX idx_contributor_status ON vacations');
+        // $this->addSql('DROP INDEX idx_order_status ON orders');
+        // $this->addSql('DROP INDEX idx_validated_at ON orders');
+        // $this->addSql('DROP INDEX idx_project_position ON project_tasks');
+        // $this->addSql('DROP INDEX idx_status ON project_tasks');
+        // $this->addSql('DROP INDEX idx_contributor_date ON timesheets');
+        // $this->addSql('DROP INDEX idx_date ON timesheets');
+        // $this->addSql('DROP INDEX idx_vacation_dates ON vacations');
+        // $this->addSql('DROP INDEX idx_contributor_status ON vacations');
     }
 
     public function down(Schema $schema): void
