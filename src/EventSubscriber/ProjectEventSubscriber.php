@@ -17,8 +17,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 class ProjectEventSubscriber
 {
     public function __construct(
-        private Security $security,
-        private EntityManagerInterface $em
+        private readonly Security $security,
+        private readonly EntityManagerInterface $em
     ) {
     }
 

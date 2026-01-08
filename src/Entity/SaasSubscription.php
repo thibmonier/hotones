@@ -10,6 +10,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['status'], name: 'idx_saas_subscription_status')]
 #[ORM\Index(columns: ['next_renewal_date'], name: 'idx_saas_subscription_renewal')]
 #[ORM\Index(columns: ['company_id'], name: 'idx_saassubscription_company')]
-class SaasSubscription implements CompanyOwnedInterface
+class SaasSubscription implements CompanyOwnedInterface, Stringable
 {
     // Périodicités de facturation
     public const BILLING_MONTHLY = 'monthly';

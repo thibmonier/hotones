@@ -211,7 +211,7 @@ class ProjectSubTask implements CompanyOwnedInterface
         // Parcourir les timesheets du projet pour éviter une relation bidirectionnelle lourde
         foreach ($this->project->getTimesheets() as $timesheet) {
             if ($timesheet->getSubTask() && $timesheet->getSubTask()->getId() === $this->getId()) {
-                $total = bcadd($total, $timesheet->getHours(), 2);
+                $total = bcadd($total, (string) $timesheet->getHours(), 2);
             }
         }
 

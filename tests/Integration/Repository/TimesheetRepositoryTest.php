@@ -62,7 +62,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $end   = new DateTime('2024-04-30');
         $sum   = $this->repository->getTotalHoursForMonth($start, $end);
 
-        $this->assertEquals(19.5, $sum, '', 0.001);
+        $this->assertEquals(19.5, $sum, '');
     }
 
     public function testFindByContributorAndDateRange(): void
@@ -347,7 +347,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $this->assertCount(1, $stats);
         // Should only include hours from project1 and project2 (8.00 + 6.00 = 14.00)
         $totalHours = (float) $stats[0]['totalHours'];
-        $this->assertEquals(14.0, $totalHours, '', 0.001);
+        $this->assertEquals(14.0, $totalHours, '');
     }
 
     public function testGetTotalHoursForPeriodAndProjects(): void
@@ -374,7 +374,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $projectIds = [$project1->getId(), $project2->getId()];
         $totalHours = $this->repository->getTotalHoursForPeriodAndProjects($start, $end, $projectIds);
 
-        $this->assertEquals(14.0, $totalHours, '', 0.001);
+        $this->assertEquals(14.0, $totalHours, '');
     }
 
     public function testGetMonthlyHoursForProject(): void
@@ -412,6 +412,6 @@ class TimesheetRepositoryTest extends KernelTestCase
         $this->assertArrayHasKey('totalHumanCost', $aggregates);
         $this->assertArrayHasKey('totalRevenue', $aggregates);
         // Verify total hours is 24.00 (16.00 + 8.00)
-        $this->assertEquals(24.0, $aggregates['totalHours'], '', 0.001);
+        $this->assertEquals(24.0, $aggregates['totalHours'], '');
     }
 }

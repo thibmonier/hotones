@@ -23,10 +23,10 @@ use Symfony\Contracts\Cache\ItemInterface;
 class StaffingDashboardController extends AbstractController
 {
     public function __construct(
-        private StaffingMetricsRepository $staffingRepo,
-        private ContributorRepository $contributorRepo,
-        private ManagerRegistry $doctrine,
-        private CacheInterface $cache,
+        private readonly StaffingMetricsRepository $staffingRepo,
+        private readonly ContributorRepository $contributorRepo,
+        private readonly ManagerRegistry $doctrine,
+        private readonly CacheInterface $cache,
     ) {
     }
 

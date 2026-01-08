@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class RiskController extends AbstractController
 {
     public function __construct(
-        private ProjectRiskAnalyzer $riskAnalyzer
+        private readonly ProjectRiskAnalyzer $riskAnalyzer
     ) {
     }
 
@@ -37,9 +37,9 @@ class RiskController extends AbstractController
         $stats = [
             'total'    => count($projects),
             'atRisk'   => count($atRiskProjects),
-            'critical' => count(array_filter($atRiskProjects, fn ($p) => $p['analysis']['riskLevel'] === 'critical')),
-            'high'     => count(array_filter($atRiskProjects, fn ($p) => $p['analysis']['riskLevel'] === 'high')),
-            'medium'   => count(array_filter($atRiskProjects, fn ($p) => $p['analysis']['riskLevel'] === 'medium')),
+            'critical' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'critical')),
+            'high'     => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'medium'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
         return $this->render('risk/projects_dashboard.html.twig', [

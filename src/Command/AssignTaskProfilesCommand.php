@@ -187,8 +187,8 @@ class AssignTaskProfilesCommand extends Command
 
         // Try to match keywords in task name
         foreach ($this->profileMapping as $keyword => $profileName) {
-            if (str_contains($taskNameLower, $keyword)) {
-                $profileNameLower = mb_strtolower($profileName);
+            if (str_contains($taskNameLower, (string) $keyword)) {
+                $profileNameLower = mb_strtolower((string) $profileName);
                 if (isset($profiles[$profileNameLower])) {
                     return $profiles[$profileNameLower];
                 }

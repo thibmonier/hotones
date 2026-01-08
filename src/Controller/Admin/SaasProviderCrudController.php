@@ -18,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use Override;
 
 class SaasProviderCrudController extends AbstractCrudController
 {
@@ -26,6 +27,7 @@ class SaasProviderCrudController extends AbstractCrudController
         return SaasProvider::class;
     }
 
+    #[Override]
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -36,6 +38,7 @@ class SaasProviderCrudController extends AbstractCrudController
             ->setPaginatorPageSize(25);
     }
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
@@ -62,9 +65,7 @@ class SaasProviderCrudController extends AbstractCrudController
 
         yield IntegerField::new('services.count', 'Nombre de services')
             ->hideOnForm()
-            ->formatValue(function ($value, SaasProvider $entity) {
-                return $entity->getServices()->count();
-            });
+            ->formatValue(fn ($value, SaasProvider $entity) => $entity->getServices()->count());
 
         yield BooleanField::new('active', 'Actif')
             ->renderAsSwitch(false);
@@ -78,12 +79,14 @@ class SaasProviderCrudController extends AbstractCrudController
             ->setFormat('dd/MM/yyyy HH:mm');
     }
 
+    #[Override]
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
             ->add(BooleanFilter::new('active', 'Actif'));
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         return $actions

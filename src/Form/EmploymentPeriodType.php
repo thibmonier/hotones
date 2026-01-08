@@ -137,7 +137,7 @@ class EmploymentPeriodType extends AbstractType
         ;
 
         // Validation personnalisée : endDate doit être après startDate
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             $period = $event->getData();
 
             if ($period->endDate && $period->endDate < $period->startDate) {

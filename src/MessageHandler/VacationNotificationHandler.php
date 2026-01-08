@@ -44,7 +44,7 @@ class VacationNotificationHandler
             return; // Pas de manager ou pas d'email
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($manager->getEmail())
             ->subject('Nouvelle demande de congé à valider')
             ->htmlTemplate('emails/vacation_created.html.twig')
@@ -63,7 +63,7 @@ class VacationNotificationHandler
             return; // Pas d'email
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($contributor->getEmail())
             ->subject('Votre demande de congé a été approuvée')
             ->htmlTemplate('emails/vacation_approved.html.twig')
@@ -81,7 +81,7 @@ class VacationNotificationHandler
             return; // Pas d'email
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($contributor->getEmail())
             ->subject('Votre demande de congé a été rejetée')
             ->htmlTemplate('emails/vacation_rejected.html.twig')

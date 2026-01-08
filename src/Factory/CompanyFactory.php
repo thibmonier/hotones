@@ -5,6 +5,7 @@ namespace App\Factory;
 use App\Entity\Company;
 use DateTime;
 use Faker\Generator;
+use Override;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -18,7 +19,7 @@ final class CompanyFactory extends PersistentObjectFactory
         $faker = self::faker();
 
         $name = $faker->company();
-        $slug = strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', trim($name)));
+        $slug = strtolower((string) preg_replace('/[^A-Za-z0-9]+/', '-', trim($name)));
 
         return [
             'name'                       => $name,
@@ -36,6 +37,7 @@ final class CompanyFactory extends PersistentObjectFactory
         ];
     }
 
+    #[Override]
     public function initialize(): static
     {
         // Note: Owner is not auto-created to avoid circular dependency issues

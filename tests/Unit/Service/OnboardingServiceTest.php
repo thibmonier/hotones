@@ -19,10 +19,10 @@ use PHPUnit\Framework\TestCase;
 
 class OnboardingServiceTest extends TestCase
 {
-    private EntityManagerInterface $em;
-    private CompanyContext $companyContext;
-    private OnboardingTaskRepository $taskRepository;
-    private OnboardingTemplateRepository $templateRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $em;
+    private \PHPUnit\Framework\MockObject\MockObject $companyContext;
+    private \PHPUnit\Framework\MockObject\MockObject $taskRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $templateRepository;
     private OnboardingService $service;
 
     protected function setUp(): void
@@ -206,12 +206,10 @@ class OnboardingServiceTest extends TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (OnboardingTemplate $template) use ($name, $description) {
-                return $template->getName()         === $name
-                    && $template->getDescription()  === $description
-                    && $template->isActive()        === true
-                    && count($template->getTasks()) === 1;
-            }));
+            ->with($this->callback(fn (OnboardingTemplate $template): bool => $template->getName() === $name
+                && $template->getDescription()                                                     === $description
+                && $template->isActive()                                                           === true
+                && count($template->getTasks())                                                    === 1));
 
         $this->em->expects($this->once())
             ->method('flush');
@@ -262,12 +260,10 @@ class OnboardingServiceTest extends TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (OnboardingTemplate $duplicate) {
-                return str_contains($duplicate->getName(), 'Copie')
-                    && $duplicate->getDescription()  === 'Original description'
-                    && $duplicate->isActive()        === true
-                    && count($duplicate->getTasks()) === 1;
-            }));
+            ->with($this->callback(fn (OnboardingTemplate $duplicate): bool => str_contains($duplicate->getName(), 'Copie')
+                && $duplicate->getDescription()  === 'Original description'
+                && $duplicate->isActive()        === true
+                && count($duplicate->getTasks()) === 1));
 
         $this->em->expects($this->once())
             ->method('flush');
@@ -288,9 +284,7 @@ class OnboardingServiceTest extends TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (OnboardingTemplate $duplicate) {
-                return $duplicate->getName() === 'Custom Copy Name';
-            }));
+            ->with($this->callback(fn (OnboardingTemplate $duplicate): bool => $duplicate->getName() === 'Custom Copy Name'));
 
         $this->em->expects($this->once())
             ->method('flush');

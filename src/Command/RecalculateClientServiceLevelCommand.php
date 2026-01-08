@@ -27,7 +27,7 @@ class RecalculateClientServiceLevelCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année pour le calcul du CA', (string) date('Y'))
+            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année pour le calcul du CA', date('Y'))
             ->setHelp('Cette commande recalcule le niveau de service de tous les clients en mode automatique basé sur leur CA.')
         ;
     }

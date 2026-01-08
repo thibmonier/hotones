@@ -28,7 +28,7 @@ class DbScheduleProvider implements ScheduleProviderInterface
             $args = $entry->getPayload() ?? [];
 
             $schedule->add(
-                (new RecurringCommand($trigger, $entry->getCommand(), $args))
+                new RecurringCommand($trigger, $entry->getCommand(), $args)
                     ->withName($entry->getName()),
             );
         }

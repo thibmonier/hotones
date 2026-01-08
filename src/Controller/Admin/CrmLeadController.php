@@ -261,10 +261,10 @@ class CrmLeadController extends AbstractController
         $output = fopen('php://temp', 'r+');
 
         // BOM UTF-8 pour Excel
-        fputs($output, "\xEF\xBB\xBF");
+        fwrite($output, "\xEF\xBB\xBF");
 
         foreach ($csv as $row) {
-            fputcsv($output, $row, ';');
+            fputcsv($output, $row, ';', escape: '\\');
         }
 
         rewind($output);
@@ -395,7 +395,7 @@ class CrmLeadController extends AbstractController
         }
 
         // Trier par date décroissante
-        usort($timeline, fn ($a, $b) => $b['date'] <=> $a['date']);
+        usort($timeline, fn ($a, $b): int => $b['date'] <=> $a['date']);
 
         return $timeline;
     }

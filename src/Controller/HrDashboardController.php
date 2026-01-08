@@ -18,8 +18,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class HrDashboardController extends AbstractController
 {
     public function __construct(
-        private HrMetricsService $hrMetricsService,
-        private SkillGapAnalyzer $skillGapAnalyzer
+        private readonly HrMetricsService $hrMetricsService,
+        private readonly SkillGapAnalyzer $skillGapAnalyzer
     ) {
     }
 

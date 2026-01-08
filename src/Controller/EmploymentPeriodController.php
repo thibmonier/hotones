@@ -94,7 +94,7 @@ class EmploymentPeriodController extends AbstractController
             'tjm'         => 'ep.tjm',
         ];
         $sortField = $validSortFields[$sort] ?? 'ep.startDate';
-        $sortDir   = strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC';
+        $sortDir   = strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC';
         $qb->orderBy($sortField, $sortDir);
 
         // Pagination
@@ -235,12 +235,10 @@ class EmploymentPeriodController extends AbstractController
 
             // Gestion des profils
             $profileIds = $request->request->all('profiles');
-            if (!empty($profileIds)) {
-                foreach ($profileIds as $profileId) {
-                    $profile = $em->getRepository(Profile::class)->find($profileId);
-                    if ($profile) {
-                        $period->addProfile($profile);
-                    }
+            foreach ($profileIds as $profileId) {
+                $profile = $em->getRepository(Profile::class)->find($profileId);
+                if ($profile) {
+                    $period->addProfile($profile);
                 }
             }
 
@@ -354,12 +352,10 @@ class EmploymentPeriodController extends AbstractController
             // Gestion des profils
             $period->profiles->clear();
             $profileIds = $request->request->all('profiles');
-            if (!empty($profileIds)) {
-                foreach ($profileIds as $profileId) {
-                    $profile = $em->getRepository(Profile::class)->find($profileId);
-                    if ($profile) {
-                        $period->addProfile($profile);
-                    }
+            foreach ($profileIds as $profileId) {
+                $profile = $em->getRepository(Profile::class)->find($profileId);
+                if ($profile) {
+                    $period->addProfile($profile);
                 }
             }
 

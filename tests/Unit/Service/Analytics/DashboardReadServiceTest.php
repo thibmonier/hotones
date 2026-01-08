@@ -21,11 +21,11 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class DashboardReadServiceTest extends TestCase
 {
-    private EntityManagerInterface|MockObject $entityManager;
-    private RealTimeService|MockObject $realTimeService;
-    private CompanyContext|MockObject $companyContext;
-    private LoggerInterface|MockObject $logger;
-    private CacheInterface|MockObject $cache;
+    private MockObject $entityManager;
+    private MockObject $realTimeService;
+    private MockObject $companyContext;
+    private MockObject $logger;
+    private MockObject $cache;
     private DashboardReadService $service;
 
     protected function setUp(): void

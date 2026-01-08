@@ -99,12 +99,12 @@ class ProjectController extends AbstractController
 
             // Ajouter l'achat projet (purchasesAmount)
             $projectPurchases = $project->purchasesAmount ?? '0';
-            $totalPurchases   = bcadd($agg['total_purchases'], $projectPurchases, 2);
+            $totalPurchases   = bcadd((string) $agg['total_purchases'], $projectPurchases, 2);
 
             // Taux de marge
             $marginRate = '0';
-            if (bccomp($agg['total_revenue'], '0', 2) > 0) {
-                $marginRate = bcmul(bcdiv($agg['total_margin'], $agg['total_revenue'], 4), '100', 2);
+            if (bccomp((string) $agg['total_revenue'], '0', 2) > 0) {
+                $marginRate = bcmul(bcdiv((string) $agg['total_margin'], (string) $agg['total_revenue'], 4), '100', 2);
             }
 
             $projectsWithMetrics[] = [
@@ -153,7 +153,7 @@ class ProjectController extends AbstractController
             'search'           => $filterSearch,
             'per_page'         => $perPage,
             'sort'             => $sort,
-            'dir'              => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
+            'dir'              => strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC',
         ]);
 
         return $this->render('project/index.html.twig', [
@@ -185,7 +185,7 @@ class ProjectController extends AbstractController
                 'dir'              => $dir,
             ],
             'sort' => $sort,
-            'dir'  => strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC',
+            'dir'  => strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC',
         ]);
     }
 
@@ -361,23 +361,23 @@ class ProjectController extends AbstractController
             if (in_array($status, ['signed', 'won', 'completed', 'signe', 'gagne', 'termine'], true)) {
                 // CA du devis (calculé depuis les sections)
                 $orderTotal   = $order->calculateTotalFromSections();
-                $totalRevenue = bcadd($totalRevenue, $orderTotal, 2);
+                $totalRevenue = bcadd($totalRevenue, (string) $orderTotal, 2);
 
                 // Compter les jours et calculer les marges par section
                 foreach ($order->getSections() as $section) {
                     foreach ($section->getLines() as $line) {
                         // Jours vendus (seulement les lignes de service)
                         if ($line->getProfile() && $line->getDays()) {
-                            $totalDays = bcadd($totalDays, $line->getDays(), 2);
+                            $totalDays = bcadd($totalDays, (string) $line->getDays(), 2);
 
                             // Marge et coût estimé
-                            $totalMargin = bcadd($totalMargin, $line->getGrossMargin(), 2);
-                            $totalCost   = bcadd($totalCost, $line->getEstimatedCost(), 2);
+                            $totalMargin = bcadd($totalMargin, (string) $line->getGrossMargin(), 2);
+                            $totalCost   = bcadd($totalCost, (string) $line->getEstimatedCost(), 2);
                         }
 
                         // Achats de la ligne
                         if ($line->getPurchaseAmount()) {
-                            $totalPurchases = bcadd($totalPurchases, $line->getPurchaseAmount(), 2);
+                            $totalPurchases = bcadd($totalPurchases, (string) $line->getPurchaseAmount(), 2);
                         }
                     }
                 }
@@ -449,7 +449,7 @@ class ProjectController extends AbstractController
         // Génération CSV sécurisée
         $handle = fopen('php://temp', 'r+');
         foreach ($rows as $r) {
-            fputcsv($handle, $r);
+            fputcsv($handle, $r, escape: '\\');
         }
         rewind($handle);
         $csv = "\xEF\xBB\xBF".stream_get_contents($handle);

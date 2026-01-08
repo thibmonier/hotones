@@ -51,8 +51,6 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 abstract class CompanyAwareRepository extends ServiceEntityRepository
 {
-    protected CompanyContext $companyContext;
-
     /**
      * @param ManagerRegistry $registry       Doctrine registry
      * @param class-string<T> $entityClass    Entity class name
@@ -61,10 +59,9 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         string $entityClass,
-        CompanyContext $companyContext
+        protected CompanyContext $companyContext
     ) {
         parent::__construct($registry, $entityClass);
-        $this->companyContext = $companyContext;
     }
 
     /**

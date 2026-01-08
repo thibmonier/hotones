@@ -82,7 +82,7 @@ class OrderController extends AbstractController
             'project'  => $projectId,
             'status'   => $status,
             'sort'     => $sort,
-            'dir'      => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+            'dir'      => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'per_page' => $perPage,
         ]);
 
@@ -94,7 +94,7 @@ class OrderController extends AbstractController
             'statusOptions'   => Order::STATUS_OPTIONS,
             'filters_query'   => ['project' => $projectId, 'status' => $status, 'sort' => $sort, 'dir' => $dir, 'per_page' => $perPage],
             'sort'            => $sort,
-            'dir'             => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+            'dir'             => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'pagination'      => $pagination,
         ]);
     }
@@ -595,7 +595,7 @@ class OrderController extends AbstractController
         $increment = 1;
         if ($lastOrder) {
             $lastNumber = $lastOrder->getOrderNumber();
-            $increment  = (int) substr($lastNumber, -3) + 1;
+            $increment  = (int) substr((string) $lastNumber, -3) + 1;
         }
 
         return sprintf('D%s%s%03d', $year, $month, $increment);
@@ -609,7 +609,7 @@ class OrderController extends AbstractController
         $totalAmount = '0';
 
         foreach ($order->getSections() as $section) {
-            $totalAmount = bcadd($totalAmount, $section->getTotalAmount(), 2);
+            $totalAmount = bcadd($totalAmount, (string) $section->getTotalAmount(), 2);
         }
 
         $order->setTotalAmount($totalAmount);
@@ -721,7 +721,7 @@ class OrderController extends AbstractController
         // Génération CSV sécurisée
         $handle = fopen('php://temp', 'r+');
         foreach ($rows as $r) {
-            fputcsv($handle, $r);
+            fputcsv($handle, $r, escape: '\\');
         }
         rewind($handle);
         $csv = "\xEF\xBB\xBF".stream_get_contents($handle);
@@ -756,7 +756,7 @@ class OrderController extends AbstractController
         $filename = sprintf(
             'devis_%s_%s.pdf',
             $order->getReference(),
-            (new DateTime())->format('Y-m-d'),
+            new DateTime()->format('Y-m-d'),
         );
 
         // Générer et retourner le PDF

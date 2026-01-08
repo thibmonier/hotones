@@ -89,43 +89,35 @@ class ProjectType extends AbstractType
             // Rôles projet avec Users
             ->add('keyAccountManager', EntityType::class, [
                 'class'        => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getFirstName().' '.$user->getLastName();
-                },
-                'label'       => 'KAM (Key Account Manager)',
-                'required'    => false,
-                'placeholder' => '-- Sélectionner un utilisateur --',
-                'attr'        => ['class' => 'form-control'],
+                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'label'        => 'KAM (Key Account Manager)',
+                'required'     => false,
+                'placeholder'  => '-- Sélectionner un utilisateur --',
+                'attr'         => ['class' => 'form-control'],
             ])
             ->add('projectManager', EntityType::class, [
                 'class'        => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getFirstName().' '.$user->getLastName();
-                },
-                'label'       => 'Chef de projet',
-                'required'    => false,
-                'placeholder' => '-- Sélectionner un utilisateur --',
-                'attr'        => ['class' => 'form-control'],
+                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'label'        => 'Chef de projet',
+                'required'     => false,
+                'placeholder'  => '-- Sélectionner un utilisateur --',
+                'attr'         => ['class' => 'form-control'],
             ])
             ->add('projectDirector', EntityType::class, [
                 'class'        => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getFirstName().' '.$user->getLastName();
-                },
-                'label'       => 'Directeur de projet',
-                'required'    => false,
-                'placeholder' => '-- Sélectionner un utilisateur --',
-                'attr'        => ['class' => 'form-control'],
+                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'label'        => 'Directeur de projet',
+                'required'     => false,
+                'placeholder'  => '-- Sélectionner un utilisateur --',
+                'attr'         => ['class' => 'form-control'],
             ])
             ->add('salesPerson', EntityType::class, [
                 'class'        => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getFirstName().' '.$user->getLastName();
-                },
-                'label'       => 'Commercial',
-                'required'    => false,
-                'placeholder' => '-- Sélectionner un utilisateur --',
-                'attr'        => ['class' => 'form-control'],
+                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'label'        => 'Commercial',
+                'required'     => false,
+                'placeholder'  => '-- Sélectionner un utilisateur --',
+                'attr'         => ['class' => 'form-control'],
             ])
             ->add('serviceCategory', EntityType::class, [
                 'class'        => ServiceCategory::class,

@@ -11,11 +11,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class AnalyzeProjectRisksMessageHandler
+final readonly class AnalyzeProjectRisksMessageHandler
 {
     public function __construct(
-        private readonly ProjectRiskAnalyzer $riskAnalyzer,
-        private readonly LoggerInterface $logger
+        private ProjectRiskAnalyzer $riskAnalyzer,
+        private LoggerInterface $logger
     ) {
     }
 

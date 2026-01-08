@@ -11,11 +11,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class GenerateForecastsMessageHandler
+final readonly class GenerateForecastsMessageHandler
 {
     public function __construct(
-        private readonly ForecastingService $forecastingService,
-        private readonly LoggerInterface $logger
+        private ForecastingService $forecastingService,
+        private LoggerInterface $logger
     ) {
     }
 

@@ -7,7 +7,9 @@ on:
     branches: [ main, master ]
 
 jobs:
-  php-tests:
+  # Job pour installer les dépendances et créer un cache partagé
+  setup:
+    name: Setup Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,8 +19,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: mbstring, intl, pdo_sqlite
+          extensions: mbstring, intl, pdo_sqlite, bcmath, redis
           coverage: none
+          tools: composer
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -34,7 +37,35 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+        run: composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Cache vendor directory
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
+
+  # Tests unitaires, fonctionnels et d'intégration
+  tests:
+    name: PHPUnit Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, pdo_sqlite, bcmath, redis
+          coverage: none
+
+      - name: Restore vendor cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
 
       - name: Generate JWT keys
         run: |
@@ -45,21 +76,50 @@ jobs:
         env:
           JWT_PASSPHRASE: test
 
-      - name: Setup Chrome
-        id: chrome
-        uses: browser-actions/setup-chrome@v1
-
       - name: Run PHPUnit
         env:
           APP_ENV: test
-          PANTHER_NO_SANDBOX: 1
-          PANTHER_CHROME_BINARY: ${{ steps.chrome.outputs.chrome-path }}
           JWT_PASSPHRASE: test
         run: |
           mkdir -p var
           ./vendor/bin/phpunit --colors=always
 
-      - name: Run E2E testsuite
+  # Tests E2E avec Chrome
+  e2e-tests:
+    name: E2E Tests (Panther)
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, pdo_sqlite, bcmath, redis
+          coverage: none
+
+      - name: Restore vendor cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
+
+      - name: Setup Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genpkey -algorithm RSA -out config/jwt/private.pem -pkeyopt rsa_keygen_bits:4096
+          openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+          chmod 644 config/jwt/private.pem config/jwt/public.pem
+        env:
+          JWT_PASSPHRASE: test
+
+      - name: Run E2E tests
         env:
           APP_ENV: test
           PANTHER_NO_SANDBOX: 1
@@ -67,8 +127,36 @@ jobs:
           JWT_PASSPHRASE: test
         run: ./vendor/bin/phpunit --testsuite e2e --colors=always
 
-  php-quality:
+  # Analyse statique avec PHPStan
+  phpstan:
+    name: PHPStan Static Analysis
     runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, bcmath, redis
+          coverage: none
+
+      - name: Restore vendor cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
+
+      - name: Run PHPStan
+        run: composer phpstan
+
+  # Code style avec PHP-CS-Fixer
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+    needs: setup
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,9 +168,87 @@ jobs:
           extensions: mbstring, intl
           coverage: none
 
-      - name: Install dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Restore vendor cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
 
-      - name: Static analysis & code style
-        run: |
-          composer run-script check-code || true
+      - name: Run PHP-CS-Fixer
+        run: composer phpcsfixer
+
+  # Code quality avec PHPCS
+  phpcs:
+    name: PHP_CodeSniffer
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl
+          coverage: none
+
+      - name: Restore vendor cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
+
+      - name: Run PHPCS
+        run: composer phpcs
+
+  # Validation architecture avec Deptrac
+  deptrac:
+    name: Deptrac Architecture
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl
+          coverage: none
+
+      - name: Restore vendor cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
+
+      - name: Run Deptrac
+        run: composer deptrac
+
+  # Suggestions de refactoring avec Rector
+  rector:
+    name: Rector Refactoring Check
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, bcmath, redis
+          coverage: none
+
+      - name: Restore vendor cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-vendor-${{ hashFiles('**/composer.lock') }}
+
+      - name: Run Rector (dry-run)
+        run: composer rector
+        continue-on-error: true  # Ne pas bloquer la CI si Rector trouve des suggestions

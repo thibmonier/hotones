@@ -273,7 +273,7 @@ class Invoice implements CompanyOwnedInterface
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
         $this->issuedAt  = new DateTime();
-        $this->dueDate   = (new DateTime())->modify('+30 days'); // Échéance par défaut : 30 jours
+        $this->dueDate   = new DateTime()->modify('+30 days'); // Échéance par défaut : 30 jours
     }
 
     #[ORM\PrePersist]

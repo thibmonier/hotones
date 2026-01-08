@@ -56,7 +56,7 @@ class BadgeController extends AbstractController
                 try {
                     $criteria = json_decode($criteriaJson, true, 512, JSON_THROW_ON_ERROR);
                     $badge->setCriteria($criteria);
-                } catch (JsonException $e) {
+                } catch (JsonException) {
                     $this->addFlash('error', 'Format JSON invalide pour les critères');
 
                     return $this->render('badge/new.html.twig', [
@@ -105,7 +105,7 @@ class BadgeController extends AbstractController
                 try {
                     $criteria = json_decode($criteriaJson, true, 512, JSON_THROW_ON_ERROR);
                     $badge->setCriteria($criteria);
-                } catch (JsonException $e) {
+                } catch (JsonException) {
                     $this->addFlash('error', 'Format JSON invalide pour les critères');
 
                     return $this->render('badge/edit.html.twig', [

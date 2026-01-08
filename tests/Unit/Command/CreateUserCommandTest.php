@@ -19,8 +19,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class CreateUserCommandTest extends TestCase
 {
-    private EntityManagerInterface $entityManager;
-    private UserPasswordHasherInterface $passwordHasher;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $passwordHasher;
     private CreateUserCommand $command;
     private CommandTester $commandTester;
 
@@ -51,7 +51,7 @@ class CreateUserCommandTest extends TestCase
         $this->entityManager
             ->expects($this->exactly(2))
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$persistedEntities) {
+            ->willReturnCallback(function ($entity) use (&$persistedEntities): void {
                 $persistedEntities[] = $entity;
             });
 
@@ -103,7 +103,7 @@ class CreateUserCommandTest extends TestCase
         $contributorId = 42;
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use ($contributorId) {
+            ->willReturnCallback(function ($entity) use ($contributorId): void {
                 if ($entity instanceof Contributor) {
                     // Simulate database assigning an ID after flush
                     $reflection = new ReflectionClass($entity);
@@ -137,9 +137,7 @@ class CreateUserCommandTest extends TestCase
             ->expects($this->once())
             ->method('hashPassword')
             ->with(
-                $this->callback(function ($user) {
-                    return $user instanceof User && $user->getEmail() === 'hash@test.com';
-                }),
+                $this->callback(fn ($user): bool => $user instanceof User && $user->getEmail() === 'hash@test.com'),
                 $plainPassword,
             )
             ->willReturn($hashedPassword);
@@ -162,8 +160,8 @@ class CreateUserCommandTest extends TestCase
         $persistOrder = [];
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$persistOrder) {
-                $persistOrder[] = get_class($entity);
+            ->willReturnCallback(function ($entity) use (&$persistOrder): void {
+                $persistOrder[] = $entity::class;
             });
 
         $this->commandTester->execute([
@@ -185,7 +183,7 @@ class CreateUserCommandTest extends TestCase
         $this->entityManager
             ->expects($this->exactly(2))
             ->method('flush')
-            ->willReturnCallback(function () use (&$flushCount) {
+            ->willReturnCallback(function () use (&$flushCount): void {
                 ++$flushCount;
             });
 
@@ -207,7 +205,7 @@ class CreateUserCommandTest extends TestCase
         $capturedUser = null;
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$capturedUser) {
+            ->willReturnCallback(function ($entity) use (&$capturedUser): void {
                 if ($entity instanceof User) {
                     $capturedUser = $entity;
                 }
@@ -233,7 +231,7 @@ class CreateUserCommandTest extends TestCase
 
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$capturedUser, &$capturedContributor) {
+            ->willReturnCallback(function ($entity) use (&$capturedUser, &$capturedContributor): void {
                 if ($entity instanceof User) {
                     $capturedUser = $entity;
                 }
@@ -261,7 +259,7 @@ class CreateUserCommandTest extends TestCase
         $capturedContributor = null;
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$capturedContributor) {
+            ->willReturnCallback(function ($entity) use (&$capturedContributor): void {
                 if ($entity instanceof Contributor) {
                     $capturedContributor = $entity;
                 }

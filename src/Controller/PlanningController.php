@@ -38,10 +38,10 @@ class PlanningController extends AbstractController
         $startParam = $request->query->get('start');
 
         // Filters (arrays)
-        $selectedContributors = array_filter((array) $request->query->all('contributors'), fn ($v) => $v !== null && $v !== '');
-        $selectedManagers     = array_filter((array) $request->query->all('project_managers'), fn ($v) => $v !== null && $v !== '');
-        $selectedProjects     = array_filter((array) $request->query->all('projects'), fn ($v) => $v !== null && $v !== '');
-        $selectedProjectTypes = array_filter((array) $request->query->all('project_types'), fn ($v) => $v !== null && $v !== '');
+        $selectedContributors = array_filter($request->query->all('contributors'), fn ($v): bool => $v !== null && $v !== '');
+        $selectedManagers     = array_filter($request->query->all('project_managers'), fn ($v): bool => $v !== null && $v !== '');
+        $selectedProjects     = array_filter($request->query->all('projects'), fn ($v): bool => $v !== null && $v !== '');
+        $selectedProjectTypes = array_filter($request->query->all('project_types'), fn ($v): bool => $v !== null && $v !== '');
 
         $today = new DateTime('today');
         // Start at Monday of the current week by default
@@ -55,7 +55,7 @@ class PlanningController extends AbstractController
         // Base contributors list (optionally filtered)
         $contributors = $contributorRepo->findActiveContributors();
         if (!empty($selectedContributors)) {
-            $contributors = array_values(array_filter($contributors, fn ($c) => in_array((string) $c->getId(), $selectedContributors, true)));
+            $contributors = array_values(array_filter($contributors, fn ($c): bool => in_array((string) $c->getId(), $selectedContributors, true)));
         }
 
         // Build query with filters
@@ -172,8 +172,8 @@ class PlanningController extends AbstractController
         $vacationsByContributor = [];
         foreach ($vacations as $vacation) {
             /** @var Vacation $vacation */
-            $cid                            = $vacation->getContributor()->getId();
-            $vacationsByContributor[$cid]   = $vacationsByContributor[$cid] ?? [];
+            $cid = $vacation->getContributor()->getId();
+            $vacationsByContributor[$cid] ??= [];
             $vacationsByContributor[$cid][] = $vacation;
         }
 
@@ -213,8 +213,8 @@ class PlanningController extends AbstractController
             $weeklyHours = (float) $employmentPeriod->weeklyHours;
             $workPct     = (float) $employmentPeriod->workTimePercentage;
             // Daily hours = (weekly hours * work% / 100) / 5 days
-            $dailyHours                    = ($weeklyHours * $workPct / 100) / 5;
-            $contributorDailyHours[$cid]   = $contributorDailyHours[$cid] ?? [];
+            $dailyHours = ($weeklyHours * $workPct / 100) / 5;
+            $contributorDailyHours[$cid] ??= [];
             $contributorDailyHours[$cid][] = $dailyHours;
         }
         // Use the first active period's daily hours for simplicity
@@ -226,8 +226,8 @@ class PlanningController extends AbstractController
         // Group timeline_dates into weeks
         $weekGroups = [];
         foreach ($timelineDates as $date) {
-            $weekKey                = $date->format('o-W'); // ISO-8601 week number
-            $weekGroups[$weekKey]   = $weekGroups[$weekKey] ?? [];
+            $weekKey = $date->format('o-W'); // ISO-8601 week number
+            $weekGroups[$weekKey] ??= [];
             $weekGroups[$weekKey][] = $date;
         }
 
@@ -259,7 +259,7 @@ class PlanningController extends AbstractController
             $cid         = $contributor->id;
             $projectRows = [];
             if (isset($planningsByContributor[$cid])) {
-                foreach ($planningsByContributor[$cid] as $pid => $items) {
+                foreach ($planningsByContributor[$cid] as $items) {
                     $projectRows[] = [
                         'project' => $items[0]->getProject(),
                         'items'   => $items,
@@ -287,7 +287,7 @@ class PlanningController extends AbstractController
                 $analysisStart = new DateTime('first day of this month');
                 $analysisEnd   = new DateTime('last day of next month');
                 $taceAnalysis  = $taceAnalyzer->analyzeAllContributors($analysisStart, $analysisEnd);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Silently fail if analysis fails (missing metrics data)
                 $taceAnalysis = ['critical' => [], 'overloaded' => [], 'underutilized' => [], 'optimal' => []];
             }

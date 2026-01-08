@@ -108,7 +108,7 @@ class TreasuryService
 
             $forecast[$weekKey]['expected_amount'] = bcadd(
                 $forecast[$weekKey]['expected_amount'],
-                $invoice->getAmountTtc(),
+                (string) $invoice->getAmountTtc(),
                 2,
             );
             ++$forecast[$weekKey]['invoice_count'];

@@ -32,11 +32,11 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
             ->setStatus('a_signer')
             ->setContractType('forfait');
 
-        $section = (new OrderSection())
+        $section = new OrderSection()
             ->setOrder($order)
             ->setTitle('Section 1');
 
-        $line = (new OrderLine())
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('Implémentation')
             ->setType('service')

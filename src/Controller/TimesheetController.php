@@ -60,7 +60,7 @@ class TimesheetController extends AbstractController
                 foreach ($row['tasks'] as $task) {
                     $subTasks = $em->createQueryBuilder()
                         ->select('st')
-                        ->from('App\\Entity\\ProjectSubTask', 'st')
+                        ->from(\App\Entity\ProjectSubTask::class, 'st')
                         ->where('st.task = :task')
                         ->andWhere('st.assignee = :contributor')
                         ->setParameter('task', $task)
@@ -450,7 +450,7 @@ class TimesheetController extends AbstractController
 
         try {
             $project = $em->getReference(Project::class, $projectId);
-        } catch (ORMException $e) {
+        } catch (ORMException) {
             return new JsonResponse(['error' => 'Projet non trouvé'], 400);
         }
         if (!$project) {
@@ -461,7 +461,7 @@ class TimesheetController extends AbstractController
         if ($taskId) {
             try {
                 $task = $em->getReference(ProjectTask::class, $taskId);
-            } catch (ORMException $e) {
+            } catch (ORMException) {
                 return new JsonResponse(['error' => 'Tâche non trouvée'], 400);
             }
             if (!$task) {
@@ -554,7 +554,7 @@ class TimesheetController extends AbstractController
             foreach ($row['tasks'] as $task) {
                 $subTasks = $em->createQueryBuilder()
                     ->select('st')
-                    ->from('App\\Entity\\ProjectSubTask', 'st')
+                    ->from(\App\Entity\ProjectSubTask::class, 'st')
                     ->where('st.task = :task')
                     ->andWhere('st.assignee = :contributor')
                     ->setParameter('task', $task)
@@ -565,7 +565,7 @@ class TimesheetController extends AbstractController
                 $taskItems[] = [
                     'id'       => $task->getId(),
                     'name'     => $task->getName(),
-                    'subTasks' => array_map(fn ($st) => ['id' => $st->getId(), 'title' => $st->getTitle()], $subTasks),
+                    'subTasks' => array_map(fn ($st): array => ['id' => $st->getId(), 'title' => $st->getTitle()], $subTasks),
                 ];
             }
             $projects[] = [
@@ -656,7 +656,7 @@ class TimesheetController extends AbstractController
         $em->remove($timer);
         $em->flush();
 
-        return (float) $hours;
+        return $hours;
     }
 
     /**
@@ -679,10 +679,10 @@ class TimesheetController extends AbstractController
 
         // Dates par défaut : mois en cours
         if (!$startDate) {
-            $startDate = (new DateTime('first day of this month'))->format('Y-m-d');
+            $startDate = new DateTime('first day of this month')->format('Y-m-d');
         }
         if (!$endDate) {
-            $endDate = (new DateTime('last day of this month'))->format('Y-m-d');
+            $endDate = new DateTime('last day of this month')->format('Y-m-d');
         }
 
         $start = new DateTime($startDate);
@@ -694,7 +694,7 @@ class TimesheetController extends AbstractController
 
         // Filtrer par projet si spécifié
         if ($projectId) {
-            $timesheets = array_filter($timesheets, fn ($t) => $t->getProject()->getId() === $projectId);
+            $timesheets = array_filter($timesheets, fn ($t): bool => $t->getProject()->getId() === $projectId);
         }
 
         // Créer le fichier Excel
@@ -802,10 +802,10 @@ class TimesheetController extends AbstractController
 
         // Dates par défaut : mois en cours
         if (!$startDate) {
-            $startDate = (new DateTime('first day of this month'))->format('Y-m-d');
+            $startDate = new DateTime('first day of this month')->format('Y-m-d');
         }
         if (!$endDate) {
-            $endDate = (new DateTime('last day of this month'))->format('Y-m-d');
+            $endDate = new DateTime('last day of this month')->format('Y-m-d');
         }
 
         $start = new DateTime($startDate);
@@ -820,7 +820,7 @@ class TimesheetController extends AbstractController
         if ($projectId) {
             // Optimisation: getReference() crée un proxy sans SELECT
             $project    = $em->getReference(Project::class, $projectId);
-            $timesheets = array_filter($timesheets, fn ($t) => $t->getProject()->getId() === (int) $projectId);
+            $timesheets = array_filter($timesheets, fn ($t): bool => $t->getProject()->getId() === (int) $projectId);
         }
 
         // Calculer les totaux

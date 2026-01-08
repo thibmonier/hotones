@@ -41,10 +41,10 @@ class TimeConversionService
 
             if ($remainingHours === '0.00') {
                 return number_format($daysTruncated, 1, ',', ' ').'j';
-            } else {
-                return number_format($daysTruncated, 1, ',', ' ').'j '.
-                       number_format(floatval($remainingHours), 1, ',', ' ').'h';
             }
+
+            return number_format($daysTruncated, 1, ',', ' ').'j '.
+                   number_format(floatval($remainingHours), 1, ',', ' ').'h';
         }
 
         return number_format($hoursFloat, 1, ',', ' ').'h';
@@ -65,7 +65,6 @@ class TimeConversionService
     public static function parseUserInput(string $input): array
     {
         $input = trim(strtolower($input));
-
         if (str_ends_with($input, 'j')) {
             $days = rtrim($input, 'j');
 
@@ -73,20 +72,22 @@ class TimeConversionService
                 'days'  => $days,
                 'hours' => self::daysToHours($days),
             ];
-        } elseif (str_ends_with($input, 'h')) {
+        }
+
+        if (str_ends_with($input, 'h')) {
             $hours = rtrim($input, 'h');
 
             return [
                 'hours' => $hours,
                 'days'  => self::hoursToDays($hours),
             ];
-        } else {
-            // Par défaut, considérer comme des heures
-            return [
-                'hours' => $input,
-                'days'  => self::hoursToDays($input),
-            ];
         }
+
+        // Par défaut, considérer comme des heures
+        return [
+            'hours' => $input,
+            'days'  => self::hoursToDays($input),
+        ];
     }
 
     /**

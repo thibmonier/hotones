@@ -21,8 +21,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ContributorSkillController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private ContributorSkillRepository $contributorSkillRepository,
+        private readonly EntityManagerInterface $em,
+        private readonly ContributorSkillRepository $contributorSkillRepository,
         private readonly CompanyContext $companyContext
     ) {
     }

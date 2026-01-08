@@ -77,7 +77,7 @@ class CompanyVoter extends Voter
                     'user_company_id'     => $currentCompany->getId(),
                     'accessed_company_id' => $subjectCompany->getId(),
                     'attribute'           => $attribute,
-                    'entity_class'        => get_class($subject),
+                    'entity_class'        => $subject::class,
                     'entity_id'           => method_exists($subject, 'getId') ? $subject->getId() : null,
                 ]);
 
@@ -121,7 +121,7 @@ class CompanyVoter extends Voter
      */
     private function canEdit(User $user, CompanyOwnedInterface $entity): bool
     {
-        $className = get_class($entity);
+        $className = $entity::class;
 
         // Entity-specific edit permissions
         return match (true) {
@@ -184,9 +184,12 @@ class CompanyVoter extends Voter
                 }
             }
         }
-
         // CHEF_PROJET or higher can edit any timesheet
-        return $user->isChefProjet() || $user->isManager();
+        if ($user->isChefProjet()) {
+            return true;
+        }
+
+        return $user->isManager();
     }
 
     /**
@@ -212,9 +215,9 @@ class CompanyVoter extends Voter
             'user_company_name'    => $currentCompany->getName(),
             'attempted_company_id' => $attemptedCompanyId,
             'attribute'            => $attribute,
-            'entity_class'         => get_class($subject),
+            'entity_class'         => $subject::class,
             'entity_id'            => method_exists($subject, 'getId') ? $subject->getId() : null,
-            'timestamp'            => (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
+            'timestamp'            => new DateTimeImmutable()->format(DateTimeInterface::ATOM),
         ]);
     }
 }

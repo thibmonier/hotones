@@ -62,7 +62,7 @@ Exemples :
 
         try {
             // Parse la période
-            if (preg_match('/^(\d{4})$/', $period, $matches)) {
+            if (preg_match('/^(\d{4})$/', (string) $period, $matches)) {
                 // Année complète
                 $year = (int) $matches[1];
 
@@ -97,7 +97,7 @@ Exemples :
                             break;
                     }
                 }
-            } elseif (preg_match('/^(\d{4})-(\d{1,2})$/', $period, $matches)) {
+            } elseif (preg_match('/^(\d{4})-(\d{1,2})$/', (string) $period, $matches)) {
                 // Mois spécifique
                 $year  = (int) $matches[1];
                 $month = (int) $matches[2];

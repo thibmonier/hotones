@@ -26,16 +26,12 @@ class ContributorSkillType extends AbstractType
                 'attr'          => ['class' => 'form-select'],
                 'placeholder'   => 'Sélectionnez une compétence',
                 'required'      => true,
-                'query_builder' => function ($repository) {
-                    return $repository->createQueryBuilder('s')
-                        ->where('s.active = :active')
-                        ->setParameter('active', true)
-                        ->orderBy('s.category', 'ASC')
-                        ->addOrderBy('s.name', 'ASC');
-                },
-                'group_by' => function (Skill $skill) {
-                    return $skill->getCategoryLabel();
-                },
+                'query_builder' => fn ($repository) => $repository->createQueryBuilder('s')
+                    ->where('s.active = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('s.category', 'ASC')
+                    ->addOrderBy('s.name', 'ASC'),
+                'group_by' => fn (Skill $skill): string => $skill->getCategoryLabel(),
             ])
             ->add('selfAssessmentLevel', ChoiceType::class, [
                 'label'   => 'Niveau auto-évalué',

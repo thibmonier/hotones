@@ -202,7 +202,7 @@ class ContributorProgress implements CompanyOwnedInterface
     private function calculateNextLevelXp(): int
     {
         // Formule: 100 * level^1.5
-        return (int) (100 * pow($this->level, 1.5));
+        return (int) (100 * $this->level ** 1.5);
     }
 
     public function setCreatedAt(DateTimeImmutable $createdAt): static

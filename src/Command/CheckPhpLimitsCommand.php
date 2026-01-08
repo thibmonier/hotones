@@ -35,7 +35,7 @@ class CheckPhpLimitsCommand extends Command
             'tmp_dir_writable'    => is_writable(ini_get('upload_tmp_dir') ?: sys_get_temp_dir()) ? '✓ Oui' : '✗ Non',
         ];
 
-        $io->table(['Configuration', 'Valeur'], array_map(fn ($k, $v) => [$k, $v], array_keys($limits), $limits));
+        $io->table(['Configuration', 'Valeur'], array_map(fn ($k, $v): array => [$k, $v], array_keys($limits), $limits));
 
         // Vérifications
         $io->section('Vérifications');

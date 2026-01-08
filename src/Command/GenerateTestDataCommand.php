@@ -25,7 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GenerateTestDataCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager
     ) {
         parent::__construct();
     }
@@ -190,8 +190,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function generateMetrics(array $dimTimes, array $projectTypes, array $contributors): array
     {
         $metrics         = [];
-        $projectManagers = array_filter($contributors, fn ($c) => $c->getRole() === 'project_manager');
-        $salesPersons    = array_filter($contributors, fn ($c) => $c->getRole() === 'sales_person');
+        $projectManagers = array_filter($contributors, fn ($c): bool => $c->getRole() === 'project_manager');
+        $salesPersons    = array_filter($contributors, fn ($c): bool => $c->getRole() === 'sales_person');
 
         foreach ($dimTimes as $dimTime) {
             foreach ($projectTypes as $projectType) {
@@ -226,21 +226,21 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             default => 1.0
         };
 
-        $baseRevenue = rand(10000, 50000) * $seasonalFactor;
-        $baseCosts   = $baseRevenue       * (0.6 + (rand(0, 20) / 100)); // 60-80% du CA
+        $baseRevenue = random_int(10000, 50000) * $seasonalFactor;
+        $baseCosts   = $baseRevenue             * (0.6 + (random_int(0, 20) / 100)); // 60-80% du CA
 
-        $metric->setProjectCount(rand(1, 5))
-            ->setActiveProjectCount(rand(1, 3))
-            ->setCompletedProjectCount(rand(0, 2))
-            ->setOrderCount(rand(1, 8))
-            ->setPendingOrderCount(rand(0, 3))
-            ->setWonOrderCount(rand(1, 5))
-            ->setContributorCount(rand(2, 8))
-            ->setTotalRevenue(number_format((float) $baseRevenue, 2, '.', ''))
-            ->setTotalCosts(number_format((float) $baseCosts, 2, '.', ''))
-            ->setPendingRevenue(number_format((float) rand(5000, 25000), 2, '.', ''))
-            ->setTotalSoldDays(number_format((float) rand(20, 100), 2, '.', ''))
-            ->setTotalWorkedDays(number_format((float) rand(15, 95), 2, '.', ''));
+        $metric->setProjectCount(random_int(1, 5))
+            ->setActiveProjectCount(random_int(1, 3))
+            ->setCompletedProjectCount(random_int(0, 2))
+            ->setOrderCount(random_int(1, 8))
+            ->setPendingOrderCount(random_int(0, 3))
+            ->setWonOrderCount(random_int(1, 5))
+            ->setContributorCount(random_int(2, 8))
+            ->setTotalRevenue(number_format($baseRevenue, 2, '.', ''))
+            ->setTotalCosts(number_format($baseCosts, 2, '.', ''))
+            ->setPendingRevenue(number_format((float) random_int(5000, 25000), 2, '.', ''))
+            ->setTotalSoldDays(number_format((float) random_int(20, 100), 2, '.', ''))
+            ->setTotalWorkedDays(number_format((float) random_int(15, 95), 2, '.', ''));
 
         // Calcul automatique des marges
         $metric->calculateMargins();

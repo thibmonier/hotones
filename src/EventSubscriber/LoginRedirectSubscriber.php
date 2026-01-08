@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 class LoginRedirectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator
+        private readonly UrlGeneratorInterface $urlGenerator
     ) {
     }
 

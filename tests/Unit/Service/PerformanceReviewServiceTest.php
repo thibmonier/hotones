@@ -18,11 +18,11 @@ use Symfony\Component\Mailer\MailerInterface;
 
 class PerformanceReviewServiceTest extends TestCase
 {
-    private EntityManagerInterface $em;
-    private PerformanceReviewRepository $reviewRepository;
-    private ContributorRepository $contributorRepository;
-    private CompanyContext $companyContext;
-    private MailerInterface $mailer;
+    private \PHPUnit\Framework\MockObject\MockObject $em;
+    private \PHPUnit\Framework\MockObject\MockObject $reviewRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $contributorRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $companyContext;
+    private \PHPUnit\Framework\MockObject\MockObject $mailer;
     private PerformanceReviewService $service;
 
     protected function setUp(): void

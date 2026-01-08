@@ -144,17 +144,13 @@ class ProjectTaskType extends AbstractType
                 'attr'        => [
                     'class' => 'form-select',
                 ],
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
-                        ->where('c.active = :active')
-                        ->setParameter('active', true)
-                        ->orderBy('c.lastName', 'ASC')
-                        ->addOrderBy('c.firstName', 'ASC');
-                },
-                'choice_label' => function ($contributor) {
-                    return $contributor->getFirstName().' '.$contributor->getLastName();
-                },
-                'help' => 'Collaborateur responsable de cette tâche',
+                'query_builder' => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('c')
+                    ->where('c.active = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('c.lastName', 'ASC')
+                    ->addOrderBy('c.firstName', 'ASC'),
+                'choice_label' => fn ($contributor): string => $contributor->getFirstName().' '.$contributor->getLastName(),
+                'help'         => 'Collaborateur responsable de cette tâche',
             ])
             ->add('requiredProfile', EntityType::class, [
                 'class'       => Profile::class,

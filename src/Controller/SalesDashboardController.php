@@ -180,7 +180,7 @@ class SalesDashboardController extends AbstractController
         $sql    = "SELECT DISTINCT {$yearExtract} as year FROM orders ORDER BY year DESC";
         $result = $conn->executeQuery($sql)->fetchAllAssociative();
 
-        $years = array_map(fn ($row) => (int) $row['year'], $result);
+        $years = array_map(fn ($row): int => (int) $row['year'], $result);
 
         // Ajouter l'année en cours si elle n'existe pas
         $currentYear = (int) date('Y');

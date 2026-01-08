@@ -70,7 +70,7 @@ class AdminUserController extends AbstractController
 
             // roles
             $roles = $request->request->all('roles');
-            $roles = array_values(array_unique(array_filter($roles, fn ($role) => $role !== null && $role !== '')));
+            $roles = array_values(array_unique(array_filter($roles, fn ($role): bool => $role !== null && $role !== '')));
             $user->setRoles($roles);
 
             $avatarFile = $request->files->get('avatar');

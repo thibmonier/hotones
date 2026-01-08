@@ -3,24 +3,27 @@
 namespace App\Twig;
 
 use App\Enum\OrderStatus;
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class OrderExtension extends AbstractExtension
 {
+    #[Override]
     public function getFilters(): array
     {
         return [
-            new TwigFilter('order_status_label', [$this, 'getStatusLabel']),
-            new TwigFilter('order_status_badge_class', [$this, 'getStatusBadgeClass']),
+            new TwigFilter('order_status_label', $this->getStatusLabel(...)),
+            new TwigFilter('order_status_badge_class', $this->getStatusBadgeClass(...)),
         ];
     }
 
+    #[Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('order_status_badge', [$this, 'renderStatusBadge'], ['is_safe' => ['html']]),
+            new TwigFunction('order_status_badge', $this->renderStatusBadge(...), ['is_safe' => ['html']]),
         ];
     }
 

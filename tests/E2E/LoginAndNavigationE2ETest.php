@@ -37,7 +37,7 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         $client->waitFor('body');
         sleep(1); // Give time for any redirects to complete
 
-        $currentPath = parse_url($client->getCurrentURL(), PHP_URL_PATH);
+        $currentPath = parse_url((string) $client->getCurrentURL(), PHP_URL_PATH);
 
         // After successful login, should be on homepage (/) or 2FA page
         // Check that we're not still on /login (which would indicate failed auth)

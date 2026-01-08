@@ -31,7 +31,7 @@ class CjmCalculatorService
         $settings = $this->companySettingsRepository->getSettings();
 
         // Nombre total de jours dans l'année
-        $totalDays = (new DateTime("$year-12-31"))->format('z') + 1;
+        $totalDays = new DateTime("$year-12-31")->format('z') + 1;
 
         // Calculer le nombre de weekends
         $weekends = $this->countWeekendsInYear($year);
@@ -202,7 +202,7 @@ class CjmCalculatorService
     public function getCalculationReport(int $year): array
     {
         $settings       = $this->companySettingsRepository->getSettings();
-        $totalDays      = (new DateTime("$year-12-31"))->format('z') + 1;
+        $totalDays      = new DateTime("$year-12-31")->format('z') + 1;
         $weekends       = $this->countWeekendsInYear($year);
         $publicHolidays = $this->countPublicHolidaysInYear($year);
 

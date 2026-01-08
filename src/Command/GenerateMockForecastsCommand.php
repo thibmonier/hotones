@@ -103,7 +103,7 @@ class GenerateMockForecastsCommand extends Command
         // Display summary
         $io->section('Aperçu des prévisions (Scénario réaliste)');
         $tableData          = [];
-        $realisticForecasts = array_filter($forecasts, fn ($f) => $f->getScenario() === 'realistic');
+        $realisticForecasts = array_filter($forecasts, fn ($f): bool => $f->getScenario() === 'realistic');
 
         foreach ($realisticForecasts as $forecast) {
             $tableData[] = [

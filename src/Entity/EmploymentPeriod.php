@@ -45,7 +45,7 @@ class EmploymentPeriod implements CompanyOwnedInterface
     public ?string $salary = null {
         get => $this->salary;
         set {
-            $this->salary = $value !== null ? (string) $value : null;
+            $this->salary = $value ?? null;
         }
     }
 
@@ -54,7 +54,7 @@ class EmploymentPeriod implements CompanyOwnedInterface
     public ?string $cjm = null {
         get => $this->cjm;
         set {
-            $this->cjm = $value !== null ? (string) $value : null;
+            $this->cjm = $value ?? null;
         }
     }
 
@@ -63,7 +63,7 @@ class EmploymentPeriod implements CompanyOwnedInterface
     public ?string $tjm = null {
         get => $this->tjm;
         set {
-            $this->tjm = $value !== null ? (string) $value : null;
+            $this->tjm = $value ?? null;
         }
     }
 
@@ -72,7 +72,7 @@ class EmploymentPeriod implements CompanyOwnedInterface
     public string $weeklyHours = '35.00' {
         get => $this->weeklyHours;
         set {
-            $this->weeklyHours = $value !== null ? (string) $value : '35.00';
+            $this->weeklyHours = $value;
         }
     }
 
@@ -81,7 +81,7 @@ class EmploymentPeriod implements CompanyOwnedInterface
     public string $workTimePercentage = '100.00' {
         get => $this->workTimePercentage;
         set {
-            $this->workTimePercentage = $value !== null ? (string) $value : '100.00';
+            $this->workTimePercentage = $value;
         }
     }
 

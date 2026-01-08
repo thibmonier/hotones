@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use Override;
 
 class ServiceCategoryCrudController extends AbstractCrudController
 {
@@ -23,6 +24,7 @@ class ServiceCategoryCrudController extends AbstractCrudController
         return ServiceCategory::class;
     }
 
+    #[Override]
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -33,6 +35,7 @@ class ServiceCategoryCrudController extends AbstractCrudController
             ->setPaginatorPageSize(25);
     }
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
@@ -48,20 +51,20 @@ class ServiceCategoryCrudController extends AbstractCrudController
 
         yield IntegerField::new('projects.count', 'Nombre de projets')
             ->hideOnForm()
-            ->formatValue(function ($value, ServiceCategory $entity) {
-                return $entity->getProjects()->count();
-            });
+            ->formatValue(fn ($value, ServiceCategory $entity) => $entity->getProjects()->count());
 
         yield BooleanField::new('active', 'Actif')
             ->renderAsSwitch(false);
     }
 
+    #[Override]
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
             ->add(BooleanFilter::new('active', 'Actif'));
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         return $actions

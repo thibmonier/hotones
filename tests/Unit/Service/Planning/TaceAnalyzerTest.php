@@ -22,8 +22,8 @@ class TaceAnalyzerTest extends TestCase
         ?ContributorRepository $contributorRepository = null,
         ?StaffingMetricsRepository $staffingMetricsRepository = null
     ): TaceAnalyzer {
-        $contributorRepository     = $contributorRepository     ?? $this->createMock(ContributorRepository::class);
-        $staffingMetricsRepository = $staffingMetricsRepository ?? $this->createMock(StaffingMetricsRepository::class);
+        $contributorRepository     ??= $this->createMock(ContributorRepository::class);
+        $staffingMetricsRepository ??= $this->createMock(StaffingMetricsRepository::class);
 
         return new TaceAnalyzer($contributorRepository, $staffingMetricsRepository);
     }

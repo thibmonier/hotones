@@ -209,13 +209,13 @@ class ProjectTask implements CompanyOwnedInterface
         // 1. Temps passé directement sur la tâche (sans sous-tâche spécifiée)
         foreach ($this->project->getTimesheets() as $timesheet) {
             if ($timesheet->task && $timesheet->task->getId() === $this->getId() && $timesheet->subTask === null) {
-                $totalHours = bcadd($totalHours, $timesheet->hours, 2);
+                $totalHours = bcadd($totalHours, (string) $timesheet->hours, 2);
             }
         }
 
         // 2. Temps passé sur les sous-tâches
         foreach ($this->subTasks as $subTask) {
-            $totalHours = bcadd($totalHours, $subTask->getTimeSpentHours(), 2);
+            $totalHours = bcadd($totalHours, (string) $subTask->getTimeSpentHours(), 2);
         }
 
         return $totalHours;
@@ -311,7 +311,7 @@ class ProjectTask implements CompanyOwnedInterface
         if (!$this->subTasks->isEmpty()) {
             $totalFromSubTasks = '0';
             foreach ($this->subTasks as $subTask) {
-                $totalFromSubTasks = bcadd($totalFromSubTasks, $subTask->getInitialEstimatedHours(), 2);
+                $totalFromSubTasks = bcadd($totalFromSubTasks, (string) $subTask->getInitialEstimatedHours(), 2);
             }
 
             // Ajouter le temps propre de la tâche si présent
@@ -409,8 +409,8 @@ class ProjectTask implements CompanyOwnedInterface
                 $cjm         = $contributor->getCjm();
 
                 if ($cjm) {
-                    $hourlyRate = bcdiv($cjm, '8', 4); // CJM / 8h
-                    $timeCost   = bcmul($timesheet->getHours(), $hourlyRate, 2);
+                    $hourlyRate = bcdiv((string) $cjm, '8', 4); // CJM / 8h
+                    $timeCost   = bcmul((string) $timesheet->getHours(), $hourlyRate, 2);
                     $totalCost  = bcadd($totalCost, $timeCost, 2);
                 }
             }

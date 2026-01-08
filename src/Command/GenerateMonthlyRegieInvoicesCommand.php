@@ -67,7 +67,7 @@ class GenerateMonthlyRegieInvoicesCommand extends Command
         } else {
             try {
                 $month = new DateTime($monthArg.'-01');
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $io->error(sprintf('Format de date invalide : %s. Utilisez le format YYYY-MM.', $monthArg));
 
                 return Command::FAILURE;

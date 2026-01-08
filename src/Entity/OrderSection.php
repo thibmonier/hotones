@@ -133,7 +133,7 @@ class OrderSection implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->lines as $line) {
-            $total = bcadd($total, $line->getTotalAmount(), 2);
+            $total = bcadd($total, (string) $line->getTotalAmount(), 2);
         }
 
         return $total;
@@ -147,7 +147,7 @@ class OrderSection implements CompanyOwnedInterface
         $total = '0';
         foreach ($this->lines as $line) {
             if ($line->getProfile()) { // Seulement les lignes avec profil
-                $total = bcadd($total, $line->getDays(), 2);
+                $total = bcadd($total, (string) $line->getDays(), 2);
             }
         }
 
@@ -182,7 +182,7 @@ class OrderSection implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->lines as $line) {
-            $total = bcadd($total, $line->getGrossMargin(), 2);
+            $total = bcadd($total, (string) $line->getGrossMargin(), 2);
         }
 
         return $total;
@@ -195,7 +195,7 @@ class OrderSection implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->lines as $line) {
-            $total = bcadd($total, $line->getEstimatedCost(), 2);
+            $total = bcadd($total, (string) $line->getEstimatedCost(), 2);
         }
 
         return $total;
@@ -208,7 +208,7 @@ class OrderSection implements CompanyOwnedInterface
     {
         $totalRevenue = '0';
         foreach ($this->lines as $line) {
-            $totalRevenue = bcadd($totalRevenue, $line->getServiceAmount(), 2);
+            $totalRevenue = bcadd($totalRevenue, (string) $line->getServiceAmount(), 2);
         }
 
         if (bccomp($totalRevenue, '0', 2) <= 0) {

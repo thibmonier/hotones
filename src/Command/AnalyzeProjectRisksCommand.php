@@ -23,8 +23,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class AnalyzeProjectRisksCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private ProjectRiskAnalyzer $riskAnalyzer
+        private readonly EntityManagerInterface $em,
+        private readonly ProjectRiskAnalyzer $riskAnalyzer
     ) {
         parent::__construct();
     }
@@ -65,13 +65,13 @@ class AnalyzeProjectRisksCommand extends Command
         if ($criticalOnly) {
             $atRiskProjects = array_filter(
                 $atRiskProjects,
-                fn ($p) => $p['analysis']['riskLevel'] === 'critical',
+                fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
             );
             $io->writeln('Filtrage: projets critiques uniquement');
         } elseif ($minScore < 80) {
             $atRiskProjects = array_filter(
                 $atRiskProjects,
-                fn ($p) => $p['analysis']['healthScore'] < $minScore,
+                fn ($p): bool => $p['analysis']['healthScore'] < $minScore,
             );
             $io->writeln(sprintf('Filtrage: score < %d', $minScore));
         }
@@ -80,9 +80,9 @@ class AnalyzeProjectRisksCommand extends Command
         $stats = [
             'total'    => count($projects),
             'atRisk'   => count($atRiskProjects),
-            'critical' => count(array_filter($atRiskProjects, fn ($p) => $p['analysis']['riskLevel'] === 'critical')),
-            'high'     => count(array_filter($atRiskProjects, fn ($p) => $p['analysis']['riskLevel'] === 'high')),
-            'medium'   => count(array_filter($atRiskProjects, fn ($p) => $p['analysis']['riskLevel'] === 'medium')),
+            'critical' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'critical')),
+            'high'     => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'medium'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
         $io->section('Résumé');
@@ -142,7 +142,7 @@ class AnalyzeProjectRisksCommand extends Command
 
                     $table->addRow([
                         '',
-                        sprintf('<fg=%s>→ %s</>', $severityColor, strtoupper($risk['severity'])),
+                        sprintf('<fg=%s>→ %s</>', $severityColor, strtoupper((string) $risk['severity'])),
                         $risk['message'],
                         '',
                         '',

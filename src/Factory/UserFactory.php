@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Exception\CompanyContextMissingException;
 use App\Security\CompanyContext;
 use Faker\Generator;
+use Override;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 use function Zenstruck\Foundry\lazy;
@@ -17,14 +18,11 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class UserFactory extends PersistentObjectFactory
 {
-    private ?CompanyContext $companyContext;
-
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
-        CompanyContext $companyContext
+        private readonly ?CompanyContext $companyContext
     ) {
         parent::__construct();
-        $this->companyContext = $companyContext;
     }
 
     protected function defaults(): array|callable
@@ -41,7 +39,7 @@ final class UserFactory extends PersistentObjectFactory
         }
 
         return [
-            'company' => $company ?? lazy(fn () => CompanyFactory::createOne()),
+            'company' => $company ?? lazy(fn (): mixed => CompanyFactory::createOne()),
             'email'   => $faker->unique()->safeEmail(),
             'roles'   => [],
             // Set a plain password; it will be hashed in initialize().
@@ -58,6 +56,7 @@ final class UserFactory extends PersistentObjectFactory
         ];
     }
 
+    #[Override]
     public function initialize(): static
     {
         return $this

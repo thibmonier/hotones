@@ -59,7 +59,7 @@ class OrderRepository extends CompanyAwareRepository
             'total'     => 'o.totalAmount',
         ];
         $col = $map[$sortField] ?? 'o.createdAt';
-        $dir = strtoupper($sortDir) === 'ASC' ? 'ASC' : 'DESC';
+        $dir = strtoupper((string) $sortDir) === 'ASC' ? 'ASC' : 'DESC';
         $qb->orderBy($col, $dir);
 
         if ($col !== 'o.createdAt') {

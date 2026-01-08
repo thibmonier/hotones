@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
 {
-    public function testClientCreationAndProperties()
+    public function testClientCreationAndProperties(): void
     {
         $client = new Client();
 
@@ -23,7 +23,7 @@ class ClientTest extends TestCase
         $this->assertCount(0, $client->getContacts());
     }
 
-    public function testClientPropertiesSettersAndGetters()
+    public function testClientPropertiesSettersAndGetters(): void
     {
         $client = new Client();
 
@@ -42,7 +42,7 @@ class ClientTest extends TestCase
         $this->assertEquals('manual', $client->getServiceLevelMode());
     }
 
-    public function testClientContactsManagement()
+    public function testClientContactsManagement(): void
     {
         $client   = new Client();
         $contact1 = new ClientContact();
@@ -63,7 +63,7 @@ class ClientTest extends TestCase
         $this->assertTrue($client->getContacts()->contains($contact2));
     }
 
-    public function testClientStringRepresentation()
+    public function testClientStringRepresentation(): void
     {
         $client = new Client();
         $client->setName('Test Company');
@@ -71,7 +71,7 @@ class ClientTest extends TestCase
         $this->assertEquals('Test Company', (string) $client);
     }
 
-    public function testClientServiceLevelValidation()
+    public function testClientServiceLevelValidation(): void
     {
         $client = new Client();
 

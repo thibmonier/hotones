@@ -6,6 +6,7 @@ use App\Entity\ProjectTask;
 use App\Exception\CompanyContextMissingException;
 use App\Security\CompanyContext;
 use Faker\Generator;
+use Override;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -13,12 +14,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ProjectTaskFactory extends PersistentObjectFactory
 {
-    private ?CompanyContext $companyContext;
-
-    public function __construct(CompanyContext $companyContext)
+    public function __construct(private readonly ?CompanyContext $companyContext)
     {
         parent::__construct();
-        $this->companyContext = $companyContext;
     }
 
     protected function defaults(): array|callable
@@ -72,6 +70,7 @@ final class ProjectTaskFactory extends PersistentObjectFactory
         ];
     }
 
+    #[Override]
     public function initialize(): static
     {
         return $this->afterInstantiate(function (ProjectTask $task): void {

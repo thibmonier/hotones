@@ -15,7 +15,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class RecalculateClientServiceLevelCommandTest extends TestCase
 {
-    private ClientServiceLevelCalculator $calculator;
+    private \PHPUnit\Framework\MockObject\MockObject $calculator;
     private RecalculateClientServiceLevelCommand $command;
     private CommandTester $commandTester;
 

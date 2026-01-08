@@ -19,8 +19,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class WorkloadPredictionController extends AbstractController
 {
     public function __construct(
-        private WorkloadPredictionService $predictionService,
-        private EntityManagerInterface $entityManager
+        private readonly WorkloadPredictionService $predictionService,
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
@@ -32,8 +32,8 @@ class WorkloadPredictionController extends AbstractController
         $contributorIds = $request->query->all('contributors');
 
         // Convertir en entiers
-        $profileIds     = array_map('intval', array_filter($profileIds, fn ($v) => $v !== null && $v !== ''));
-        $contributorIds = array_map('intval', array_filter($contributorIds, fn ($v) => $v !== null && $v !== ''));
+        $profileIds     = array_map(intval(...), array_filter($profileIds, fn ($v): bool => $v !== null && $v !== ''));
+        $contributorIds = array_map(intval(...), array_filter($contributorIds, fn ($v): bool => $v !== null && $v !== ''));
 
         // Analyser le pipeline avec filtres
         $analysis = $this->predictionService->analyzePipeline($profileIds, $contributorIds);

@@ -18,7 +18,7 @@ class LeadMagnetScheduleProvider implements ScheduleProviderInterface
 {
     public function getSchedule(): Schedule
     {
-        return (new Schedule())
+        return new Schedule()
             // Envoi quotidien des emails de nurturing à 9h du matin
             // Cela donne le temps aux leads de télécharger le guide avant le premier email
             ->add(

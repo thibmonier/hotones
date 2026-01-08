@@ -116,24 +116,26 @@ class CspReportController extends AbstractController
 
         $violations = [];
         foreach ($lines as $line) {
-            if (str_contains($line, 'CSP Violation detected')) {
-                // Parser la ligne de log pour extraire les infos
-                if (preg_match('/\[(.*?)\].*CSP Violation detected.*context:\s*({.*})/s', $line, $matches)) {
-                    try {
-                        $context      = json_decode($matches[2], true, 512, JSON_THROW_ON_ERROR);
-                        $violations[] = [
-                            'timestamp'          => $matches[1],
-                            'document_uri'       => $context['document_uri']       ?? 'unknown',
-                            'violated_directive' => $context['violated_directive'] ?? 'unknown',
-                            'blocked_uri'        => $context['blocked_uri']        ?? 'unknown',
-                            'source_file'        => $context['source_file']        ?? null,
-                            'line_number'        => $context['line_number']        ?? null,
-                        ];
-                    } catch (JsonException $e) {
-                        // Ignorer les lignes mal formées
-                        continue;
-                    }
-                }
+            if (!str_contains($line, 'CSP Violation detected')) {
+                continue;
+            }
+            // Parser la ligne de log pour extraire les infos
+            if (!preg_match('/\[(.*?)\].*CSP Violation detected.*context:\s*({.*})/s', $line, $matches)) {
+                continue;
+            }
+            try {
+                $context      = json_decode($matches[2], true, 512, JSON_THROW_ON_ERROR);
+                $violations[] = [
+                    'timestamp'          => $matches[1],
+                    'document_uri'       => $context['document_uri']       ?? 'unknown',
+                    'violated_directive' => $context['violated_directive'] ?? 'unknown',
+                    'blocked_uri'        => $context['blocked_uri']        ?? 'unknown',
+                    'source_file'        => $context['source_file']        ?? null,
+                    'line_number'        => $context['line_number']        ?? null,
+                ];
+            } catch (JsonException) {
+                // Ignorer les lignes mal formées
+                continue;
             }
         }
 

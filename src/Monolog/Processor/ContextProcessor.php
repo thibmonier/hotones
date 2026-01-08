@@ -23,9 +23,9 @@ class ContextProcessor implements ProcessorInterface
     private ?string $requestId = null;
 
     public function __construct(
-        private RequestStack $requestStack,
-        private Security $security,
-        private string $environment,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly string $environment,
     ) {
     }
 

@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -37,7 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'idx_bu_parent', columns: ['parent_id'])]
 #[ORM\Index(name: 'idx_bu_active', columns: ['active'])]
 #[ORM\HasLifecycleCallbacks]
-class BusinessUnit implements CompanyOwnedInterface
+class BusinessUnit implements CompanyOwnedInterface, Stringable
 {
     // ===========================
     // Primary Key

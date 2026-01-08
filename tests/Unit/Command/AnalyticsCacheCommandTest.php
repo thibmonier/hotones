@@ -15,7 +15,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class AnalyticsCacheCommandTest extends TestCase
 {
-    private AnalyticsCacheService $cacheService;
+    private \PHPUnit\Framework\MockObject\MockObject $cacheService;
     private AnalyticsCacheCommand $command;
     private CommandTester $commandTester;
 
@@ -48,7 +48,7 @@ class AnalyticsCacheCommandTest extends TestCase
         $this->cacheService
             ->expects($this->once())
             ->method('warmup')
-            ->with($this->isType('array'));
+            ->with($this->isArray());
 
         $exitCode = $this->commandTester->execute([
             '--warmup' => true,
@@ -159,7 +159,7 @@ class AnalyticsCacheCommandTest extends TestCase
         $this->cacheService
             ->expects($this->once())
             ->method('warmup')
-            ->willReturnCallback(function ($metrics) use (&$capturedMetrics) {
+            ->willReturnCallback(function ($metrics) use (&$capturedMetrics): void {
                 $capturedMetrics = $metrics;
             });
 

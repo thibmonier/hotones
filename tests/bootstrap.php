@@ -9,7 +9,7 @@ $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = 'test';
 putenv('APP_ENV=test');
 
 if (method_exists(Dotenv::class, 'bootEnv')) {
-    (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+    new Dotenv()->bootEnv(dirname(__DIR__).'/.env');
 }
 
 // Override DATABASE_URL for tests to use SQLite (no Docker dependency)

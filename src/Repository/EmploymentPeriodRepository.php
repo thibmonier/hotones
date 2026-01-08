@@ -272,7 +272,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
             return [];
         }
 
-        $contributorIds = array_map(fn (Contributor $c) => $c->getId(), $contributors);
+        $contributorIds = array_map(fn (Contributor $c): ?int => $c->getId(), $contributors);
 
         return $this->createCompanyQueryBuilder('ep')
             ->andWhere('ep.contributor IN (:contributorIds)')

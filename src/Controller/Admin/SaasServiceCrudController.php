@@ -20,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use Override;
 
 class SaasServiceCrudController extends AbstractCrudController
 {
@@ -28,6 +29,7 @@ class SaasServiceCrudController extends AbstractCrudController
         return SaasService::class;
     }
 
+    #[Override]
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -38,6 +40,7 @@ class SaasServiceCrudController extends AbstractCrudController
             ->setPaginatorPageSize(25);
     }
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
@@ -49,12 +52,10 @@ class SaasServiceCrudController extends AbstractCrudController
 
         yield AssociationField::new('provider', 'Fournisseur')
             ->setRequired(false)
-            ->setQueryBuilder(function ($qb) {
-                return $qb
-                    ->andWhere('entity.active = :active')
-                    ->setParameter('active', true)
-                    ->orderBy('entity.name', 'ASC');
-            })
+            ->setQueryBuilder(fn ($qb) => $qb
+                ->andWhere('entity.active = :active')
+                ->setParameter('active', true)
+                ->orderBy('entity.name', 'ASC'))
             ->setHelp('Laisser vide si souscription directe');
 
         yield TextField::new('category', 'Catégorie')
@@ -92,9 +93,7 @@ class SaasServiceCrudController extends AbstractCrudController
 
         yield IntegerField::new('subscriptions.count', 'Abonnements')
             ->hideOnForm()
-            ->formatValue(function ($value, SaasService $entity) {
-                return $entity->getSubscriptions()->count();
-            });
+            ->formatValue(fn ($value, SaasService $entity) => $entity->getSubscriptions()->count());
 
         yield BooleanField::new('active', 'Actif')
             ->renderAsSwitch(false);
@@ -108,6 +107,7 @@ class SaasServiceCrudController extends AbstractCrudController
             ->setFormat('dd/MM/yyyy HH:mm');
     }
 
+    #[Override]
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
@@ -116,6 +116,7 @@ class SaasServiceCrudController extends AbstractCrudController
             ->add(BooleanFilter::new('active', 'Actif'));
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         return $actions

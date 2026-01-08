@@ -21,9 +21,9 @@ use Psr\Log\LoggerInterface;
 
 class MetricsCalculationServiceTest extends TestCase
 {
-    private EntityManagerInterface|MockObject $entityManager;
-    private CompanyContext|MockObject $companyContext;
-    private LoggerInterface|MockObject $logger;
+    private MockObject $entityManager;
+    private MockObject $companyContext;
+    private MockObject $logger;
     private MetricsCalculationService $service;
 
     protected function setUp(): void
@@ -248,9 +248,7 @@ class MetricsCalculationServiceTest extends TestCase
             ->method('error')
             ->with(
                 'Erreur lors du calcul des métriques',
-                $this->callback(function ($context) use ($errorMessage) {
-                    return isset($context['error']) && $context['error'] === $errorMessage;
-                }),
+                $this->callback(fn ($context): bool => isset($context['error']) && $context['error'] === $errorMessage),
             );
 
         $this->expectException(Exception::class);

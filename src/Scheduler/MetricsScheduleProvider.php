@@ -19,7 +19,7 @@ class MetricsScheduleProvider implements ScheduleProviderInterface
             ->withDescription('Recalcul quotidien des métriques');
 
         $schedule->add(
-            (new RecurringCommand($trigger, 'app:metrics:dispatch', ['--date' => 'today', '--granularity' => 'daily']))
+            new RecurringCommand($trigger, 'app:metrics:dispatch', ['--date' => 'today', '--granularity' => 'daily'])
                 ->withName('metrics:daily'),
         );
 

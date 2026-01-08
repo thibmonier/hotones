@@ -332,7 +332,7 @@ class Order implements CompanyOwnedInterface
         $total     = $this->calculateTotalFromSections();
         $scheduled = '0.00';
         foreach ($this->paymentSchedules as $s) {
-            $scheduled = bcadd($scheduled, $s->computeAmount($total), 2);
+            $scheduled = bcadd($scheduled, (string) $s->computeAmount($total), 2);
         }
 
         return [bccomp($scheduled, $total, 2) === 0, $scheduled];
@@ -342,7 +342,7 @@ class Order implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->sections as $section) {
-            $total = bcadd($total, $section->getTotalAmount(), 2);
+            $total = bcadd($total, (string) $section->getTotalAmount(), 2);
         }
 
         return $total;
@@ -423,7 +423,7 @@ class Order implements CompanyOwnedInterface
         $total = '0.00';
         foreach ($this->expenseReports as $expense) {
             if ($expense->getStatus() === ExpenseReport::STATUS_VALIDATED || $expense->getStatus() === ExpenseReport::STATUS_PAID) {
-                $total = bcadd($total, $expense->getAmountTTC(), 2);
+                $total = bcadd($total, (string) $expense->getAmountTTC(), 2);
             }
         }
 

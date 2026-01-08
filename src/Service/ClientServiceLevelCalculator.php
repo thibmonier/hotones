@@ -14,9 +14,9 @@ use function in_array;
 class ClientServiceLevelCalculator
 {
     // Paramètres configurables (à externaliser plus tard dans la config)
-    private const TOP_VIP_RANK      = 20;  // Top 20 = VIP
-    private const TOP_PRIORITY_RANK = 50;  // Top 50 = Prioritaire
-    private const LOW_THRESHOLD     = 5000; // < 5000€ = Basse priorité
+    private const int TOP_VIP_RANK      = 20;  // Top 20 = VIP
+    private const int TOP_PRIORITY_RANK = 50;  // Top 50 = Prioritaire
+    private const int LOW_THRESHOLD     = 5000; // < 5000€ = Basse priorité
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -88,16 +88,23 @@ class ClientServiceLevelCalculator
 
         $total = 0.0;
         foreach ($allOrders as $order) {
-            // Vérifier que l'order appartient au bon client
-            if ($order->getProject() && $order->getProject()->getClient() === $client) {
-                // Vérifier le statut (signe ou gagne)
-                if (in_array($order->getStatus(), ['signe', 'gagne'], true)) {
-                    // Filtrer par année (date de validation)
-                    if ($order->getValidatedAt() && (int) $order->getValidatedAt()->format('Y') === $year) {
-                        $total += (float) $order->getTotalAmount();
-                    }
-                }
+            if (!$order->getProject()) {
+                continue;
             }
+            if (!($order->getProject()->getClient() === $client)) {
+                continue;
+            }
+            // Vérifier le statut (signe ou gagne)
+            if (!in_array($order->getStatus(), ['signe', 'gagne'], true)) {
+                continue;
+            }
+            if (!$order->getValidatedAt()) {
+                continue;
+            }
+            if (!((int) $order->getValidatedAt()->format('Y') === $year)) {
+                continue;
+            }
+            $total += (float) $order->getTotalAmount();
         }
 
         return $total;

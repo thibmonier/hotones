@@ -71,7 +71,7 @@ class DebugTaskAssignmentCommand extends Command
         // Récupérer les tâches assignées
         $tasks = $this->em->createQueryBuilder()
             ->select('t', 'p')
-            ->from('App\Entity\ProjectTask', 't')
+            ->from(\App\Entity\ProjectTask::class, 't')
             ->join('t.project', 'p')
             ->where('t.assignedContributor = :contributor')
             ->setParameter('contributor', $contributor)
@@ -112,8 +112,8 @@ class DebugTaskAssignmentCommand extends Command
 
         $results = $this->em->createQueryBuilder()
             ->select('c.id', 'c.firstName', 'c.lastName', 'c.active', 'COUNT(t.id) as taskCount')
-            ->from('App\Entity\Contributor', 'c')
-            ->leftJoin('App\Entity\ProjectTask', 't', 'WITH', 't.assignedContributor = c.id')
+            ->from(Contributor::class, 'c')
+            ->leftJoin(\App\Entity\ProjectTask::class, 't', 'WITH', 't.assignedContributor = c.id')
             ->groupBy('c.id')
             ->having('COUNT(t.id) > 0')
             ->orderBy('taskCount', 'DESC')

@@ -50,11 +50,11 @@ class PerformanceReviewController extends AbstractController
 
         // Apply filters
         if ($year) {
-            $reviews = array_filter($reviews, fn ($review) => $review->getYear() === $year);
+            $reviews = array_filter($reviews, fn ($review): bool => $review->getYear() === $year);
         }
 
         if ($status) {
-            $reviews = array_filter($reviews, fn ($review) => $review->getStatus() === $status);
+            $reviews = array_filter($reviews, fn ($review): bool => $review->getStatus() === $status);
         }
 
         // Get statistics for admin/manager
@@ -191,15 +191,13 @@ class PerformanceReviewController extends AbstractController
 
             // Parse objectives
             $objectives = [];
-            if (!empty($objectivesData)) {
-                foreach ($objectivesData as $objective) {
-                    if (!empty($objective['title'])) {
-                        $objectives[] = [
-                            'title'       => $objective['title'],
-                            'description' => $objective['description'] ?? '',
-                            'deadline'    => $objective['deadline']    ?? null,
-                        ];
-                    }
+            foreach ($objectivesData as $objective) {
+                if (!empty($objective['title'])) {
+                    $objectives[] = [
+                        'title'       => $objective['title'],
+                        'description' => $objective['description'] ?? '',
+                        'deadline'    => $objective['deadline']    ?? null,
+                    ];
                 }
             }
 

@@ -14,9 +14,9 @@ use App\Repository\SkillRepository;
 class SkillGapAnalyzer
 {
     public function __construct(
-        private SkillRepository $skillRepository,
-        private ContributorSkillRepository $contributorSkillRepository,
-        private ProjectRepository $projectRepository
+        private readonly SkillRepository $skillRepository,
+        private readonly ContributorSkillRepository $contributorSkillRepository,
+        private readonly ProjectRepository $projectRepository
     ) {
     }
 
@@ -71,7 +71,7 @@ class SkillGapAnalyzer
         }
 
         // Trier les gaps par sévérité décroissante
-        usort($gaps, fn ($a, $b) => $b['gap'] <=> $a['gap']);
+        usort($gaps, fn ($a, $b): int => $b['gap'] <=> $a['gap']);
 
         return [
             'gaps'     => $gaps,
@@ -79,7 +79,7 @@ class SkillGapAnalyzer
             'balanced' => $balanced,
             'summary'  => [
                 'totalGaps'     => count($gaps),
-                'criticalGaps'  => count(array_filter($gaps, fn ($g) => $g['severity'] === 'critical')),
+                'criticalGaps'  => count(array_filter($gaps, fn ($g): bool => $g['severity'] === 'critical')),
                 'totalSurplus'  => count($surplus),
                 'totalBalanced' => count($balanced),
             ],
@@ -228,8 +228,8 @@ class SkillGapAnalyzer
             // Rechercher si la compétence correspond à une technologie du projet
             foreach ($project->getTechnologies() as $technology) {
                 if (
-                    stripos($technology->getName(), $skill->getName())    !== false
-                    || stripos($skill->getName(), $technology->getName()) !== false
+                    stripos((string) $technology->getName(), (string) $skill->getName())    !== false
+                    || stripos((string) $skill->getName(), (string) $technology->getName()) !== false
                 ) {
                     ++$demandCount;
                     break;
@@ -290,7 +290,7 @@ class SkillGapAnalyzer
         }
 
         // Vérifier si certaines compétences ont peu de contributeurs disponibles
-        $lowAvailability = array_filter($requiredSkills, fn ($rs) => $rs['availableCount'] > 0 && $rs['availableCount'] <= 2);
+        $lowAvailability = array_filter($requiredSkills, fn ($rs): bool => $rs['availableCount'] > 0 && $rs['availableCount'] <= 2);
         if (count($lowAvailability) > 0) {
             $recommendations[] = [
                 'type'     => 'warning',

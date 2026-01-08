@@ -120,7 +120,7 @@ class SubscriptionController extends AbstractController
             'category'        => 'srv.category',
         ];
         $sortField = $validSortFields[$sort] ?? 's.nextRenewalDate';
-        $sortDir   = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $sortDir   = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($sortField, $sortDir);
 
         $pagination = $paginator->paginate(

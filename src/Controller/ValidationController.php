@@ -143,7 +143,7 @@ class ValidationController extends AbstractController
         $cleaned = preg_replace('/[\s\-\.\(\)]/', '', $phone);
 
         // Validate French phone number format
-        if (!preg_match('/^(\+33|0)[1-9]\d{8}$/', $cleaned)) {
+        if (!preg_match('/^(\+33|0)[1-9]\d{8}$/', (string) $cleaned)) {
             return new JsonResponse([
                 'valid'   => false,
                 'message' => 'Format de téléphone invalide (ex: 01 23 45 67 89)',

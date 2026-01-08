@@ -131,7 +131,7 @@ class PredictionsController extends AbstractController
      */
     private function getAlertStats(): array
     {
-        $sevenDaysAgo = (new DateTimeImmutable())->modify('-7 days');
+        $sevenDaysAgo = new DateTimeImmutable()->modify('-7 days');
 
         // Count alerts by type in last 7 days using query builder
         $budgetAlerts = $this->notificationRepository->createQueryBuilder('n')
@@ -184,7 +184,7 @@ class PredictionsController extends AbstractController
      */
     private function getRecentAlerts(): array
     {
-        $sevenDaysAgo = (new DateTimeImmutable())->modify('-7 days');
+        $sevenDaysAgo = new DateTimeImmutable()->modify('-7 days');
 
         return $this->notificationRepository->createQueryBuilder('n')
             ->where('n.type IN (:types)')

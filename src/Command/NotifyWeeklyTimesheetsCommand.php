@@ -92,7 +92,7 @@ final class NotifyWeeklyTimesheetsCommand extends Command
                 $pref      = $this->prefs->findByUserAndEventType($user, NotificationType::TIMESHEET_MISSING_WEEKLY);
                 $sendEmail = $pref ? $pref->isEmail() : true;
                 if ($sendEmail && $user->getEmail()) {
-                    $email = (new \Symfony\Component\Mime\Email())
+                    $email = new \Symfony\Component\Mime\Email()
                         ->to($user->getEmail())
                         ->subject('Rappel – Saisie des temps (hebdomadaire)')
                         ->text(sprintf(
@@ -131,15 +131,13 @@ final class NotifyWeeklyTimesheetsCommand extends Command
     {
         // Vendredi 12:00:00 de la semaine courante
         $dow           = (int) $date->format('N'); // 1..7
-        $deltaToFriday = 5 - $dow; // 5 = vendredi
-        $target        = $date->setTime(12, 0, 0)->add(new DateInterval('P'.max(0, $deltaToFriday).'D'));
+        $deltaToFriday = 5 - $dow;
         // Si on est déjà après vendredi midi, rester sur vendredi de cette semaine
         if ($deltaToFriday < 0) {
-            // revenir au vendredi de cette semaine
-            $target = $date->setTime(12, 0, 0)->sub(new DateInterval('P'.abs($deltaToFriday).'D'));
+            return $date->setTime(12, 0, 0)->sub(new DateInterval('P'.abs($deltaToFriday).'D'));
         }
 
-        return $target;
+        return $date->setTime(12, 0, 0)->add(new DateInterval('P'.max(0, $deltaToFriday).'D'));
     }
 
     private function getActiveEmploymentPeriod(Contributor $c, DateTimeInterface $at): ?EmploymentPeriod

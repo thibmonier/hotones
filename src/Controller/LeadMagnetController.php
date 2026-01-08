@@ -88,7 +88,7 @@ class LeadMagnetController extends AbstractController
             try {
                 $this->leadMagnetMailer->sendGuideKpisEmail($leadCapture);
                 $this->addFlash('success', 'Un email avec le lien de téléchargement vous a été envoyé !');
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Log l'erreur mais ne bloque pas l'utilisateur
                 $this->addFlash('warning', 'Votre inscription est confirmée ! Si vous ne recevez pas l\'email, vérifiez vos spams.');
             }

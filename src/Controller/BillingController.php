@@ -26,7 +26,7 @@ class BillingController extends AbstractController
     #[IsGranted('ROLE_COMPTA')]
     public function index(Request $request, TimesheetRepository $timesheets, BillingMarkerRepository $markersRepo): Response
     {
-        $monthParam = (string) ($request->query->get('month') ?? (new DateTime('first day of this month'))->format('Y-m'));
+        $monthParam = (string) ($request->query->get('month') ?? new DateTime('first day of this month')->format('Y-m'));
         $month      = DateTime::createFromFormat('Y-m-d', $monthParam.'-01') ?: new DateTime('first day of this month');
         $start      = (clone $month)->modify('first day of this month')->setTime(0, 0, 0);
         $end        = (clone $month)->modify('last day of this month')->setTime(23, 59, 59);
@@ -88,7 +88,7 @@ class BillingController extends AbstractController
         }
 
         $entries = array_merge($forfaitEntries, $regieEntries);
-        usort($entries, fn ($a, $b) => ($a['date'] <=> $b['date']) ?: ($a['project']->getName() <=> $b['project']->getName()));
+        usort($entries, fn ($a, $b): int => ($a['date'] <=> $b['date']) ?: ($a['project']->getName() <=> $b['project']->getName()));
 
         // Récupérer les marqueurs existants pour le mois
         $monthMarkers = $markersRepo->getMonthMarkers($start, $end);

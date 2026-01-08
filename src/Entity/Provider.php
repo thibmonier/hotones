@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'saas_distribution_providers')]
 #[ORM\Index(name: 'idx_provider_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
-class Provider implements CompanyOwnedInterface
+class Provider implements CompanyOwnedInterface, Stringable
 {
     // Types de providers
     public const TYPE_APP_STORE         = 'app_store';

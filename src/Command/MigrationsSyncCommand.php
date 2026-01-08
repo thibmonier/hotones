@@ -73,12 +73,12 @@ HELP
 
         // Calculate pending migrations
         $executedVersionStrings = array_map(
-            fn ($executionResult) => (string) $executionResult->getVersion(),
+            fn ($executionResult): string => (string) $executionResult->getVersion(),
             $executedVersions->getItems(),
         );
 
         $availableVersionStrings = array_map(
-            fn ($version) => (string) $version->getVersion(),
+            fn ($version): string => (string) $version->getVersion(),
             $availableMigrations->getItems(),
         );
 

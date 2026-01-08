@@ -80,7 +80,7 @@ class ContributorController extends AbstractController
             // Utiliser une sous-requête pour exclure les collaborateurs avec des périodes en cours
             $subQuery = $this->entityManager->createQueryBuilder()
                 ->select('IDENTITY(ep2.contributor)')
-                ->from('App\Entity\EmploymentPeriod', 'ep2')
+                ->from(\App\Entity\EmploymentPeriod::class, 'ep2')
                 ->where('ep2.startDate <= :today')
                 ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
                 ->getDQL();
@@ -97,7 +97,7 @@ class ContributorController extends AbstractController
             'active' => ['c.active'],
         ];
         $columns   = $map[$sort] ?? ['c.lastName', 'c.firstName'];
-        $direction = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $direction = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
         $first     = true;
         foreach ($columns as $col) {
             if ($first) {
@@ -230,7 +230,7 @@ class ContributorController extends AbstractController
         // Agréger les ressources disponibles par compétence et niveau
         $skillsData = $em->createQueryBuilder()
             ->select('s.id', 's.name', 'cs.managerAssessmentLevel as level', 'COUNT(cs.id) as count')
-            ->from('App\Entity\ContributorSkill', 'cs')
+            ->from(\App\Entity\ContributorSkill::class, 'cs')
             ->join('cs.skill', 's')
             ->join('cs.contributor', 'c')
             ->where('c.active = true')
@@ -415,7 +415,7 @@ class ContributorController extends AbstractController
             // Utiliser une sous-requête pour exclure les collaborateurs avec des périodes en cours
             $subQuery = $this->entityManager->createQueryBuilder()
                 ->select('IDENTITY(ep2.contributor)')
-                ->from('App\Entity\EmploymentPeriod', 'ep2')
+                ->from(\App\Entity\EmploymentPeriod::class, 'ep2')
                 ->where('ep2.startDate <= :today')
                 ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
                 ->getDQL();
@@ -459,7 +459,7 @@ class ContributorController extends AbstractController
         // Génération CSV sécurisée
         $handle = fopen('php://temp', 'r+');
         foreach ($rows as $r) {
-            fputcsv($handle, $r);
+            fputcsv($handle, $r, escape: '\\');
         }
         rewind($handle);
         $csv = "\xEF\xBB\xBF".stream_get_contents($handle);

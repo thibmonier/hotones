@@ -158,7 +158,7 @@ class CreateTestUsersCommand extends Command
             $io->newLine();
             $io->table(
                 ['Email', 'Name', 'Roles', 'Contributor ID'],
-                array_map(fn ($user) => array_values($user), $createdUsers),
+                array_map(array_values(...), $createdUsers),
             );
 
             $io->newLine();

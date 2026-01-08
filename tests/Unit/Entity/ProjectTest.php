@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ProjectTest extends TestCase
 {
-    public function testProjectCreationAndDefaultValues()
+    public function testProjectCreationAndDefaultValues(): void
     {
         $project = new Project();
         $project->setName('Test Project'); // Name is required
@@ -31,7 +31,7 @@ class ProjectTest extends TestCase
         $this->assertNull($project->getProjectManager());
     }
 
-    public function testProjectPropertiesSettersAndGetters()
+    public function testProjectPropertiesSettersAndGetters(): void
     {
         $project = new Project();
         $client  = new Client();
@@ -65,7 +65,7 @@ class ProjectTest extends TestCase
         $this->assertSame($pm, $project->getProjectManager());
     }
 
-    public function testProjectStatusValidation()
+    public function testProjectStatusValidation(): void
     {
         $project = new Project();
 
@@ -77,7 +77,7 @@ class ProjectTest extends TestCase
         }
     }
 
-    public function testProjectTypeValidation()
+    public function testProjectTypeValidation(): void
     {
         $project = new Project();
 
@@ -89,7 +89,7 @@ class ProjectTest extends TestCase
         }
     }
 
-    public function testProjectDateManagement()
+    public function testProjectDateManagement(): void
     {
         $project   = new Project();
         $startDate = new DateTime('2023-01-15');
@@ -108,7 +108,7 @@ class ProjectTest extends TestCase
         $this->assertNull($project->getEndDate());
     }
 
-    public function testProjectStringRepresentation()
+    public function testProjectStringRepresentation(): void
     {
         $project = new Project();
         $project->setName('Test Project');
@@ -117,7 +117,7 @@ class ProjectTest extends TestCase
         $this->assertEquals('Test Project', $project->getName());
     }
 
-    public function testProjectClientAssociation()
+    public function testProjectClientAssociation(): void
     {
         $project = new Project();
         $client  = new Client();

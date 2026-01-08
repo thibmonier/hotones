@@ -27,7 +27,7 @@ class AnalyticsScheduleProvider implements ScheduleProviderInterface
     {
         $currentYear = (int) date('Y');
 
-        return (new Schedule())
+        return new Schedule()
             // Recalcul quotidien des métriques mensuelles à 6h du matin
             ->add(
                 RecurringMessage::cron('0 6 * * *', new RecalculateMetricsMessage((string) $currentYear, 'monthly')),

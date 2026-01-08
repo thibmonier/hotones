@@ -12,10 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectRiskAnalyzer
 {
-    private const WEIGHT_BUDGET   = 0.40;    // 40%
-    private const WEIGHT_TIMELINE = 0.30;  // 30%
-    private const WEIGHT_VELOCITY = 0.20;  // 20%
-    private const WEIGHT_QUALITY  = 0.10;   // 10%
+    private const float WEIGHT_BUDGET   = 0.40;    // 40%
+    private const float WEIGHT_TIMELINE = 0.30;  // 30%
+    private const float WEIGHT_VELOCITY = 0.20;  // 20%
+    private const float WEIGHT_QUALITY  = 0.10;   // 10%
 
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -283,9 +283,7 @@ class ProjectRiskAnalyzer
         $now         = new DateTime();
         $twoWeeksAgo = (clone $now)->modify('-14 days');
 
-        $recentTimesheets = $timesheets->filter(function ($timesheet) use ($twoWeeksAgo) {
-            return $timesheet->getDate() >= $twoWeeksAgo;
-        });
+        $recentTimesheets = $timesheets->filter(fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
 
         if ($recentTimesheets->count() === 0) {
             return [
@@ -312,7 +310,7 @@ class ProjectRiskAnalyzer
         }
 
         // Vérifier si le projet est bloqué (0% ou 100% sans changement de statut)
-        if ($progress === 0.0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
+        if ($progress === 0.0 && $project->getStartDate() < new DateTime()->modify('-1 month')) {
             return [
                 'type'     => 'not_started',
                 'severity' => 'high',
@@ -375,9 +373,7 @@ class ProjectRiskAnalyzer
         }
 
         // Trier par score de santé croissant (les plus à risque en premier)
-        usort($atRiskProjects, function ($a, $b) {
-            return $a['analysis']['healthScore'] <=> $b['analysis']['healthScore'];
-        });
+        usort($atRiskProjects, fn ($a, $b): int => $a['analysis']['healthScore'] <=> $b['analysis']['healthScore']);
 
         return $atRiskProjects;
     }
@@ -541,9 +537,7 @@ class ProjectRiskAnalyzer
         $now         = new DateTime();
         $twoWeeksAgo = (clone $now)->modify('-14 days');
 
-        $recentTimesheets = $timesheets->filter(function ($timesheet) use ($twoWeeksAgo) {
-            return $timesheet->getDate() >= $twoWeeksAgo;
-        });
+        $recentTimesheets = $timesheets->filter(fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
 
         if ($project->getStatus() === 'in_progress' && $recentTimesheets->count() === 0) {
             return 50; // No recent activity
@@ -551,7 +545,7 @@ class ProjectRiskAnalyzer
 
         // Check progress velocity (has progress been made?)
         $progress = (float) $project->getGlobalProgress();
-        if ($progress === 0.0 && $project->getStartDate() < (new DateTime())->modify('-1 month')) {
+        if ($progress === 0.0 && $project->getStartDate() < new DateTime()->modify('-1 month')) {
             return 40; // Started but no progress
         }
 

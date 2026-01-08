@@ -109,7 +109,7 @@ class ContributorSatisfactionReminderCommand extends Command
 
     private function sendReminder($contributor, int $year, int $month): void
     {
-        $email = (new Email())
+        $email = new Email()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to(new Address($contributor->getEmail(), $contributor->getFullName()))
             ->subject(sprintf('Rappel : Satisfaction mensuelle - %s %d', $this->getMonthLabel($month), $year))

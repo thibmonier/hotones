@@ -80,7 +80,7 @@ class ClientController extends AbstractController
         // Tri
         $validSortFields = ['name' => 'c.name', 'serviceLevel' => 'c.serviceLevel'];
         $sortField       = $validSortFields[$sort] ?? 'c.name';
-        $sortDir         = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $sortDir         = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($sortField, $sortDir);
 
         // Pagination

@@ -19,7 +19,7 @@ class NotificationsScheduleProvider implements ScheduleProviderInterface
             ->withDescription('Rappel hebdomadaire de saisie des temps');
 
         $schedule->add(
-            (new RecurringCommand($trigger, 'app:notify:timesheets-weekly'))
+            new RecurringCommand($trigger, 'app:notify:timesheets-weekly')
                 ->withName('notifications:timesheets-weekly'),
         );
 

@@ -163,7 +163,7 @@ class NpsSurvey implements CompanyOwnedInterface
         $this->sentAt = new DateTime();
         $this->token  = bin2hex(random_bytes(32));
         // Par défaut, expire après 30 jours
-        $this->expiresAt = (new DateTime())->modify('+30 days');
+        $this->expiresAt = new DateTime()->modify('+30 days');
     }
 
     public function getId(): ?int

@@ -11,14 +11,14 @@ class OrderLineTest extends TestCase
 {
     private function createServiceLine(string $days, string $tjm, ?string $purchase = null, ?string $defaultProfileRate = '500'): OrderLine
     {
-        $profile = (new Profile())
+        $profile = new Profile()
             ->setName('Dev')
             ->setDefaultDailyRate($defaultProfileRate);
 
-        $section = (new OrderSection())
+        $section = new OrderSection()
             ->setTitle('Section 1');
 
-        $line = (new OrderLine())
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('Service line')
             ->setType('service')
@@ -59,8 +59,8 @@ class OrderLineTest extends TestCase
 
     public function testPurchaseLine(): void
     {
-        $section = (new OrderSection())->setTitle('Section 1');
-        $line    = (new OrderLine())
+        $section = new OrderSection()->setTitle('Section 1');
+        $line    = new OrderLine()
             ->setSection($section)
             ->setDescription('Purchase')
             ->setType('purchase')

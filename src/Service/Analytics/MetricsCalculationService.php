@@ -143,20 +143,20 @@ readonly class MetricsCalculationService
                 case 'a_signer':
                     $metrics->setPendingOrderCount($metrics->getPendingOrderCount() + 1);
                     $metrics->setPendingRevenue(
-                        bcadd($metrics->getPendingRevenue(), $order->getTotalAmount(), 2),
+                        bcadd($metrics->getPendingRevenue(), (string) $order->getTotalAmount(), 2),
                     );
                     break;
                 case 'gagne':
                     $metrics->setWonOrderCount($metrics->getWonOrderCount() + 1);
                     $metrics->setTotalRevenue(
-                        bcadd($metrics->getTotalRevenue(), $order->getTotalAmount(), 2),
+                        bcadd($metrics->getTotalRevenue(), (string) $order->getTotalAmount(), 2),
                     );
                     break;
                 case 'signe':
                     $metrics->setWonOrderCount($metrics->getWonOrderCount() + 1);
                     $metrics->setSignedOrderCount($metrics->getSignedOrderCount() + 1);
                     $metrics->setTotalRevenue(
-                        bcadd($metrics->getTotalRevenue(), $order->getTotalAmount(), 2),
+                        bcadd($metrics->getTotalRevenue(), (string) $order->getTotalAmount(), 2),
                     );
                     break;
                 case 'perdu':
@@ -208,7 +208,7 @@ readonly class MetricsCalculationService
         foreach ($timesheets as $timesheet) {
             $contributor = $timesheet->getContributor();
             if ($contributor && $contributor->getCjm()) {
-                $dailyCost  = bcdiv($contributor->getCjm(), '8', 4); // Coût horaire
+                $dailyCost  = bcdiv((string) $contributor->getCjm(), '8', 4); // Coût horaire
                 $timeCost   = bcmul($dailyCost, (string) $timesheet->getHours(), 2);
                 $totalCosts = bcadd($totalCosts, $timeCost, 2);
             }
@@ -222,11 +222,11 @@ readonly class MetricsCalculationService
                     foreach ($section->getLines() as $line) {
                         // Achats attachés à une ligne de service
                         if ($line->getAttachedPurchaseAmount()) {
-                            $totalCosts = bcadd($totalCosts, $line->getAttachedPurchaseAmount(), 2);
+                            $totalCosts = bcadd($totalCosts, (string) $line->getAttachedPurchaseAmount(), 2);
                         }
                         // Lignes d'achat direct ou montant fixe
                         if (in_array($line->getType(), ['purchase', 'fixed_amount'], true) && $line->getDirectAmount()) {
-                            $totalCosts = bcadd($totalCosts, $line->getDirectAmount(), 2);
+                            $totalCosts = bcadd($totalCosts, (string) $line->getDirectAmount(), 2);
                         }
                     }
                 }
@@ -476,8 +476,8 @@ readonly class MetricsCalculationService
                 $endDate    = (clone $startDate)->modify('+2 months')->modify('last day of this month')->setTime(23, 59, 59);
                 break;
             case 'yearly':
-                $startDate = (new DateTime($date->format('Y').'-01-01'))->setTime(0, 0, 0);
-                $endDate   = (new DateTime($date->format('Y').'-12-31'))->setTime(23, 59, 59);
+                $startDate = new DateTime($date->format('Y').'-01-01')->setTime(0, 0, 0);
+                $endDate   = new DateTime($date->format('Y').'-12-31')->setTime(23, 59, 59);
                 break;
             default:
                 throw new InvalidArgumentException("Granularité non supportée: {$granularity}");

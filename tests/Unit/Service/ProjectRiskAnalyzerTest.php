@@ -63,7 +63,7 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect budget overrun
-        $budgetRisks = array_filter($result['risks'], fn ($r) => str_contains($r['type'], 'budget'));
+        $budgetRisks = array_filter($result['risks'], fn ($r): bool => str_contains((string) $r['type'], 'budget'));
         $this->assertNotEmpty($budgetRisks);
 
         // Health score should be impacted
@@ -88,7 +88,7 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect schedule delay
-        $scheduleRisks = array_filter($result['risks'], fn ($r) => $r['type'] === 'schedule_delay');
+        $scheduleRisks = array_filter($result['risks'], fn ($r): bool => $r['type'] === 'schedule_delay');
         $this->assertNotEmpty($scheduleRisks);
 
         $this->assertContains($result['riskLevel'], ['high', 'critical']);
@@ -109,7 +109,7 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect low/negative margin
-        $marginRisks = array_filter($result['risks'], fn ($r) => str_contains($r['type'], 'margin'));
+        $marginRisks = array_filter($result['risks'], fn ($r): bool => str_contains((string) $r['type'], 'margin'));
         $this->assertNotEmpty($marginRisks);
     }
 
@@ -131,7 +131,7 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect missing timesheets
-        $timesheetRisks = array_filter($result['risks'], fn ($r) => str_contains($r['type'], 'timesheet'));
+        $timesheetRisks = array_filter($result['risks'], fn ($r): bool => str_contains((string) $r['type'], 'timesheet'));
         $this->assertNotEmpty($timesheetRisks);
     }
 
@@ -153,7 +153,7 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect project not started
-        $stagnationRisks = array_filter($result['risks'], fn ($r) => $r['type'] === 'not_started');
+        $stagnationRisks = array_filter($result['risks'], fn ($r): bool => $r['type'] === 'not_started');
         $this->assertNotEmpty($stagnationRisks);
     }
 

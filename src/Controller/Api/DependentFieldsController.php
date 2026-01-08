@@ -34,7 +34,7 @@ class DependentFieldsController extends AbstractController
             ['name' => 'ASC'],
         );
 
-        $data = array_map(fn ($project) => [
+        $data = array_map(fn ($project): array => [
             'id'   => $project->getId(),
             'name' => $project->getName(),
         ], $projects);
@@ -57,7 +57,7 @@ class DependentFieldsController extends AbstractController
             ['position' => 'ASC'],
         );
 
-        $data = array_map(fn ($task) => [
+        $data = array_map(fn ($task): array => [
             'id'          => $task->getId(),
             'name'        => $task->getName(),
             'description' => $task->getDescription(),
@@ -81,7 +81,7 @@ class DependentFieldsController extends AbstractController
             ['position' => 'ASC'],
         );
 
-        $data = array_map(fn ($subTask) => [
+        $data = array_map(fn ($subTask): array => [
             'id'   => $subTask->getId(),
             'name' => $subTask->getTitle(),
         ], $subTasks);

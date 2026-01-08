@@ -24,11 +24,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ExpenseReportController extends AbstractController
 {
     public function __construct(
-        private ExpenseReportRepository $expenseRepo,
-        private ContributorRepository $contributorRepo,
-        private ExpenseReportService $service,
-        private EntityManagerInterface $em,
-        private SecureFileUploadService $uploadService,
+        private readonly ExpenseReportRepository $expenseRepo,
+        private readonly ContributorRepository $contributorRepo,
+        private readonly ExpenseReportService $service,
+        private readonly EntityManagerInterface $em,
+        private readonly SecureFileUploadService $uploadService,
         private readonly CompanyContext $companyContext
     ) {
     }

@@ -68,7 +68,7 @@ class GenerateInvoicesFromSchedulesCommand extends Command
         if ($dateOption) {
             try {
                 $referenceDate = new DateTime($dateOption);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $io->error(sprintf('Format de date invalide : %s. Utilisez le format YYYY-MM-DD.', $dateOption));
 
                 return Command::FAILURE;

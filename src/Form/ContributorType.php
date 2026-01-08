@@ -121,30 +121,24 @@ class ContributorType extends AbstractType
             ->add('user', EntityType::class, [
                 'label'        => 'Compte utilisateur associé',
                 'class'        => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getFirstName().' '.$user->getLastName().' ('.$user->getEmail().')';
-                },
-                'required'    => false,
-                'placeholder' => '-- Aucun compte --',
-                'attr'        => ['class' => 'form-select'],
+                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName().' ('.$user->getEmail().')',
+                'required'     => false,
+                'placeholder'  => '-- Aucun compte --',
+                'attr'         => ['class' => 'form-select'],
             ])
             ->add('manager', EntityType::class, [
-                'label'        => 'Manager responsable',
-                'class'        => Contributor::class,
-                'choice_label' => function (Contributor $contributor) {
-                    return $contributor->getFullName();
-                },
+                'label'         => 'Manager responsable',
+                'class'         => Contributor::class,
+                'choice_label'  => fn (Contributor $contributor): string => $contributor->getFullName(),
                 'required'      => false,
                 'placeholder'   => '-- Aucun manager --',
                 'attr'          => ['class' => 'form-select'],
                 'help'          => 'Sélectionnez le manager qui validera les demandes de congés de ce collaborateur',
-                'query_builder' => function ($er) {
-                    return $er->createQueryBuilder('c')
-                        ->where('c.active = :active')
-                        ->setParameter('active', true)
-                        ->orderBy('c.lastName', 'ASC')
-                        ->addOrderBy('c.firstName', 'ASC');
-                },
+                'query_builder' => fn ($er) => $er->createQueryBuilder('c')
+                    ->where('c.active = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('c.lastName', 'ASC')
+                    ->addOrderBy('c.firstName', 'ASC'),
             ])
             ->add('profiles', EntityType::class, [
                 'label'        => 'Profils métier',
@@ -157,12 +151,10 @@ class ContributorType extends AbstractType
                     'class'            => 'form-select select2-multiple',
                     'data-placeholder' => 'Sélectionnez un ou plusieurs profils',
                 ],
-                'query_builder' => function ($er) {
-                    return $er->createQueryBuilder('p')
-                        ->where('p.active = :active')
-                        ->setParameter('active', true)
-                        ->orderBy('p.name', 'ASC');
-                },
+                'query_builder' => fn ($er) => $er->createQueryBuilder('p')
+                    ->where('p.active = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('p.name', 'ASC'),
             ])
             ->add('avatarFile', FileType::class, [
                 'label'       => 'Avatar',

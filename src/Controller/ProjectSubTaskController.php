@@ -22,8 +22,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProjectSubTaskController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private ProjectSubTaskRepository $subTasks
+        private readonly EntityManagerInterface $em,
+        private readonly ProjectSubTaskRepository $subTasks
     ) {
     }
 

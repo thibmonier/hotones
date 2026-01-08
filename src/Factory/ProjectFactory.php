@@ -13,12 +13,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ProjectFactory extends PersistentObjectFactory
 {
-    private ?CompanyContext $companyContext;
-
-    public function __construct(CompanyContext $companyContext)
+    public function __construct(private readonly ?CompanyContext $companyContext)
     {
         parent::__construct();
-        $this->companyContext = $companyContext;
     }
 
     protected function defaults(): array|callable

@@ -5,17 +5,19 @@ namespace App\Twig;
 use Cron\CronExpression;
 use DateTimeImmutable;
 use DateTimeZone;
+use Override;
 use Throwable;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 class CronExtension extends AbstractExtension
 {
+    #[Override]
     public function getFilters(): array
     {
         return [
-            new TwigFilter('human_cron', [$this, 'humanizeCron']),
-            new TwigFilter('cron_next_run', [$this, 'nextRun']),
+            new TwigFilter('human_cron', $this->humanizeCron(...)),
+            new TwigFilter('cron_next_run', $this->nextRun(...)),
         ];
     }
 
@@ -32,7 +34,7 @@ class CronExtension extends AbstractExtension
         [$min, $hour, $dom, $mon, $dow] = $parts;
 
         // Helpers
-        $isStar  = fn (string $s) => $s === '*';
+        $isStar  = fn (string $s): bool => $s === '*';
         $fmtTime = function (string $h, string $m, string $loc): string {
             if ($h === '*' && $m === '*') {
                 return $this->t('any time', $loc);
@@ -88,7 +90,7 @@ class CronExtension extends AbstractExtension
         }
         // 4c) At specific hours list
         if ($hourInfo['type'] === 'list' && $dom === '*' && $mon === '*' && $dow === '*') {
-            $times = array_map(fn ($h) => sprintf('%02d:%02d', $h, (int) ($min === '*' ? 0 : $min)), $hourInfo['list']);
+            $times = array_map(fn ($h): string => sprintf('%02d:%02d', $h, (int) ($min === '*' ? 0 : $min)), $hourInfo['list']);
             $glue  = $locale === 'en' ? ', ' : ', ';
 
             return sprintf($this->t('at times %s', $locale), implode($glue, $times));
@@ -114,7 +116,7 @@ class CronExtension extends AbstractExtension
                 $minuteTxt = $min === '*' ? $this->t('any minute', $locale) : sprintf('%02d', (int) $min);
                 $timeTxt   = sprintf($this->t('every %d hours at minute %s', $locale), $hourInfo['step'], $minuteTxt);
             } elseif ($hourInfo['type'] === 'list') {
-                $times   = array_map(fn ($h) => sprintf('%02d:%02d', $h, (int) ($min === '*' ? 0 : $min)), $hourInfo['list']);
+                $times   = array_map(fn ($h): string => sprintf('%02d:%02d', $h, (int) ($min === '*' ? 0 : $min)), $hourInfo['list']);
                 $timeTxt = sprintf($this->t('at times %s', $locale), implode(', ', $times));
             } else {
                 $timeTxt = $fmtTime($hour, $min, $locale);
@@ -159,7 +161,7 @@ class CronExtension extends AbstractExtension
             return ['type' => 'range', 'start' => (int) $m[1], 'end' => (int) $m[2]];
         }
         if (preg_match('#^(\d+)(?:,(\d+))+?#', $expr)) {
-            $list = array_map('intval', explode(',', $expr));
+            $list = array_map(intval(...), explode(',', $expr));
 
             return ['type' => 'list', 'list' => $list];
         }
@@ -194,7 +196,7 @@ class CronExtension extends AbstractExtension
             }
             if (ctype_digit($p)) {
                 $k     = (int) $p;
-                $out[] = $labels[$k] ?? (string) $p;
+                $out[] = $labels[$k] ?? $p;
             } elseif (preg_match('#^(\d+)-(\d+)$#', $p, $m)) {
                 $start = (int) $m[1];
                 $end   = (int) $m[2];
@@ -208,7 +210,7 @@ class CronExtension extends AbstractExtension
     private function listToText(string $expr, string $locale, string $type): string
     {
         // For day-of-month numbers
-        $parts = array_map('trim', explode(',', $expr));
+        $parts = array_map(trim(...), explode(',', $expr));
         $fmt   = function (string $n) use ($locale) {
             $i = (int) $n;
             if ($locale === 'en') {

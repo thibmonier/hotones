@@ -18,10 +18,10 @@ class OrderPaymentScheduleCoverageTest extends TestCase
         $order = new Order();
         $order->setOrderNumber('DTEST-001');
 
-        $section = (new OrderSection())->setOrder($order)->setTitle('S1');
+        $section = new OrderSection()->setOrder($order)->setTitle('S1');
 
-        $profile = (new Profile())->setName('Dev')->setDefaultDailyRate('600');
-        $line    = (new OrderLine())
+        $profile = new Profile()->setName('Dev')->setDefaultDailyRate('600');
+        $line    = new OrderLine()
             ->setSection($section)
             ->setDescription('L1')
             ->setType('service')
@@ -40,12 +40,12 @@ class OrderPaymentScheduleCoverageTest extends TestCase
     {
         $order = $this->makeOrderWithTotal('5000.00');
 
-        $s1 = (new OrderPaymentSchedule())
+        $s1 = new OrderPaymentSchedule()
             ->setOrder($order)
             ->setBillingDate(new DateTime('2025-01-15'))
             ->setAmountType(OrderPaymentSchedule::TYPE_PERCENT)
             ->setPercent('60');
-        $s2 = (new OrderPaymentSchedule())
+        $s2 = new OrderPaymentSchedule()
             ->setOrder($order)
             ->setBillingDate(new DateTime('2025-02-15'))
             ->setAmountType(OrderPaymentSchedule::TYPE_PERCENT)
@@ -63,7 +63,7 @@ class OrderPaymentScheduleCoverageTest extends TestCase
     {
         $order = $this->makeOrderWithTotal('4000.00');
 
-        $s1 = (new OrderPaymentSchedule())
+        $s1 = new OrderPaymentSchedule()
             ->setOrder($order)
             ->setBillingDate(new DateTime('2025-01-15'))
             ->setAmountType(OrderPaymentSchedule::TYPE_PERCENT)
@@ -80,12 +80,12 @@ class OrderPaymentScheduleCoverageTest extends TestCase
     {
         $order = $this->makeOrderWithTotal('3000.00');
 
-        $s1 = (new OrderPaymentSchedule())
+        $s1 = new OrderPaymentSchedule()
             ->setOrder($order)
             ->setBillingDate(new DateTime('2025-01-10'))
             ->setAmountType(OrderPaymentSchedule::TYPE_FIXED)
             ->setFixedAmount('1000.00');
-        $s2 = (new OrderPaymentSchedule())
+        $s2 = new OrderPaymentSchedule()
             ->setOrder($order)
             ->setBillingDate(new DateTime('2025-02-10'))
             ->setAmountType(OrderPaymentSchedule::TYPE_PERCENT)

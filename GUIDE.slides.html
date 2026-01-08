@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HotOnes Developer Onboarding</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/theme/white.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #0ea5e9;
+            --accent-color: #f59e0b;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        .reveal {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .reveal h1, .reveal h2, .reveal h3 {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .reveal h1 {
+            font-size: 3rem;
+            text-transform: none;
+            line-height: 1.2;
+        }
+
+        .reveal h2 {
+            font-size: 2.2rem;
+            text-transform: none;
+        }
+
+        .reveal h3 {
+            font-size: 1.6rem;
+            text-transform: none;
+        }
+
+        .reveal section {
+            text-align: left;
+            padding: 2rem;
+        }
+
+        .reveal .title-slide {
+            text-align: center;
+        }
+
+        .reveal ul {
+            margin: 1.5rem 0;
+        }
+
+        .reveal li {
+            margin: 0.8rem 0;
+            line-height: 1.6;
+        }
+
+        .reveal code {
+            background: var(--bg-light);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--primary-color);
+            font-size: 0.9em;
+        }
+
+        .reveal pre {
+            background: var(--text-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .reveal pre code {
+            background: transparent;
+            color: #e2e8f0;
+            padding: 0;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .accent {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin: 0.2rem;
+        }
+
+        .badge-secondary {
+            background: var(--secondary-color);
+        }
+
+        .badge-accent {
+            background: var(--accent-color);
+        }
+
+        .info-box {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .small-text {
+            font-size: 0.85em;
+            color: var(--text-light);
+        }
+
+        .reveal .date-stamp {
+            font-size: 0.9em;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .reveal strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .reveal section img {
+            border: none;
+            box-shadow: none;
+        }
+
+        .architecture-diagram {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .reveal .slides section .fragment.highlight-current-blue {
+            opacity: 1;
+            visibility: inherit;
+        }
+
+        .reveal .slides section .fragment.highlight-current-blue.current-fragment {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Title Slide -->
+            <section class="title-slide">
+                <h1>🔥 HotOnes</h1>
+                <h3>Developer Onboarding Guide</h3>
+                <p class="date-stamp">January 6, 2026</p>
+                <p style="margin-top: 2rem;">Web Agency Project Profitability Management</p>
+                <div style="margin-top: 2rem;">
+                    <span class="badge">Symfony 8.0</span>
+                    <span class="badge-secondary">PHP 8.5</span>
+                    <span class="badge-accent">AI-Powered</span>
+                </div>
+            </section>
+
+            <!-- Overview Section -->
+            <section>
+                <section>
+                    <h2>What is HotOnes?</h2>
+                    <div class="info-box">
+                        <p><strong>HotOnes is a project profitability management system for web agencies.</strong></p>
+                    </div>
+                    <p>It helps agencies understand and optimize project profitability by tracking the full lifecycle:</p>
+                    <ul>
+                        <li><span class="highlight">Sales data</span> - Days sold, daily rates</li>
+                        <li><span class="highlight">Time tracking</span> - Actual hours worked</li>
+                        <li><span class="highlight">Costs</span> - Daily cost rates, purchases</li>
+                        <li><span class="highlight">KPIs</span> - Consolidated financial metrics</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Core Purpose</h3>
+                    <p>Answer the critical questions every agency needs to know:</p>
+                    <ul>
+                        <li>📊 <strong>Are our projects profitable?</strong></li>
+                        <li>💰 <strong>Where are we losing money?</strong></li>
+                        <li>⏰ <strong>Are we over/under utilizing resources?</strong></li>
+                        <li>🎯 <strong>Which clients drive the most value?</strong></li>
+                        <li>📈 <strong>What does our financial future look like?</strong></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Tech Stack Overview</h3>
+                    <div class="two-column">
+                        <div>
+                            <h4>Backend</h4>
+                            <ul class="small-text">
+                                <li>Symfony 8.0</li>
+                                <li>PHP 8.5</li>
+                                <li>MariaDB 11.4</li>
+                                <li>API Platform 4</li>
+                                <li>Doctrine ORM</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Frontend</h4>
+                            <ul class="small-text">
+                                <li>Twig Templates</li>
+                                <li>Bootstrap 5 (Skote)</li>
+                                <li>Webpack Encore</li>
+                                <li>Stimulus + Turbo</li>
+                                <li>FullCalendar</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p><strong>Special Features:</strong> 2FA Authentication, AI Planning Optimization (OpenAI + Anthropic), Multi-tenant SaaS Architecture</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Project Context</h3>
+                    <p><strong>Age:</strong> 78 days (Oct 19, 2025 - Jan 6, 2026)</p>
+                    <p><strong>Commits:</strong> 532 commits</p>
+                    <p><strong>Maturity:</strong> Production-ready multi-tenant SaaS</p>
+                    <div class="warning-box" style="margin-top: 1.5rem;">
+                        <p><strong>⚠️ Recent Major Change:</strong> Completed massive multi-tenant migration (Lot 23) on Dec 31 - Jan 4. This touched 54+ entities and represents the biggest architectural transformation in the project's history.</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Getting Started Section -->
+            <section>
+                <section>
+                    <h2>⚡ Quick Start</h2>
+                    <p>Get up and running in <strong class="highlight">5 minutes</strong></p>
+                </section>
+
+                <section>
+                    <h3>Prerequisites</h3>
+                    <div class="two-column">
+                        <div>
+                            <h4>Required</h4>
+                            <ul>
+                                <li>Docker + Docker Compose</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Optional</h4>
+                            <ul>
+                                <li>Node.js + Yarn<br><span class="small-text">(for local asset building)</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin-top: 2rem;">
+                        <p><strong>That's it!</strong> Everything else runs in Docker containers.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Setup Steps (1/2)</h3>
+                    <pre><code class="bash"># 1. Launch the environment
+docker compose up -d --build
+
+# 2. Install PHP dependencies
+docker compose exec app composer install
+
+# 3. Run database migrations
+docker compose exec app php bin/console \
+  doctrine:migrations:migrate -n</code></pre>
+                </section>
+
+                <section>
+                    <h3>Setup Steps (2/2)</h3>
+                    <pre><code class="bash"># 4. Build assets (choose one)
+./build-assets.sh dev          # Local build
+# OR
+./docker-build-assets.sh dev   # Docker build
+
+# 5. Create an admin user
+docker compose exec app php bin/console \
+  app:user:create email@example.com password \
+  "FirstName" "LastName"
+
+# 6. Optional: Generate test data
+docker compose exec app php bin/console \
+  app:generate-test-data --year=2026</code></pre>
+                    <p style="margin-top: 1rem;"><strong>Access:</strong> <code>http://localhost:8080</code></p>
+                </section>
+
+                <section>
+                    <h3>Common Gotchas</h3>
+                    <div class="warning-box">
+                        <p><strong>1. Port Conflicts</strong></p>
+                        <p class="small-text">Ports 8080 (web) and 3307 (database) must be available. Modify <code>docker-compose.yml</code> if needed.</p>
+                    </div>
+                    <div class="warning-box">
+                        <p><strong>2. Asset Building</strong></p>
+                        <p class="small-text">CSS/JS changes won't appear without rebuilding. Use <code>./build-assets.sh watch</code> during development.</p>
+                    </div>
+                    <div class="warning-box">
+                        <p><strong>3. 2FA Setup</strong></p>
+                        <p class="small-text">Users must manually configure 2FA at <code>/me/2fa/enable</code> after first login.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Daily Workflow</h3>
+                    <pre><code class="bash"># Start services
+docker compose up -d
+
+# Watch for asset changes (keep running)
+./build-assets.sh watch
+
+# View logs
+docker compose logs -f app
+
+# Access Symfony console
+docker compose exec app php bin/console
+
+# Stop services
+docker compose down</code></pre>
+                </section>
+            </section>
+
+            <!-- Architecture Section -->
+            <section>
+                <section>
+                    <h2>🏗️ Architecture</h2>
+                    <p>Understanding the system structure</p>
+                </section>
+
+                <section>
+                    <h3>Directory Structure</h3>
+                    <pre><code class="text">hotones/
+├── src/                    # Application code
+│   ├── Entity/            # 61 domain entities
+│   ├── Repository/        # 51 data repositories
+│   ├── Service/           # 36 business services
+│   ├── Controller/        # 66 HTTP controllers
+│   ├── Command/           # 39 CLI commands
+│   ├── AI/                # AI integrations
+│   └── Security/          # Auth & authorization
+├── templates/             # 88 Twig templates
+├── assets/                # Frontend (JS, CSS, Sass)
+├── config/                # App configuration
+├── migrations/            # 79 database migrations
+├── tests/                 # Comprehensive test suite
+└── public/                # Web root + build/</code></pre>
+                </section>
+
+                <section>
+                    <h3>The Most Important Concept</h3>
+                    <div class="info-box">
+                        <h4 style="margin-top: 0;">🏢 Multi-Tenancy: Company-Based Isolation</h4>
+                        <p><strong>Every piece of data belongs to a Company.</strong></p>
+                    </div>
+                    <p>This is a <strong>multi-tenant SaaS platform</strong> where:</p>
+                    <ul>
+                        <li><code>Company</code> entity is the root tenant</li>
+                        <li><code>CompanyOwnedInterface</code> marks tenant-scoped entities</li>
+                        <li>Automatic filtering prevents cross-tenant data leakage</li>
+                        <li>Security enforced via <code>CompanyVoter</code></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Why Multi-Tenancy Matters</h3>
+                    <div class="warning-box">
+                        <p><strong>🔒 Critical Security Rule</strong></p>
+                        <p>When adding new features, any entity that stores customer data <strong>MUST</strong>:</p>
+                        <ul class="small-text">
+                            <li>Implement <code>CompanyOwnedInterface</code></li>
+                            <li>Have a <code>company</code> relationship</li>
+                            <li>Be filtered in repositories</li>
+                        </ul>
+                        <p style="margin-top: 1rem;">This is <strong>not optional</strong> - it prevents data leakage between tenants.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Domain Model Structure</h3>
+                    <div class="architecture-diagram">
+                        <pre style="background: transparent; color: var(--text-dark); box-shadow: none;"><code>Company (Tenant)
+  ├── Users & Contributors
+  ├── Clients
+  │   └── Projects
+  │       ├── Orders/Quotes (devis)
+  │       ├── ProjectTasks
+  │       └── Timesheets
+  ├── EmploymentPeriods
+  ├── Vacations
+  └── Analytics & Forecasts</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Key Domain Concepts</h3>
+                    <ul>
+                        <li><strong>Project Types:</strong> <code>forfait</code> (fixed-price) vs <code>régie</code> (time & materials)</li>
+                        <li><strong>Orders/Devis:</strong> Quotes with sections and line items</li>
+                        <li><strong>Timesheets:</strong> Weekly time entry, optionally linked to tasks</li>
+                        <li><strong>TACE:</strong> Taux d'Affectation sur Charge Externe (staffing utilization)</li>
+                        <li><strong>CJM:</strong> Coût Journalier Moyen (daily cost rate)</li>
+                        <li><strong>TJM:</strong> Taux Journalier Moyen (daily billing rate)</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Architectural Layers</h3>
+                    <p>Enforced by Deptrac for clean architecture:</p>
+                    <div class="architecture-diagram">
+                        <pre style="background: transparent; color: var(--text-dark); box-shadow: none;"><code>Controller (Presentation)
+    ↓
+Service (Application Logic)
+    ↓
+Entity + Repository (Domain)
+    ↑
+Security + Infrastructure</code></pre>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p><strong>Golden Rule:</strong> Controllers MUST be thin - delegate to Services for business logic.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Modern PHP 8.4+ Features</h3>
+                    <p>The codebase uses cutting-edge PHP syntax:</p>
+                    <pre><code class="php">// Property hooks (PHP 8.4)
+public string $name {
+    get => $this->name;
+    set => $this->name = $value;
+}
+
+// Constructor property promotion
+public function __construct(
+    private readonly EntityManagerInterface $em,
+    private readonly ProjectRepository $repo,
+) {}</code></pre>
+                    <p><strong>Convention:</strong> All code uses <code>declare(strict_types=1);</code> and full type hints</p>
+                </section>
+            </section>
+
+            <!-- Key Features Section -->
+            <section>
+                <section>
+                    <h2>🚀 Key Features</h2>
+                    <p>What makes HotOnes special</p>
+                </section>
+
+                <section>
+                    <h3>1. AI Planning Optimization</h3>
+                    <p>Intelligent resource allocation powered by AI</p>
+                    <ul>
+                        <li><strong>TACE Analysis:</strong> Detects overload & underutilization</li>
+                        <li><strong>Dual AI Providers:</strong> OpenAI (GPT-4o-mini) + Anthropic (Claude 3.5 Haiku)</li>
+                        <li><strong>Service-Level Awareness:</strong> Prioritizes VIP clients</li>
+                        <li><strong>Dashboard:</strong> <code>/planning/optimization</code></li>
+                    </ul>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p>The AI analyzes staffing patterns and provides actionable recommendations automatically.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>2. Client Service Levels</h3>
+                    <p>Automatic client prioritization based on revenue</p>
+                    <div class="two-column">
+                        <div>
+                            <h4>Tiers</h4>
+                            <ul class="small-text">
+                                <li>🌟 VIP</li>
+                                <li>⭐ Priority</li>
+                                <li>📋 Standard</li>
+                                <li>📄 Low Priority</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Auto-Calculation</h4>
+                            <ul class="small-text">
+                                <li>Top 20 by revenue = VIP</li>
+                                <li>Top 50 = Priority</li>
+                                <li>Manual override available</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <pre style="margin-top: 1rem;"><code class="bash">php bin/console app:client:recalculate-service-level</code></pre>
+                </section>
+
+                <section>
+                    <h3>3. Analytics & Dashboards</h3>
+                    <ul>
+                        <li><strong>Star Schema:</strong> Optimized analytics queries</li>
+                        <li><strong>Treasury Dashboard:</strong> Comprehensive financial tracking</li>
+                        <li><strong>Predictive Analytics:</strong> Forecast future profitability</li>
+                        <li><strong>Project Satisfaction:</strong> Track client happiness over time</li>
+                        <li><strong>Excel Export:</strong> Full data export capabilities</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><strong>Location:</strong> <code>/analytics/dashboard</code></p>
+                </section>
+
+                <section>
+                    <h3>4. Vacation Workflow</h3>
+                    <p>Complete request and approval system</p>
+                    <ul>
+                        <li>Hierarchical approval workflow</li>
+                        <li>Real-time notifications (Symfony Messenger)</li>
+                        <li>Integration with planning calendar</li>
+                        <li>Manager dashboard widgets</li>
+                    </ul>
+                    <div class="two-column" style="margin-top: 1rem;">
+                        <div>
+                            <p><strong>Employees:</strong> <code>/vacation-request</code></p>
+                        </div>
+                        <div>
+                            <p><strong>Managers:</strong> <code>/vacation-approval</code></p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>5. Running Timer</h3>
+                    <p>Simple time tracking directly from timesheet view</p>
+                    <ul>
+                        <li>Start/stop timer from weekly timesheet</li>
+                        <li>Only one active timer at a time</li>
+                        <li>Auto-imputation with 0.125 day minimum</li>
+                        <li>No separate time tracking app needed</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Development Workflow Section -->
+            <section>
+                <section>
+                    <h2>💻 Development Workflow</h2>
+                    <p>How to build features effectively</p>
+                </section>
+
+                <section>
+                    <h3>Adding New Features: Step 1-2</h3>
+                    <p><strong>1. Create/Update Entity</strong></p>
+                    <pre><code class="bash">docker compose exec app php bin/console make:entity</code></pre>
+                    <div class="warning-box">
+                        <p><strong>Must implement:</strong></p>
+                        <ul class="small-text">
+                            <li><code>CompanyOwnedInterface</code> if tenant-scoped</li>
+                            <li>Property hooks (PHP 8.4)</li>
+                            <li><code>declare(strict_types=1);</code> at top</li>
+                        </ul>
+                    </div>
+                    <p><strong>2. Generate Migration</strong></p>
+                    <pre><code class="bash">docker compose exec app php bin/console make:migration
+docker compose exec app php bin/console \
+  doctrine:migrations:migrate -n</code></pre>
+                </section>
+
+                <section>
+                    <h3>Adding New Features: Step 3-4</h3>
+                    <p><strong>3. Create Service (Business Logic)</strong></p>
+                    <ul class="small-text">
+                        <li>Place in <code>src/Service/</code></li>
+                        <li>Use constructor property promotion</li>
+                        <li>Keep controllers thin - delegate here</li>
+                    </ul>
+                    <p><strong>4. Create Controller (Presentation)</strong></p>
+                    <pre><code class="bash">docker compose exec app php bin/console make:controller</code></pre>
+                    <ul class="small-text">
+                        <li>Use attribute routing: <code>#[Route('/path')]</code></li>
+                        <li>Use security: <code>#[IsGranted('ROLE_X')]</code></li>
+                        <li>Minimal logic - delegate to services</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Adding New Features: Step 5-7</h3>
+                    <p><strong>5. Create Form (if UI needed)</strong></p>
+                    <pre><code class="bash">docker compose exec app php bin/console make:form</code></pre>
+                    <p><strong>6. Write Tests</strong></p>
+                    <ul class="small-text">
+                        <li>Unit tests: <code>tests/Unit/</code></li>
+                        <li>Functional tests: <code>tests/Functional/</code></li>
+                    </ul>
+                    <p><strong>7. Validate Code Quality</strong></p>
+                    <pre><code class="bash">docker compose exec app composer check-all</code></pre>
+                </section>
+
+                <section>
+                    <h3>Testing Commands</h3>
+                    <pre><code class="bash"># All tests
+./vendor/bin/phpunit
+
+# By suite
+composer test-unit
+composer test-functional
+composer test-integration
+composer test-api
+composer test-e2e
+
+# Code quality
+composer check-code              # PHPStan + CS
+composer check-architecture      # Deptrac
+composer check-all               # Everything
+
+# Fix code style
+composer phpcsfixer-fix</code></pre>
+                </section>
+
+                <section>
+                    <h3>Asset Development</h3>
+                    <pre><code class="bash"># Development mode (watch for changes)
+./build-assets.sh watch
+
+# One-time builds
+./build-assets.sh dev      # Development
+./build-assets.sh prod     # Production
+
+# Docker variants (if npm not local)
+./docker-build-assets.sh watch</code></pre>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p><strong>Structure:</strong> Entry points in <code>webpack.config.js</code>, source in <code>assets/</code>, output in <code>public/assets/</code></p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Database Migrations</h3>
+                    <pre><code class="bash"># Create migration
+php bin/console make:migration
+
+# Apply migrations
+php bin/console doctrine:migrations:migrate -n
+
+# Rollback one migration
+php bin/console doctrine:migrations:migrate prev
+
+# Check schema sync
+php bin/console doctrine:schema:validate
+
+# Generate diff (if out of sync)
+php bin/console doctrine:migrations:diff</code></pre>
+                    <div class="warning-box" style="margin-top: 1rem;">
+                        <p><strong>Important:</strong> 79 migrations exist. Always create migrations - never use <code>schema:update</code> directly.</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Code Quality Section -->
+            <section>
+                <section>
+                    <h2>✨ Code Quality Standards</h2>
+                    <p>This project enforces strict quality</p>
+                </section>
+
+                <section>
+                    <h3>Quality Tools</h3>
+                    <div class="two-column">
+                        <div>
+                            <h4>Static Analysis</h4>
+                            <p><strong>PHPStan Level 4</strong></p>
+                            <ul class="small-text">
+                                <li>Strict rules enabled</li>
+                                <li>Catches type errors</li>
+                                <li>Run: <code>composer phpstan</code></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Code Style</h4>
+                            <p><strong>PSR-12 + Symfony</strong></p>
+                            <ul class="small-text">
+                                <li>PHP CS Fixer</li>
+                                <li>PHPCS validation</li>
+                                <li>Auto-fix available</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p><strong>Architecture Validation:</strong> Deptrac enforces layer boundaries and prevents circular dependencies</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Testing Philosophy</h3>
+                    <ul>
+                        <li><strong>Unit tests:</strong> Mock dependencies, test logic in isolation</li>
+                        <li><strong>Functional tests:</strong> Test HTTP responses, forms</li>
+                        <li><strong>Integration tests:</strong> Test database interactions</li>
+                        <li><strong>API tests:</strong> Test REST endpoints</li>
+                        <li><strong>E2E tests:</strong> Test full flows with Panther</li>
+                    </ul>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p><strong>Test Environment:</strong> Uses SQLite (not MariaDB) for isolation. Config in <code>.env.test</code></p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Naming Conventions</h3>
+                    <div class="two-column">
+                        <div>
+                            <h4>PHP</h4>
+                            <ul class="small-text">
+                                <li>Classes: <code>PascalCase</code></li>
+                                <li>Methods: <code>camelCase</code></li>
+                                <li>Variables: <code>camelCase</code></li>
+                                <li>Constants: <code>SCREAMING_SNAKE_CASE</code></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Database</h4>
+                            <ul class="small-text">
+                                <li>Tables: <code>snake_case</code> (plural)</li>
+                                <li>Columns: <code>snake_case</code></li>
+                            </ul>
+                            <h4>Routes</h4>
+                            <ul class="small-text">
+                                <li>Names: <code>snake_case</code></li>
+                                <li>URLs: <code>kebab-case</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Code Quality Rules</h3>
+                    <div class="warning-box">
+                        <p><strong>❌ No Yoda Conditions</strong></p>
+                        <pre><code class="php">// ✅ Correct
+if ($var === 'value')
+
+// ❌ Wrong
+if ('value' === $var)</code></pre>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p><strong>✅ Always use:</strong></p>
+                        <ul class="small-text">
+                            <li><code>declare(strict_types=1);</code> at file top</li>
+                            <li>Type hints on all parameters and returns</li>
+                            <li>Property hooks (PHP 8.4) for entities</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Security Section -->
+            <section>
+                <section>
+                    <h2>🔒 Security & Authorization</h2>
+                    <p>Understanding the security model</p>
+                </section>
+
+                <section>
+                    <h3>Role Hierarchy</h3>
+                    <div class="architecture-diagram">
+                        <pre style="background: transparent; color: var(--text-dark); box-shadow: none;"><code>ROLE_USER (base - all authenticated)
+  └── ROLE_INTERVENANT (contributor)
+      └── ROLE_CHEF_PROJET (project manager)
+          └── ROLE_MANAGER (team manager)
+              └── ROLE_COMPTA (accounting)
+                  └── ROLE_SUPERADMIN (full admin)</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Security Patterns</h3>
+                    <ul>
+                        <li><strong>CSRF Protection:</strong> Enabled by default on all forms</li>
+                        <li><strong>Controller Security:</strong> <code>#[IsGranted('ROLE_X')]</code> attributes</li>
+                        <li><strong>API Security:</strong> Expressions in <code>#[ApiResource]</code></li>
+                        <li><strong>Multi-Tenant:</strong> <code>CompanyVoter</code> enforces data isolation</li>
+                        <li><strong>2FA:</strong> Available but must be manually enabled per user</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><strong>2FA Setup:</strong> <code>/me/2fa/enable</code></p>
+                </section>
+
+                <section>
+                    <h3>Company-Based Security</h3>
+                    <div class="info-box">
+                        <p><strong>The CompanyVoter ensures users can only access their company's data.</strong></p>
+                    </div>
+                    <ul>
+                        <li>Automatic filtering in repositories</li>
+                        <li>Controllers inject <code>CompanyContext</code></li>
+                        <li>Forms automatically assign company</li>
+                        <li>Prevents cross-tenant data leakage</li>
+                    </ul>
+                    <div class="warning-box" style="margin-top: 1rem;">
+                        <p><strong>Critical:</strong> This is the primary security mechanism for multi-tenancy. Do not bypass it.</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Important Commands Section -->
+            <section>
+                <section>
+                    <h2>⚙️ Important Commands</h2>
+                    <p>CLI tools you'll use regularly</p>
+                </section>
+
+                <section>
+                    <h3>User Management</h3>
+                    <pre><code class="bash"># Create a user
+php bin/console app:user:create \
+  email@example.com password \
+  "FirstName" "LastName"</code></pre>
+                </section>
+
+                <section>
+                    <h3>Test Data & Analytics</h3>
+                    <pre><code class="bash"># Generate test data
+php bin/console app:generate-test-data \
+  --year=2026
+
+# Calculate metrics
+php bin/console app:calculate-metrics \
+  2026 --granularity=monthly
+
+# Calculate staffing metrics
+php bin/console app:calculate-staffing-metrics \
+  2026 --granularity=weekly</code></pre>
+                </section>
+
+                <section>
+                    <h3>Client & Service Levels</h3>
+                    <pre><code class="bash"># Recalculate service levels
+php bin/console \
+  app:client:recalculate-service-level</code></pre>
+                    <p style="margin-top: 1rem;" class="small-text">Automatically sets VIP (top 20) and Priority (top 50) based on annual revenue</p>
+                </section>
+
+                <section>
+                    <h3>Background Jobs</h3>
+                    <pre><code class="bash"># View scheduled tasks
+php bin/console debug:scheduler
+
+# Consume scheduler messages
+php bin/console messenger:consume \
+  scheduler_default
+
+# Consume async messages
+php bin/console messenger:consume async -vv
+
+# Retry failed messages
+php bin/console messenger:failed:retry</code></pre>
+                </section>
+            </section>
+
+            <!-- Important URLs Section -->
+            <section>
+                <section>
+                    <h2>🔗 Important URLs</h2>
+                    <p>Key locations in the application</p>
+                </section>
+
+                <section>
+                    <h3>Main Application Areas</h3>
+                    <ul>
+                        <li><strong>Planning:</strong> <code>/planning</code> - Resource timeline</li>
+                        <li><strong>Planning AI:</strong> <code>/planning/optimization</code> - AI recommendations</li>
+                        <li><strong>Analytics:</strong> <code>/analytics/dashboard</code> - KPIs & metrics</li>
+                        <li><strong>Staffing:</strong> <code>/staffing/dashboard</code> - Resource utilization</li>
+                        <li><strong>Vacation Requests:</strong> <code>/vacation-request</code> - Employee view</li>
+                        <li><strong>Vacation Approvals:</strong> <code>/vacation-approval</code> - Manager view</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Admin & API</h3>
+                    <ul>
+                        <li><strong>Admin Config:</strong>
+                            <ul class="small-text">
+                                <li><code>/admin/technologies</code></li>
+                                <li><code>/admin/service-categories</code></li>
+                                <li><code>/admin/job-profiles</code></li>
+                            </ul>
+                        </li>
+                        <li><strong>API Docs:</strong> <code>/api/documentation</code> - Swagger/OpenAPI</li>
+                        <li><strong>2FA Setup:</strong> <code>/me/2fa/enable</code> - Configure TOTP</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Dependencies Section -->
+            <section>
+                <section>
+                    <h2>📦 Key Dependencies</h2>
+                    <p>What powers HotOnes</p>
+                </section>
+
+                <section>
+                    <h3>Core Backend</h3>
+                    <ul>
+                        <li><strong>symfony/*</strong> v8.0 - Framework with auto-wiring</li>
+                        <li><strong>doctrine/orm</strong> v3.6 - Database ORM</li>
+                        <li><strong>api-platform/core</strong> v4.2 - REST API</li>
+                        <li><strong>easycorp/easyadmin-bundle</strong> v4.27 - Admin CRUD</li>
+                        <li><strong>lexik/jwt-authentication-bundle</strong> - JWT auth</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Security & Features</h3>
+                    <ul>
+                        <li><strong>scheb/2fa-bundle</strong> - Two-factor authentication (TOTP)</li>
+                        <li><strong>nelmio/security-bundle</strong> - Security headers (CSP, HSTS)</li>
+                        <li><strong>dompdf/dompdf</strong> - PDF generation</li>
+                        <li><strong>phpoffice/phpspreadsheet</strong> - Excel export/import</li>
+                        <li><strong>sentry/sentry-symfony</strong> - Error tracking</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>AI & Async</h3>
+                    <ul>
+                        <li><strong>openai-php/client</strong> - OpenAI GPT-4o-mini integration</li>
+                        <li><strong>anthropic-ai/sdk</strong> - Anthropic Claude 3.5 Haiku</li>
+                        <li><strong>symfony/ai-*</strong> - Symfony AI abstraction layer</li>
+                        <li><strong>symfony/messenger</strong> - Async job processing</li>
+                        <li><strong>symfony/scheduler</strong> - Cron-like tasks</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Frontend Stack</h3>
+                    <ul>
+                        <li><strong>@hotwired/stimulus</strong> - Lightweight JS framework</li>
+                        <li><strong>@hotwired/turbo</strong> - SPA-like navigation</li>
+                        <li><strong>@symfony/ux-live-component</strong> - Live components</li>
+                        <li><strong>bootstrap</strong> 5.3.8 - UI framework (Skote theme)</li>
+                        <li><strong>choices.js</strong> - Enhanced selects</li>
+                        <li><strong>toastr</strong> - Toast notifications</li>
+                        <li><strong>fullcalendar</strong> - Planning views</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Development Tools</h3>
+                    <ul>
+                        <li><strong>phpstan/phpstan</strong> - Static analysis (Level 4)</li>
+                        <li><strong>friendsofphp/php-cs-fixer</strong> - Code style</li>
+                        <li><strong>deptrac/deptrac</strong> - Architecture validation</li>
+                        <li><strong>infection/infection</strong> - Mutation testing</li>
+                        <li><strong>symfony/web-profiler-bundle</strong> - Debug toolbar</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>External Services</h3>
+                    <div class="two-column">
+                        <div>
+                            <h4>Required</h4>
+                            <ul class="small-text">
+                                <li>MariaDB 11.4</li>
+                                <li>Redis</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Optional</h4>
+                            <ul class="small-text">
+                                <li>OpenAI API</li>
+                                <li>Anthropic API</li>
+                                <li>Sentry DSN</li>
+                                <li>SMTP Server</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Project History Section -->
+            <section>
+                <section>
+                    <h2>📜 Project Evolution</h2>
+                    <p>Understanding where we came from</p>
+                </section>
+
+                <section>
+                    <h3>Timeline Overview</h3>
+                    <ul>
+                        <li><strong>Oct 19, 2025:</strong> Initial commit by Thibaut MONIER</li>
+                        <li><strong>Oct-Nov:</strong> Foundation & core features</li>
+                        <li><strong>Nov-Dec:</strong> Analytics & dashboards</li>
+                        <li><strong>Nov-Dec:</strong> AI planning optimization</li>
+                        <li><strong>Dec:</strong> SaaS transformation</li>
+                        <li><strong>Dec 31 - Jan 4:</strong> Multi-tenant migration (Lot 23)</li>
+                        <li><strong>Dec-Jan:</strong> Consolidation & optimization</li>
+                        <li><strong>Dec-Jan:</strong> AI integration expansion</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>The Lot 23 Migration</h3>
+                    <div class="warning-box">
+                        <p><strong>The most significant architectural change</strong></p>
+                    </div>
+                    <p>Completed December 31, 2025 - January 4, 2026</p>
+                    <ul class="small-text">
+                        <li>Added <code>company_id</code> to 54+ entities in 8 batches</li>
+                        <li>All entities implement <code>CompanyOwnedInterface</code></li>
+                        <li>45+ repositories updated with company scoping</li>
+                        <li>21 controllers refactored with <code>CompanyContext</code></li>
+                        <li>Complete test suite rewrite</li>
+                        <li>Reversible migrations with backup/restore</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Rapid Evolution</h3>
+                    <div class="info-box">
+                        <p><strong>78 days</strong> from initial commit to production-ready multi-tenant SaaS</p>
+                        <p><strong>532 commits</strong> maintaining high code quality throughout</p>
+                    </div>
+                    <p>Key achievements:</p>
+                    <ul class="small-text">
+                        <li>PHPStan Level 4 static analysis</li>
+                        <li>Comprehensive test coverage</li>
+                        <li>AI-powered features</li>
+                        <li>Cloud-native deployment</li>
+                        <li>GDPR compliance</li>
+                        <li>Professional SaaS presentation</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Structured Development</h3>
+                    <p>Development organized in clear "Lots":</p>
+                    <ul class="small-text">
+                        <li><strong>Lot 9:</strong> UI standardization</li>
+                        <li><strong>Lot 11bis:</strong> Technical consolidation</li>
+                        <li><strong>Lot 15.5:</strong> Form standardization</li>
+                        <li><strong>Lot 17:</strong> Naming improvements</li>
+                        <li><strong>Lot 20:</strong> Error pages</li>
+                        <li><strong>Lot 23:</strong> Multi-tenant migration (the big one)</li>
+                        <li><strong>Lot 27:</strong> GDPR compliance</li>
+                    </ul>
+                    <p style="margin-top: 1rem;">Each lot has clear objectives and completion criteria</p>
+                </section>
+            </section>
+
+            <!-- Best Practices Section -->
+            <section>
+                <section>
+                    <h2>💡 Best Practices</h2>
+                    <p>How to work effectively in this codebase</p>
+                </section>
+
+                <section>
+                    <h3>Multi-Tenant Development</h3>
+                    <div class="warning-box">
+                        <p><strong>Always remember: this is multi-tenant</strong></p>
+                    </div>
+                    <ul>
+                        <li>✅ <strong>DO:</strong> Implement <code>CompanyOwnedInterface</code> for user data</li>
+                        <li>✅ <strong>DO:</strong> Filter by company in repositories</li>
+                        <li>✅ <strong>DO:</strong> Inject <code>CompanyContext</code> in controllers</li>
+                        <li>❌ <strong>DON'T:</strong> Query data without company filtering</li>
+                        <li>❌ <strong>DON'T:</strong> Assume single-tenant in business logic</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Code Organization</h3>
+                    <ul>
+                        <li><strong>Controllers:</strong> Thin, delegate to services</li>
+                        <li><strong>Services:</strong> Business logic, reusable</li>
+                        <li><strong>Repositories:</strong> Data access only</li>
+                        <li><strong>Entities:</strong> Domain models, minimal logic</li>
+                        <li><strong>Forms:</strong> Validation & transformation</li>
+                    </ul>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <p>This layering is enforced by Deptrac - respect the boundaries</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Testing Strategy</h3>
+                    <ul>
+                        <li>Write tests <strong>before</strong> marking feature complete</li>
+                        <li>Use factories (Foundry) for test data</li>
+                        <li>Mock external dependencies in unit tests</li>
+                        <li>Test happy path AND error cases</li>
+                        <li>Run <code>composer check-all</code> before committing</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Asset Development</h3>
+                    <div class="info-box">
+                        <p><strong>Always run watch mode during frontend work</strong></p>
+                    </div>
+                    <pre><code class="bash">./build-assets.sh watch</code></pre>
+                    <ul class="small-text">
+                        <li>Changes won't appear without rebuilding</li>
+                        <li>Watch mode auto-rebuilds on file changes</li>
+                        <li>Use Docker variant if npm not installed locally</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Git Workflow</h3>
+                    <ul>
+                        <li>Clear commit messages describing <strong>what</strong> changed</li>
+                        <li>Reference Lot/Sprint numbers when applicable</li>
+                        <li>Keep commits focused and atomic</li>
+                        <li>Run quality checks before pushing</li>
+                    </ul>
+                    <p style="margin-top: 1rem;" class="small-text">The project has githooks configured - they'll help maintain quality</p>
+                </section>
+            </section>
+
+            <!-- Common Issues Section -->
+            <section>
+                <section>
+                    <h2>⚠️ Common Issues</h2>
+                    <p>Problems you might encounter</p>
+                </section>
+
+                <section>
+                    <h3>Port Conflicts</h3>
+                    <div class="warning-box">
+                        <p><strong>Problem:</strong> "Port already in use" errors</p>
+                    </div>
+                    <p><strong>Affected ports:</strong></p>
+                    <ul>
+                        <li>8080 - Web server (nginx)</li>
+                        <li>3307 - MariaDB</li>
+                    </ul>
+                    <p><strong>Solution:</strong> Modify <code>docker-compose.yml</code> to use different ports</p>
+                </section>
+
+                <section>
+                    <h3>Asset Build Issues</h3>
+                    <div class="warning-box">
+                        <p><strong>Problem:</strong> CSS/JS changes not appearing</p>
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ul>
+                        <li>Check if assets were built: <code>ls public/build/</code></li>
+                        <li>Rebuild: <code>./build-assets.sh dev</code></li>
+                        <li>Use watch mode: <code>./build-assets.sh watch</code></li>
+                        <li>Clear browser cache</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Test Environment</h3>
+                    <div class="warning-box">
+                        <p><strong>Problem:</strong> Tests using wrong database</p>
+                    </div>
+                    <p>Tests use <strong>SQLite</strong>, not MariaDB</p>
+                    <ul class="small-text">
+                        <li>Configured in <code>.env.test</code></li>
+                        <li>Provides isolation without external DB</li>
+                        <li>Subtle differences from MariaDB possible</li>
+                        <li>If tests fail but app works, check SQL syntax differences</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>PHP Version Issues</h3>
+                    <div class="warning-box">
+                        <p><strong>Problem:</strong> Syntax errors or unexpected behavior</p>
+                    </div>
+                    <p>This project requires <strong>PHP 8.5+</strong></p>
+                    <ul class="small-text">
+                        <li>Uses PHP 8.4 property hooks</li>
+                        <li>Cutting-edge syntax</li>
+                        <li>Ensure Docker image matches: <code>php:8.5.1-fpm</code></li>
+                        <li>IDE/tooling must support PHP 8.4+</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>2FA Lockout</h3>
+                    <div class="warning-box">
+                        <p><strong>Problem:</strong> Can't login after enabling 2FA</p>
+                    </div>
+                    <p><strong>Solution:</strong> Disable 2FA via database</p>
+                    <pre><code class="sql">UPDATE user SET totp_secret = NULL 
+WHERE email = 'user@example.com';</code></pre>
+                    <p class="small-text">Access database: <code>localhost:3307</code> with credentials <code>symfony/symfony</code></p>
+                </section>
+            </section>
+
+            <!-- Resources Section -->
+            <section>
+                <section>
+                    <h2>📚 Documentation & Resources</h2>
+                    <p>Where to find more information</p>
+                </section>
+
+                <section>
+                    <h3>Project Documentation</h3>
+                    <ul>
+                        <li><strong>README.md</strong> - Installation & feature overview</li>
+                        <li><strong>CONTRIBUTING.md</strong> - Contribution guidelines & standards</li>
+                        <li><strong>CLAUDE.md</strong> - Commands reference & patterns</li>
+                        <li><strong>WARP.md</strong> - Project navigation index</li>
+                        <li><strong>AGENTS.md</strong> - Agent guidelines</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Documentation Categories</h3>
+                    <p>In <code>docs/</code> directory:</p>
+                    <div class="two-column">
+                        <div>
+                            <ul class="small-text">
+                                <li>01-getting-started</li>
+                                <li>02-architecture</li>
+                                <li>03-features</li>
+                                <li>04-development</li>
+                                <li>05-deployment</li>
+                                <li>06-security</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul class="small-text">
+                                <li>07-performance</li>
+                                <li>08-ui-ux</li>
+                                <li>09-migration</li>
+                                <li>10-planning</li>
+                                <li>11-reports</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Migration Documentation</h3>
+                    <p>Understanding the multi-tenant migration:</p>
+                    <ul class="small-text">
+                        <li><code>MIGRATION-COMPLETE.md</code> - Completed migration status</li>
+                        <li><code>docs/multi-tenant-company-context-migration.md</code> - Technical guide</li>
+                        <li><code>backups/</code> - Backup scripts</li>
+                        <li><code>migrations/</code> - All 79 database migrations</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>External Resources</h3>
+                    <ul>
+                        <li><strong>Symfony Docs:</strong> <a href="https://symfony.com/doc/8.0/index.html">symfony.com/doc/8.0</a></li>
+                        <li><strong>Doctrine ORM:</strong> <a href="https://www.doctrine-project.org/projects/orm.html">doctrine-project.org</a></li>
+                        <li><strong>API Platform:</strong> <a href="https://api-platform.com/docs/">api-platform.com/docs</a></li>
+                        <li><strong>PHPStan:</strong> <a href="https://phpstan.org/user-guide/getting-started">phpstan.org</a></li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Getting Help Section -->
+            <section>
+                <section>
+                    <h2>🆘 Getting Help</h2>
+                    <p>When you're stuck</p>
+                </section>
+
+                <section>
+                    <h3>Debugging Tools</h3>
+                    <ul>
+                        <li><strong>Symfony Profiler:</strong> Available in dev mode - bottom toolbar</li>
+                        <li><strong>Logs:</strong> <code>docker compose logs -f app</code></li>
+                        <li><strong>Database logs:</strong> <code>docker compose logs -f db</code></li>
+                        <li><strong>Redis:</strong> <code>docker compose exec redis redis-cli</code></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Console Commands</h3>
+                    <pre><code class="bash"># List all commands
+php bin/console list
+
+# Get help for a command
+php bin/console help &lt;command&gt;
+
+# Debug routes
+php bin/console debug:router
+
+# Debug services
+php bin/console debug:container
+
+# Debug config
+php bin/console debug:config</code></pre>
+                </section>
+
+                <section>
+                    <h3>Common Debugging Steps</h3>
+                    <ol>
+                        <li>Check the Symfony profiler (dev toolbar)</li>
+                        <li>Review application logs</li>
+                        <li>Verify database state</li>
+                        <li>Test in isolation (unit test)</li>
+                        <li>Check for multi-tenant issues (company filtering)</li>
+                        <li>Verify migrations are up to date</li>
+                        <li>Clear cache: <code>php bin/console cache:clear</code></li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>Before Asking for Help</h3>
+                    <div class="info-box">
+                        <p><strong>Provide context:</strong></p>
+                        <ul class="small-text">
+                            <li>What were you trying to do?</li>
+                            <li>What did you expect to happen?</li>
+                            <li>What actually happened?</li>
+                            <li>Error messages (full stack trace)</li>
+                            <li>Steps to reproduce</li>
+                            <li>What have you tried already?</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Key Takeaways Section -->
+            <section>
+                <section>
+                    <h2>🎯 Key Takeaways</h2>
+                    <p>Remember these core concepts</p>
+                </section>
+
+                <section>
+                    <h3>The Big Three</h3>
+                    <div class="info-box">
+                        <h4 style="margin-top: 0;">1. Multi-Tenancy is Everything</h4>
+                        <p>Every entity must implement <code>CompanyOwnedInterface</code>. This is non-negotiable for data security.</p>
+                    </div>
+                    <div class="info-box">
+                        <h4 style="margin-top: 0;">2. Quality is Built-In</h4>
+                        <p>PHPStan Level 4, comprehensive tests, Deptrac validation. Run <code>composer check-all</code> before committing.</p>
+                    </div>
+                    <div class="info-box">
+                        <h4 style="margin-top: 0;">3. Modern PHP All The Way</h4>
+                        <p>PHP 8.5, property hooks, strict types. This is cutting-edge PHP development.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Essential Commands</h3>
+                    <pre><code class="bash"># Start development
+docker compose up -d
+./build-assets.sh watch
+
+# Before committing
+composer check-all
+
+# Run tests
+composer test-all
+
+# Access console
+docker compose exec app php bin/console</code></pre>
+                </section>
+
+                <section>
+                    <h3>Architecture Principles</h3>
+                    <ul>
+                        <li>✅ <strong>Controllers are thin</strong> - delegate to services</li>
+                        <li>✅ <strong>Company context everywhere</strong> - multi-tenant always</li>
+                        <li>✅ <strong>Tests are required</strong> - not optional</li>
+                        <li>✅ <strong>Migrations for schema changes</strong> - never skip them</li>
+                        <li>✅ <strong>Type hints everywhere</strong> - strict types enabled</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Project Philosophy</h3>
+                    <div class="info-box">
+                        <p><strong>HotOnes is built for:</strong></p>
+                        <ul>
+                            <li>🎯 <strong>Clarity:</strong> Understand profitability at a glance</li>
+                            <li>🤖 <strong>Intelligence:</strong> AI-powered recommendations</li>
+                            <li>🔒 <strong>Security:</strong> Multi-tenant isolation</li>
+                            <li>📊 <strong>Insights:</strong> Data-driven decision making</li>
+                            <li>⚡ <strong>Quality:</strong> Maintainable, tested, validated</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>What Makes HotOnes Special</h3>
+                    <ul>
+                        <li>🔥 <strong>78 days</strong> to production-ready SaaS</li>
+                        <li>🔥 <strong>532 commits</strong> maintaining quality</li>
+                        <li>🔥 <strong>Multi-tenant</strong> architecture from the ground up</li>
+                        <li>🔥 <strong>AI-powered</strong> planning & optimization</li>
+                        <li>🔥 <strong>Modern PHP</strong> 8.5 with property hooks</li>
+                        <li>🔥 <strong>Comprehensive</strong> testing & validation</li>
+                    </ul>
+                </section>
+
+                <section class="title-slide">
+                    <h2>Welcome to HotOnes! 🔥</h2>
+                    <p style="margin-top: 2rem; font-size: 1.2em;">You're now ready to start developing</p>
+                    <div style="margin-top: 3rem;">
+                        <p><strong>Quick Start:</strong></p>
+                        <pre style="display: inline-block; text-align: left;"><code class="bash">docker compose up -d
+./build-assets.sh watch
+# Start building!</code></pre>
+                    </div>
+                    <p style="margin-top: 2rem;" class="small-text">Remember: Multi-tenant always, quality first, test everything</p>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1280,
+            height: 800,
+            margin: 0.04,
+            maxScale: 0.8,
+            center: false,
+            hash: true,
+            transition: 'slide',
+            transitionSpeed: 'default',
+            slideNumber: true,
+            progress: true,
+            controls: true,
+            keyboard: true,
+            overview: true,
+            touch: true,
+            loop: false,
+            rtl: false,
+            shuffle: false,
+            fragments: true,
+            fragmentInURL: true,
+            embedded: false,
+            help: true,
+            showNotes: false,
+            autoPlayMedia: null,
+            preloadIframes: null,
+            autoSlide: 0,
+            autoSlideStoppable: true,
+            mouseWheel: false,
+            hideInactiveCursor: true,
+            hideCursorTime: 5000,
+            navigationMode: 'default'
+        });
+    </script>
+</body>
+</html>

@@ -21,8 +21,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProjectDetailController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private \App\Service\ProfitabilityService $profitabilityService,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly \App\Service\ProfitabilityService $profitabilityService,
         private readonly CompanyContext $companyContext
     ) {
     }
@@ -227,7 +227,7 @@ class ProjectDetailController extends AbstractController
 
         foreach ($tasks as $task) {
             if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $labels[]         = substr($task->getName(), 0, 20).(strlen($task->getName()) > 20 ? '...' : '');
+                $labels[]         = substr((string) $task->getName(), 0, 20).(strlen((string) $task->getName()) > 20 ? '...' : '');
                 $progressData[]   = (float) $task->getProgressPercentage();
                 $spentHours[]     = (float) $task->getTotalHours();
                 $remainingHours[] = (float) $task->getRemainingHours();

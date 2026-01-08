@@ -14,7 +14,7 @@ use Monolog\Processor\ProcessorInterface;
  */
 class PerformanceProcessor implements ProcessorInterface
 {
-    private float $startTime;
+    private readonly float $startTime;
 
     public function __construct()
     {

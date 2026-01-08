@@ -122,10 +122,10 @@ class ContributorSatisfactionController extends AbstractController
                     }
 
                     if (!empty($xpResult['badges_unlocked'])) {
-                        $badgeNames = array_map(fn ($badge) => $badge->getName(), $xpResult['badges_unlocked']);
+                        $badgeNames = array_map(fn ($badge): string => $badge->getName(), $xpResult['badges_unlocked']);
                         $this->addFlash('success', 'Nouveau badge débloqué : '.implode(', ', $badgeNames));
                     }
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // Ne pas bloquer la satisfaction si l'XP échoue
                 }
             }
@@ -266,7 +266,7 @@ class ContributorSatisfactionController extends AbstractController
 
         $output = fopen('php://temp', 'r+');
         foreach ($csv as $row) {
-            fputcsv($output, $row, ';');
+            fputcsv($output, $row, ';', escape: '\\');
         }
         rewind($output);
         $response->setContent(stream_get_contents($output));

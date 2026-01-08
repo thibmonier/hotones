@@ -127,19 +127,17 @@ class PlanningOptimizationController extends AbstractController
 
         return $this->json([
             'success'         => true,
-            'recommendations' => array_map(function ($rec) {
-                return [
-                    'type'           => $rec['type'],
-                    'title'          => $rec['title'],
-                    'description'    => $rec['description'],
-                    'priority_score' => $rec['priority_score'],
-                    'severity'       => $rec['severity_level'],
-                    'impact'         => $rec['expected_impact'] ?? null,
-                    'contributor'    => $rec['contributor']->getFullName(),
-                    'target'         => $rec['target']?->getFullName() ?? null,
-                    'project'        => $rec['project']?->getName()    ?? null,
-                ];
-            }, $result['recommendations']),
+            'recommendations' => array_map(fn ($rec): array => [
+                'type'           => $rec['type'],
+                'title'          => $rec['title'],
+                'description'    => $rec['description'],
+                'priority_score' => $rec['priority_score'],
+                'severity'       => $rec['severity_level'],
+                'impact'         => $rec['expected_impact'] ?? null,
+                'contributor'    => $rec['contributor']->getFullName(),
+                'target'         => $rec['target']?->getFullName() ?? null,
+                'project'        => $rec['project']?->getName()    ?? null,
+            ], $result['recommendations']),
             'summary' => $result['summary'],
         ]);
     }

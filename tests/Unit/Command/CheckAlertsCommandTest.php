@@ -15,7 +15,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class CheckAlertsCommandTest extends TestCase
 {
-    private AlertDetectionService $alertDetectionService;
+    private \PHPUnit\Framework\MockObject\MockObject $alertDetectionService;
     private CheckAlertsCommand $command;
     private CommandTester $commandTester;
 

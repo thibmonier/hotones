@@ -24,8 +24,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class HomeController extends AbstractController
 {
     public function __construct(
-        private DashboardReadService $dashboardReadService,
-        private ?HrMetricsService $hrMetricsService = null
+        private readonly DashboardReadService $dashboardReadService,
+        private readonly ?HrMetricsService $hrMetricsService = null
     ) {
     }
 
@@ -304,7 +304,7 @@ class HomeController extends AbstractController
         $weeklyTimesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startOfWeek, $endOfWeek);
 
         // Total heures cette semaine
-        $weeklyHours = array_reduce($weeklyTimesheets, fn ($sum, $t) => $sum + $t->getHours(), 0);
+        $weeklyHours = array_reduce($weeklyTimesheets, fn ($sum, $t): float|int|array => $sum + $t->getHours(), 0);
 
         // Mes temps récents
         $recentTimesheets = $timesheetRepo->findRecentByContributor($contributor, 5);

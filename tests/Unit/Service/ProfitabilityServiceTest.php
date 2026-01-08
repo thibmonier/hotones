@@ -22,21 +22,21 @@ class ProfitabilityServiceTest extends TestCase
 {
     private function createProjectWithRevenueAndCosts(): Project
     {
-        $project = (new Project())->setName('Test Project');
+        $project = new Project()->setName('Test Project');
 
         // Order with one section and one service line
-        $order = (new Order())
+        $order = new Order()
             ->setOrderNumber('D202501-001')
             ->setStatus('signed'); // Note: service expects english statuses
 
-        $section = (new OrderSection())
+        $section = new OrderSection()
             ->setTitle('Services');
 
-        $profile = (new Profile())
+        $profile = new Profile()
             ->setName('Dev')
             ->setDefaultDailyRate('600');
 
-        $line = (new OrderLine())
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('Implementation')
             ->setType('service')
@@ -53,31 +53,31 @@ class ProfitabilityServiceTest extends TestCase
         $project->setPurchasesAmount('200.00');
 
         // Timesheets: 2 days total (16h) with CJM 400
-        $contributor = (new Contributor())
+        $contributor = new Contributor()
             ->setFirstName('Alice')
             ->setLastName('Test');
 
-        $employmentPeriod = (new EmploymentPeriod())
+        $employmentPeriod = new EmploymentPeriod()
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
             ->setCjm('400')
             ->setTjm('800');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
-        $regularTask = (new ProjectTask())
+        $regularTask = new ProjectTask()
             ->setProject($project)
             ->setName('Work')
             ->setType(ProjectTask::TYPE_REGULAR)
             ->setCountsForProfitability(true);
         $project->addTask($regularTask);
 
-        $ts1 = (new Timesheet())
+        $ts1 = new Timesheet()
             ->setContributor($contributor)
             ->setProject($project)
             ->setTask($regularTask)
             ->setDate(new DateTime('2025-01-10'))
             ->setHours('8.00');
-        $ts2 = (new Timesheet())
+        $ts2 = new Timesheet()
             ->setContributor($contributor)
             ->setProject($project)
             ->setTask($regularTask)
@@ -122,21 +122,21 @@ class ProfitabilityServiceTest extends TestCase
         $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
-        $project = (new Project())
+        $project = new Project()
             ->setName('Internal')
             ->setIsInternal(true);
 
-        $contributor = (new Contributor())
+        $contributor = new Contributor()
             ->setFirstName('Bob')
             ->setLastName('Test');
 
-        $employmentPeriod = (new EmploymentPeriod())
+        $employmentPeriod = new EmploymentPeriod()
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
             ->setCjm('400');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
-        $ts = (new Timesheet())
+        $ts = new Timesheet()
             ->setContributor($contributor)
             ->setProject($project)
             ->setDate(new DateTime('2025-01-10'))
@@ -159,21 +159,21 @@ class ProfitabilityServiceTest extends TestCase
         $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
-        $project = (new Project())->setName('Test Project');
+        $project = new Project()->setName('Test Project');
 
         // Order with contingency
-        $order = (new Order())
+        $order = new Order()
             ->setOrderNumber('D202501-002')
             ->setStatus('signed')
             ->setContingencyPercentage('10'); // 10% contingency
 
-        $section = (new OrderSection())->setTitle('Services');
+        $section = new OrderSection()->setTitle('Services');
 
-        $profile = (new Profile())
+        $profile = new Profile()
             ->setName('Dev')
             ->setDefaultDailyRate('600');
 
-        $line = (new OrderLine())
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('Implementation')
             ->setType('service')
@@ -196,20 +196,20 @@ class ProfitabilityServiceTest extends TestCase
         $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
-        $project = (new Project())->setName('Test Project');
+        $project = new Project()->setName('Test Project');
 
-        $contributor = (new Contributor())
+        $contributor = new Contributor()
             ->setFirstName('Alice')
             ->setLastName('Test');
 
-        $employmentPeriod = (new EmploymentPeriod())
+        $employmentPeriod = new EmploymentPeriod()
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
             ->setCjm('400');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
         // Billable task
-        $billableTask = (new ProjectTask())
+        $billableTask = new ProjectTask()
             ->setProject($project)
             ->setName('Billable Work')
             ->setType(ProjectTask::TYPE_REGULAR)
@@ -217,7 +217,7 @@ class ProfitabilityServiceTest extends TestCase
         $project->addTask($billableTask);
 
         // Non-billable task (AVV)
-        $nonBillableTask = (new ProjectTask())
+        $nonBillableTask = new ProjectTask()
             ->setProject($project)
             ->setName('AVV')
             ->setType(ProjectTask::TYPE_AVV)
@@ -225,7 +225,7 @@ class ProfitabilityServiceTest extends TestCase
         $project->addTask($nonBillableTask);
 
         // Billable timesheet (8h)
-        $ts1 = (new Timesheet())
+        $ts1 = new Timesheet()
             ->setContributor($contributor)
             ->setProject($project)
             ->setTask($billableTask)
@@ -234,7 +234,7 @@ class ProfitabilityServiceTest extends TestCase
         $project->getTimesheets()->add($ts1);
 
         // Non-billable timesheet (4h)
-        $ts2 = (new Timesheet())
+        $ts2 = new Timesheet()
             ->setContributor($contributor)
             ->setProject($project)
             ->setTask($nonBillableTask)
@@ -257,17 +257,17 @@ class ProfitabilityServiceTest extends TestCase
         $service = new ProfitabilityService($em);
 
         // External project with revenue
-        $externalProject = (new Project())
+        $externalProject = new Project()
             ->setName('External')
             ->setIsInternal(false);
 
-        $order = (new Order())
+        $order = new Order()
             ->setOrderNumber('D202501-003')
             ->setStatus('signed');
 
-        $section = (new OrderSection())->setTitle('Services');
+        $section = new OrderSection()->setTitle('Services');
 
-        $line = (new OrderLine())
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('Implementation')
             ->setType('service')
@@ -279,7 +279,7 @@ class ProfitabilityServiceTest extends TestCase
         $externalProject->addOrder($order);
 
         // Internal project (should be excluded)
-        $internalProject = (new Project())
+        $internalProject = new Project()
             ->setName('Internal')
             ->setIsInternal(true);
 
@@ -309,16 +309,16 @@ class ProfitabilityServiceTest extends TestCase
         $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
-        $project = (new Project())->setName('Test Project');
+        $project = new Project()->setName('Test Project');
 
         // Sold: 5 days
-        $order = (new Order())
+        $order = new Order()
             ->setOrderNumber('D202501-004')
             ->setStatus('signed');
 
-        $section = (new OrderSection())->setTitle('Services');
+        $section = new OrderSection()->setTitle('Services');
 
-        $line = (new OrderLine())
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('Implementation')
             ->setType('service')
@@ -330,17 +330,17 @@ class ProfitabilityServiceTest extends TestCase
         $project->addOrder($order);
 
         // Worked: 8 days (6 days billable = 48h)
-        $contributor = (new Contributor())
+        $contributor = new Contributor()
             ->setFirstName('Alice')
             ->setLastName('Test');
 
-        $employmentPeriod = (new EmploymentPeriod())
+        $employmentPeriod = new EmploymentPeriod()
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
             ->setCjm('400');
         $contributor->addEmploymentPeriod($employmentPeriod);
 
-        $billableTask = (new ProjectTask())
+        $billableTask = new ProjectTask()
             ->setProject($project)
             ->setName('Work')
             ->setType(ProjectTask::TYPE_REGULAR)
@@ -349,7 +349,7 @@ class ProfitabilityServiceTest extends TestCase
 
         // 6 timesheets of 8h each = 48h = 6 days
         for ($i = 0; $i < 6; ++$i) {
-            $ts = (new Timesheet())
+            $ts = new Timesheet()
                 ->setContributor($contributor)
                 ->setProject($project)
                 ->setTask($billableTask)
@@ -372,16 +372,16 @@ class ProfitabilityServiceTest extends TestCase
         $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
-        $project = (new Project())->setName('Test Project');
+        $project = new Project()->setName('Test Project');
 
         // Low revenue
-        $order = (new Order())
+        $order = new Order()
             ->setOrderNumber('D202501-005')
             ->setStatus('signed');
 
-        $section = (new OrderSection())->setTitle('Services');
+        $section = new OrderSection()->setTitle('Services');
 
-        $line = (new OrderLine())
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('Implementation')
             ->setType('service')
@@ -393,17 +393,17 @@ class ProfitabilityServiceTest extends TestCase
         $project->addOrder($order);
 
         // High costs
-        $contributor = (new Contributor())
+        $contributor = new Contributor()
             ->setFirstName('Alice')
             ->setLastName('Test');
 
-        $employmentPeriod = (new EmploymentPeriod())
+        $employmentPeriod = new EmploymentPeriod()
             ->setContributor($contributor)
             ->setStartDate(new DateTime('-6 months'))
             ->setCjm('800'); // High cost
         $contributor->addEmploymentPeriod($employmentPeriod);
 
-        $billableTask = (new ProjectTask())
+        $billableTask = new ProjectTask()
             ->setProject($project)
             ->setName('Work')
             ->setType(ProjectTask::TYPE_REGULAR)
@@ -412,7 +412,7 @@ class ProfitabilityServiceTest extends TestCase
 
         // 10 days of work (80h)
         for ($i = 1; $i <= 10; ++$i) {
-            $ts = (new Timesheet())
+            $ts = new Timesheet()
                 ->setContributor($contributor)
                 ->setProject($project)
                 ->setTask($billableTask)
@@ -421,16 +421,8 @@ class ProfitabilityServiceTest extends TestCase
             $project->getTimesheets()->add($ts);
         }
 
-        $alerts = $service->generateProfitabilityAlerts($project);
-
-        // Should have negative margin alert
-        $hasNegativeMarginAlert = false;
-        foreach ($alerts as $alert) {
-            if ($alert['type'] === 'danger' && $alert['title'] === 'Marge négative') {
-                $hasNegativeMarginAlert = true;
-                break;
-            }
-        }
+        $alerts                 = $service->generateProfitabilityAlerts($project);
+        $hasNegativeMarginAlert = array_any($alerts, fn ($alert): bool => $alert['type'] === 'danger' && $alert['title'] === 'Marge négative');
 
         $this->assertTrue($hasNegativeMarginAlert);
     }
@@ -483,16 +475,16 @@ class ProfitabilityServiceTest extends TestCase
         $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
-        $project = (new Project())->setName('Multi-order Project');
+        $project = new Project()->setName('Multi-order Project');
 
         // First order: 5 days at 1000/day
-        $order1 = (new Order())
+        $order1 = new Order()
             ->setOrderNumber('D202501-006')
             ->setStatus('signed');
 
-        $section1 = (new OrderSection())->setTitle('Phase 1');
+        $section1 = new OrderSection()->setTitle('Phase 1');
 
-        $line1 = (new OrderLine())
+        $line1 = new OrderLine()
             ->setSection($section1)
             ->setDescription('Implementation')
             ->setType('service')
@@ -504,13 +496,13 @@ class ProfitabilityServiceTest extends TestCase
         $project->addOrder($order1);
 
         // Second order: 3 days at 1200/day
-        $order2 = (new Order())
+        $order2 = new Order()
             ->setOrderNumber('D202501-007')
             ->setStatus('signed');
 
-        $section2 = (new OrderSection())->setTitle('Phase 2');
+        $section2 = new OrderSection()->setTitle('Phase 2');
 
-        $line2 = (new OrderLine())
+        $line2 = new OrderLine()
             ->setSection($section2)
             ->setDescription('Additional work')
             ->setType('service')
@@ -535,16 +527,16 @@ class ProfitabilityServiceTest extends TestCase
         $em      = $this->createMock(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
-        $project = (new Project())->setName('Test Project');
+        $project = new Project()->setName('Test Project');
 
         // Signed order (should count)
-        $order1 = (new Order())
+        $order1 = new Order()
             ->setOrderNumber('D202501-008')
             ->setStatus('signed');
 
-        $section1 = (new OrderSection())->setTitle('Services 1');
+        $section1 = new OrderSection()->setTitle('Services 1');
 
-        $line1 = (new OrderLine())
+        $line1 = new OrderLine()
             ->setSection($section1)
             ->setDescription('Implementation')
             ->setType('service')
@@ -556,13 +548,13 @@ class ProfitabilityServiceTest extends TestCase
         $project->addOrder($order1);
 
         // Pending order (should NOT count)
-        $order2 = (new Order())
+        $order2 = new Order()
             ->setOrderNumber('D202501-009')
             ->setStatus('a_signer'); // Not signed yet
 
-        $section2 = (new OrderSection())->setTitle('Services 2');
+        $section2 = new OrderSection()->setTitle('Services 2');
 
-        $line2 = (new OrderLine())
+        $line2 = new OrderLine()
             ->setSection($section2)
             ->setDescription('Future work')
             ->setType('service')

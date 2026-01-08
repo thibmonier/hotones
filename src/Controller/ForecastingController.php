@@ -56,7 +56,7 @@ class ForecastingController extends AbstractController
         // Get legacy forecast for comparison (using old method)
         try {
             $legacyForecast = $this->forecastingService->forecastRevenue($months);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             $legacyForecast = null;
         }
 

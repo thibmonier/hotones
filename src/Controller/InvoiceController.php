@@ -98,7 +98,7 @@ class InvoiceController extends AbstractController
             'amountTtc'     => 'i.amountTtc',
             default         => 'i.issuedAt',
         };
-        $qb->orderBy($sortField, strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC');
+        $qb->orderBy($sortField, strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC');
 
         // Total - recréer les joins pour le comptage
         $qbCount = $em->createQueryBuilder()
@@ -149,7 +149,7 @@ class InvoiceController extends AbstractController
             'start_date' => $startDate,
             'end_date'   => $endDate,
             'sort'       => $sort,
-            'dir'        => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+            'dir'        => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'per_page'   => $perPage,
         ]);
 
@@ -174,7 +174,7 @@ class InvoiceController extends AbstractController
                 'per_page'   => $perPage,
             ],
             'sort'       => $sort,
-            'dir'        => strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC',
+            'dir'        => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'pagination' => $pagination,
         ]);
     }
@@ -372,7 +372,7 @@ class InvoiceController extends AbstractController
         $filename = sprintf(
             'facture_%s_%s.pdf',
             $invoice->getInvoiceNumber(),
-            (new DateTime())->format('Y-m-d'),
+            new DateTime()->format('Y-m-d'),
         );
 
         // Générer et retourner le PDF
@@ -430,10 +430,10 @@ class InvoiceController extends AbstractController
 
         // Dates par défaut : année en cours
         if (!$startDate) {
-            $startDate = (new DateTime('first day of January this year'))->format('Y-m-d');
+            $startDate = new DateTime('first day of January this year')->format('Y-m-d');
         }
         if (!$endDate) {
-            $endDate = (new DateTime('last day of December this year'))->format('Y-m-d');
+            $endDate = new DateTime('last day of December this year')->format('Y-m-d');
         }
 
         $start = new DateTime($startDate);

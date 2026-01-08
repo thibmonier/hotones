@@ -97,7 +97,7 @@ class NotificationController extends AbstractController
         $notifications = $this->notificationService->getUnreadNotifications($user, 10);
         $count         = $this->notificationService->countUnreadNotifications($user);
 
-        $data = array_map(fn (Notification $n) => [
+        $data = array_map(fn (Notification $n): array => [
             'id'               => $n->getId(),
             'type'             => $n->getType()->value,
             'title'            => $n->getTitle(),
@@ -172,23 +172,26 @@ class NotificationController extends AbstractController
     {
         $now  = new DateTimeImmutable();
         $diff = $now->getTimestamp() - $date->getTimestamp();
-
         if ($diff < 60) {
             return 'À l\'instant';
-        } elseif ($diff < 3600) {
+        }
+        if ($diff < 3600) {
             $minutes = (int) floor($diff / 60);
 
             return "Il y a {$minutes} minute".($minutes > 1 ? 's' : '');
-        } elseif ($diff < 86400) {
+        }
+        if ($diff < 86400) {
             $hours = (int) floor($diff / 3600);
 
             return "Il y a {$hours} heure".($hours > 1 ? 's' : '');
-        } elseif ($diff < 604800) {
+        }
+
+        if ($diff < 604800) {
             $days = (int) floor($diff / 86400);
 
             return "Il y a {$days} jour".($days > 1 ? 's' : '');
-        } else {
-            return $date->format('d/m/Y à H:i');
         }
+
+        return $date->format('d/m/Y à H:i');
     }
 }

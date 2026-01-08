@@ -22,10 +22,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractController
 {
     public function __construct(
-        private DashboardReadService $dashboardReadService,
-        private ExcelExportService $excelExportService,
-        private MessageBusInterface $messageBus,
-        private \App\Repository\ProjectRepository $projectRepository
+        private readonly DashboardReadService $dashboardReadService,
+        private readonly ExcelExportService $excelExportService,
+        private readonly MessageBusInterface $messageBus,
+        private readonly \App\Repository\ProjectRepository $projectRepository
     ) {
     }
 

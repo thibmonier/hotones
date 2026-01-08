@@ -14,6 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Error;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Stringable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -39,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'idx_company_subscription_tier', columns: ['subscription_tier'])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['slug'], message: 'This company slug is already in use.')]
-class Company
+class Company implements Stringable
 {
     // ===========================
     // Constants
@@ -410,7 +411,7 @@ class Company
     public function disableFeature(string $feature): self
     {
         $this->enabledFeatures = array_values(
-            array_filter($this->enabledFeatures, fn ($f) => $f !== $feature),
+            array_filter($this->enabledFeatures, fn ($f): bool => $f !== $feature),
         );
 
         return $this;

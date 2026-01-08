@@ -3,22 +3,21 @@
 namespace App\Twig;
 
 use App\Menu\MenuBuilder;
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class MenuExtension extends AbstractExtension
 {
-    private MenuBuilder $menuBuilder;
-
-    public function __construct(MenuBuilder $menuBuilder)
+    public function __construct(private readonly MenuBuilder $menuBuilder)
     {
-        $this->menuBuilder = $menuBuilder;
     }
 
+    #[Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_main_menu', [$this, 'getMainMenu']),
+            new TwigFunction('get_main_menu', $this->getMainMenu(...)),
         ];
     }
 

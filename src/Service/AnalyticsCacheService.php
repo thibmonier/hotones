@@ -13,8 +13,8 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class AnalyticsCacheService
 {
-    private const DEFAULT_TTL      = 3600; // 1 heure par défaut
-    private const CACHE_KEY_PREFIX = 'analytics_';
+    private const int DEFAULT_TTL         = 3600; // 1 heure par défaut
+    private const string CACHE_KEY_PREFIX = 'analytics_';
 
     public function __construct(
         private readonly CacheInterface $cache

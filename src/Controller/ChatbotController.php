@@ -71,7 +71,7 @@ class ChatbotController extends AbstractController
         if (!empty($this->anthropicApiKey)) {
             try {
                 return $this->callAnthropic($userMessage);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Fallback vers OpenAI
             }
         }
@@ -80,7 +80,7 @@ class ChatbotController extends AbstractController
         if (!empty($this->openAiKey)) {
             try {
                 return $this->callOpenAI($userMessage);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Fallback vers Gemini
             }
         }

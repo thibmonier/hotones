@@ -181,7 +181,7 @@ class AlertDetectionService
     private function checkPaymentAlerts(): int
     {
         $alertCount       = 0;
-        $sevenDaysFromNow = (new DateTimeImmutable())->modify('+7 days');
+        $sevenDaysFromNow = new DateTimeImmutable()->modify('+7 days');
 
         // Find all active orders
         $orders = $this->orderRepository->findBy(
@@ -194,7 +194,7 @@ class AlertDetectionService
                 // Note: Actual billing status tracking may be elsewhere in the system
                 if ($schedule->getBillingDate() <= $sevenDaysFromNow) {
                     $recipients   = $this->getPaymentAlertRecipients($order);
-                    $daysUntilDue = (new DateTime())->diff($schedule->getBillingDate())->days;
+                    $daysUntilDue = new DateTime()->diff($schedule->getBillingDate())->days;
 
                     $this->eventDispatcher->dispatch(
                         new PaymentDueAlertEvent(

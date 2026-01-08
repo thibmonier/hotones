@@ -176,7 +176,7 @@ class Planning implements CompanyOwnedInterface
         // Convertir heures en jours (8h = 1j) puis multiplier par CJM
         $days = bcdiv($totalHours, '8', 4);
 
-        return bcmul($days, $cjm, 2);
+        return bcmul($days, (string) $cjm, 2);
     }
 
     /**

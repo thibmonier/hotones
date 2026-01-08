@@ -14,6 +14,7 @@ use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -35,6 +36,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->setUpMultiTenant();
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();

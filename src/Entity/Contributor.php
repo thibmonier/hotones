@@ -358,7 +358,7 @@ class Contributor implements CompanyOwnedInterface
     // Méthode utilitaire pour obtenir les noms des profils
     public function getProfileNames(): array
     {
-        return $this->profiles->map(fn (Profile $profile) => $profile->getName())->toArray();
+        return $this->profiles->map(fn (Profile $profile): string => $profile->getName())->toArray();
     }
 
     /**

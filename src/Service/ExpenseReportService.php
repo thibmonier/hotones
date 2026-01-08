@@ -14,8 +14,8 @@ use LogicException;
 class ExpenseReportService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private CompanyContext $companyContext,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CompanyContext $companyContext,
     ) {
     }
 

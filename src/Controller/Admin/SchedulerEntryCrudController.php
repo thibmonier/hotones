@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use Override;
 
 class SchedulerEntryCrudController extends AbstractCrudController
 {
@@ -22,6 +23,7 @@ class SchedulerEntryCrudController extends AbstractCrudController
         return SchedulerEntry::class;
     }
 
+    #[Override]
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -32,6 +34,7 @@ class SchedulerEntryCrudController extends AbstractCrudController
             ->setPaginatorPageSize(25);
     }
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
@@ -69,12 +72,14 @@ class SchedulerEntryCrudController extends AbstractCrudController
             ->hideOnIndex();
     }
 
+    #[Override]
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
             ->add(BooleanFilter::new('enabled', 'Activé'));
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         return $actions

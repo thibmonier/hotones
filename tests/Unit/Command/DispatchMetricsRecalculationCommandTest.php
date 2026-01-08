@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
  */
 class DispatchMetricsRecalculationCommandTest extends TestCase
 {
-    private MessageBusInterface $messageBus;
+    private \PHPUnit\Framework\MockObject\MockObject $messageBus;
     private DispatchMetricsRecalculationCommand $command;
     private CommandTester $commandTester;
 
@@ -71,7 +71,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->commandTester->execute(['--year' => (string) $year]);
 
         // Verify 12 monthly messages
-        $monthlyMessages = array_filter($dispatchedDates, fn ($d) => $d['granularity'] === 'monthly');
+        $monthlyMessages = array_filter($dispatchedDates, fn ($d): bool => $d['granularity'] === 'monthly');
         $this->assertCount(12, $monthlyMessages);
 
         // Verify dates are correct
@@ -108,7 +108,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->commandTester->execute(['--year' => (string) $year]);
 
         // Verify 4 quarterly messages
-        $quarterlyMessages = array_filter($dispatchedDates, fn ($d) => $d['granularity'] === 'quarterly');
+        $quarterlyMessages = array_filter($dispatchedDates, fn ($d): bool => $d['granularity'] === 'quarterly');
         $this->assertCount(4, $quarterlyMessages);
 
         // Verify dates: Q1=01-01, Q2=04-01, Q3=07-01, Q4=10-01
@@ -140,7 +140,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->commandTester->execute(['--year' => (string) $year]);
 
         // Verify 1 yearly message
-        $yearlyMessages = array_filter($dispatchedDates, fn ($d) => $d['granularity'] === 'yearly');
+        $yearlyMessages = array_filter($dispatchedDates, fn ($d): bool => $d['granularity'] === 'yearly');
         $this->assertCount(1, $yearlyMessages);
         $this->assertEquals('2023-01-01', array_values($yearlyMessages)[0]['date']);
     }

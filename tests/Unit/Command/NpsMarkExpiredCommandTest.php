@@ -15,7 +15,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class NpsMarkExpiredCommandTest extends TestCase
 {
-    private NpsSurveyRepository $npsSurveyRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $npsSurveyRepository;
     private NpsMarkExpiredCommand $command;
     private CommandTester $commandTester;
 

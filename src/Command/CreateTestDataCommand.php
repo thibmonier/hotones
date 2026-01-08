@@ -37,7 +37,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class CreateTestDataCommand extends Command
 {
     // Répartition des contributeurs selon les profils
-    private const CONTRIBUTORS_DISTRIBUTION = [
+    private const array CONTRIBUTORS_DISTRIBUTION = [
         'développeur fullstack' => 6,
         'développeur frontend'  => 5,
         'développeur backend'   => 4,
@@ -51,13 +51,13 @@ class CreateTestDataCommand extends Command
     ];
 
     // Prénoms et noms français
-    private const FIRST_NAMES = [
+    private const array FIRST_NAMES = [
         'Alice', 'Bob', 'Claire', 'David', 'Emma', 'François', 'Gabrielle', 'Hugo',
         'Isabelle', 'Julien', 'Karim', 'Léa', 'Marc', 'Nathalie', 'Olivier', 'Patricia',
         'Quentin', 'Rachel', 'Sophie', 'Thomas', 'Valérie', 'William', 'Xavier', 'Yasmine', 'Zoé',
     ];
 
-    private const LAST_NAMES = [
+    private const array LAST_NAMES = [
         'Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert', 'Petit', 'Durand', 'Leroy',
         'Moreau', 'Simon', 'Laurent', 'Lefebvre', 'Michel', 'Garcia', 'David', 'Bertrand',
         'Roux', 'Vincent', 'Fournier', 'Morel', 'Girard', 'André', 'Lefevre', 'Mercier', 'Dupont',
@@ -518,7 +518,7 @@ Répartition des contributeurs :
                 }
 
                 // Tarif journalier aléatoire
-                $task->setDailyRate(400 + rand(0, 200).'.00');
+                $task->setDailyRate(400 + random_int(0, 200).'.00');
 
                 $this->entityManager->persist($task);
             }
@@ -568,12 +568,12 @@ Répartition des contributeurs :
 
             // Chaque contributeur a 70% de chance de travailler un jour donné
             foreach ($contributors as $contributor) {
-                if (rand(1, 100) <= 70) {
+                if (random_int(1, 100) <= 70) {
                     // Sélectionner un projet aléatoire
                     $project = $projects[array_rand($projects)];
 
                     // Heures travaillées entre 4 et 8
-                    $hours = (string) (4 + (rand(0, 40) / 10)); // 4.0 à 8.0
+                    $hours = (string) (4 + (random_int(0, 40) / 10)); // 4.0 à 8.0
 
                     $timesheet = new Timesheet();
                     $timesheet->setCompany($project->getCompany());
@@ -603,7 +603,7 @@ Répartition des contributeurs :
 
         foreach ($contributors as $contributor) {
             // Chaque contributeur: 1 à 3 projets planifiés
-            $num              = rand(1, 3);
+            $num              = random_int(1, 3);
             $selectedProjects = array_rand($projects, min($num, count($projects)));
             if (!is_array($selectedProjects)) {
                 $selectedProjects = [$selectedProjects];
@@ -613,10 +613,10 @@ Répartition des contributeurs :
                 $project = $projects[$idx];
 
                 // Générer 1 à 2 blocs de planification de 2-10 jours ouvrés
-                $blocks = rand(1, 2);
-                $cursor = (clone $startWindow)->modify('+'.rand(0, 14).' days');
+                $blocks = random_int(1, 2);
+                $cursor = (clone $startWindow)->modify('+'.random_int(0, 14).' days');
                 for ($b = 0; $b < $blocks; ++$b) {
-                    $days  = rand(3, 10);
+                    $days  = random_int(3, 10);
                     $start = clone $cursor;
                     $end   = (clone $start)->modify('+'.max(0, $days - 1).' days');
 
@@ -626,15 +626,15 @@ Répartition des contributeurs :
                     $planning->setProject($project);
                     $planning->setStartDate($start);
                     $planning->setEndDate($end);
-                    $planning->setDailyHours((string) rand(6, 8));
-                    $planning->setStatus(rand(0, 1) ? 'planned' : 'confirmed');
+                    $planning->setDailyHours((string) random_int(6, 8));
+                    $planning->setStatus(random_int(0, 1) ? 'planned' : 'confirmed');
                     $planning->setNotes('Bloc prévisionnel');
 
                     $this->entityManager->persist($planning);
                     ++$planningCreated;
 
                     // avancer le curseur de 1 à 3 jours après ce bloc
-                    $cursor = (clone $end)->modify('+'.rand(1, 3).' days');
+                    $cursor = (clone $end)->modify('+'.random_int(1, 3).' days');
                 }
             }
         }

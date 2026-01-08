@@ -22,8 +22,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class HealthCheckController extends AbstractController
 {
     public function __construct(
-        private Connection $connection,
-        private CacheItemPoolInterface $cache,
+        private readonly Connection $connection,
+        private readonly CacheItemPoolInterface $cache,
     ) {
     }
 
@@ -134,7 +134,7 @@ class HealthCheckController extends AbstractController
 
         return $this->json([
             'status'    => $overallStatus,
-            'timestamp' => (new DateTime())->format(DateTimeInterface::ATOM),
+            'timestamp' => new DateTime()->format(DateTimeInterface::ATOM),
             'checks'    => $checks,
             'metadata'  => $metadata,
         ], $httpStatus);
@@ -151,7 +151,7 @@ class HealthCheckController extends AbstractController
     {
         return $this->json([
             'status'    => 'alive',
-            'timestamp' => (new DateTime())->format(DateTimeInterface::ATOM),
+            'timestamp' => new DateTime()->format(DateTimeInterface::ATOM),
         ]);
     }
 
@@ -185,7 +185,7 @@ class HealthCheckController extends AbstractController
             $this->cache->save($testItem);
             $this->cache->deleteItem('readiness_check');
             $checks['cache'] = 'ready';
-        } catch (Exception $e) {
+        } catch (Exception) {
             $checks['cache'] = 'not ready';
             $ready           = false;
             $httpStatus      = Response::HTTP_SERVICE_UNAVAILABLE;
@@ -193,7 +193,7 @@ class HealthCheckController extends AbstractController
 
         return $this->json([
             'status'    => $ready ? 'ready' : 'not ready',
-            'timestamp' => (new DateTime())->format(DateTimeInterface::ATOM),
+            'timestamp' => new DateTime()->format(DateTimeInterface::ATOM),
             'checks'    => $checks,
         ], $httpStatus);
     }

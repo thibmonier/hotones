@@ -23,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GenerateTestInvoicesCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $em
+        private readonly EntityManagerInterface $em
     ) {
         parent::__construct();
     }
@@ -85,7 +85,7 @@ class GenerateTestInvoicesCommand extends Command
             $invoice->setInvoiceNumber($invoiceNumber);
 
             // Montant aléatoire entre 2000€ et 25000€
-            $amountHt  = rand(2000, 25000);
+            $amountHt  = random_int(2000, 25000);
             $tvaRate   = 20.00;
             $amountTva = $amountHt * $tvaRate / 100;
             $amountTtc = $amountHt + $amountTva;
@@ -96,12 +96,12 @@ class GenerateTestInvoicesCommand extends Command
             $invoice->setAmountTtc((string) $amountTtc);
 
             // Date d'émission entre -6 mois et maintenant
-            $monthsAgo = rand(0, 6);
-            $issuedAt  = (clone $today)->modify("-{$monthsAgo} months")->modify(sprintf('-%d days', rand(0, 28)));
+            $monthsAgo = random_int(0, 6);
+            $issuedAt  = (clone $today)->modify("-{$monthsAgo} months")->modify(sprintf('-%d days', random_int(0, 28)));
             $invoice->setIssuedAt($issuedAt);
 
             // Statut pondéré
-            $rand   = rand(1, 100);
+            $rand   = random_int(1, 100);
             $cumul  = 0;
             $status = Invoice::STATUS_SENT;
             foreach ($statuses as $st => $weight) {
@@ -119,7 +119,7 @@ class GenerateTestInvoicesCommand extends Command
 
             // Si payée, date de paiement entre échéance -10j et échéance +5j
             if ($status === Invoice::STATUS_PAID) {
-                $daysVariation = rand(-10, 5);
+                $daysVariation = random_int(-10, 5);
                 $paidAt        = (clone $dueDate)->modify(sprintf('%+d days', $daysVariation));
                 $invoice->setPaidAt($paidAt);
             }

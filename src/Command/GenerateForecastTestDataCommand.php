@@ -24,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GenerateForecastTestDataCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $em
+        private readonly EntityManagerInterface $em
     ) {
         parent::__construct();
     }
@@ -107,7 +107,7 @@ class GenerateForecastTestDataCommand extends Command
                 $project->setName($projectName);
 
                 // Date de début (dans le mois)
-                $dayOfMonth = rand(1, 28);
+                $dayOfMonth = random_int(1, 28);
                 $startDate  = (clone $monthDate)->setDate(
                     (int) $monthDate->format('Y'),
                     (int) $monthDate->format('n'),
@@ -116,12 +116,12 @@ class GenerateForecastTestDataCommand extends Command
                 $project->setStartDate($startDate);
 
                 // Date de fin (2-6 mois après)
-                $duration = rand(2, 6);
+                $duration = random_int(2, 6);
                 $endDate  = (clone $startDate)->modify("+{$duration} months");
                 $project->setEndDate($endDate);
 
                 // Statut (80% completed, 20% in_progress)
-                $status = rand(1, 10) <= 8 ? 'completed' : 'in_progress';
+                $status = random_int(1, 10) <= 8 ? 'completed' : 'in_progress';
                 $project->setStatus($status);
 
                 // Client et managers
@@ -130,11 +130,11 @@ class GenerateForecastTestDataCommand extends Command
                 $project->setIsInternal(false);
 
                 // Type de projet (70% forfait, 30% régie)
-                $projectType = rand(1, 10) <= 7 ? 'forfait' : 'regie';
+                $projectType = random_int(1, 10) <= 7 ? 'forfait' : 'regie';
                 $project->setProjectType($projectType);
 
                 // Montant CA (variation réaliste entre 10k et 150k)
-                $baseAmount = rand(10000, 150000);
+                $baseAmount = random_int(10000, 150000);
                 // Arrondir aux 5000€
                 $soldAmount = round($baseAmount / 5000) * 5000;
 
@@ -149,7 +149,7 @@ class GenerateForecastTestDataCommand extends Command
                 $order->setProject($project);
                 $order->setName('Devis principal');
                 $order->setOrderNumber(sprintf('DEV-%s-%03d', $monthDate->format('Ym'), $orderSequence++));
-                $order->setStatus(rand(1, 10) <= 9 ? 'signe' : 'gagne'); // 90% signés, 10% gagnés
+                $order->setStatus(random_int(1, 10) <= 9 ? 'signe' : 'gagne'); // 90% signés, 10% gagnés
                 $order->setContractType($projectType);
                 $order->setTotalAmount((string) $soldAmount);
                 $order->setCreatedAt(clone $startDate);

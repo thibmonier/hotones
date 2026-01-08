@@ -23,7 +23,7 @@ final class StatusController extends AbstractController
             return new JsonResponse([
                 'status' => 'ok',
             ], Response::HTTP_OK);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return new JsonResponse([
                 'status'  => 'error',
                 'message' => 'Database unreachable',

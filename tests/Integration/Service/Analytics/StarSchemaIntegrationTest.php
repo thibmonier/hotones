@@ -73,7 +73,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
             'status'      => 'active',
         ]);
 
-        $fact1 = (new FactProjectMetrics())
+        $fact1 = new FactProjectMetrics()
             ->setCompany($this->getTestCompany())
             ->setDimTime($dimTime1)
             ->setDimProjectType($dimProjectType)
@@ -88,7 +88,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         $this->entityManager->persist($fact1);
 
-        $fact2 = (new FactProjectMetrics())
+        $fact2 = new FactProjectMetrics()
             ->setCompany($this->getTestCompany())
             ->setDimTime($dimTime2)
             ->setDimProjectType($dimProjectType)
@@ -132,7 +132,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
             'status'      => 'active',
         ]);
 
-        $fact = (new FactProjectMetrics())
+        $fact = new FactProjectMetrics()
             ->setCompany($this->getTestCompany())
             ->setDimTime($dimTime)
             ->setDimProjectType($dimProjectType)
@@ -189,7 +189,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
                 'date' => new DateTime("2025-{$month}-15"),
             ]);
 
-            $fact = (new FactProjectMetrics())
+            $fact = new FactProjectMetrics()
                 ->setCompany($this->getTestCompany())
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
@@ -224,12 +224,12 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         // Create 100 entries to test performance - only set date
         for ($i = 1; $i <= 100; ++$i) {
-            $date    = (new DateTime('2025-01-01'))->modify("+{$i} days");
+            $date    = new DateTime('2025-01-01')->modify("+{$i} days");
             $dimTime = DimTimeFactory::createOne([
                 'date' => $date,
             ]);
 
-            $fact = (new FactProjectMetrics())
+            $fact = new FactProjectMetrics()
                 ->setCompany($this->getTestCompany())
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)

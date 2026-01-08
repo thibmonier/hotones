@@ -55,7 +55,7 @@ class NpsController extends AbstractController
 
         // Statistiques globales
         $totalSurveys     = count($surveys);
-        $completedSurveys = array_filter($surveys, fn ($s) => $s->getStatus() === NpsSurvey::STATUS_COMPLETED);
+        $completedSurveys = array_filter($surveys, fn ($s): bool => $s->getStatus() === NpsSurvey::STATUS_COMPLETED);
         $completedCount   = count($completedSurveys);
         $responseRate     = $totalSurveys > 0 ? round(($completedCount / $totalSurveys) * 100, 1) : 0;
 
@@ -249,7 +249,7 @@ class NpsController extends AbstractController
 
         $output = fopen('php://temp', 'r+');
         foreach ($csv as $row) {
-            fputcsv($output, $row, ';');
+            fputcsv($output, $row, ';', escape: '\\');
         }
         rewind($output);
         $response->setContent(stream_get_contents($output));

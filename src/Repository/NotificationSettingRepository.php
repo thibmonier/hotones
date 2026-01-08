@@ -38,12 +38,7 @@ class NotificationSettingRepository extends CompanyAwareRepository
 
         $value = $setting->getSettingValue();
 
-        // Si c'est un tableau avec une seule clé "value", on retourne directement la valeur
-        if (isset($value['value'])) {
-            return $value['value'];
-        }
-
-        return $value;
+        return $value['value'] ?? $value;
     }
 
     /**

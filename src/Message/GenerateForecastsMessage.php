@@ -7,10 +7,10 @@ namespace App\Message;
 /**
  * Message pour déclencher la génération des prévisions de CA.
  */
-final class GenerateForecastsMessage
+final readonly class GenerateForecastsMessage
 {
     public function __construct(
-        private readonly int $months = 12
+        private int $months = 12
     ) {
     }
 

@@ -6,11 +6,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class MenuBuilder
 {
-    private AuthorizationCheckerInterface $security;
-
-    public function __construct(AuthorizationCheckerInterface $security)
+    public function __construct(private readonly AuthorizationCheckerInterface $security)
     {
-        $this->security = $security;
     }
 
     public function buildMainMenu(): array

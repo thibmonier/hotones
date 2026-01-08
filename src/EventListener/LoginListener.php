@@ -15,8 +15,8 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 class LoginListener
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private RequestStack $requestStack
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack
     ) {
     }
 

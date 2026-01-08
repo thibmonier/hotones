@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 class BillingServiceTest extends TestCase
 {
     private BillingService $billingService;
-    private TimesheetRepository|\PHPUnit\Framework\MockObject\MockObject $timesheetRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $timesheetRepositoryMock;
 
     protected function setUp(): void
     {
@@ -24,7 +24,7 @@ class BillingServiceTest extends TestCase
         $this->billingService          = new BillingService($this->timesheetRepositoryMock);
     }
 
-    public function testBuildProjectBillingRecapWithForfaitOrder()
+    public function testBuildProjectBillingRecapWithForfaitOrder(): void
     {
         $project = new Project();
         $order   = new Order();
@@ -58,7 +58,7 @@ class BillingServiceTest extends TestCase
         $this->assertEquals('forfait', $result[1]['type']);
     }
 
-    public function testBuildProjectBillingRecapWithRegieOrder()
+    public function testBuildProjectBillingRecapWithRegieOrder(): void
     {
         $project = new Project();
         $order   = new Order();
@@ -90,7 +90,7 @@ class BillingServiceTest extends TestCase
         $this->assertEquals('regie', $result[1]['type']);
     }
 
-    public function testBuildProjectBillingRecapWithMixedOrders()
+    public function testBuildProjectBillingRecapWithMixedOrders(): void
     {
         $project = new Project();
 
@@ -131,7 +131,7 @@ class BillingServiceTest extends TestCase
         $this->assertEquals('regie', $result[1]['type']);
     }
 
-    public function testBuildProjectBillingRecapEmptyProject()
+    public function testBuildProjectBillingRecapEmptyProject(): void
     {
         $project = new Project();
 
@@ -140,7 +140,7 @@ class BillingServiceTest extends TestCase
         $this->assertEmpty($result);
     }
 
-    public function testBuildProjectBillingRecapSortingByDate()
+    public function testBuildProjectBillingRecapSortingByDate(): void
     {
         $project = new Project();
         $order   = new Order();
@@ -174,7 +174,7 @@ class BillingServiceTest extends TestCase
         $this->assertEquals('2023-03-15', $result[2]['date']->format('Y-m-d'));
     }
 
-    public function testBuildProjectBillingRecapWithEmptyScheduleLabel()
+    public function testBuildProjectBillingRecapWithEmptyScheduleLabel(): void
     {
         $project = new Project();
         $order   = new Order();
@@ -195,7 +195,7 @@ class BillingServiceTest extends TestCase
         $this->assertEquals('Échéance', $result[0]['label']); // Should default to 'Échéance'
     }
 
-    public function testBuildProjectBillingRecapWithNullRevenue()
+    public function testBuildProjectBillingRecapWithNullRevenue(): void
     {
         $project    = new Project();
         $regieOrder = new Order();
@@ -219,7 +219,7 @@ class BillingServiceTest extends TestCase
         $this->assertEquals(0.0, $result[0]['amount']); // Null revenue becomes 0.0
     }
 
-    public function testBuildProjectBillingRecapWithEmptyTimesheetData()
+    public function testBuildProjectBillingRecapWithEmptyTimesheetData(): void
     {
         $project    = new Project();
         $regieOrder = new Order();
@@ -238,7 +238,7 @@ class BillingServiceTest extends TestCase
         $this->assertEmpty($result);
     }
 
-    public function testBuildProjectBillingRecapArrayStructure()
+    public function testBuildProjectBillingRecapArrayStructure(): void
     {
         $project = new Project();
         $order   = new Order();

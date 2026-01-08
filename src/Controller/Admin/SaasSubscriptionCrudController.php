@@ -20,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use Override;
 
 class SaasSubscriptionCrudController extends AbstractCrudController
 {
@@ -28,6 +29,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
         return SaasSubscription::class;
     }
 
+    #[Override]
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -38,6 +40,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
             ->setPaginatorPageSize(25);
     }
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
@@ -45,14 +48,12 @@ class SaasSubscriptionCrudController extends AbstractCrudController
 
         yield AssociationField::new('service', 'Service')
             ->setRequired(true)
-            ->setQueryBuilder(function ($qb) {
-                return $qb
-                    ->leftJoin('entity.provider', 'p')
-                    ->andWhere('entity.active = :active')
-                    ->setParameter('active', true)
-                    ->orderBy('p.name', 'ASC')
-                    ->addOrderBy('entity.name', 'ASC');
-            })
+            ->setQueryBuilder(fn ($qb) => $qb
+                ->leftJoin('entity.provider', 'p')
+                ->andWhere('entity.active = :active')
+                ->setParameter('active', true)
+                ->orderBy('p.name', 'ASC')
+                ->addOrderBy('entity.name', 'ASC'))
             ->formatValue(function ($value, SaasSubscription $entity) {
                 $service = $entity->getService();
                 if (!$service) {
@@ -77,9 +78,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
             ->setNumDecimals(2)
             ->setRequired(true)
             ->setHelp('Prix unitaire (€)')
-            ->formatValue(function ($value) {
-                return number_format((float) $value, 2, ',', ' ').' €';
-            });
+            ->formatValue(fn ($value): string => number_format((float) $value, 2, ',', ' ').' €');
 
         yield ChoiceField::new('currency', 'Devise')
             ->setChoices([
@@ -130,6 +129,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
             ->setFormat('dd/MM/yyyy HH:mm');
     }
 
+    #[Override]
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
@@ -138,6 +138,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
             ->add(ChoiceFilter::new('billingPeriod', 'Périodicité')->setChoices(array_flip(SaasSubscription::BILLING_PERIODS)));
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         return $actions

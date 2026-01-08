@@ -30,8 +30,8 @@ class ForecastingServiceTest extends TestCase
         $em                 = $this->createMock(EntityManagerInterface::class);
         $companyContext     = $this->createMock(CompanyContext::class);
         $forecastRepository = $this->createMock(FactForecastRepository::class);
-        $projectRepository  = $projectRepository ?? $this->createMock(ProjectRepository::class);
-        $dashboardService   = $this->createMock(DashboardReadService::class);
+        $projectRepository ??= $this->createMock(ProjectRepository::class);
+        $dashboardService = $this->createMock(DashboardReadService::class);
 
         return new ForecastingService(
             $em,
@@ -110,7 +110,7 @@ class ForecastingServiceTest extends TestCase
             $project = new Project();
             $project->setName("Project $i");
             $project->setStatus('completed');
-            $date = (new DateTime())->modify("-$i months");
+            $date = new DateTime()->modify("-$i months");
             $project->setStartDate($date);
 
             // Use reflection to set totalSoldAmount (it's calculated from tasks/orders)

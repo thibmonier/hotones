@@ -24,14 +24,14 @@ class SecureFileUploadService
 {
     private const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 Mo
 
-    private const ALLOWED_IMAGE_MIMES = [
+    private const array ALLOWED_IMAGE_MIMES = [
         'image/jpeg',
         'image/png',
         'image/gif',
         'image/webp',
     ];
 
-    private const ALLOWED_DOCUMENT_MIMES = [
+    private const array ALLOWED_DOCUMENT_MIMES = [
         'application/pdf',
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

@@ -63,7 +63,7 @@ class ExcelExportService
             $endDate->format('Y-m-d'),
         );
 
-        $response = new StreamedResponse(function () use ($writer) {
+        $response = new StreamedResponse(function () use ($writer): void {
             $writer->save('php://output');
         });
 
@@ -107,7 +107,7 @@ class ExcelExportService
             ++$row;
             foreach ($filters as $key => $value) {
                 if ($value !== null) {
-                    $sheet->setCellValue('A'.$row, '  - '.ucfirst($key));
+                    $sheet->setCellValue('A'.$row, '  - '.ucfirst((string) $key));
                     $sheet->setCellValue('B'.$row, (string) $value);
                     ++$row;
                 }
@@ -209,7 +209,7 @@ class ExcelExportService
         // Données
         $row = 2;
         foreach ($projectsByType as $type => $count) {
-            $sheet->setCellValue('A'.$row, ucfirst($type));
+            $sheet->setCellValue('A'.$row, ucfirst((string) $type));
             $sheet->setCellValue('B'.$row, (int) $count);
             ++$row;
         }

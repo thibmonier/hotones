@@ -38,14 +38,12 @@ class SaasSubscriptionType extends AbstractType
                         ? sprintf('%s (%s)', $service->getName(), $provider->getName())
                         : $service->getName();
                 },
-                'query_builder' => function ($repository) {
-                    return $repository->createQueryBuilder('s')
-                        ->leftJoin('s.provider', 'p')
-                        ->where('s.active = :active')
-                        ->setParameter('active', true)
-                        ->orderBy('p.name', 'ASC')
-                        ->addOrderBy('s.name', 'ASC');
-                },
+                'query_builder' => fn ($repository) => $repository->createQueryBuilder('s')
+                    ->leftJoin('s.provider', 'p')
+                    ->where('s.active = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('p.name', 'ASC')
+                    ->addOrderBy('s.name', 'ASC'),
                 'attr' => [
                     'class' => 'form-select',
                 ],

@@ -23,8 +23,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProjectTaskController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private ProjectTaskRepository $taskRepo,
+        private readonly EntityManagerInterface $em,
+        private readonly ProjectTaskRepository $taskRepo,
         private readonly CompanyContext $companyContext
     ) {
     }

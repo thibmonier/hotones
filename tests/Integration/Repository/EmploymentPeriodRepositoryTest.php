@@ -137,7 +137,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $this->createEmploymentPeriod($contributor2, '2024-06-01', '2030-12-31');
 
         // Inactive: ended yesterday
-        $yesterday = (new DateTime())->modify('-1 day');
+        $yesterday = new DateTime()->modify('-1 day');
         $this->createEmploymentPeriod($contributor1, '2023-01-01', $yesterday->format('Y-m-d'));
 
         $results = $this->repository->findActivePeriods();
@@ -220,7 +220,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         // Factory creates 1 period + 1 manual = 2 total
         $this->assertCount(2, $results);
         // Find our period with profiles
-        $periodWithProfiles = array_filter($results, fn ($p) => $p->getProfiles()->count() === 2);
+        $periodWithProfiles = array_filter($results, fn ($p): bool => $p->getProfiles()->count() === 2);
         $this->assertCount(1, $periodWithProfiles);
     }
 

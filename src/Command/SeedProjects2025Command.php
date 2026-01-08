@@ -191,11 +191,11 @@ class SeedProjects2025Command extends Command
             $project->setCompany($company);
             $project->setName(sprintf('Projet Test %d #%02d', $year, $i));
             $project->setDescription('Projet de test généré automatiquement.');
-            $project->setProjectType(rand(0, 1) ? 'forfait' : 'regie');
-            $project->setStatus(rand(0, 10) > 7 ? 'completed' : 'active');
+            $project->setProjectType(random_int(0, 1) ? 'forfait' : 'regie');
+            $project->setStatus(random_int(0, 10) > 7 ? 'completed' : 'active');
 
-            $start = new DateTime(sprintf('%d-%02d-%02d', $year, rand(1, 11), rand(1, 28)));
-            $end   = (clone $start)->modify('+'.rand(30, 180).' days');
+            $start = new DateTime(sprintf('%d-%02d-%02d', $year, random_int(1, 11), random_int(1, 28)));
+            $end   = (clone $start)->modify('+'.random_int(30, 180).' days');
             if ((int) $end->format('Y') > $year) {
                 $end = new DateTime(sprintf('%d-12-15', $year));
             }
@@ -203,13 +203,13 @@ class SeedProjects2025Command extends Command
             $project->setEndDate($end);
 
             // Achats globaux aléatoires
-            if (rand(0, 1)) {
-                $project->setPurchasesAmount((string) rand(0, 3000).'.00');
+            if (random_int(0, 1)) {
+                $project->setPurchasesAmount((string) random_int(0, 3000).'.00');
                 $project->setPurchasesDescription('Achats tests (licenses, outils)');
             }
 
             // Associer 1-3 technologies
-            $used = array_rand($technos, min(3, max(1, rand(1, 3))));
+            $used = array_rand($technos, min(3, max(1, random_int(1, 3))));
             if (!is_array($used)) {
                 $used = [$used];
             }
@@ -232,10 +232,10 @@ class SeedProjects2025Command extends Command
         $order->setCompany($project->getCompany());
         $order->setProject($project)
             ->setOrderNumber($this->generateOrderNumberForDate($createdAt))
-            ->setStatus(rand(0, 1) ? 'signe' : 'gagne')
+            ->setStatus(random_int(0, 1) ? 'signe' : 'gagne')
             ->setCreatedAt($createdAt);
 
-        $order->validatedAt = (clone $createdAt)->modify('+'.rand(1, 30).' days');
+        $order->validatedAt = (clone $createdAt)->modify('+'.random_int(1, 30).' days');
 
         // Section prestations
         $section = new OrderSection();
@@ -245,7 +245,7 @@ class SeedProjects2025Command extends Command
             ->setSortOrder(1);
 
         // 2-4 lignes de service
-        $numLines = rand(2, 4);
+        $numLines = random_int(2, 4);
         for ($i = 0; $i < $numLines; ++$i) {
             $line = new OrderLine();
             $line->setCompany($project->getCompany());
@@ -254,18 +254,18 @@ class SeedProjects2025Command extends Command
                 ->setPosition($i + 1)
                 ->setType('service')
                 ->setProfile($profiles[$i % count($profiles)])
-                ->setDailyRate((string) (400 + rand(0, 250)).'.00')
-                ->setDays((string) (1 + rand(1, 15)));
+                ->setDailyRate((string) (400 + random_int(0, 250)).'.00')
+                ->setDays((string) (1 + random_int(1, 15)));
             // Attacher un achat ponctuel parfois
-            if (rand(0, 3) === 0) {
-                $line->setAttachedPurchaseAmount((string) rand(200, 1200).'.00');
+            if (random_int(0, 3) === 0) {
+                $line->setAttachedPurchaseAmount((string) random_int(200, 1200).'.00');
             }
             $section->addLine($line);
             $this->em->persist($line);
         }
 
         // Éventuelle section achats
-        if (rand(0, 1)) {
+        if (random_int(0, 1)) {
             $sec2 = new OrderSection();
             $sec2->setCompany($project->getCompany());
             $sec2->setOrder($order)
@@ -278,7 +278,7 @@ class SeedProjects2025Command extends Command
                 ->setDescription('Licence annuelle')
                 ->setType('fixed_amount')
                 ->setPosition(1)
-                ->setDirectAmount((string) rand(300, 2000).'.00');
+                ->setDirectAmount((string) random_int(300, 2000).'.00');
             $sec2->addLine($purchase);
 
             $this->em->persist($sec2);
@@ -298,7 +298,7 @@ class SeedProjects2025Command extends Command
     private function createTasksForProject(Project $project, array $profiles, array $contributors): void
     {
         $positions = 1;
-        $numTasks  = rand(3, 6);
+        $numTasks  = random_int(3, 6);
         for ($i = 0; $i < $numTasks; ++$i) {
             $task = new ProjectTask();
             $task->setCompany($project->getCompany());
@@ -308,9 +308,9 @@ class SeedProjects2025Command extends Command
                 ->setCountsForProfitability(true)
                 ->setPosition($positions++)
                 ->setStatus('in_progress')
-                ->setEstimatedHoursSold(rand(16, 80))
-                ->setEstimatedHoursRevised(rand(16, 100))
-                ->setDailyRate((string) (450 + rand(0, 200)).'.00');
+                ->setEstimatedHoursSold(random_int(16, 80))
+                ->setEstimatedHoursRevised(random_int(16, 100))
+                ->setDailyRate((string) (450 + random_int(0, 200)).'.00');
             // assigner un contrib éventuel
             if (!empty($contributors)) {
                 $task->setAssignedContributor($contributors[array_rand($contributors)]);
@@ -340,7 +340,7 @@ class SeedProjects2025Command extends Command
                 continue;
             }
             // 25% de chances qu'il y ait du temps ce jour pour ce projet
-            if (rand(1, 100) > 25) {
+            if (random_int(1, 100) > 25) {
                 continue;
             }
 
@@ -349,7 +349,7 @@ class SeedProjects2025Command extends Command
             $timesheet->setContributor($contributors[array_rand($contributors)])
                 ->setProject($project)
                 ->setDate($date)
-                ->setHours((string) rand(4, 8))
+                ->setHours((string) random_int(4, 8))
                 ->setNotes('Temps saisi automatiquement (test)');
             $this->em->persist($timesheet);
         }
@@ -368,7 +368,7 @@ class SeedProjects2025Command extends Command
             $lastIncrement = 0;
             if ($last) {
                 $lastNumber    = $last->getOrderNumber();
-                $lastIncrement = (int) substr($lastNumber, -3);
+                $lastIncrement = (int) substr((string) $lastNumber, -3);
             }
             $this->orderCounters[$key] = $lastIncrement;
         }

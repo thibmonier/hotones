@@ -13,8 +13,8 @@ use DateTimeImmutable;
 class WorkloadPredictionService
 {
     public function __construct(
-        private OrderRepository $orderRepository,
-        private ContributorRepository $contributorRepository
+        private readonly OrderRepository $orderRepository,
+        private readonly ContributorRepository $contributorRepository
     ) {
     }
 
@@ -71,7 +71,7 @@ class WorkloadPredictionService
         }
 
         // Trier le pipeline par probabilité décroissante
-        usort($pipeline, fn ($a, $b) => $b['winProbability'] <=> $a['winProbability']);
+        usort($pipeline, fn ($a, $b): int => $b['winProbability'] <=> $a['winProbability']);
 
         // Détecter les alertes de surcharge/sous-charge
         $alerts = $this->detectWorkloadAlerts($workloadByMonth);
@@ -112,7 +112,7 @@ class WorkloadPredictionService
         $createdAt = $order->getCreatedAt();
         $daysOld   = 0;
         if ($createdAt !== null) {
-            $daysOld = (new DateTime())->diff($createdAt)->days;
+            $daysOld = new DateTime()->diff($createdAt)->days;
             if ($daysOld > 60) {
                 $probability -= 20; // Très ancien
             } elseif ($daysOld > 30) {
@@ -218,10 +218,12 @@ class WorkloadPredictionService
         foreach ($order->getSections() as $section) {
             foreach ($section->getLines() as $line) {
                 // Ne compter que les lignes de type "service"
-                if ($line->type !== 'service' || !$line->days) {
+                if ($line->type !== 'service') {
                     continue;
                 }
-
+                if (!$line->days) {
+                    continue;
+                }
                 // Filtrer par profil (incluant les profils des contributeurs sélectionnés)
                 if (!empty($effectiveProfileIds) && $line->getProfile()) {
                     if (!in_array($line->getProfile()->getId(), $effectiveProfileIds, true)) {
@@ -298,7 +300,7 @@ class WorkloadPredictionService
                     'severity' => 'critical',
                     'message'  => sprintf(
                         'Surcharge critique en %s : %.0f%% de la capacité (%.1f jours sur %d disponibles)',
-                        (new DateTimeImmutable($month))->format('F Y'),
+                        new DateTimeImmutable($month)->format('F Y'),
                         $capacityRate,
                         $totalLoad,
                         $teamCapacityPerMonth,
@@ -312,7 +314,7 @@ class WorkloadPredictionService
                     'severity' => 'high',
                     'message'  => sprintf(
                         'Surcharge en %s : %.0f%% de la capacité',
-                        (new DateTimeImmutable($month))->format('F Y'),
+                        new DateTimeImmutable($month)->format('F Y'),
                         $capacityRate,
                     ),
                     'capacityRate' => round($capacityRate, 1),
@@ -324,7 +326,7 @@ class WorkloadPredictionService
                     'severity' => 'medium',
                     'message'  => sprintf(
                         'Sous-charge en %s : seulement %.0f%% de la capacité utilisée',
-                        (new DateTimeImmutable($month))->format('F Y'),
+                        new DateTimeImmutable($month)->format('F Y'),
                         $capacityRate,
                     ),
                     'capacityRate' => round($capacityRate, 1),

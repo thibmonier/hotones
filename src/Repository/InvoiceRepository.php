@@ -48,7 +48,7 @@ class InvoiceRepository extends CompanyAwareRepository
         }
 
         // Extraire l'incrément et ajouter 1
-        $lastNumber = (int) substr($lastInvoiceNumber['invoiceNumber'], -3);
+        $lastNumber = (int) substr((string) $lastInvoiceNumber['invoiceNumber'], -3);
         $nextNumber = $lastNumber + 1;
 
         return $prefix.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);

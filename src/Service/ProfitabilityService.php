@@ -13,11 +13,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ProfitabilityService
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
     }
 
     /**
@@ -166,7 +163,7 @@ class ProfitabilityService
                     continue;
                 }
                 $dailyCost  = $this->getContributorDailyCost($t->getContributor(), $t->getDate());
-                $timeCost   = bcdiv(bcmul($t->getHours(), $dailyCost, 4), '8', 2);
+                $timeCost   = bcdiv(bcmul((string) $t->getHours(), $dailyCost, 4), '8', 2);
                 $windowCost = bcadd($windowCost, $timeCost, 2);
             }
             $cumulativeConsumed = bcadd($cumulativeConsumed, $windowCost, 2);
@@ -179,7 +176,7 @@ class ProfitabilityService
 
         return [
             'labels'     => $labels,
-            'budgetLine' => array_map('floatval', $budgetLine),
+            'budgetLine' => array_map(floatval(...), $budgetLine),
             'consumed'   => $consumed,
             'forecast'   => $forecast,
         ];
@@ -300,7 +297,7 @@ class ProfitabilityService
 
         foreach ($order->getSections() as $section) {
             foreach ($section->getLines() as $line) {
-                $lineTotal = bcmul($line->getDays(), $line->getTjm() ?? '0', 2);
+                $lineTotal = bcmul((string) $line->getDays(), $line->getTjm() ?? '0', 2);
                 $total     = bcadd($total, $lineTotal, 2);
             }
         }
@@ -325,7 +322,7 @@ class ProfitabilityService
             if (in_array($order->getStatus(), ['signed', 'won', 'completed'], true)) {
                 foreach ($order->getSections() as $section) {
                     foreach ($section->getLines() as $line) {
-                        $totalDays = bcadd($totalDays, $line->getDays(), 2);
+                        $totalDays = bcadd($totalDays, (string) $line->getDays(), 2);
                     }
                 }
             }
@@ -346,7 +343,7 @@ class ProfitabilityService
         foreach ($project->getTimesheets() as $timesheet) {
             if ($this->shouldCountTimesheet($timesheet)) {
                 $contributorCost = $this->getContributorDailyCost($timesheet->getContributor(), $timesheet->getDate());
-                $timeCostPerDay  = bcdiv(bcmul($timesheet->getHours(), $contributorCost, 4), '8', 2);
+                $timeCostPerDay  = bcdiv(bcmul((string) $timesheet->getHours(), $contributorCost, 4), '8', 2);
                 $totalCost       = bcadd($totalCost, $timeCostPerDay, 2);
             }
         }
@@ -361,7 +358,7 @@ class ProfitabilityService
             foreach ($order->getSections() as $section) {
                 foreach ($section->getLines() as $line) {
                     if ($line->getPurchaseAmount()) {
-                        $totalCost = bcadd($totalCost, $line->getPurchaseAmount(), 2);
+                        $totalCost = bcadd($totalCost, (string) $line->getPurchaseAmount(), 2);
                     }
                 }
             }
@@ -440,7 +437,7 @@ class ProfitabilityService
     {
         $totalHours = '0';
         foreach ($project->getTimesheets() as $timesheet) {
-            $totalHours = bcadd($totalHours, $timesheet->getHours(), 2);
+            $totalHours = bcadd($totalHours, (string) $timesheet->getHours(), 2);
         }
 
         return $totalHours;
@@ -454,7 +451,7 @@ class ProfitabilityService
         $excludedHours = '0';
         foreach ($project->getTimesheets() as $timesheet) {
             if (!$this->shouldCountTimesheet($timesheet)) {
-                $excludedHours = bcadd($excludedHours, $timesheet->getHours(), 2);
+                $excludedHours = bcadd($excludedHours, (string) $timesheet->getHours(), 2);
             }
         }
 
@@ -478,8 +475,8 @@ class ProfitabilityService
             }
 
             $profitability = $this->calculateProjectProfitability($project);
-            $totalRevenue  = bcadd($totalRevenue, $profitability['revenue'], 2);
-            $totalCost     = bcadd($totalCost, $profitability['cost'], 2);
+            $totalRevenue  = bcadd($totalRevenue, (string) $profitability['revenue'], 2);
+            $totalCost     = bcadd($totalCost, (string) $profitability['cost'], 2);
             ++$totalExternalProjects;
         }
 
@@ -608,7 +605,7 @@ class ProfitabilityService
         $alerts        = [];
 
         // Alerte marge négative
-        if (bccomp($profitability['margin'], '0', 2) < 0) {
+        if (bccomp((string) $profitability['margin'], '0', 2) < 0) {
             $alerts[] = [
                 'type'    => 'danger',
                 'title'   => 'Marge négative',
@@ -618,7 +615,7 @@ class ProfitabilityService
         }
 
         // Alerte taux de marge faible
-        if (bccomp($profitability['margin_rate'], '10', 2) < 0 && bccomp($profitability['margin_rate'], '0', 2) >= 0) {
+        if (bccomp((string) $profitability['margin_rate'], '10', 2) < 0 && bccomp((string) $profitability['margin_rate'], '0', 2) >= 0) {
             $alerts[] = [
                 'type'    => 'warning',
                 'title'   => 'Taux de marge faible',

@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use Override;
 
 class ProfileCrudController extends AbstractCrudController
 {
@@ -24,6 +25,7 @@ class ProfileCrudController extends AbstractCrudController
         return Profile::class;
     }
 
+    #[Override]
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -34,6 +36,7 @@ class ProfileCrudController extends AbstractCrudController
             ->setPaginatorPageSize(25);
     }
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
@@ -62,12 +65,14 @@ class ProfileCrudController extends AbstractCrudController
             ->renderAsSwitch(false);
     }
 
+    #[Override]
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
             ->add(BooleanFilter::new('active', 'Actif'));
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         return $actions

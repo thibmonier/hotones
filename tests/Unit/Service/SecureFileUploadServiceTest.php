@@ -23,9 +23,9 @@ use Symfony\Component\String\UnicodeString;
 class SecureFileUploadServiceTest extends TestCase
 {
     private SecureFileUploadService $service;
-    private SluggerInterface $slugger;
-    private FilesystemOperator $filesystem;
-    private LoggerInterface $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $slugger;
+    private \PHPUnit\Framework\MockObject\MockObject $filesystem;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     protected function setUp(): void
     {

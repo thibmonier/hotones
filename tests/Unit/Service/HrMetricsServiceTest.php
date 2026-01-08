@@ -23,9 +23,9 @@ use PHPUnit\Framework\TestCase;
 class HrMetricsServiceTest extends TestCase
 {
     private HrMetricsService $service;
-    private ContributorRepository $contributorRepository;
-    private EmploymentPeriodRepository $employmentPeriodRepository;
-    private VacationRepository $vacationRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $contributorRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $employmentPeriodRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $vacationRepository;
 
     protected function setUp(): void
     {

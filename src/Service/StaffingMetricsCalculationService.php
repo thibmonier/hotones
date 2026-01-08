@@ -29,11 +29,11 @@ class StaffingMetricsCalculationService
     private array $dimTimeCache = [];
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private CompanyContext $companyContext,
-        private ContributorRepository $contributorRepo,
-        private TimesheetRepository $timesheetRepo,
-        private EmploymentPeriodRepository $employmentPeriodRepo
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CompanyContext $companyContext,
+        private readonly ContributorRepository $contributorRepo,
+        private readonly TimesheetRepository $timesheetRepo,
+        private readonly EmploymentPeriodRepository $employmentPeriodRepo
     ) {
     }
 

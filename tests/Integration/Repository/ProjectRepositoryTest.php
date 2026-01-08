@@ -35,7 +35,7 @@ class ProjectRepositoryTest extends KernelTestCase
         ProjectFactory::createMany(2, ['status' => 'completed']);
         ProjectFactory::createOne(['status' => 'cancelled']);
 
-        $this->assertSame(3, (int) $this->repository->countActiveProjects());
+        $this->assertSame(3, $this->repository->countActiveProjects());
 
         $stats = $this->repository->getProjectsByStatus();
         $this->assertSame(3, (int) ($stats['active'] ?? 0));

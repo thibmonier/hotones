@@ -63,21 +63,17 @@ class ExpenseReportType extends AbstractType
             ])
             ->add('project', EntityType::class, [
                 'class'        => Project::class,
-                'choice_label' => function (Project $project) {
-                    return $project->getName().($project->getClient() ? ' - '.$project->getClient()->getName() : '');
-                },
-                'required'    => false,
-                'placeholder' => '-- Sélectionner un projet --',
-                'label'       => 'Projet',
-                'attr'        => [
+                'choice_label' => fn (Project $project): string => $project->getName().($project->getClient() ? ' - '.$project->getClient()->getName() : ''),
+                'required'     => false,
+                'placeholder'  => '-- Sélectionner un projet --',
+                'label'        => 'Projet',
+                'attr'         => [
                     'class'            => 'form-select select2-search',
                     'data-placeholder' => 'Rechercher un projet...',
                 ],
-                'query_builder' => function ($er) {
-                    return $er->createQueryBuilder('p')
-                        ->leftJoin('p.client', 'c')
-                        ->orderBy('p.name', 'ASC');
-                },
+                'query_builder' => fn ($er) => $er->createQueryBuilder('p')
+                    ->leftJoin('p.client', 'c')
+                    ->orderBy('p.name', 'ASC'),
             ])
             ->add('order', EntityType::class, [
                 'class'        => Order::class,
@@ -99,11 +95,9 @@ class ExpenseReportType extends AbstractType
                     'class'            => 'form-select select2-search',
                     'data-placeholder' => 'Rechercher un devis...',
                 ],
-                'query_builder' => function ($er) {
-                    return $er->createQueryBuilder('o')
-                        ->leftJoin('o.project', 'p')
-                        ->orderBy('o.orderNumber', 'DESC');
-                },
+                'query_builder' => fn ($er) => $er->createQueryBuilder('o')
+                    ->leftJoin('o.project', 'p')
+                    ->orderBy('o.orderNumber', 'DESC'),
             ])
             ->add('receiptFile', FileType::class, [
                 'label'       => 'Justificatif',
