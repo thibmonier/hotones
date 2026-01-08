@@ -198,7 +198,7 @@ class PlanningAIAssistant
         $content = $response->choices[0]->message->content;
 
         // Parser la réponse JSON
-        $data = json_decode($content, true);
+        $data = json_decode((string) $content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new RuntimeException('Failed to parse AI response as JSON: '.json_last_error_msg());
@@ -277,7 +277,7 @@ class PlanningAIAssistant
         }
 
         // Parser la réponse JSON
-        $parsedData = json_decode($content, true);
+        $parsedData = json_decode((string) $content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new RuntimeException('Failed to parse AI response as JSON: '.json_last_error_msg());

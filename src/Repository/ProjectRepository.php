@@ -335,7 +335,7 @@ class ProjectRepository extends CompanyAwareRepository
             'end'    => 'p.endDate',
         ];
         $col = $map[$sortField] ?? 'p.name';
-        $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = strtoupper((string) $sortDir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($col, $dir);
 
         if ($status) {
@@ -444,12 +444,10 @@ class ProjectRepository extends CompanyAwareRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_map(static function (array $r) {
-            return [
-                'id'   => (int) $r['id'],
-                'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
-            ];
-        }, $rows);
+        return array_map(static fn (array $r): array => [
+            'id'   => (int) $r['id'],
+            'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
+        ], $rows);
     }
 
     /**
@@ -471,12 +469,10 @@ class ProjectRepository extends CompanyAwareRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_map(static function (array $r) {
-            return [
-                'id'   => (int) $r['id'],
-                'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
-            ];
-        }, $rows);
+        return array_map(static fn (array $r): array => [
+            'id'   => (int) $r['id'],
+            'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
+        ], $rows);
     }
 
     /**
@@ -497,12 +493,10 @@ class ProjectRepository extends CompanyAwareRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_map(static function (array $r) {
-            return [
-                'id'   => (int) $r['id'],
-                'name' => (string) ($r['name'] ?? ''),
-            ];
-        }, $rows);
+        return array_map(static fn (array $r): array => [
+            'id'   => (int) $r['id'],
+            'name' => (string) ($r['name'] ?? ''),
+        ], $rows);
     }
 
     /**
@@ -523,12 +517,10 @@ class ProjectRepository extends CompanyAwareRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_map(static function (array $r) {
-            return [
-                'id'   => (int) $r['id'],
-                'name' => (string) ($r['name'] ?? ''),
-            ];
-        }, $rows);
+        return array_map(static fn (array $r): array => [
+            'id'   => (int) $r['id'],
+            'name' => (string) ($r['name'] ?? ''),
+        ], $rows);
     }
 
     /**
@@ -543,7 +535,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn ($r) => $r['type'], $rows), fn ($v) => $v !== null && $v !== ''));
+        return array_values(array_filter(array_map(fn ($r): mixed => $r['type'], $rows), fn ($v): bool => $v !== null && $v !== ''));
     }
 
     /**
@@ -558,7 +550,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn ($r) => $r['status'], $rows), fn ($v) => $v !== null && $v !== ''));
+        return array_values(array_filter(array_map(fn ($r): mixed => $r['status'], $rows), fn ($v): bool => $v !== null && $v !== ''));
     }
 
     /**
@@ -610,7 +602,7 @@ class ProjectRepository extends CompanyAwareRepository
             $performance = $project->getPerformanceComparison();
             $marginRate  = (float) $project->getRealMarginPercentage();
 
-            $isOverTime  = bccomp($performance['real_hours'], $performance['target_hours'], 2) > 0;
+            $isOverTime  = bccomp((string) $performance['real_hours'], (string) $performance['target_hours'], 2) > 0;
             $isLowMargin = $marginRate < 20.0;
 
             if ($isOverTime || $isLowMargin) {

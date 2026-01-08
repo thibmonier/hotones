@@ -76,7 +76,7 @@ class PlanningOptimizer
         }
 
         // Trier par priorité (score)
-        usort($recommendations, fn ($a, $b) => $b['priority_score'] <=> $a['priority_score']);
+        usort($recommendations, fn ($a, $b): int => $b['priority_score'] <=> $a['priority_score']);
 
         return [
             'recommendations' => $recommendations,
@@ -327,7 +327,7 @@ class PlanningOptimizer
         }
 
         // Trier par TACE croissant (les plus sous-utilisés en premier)
-        usort($compatible, fn ($a, $b) => $a['tace'] <=> $b['tace']);
+        usort($compatible, fn ($a, $b): int => $a['tace'] <=> $b['tace']);
 
         return $compatible;
     }
@@ -368,9 +368,9 @@ class PlanningOptimizer
             'underutilized_count'     => count($analysis['underutilized']),
             'optimal_count'           => count($analysis['optimal']),
             'total_recommendations'   => count($recommendations),
-            'high_priority_count'     => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high')),
-            'medium_priority_count'   => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'medium')),
-            'low_priority_count'      => count(array_filter($recommendations, fn ($r) => $r['severity_level'] === 'low')),
+            'high_priority_count'     => count(array_filter($recommendations, fn ($r): bool => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high')),
+            'medium_priority_count'   => count(array_filter($recommendations, fn ($r): bool => $r['severity_level'] === 'medium')),
+            'low_priority_count'      => count(array_filter($recommendations, fn ($r): bool => $r['severity_level'] === 'low')),
             'critical_workload_count' => count($analysis['critical']),
             'contributors_analyzed'   => count($analysis['critical']) + count($analysis['overloaded']) + count($analysis['underutilized']) + count($analysis['optimal']),
         ];
@@ -393,25 +393,18 @@ class PlanningOptimizer
         }
 
         try {
-            switch ($type) {
-                case 'increase_allocation':
-                    return $this->applyIncreaseAllocation($recommendation, $startDate, $endDate);
-
-                case 'reassign_planning':
-                    return $this->applyReassignPlanning($recommendation, $startDate, $endDate);
-
-                case 'reduce_workload':
-                    return [
-                        'success' => false,
-                        'message' => 'La réduction de charge doit être effectuée manuellement',
-                    ];
-
-                default:
-                    return [
-                        'success' => false,
-                        'message' => 'Type de recommandation non supporté: '.$type,
-                    ];
-            }
+            return match ($type) {
+                'increase_allocation' => $this->applyIncreaseAllocation($recommendation, $startDate, $endDate),
+                'reassign_planning'   => $this->applyReassignPlanning($recommendation, $startDate, $endDate),
+                'reduce_workload'     => [
+                    'success' => false,
+                    'message' => 'La réduction de charge doit être effectuée manuellement',
+                ],
+                default => [
+                    'success' => false,
+                    'message' => 'Type de recommandation non supporté: '.$type,
+                ],
+            };
         } catch (Exception $e) {
             return [
                 'success' => false,

@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Address;
  */
 class InvoiceReminderService
 {
-    private const REMINDER_DELAYS = [30, 45, 60];
+    private const array REMINDER_DELAYS = [30, 45, 60];
 
     public function __construct(
         private readonly InvoiceRepository $invoiceRepository,
@@ -132,13 +132,13 @@ class InvoiceReminderService
         };
 
         // Récupérer l'email du premier contact actif du client
-        $contacts = $client->getContacts()->filter(fn ($contact) => $contact->getEmail() !== null);
+        $contacts = $client->getContacts()->filter(fn ($contact): bool => $contact->getEmail() !== null);
         if ($contacts->isEmpty()) {
             return; // Pas de contact avec email, impossible d'envoyer la relance
         }
         $primaryContact = $contacts->first();
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to($primaryContact->getEmail())
             ->subject(sprintf('Relance facture %s - %s', $invoice->getInvoiceNumber(), $client->getName()))

@@ -134,7 +134,7 @@ Répartition des contributeurs :
             $this->checkReferenceData($io);
 
             // 2. Créer des utilisateurs de test
-            $users = $this->createUsers($io);
+            $users = $this->createUsers($io, $company);
 
             // 3. Créer les contributeurs avec la bonne répartition
             $contributors = $this->createContributorsWithDistribution($io, $company);
@@ -190,7 +190,7 @@ Répartition des contributeurs :
         $io->writeln("✓ $profileCount profils et $techCount technologies trouvés");
     }
 
-    private function createUsers(SymfonyStyle $io): array
+    private function createUsers(SymfonyStyle $io, Company $company): array
     {
         $io->section('Création des utilisateurs de test');
 
@@ -208,6 +208,7 @@ Répartition des contributeurs :
             if (!$user) {
                 $user = new User();
                 $user->setEmail($data['email']);
+                $user->setCompany($company);
                 $io->writeln("✓ Utilisateur créé : {$data['firstName']} {$data['lastName']} ({$data['email']})");
             } else {
                 $io->writeln("• Utilisateur existant : {$data['email']}");

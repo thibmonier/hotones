@@ -17,11 +17,11 @@ use RuntimeException;
 
 class ForecastingService
 {
-    private const SCENARIO_REALISTIC   = 'realistic';
-    private const SCENARIO_OPTIMISTIC  = 'optimistic';
-    private const SCENARIO_PESSIMISTIC = 'pessimistic';
+    private const string SCENARIO_REALISTIC   = 'realistic';
+    private const string SCENARIO_OPTIMISTIC  = 'optimistic';
+    private const string SCENARIO_PESSIMISTIC = 'pessimistic';
 
-    private const SCENARIO_ADJUSTMENTS = [
+    private const array SCENARIO_ADJUSTMENTS = [
         self::SCENARIO_OPTIMISTIC  => 1.10,   // +10%
         self::SCENARIO_REALISTIC   => 1.00,    // baseline
         self::SCENARIO_PESSIMISTIC => 0.85,  // -15%
@@ -341,7 +341,7 @@ class ForecastingService
 
         // Collect last 6 months for trend analysis (sufficient for short-term forecasting)
         for ($i = $historicalMonths; $i >= 1; --$i) {
-            $month     = (new DateTimeImmutable())->modify("-{$i} months");
+            $month     = new DateTimeImmutable()->modify("-{$i} months");
             $startDate = $month->modify('first day of this month');
             $endDate   = $month->modify('last day of this month');
 
@@ -358,7 +358,7 @@ class ForecastingService
         // Collect last 12 months for seasonality analysis (1 year instead of 3)
         // This is much faster and still captures seasonal patterns
         for ($i = 12; $i >= 1; --$i) {
-            $month     = (new DateTimeImmutable())->modify("-{$i} months");
+            $month     = new DateTimeImmutable()->modify("-{$i} months");
             $monthNum  = (int) $month->format('m');
             $startDate = $month->modify('first day of this month');
             $endDate   = $month->modify('last day of this month');
@@ -384,7 +384,7 @@ class ForecastingService
      */
     private function calculateTrendPredictionFromCache(DateTimeImmutable $targetMonth, array $historicalData): float
     {
-        $dataPoints = array_map(fn ($item) => ['x' => $item['x'], 'y' => $item['y']], $historicalData['trend']);
+        $dataPoints = array_map(fn ($item): array => ['x' => $item['x'], 'y' => $item['y']], $historicalData['trend']);
 
         $regression  = $this->linearRegressionSimple($dataPoints);
         $monthsAhead = $this->getMonthsDifference(new DateTimeImmutable(), $targetMonth);

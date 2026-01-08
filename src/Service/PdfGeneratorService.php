@@ -11,7 +11,7 @@ use Twig\Environment;
 class PdfGeneratorService
 {
     public function __construct(
-        private Environment $twig
+        private readonly Environment $twig
     ) {
     }
 

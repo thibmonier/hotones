@@ -15,10 +15,10 @@ use DateTime;
 class TaceAnalyzer
 {
     // Seuils de TACE (en pourcentage)
-    private const TACE_IDEAL_MIN     = 70;  // En dessous = sous-utilisation
-    private const TACE_IDEAL_MAX     = 90;  // Au-dessus = surcharge
-    private const TACE_CRITICAL_LOW  = 50;  // Sous-utilisation critique
-    private const TACE_CRITICAL_HIGH = 110; // Surcharge critique
+    private const int TACE_IDEAL_MIN     = 70;  // En dessous = sous-utilisation
+    private const int TACE_IDEAL_MAX     = 90;  // Au-dessus = surcharge
+    private const int TACE_CRITICAL_LOW  = 50;  // Sous-utilisation critique
+    private const int TACE_CRITICAL_HIGH = 110; // Surcharge critique
 
     public function __construct(
         private readonly ContributorRepository $contributorRepository,
@@ -68,9 +68,9 @@ class TaceAnalyzer
         }
 
         // Trier par gravité (TACE le plus éloigné de l'idéal)
-        usort($results['critical'], fn ($a, $b) => abs($b['tace'] - 80) <=> abs($a['tace'] - 80));
-        usort($results['overloaded'], fn ($a, $b) => $b['tace'] <=> $a['tace']);
-        usort($results['underutilized'], fn ($a, $b) => $a['tace'] <=> $b['tace']);
+        usort($results['critical'], fn ($a, $b): int => abs($b['tace'] - 80) <=> abs($a['tace'] - 80));
+        usort($results['overloaded'], fn ($a, $b): int => $b['tace'] <=> $a['tace']);
+        usort($results['underutilized'], fn ($a, $b): int => $a['tace'] <=> $b['tace']);
 
         return $results;
     }

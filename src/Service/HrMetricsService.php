@@ -14,8 +14,8 @@ class HrMetricsService
 {
     public function __construct(
         public ContributorRepository $contributorRepository,
-        private EmploymentPeriodRepository $employmentPeriodRepository,
-        private VacationRepository $vacationRepository
+        private readonly EmploymentPeriodRepository $employmentPeriodRepository,
+        private readonly VacationRepository $vacationRepository
     ) {
     }
 

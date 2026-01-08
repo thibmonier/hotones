@@ -136,7 +136,7 @@ class PerformanceReviewService
             'achievements' => $achievements,
             'strengths'    => $strengths,
             'improvements' => $improvements,
-            'completed_at' => (new DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'completed_at' => new DateTimeImmutable()->format('Y-m-d H:i:s'),
         ]);
 
         $review->setStatus('auto_eval_faite');
@@ -163,7 +163,7 @@ class PerformanceReviewService
             'strengths'    => $strengths,
             'improvements' => $improvements,
             'feedback'     => $feedback,
-            'completed_at' => (new DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'completed_at' => new DateTimeImmutable()->format('Y-m-d H:i:s'),
         ]);
 
         if (null !== $rating) {
@@ -243,7 +243,7 @@ class PerformanceReviewService
             return;
         }
 
-        $email = (new Email())
+        $email = new Email()
             ->from('noreply@hotones.app')
             ->to($to)
             ->subject($subject)
@@ -251,7 +251,7 @@ class PerformanceReviewService
 
         try {
             $this->mailer->send($email);
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Log error but don't fail the operation
             // You could inject a logger here
         }

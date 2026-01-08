@@ -172,7 +172,7 @@ class HealthCheckController extends AbstractController
         try {
             $this->connection->executeQuery('SELECT 1')->fetchOne();
             $checks['database'] = 'ready';
-        } catch (Exception $e) {
+        } catch (Exception) {
             $checks['database'] = 'not ready';
             $ready              = false;
             $httpStatus         = Response::HTTP_SERVICE_UNAVAILABLE;

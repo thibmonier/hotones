@@ -31,7 +31,7 @@ class NpsMailerService
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to(new Address($survey->getRecipientEmail(), $survey->getRecipientName() ?? ''))
             ->subject('Votre avis compte : partagez votre expérience avec nous')
@@ -58,7 +58,7 @@ class NpsMailerService
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to(new Address($survey->getRecipientEmail(), $survey->getRecipientName() ?? ''))
             ->subject('Rappel : votre avis nous intéresse')

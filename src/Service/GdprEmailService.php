@@ -19,9 +19,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class GdprEmailService
 {
-    private const DPO_EMAIL  = 'dpo@hotones.example';
-    private const FROM_EMAIL = 'noreply@hotones.example';
-    private const FROM_NAME  = 'HotOnes - RGPD';
+    private const string DPO_EMAIL  = 'dpo@hotones.example';
+    private const string FROM_EMAIL = 'noreply@hotones.example';
+    private const string FROM_NAME  = 'HotOnes - RGPD';
 
     public function __construct(
         private readonly MailerInterface $mailer,
@@ -46,7 +46,7 @@ class GdprEmailService
 
         $expiryDate = $deletionRequest->getRequestedAt()->modify('+48 hours');
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address(self::FROM_EMAIL, self::FROM_NAME))
             ->to(new Address($user->getEmail(), $user->getFullName()))
             ->subject('⚠️ Confirmation requise - Suppression de compte')
@@ -96,9 +96,9 @@ class GdprEmailService
         $scheduledDate = $deletionRequest->getScheduledDeletionAt();
         $reminderDate  = $scheduledDate->modify('-7 days');
 
-        $daysRemaining = (new DateTimeImmutable())->diff($scheduledDate)->days;
+        $daysRemaining = new DateTimeImmutable()->diff($scheduledDate)->days;
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address(self::FROM_EMAIL, self::FROM_NAME))
             ->to(new Address($user->getEmail(), $user->getFullName()))
             ->subject('⏱️ Suppression confirmée - Période de grâce de 30 jours')
@@ -148,9 +148,9 @@ class GdprEmailService
         );
 
         $scheduledDate = $deletionRequest->getScheduledDeletionAt();
-        $daysRemaining = (new DateTimeImmutable())->diff($scheduledDate)->days;
+        $daysRemaining = new DateTimeImmutable()->diff($scheduledDate)->days;
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address(self::FROM_EMAIL, self::FROM_NAME))
             ->to(new Address($user->getEmail(), $user->getFullName()))
             ->subject('⚠️ Dernière chance - Suppression dans '.$daysRemaining.' jours')
@@ -199,7 +199,7 @@ class GdprEmailService
 
         $cancelledDate = $deletionRequest->getCancelledAt();
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address(self::FROM_EMAIL, self::FROM_NAME))
             ->to(new Address($user->getEmail(), $user->getFullName()))
             ->subject('✅ Suppression annulée - Votre compte est conservé')

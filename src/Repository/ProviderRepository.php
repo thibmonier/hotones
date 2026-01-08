@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Provider;
 use App\Security\CompanyContext;
 use Doctrine\Persistence\ManagerRegistry;
+use Override;
 
 /**
  * @extends CompanyAwareRepository<Provider>
@@ -36,6 +37,7 @@ class ProviderRepository extends CompanyAwareRepository
     /**
      * @return list<Provider>
      */
+    #[Override]
     public function findAll(): array
     {
         return $this->createCompanyQueryBuilder('p')

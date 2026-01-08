@@ -8,6 +8,7 @@ use App\Entity\Subscription;
 use App\Security\CompanyContext;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
+use Override;
 
 /**
  * @extends CompanyAwareRepository<Subscription>
@@ -43,6 +44,7 @@ class SubscriptionRepository extends CompanyAwareRepository
     /**
      * @return list<Subscription>
      */
+    #[Override]
     public function findAll(): array
     {
         return $this->createCompanyQueryBuilder('s')

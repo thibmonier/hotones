@@ -276,7 +276,7 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         }
 
         // Extraire les IDs
-        $idList = array_map(fn ($row) => $row['id'], $ids);
+        $idList = array_map(fn ($row): mixed => $row['id'], $ids);
 
         // Supprimer par IDs
         $result = $this->createCompanyQueryBuilder('fsm')

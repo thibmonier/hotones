@@ -37,7 +37,7 @@ class GdprDataExportService
 
         $data = [
             'export_metadata' => [
-                'export_date'    => (new DateTimeImmutable())->format('c'),
+                'export_date'    => new DateTimeImmutable()->format('c'),
                 'format_version' => '1.0',
                 'gdpr_rights'    => ['access', 'portability'],
             ],
@@ -87,7 +87,7 @@ class GdprDataExportService
             'departure_date'   => $contributor->getDepartureDate()?->format('Y-m-d'),
             'is_active'        => $contributor->isActive(),
             'profiles'         => array_map(
-                fn ($profile) => [
+                fn ($profile): array => [
                     'id'   => $profile->getId(),
                     'name' => $profile->getName(),
                 ],
@@ -103,20 +103,18 @@ class GdprDataExportService
             ['startDate' => 'ASC'],
         );
 
-        return array_map(function ($period) {
-            return [
-                'period_id'            => $period->getId(),
-                'start_date'           => $period->getStartDate()->format('Y-m-d'),
-                'end_date'             => $period->getEndDate()?->format('Y-m-d'),
-                'salary'               => $period->getSalary(),
-                'weekly_hours'         => $period->getWeeklyHours(),
-                'work_time_percentage' => $period->getWorkTimePercentage(),
-                'profiles'             => array_map(
-                    fn ($profile) => $profile->getName(),
-                    $period->getProfiles()->toArray(),
-                ),
-            ];
-        }, $periods);
+        return array_map(fn ($period): array => [
+            'period_id'            => $period->getId(),
+            'start_date'           => $period->getStartDate()->format('Y-m-d'),
+            'end_date'             => $period->getEndDate()?->format('Y-m-d'),
+            'salary'               => $period->getSalary(),
+            'weekly_hours'         => $period->getWeeklyHours(),
+            'work_time_percentage' => $period->getWorkTimePercentage(),
+            'profiles'             => array_map(
+                fn ($profile) => $profile->getName(),
+                $period->getProfiles()->toArray(),
+            ),
+        ], $periods);
     }
 
     private function exportTimesheets($contributor): array
@@ -126,26 +124,24 @@ class GdprDataExportService
             ['date' => 'DESC'],
         );
 
-        return array_map(function ($timesheet) {
-            return [
-                'timesheet_id' => $timesheet->getId(),
-                'date'         => $timesheet->getDate()->format('Y-m-d'),
-                'hours'        => $timesheet->getHours(),
-                'notes'        => $timesheet->getNotes(),
-                'project'      => [
-                    'id'   => $timesheet->getProject()->getId(),
-                    'name' => $timesheet->getProject()->getName(),
-                ],
-                'task' => $timesheet->getTask() ? [
-                    'id'   => $timesheet->getTask()->getId(),
-                    'name' => $timesheet->getTask()->getName(),
-                ] : null,
-                'sub_task' => $timesheet->getSubTask() ? [
-                    'id'    => $timesheet->getSubTask()->getId(),
-                    'title' => $timesheet->getSubTask()->getTitle(),
-                ] : null,
-            ];
-        }, $timesheets);
+        return array_map(fn ($timesheet): array => [
+            'timesheet_id' => $timesheet->getId(),
+            'date'         => $timesheet->getDate()->format('Y-m-d'),
+            'hours'        => $timesheet->getHours(),
+            'notes'        => $timesheet->getNotes(),
+            'project'      => [
+                'id'   => $timesheet->getProject()->getId(),
+                'name' => $timesheet->getProject()->getName(),
+            ],
+            'task' => $timesheet->getTask() ? [
+                'id'   => $timesheet->getTask()->getId(),
+                'name' => $timesheet->getTask()->getName(),
+            ] : null,
+            'sub_task' => $timesheet->getSubTask() ? [
+                'id'    => $timesheet->getSubTask()->getId(),
+                'title' => $timesheet->getSubTask()->getTitle(),
+            ] : null,
+        ], $timesheets);
     }
 
     private function exportCookieConsents(User $user): array
@@ -154,7 +150,7 @@ class GdprDataExportService
         $company  = $this->companyContext->getCurrentCompany();
         $qb       = $this->em->createQueryBuilder();
         $consents = $qb->select('c')
-            ->from('App\Entity\CookieConsent', 'c')
+            ->from(\App\Entity\CookieConsent::class, 'c')
             ->where('c.user = :user')
             ->andWhere('c.company = :company')
             ->setParameter('user', $user)
@@ -163,27 +159,25 @@ class GdprDataExportService
             ->getQuery()
             ->getResult();
 
-        return array_map(function ($consent) {
-            return [
-                'consent_id' => $consent->getId(),
-                'essential'  => $consent->isEssential(),
-                'functional' => $consent->isFunctional(),
-                'analytics'  => $consent->isAnalytics(),
-                'version'    => $consent->getVersion(),
-                'ip_address' => $consent->getIpAddress(),
-                'user_agent' => $consent->getUserAgent(),
-                'created_at' => $consent->getCreatedAt()?->format('c'),
-                'expires_at' => $consent->getExpiresAt()?->format('c'),
-                'is_expired' => $consent->isExpired(),
-            ];
-        }, $consents);
+        return array_map(fn ($consent): array => [
+            'consent_id' => $consent->getId(),
+            'essential'  => $consent->isEssential(),
+            'functional' => $consent->isFunctional(),
+            'analytics'  => $consent->isAnalytics(),
+            'version'    => $consent->getVersion(),
+            'ip_address' => $consent->getIpAddress(),
+            'user_agent' => $consent->getUserAgent(),
+            'created_at' => $consent->getCreatedAt()?->format('c'),
+            'expires_at' => $consent->getExpiresAt()?->format('c'),
+            'is_expired' => $consent->isExpired(),
+        ], $consents);
     }
 
     private function exportStatistics(User $user, $contributor): array
     {
         $stats = [
             'account_age_days' => $user->getCreatedAt()
-                ? (new DateTimeImmutable())->diff($user->getCreatedAt())->days
+                ? new DateTimeImmutable()->diff($user->getCreatedAt())->days
                 : null,
         ];
 
@@ -201,7 +195,7 @@ class GdprDataExportService
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->em->createQueryBuilder();
         $result  = $qb->select('SUM(t.hours) as total')
-            ->from('App\Entity\Timesheet', 't')
+            ->from(\App\Entity\Timesheet::class, 't')
             ->where('t.contributor = :contributor')
             ->andWhere('t.company = :company')
             ->setParameter('contributor', $contributor)

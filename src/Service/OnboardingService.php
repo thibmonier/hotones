@@ -242,7 +242,7 @@ class OnboardingService
         $template->setDescription($description);
 
         if (null !== $profileId) {
-            $profile = $this->em->getReference('App\Entity\Profile', $profileId);
+            $profile = $this->em->getReference(\App\Entity\Profile::class, $profileId);
             $template->setProfile($profile);
         }
 
@@ -283,7 +283,7 @@ class OnboardingService
         $newTemplate->setActive(true);
 
         if (null !== $profileId) {
-            $profile = $this->em->getReference('App\Entity\Profile', $profileId);
+            $profile = $this->em->getReference(\App\Entity\Profile::class, $profileId);
             $newTemplate->setProfile($profile);
         }
 

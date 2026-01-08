@@ -119,7 +119,10 @@ class CreateTestUsersCommand extends Command
             // Create User
             $user = new User();
             $user->setEmail($userData['email'])
+                ->setCompany($company)
                 ->setRoles($userData['roles']);
+            $user->firstName = $userData['firstName'];
+            $user->lastName  = $userData['lastName'];
 
             $hashedPassword = $this->hasher->hashPassword($user, self::DEFAULT_PASSWORD);
             $user->setPassword($hashedPassword);
@@ -130,9 +133,9 @@ class CreateTestUsersCommand extends Command
             // Create linked Contributor
             $contributor = new Contributor();
             $contributor->setCompany($company);
-            $contributor->setFirstName($user->getFirstName())
-                ->setLastName($user->getLastName())
-                ->setEmail($user->getEmail())
+            $contributor->setFirstName($userData['firstName'])
+                ->setLastName($userData['lastName'])
+                ->setEmail($user->email)
                 ->setUser($user)
                 ->setActive(true);
 

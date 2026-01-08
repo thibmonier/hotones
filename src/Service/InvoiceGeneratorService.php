@@ -157,7 +157,7 @@ class InvoiceGeneratorService
         $timesheetDetails = $this->timesheetRepository->createQueryBuilder('t')
             ->select('c.id as contributor_id, c.firstName, c.lastName, SUM(t.hours) as totalHours, ep.tjm')
             ->join('t.contributor', 'c')
-            ->leftJoin('App\\Entity\\EmploymentPeriod', 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
+            ->leftJoin(\App\Entity\EmploymentPeriod::class, 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
             ->where('t.project = :project')
             ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('project', $project)
@@ -188,7 +188,7 @@ class InvoiceGeneratorService
             $days            = round($hours / 8, 2);
 
             // Calcul : montant HT = (heures × TJM) / 8
-            $lineAmountHt = bcmul((string) $hours, bcdiv($tjm, '8', 4), 2);
+            $lineAmountHt = bcmul((string) $hours, bcdiv((string) $tjm, '8', 4), 2);
 
             $line = new InvoiceLine();
             $line->setCompany($this->companyContext->getCurrentCompany());

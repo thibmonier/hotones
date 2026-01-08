@@ -176,7 +176,6 @@ class SecureFileUploadService
         // Vérification du type MIME réel (pas juste l'extension)
         $finfo    = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file->getPathname());
-        finfo_close($finfo);
 
         if (!in_array($mimeType, $allowedMimes, true)) {
             throw new FileException(sprintf('Type de fichier non autorisé: %s. Types acceptés: %s', $mimeType, implode(', ', $allowedMimes)));
@@ -221,7 +220,6 @@ class SecureFileUploadService
             // Conversion en WebP (qualité 85%)
             $webpTempFile = tempnam(sys_get_temp_dir(), 'webp_result_');
             imagewebp($image, $webpTempFile, 85);
-            imagedestroy($image);
 
             // Upload du fichier WebP
             $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $filePath);

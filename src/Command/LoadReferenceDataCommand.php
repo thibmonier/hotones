@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Company;
 use App\Entity\Profile;
 use App\Entity\Technology;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,6 +12,7 @@ use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -68,19 +70,43 @@ class LoadReferenceDataCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
         $io->title('Chargement des données de référence');
 
+        // Récupérer la Company
+        $companyId = $input->getOption('company-id');
+        if ($companyId) {
+            $company = $this->entityManager->getRepository(Company::class)->find($companyId);
+            if (!$company) {
+                $io->error(sprintf('Company avec ID %d introuvable', $companyId));
+
+                return Command::FAILURE;
+            }
+        } else {
+            $company = $this->entityManager->getRepository(Company::class)->findOneBy([]);
+            if (!$company) {
+                $io->error('Aucune Company trouvée. Créez d\'abord une Company.');
+
+                return Command::FAILURE;
+            }
+            $io->note(sprintf('Utilisation de la Company: %s (ID: %d)', $company->getName(), $company->getId()));
+        }
+
         try {
             // 1. Charger les profils
-            $profiles = $this->loadProfiles($io);
+            $profiles = $this->loadProfiles($io, $company);
             $io->success(count($profiles).' profils chargés');
 
             // 2. Charger les technologies
-            $technologies = $this->loadTechnologies($io);
+            $technologies = $this->loadTechnologies($io, $company);
             $io->success(count($technologies).' technologies chargées');
 
             $this->entityManager->flush();
@@ -95,7 +121,7 @@ class LoadReferenceDataCommand extends Command
         }
     }
 
-    private function loadProfiles(SymfonyStyle $io): array
+    private function loadProfiles(SymfonyStyle $io, Company $company): array
     {
         $io->section('Chargement des profils métier');
 
@@ -121,10 +147,11 @@ class LoadReferenceDataCommand extends Command
         $repo     = $this->entityManager->getRepository(Profile::class);
 
         foreach (self::PROFILES as $profileName) {
-            $profile = $repo->findOneBy(['name' => $profileName]);
+            $profile = $repo->findOneBy(['name' => $profileName, 'company' => $company]);
             if (!$profile) {
                 $profile = new Profile();
                 $profile->setName($profileName);
+                $profile->setCompany($company);
                 $io->writeln("✓ Profil créé : $profileName");
             } else {
                 $io->writeln("• Profil existant : $profileName");
@@ -140,7 +167,7 @@ class LoadReferenceDataCommand extends Command
         return $profiles;
     }
 
-    private function loadTechnologies(SymfonyStyle $io): array
+    private function loadTechnologies(SymfonyStyle $io, Company $company): array
     {
         $io->section('Chargement des technologies');
 
@@ -175,10 +202,11 @@ class LoadReferenceDataCommand extends Command
             $techName = $techData['name'];
             $techType = $techData['category'];
 
-            $technology = $repo->findOneBy(['name' => $techName]);
+            $technology = $repo->findOneBy(['name' => $techName, 'company' => $company]);
             if (!$technology) {
                 $technology = new Technology();
                 $technology->setName($techName);
+                $technology->setCompany($company);
                 $io->writeln("✓ Technologie créée : $techName ($techType)");
             } else {
                 $io->writeln("• Technologie existante : $techName");

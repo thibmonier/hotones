@@ -12,6 +12,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use DateTimeInterface;
+use Deprecated;
 
 /**
  * Service de calcul des métriques en temps réel.
@@ -23,24 +24,25 @@ use DateTimeInterface;
 class MetricsCalculationService
 {
     public function __construct(
-        private ProjectRepository $projectRepo,
-        private OrderRepository $orderRepo,
-        private TimesheetRepository $timesheetRepo,
-        private ContributorRepository $contributorRepo
+        private readonly ProjectRepository $projectRepo,
+        private readonly OrderRepository $orderRepo,
+        private readonly TimesheetRepository $timesheetRepo,
+        private readonly ContributorRepository $contributorRepo
     ) {
     }
 
     /**
      * Calcule tous les KPIs pour une période donnée.
-     *
-     * @deprecated Utilisez DashboardReadService::getKPIs() à la place.
-     *             Cette méthode est conservée uniquement pour le fallback
-     *             quand les données pré-calculées ne sont pas disponibles.
      */
+    #[Deprecated(message: <<<'TXT'
+    Utilisez DashboardReadService::getKPIs() à la place.
+                 Cette méthode est conservée uniquement pour le fallback
+                 quand les données pré-calculées ne sont pas disponibles.
+    TXT)]
     public function calculateKPIs(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, array $filters = []): array
     {
-        $startDate = $startDate ?? new DateTime('first day of this month');
-        $endDate   = $endDate   ?? new DateTime('last day of this month');
+        $startDate ??= new DateTime('first day of this month');
+        $endDate   ??= new DateTime('last day of this month');
 
         return [
             'period' => [
@@ -71,8 +73,8 @@ class MetricsCalculationService
             $revenue = $project->getTotalSoldAmount();
             $cost    = $project->getTotalRealCost();
 
-            $totalRevenue = bcadd($totalRevenue, $revenue, 2);
-            $totalCost    = bcadd($totalCost, $cost, 2);
+            $totalRevenue = bcadd($totalRevenue, (string) $revenue, 2);
+            $totalCost    = bcadd($totalCost, (string) $cost, 2);
         }
 
         $totalMargin = bcsub($totalRevenue, $totalCost, 2);

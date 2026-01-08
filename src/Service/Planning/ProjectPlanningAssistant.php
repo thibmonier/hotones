@@ -77,7 +77,7 @@ class ProjectPlanningAssistant
         }
 
         // Trier par confiance décroissante
-        usort($suggestions, fn ($a, $b) => $b['confidence'] <=> $a['confidence']);
+        usort($suggestions, fn ($a, $b): int => $b['confidence'] <=> $a['confidence']);
 
         return [
             'suggestions' => $suggestions,
@@ -229,7 +229,7 @@ class ProjectPlanningAssistant
         }
 
         // Trier par score décroissant
-        usort($scoredCandidates, fn ($a, $b) => $b['score'] <=> $a['score']);
+        usort($scoredCandidates, fn ($a, $b): int => $b['score'] <=> $a['score']);
 
         return $scoredCandidates[0];
     }

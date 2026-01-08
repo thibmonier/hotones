@@ -8,9 +8,9 @@ use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '/assets',
-        __DIR__ . '/config',
-        __DIR__ . '/public',
+//        __DIR__ . '/assets',
+//        __DIR__ . '/config',
+//        __DIR__ . '/public',
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ])
@@ -21,9 +21,16 @@ return RectorConfig::configure()
         // Skip if you want to exclude specific rules
         // ExplicitNullableParamTypeRector::class,
     ])
+    ->withParallel(
+        timeoutSeconds: 600,
+//        maxNumberOfProcesses: 8,
+        jobSize: 20,
+    )
+    // if you want to disable parallel processing
+    //->withoutParallel()
     // PHASE 1: Configuration conservatrice (ACTUELLE)
     // Activez les suggestions pour utiliser les fonctionnalités modernes de PHP
-    ->withPhpSets(php84: true)
+    ->withPhpSets(php85: true)
 
     // Type Coverage: Ajoute des types manquants (propriétés, retours, paramètres)
     // Niveau 10 = suggestions de base, non intrusives

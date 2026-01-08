@@ -37,7 +37,7 @@ class LeadMagnetMailer
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to(new Address($lead->getEmail(), $lead->getFullName()))
             ->subject('🎁 Votre guide "15 KPIs pour Agences Web" est prêt !')
@@ -64,7 +64,7 @@ class LeadMagnetMailer
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to(new Address($lead->getEmail(), $lead->getFullName()))
             ->subject('💡 Avez-vous consulté votre guide KPIs ?')
@@ -96,7 +96,7 @@ class LeadMagnetMailer
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to(new Address($lead->getEmail(), $lead->getFullName()))
             ->subject('🚀 Comment automatiser le calcul de vos KPIs ?')
@@ -123,7 +123,7 @@ class LeadMagnetMailer
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to(new Address($lead->getEmail(), $lead->getFullName()))
             ->subject('🎯 Testez HotOnes gratuitement pendant 14 jours')
