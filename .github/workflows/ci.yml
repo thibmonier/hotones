@@ -37,6 +37,9 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
+        env:
+          APP_ENV: test
+          DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
         run: composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader
 
       - name: Cache vendor directory
