@@ -1,0 +1,164 @@
+{% extends 'blog/base.html.twig' %}
+
+{% block title %}Blog - Best Practices en gestion de projet | HotOnes{% endblock %}
+
+{% block meta_description %}Découvrez nos articles sur les best practices en gestion de projet, optimisation de planning, suivi des KPIs et amélioration de la rentabilité d'agence web.{% endblock %}
+
+{% block blog_content %}
+    {# Hero Section #}
+    <div class="blog-hero mb-5" data-aos="fade-up">
+        <h1 class="blog-hero-title">Blog HotOnes</h1>
+        <p class="blog-hero-subtitle">
+            Best practices, conseils et astuces pour optimiser la gestion de vos projets
+        </p>
+    </div>
+
+    {# Posts Grid #}
+    {% if posts|length > 0 %}
+        <div class="blog-posts-grid">
+            {% for post in posts %}
+                <div class="blog-post-col">
+                    {% include 'blog/_partials/_post_card.html.twig' with {post: post} %}
+                </div>
+            {% endfor %}
+        </div>
+
+        {# Pagination #}
+        {% if totalPages > 1 %}
+            <nav class="blog-pagination mt-5" data-aos="fade-up">
+                <ul class="pagination justify-content-center">
+                    {# Previous #}
+                    <li class="page-item {% if currentPage == 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ currentPage > 1 ? path('blog_index', {page: currentPage - 1}) : '#' }}">
+                            <i class='bx bx-chevron-left'></i> Précédent
+                        </a>
+                    </li>
+
+                    {# Pages #}
+                    {% for page in 1..totalPages %}
+                        {% if page == currentPage %}
+                            <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                        {% elseif page == 1 or page == totalPages or (page >= currentPage - 2 and page <= currentPage + 2) %}
+                            <li class="page-item"><a class="page-link" href="{{ path('blog_index', {page: page}) }}">{{ page }}</a></li>
+                        {% elseif page == currentPage - 3 or page == currentPage + 3 %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# Next #}
+                    <li class="page-item {% if currentPage == totalPages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ currentPage < totalPages ? path('blog_index', {page: currentPage + 1}) : '#' }}">
+                            Suivant <i class='bx bx-chevron-right'></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="blog-empty" data-aos="fade-up">
+            <i class='bx bx-file'></i>
+            <h3>Aucun article publié</h3>
+            <p>Revenez bientôt pour découvrir nos articles.</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .blog-hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .blog-hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .blog-hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .blog-posts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .blog-hero-title {
+                font-size: 2rem;
+            }
+        }
+
+        .blog-post-col {
+            display: flex;
+        }
+
+        /* Pagination Styling */
+        .blog-pagination .pagination {
+            gap: 0.5rem;
+        }
+
+        .blog-pagination .page-link {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .blog-pagination .page-link:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .blog-pagination .page-item.active .page-link {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .blog-pagination .page-item.disabled .page-link {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        /* Empty State */
+        .blog-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .blog-empty i {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .blog-empty h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-empty p {
+            color: var(--text-secondary);
+        }
+    </style>
+{% endblock %}

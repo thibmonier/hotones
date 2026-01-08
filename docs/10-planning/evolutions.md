@@ -6,6 +6,11 @@ Une fois validées et priorisées, ces évolutions sont déplacées dans [ROADMA
 
 ---
 
+## Mise à jour des fichiers markdown de la racine
+
+les fichiers markdown de la racine ne sont pas automatiquement mis à jour par le système de versionnement. Il est recommandé de les mettre à jour manuellement lorsque nécessaire.
+Il faudrait mettre à jour à minima README.md et CONTRIBUTING.md afin qu'ils reflètent les dernières modifications et les nouvelles fonctionnalités.
+
 ## compléments pour la mise en place des tenants
 
 Lors de la mise en place des tenants pour avoir des comptes sociétés différents, il faudrait :
@@ -87,6 +92,11 @@ Permettre le lancement depuis l'écran du backoffice des taches du scheduler (sa
 
 revoir les pages existantes pour ne conserver que les pages utiles
 
+## ajout d'un blog
+
+ajouter des pages de blog dans les pages publiques pour décrire des best practices dans la gestion de projet, l'optimisation de planning, l'amélioration du suivi des KPIs, etc.
+
+
 ## prévoir l'intégration d'un PSP pour le paiement de l'abonnement 
 
 
@@ -100,6 +110,11 @@ finalisation des optimisations php8.5 (SPRINT-PHP85-OPTIMIZATIONS.md)
 prise en compte des remarques doctrine_doctor (et profiling blackfire-profiling.md)
 
 voir si il n'y a pas de la factorisation possible pour limiter le code dupliquer en mettant en place des traits par exemple ou en factorisant simplement
+
+### versions utilisées
+
+Les version utilisées pour la partie backend sont les plus récentes possibles, cependant ne devrait on pas mettre à jour l'ensemble de la stack frontend pour avoir des versions le plus à jour possible à commencer par node et npm puis l'ensemble des librairies définies pour le projet
+
 
 ## ecran de suivi
 

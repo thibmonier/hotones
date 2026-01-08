@@ -422,16 +422,14 @@ class SeedProjects2025Command extends Command
 
             if ($reflection->hasProperty('createdBy')) {
                 $property = $reflection->getProperty('createdBy');
-                $property->setAccessible(true);
                 $property->setValue($entity, $user);
             }
 
             if ($reflection->hasProperty('updatedBy')) {
                 $property = $reflection->getProperty('updatedBy');
-                $property->setAccessible(true);
                 $property->setValue($entity, $user);
             }
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             // Silently ignore if properties don't exist
         }
     }

@@ -2,6 +2,9 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\BlogCategory;
+use App\Entity\BlogPost;
+use App\Entity\BlogTag;
 use App\Entity\Company;
 use App\Entity\Profile;
 use App\Entity\SaasProvider;
@@ -68,6 +71,11 @@ class BackofficeDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Fournisseurs', 'fas fa-building', SaasProvider::class);
         yield MenuItem::linkToCrud('Services', 'fas fa-cube', SaasService::class);
         yield MenuItem::linkToCrud('Abonnements', 'fas fa-calendar-check', SaasSubscription::class);
+
+        yield MenuItem::section('Blog');
+        yield MenuItem::linkToCrud('Articles', 'fas fa-newspaper', BlogPost::class);
+        yield MenuItem::linkToCrud('Catégories', 'fas fa-folder', BlogCategory::class);
+        yield MenuItem::linkToCrud('Tags', 'fas fa-tag', BlogTag::class);
 
         yield MenuItem::section('Système');
         yield MenuItem::linkToCrud('Sociétés', 'fas fa-building', Company::class);

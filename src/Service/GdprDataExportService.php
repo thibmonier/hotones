@@ -111,7 +111,7 @@ class GdprDataExportService
             'weekly_hours'         => $period->getWeeklyHours(),
             'work_time_percentage' => $period->getWorkTimePercentage(),
             'profiles'             => array_map(
-                fn ($profile) => $profile->getName(),
+                fn ($profile): string => $profile->getName(),
                 $period->getProfiles()->toArray(),
             ),
         ], $periods);

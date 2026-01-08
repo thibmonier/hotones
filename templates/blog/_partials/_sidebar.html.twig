@@ -1,0 +1,188 @@
+{# Blog sidebar with categories, tags, and recent posts #}
+<div class="blog-sidebar">
+    {# Categories #}
+    {% if categories is defined and categories|length > 0 %}
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">Catégories</h3>
+            <ul class="sidebar-categories">
+                {% for category in categories %}
+                    <li>
+                        <a href="{{ path('blog_category', {slug: category.slug}) }}" class="category-link">
+                            {% if category.color %}
+                                <span class="category-dot" style="background-color: {{ category.color }};"></span>
+                            {% endif %}
+                            <span class="category-name">{{ category.name }}</span>
+                            <span class="category-count">{{ category.publishedPostCount }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {# Popular Tags #}
+    {% if popularTags is defined and popularTags|length > 0 %}
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">Tags populaires</h3>
+            <div class="sidebar-tags">
+                {% for tag in popularTags %}
+                    <a href="{{ path('blog_tag', {slug: tag.slug}) }}" class="tag-link">
+                        {{ tag.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {# Recent Posts #}
+    {% if recentPosts is defined and recentPosts|length > 0 %}
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">Articles récents</h3>
+            <ul class="sidebar-recent-posts">
+                {% for post in recentPosts %}
+                    <li>
+                        <a href="{{ path('blog_show', {slug: post.slug}) }}" class="recent-post-link">
+                            <span class="recent-post-title">{{ post.title }}</span>
+                            <span class="recent-post-date">{{ post.publishedAt|date('d/m/Y') }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.blog-sidebar {
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-section {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+/* Categories */
+.sidebar-categories {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-categories li {
+    margin-bottom: 0.5rem;
+}
+
+.category-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+}
+
+.category-link:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary-color);
+}
+
+.category-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.category-name {
+    flex: 1;
+}
+
+.category-count {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    background: var(--dark-bg);
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+}
+
+/* Tags */
+.sidebar-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-link {
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--text-secondary);
+    border: 1px solid var(--dark-border);
+    transition: all 0.3s;
+}
+
+.tag-link:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Recent Posts */
+.sidebar-recent-posts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-recent-posts li {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--dark-border);
+}
+
+.sidebar-recent-posts li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.recent-post-link {
+    text-decoration: none;
+    display: block;
+}
+
+.recent-post-title {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+    transition: color 0.3s;
+}
+
+.recent-post-link:hover .recent-post-title {
+    color: var(--primary-color);
+}
+
+.recent-post-date {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+</style>

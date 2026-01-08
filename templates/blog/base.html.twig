@@ -1,0 +1,22 @@
+{% extends 'public/base.html.twig' %}
+
+{% block body %}
+<div class="blog-container">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8">
+                {% block blog_content %}{% endblock %}
+            </div>
+            <div class="col-lg-4">
+                {% include 'blog/_partials/_sidebar.html.twig' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.blog-container {
+    min-height: calc(100vh - 200px);
+}
+</style>
+{% endblock %}

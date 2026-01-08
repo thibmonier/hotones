@@ -1,0 +1,188 @@
+{% extends 'blog/base.html.twig' %}
+
+{% block title %}#{{ tag.name }} - Blog | HotOnes{% endblock %}
+
+{% block meta_description %}Articles tagués avec {{ tag.name }} sur le blog HotOnes{% endblock %}
+
+{% block blog_content %}
+    {# Tag Hero #}
+    <div class="tag-hero mb-5" data-aos="fade-up">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb blog-breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('blog_index') }}">Blog</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tag: {{ tag.name }}</li>
+            </ol>
+        </nav>
+
+        <div class="tag-badge-large">
+            <i class='bx bx-purchase-tag'></i> {{ tag.name }}
+        </div>
+
+        <div class="tag-stats">
+            <span class="stat-item">
+                <i class='bx bx-file'></i> {{ posts|length }} article{{ posts|length > 1 ? 's' : '' }}
+            </span>
+        </div>
+    </div>
+
+    {# Posts Grid #}
+    {% if posts|length > 0 %}
+        <div class="blog-posts-grid">
+            {% for post in posts %}
+                <div class="blog-post-col">
+                    {% include 'blog/_partials/_post_card.html.twig' with {post: post} %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="blog-empty" data-aos="fade-up">
+            <i class='bx bx-file'></i>
+            <h3>Aucun article avec ce tag</h3>
+            <p>Revenez bientôt pour découvrir nos articles.</p>
+            <a href="{{ path('blog_index') }}" class="btn-back-to-blog mt-3">
+                <i class='bx bx-arrow-back'></i> Retour au blog
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .tag-hero {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .tag-badge-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-size: 2rem;
+            font-weight: 700;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .tag-badge-large:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tag-badge-large i {
+            font-size: 2rem;
+        }
+
+        .tag-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-item i {
+            font-size: 1.25rem;
+        }
+
+        .blog-posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .blog-posts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tag-badge-large {
+                font-size: 1.5rem;
+                padding: 0.75rem 1.75rem;
+            }
+
+            .tag-badge-large i {
+                font-size: 1.5rem;
+            }
+        }
+
+        .blog-post-col {
+            display: flex;
+        }
+
+        .blog-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .blog-empty i {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .blog-empty h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-empty p {
+            color: var(--text-secondary);
+        }
+
+        .btn-back-to-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back-to-blog:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .blog-breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            justify-content: center;
+        }
+
+        .blog-breadcrumb .breadcrumb-item {
+            color: var(--text-secondary);
+        }
+
+        .blog-breadcrumb .breadcrumb-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .blog-breadcrumb .breadcrumb-item a:hover {
+            color: var(--primary-color);
+        }
+
+        .blog-breadcrumb .breadcrumb-item.active {
+            color: var(--text-primary);
+        }
+    </style>
+{% endblock %}
