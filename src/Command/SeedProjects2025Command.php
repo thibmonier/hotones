@@ -18,6 +18,7 @@ use App\Entity\User;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -89,7 +90,7 @@ class SeedProjects2025Command extends Command
             }
 
             // Pré-requis (profils, contributeurs, technos)
-            $profiles     = $this->ensureProfiles($io);
+            $profiles     = $this->ensureProfiles($io, $company);
             $contributors = $this->ensureContributors($io, $profiles, $company);
             $technos      = $this->ensureTechnologies($io);
 
@@ -132,16 +133,16 @@ class SeedProjects2025Command extends Command
         }
     }
 
-    private function ensureProfiles(SymfonyStyle $io): array
+    private function ensureProfiles(SymfonyStyle $io, Company $company): array
     {
         $repo     = $this->em->getRepository(Profile::class);
         $names    = ['Développeur Frontend', 'Développeur Backend', 'Chef de projet', 'Designer UX/UI', 'DevOps'];
         $profiles = [];
         foreach ($names as $name) {
-            $p = $repo->findOneBy(['name' => $name]);
+            $p = $repo->findOneBy(['name' => $name, 'company' => $company]);
             if (!$p) {
                 $p = new Profile();
-                $p->setName($name)->setDescription('Profil test');
+                $p->setName($name)->setDescription('Profil test')->setCompany($company);
                 $this->em->persist($p);
                 $io->writeln("✓ Profil créé: $name");
             }
@@ -197,10 +198,11 @@ class SeedProjects2025Command extends Command
         $techs   = ['Symfony', 'React', 'Vue.js', 'Angular', 'Node.js', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis'];
         $created = [];
         foreach ($techs as $t) {
-            $tech = $repo->findOneBy(['name' => $t]);
+            $tech = $repo->findOneBy(['name' => $t, 'company' => $this->em->getRepository(Company::class)->findOneBy([])]);
             if (!$tech) {
-                $tech = new Technology();
-                $tech->setName($t)->setCategory('tool')->setActive(true);
+                $tech    = new Technology();
+                $company = $this->em->getRepository(Company::class)->findOneBy([]);
+                $tech->setName($t)->setCategory('tool')->setActive(true)->setCompany($company);
                 $this->em->persist($tech);
                 $io->writeln("✓ Technologie créée: $t");
             }
@@ -254,18 +256,20 @@ class SeedProjects2025Command extends Command
 
     private function createSignedOrderForProject(Project $project, array $profiles, Company $company, User $user): void
     {
-        $createdAt = clone $project->getStartDate();
+        $createdAt = DateTimeImmutable::createFromMutable($project->getStartDate());
         $order     = new Order();
         $order->setCompany($project->getCompany());
         $order->setProject($project)
-            ->setOrderNumber($this->generateOrderNumberForDate($createdAt))
+            ->setOrderNumber($this->generateOrderNumberForDate($project->getStartDate()))
             ->setStatus(random_int(0, 1) ? 'signe' : 'gagne')
             ->setCreatedAt($createdAt);
 
         // Set blameable fields via reflection (workaround for CLI context)
         $this->setBlameable($order, $user);
 
-        $order->validatedAt = (clone $createdAt)->modify('+'.random_int(1, 30).' days');
+        // validatedAt is type 'date' which requires DateTime, not DateTimeImmutable
+        $validatedDate      = $createdAt->modify('+'.random_int(1, 30).' days');
+        $order->validatedAt = DateTime::createFromImmutable($validatedDate);
 
         // Section prestations
         $section = new OrderSection();
