@@ -23,7 +23,7 @@
 [![Symfony Version](https://img.shields.io/badge/Symfony-8.0-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
 [![MariaDB Version](https://img.shields.io/badge/MariaDB-11.4-003545?style=flat&logo=mariadb&logoColor=white)](https://mariadb.org/)
 
-Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en croisant ventes (jours/TJM), temps passés, coûts (CJM), achats et KPIs consolidés.
+Plateforme SaaS multi-tenant de gestion de rentabilité pour agences web. Analyse de la rentabilité en croisant ventes (jours/TJM), temps passés, coûts (CJM), achats et KPIs consolidés. Support multi-sociétés avec isolation complète des données.
 
 ## 🚀 Guide Warp/Agents
 - WARP index: WARP.md
@@ -35,15 +35,17 @@ Gestion de rentabilité des projets d'agence web. Analyse de la rentabilité en 
 - DB: MariaDB 11.4 (Docker)
 - Frontend: Twig + Bootstrap 5 (thème Skote)
 - Assets: Webpack Encore + Sass
+- Admin: EasyAdmin 4.27
 - 2FA: scheb/2fa-bundle (TOTP)
-- ApiPlatform 4 (REST)
+- API: ApiPlatform 4.2 (REST)
+- AI: Symfony AI (Anthropic Claude, OpenAI GPT)
 
 ## Prérequis
 - Docker + Docker Compose
 - Node.js + Yarn (si build assets en local)
 
 ## Démarrage rapide (Docker)
-```bash path=null start=null
+```bash
 # 1) Lancer l'environnement
 docker compose up -d --build
 
@@ -51,23 +53,29 @@ docker compose up -d --build
 docker compose exec app composer install
 
 # 3) Créer/update le schéma et exécuter les migrations
-# (si une nouvelle migration est requise : docker compose exec app php bin/console make:migration)
 docker compose exec app php bin/console doctrine:migrations:migrate -n
 
-# 4) (Optionnel) Générer des données de test
-docker compose exec app php bin/console app:generate-test-data --year=$(date +%Y)
+# 4) Charger les données de référence (profils, technologies)
+docker compose exec app php bin/console app:load-reference-data
 
-# 5) Builder les assets (au choix)
+# 5) Créer des utilisateurs de test pour tous les rôles
+docker compose exec app php bin/console app:create-test-users
+# Utilisateurs créés: intervenant@test.com, chef-projet@test.com, manager@test.com,
+# compta@test.com, admin@test.com, superadmin@test.com (password: "password")
+
+# 6) (Optionnel) Générer des projets de test avec devis et temps passés
+docker compose exec app php bin/console app:seed-projects-2025 --count=50 --year=2025
+
+# 7) Builder les assets (au choix)
 # En local
 ./build-assets.sh dev
 # OU dans Docker
 ./docker-build-assets.sh dev
-
-# 6) Créer un utilisateur d'admin de test
-docker compose exec app php bin/console app:user:create email@example.com password "Prénom" "Nom"
 ```
 
-Application: http://localhost:8080
+**URLs principales:**
+- Application: http://localhost:8080
+- Backoffice Admin: http://localhost:8080/backoffice (ROLE_ADMIN requis)
 
 ## Développement quotidien
 - Lancer/arrêter: `docker compose up -d` / `docker compose down`
@@ -85,18 +93,55 @@ Application: http://localhost:8080
 ```
 
 ## Fonctionnalités clés
-- Authentification + 2FA TOTP
-- Gestion Contributeurs, Périodes d'emploi, Profils
-- Projets: type (forfait/régie), statut, achats, technos, catégorie de service
-- Devis: sections + lignes (jours/TJM/achats), contingence
-- Timesheet: saisie hebdo, historique, vue globale
-- **Planning Resource Timeline**: vue planning avec FullCalendar Scheduler, gestion des congés
-- **Optimisation du planning**: analyse TACE, recommandations intelligentes avec IA (OpenAI/Anthropic)
-- **Workflow de congés**: demandes avec validation hiérarchique, notifications
-- **Niveaux de service client**: VIP, Prioritaire, Standard, Basse priorité (auto/manuel)
-- Analytics: `/analytics/dashboard` (KPIs, filtres, graphiques)
+
+### 🏢 Multi-tenancy & Administration
+- **Architecture multi-tenant** : Isolation complète des données par société (Company)
+- **Backoffice EasyAdmin** : Interface d'administration moderne (`/backoffice`)
+  - Gestion des sociétés (Company) avec configuration fine (limites, forfaits, features)
+  - Configuration des technologies, profils métiers, catégories de service
+  - Gestion des abonnements SaaS et planification des tâches
+
+### 👤 Authentification & Sécurité
+- Authentification multi-rôles (INTERVENANT → CHEF_PROJET → MANAGER → COMPTA/ADMIN → SUPERADMIN)
+- 2FA TOTP (scheb/2fa-bundle)
+- Protection CSRF sur tous les formulaires
+- API REST sécurisée (JWT via lexik/jwt-authentication-bundle)
+
+### 💼 Gestion de projet
+- Gestion Contributeurs, Périodes d'emploi, Profils métiers
+- Projets: type (forfait/régie), statut, achats, technologies, catégories de service
+- Devis: sections + lignes (jours/TJM/achats), contingence, workflow de validation
+- Timesheet: saisie hebdo avec timer, historique, vue globale
+
+### 📅 Planning & Ressources
+- **Planning Resource Timeline**: FullCalendar Scheduler avec gestion des congés
+- **Optimisation intelligente**: analyse TACE avec recommandations IA (OpenAI GPT-4o-mini, Anthropic Claude 3.5 Haiku)
+- **Workflow de congés**: demandes avec validation hiérarchique, notifications temps réel
+- **Staffing Dashboard**: métriques de charge, disponibilité, taux d'activité
+
+### 📊 Analytics & KPIs
+- Tableaux de bord: Analytics, Profitabilité, Ventes, Staffing
+- Export Excel avec graphiques et évolutions mensuelles
+- Métriques pré-calculées (star schema) avec fallback temps réel
+- **Niveaux de service client**: VIP, Prioritaire, Standard, Basse priorité (calcul auto ou manuel)
 
 ## Dernières mises à jour
+
+### 🏢 Architecture Multi-tenant & Backoffice (Janvier 2025)
+- **Multi-tenancy complet**: Entité Company avec isolation des données
+  - Gestion des abonnements (Starter/Professional/Enterprise)
+  - Limites configurables (utilisateurs, projets, stockage)
+  - Feature flags modulaires (Invoicing, Planning, Analytics, AI Tools, API Access)
+  - Paramètres métier (coefficients de charges, congés, RTT)
+- **Backoffice EasyAdmin 4.27**: Interface d'administration complète
+  - CRUD Company avec tous les champs de configuration
+  - Gestion Technologies, Profils, Catégories de service, Compétences
+  - Gestion abonnements SaaS (Providers, Services, Subscriptions)
+  - Monitoring Scheduler et paramètres notifications
+- **Commandes de setup améliorées**:
+  - `app:load-reference-data`: Charge profils métiers et technologies avec descriptions
+  - `app:create-test-users`: Génère utilisateurs pour tous les rôles (password: "password")
+  - `app:seed-projects-2025`: Génère projets complets avec devis signés, tâches et temps passés
 
 ### 🤖 Optimisation IA du planning (Novembre 2024)
 - **Analyse TACE intelligente**: détection automatique des surcharges et sous-utilisations
@@ -152,16 +197,28 @@ export PANTHER_NO_SANDBOX=1
 - Plus d’infos: `docs/tests.md`
 
 ## URLs utiles
-- App: http://localhost:8080
-- Admin config: /admin/technologies, /admin/service-categories, /admin/job-profiles
-- Périodes d'emploi: /employment-periods
+
+### Administration
+- **Backoffice**: http://localhost:8080/backoffice (EasyAdmin - ROLE_ADMIN)
+  - Gestion Company, Technologies, Profils, SaaS, Scheduler
+- **Configuration legacy**: /admin/technologies, /admin/service-categories, /admin/job-profiles
+
+### Application principale
+- **App**: http://localhost:8080
+- **Périodes d'emploi**: /employment-periods
 - **Planning**: /planning (resource timeline avec gestion des congés)
 - **Optimisation planning**: /planning/optimization (recommandations IA)
 - **Demande de congés**: /vacation-request (pour intervenants)
 - **Validation congés**: /vacation-approval (pour managers)
-- Analytics: /analytics/dashboard
-- Staffing & TACE: /staffing/dashboard
-- /api/documentation pour avoir la documentation swagger de l'API
+
+### Analytics & Dashboards
+- **Analytics**: /analytics/dashboard (KPIs consolidés avec export Excel)
+- **Profitabilité**: /profitability/dashboard
+- **Ventes**: /sales/dashboard
+- **Staffing & TACE**: /staffing/dashboard
+
+### API
+- **Documentation**: /api/documentation (Swagger/OpenAPI)
 
 ## Accès Base de données (clients externes)
 - Host: localhost

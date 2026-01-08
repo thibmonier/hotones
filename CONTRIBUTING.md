@@ -41,10 +41,11 @@ Merci de votre intérêt pour contribuer à HotOnes ! Ce document fournit les gu
 ### Prérequis
 
 - **Docker** & **Docker Compose** (recommandé)
-- **PHP 8.4+** (si développement local)
+- **PHP 8.4+** avec extensions: bcmath, ctype, iconv, redis
 - **Composer 2.x**
-- **Node.js 18+** & **npm** (pour assets)
+- **Node.js 18+** & **npm/yarn** (pour assets)
 - **Git**
+- **MariaDB 11.4** ou **MySQL 8.0+** (si développement local sans Docker)
 
 ### Installation
 
@@ -59,12 +60,20 @@ docker compose up -d --build
 # Installer les dépendances PHP
 docker compose exec app composer install
 
-# Créer la base de données et exécuter les migrations
-docker compose exec app php bin/console doctrine:database:create
+# Exécuter les migrations
 docker compose exec app php bin/console doctrine:migrations:migrate -n
 
-# Charger les fixtures (données de test)
-docker compose exec app php bin/console doctrine:fixtures:load -n
+# Charger les données de référence (profils métiers et technologies)
+docker compose exec app php bin/console app:load-reference-data
+
+# Créer des utilisateurs de test pour tous les rôles
+docker compose exec app php bin/console app:create-test-users
+# Créé: intervenant@test.com, chef-projet@test.com, manager@test.com,
+#        compta@test.com, admin@test.com, superadmin@test.com
+# Mot de passe pour tous: "password"
+
+# (Optionnel) Générer des projets de test avec devis et temps passés
+docker compose exec app php bin/console app:seed-projects-2025 --count=50
 
 # Compiler les assets
 ./build-assets.sh dev
@@ -72,9 +81,11 @@ docker compose exec app php bin/console doctrine:fixtures:load -n
 
 ### Configuration
 
-- L'application est accessible sur `http://localhost:8080`
-- La base de données MariaDB est accessible sur `localhost:3307`
-- Redis est disponible sur `localhost:6379`
+- **Application principale**: `http://localhost:8080`
+- **Backoffice admin (EasyAdmin)**: `http://localhost:8080/backoffice` (ROLE_ADMIN requis)
+- **Base de données MariaDB**: `localhost:3307` (user: symfony, password: symfony, db: hotones)
+- **Redis**: `localhost:6379`
+- **API Documentation**: `http://localhost:8080/api/documentation`
 
 ## 📏 Standards de code
 
@@ -116,6 +127,7 @@ docker compose exec app composer check-code
 
 #### Structure des contrôleurs
 
+**Contrôleurs standards (application)** :
 ```php
 #[Route('/resource')]
 #[IsGranted('ROLE_REQUIRED')]
@@ -132,6 +144,43 @@ class ResourceController extends AbstractController
     {
         // Logique minimale
         // Déléguer au service pour la logique métier
+    }
+}
+```
+
+**Contrôleurs CRUD EasyAdmin (backoffice)** :
+```php
+namespace App\Controller\Admin;
+
+use App\Entity\Resource;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use Override;
+
+class ResourceCrudController extends AbstractCrudController
+{
+    public static function getEntityFqcn(): string
+    {
+        return Resource::class;
+    }
+
+    #[Override]
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Ressource')
+            ->setEntityLabelInPlural('Ressources')
+            ->setSearchFields(['name', 'slug'])
+            ->setDefaultSort(['name' => 'ASC']);
+    }
+
+    #[Override]
+    public function configureFields(string $pageName): iterable
+    {
+        // Configuration des champs du CRUD
+        yield IdField::new('id')->hideOnForm();
+        yield TextField::new('name', 'Nom')->setRequired(true);
+        // ...
     }
 }
 ```
@@ -184,11 +233,14 @@ class Resource
 
 1. **Pas de logique métier dans les contrôleurs** - Utilisez les services
 2. **Injection de dépendances** - Toujours via le constructeur
-3. **Type hints stricts** - Utilisez `declare(strict_types=1);`
+3. **Type hints stricts** - Utilisez `declare(strict_types=1);` en tête de fichier
 4. **Pas de Yoda conditions** - `if ($var === 'value')` pas `if ('value' === $var)`
 5. **Sécurité CSRF** - Protégez tous les formulaires et actions sensibles
 6. **Validation** - Toujours valider les entrées utilisateur
 7. **Pas de code mort** - Supprimez le code inutilisé au lieu de le commenter
+8. **Multi-tenancy** - Toutes les entités métier doivent avoir une relation `ManyToOne` vers `Company`
+9. **Isolation des données** - Toujours filtrer par Company dans les repositories
+10. **Permissions EasyAdmin** - Utiliser `setPermission()` pour restreindre l'accès aux actions CRUD
 
 ## 🔄 Processus de contribution
 
@@ -355,6 +407,42 @@ class MyControllerTest extends WebTestCase
 - **Objectif minimum** : 80% de couverture pour les services
 - **Priorité** : Logique métier critique (calculs, workflows, permissions)
 - **Facultatif** : Getters/setters simples, constructeurs
+
+## 🗄️ Données de test
+
+### Commandes de génération
+
+Le projet inclut plusieurs commandes pour générer des données de test :
+
+```bash
+# Charger les données de référence (profils métiers, technologies)
+docker compose exec app php bin/console app:load-reference-data [--company-id=X]
+
+# Créer des utilisateurs de test pour tous les rôles
+docker compose exec app php bin/console app:create-test-users [--company-id=X]
+# Créé 6 utilisateurs: intervenant, chef-projet, manager, compta, admin, superadmin
+# Mot de passe: "password"
+
+# Générer des projets de test complets (devis + tâches + temps passés)
+docker compose exec app php bin/console app:seed-projects-2025 \
+  --count=50 \
+  --year=2025 \
+  [--company-id=X]
+# Génère: projets, devis signés, tâches, temps passés sur toute l'année
+
+# Recalculer les métriques analytics
+docker compose exec app php bin/console app:metrics:dispatch --year=2025
+```
+
+### Structure des données générées
+
+- **Profils métiers** : 15 profils (fullstack, frontend, backend, lead dev, chef de projet, etc.)
+- **Technologies** : 20 technologies avec couleurs (Symfony, React, Vue, Angular, etc.)
+- **Contributeurs** : 7 contributeurs avec profils et CJM variables
+- **Projets** : Projets forfait/régie avec statut actif/complété
+- **Devis** : Sections + lignes de service avec jours/TJM + achats
+- **Tâches** : 3-6 tâches par projet avec estimations
+- **Timesheets** : Temps passés répartis sur l'année (jours ouvrés, 25% de remplissage)
 
 ## 📚 Documentation
 

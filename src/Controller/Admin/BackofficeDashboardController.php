@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Company;
 use App\Entity\Profile;
 use App\Entity\SaasProvider;
 use App\Entity\SaasService;
@@ -69,6 +70,7 @@ class BackofficeDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Abonnements', 'fas fa-calendar-check', SaasSubscription::class);
 
         yield MenuItem::section('Système');
+        yield MenuItem::linkToCrud('Sociétés', 'fas fa-building', Company::class);
         yield MenuItem::linkToCrud('Scheduler', 'fas fa-clock', SchedulerEntry::class);
         yield MenuItem::linkToRoute('Notifications', 'fas fa-bell', 'admin_notification_settings');
 
