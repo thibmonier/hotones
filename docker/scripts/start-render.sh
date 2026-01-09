@@ -105,6 +105,10 @@ if [ ! -f config/jwt/private.pem ] || [ ! -f config/jwt/public.pem ]; then
     php bin/console lexik:jwt:generate-keypair --skip-if-exists
 fi
 
+# Install bundle assets (EasyAdmin, API Platform, etc.)
+echo "Installing bundle assets..."
+php bin/console assets:install public --no-interaction
+
 # Run database migrations with error handling
 echo "Running database migrations..."
 

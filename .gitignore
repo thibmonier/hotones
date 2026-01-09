@@ -59,3 +59,4 @@ yarn-error.log
 ###< deptrac/deptrac ###
 /public/sitemap.default.xml
 /public/sitemap.xml
+.DS_Store

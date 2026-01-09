@@ -96,6 +96,10 @@ revoir les pages existantes pour ne conserver que les pages utiles
 
 ajouter des pages de blog dans les pages publiques pour décrire des best practices dans la gestion de projet, l'optimisation de planning, l'amélioration du suivi des KPIs, etc.
 
+    pour l'image d'un article, il faudrait pouvoir ajouter un prompt de génération d'image ou de recherche d'image par l'IA et laisser le choix à l'utilisateur de choisir entre les deux.
+    Une fois l'image par IA trouvée, elle doit passer en filtre liip pour etre stockée/mise en cache pour ne pas avoir à la regénérer sauf si demandé par le contributeur de l'article
+    
+
 
 ## prévoir l'intégration d'un PSP pour le paiement de l'abonnement 
 

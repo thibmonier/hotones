@@ -8,11 +8,17 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[BlogPost] Script loaded, looking for imageSource field...');
+
     const imageSourceField = document.querySelector('select[name="BlogPost[imageSource]"]');
 
     if (!imageSourceField) {
+        console.log('[BlogPost] imageSource field not found. Available selects:',
+            Array.from(document.querySelectorAll('select')).map(s => s.name));
         return; // Not on the blog post form
     }
+
+    console.log('[BlogPost] imageSource field found:', imageSourceField.name);
 
     // Get all image-related fields
     const externalUrlField = document.querySelector('[data-image-field="external"]')?.closest('.form-group');

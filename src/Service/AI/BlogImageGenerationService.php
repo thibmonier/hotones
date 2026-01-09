@@ -276,7 +276,7 @@ class BlogImageGenerationService
      */
     private function checkRateLimit(Company $company): bool
     {
-        $cacheKey = sprintf('blog_ai_gen:%d:%s', $company->getId(), date('YmdH'));
+        $cacheKey = sprintf('blog_ai_gen-%d-%s', $company->getId(), date('YmdH'));
         $item     = $this->cache->getItem($cacheKey);
 
         if (!$item->isHit()) {

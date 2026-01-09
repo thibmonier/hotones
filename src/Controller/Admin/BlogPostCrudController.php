@@ -268,6 +268,15 @@ class BlogPostCrudController extends AbstractCrudController
             return;
         }
 
+        // DEBUG: Log current state
+        error_log(sprintf(
+            '[BlogPost #%d] imageSource=%s, imagePrompt=%s, imageGeneratedAt=%s',
+            $blogPost->id ?? 0,
+            $blogPost->imageSource,
+            $blogPost->imagePrompt ? 'SET' : 'NULL',
+            $blogPost->imageGeneratedAt ? 'SET' : 'NULL',
+        ));
+
         // Check if there's an uploaded file (not implemented yet - would need ImageField in EasyAdmin)
         // For now, we focus on AI generation workflow
 
@@ -275,6 +284,7 @@ class BlogPostCrudController extends AbstractCrudController
         if ($blogPost->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
             && $blogPost->imagePrompt !== null
             && $blogPost->imageGeneratedAt === null) {
+            error_log('[BlogPost] AI generation triggered!');
             try {
                 $this->imageGenerationService->generateImage(
                     $blogPost->imagePrompt,
