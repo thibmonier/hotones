@@ -95,14 +95,14 @@ RUN composer install \
     --ignore-platform-req=php \
     && composer clear-cache
 
-# Install bundle assets (EasyAdmin, API Platform, etc.) to public/bundles/
-# Use hard copy (not symlink) for production compatibility
-RUN php bin/console assets:install public
-
 # Install AssetMapper vendor files and compile assets
 # Use SQLite for build-time database connection (DB container not available during build)
 RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console importmap:install \
     && APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console asset-map:compile
+
+# Install bundle assets (EasyAdmin, API Platform, etc.) to public/bundles/
+# Use hard copy (not symlink) for production compatibility
+RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console assets:install public
 
 # Create JWT directory (keys will be generated on first startup)
 RUN mkdir -p config/jwt
