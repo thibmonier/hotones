@@ -111,39 +111,39 @@ echo "Running database migrations..."
 # First, ensure migration metadata storage is synced
 php bin/console doctrine:migrations:sync-metadata-storage --no-interaction 2>/dev/null || true
 
-# Try to run migrations
-if ! php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration 2>&1 | tee /tmp/migration.log; then
-    echo "  Migration failed, checking if it's due to existing tables..."
+# Check if there are migrations to run
+echo "Checking for pending migrations..."
+php bin/console doctrine:migrations:status --no-interaction | tee /tmp/migration_status.log || true
 
-    # If the error is about tables already existing, try to recover
-    if grep -q "Base table or view already exists" /tmp/migration.log; then
-        echo "  Tables already exist, syncing migration versions..."
+# Count available migrations
+available_migrations=$(grep -c "not migrated" /tmp/migration_status.log || echo "0")
+echo "Found $available_migrations pending migration(s)"
 
-        # Get list of all migrations
-        migrations=$(php bin/console doctrine:migrations:list --no-interaction 2>/dev/null | grep -oP "Version\d+" || true)
+if [ "$available_migrations" -gt 0 ]; then
+    echo "Executing pending migrations..."
+    # Force execution by running each migration individually
+    pending_versions=$(grep "not migrated" /tmp/migration_status.log | grep -oP "Version\d+" || true)
 
-        if [ -n "$migrations" ]; then
-            # Mark each migration that failed as executed
-            for version in $migrations; do
-                # Try to add the version, ignore if already added
-                php bin/console doctrine:migrations:version "$version" --add --no-interaction 2>/dev/null || true
-            done
+    for version in $pending_versions; do
+        echo "  Migrating $version..."
+        php bin/console doctrine:migrations:execute --up "$version" --no-interaction || {
+            echo "  ERROR: Migration $version failed!"
+            # Check if it's because table already exists
+            if php bin/console doctrine:migrations:execute --up "$version" --no-interaction 2>&1 | grep -q "already exists"; then
+                echo "  Tables already exist, marking as migrated..."
+                php bin/console doctrine:migrations:version "$version" --add --no-interaction || true
+            else
+                echo "  Continuing with remaining migrations..."
+            fi
+        }
+    done
 
-            echo "  Migration versions synced, trying migrations again..."
-            # Try migrations one more time (should only run new ones)
-            php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || {
-                echo "  Warning: Some migrations still failed, but continuing startup..."
-                echo "  You may need to manually review migrations later."
-            }
-        fi
-    else
-        echo "  Migration failed with unexpected error:"
-        cat /tmp/migration.log
-        echo "  Continuing anyway, but database may be in inconsistent state."
-    fi
+    echo "All migrations processed."
+else
+    echo "No pending migrations to execute."
 fi
 
-echo "Checking migration status..."
+echo "Final migration status:"
 php bin/console doctrine:migrations:status --no-interaction || true
 
 # Clear and warm up cache
@@ -151,7 +151,14 @@ echo "Clearing cache..."
 php bin/console cache:clear --no-warmup
 
 echo "Warming up cache..."
-php bin/console cache:warmup
+# Skip optional warmers to avoid Doctrine metadata issues if schema is not yet migrated
+php bin/console cache:warmup --no-optional-warmers || {
+    echo "  Cache warmup with --no-optional-warmers failed, trying without flag..."
+    php bin/console cache:warmup || {
+        echo "  WARNING: Cache warmup failed, but continuing..."
+        echo "  Cache will be built on first request."
+    }
+}
 
 # Set proper permissions
 echo "Setting permissions..."
