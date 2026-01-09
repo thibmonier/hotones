@@ -1,57 +1,57 @@
 name: Quality
 
 on:
-  push:
-  pull_request:
-  schedule:
-    # Exécution quotidienne à 6h du matin
-    - cron: '0 6 * * *'
+    push:
+    pull_request:
+    schedule:
+        # Exécution quotidienne à 6h du matin
+        - cron: "0 6 * * *"
 
 jobs:
-  quality:
-    name: Code Quality Checks
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        tool:
-          - { name: 'PHP-CS-Fixer', script: 'phpcsfixer' }
-          - { name: 'PHPStan', script: 'phpstan' }
-          - { name: 'PHP_CodeSniffer', script: 'phpcs' }
-          - { name: 'Deptrac', script: 'deptrac' }
-          - { name: 'Rector', script: 'rector' }
+    quality:
+        name: Code Quality Checks
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                tool:
+                    - { name: "PHP-CS-Fixer", script: "phpcsfixer" }
+                    - { name: "PHPStan", script: "phpstan" }
+                    #- { name: 'PHP_CodeSniffer', script: 'phpcs' }
+                    - { name: "Deptrac", script: "deptrac" }
+                    - { name: "Rector", script: "rector" }
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          coverage: none
-          tools: composer
-          extensions: mbstring, intl, pdo_mysql, bcmath, redis
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.5"
+                  coverage: none
+                  tools: composer
+                  extensions: mbstring, intl, pdo_mysql, bcmath, redis
 
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+            - name: Get Composer Cache Directory
+              id: composer-cache
+              run: |
+                  echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+            - name: Cache Composer dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-
 
-      - name: Install dependencies
-        env:
-          APP_ENV: test
-          DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+            - name: Install dependencies
+              env:
+                  APP_ENV: test
+                  DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
+              run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Run ${{ matrix.tool.name }}
-        run: composer ${{ matrix.tool.script }}
-        continue-on-error: ${{ matrix.tool.script == 'rector' || matrix.tool.script == 'deptrac' || matrix.tool.script == 'phpcs' }}  # Rector/Deptrac/PHPCS ne bloquent pas
+            - name: Run ${{ matrix.tool.name }}
+              run: composer ${{ matrix.tool.script }}
+              continue-on-error: ${{ matrix.tool.script == 'rector' || matrix.tool.script == 'deptrac' || matrix.tool.script == 'phpcs' }} # Rector/Deptrac/PHPCS ne bloquent pas

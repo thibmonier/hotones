@@ -148,7 +148,28 @@ class BlogPostCrudController extends AbstractCrudController
     }
 
     /**
-     * Auto-assign author and company before persisting a new blog post.
+     * Create a new BlogPost with author and company pre-assigned.
+     * This is called BEFORE the form is created, ensuring validation passes.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): BlogPost
+    {
+        $post = new BlogPost();
+
+        // Auto-assign author (current user)
+        $currentUser = $this->getUser();
+        if ($currentUser instanceof User) {
+            $post->setAuthor($currentUser);
+        }
+
+        // Auto-assign company from context
+        $post->setCompany($this->companyContext->getCurrentCompany());
+
+        return $post;
+    }
+
+    /**
+     * Auto-set publishedAt when status is published.
      */
     #[Override]
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -158,15 +179,6 @@ class BlogPostCrudController extends AbstractCrudController
 
             return;
         }
-
-        // Auto-assign author if not set
-        $currentUser = $this->getUser();
-        if ($currentUser instanceof User && !isset($entityInstance->author)) {
-            $entityInstance->setAuthor($currentUser);
-        }
-
-        // Auto-assign company from context
-        $entityInstance->setCompany($this->companyContext->getCurrentCompany());
 
         // Auto-set publishedAt if status is published and publishedAt is null
         if ($entityInstance->getStatus() === BlogPost::STATUS_PUBLISHED && $entityInstance->getPublishedAt() === null) {
