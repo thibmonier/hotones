@@ -7,6 +7,7 @@ namespace App\Service\AI;
 use GuzzleHttp\Client as GuzzleClient;
 use OpenAI;
 use OpenAI\Client;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Factory for creating OpenAI API clients.
@@ -14,6 +15,7 @@ use OpenAI\Client;
 class OpenAIClientFactory
 {
     public function __construct(
+        #[Autowire(param: 'env(OPENAI_API_KEY)')]
         private readonly string $openaiApiKey,
         private readonly string $baseUri = 'https://api.openai.com/v1'
     ) {

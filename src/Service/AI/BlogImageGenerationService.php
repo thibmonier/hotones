@@ -15,6 +15,7 @@ use DateTimeImmutable;
 use Exception;
 use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -42,10 +43,12 @@ class BlogImageGenerationService
     public function __construct(
         private readonly OpenAIClientFactory $clientFactory,
         private readonly SecureFileUploadService $uploadService,
+        #[Autowire(service: 'oneup_flysystem.default_filesystem')]
         private readonly FilesystemOperator $filesystem,
         private readonly HttpClientInterface $httpClient,
         private readonly CacheInterface $cache,
         private readonly LoggerInterface $logger,
+        #[Autowire(param: 'kernel.environment')]
         private readonly string $environment = 'dev'
     ) {
     }

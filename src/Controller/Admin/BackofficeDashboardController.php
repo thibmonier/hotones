@@ -14,6 +14,7 @@ use App\Entity\SchedulerEntry;
 use App\Entity\ServiceCategory;
 use App\Entity\Skill;
 use App\Entity\Technology;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -54,6 +55,13 @@ class BackofficeDashboardController extends AbstractDashboardController
             ->setTitle('HotOnes - Backoffice')
             ->setFaviconPath('favicon.ico')
             ->setLocales(['fr']);
+    }
+
+    #[Override]
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addJsFile('assets/js/admin/blog-post-image-fields.js');
     }
 
     #[Override]

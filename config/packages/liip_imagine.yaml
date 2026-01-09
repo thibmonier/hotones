@@ -18,6 +18,10 @@ liip_imagine:
     # Loaders pour charger les images depuis différentes sources
     loaders:
         default:
+            flysystem:
+                filesystem_service: oneup_flysystem.default_filesystem
+        # Fallback filesystem loader for static assets
+        filesystem:
             filesystem:
                 data_root:
                     - '%kernel.project_dir%/public/assets/images'
@@ -69,3 +73,45 @@ liip_imagine:
                     size: [40, 40]
                     mode: outbound
                     allow_upscale: true
+
+        # === BLOG IMAGE FILTERS ===
+
+        # Blog Hero - Large OG image for social sharing and hero sections (1200x630)
+        blog_hero:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [1200, 630]
+                    mode: outbound
+
+        # Blog Thumbnail - Small preview for article cards in lists (400x300)
+        blog_thumbnail:
+            quality: 85
+            filters:
+                thumbnail:
+                    size: [400, 300]
+                    mode: outbound
+
+        # Blog Detail - Medium size for article detail page (800x500)
+        blog_detail:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [800, 500]
+                    mode: outbound
+
+        # Blog OG - Social sharing optimized (1200x630, Twitter/Facebook/LinkedIn)
+        blog_og:
+            quality: 85
+            filters:
+                thumbnail:
+                    size: [1200, 630]
+                    mode: outbound
+
+        # Blog Admin Preview - Tiny preview for EasyAdmin index page (200x150)
+        blog_admin_preview:
+            quality: 75
+            filters:
+                thumbnail:
+                    size: [200, 150]
+                    mode: outbound
