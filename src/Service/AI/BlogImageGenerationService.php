@@ -64,7 +64,7 @@ class BlogImageGenerationService
         $sanitizedPrompt = $this->sanitizePrompt($prompt);
 
         // Check rate limits
-        $this->checkRateLimit($blogPost->getCompany());
+        $this->checkRateLimit($blogPost->company);
 
         try {
             // Call DALL-E 3 API
@@ -85,20 +85,20 @@ class BlogImageGenerationService
             }
 
             // Download and store image
-            $filename  = $this->generateFilename($blogPost->getSlug());
+            $filename  = $this->generateFilename($blogPost->slug);
             $imagePath = $this->downloadAndStoreImage($imageUrl, $filename);
 
             // Update blog post metadata
-            $blogPost->setFeaturedImage($this->uploadService->getBlogImagePublicUrl($filename));
-            $blogPost->setImagePrompt($prompt);
-            $blogPost->setImageSource(BlogPost::IMAGE_SOURCE_AI_GENERATED);
-            $blogPost->setImageGeneratedAt(new DateTimeImmutable());
-            $blogPost->setImageModel('dall-e-3');
+            $blogPost->featuredImage    = $this->uploadService->getBlogImagePublicUrl($filename);
+            $blogPost->imagePrompt      = $prompt;
+            $blogPost->imageSource      = BlogPost::IMAGE_SOURCE_AI_GENERATED;
+            $blogPost->imageGeneratedAt = new DateTimeImmutable();
+            $blogPost->imageModel       = 'dall-e-3';
 
             // Log success
             $this->logger->info('AI image generated successfully', [
-                'company_id'     => $blogPost->getCompany()->getId(),
-                'blog_post_id'   => $blogPost->getId(),
+                'company_id'     => $blogPost->company->getId(),
+                'blog_post_id'   => $blogPost->id,
                 'prompt'         => $prompt,
                 'model'          => 'dall-e-3',
                 'size'           => '1024x1024',
@@ -112,8 +112,8 @@ class BlogImageGenerationService
             $this->logger->error('AI image generation failed', [
                 'exception'    => $e->getMessage(),
                 'prompt'       => $prompt,
-                'company_id'   => $blogPost->getCompany()->getId(),
-                'blog_post_id' => $blogPost->getId(),
+                'company_id'   => $blogPost->company->getId(),
+                'blog_post_id' => $blogPost->id,
             ]);
 
             throw new OpenAIApiException(sprintf('Failed to generate image: %s', $e->getMessage()), 0, $e);
@@ -127,27 +127,27 @@ class BlogImageGenerationService
      */
     public function regenerateImage(BlogPost $blogPost): string
     {
-        if ($blogPost->getImagePrompt() === null) {
+        if ($blogPost->imagePrompt === null) {
             throw new InvalidPromptException('Cannot regenerate: no prompt stored');
         }
 
-        if ($blogPost->getImageSource() !== BlogPost::IMAGE_SOURCE_AI_GENERATED) {
+        if ($blogPost->imageSource !== BlogPost::IMAGE_SOURCE_AI_GENERATED) {
             throw new BlogImageGenerationException('Cannot regenerate: image was not AI-generated');
         }
 
         // Delete old AI-generated image
-        if ($blogPost->getFeaturedImage() !== null) {
-            $oldFilename = basename(parse_url($blogPost->getFeaturedImage(), PHP_URL_PATH));
+        if ($blogPost->featuredImage !== null) {
+            $oldFilename = basename(parse_url($blogPost->featuredImage, PHP_URL_PATH));
             $this->uploadService->deleteBlogImage($oldFilename);
 
             $this->logger->info('Deleted old AI-generated image', [
                 'filename'     => $oldFilename,
-                'blog_post_id' => $blogPost->getId(),
+                'blog_post_id' => $blogPost->id,
             ]);
         }
 
         // Generate new image with same prompt
-        return $this->generateImage($blogPost->getImagePrompt(), $blogPost);
+        return $this->generateImage($blogPost->imagePrompt, $blogPost);
     }
 
     /**

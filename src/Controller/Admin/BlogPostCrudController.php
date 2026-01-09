@@ -175,8 +175,8 @@ class BlogPostCrudController extends AbstractCrudController
         $regenerateImage = Action::new('regenerateImage', 'Régénérer l\'image IA')
             ->linkToCrudAction('regenerateImageAction')
             ->setIcon('fa fa-refresh')
-            ->displayIf(static fn (BlogPost $post) => $post->getImageSource() === BlogPost::IMAGE_SOURCE_AI_GENERATED
-                && $post->getImagePrompt() !== null)
+            ->displayIf(static fn (BlogPost $post) => $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
+                && $post->imagePrompt !== null)
             ->addCssClass('btn btn-warning');
 
         return $actions
@@ -272,12 +272,12 @@ class BlogPostCrudController extends AbstractCrudController
         // For now, we focus on AI generation workflow
 
         // Priority 2: AI generation
-        if ($blogPost->getImageSource() === BlogPost::IMAGE_SOURCE_AI_GENERATED
-            && $blogPost->getImagePrompt() !== null
-            && $blogPost->getImageGeneratedAt() === null) {
+        if ($blogPost->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
+            && $blogPost->imagePrompt !== null
+            && $blogPost->imageGeneratedAt === null) {
             try {
                 $this->imageGenerationService->generateImage(
-                    $blogPost->getImagePrompt(),
+                    $blogPost->imagePrompt,
                     $blogPost,
                 );
 
@@ -286,21 +286,21 @@ class BlogPostCrudController extends AbstractCrudController
                 $this->addFlash('error', sprintf('Erreur lors de la génération de l\'image: %s', $e->getMessage()));
 
                 // Don't throw - allow the blog post to be saved without image
-                $blogPost->setImageSource(BlogPost::IMAGE_SOURCE_EXTERNAL);
-                $blogPost->setFeaturedImage(null);
+                $blogPost->imageSource   = BlogPost::IMAGE_SOURCE_EXTERNAL;
+                $blogPost->featuredImage = null;
             }
 
             return;
         }
 
         // Priority 3: External URL (backward compatibility)
-        if ($blogPost->getImageSource() === BlogPost::IMAGE_SOURCE_EXTERNAL) {
+        if ($blogPost->imageSource === BlogPost::IMAGE_SOURCE_EXTERNAL) {
             // Validate URL format if provided
-            if ($blogPost->getFeaturedImage()    !== null
-                && $blogPost->getFeaturedImage() !== ''
-                && !filter_var($blogPost->getFeaturedImage(), FILTER_VALIDATE_URL)) {
+            if ($blogPost->featuredImage    !== null
+                && $blogPost->featuredImage !== ''
+                && !filter_var($blogPost->featuredImage, FILTER_VALIDATE_URL)) {
                 $this->addFlash('error', 'L\'URL de l\'image externe n\'est pas valide.');
-                $blogPost->setFeaturedImage(null);
+                $blogPost->featuredImage = null;
             }
         }
     }
@@ -316,13 +316,13 @@ class BlogPostCrudController extends AbstractCrudController
         /** @var BlogPost $blogPost */
         $blogPost = $context->getEntity()->getInstance();
 
-        if ($blogPost->getImageSource() !== BlogPost::IMAGE_SOURCE_AI_GENERATED) {
+        if ($blogPost->imageSource !== BlogPost::IMAGE_SOURCE_AI_GENERATED) {
             $this->addFlash('error', 'Cette image n\'a pas été générée par l\'IA.');
 
             return $this->redirect($adminUrlGenerator->setAction(Action::INDEX)->generateUrl());
         }
 
-        if ($blogPost->getImagePrompt() === null) {
+        if ($blogPost->imagePrompt === null) {
             $this->addFlash('error', 'Aucun prompt enregistré pour régénérer l\'image.');
 
             return $this->redirect($adminUrlGenerator->setAction(Action::INDEX)->generateUrl());
