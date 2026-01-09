@@ -18,7 +18,7 @@ final class CompanyFactory extends PersistentObjectFactory
         /** @var Generator $faker */
         $faker = self::faker();
 
-        $name = $faker->company();
+        $name = $faker->unique()->company();
         $slug = strtolower((string) preg_replace('/[^A-Za-z0-9]+/', '-', trim($name)));
 
         return [
