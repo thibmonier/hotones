@@ -246,12 +246,10 @@ class SeedBlogCommand extends Command
             $post->setPublishedAt($postData['publishedAt']);
 
             // Set category (reload from DB to avoid detached entity issues)
-            if (isset($postData['category'])) {
-                $categoryEntity = $this->entityManager->getRepository(BlogCategory::class)
-                    ->findOneBy(['name' => $categories[$postData['category']]->getName()]);
-                if ($categoryEntity) {
-                    $post->setCategory($categoryEntity);
-                }
+            $categoryEntity = $this->entityManager->getRepository(BlogCategory::class)
+                ->findOneBy(['name' => $categories[$postData['category']]->getName()]);
+            if ($categoryEntity) {
+                $post->setCategory($categoryEntity);
             }
 
             // Add tags (reload from DB to avoid detached entity issues)

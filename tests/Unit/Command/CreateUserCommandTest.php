@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Command;
 
 use App\Command\CreateUserCommand;
+use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Entity\User;
+use App\Repository\CompanyRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
@@ -28,8 +32,39 @@ class CreateUserCommandTest extends TestCase
     {
         $this->entityManager  = $this->createMock(EntityManagerInterface::class);
         $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
-        $this->command        = new CreateUserCommand($this->entityManager, $this->passwordHasher);
-        $this->commandTester  = new CommandTester($this->command);
+
+        // Mock repositories
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->method('findOneBy')->willReturn(null); // No existing user
+
+        $companyRepository = $this->createMock(CompanyRepository::class);
+
+        // Create a mock Company
+        $company    = new Company();
+        $reflection = new ReflectionClass($company);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setValue($company, 1);
+        $nameProperty = $reflection->getProperty('name');
+        $nameProperty->setValue($company, 'Test Company');
+        $company->setStatus(Company::STATUS_ACTIVE);
+
+        // Repository returns the company when findOneBy is called
+        $companyRepository->method('findOneBy')->willReturn($company);
+        $companyRepository->method('find')->willReturn($company);
+
+        // Configure EntityManager to return appropriate repositories
+        $this->entityManager->method('getRepository')->willReturnCallback(
+            function ($entityClass) use ($userRepository, $companyRepository) {
+                return match ($entityClass) {
+                    User::class    => $userRepository,
+                    Company::class => $companyRepository,
+                    default        => throw new Exception('Unexpected repository requested: '.$entityClass),
+                };
+            },
+        );
+
+        $this->command       = new CreateUserCommand($this->entityManager, $this->passwordHasher);
+        $this->commandTester = new CommandTester($this->command);
     }
 
     public function testExecuteCreatesUserSuccessfully(): void
@@ -78,7 +113,7 @@ class CreateUserCommandTest extends TestCase
         $this->assertEquals($firstName, $user->getFirstName());
         $this->assertEquals($lastName, $user->getLastName());
         $this->assertEquals($hashedPassword, $user->getPassword());
-        $this->assertEquals(['ROLE_USER'], $user->getRoles());
+        $this->assertEquals(['ROLE_INTERVENANT', 'ROLE_USER'], $user->getRoles());
 
         // Verify Contributor was created correctly
         $contributor = $persistedEntities[1];
@@ -124,7 +159,7 @@ class CreateUserCommandTest extends TestCase
         $output = $this->commandTester->getDisplay();
         $this->assertStringContainsString('User created:', $output);
         $this->assertStringContainsString($email, $output);
-        $this->assertStringContainsString("Contributor #$contributorId", $output);
+        $this->assertStringContainsString("Contributor ID: $contributorId", $output);
     }
 
     public function testExecuteHashesPassword(): void
@@ -219,7 +254,7 @@ class CreateUserCommandTest extends TestCase
         ]);
 
         $this->assertNotNull($capturedUser);
-        $this->assertEquals(['ROLE_USER'], $capturedUser->getRoles());
+        $this->assertEquals(['ROLE_INTERVENANT', 'ROLE_USER'], $capturedUser->getRoles());
     }
 
     public function testExecuteLinksContributorToUser(): void
