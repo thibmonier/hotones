@@ -440,7 +440,7 @@ class ExpenseReport implements CompanyOwnedInterface
      */
     public function isRebillable(): bool
     {
-        return $this->order !== null && $this->order->isExpensesRebillable();
+        return $this->order !== null && $this->order->expensesRebillable;
     }
 
     /**

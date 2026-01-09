@@ -742,11 +742,7 @@ class Project implements CompanyOwnedInterface
 
     public function removeTimesheet(Timesheet $timesheet): self
     {
-        if ($this->timesheets->removeElement($timesheet)) {
-            if ($timesheet->project === $this) {
-                $timesheet->project = null;
-            }
-        }
+        $this->timesheets->removeElement($timesheet);
 
         return $this;
     }
