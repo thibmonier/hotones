@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'idx_blogpost_published_at', columns: ['published_at'])]
 #[ORM\Index(name: 'idx_blogpost_author', columns: ['author_id'])]
 #[ORM\Index(name: 'idx_blogpost_category', columns: ['category_id'])]
+#[ORM\Index(name: 'idx_blogpost_image_source', columns: ['image_source'])]
 #[ORM\UniqueConstraint(name: 'uniq_blogpost_company_slug', columns: ['company_id', 'slug'])]
 #[ORM\HasLifecycleCallbacks]
 class BlogPost implements CompanyOwnedInterface, Stringable
@@ -41,6 +42,17 @@ class BlogPost implements CompanyOwnedInterface, Stringable
         'Brouillon' => self::STATUS_DRAFT,
         'Publié'    => self::STATUS_PUBLISHED,
         'Archivé'   => self::STATUS_ARCHIVED,
+    ];
+
+    // Image source constants
+    public const IMAGE_SOURCE_EXTERNAL     = 'external';
+    public const IMAGE_SOURCE_UPLOAD       = 'upload';
+    public const IMAGE_SOURCE_AI_GENERATED = 'ai_generated';
+
+    public const IMAGE_SOURCE_OPTIONS = [
+        'URL externe'   => self::IMAGE_SOURCE_EXTERNAL,
+        'Upload manuel' => self::IMAGE_SOURCE_UPLOAD,
+        'Généré par IA' => self::IMAGE_SOURCE_AI_GENERATED,
     ];
 
     #[ORM\Id]
@@ -100,6 +112,40 @@ class BlogPost implements CompanyOwnedInterface, Stringable
         get => $this->featuredImage;
         set {
             $this->featuredImage = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'string', length: 1000, nullable: true)]
+    #[Assert\Length(max: 1000, maxMessage: 'Le prompt ne peut pas dépasser {{ limit }} caractères.')]
+    public ?string $imagePrompt = null {
+        get => $this->imagePrompt;
+        set {
+            $this->imagePrompt = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'string', length: 20)]
+    #[Assert\Choice(choices: [self::IMAGE_SOURCE_EXTERNAL, self::IMAGE_SOURCE_UPLOAD, self::IMAGE_SOURCE_AI_GENERATED])]
+    public string $imageSource = self::IMAGE_SOURCE_EXTERNAL {
+        get => $this->imageSource;
+        set {
+            $this->imageSource = $value;
+        }
+    }
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    public ?DateTimeImmutable $imageGeneratedAt = null {
+        get => $this->imageGeneratedAt;
+        set {
+            $this->imageGeneratedAt = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    public ?string $imageModel = null {
+        get => $this->imageModel;
+        set {
+            $this->imageModel = $value;
         }
     }
 

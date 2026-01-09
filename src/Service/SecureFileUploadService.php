@@ -277,4 +277,34 @@ class SecureFileUploadService
         // En dev, utiliser le chemin local
         return sprintf('/uploads/%s', $filePath);
     }
+
+    /**
+     * Upload d'une image pour un article de blog.
+     *
+     * @throws FileException
+     */
+    public function uploadBlogImage(UploadedFile $file, string $slug): string
+    {
+        return $this->uploadImage(
+            file: $file,
+            subdirectory: 'blog-images',
+            convertToWebP: true,
+        );
+    }
+
+    /**
+     * Supprime une image de blog.
+     */
+    public function deleteBlogImage(string $filename): bool
+    {
+        return $this->deleteFile($filename, 'blog-images');
+    }
+
+    /**
+     * Obtient l'URL publique d'une image de blog.
+     */
+    public function getBlogImagePublicUrl(string $filename): string
+    {
+        return $this->getPublicUrl($filename, 'blog-images');
+    }
 }
