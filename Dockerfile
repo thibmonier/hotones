@@ -96,7 +96,9 @@ RUN composer install \
     && composer clear-cache
 
 # Install AssetMapper vendor files and compile assets
-RUN APP_ENV=prod php bin/console importmap:install && APP_ENV=prod php bin/console asset-map:compile
+# Use SQLite for build-time database connection (DB container not available during build)
+RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console importmap:install \
+    && APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console asset-map:compile
 
 # Create JWT directory (keys will be generated on first startup)
 RUN mkdir -p config/jwt
@@ -107,8 +109,9 @@ RUN mkdir -p var/cache var/log var/sessions \
     && chmod -R 775 var/
 
 # Warm up cache (will be re-warmed on startup with proper env vars)
-RUN APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear --no-warmup || true \
-    && APP_ENV=prod APP_DEBUG=0 php bin/console cache:warmup || true
+# Use SQLite for build-time to avoid DB connection errors
+RUN APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:clear --no-warmup || true \
+    && APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:warmup || true
 
 # Copy startup script
 COPY ./docker/scripts/start-render.sh /usr/local/bin/start-render.sh
