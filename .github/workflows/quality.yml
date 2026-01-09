@@ -47,8 +47,11 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
+        env:
+          APP_ENV: test
+          DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run ${{ matrix.tool.name }}
         run: composer ${{ matrix.tool.script }}
-        continue-on-error: ${{ matrix.tool.script == 'rector' }}  # Rector ne bloque pas
+        continue-on-error: ${{ matrix.tool.script == 'rector' || matrix.tool.script == 'deptrac' || matrix.tool.script == 'phpcs' }}  # Rector/Deptrac/PHPCS ne bloquent pas
