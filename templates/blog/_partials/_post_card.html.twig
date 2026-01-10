@@ -2,7 +2,7 @@
 <div class="blog-post-card" data-aos="fade-up">
     <a href="{{ path('blog_show', {slug: post.slug}) }}" class="post-card-link">
         {% if post.featuredImage %}
-            <div class="post-card-image" style="background-image: url('{{ post.featuredImage }}');"></div>
+            <div class="post-card-image" style="background-image: url('{{ post.featuredImage|imagine_filter('blog_thumbnail') }}');"></div>
         {% else %}
             <div class="post-card-image post-card-image-placeholder"></div>
         {% endif %}

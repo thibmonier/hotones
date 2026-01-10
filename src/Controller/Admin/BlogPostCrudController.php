@@ -61,8 +61,7 @@ class BlogPostCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Articles de blog')
             ->setSearchFields(['title', 'content', 'excerpt'])
             ->setDefaultSort(['publishedAt' => 'DESC', 'createdAt' => 'DESC'])
-            ->setPaginatorPageSize(25)
-            ->showEntityActionsInlined();
+            ->setPaginatorPageSize(25);
     }
 
     #[Override]
@@ -70,6 +69,10 @@ class BlogPostCrudController extends AbstractCrudController
     {
         yield IdField::new('id')
             ->hideOnForm();
+
+        yield TextField::new('featuredImage', 'Image')
+            ->setTemplatePath('admin/field/blog_image_thumbnail.html.twig')
+            ->onlyOnIndex();
 
         yield TextField::new('title', 'Titre')
             ->setRequired(true)
@@ -98,6 +101,23 @@ class BlogPostCrudController extends AbstractCrudController
             ->setHelp('Résumé court (max 500 caractères). Si vide, sera auto-généré depuis le contenu.')
             ->hideOnIndex();
 
+        // === SEO SECTION ===
+        yield TextField::new('metaTitle', 'Titre SEO')
+            ->setMaxLength(60)
+            ->setHelp('Max 60 caractères. Si vide, le titre de l\'article sera utilisé.')
+            ->hideOnIndex();
+
+        yield TextareaField::new('metaDescription', 'Description SEO')
+            ->setMaxLength(160)
+            ->setHelp('Max 160 caractères. Si vide, l\'extrait sera utilisé.')
+            ->setFormTypeOption('attr', ['rows' => 3])
+            ->hideOnIndex();
+
+        yield TextField::new('keywords', 'Mots-clés')
+            ->setMaxLength(255)
+            ->setHelp('Séparés par des virgules')
+            ->hideOnIndex();
+
         // === IMAGE SECTION ===
         yield ChoiceField::new('imageSource', 'Source de l\'image')
             ->setChoices(BlogPost::IMAGE_SOURCE_OPTIONS)
@@ -115,6 +135,11 @@ class BlogPostCrudController extends AbstractCrudController
             ->setHelp('Décrivez l\'image souhaitée en détail (10-1000 caractères). Ex: "A modern minimalist office with plants and natural light"')
             ->hideOnIndex()
             ->setFormTypeOption('attr', ['data-image-field' => 'ai_generated', 'rows' => 3]);
+
+        yield TextField::new('featuredImage', 'Aperçu de l\'image')
+            ->setTemplatePath('admin/field/blog_image_preview.html.twig')
+            ->hideOnIndex()
+            ->setFormTypeOption('disabled', true);
 
         // Metadata fields (readonly)
         yield DateTimeField::new('imageGeneratedAt', 'Image générée le')
@@ -171,6 +196,16 @@ class BlogPostCrudController extends AbstractCrudController
     #[Override]
     public function configureActions(Actions $actions): Actions
     {
+        // Custom action: Preview on public site
+        $previewOnSite = Action::new('previewOnSite', 'Voir sur le site')
+            ->linkToUrl(function (BlogPost $post): string {
+                return $this->generateUrl('blog_show', ['slug' => $post->getSlug()]);
+            })
+            ->setIcon('fa fa-external-link-alt')
+            ->displayIf(static fn (BlogPost $post) => $post->isPublished())
+            ->addCssClass('btn btn-info')
+            ->setHtmlAttributes(['target' => '_blank', 'rel' => 'noopener noreferrer']);
+
         // Custom action: Regenerate AI image
         $regenerateImage = Action::new('regenerateImage', 'Régénérer l\'image IA')
             ->linkToCrudAction('regenerateImageAction')
@@ -181,7 +216,10 @@ class BlogPostCrudController extends AbstractCrudController
 
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_INDEX, $previewOnSite)
+            ->add(Crud::PAGE_EDIT, $previewOnSite)
             ->add(Crud::PAGE_EDIT, $regenerateImage)
+            ->add(Crud::PAGE_DETAIL, $previewOnSite)
             ->add(Crud::PAGE_DETAIL, $regenerateImage)
             ->setPermission(Action::INDEX, 'ROLE_ADMIN')
             ->setPermission(Action::NEW, 'ROLE_ADMIN')

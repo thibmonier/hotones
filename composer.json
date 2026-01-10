@@ -16,7 +16,7 @@
         "ext-iconv": "*",
         "ext-redis": "*",
         "anthropic-ai/sdk": "^0.3.0",
-        "api-platform/core": "^4.2.11",
+        "api-platform/core": "^4.2.12",
         "beberlei/doctrineextensions": "^1.5",
         "doctrine/dbal": "^4.4.1",
         "doctrine/doctrine-bundle": "^3.2.2",

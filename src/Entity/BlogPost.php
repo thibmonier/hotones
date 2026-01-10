@@ -106,6 +106,33 @@ class BlogPost implements CompanyOwnedInterface, Stringable
         }
     }
 
+    #[ORM\Column(type: 'string', length: 60, nullable: true)]
+    #[Assert\Length(max: 60, maxMessage: 'Le titre SEO ne peut pas dépasser {{ limit }} caractères.')]
+    public ?string $metaTitle = null {
+        get => $this->metaTitle;
+        set {
+            $this->metaTitle = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'string', length: 160, nullable: true)]
+    #[Assert\Length(max: 160, maxMessage: 'La description SEO ne peut pas dépasser {{ limit }} caractères.')]
+    public ?string $metaDescription = null {
+        get => $this->metaDescription;
+        set {
+            $this->metaDescription = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\Length(max: 255, maxMessage: 'Les mots-clés ne peuvent pas dépasser {{ limit }} caractères.')]
+    public ?string $keywords = null {
+        get => $this->keywords;
+        set {
+            $this->keywords = $value;
+        }
+    }
+
     #[ORM\Column(type: 'string', length: 500, nullable: true)]
     #[Assert\Url(message: 'L\'URL de l\'image doit être valide.')]
     public ?string $featuredImage = null {
@@ -436,6 +463,39 @@ class BlogPost implements CompanyOwnedInterface, Stringable
 
         // Average reading speed: 200 words per minute
         return max(1, (int) ceil($wordCount / 200));
+    }
+
+    /**
+     * Get effective meta title (custom or fallback to title).
+     */
+    public function getEffectiveMetaTitle(): string
+    {
+        return $this->metaTitle ?? $this->title;
+    }
+
+    /**
+     * Get effective meta description (custom or fallback to excerpt).
+     */
+    public function getEffectiveMetaDescription(): string
+    {
+        return $this->metaDescription ?? $this->getExcerpt();
+    }
+
+    /**
+     * Get keywords as array.
+     *
+     * @return array<int, string>
+     */
+    public function getKeywordsArray(): array
+    {
+        if (!$this->keywords) {
+            return [];
+        }
+
+        return array_map(
+            'trim',
+            explode(',', $this->keywords),
+        );
     }
 
     public function __toString(): string

@@ -1,11 +1,18 @@
 {% extends 'blog/base.html.twig' %}
 
-{% block title %}{{ post.title }} | Blog HotOnes{% endblock %}
+{% block title %}{{ post.effectiveMetaTitle }} | Blog HotOnes{% endblock %}
 
-{% block meta_description %}{{ post.excerpt }}{% endblock %}
+{% block meta_description %}{{ post.effectiveMetaDescription }}{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    {% if post.keywords %}
+        <meta name="keywords" content="{{ post.keywords|e('html_attr') }}">
+    {% endif %}
+{% endblock %}
 
 {% block og_type %}article{% endblock %}
-{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_title %}{{ post.effectiveMetaTitle }}{% endblock %}
 {% block og_image %}{{ post.featuredImage ? post.featuredImage : absolute_url(asset('favicon.svg')) }}{% endblock %}
 
 {% block twitter_card %}summary_large_image{% endblock %}
@@ -17,8 +24,8 @@
     {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
-        "headline": "{{ post.title|escape('js') }}",
-        "description": "{{ post.excerpt|escape('js') }}",
+        "headline": "{{ post.effectiveMetaTitle|escape('js') }}",
+        "description": "{{ post.effectiveMetaDescription|escape('js') }}",
         "image": "{{ post.featuredImage ? post.featuredImage : absolute_url(asset('favicon.svg')) }}",
         "datePublished": "{{ post.publishedAt|date('c') }}",
         "dateModified": "{{ post.updatedAt|date('c') }}",

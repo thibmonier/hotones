@@ -1,0 +1,27 @@
+{# EasyAdmin field template: Blog image preview for form view #}
+<div class="blog-image-preview" style="margin-top: 1rem;">
+    {% if field.value %}
+        <div style="max-width: 600px; border: 2px solid #dee2e6; border-radius: 8px; overflow: hidden;">
+            <img
+                src="{{ field.value }}"
+                alt="Aperçu"
+                style="width: 100%; height: auto;"
+                loading="lazy"
+            >
+        </div>
+        <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #6c757d;">
+            <strong>Source :</strong>
+            {% if ea.entity.instance.imageSource == 'ai_generated' %}
+                IA ({{ ea.entity.instance.imageModel ?? 'Inconnu' }})
+            {% elseif ea.entity.instance.imageSource == 'upload' %}
+                Upload
+            {% else %}
+                URL externe
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Aucune image configurée.
+        </div>
+    {% endif %}
+</div>
