@@ -103,20 +103,70 @@ final class Version20260110081458 extends AbstractMigration
             DEALLOCATE PREPARE stmt;
         ");
 
-        // Create index if it doesn't exist (MariaDB 10.1.4+ supports IF NOT EXISTS for indexes)
+        // Create index if it doesn't exist
         $this->addSql("
-            CREATE INDEX IF NOT EXISTS idx_blogpost_image_source
-            ON blog_posts (image_source)
+            SET @index_exists = (
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.STATISTICS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'blog_posts'
+                AND INDEX_NAME = 'idx_blogpost_image_source'
+            );
+
+            SET @sql = IF(@index_exists = 0,
+                'CREATE INDEX idx_blogpost_image_source ON blog_posts (image_source)',
+                'SELECT ''Index idx_blogpost_image_source already exists'' AS message'
+            );
+
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
         ");
     }
 
     public function down(Schema $schema): void
     {
-        // Safely drop index and columns
-        $this->addSql('DROP INDEX IF EXISTS idx_blogpost_image_source ON blog_posts');
-        $this->addSql('ALTER TABLE blog_posts DROP COLUMN IF EXISTS image_prompt');
-        $this->addSql('ALTER TABLE blog_posts DROP COLUMN IF EXISTS image_source');
-        $this->addSql('ALTER TABLE blog_posts DROP COLUMN IF EXISTS image_generated_at');
-        $this->addSql('ALTER TABLE blog_posts DROP COLUMN IF EXISTS image_model');
+        // Drop index if it exists
+        $this->addSql("
+            SET @index_exists = (
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.STATISTICS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'blog_posts'
+                AND INDEX_NAME = 'idx_blogpost_image_source'
+            );
+
+            SET @sql = IF(@index_exists > 0,
+                'DROP INDEX idx_blogpost_image_source ON blog_posts',
+                'SELECT ''Index idx_blogpost_image_source does not exist'' AS message'
+            );
+
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        ");
+
+        // Drop columns if they exist
+        $columns = ['image_prompt', 'image_source', 'image_generated_at', 'image_model'];
+        foreach ($columns as $column) {
+            $this->addSql("
+                SET @column_exists = (
+                    SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'blog_posts'
+                    AND COLUMN_NAME = '$column'
+                );
+
+                SET @sql = IF(@column_exists > 0,
+                    'ALTER TABLE blog_posts DROP COLUMN $column',
+                    'SELECT ''Column $column does not exist'' AS message'
+                );
+
+                PREPARE stmt FROM @sql;
+                EXECUTE stmt;
+                DEALLOCATE PREPARE stmt;
+            ");
+        }
     }
 }
