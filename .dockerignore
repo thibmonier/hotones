@@ -3,6 +3,7 @@
 .github
 .gitignore
 .gitattributes
+.gitmodules
 
 # Documentation
 *.md
@@ -10,6 +11,9 @@ docs/
 WARP.md
 AGENTS.md
 CLAUDE.md
+README.md
+CHANGELOG.md
+LICENSE
 
 # IDE
 .idea
@@ -53,15 +57,32 @@ phpunit.xml.dist
 docker-compose.yml
 docker-compose.*.yml
 Dockerfile
+Dockerfile.dev
+Dockerfile.simple
+Dockerfile.optimized
 !Dockerfile.render
+.dockerignore
 
 # Quality tools configs
 .php-cs-fixer.dist.php
 .php-cs-fixer.cache
 phpstan.neon
 phpmd.xml
+deptrac.yaml
+infection.json.dist
 
 # Misc
 /tmp/
 *.bak
 *.tmp
+*.orig
+.DS_Store
+
+# Development scripts
+fix-prod-migrations.sh
+PROD-MIGRATION-FIX.md
+docker-build-assets.sh
+build-assets.sh
+
+# Migrations status files (temporaires)
+migrations-status-*.txt

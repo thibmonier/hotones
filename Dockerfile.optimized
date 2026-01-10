@@ -1,122 +1,76 @@
 # syntax=docker/dockerfile:1.4
-# Dockerfile OPTIMISÉ pour déploiement production sur Render
-# Combine Nginx + PHP-FPM dans un seul conteneur
-#
-# OPTIMISATIONS CLÉS :
-# - Cache BuildKit pour Composer et Yarn (économise 3-5 min)
-# - Layers séparés pour dépendances vs code (cache plus efficace)
-# - Suppression du cache warmup au build (économise 1-2 min)
-# - Base images pinnées pour reproductibilité
-# - Healthcheck intégré
-#
-# UTILISATION :
-# Pour activer le cache BuildKit sur Render, ajoutez à render.yaml :
-#   buildFilter:
-#     paths:
-#       - Dockerfile
-#     dockerfilePath: ./Dockerfile.optimized
-#   dockerCommand: docker buildx build --cache-from=type=registry,ref=registry.render.com/<your-repo>:buildcache --cache-to=type=registry,ref=registry.render.com/<your-repo>:buildcache,mode=max -t <image> .
+# Dockerfile optimisé pour déploiement production sur Render
+# Utilise BuildKit cache mounts pour des builds 30-60% plus rapides
+# Documentation: https://docs.docker.com/build/cache/optimize/
 
 # ============================================
 # Stage 1: Build JavaScript/CSS assets
 # ============================================
-FROM node:22-alpine@sha256:6e80991f69cc7722c561e5d14d5e72ab47c0d6b6cfb3ae50fb9cf9a7b30fdf97 AS assets
+FROM node:24-alpine3.23 AS assets
+
 WORKDIR /app
 
-# Install dependencies (with BuildKit cache mount)
+# Configure Yarn cache directory
+ENV YARN_CACHE_FOLDER=/root/.yarn-cache
+
+# Install dependencies with cache mount
+# Cache mount persiste entre les builds, évitant les téléchargements répétés
 COPY package.json yarn.lock ./
-RUN --mount=type=cache,target=/root/.yarn \
-    --mount=type=cache,target=/app/node_modules \
-    yarn install --frozen-lockfile --production=false && \
-    cp -r node_modules /tmp/node_modules
+RUN --mount=type=cache,target=/root/.yarn-cache,sharing=locked \
+    --mount=type=cache,target=/usr/local/share/.cache/yarn,sharing=locked \
+    yarn install --frozen-lockfile --production=false
 
-# Restore node_modules from cache
-RUN mv /tmp/node_modules ./node_modules
-
-# Build assets
+# Build assets (seulement si les sources changent)
 COPY assets/ assets/
 COPY webpack.config.js ./
 RUN yarn build
 
 # ============================================
-# Stage 2: Composer dependencies (separate layer for better caching)
+# Stage 2: Production PHP + Nginx image
 # ============================================
-FROM php:8.4-fpm-alpine@sha256:5d8dc867dd5c6abedcb3b83e3d4c8e5c8f1c5c3c5e2d7f3e5c8e5c8e5c8e5c8e AS composer-deps
+FROM php:8.5.1-fpm-alpine3.23
 
-# Install minimal system dependencies for Composer
-RUN apk add --no-cache \
+# Install system dependencies with cache mount
+# Cache APK évite de re-télécharger les packages à chaque build
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
+    --mount=type=cache,target=/etc/apk/cache,sharing=locked \
+    apk add --no-cache \
+    bash \
+    nginx \
+    supervisor \
     git \
     unzip \
     libzip-dev \
-    icu-dev
-
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www/html
-
-# Copy dependency manifests first
-COPY composer.json composer.lock symfony.lock ./
-
-# Install PHP dependencies with BuildKit cache mount (économise 3-5 min)
-RUN --mount=type=cache,target=/root/.composer/cache \
-    composer install \
-    --no-dev \
-    --no-scripts \
-    --no-autoloader \
-    --no-interaction \
-    --no-progress
-
-# Copy application source and generate optimized autoloader
-COPY . .
-RUN composer dump-autoload \
-    --optimize \
-    --classmap-authoritative \
-    --apcu \
-    --no-dev
-
-# ============================================
-# Stage 3: Production PHP + Nginx image
-# ============================================
-FROM php:8.4-fpm-alpine@sha256:5d8dc867dd5c6abedcb3b83e3d4c8e5c8f1c5c3c5e2d7f3e5c8e5c8e5c8e5c8e
-
-# Install system dependencies (pinned versions for reproducibility)
-RUN apk add --no-cache \
-    bash=5.2.21-r0 \
-    nginx=1.27.3-r0 \
-    supervisor=4.2.5-r5 \
-    libzip=1.11.2-r0 \
-    icu-libs=74.2-r0 \
-    libpng=1.6.44-r0 \
-    libjpeg-turbo=3.0.4-r0 \
-    freetype=2.13.3-r0 \
-    oniguruma=6.9.9-r1 \
-    mariadb-client=11.4.4-r0 \
-  && apk add --no-cache --virtual .build-deps \
-    libzip-dev \
     icu-dev \
     oniguruma-dev \
+    mariadb-client \
+    tzdata \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
+    # Build dependencies (will be removed after)
+    && apk add --no-cache --virtual .build-deps \
+    autoconf \
+    g++ \
+    make \
   && docker-php-ext-configure intl \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
-  && pecl install apcu-5.1.24 \
+  && pecl install apcu \
   && docker-php-ext-enable apcu \
-  && pecl install redis-6.1.0 \
+  && pecl install redis \
   && docker-php-ext-enable redis \
-  && docker-php-ext-install -j$(nproc) \
-    pdo_mysql \
-    intl \
-    opcache \
-    gd \
-    bcmath \
-    zip \
+  && docker-php-ext-install pdo \
+  && docker-php-ext-install pdo_mysql \
+  && docker-php-ext-install intl \
+  && docker-php-ext-install gd \
+  && docker-php-ext-install bcmath \
+  && docker-php-ext-install zip \
+  # Remove build dependencies to keep image small
   && apk del .build-deps \
   && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
-# Install Composer (for runtime console commands)
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install Composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 # Configure PHP for production
 COPY ./docker/php/php-prod.ini /usr/local/etc/php/conf.d/php.ini
@@ -134,49 +88,59 @@ COPY ./docker/supervisor/supervisord.conf /etc/supervisord.conf
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application files (except vendor - comes from composer-deps stage)
-COPY --chown=www-data:www-data . .
+# Copy composer files first (pour layer caching)
+COPY composer.json composer.lock symfony.lock ./
 
-# Copy vendor from composer-deps stage (cached layer)
-COPY --from=composer-deps --chown=www-data:www-data /var/www/html/vendor/ vendor/
+# Install PHP dependencies with cache mount
+# Cache Composer évite de re-télécharger les packages à chaque build
+RUN --mount=type=cache,target=/root/.composer/cache,sharing=locked \
+    composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --classmap-authoritative \
+    --apcu-autoloader \
+    --ignore-platform-req=php
+
+# Copy application files (après dependencies pour meilleur layer caching)
+COPY --chown=www-data:www-data . .
 
 # Copy built assets from assets stage
 COPY --from=assets --chown=www-data:www-data /app/public/assets/ public/assets/
 
 # Install AssetMapper vendor files and compile assets
-RUN APP_ENV=prod php bin/console importmap:install && \
-    APP_ENV=prod php bin/console asset-map:compile
+# Use SQLite for build-time database connection (DB container not available during build)
+RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console importmap:install \
+    && APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console asset-map:compile
+
+# Install bundle assets (EasyAdmin, API Platform, etc.) to public/bundles/
+# Use hard copy (not symlink) for production compatibility
+RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console assets:install public
 
 # Create JWT directory (keys will be generated on first startup)
 RUN mkdir -p config/jwt
 
 # Create necessary directories and set permissions
 RUN mkdir -p var/cache var/log var/sessions \
-    && chown -R www-data:www-data var/ public/ config/jwt/ \
-    && chmod -R 775 var/ config/jwt/
+    && chown -R www-data:www-data var/ public/ \
+    && chmod -R 775 var/
 
-# OPTIMISATION : Skip cache warmup in Docker build
-# Cache will be warmed at startup with proper DATABASE_URL
-# This saves 1-2 minutes in build time
+# Warm up cache (will be re-warmed on startup with proper env vars)
+# Use SQLite for build-time to avoid DB connection errors
+RUN APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:clear --no-warmup || true \
+    && APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:warmup || true
 
-# Copy optimized startup script
-COPY ./docker/scripts/start-render-optimized.sh /usr/local/bin/start-render.sh
+# Copy startup script
+COPY ./docker/scripts/start-render.sh /usr/local/bin/start-render.sh
 RUN chmod +x /usr/local/bin/start-render.sh
 
 # Create simple health check endpoint
 RUN echo '<?php http_response_code(200); echo "OK";' > /var/www/html/public/health
 
-# Healthcheck (improves deployment reliability)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD php -r "exit(file_get_contents('http://localhost:8080/health') === 'OK' ? 0 : 1);"
-
 # Expose port (Render uses PORT environment variable)
 EXPOSE 8080
-
-# Labels for metadata
-LABEL maintainer="HotOnes Team" \
-      version="1.0" \
-      description="Optimized HotOnes production image for Render"
 
 # Reset base image entrypoint and use our startup script
 ENTRYPOINT []
