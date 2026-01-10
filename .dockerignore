@@ -56,10 +56,10 @@ phpunit.xml.dist
 # Docker files (not needed inside container)
 docker-compose.yml
 docker-compose.*.yml
-Dockerfile
 Dockerfile.dev
 Dockerfile.simple
 Dockerfile.optimized
+Dockerfile.original
 !Dockerfile.render
 .dockerignore
 
@@ -83,6 +83,12 @@ fix-prod-migrations.sh
 PROD-MIGRATION-FIX.md
 docker-build-assets.sh
 build-assets.sh
+docker-benchmark.sh
 
-# Migrations status files (temporaires)
+# Build and migration logs (temporaires)
 migrations-status-*.txt
+docker-build-*.log
+docker-rebuild.log
+build-log-*.txt
+build-time-*.txt
+build-size-*.txt

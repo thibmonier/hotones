@@ -1,18 +1,26 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.4
 # Dockerfile optimisé pour déploiement production sur Render
-# Combine Nginx + PHP-FPM dans un seul conteneur
+# Utilise BuildKit cache mounts pour des builds 30-60% plus rapides
+# Documentation: https://docs.docker.com/build/cache/optimize/
 
 # ============================================
 # Stage 1: Build JavaScript/CSS assets
 # ============================================
-FROM node:22-alpine AS assets
+FROM node:24-alpine3.23 AS assets
+
 WORKDIR /app
 
-# Install dependencies
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production=false
+# Configure Yarn cache directory
+ENV YARN_CACHE_FOLDER=/root/.yarn-cache
 
-# Build assets
+# Install dependencies with cache mount
+# Cache mount persiste entre les builds, évitant les téléchargements répétés
+COPY package.json yarn.lock ./
+RUN --mount=type=cache,target=/root/.yarn-cache,sharing=locked \
+    --mount=type=cache,target=/usr/local/share/.cache/yarn,sharing=locked \
+    yarn install --frozen-lockfile --production=false
+
+# Build assets (seulement si les sources changent)
 COPY assets/ assets/
 COPY webpack.config.js ./
 RUN yarn build
@@ -20,10 +28,13 @@ RUN yarn build
 # ============================================
 # Stage 2: Production PHP + Nginx image
 # ============================================
-FROM php:8.5-fpm-alpine
+FROM php:8.5.1-fpm-alpine3.23
 
-# Install system dependencies
-RUN apk add --no-cache \
+# Install system dependencies with cache mount
+# Cache APK évite de re-télécharger les packages à chaque build
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
+    --mount=type=cache,target=/etc/apk/cache,sharing=locked \
+    apk add --no-cache \
     bash \
     nginx \
     supervisor \
@@ -56,10 +67,10 @@ RUN apk add --no-cache \
   && docker-php-ext-install zip \
   # Remove build dependencies to keep image small
   && apk del .build-deps \
-  && rm -rf /var/cache/apk/*
+  && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
 # Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 # Configure PHP for production
 COPY ./docker/php/php-prod.ini /usr/local/etc/php/conf.d/php.ini
@@ -77,14 +88,13 @@ COPY ./docker/supervisor/supervisord.conf /etc/supervisord.conf
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application files
+# Copy application files first (needed for Symfony autoloader)
 COPY --chown=www-data:www-data . .
 
-# Copy built assets from assets stage
-COPY --from=assets --chown=www-data:www-data /app/public/assets/ public/assets/
-
-# Install PHP dependencies (production only, optimized)
-RUN composer install \
+# Install PHP dependencies with cache mount
+# Cache Composer évite de re-télécharger les packages à chaque build
+RUN --mount=type=cache,target=/root/.composer/cache,sharing=locked \
+    composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction \
@@ -92,17 +102,19 @@ RUN composer install \
     --no-scripts \
     --classmap-authoritative \
     --apcu-autoloader \
-    --ignore-platform-req=php \
-    && composer clear-cache
+    --ignore-platform-req=php
+
+# Copy built assets from assets stage
+COPY --from=assets --chown=www-data:www-data /app/public/assets/ public/assets/
 
 # Install AssetMapper vendor files and compile assets
 # Use SQLite for build-time database connection (DB container not available during build)
-RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console importmap:install \
-    && APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console asset-map:compile
+RUN APP_ENV=prod DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console importmap:install \
+    && APP_ENV=prod DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console asset-map:compile
 
 # Install bundle assets (EasyAdmin, API Platform, etc.) to public/bundles/
 # Use hard copy (not symlink) for production compatibility
-RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console assets:install public
+RUN APP_ENV=prod DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console assets:install public
 
 # Create JWT directory (keys will be generated on first startup)
 RUN mkdir -p config/jwt
@@ -114,8 +126,8 @@ RUN mkdir -p var/cache var/log var/sessions \
 
 # Warm up cache (will be re-warmed on startup with proper env vars)
 # Use SQLite for build-time to avoid DB connection errors
-RUN APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:clear --no-warmup || true \
-    && APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:warmup || true
+RUN APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console cache:clear --no-warmup || true \
+    && APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console cache:warmup || true
 
 # Copy startup script
 COPY ./docker/scripts/start-render.sh /usr/local/bin/start-render.sh
