@@ -20,35 +20,90 @@ final class Version20260110081458 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // MySQL/MariaDB doesn't support IF NOT EXISTS for columns
+        // We need to check existence first using stored procedures or catch exceptions
+
         // Check and add image_prompt if it doesn't exist
         $this->addSql("
-            ALTER TABLE blog_posts
-            ADD COLUMN IF NOT EXISTS image_prompt VARCHAR(1000) DEFAULT NULL
-            COMMENT 'AI prompt for generating featured image'
+            SET @column_exists = (
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'blog_posts'
+                AND COLUMN_NAME = 'image_prompt'
+            );
+
+            SET @sql = IF(@column_exists = 0,
+                'ALTER TABLE blog_posts ADD COLUMN image_prompt VARCHAR(1000) DEFAULT NULL COMMENT ''AI prompt for generating featured image''',
+                'SELECT ''Column image_prompt already exists'' AS message'
+            );
+
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
         ");
 
         // Check and add image_source if it doesn't exist
         $this->addSql("
-            ALTER TABLE blog_posts
-            ADD COLUMN IF NOT EXISTS image_source VARCHAR(20) NOT NULL DEFAULT 'external'
-            COMMENT 'Source: external, upload, ai_generated'
+            SET @column_exists = (
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'blog_posts'
+                AND COLUMN_NAME = 'image_source'
+            );
+
+            SET @sql = IF(@column_exists = 0,
+                'ALTER TABLE blog_posts ADD COLUMN image_source VARCHAR(20) NOT NULL DEFAULT ''external'' COMMENT ''Source: external, upload, ai_generated''',
+                'SELECT ''Column image_source already exists'' AS message'
+            );
+
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
         ");
 
         // Check and add image_generated_at if it doesn't exist
         $this->addSql("
-            ALTER TABLE blog_posts
-            ADD COLUMN IF NOT EXISTS image_generated_at DATETIME DEFAULT NULL
-            COMMENT 'Timestamp when AI image was generated'
+            SET @column_exists = (
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'blog_posts'
+                AND COLUMN_NAME = 'image_generated_at'
+            );
+
+            SET @sql = IF(@column_exists = 0,
+                'ALTER TABLE blog_posts ADD COLUMN image_generated_at DATETIME DEFAULT NULL COMMENT ''Timestamp when AI image was generated''',
+                'SELECT ''Column image_generated_at already exists'' AS message'
+            );
+
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
         ");
 
         // Check and add image_model if it doesn't exist
         $this->addSql("
-            ALTER TABLE blog_posts
-            ADD COLUMN IF NOT EXISTS image_model VARCHAR(50) DEFAULT NULL
-            COMMENT 'AI model used (e.g. dall-e-3)'
+            SET @column_exists = (
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'blog_posts'
+                AND COLUMN_NAME = 'image_model'
+            );
+
+            SET @sql = IF(@column_exists = 0,
+                'ALTER TABLE blog_posts ADD COLUMN image_model VARCHAR(50) DEFAULT NULL COMMENT ''AI model used (e.g. dall-e-3)''',
+                'SELECT ''Column image_model already exists'' AS message'
+            );
+
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
         ");
 
-        // Create index if it doesn't exist
+        // Create index if it doesn't exist (MariaDB 10.1.4+ supports IF NOT EXISTS for indexes)
         $this->addSql("
             CREATE INDEX IF NOT EXISTS idx_blogpost_image_source
             ON blog_posts (image_source)
