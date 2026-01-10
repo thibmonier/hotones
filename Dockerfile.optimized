@@ -88,8 +88,8 @@ COPY ./docker/supervisor/supervisord.conf /etc/supervisord.conf
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first (pour layer caching)
-COPY composer.json composer.lock symfony.lock ./
+# Copy application files first (needed for Symfony autoloader)
+COPY --chown=www-data:www-data . .
 
 # Install PHP dependencies with cache mount
 # Cache Composer évite de re-télécharger les packages à chaque build
@@ -104,20 +104,17 @@ RUN --mount=type=cache,target=/root/.composer/cache,sharing=locked \
     --apcu-autoloader \
     --ignore-platform-req=php
 
-# Copy application files (après dependencies pour meilleur layer caching)
-COPY --chown=www-data:www-data . .
-
 # Copy built assets from assets stage
 COPY --from=assets --chown=www-data:www-data /app/public/assets/ public/assets/
 
 # Install AssetMapper vendor files and compile assets
 # Use SQLite for build-time database connection (DB container not available during build)
-RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console importmap:install \
-    && APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console asset-map:compile
+RUN APP_ENV=prod DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console importmap:install \
+    && APP_ENV=prod DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console asset-map:compile
 
 # Install bundle assets (EasyAdmin, API Platform, etc.) to public/bundles/
 # Use hard copy (not symlink) for production compatibility
-RUN APP_ENV=prod DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console assets:install public
+RUN APP_ENV=prod DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console assets:install public
 
 # Create JWT directory (keys will be generated on first startup)
 RUN mkdir -p config/jwt
@@ -129,8 +126,8 @@ RUN mkdir -p var/cache var/log var/sessions \
 
 # Warm up cache (will be re-warmed on startup with proper env vars)
 # Use SQLite for build-time to avoid DB connection errors
-RUN APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:clear --no-warmup || true \
-    && APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" php bin/console cache:warmup || true
+RUN APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console cache:clear --no-warmup || true \
+    && APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console cache:warmup || true
 
 # Copy startup script
 COPY ./docker/scripts/start-render.sh /usr/local/bin/start-render.sh
