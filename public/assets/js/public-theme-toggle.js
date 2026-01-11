@@ -21,6 +21,7 @@
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-bs-theme', theme);
         updateIcon(theme);
+        updateLogo(theme);
     }
 
     /**
@@ -36,6 +37,23 @@
         } else {
             icon.className = 'bx bx-moon'; // Lune en mode light (pour passer en dark)
         }
+    }
+
+    /**
+     * Met à jour le logo de la navbar en fonction du thème
+     * @param {string} theme - 'light' ou 'dark'
+     */
+    function updateLogo(theme) {
+        const logo = document.getElementById('navbar-logo');
+        if (!logo) return;
+
+        // En mode light, on utilise le logo dark (contraste)
+        // En mode dark, on utilise le logo light (contraste)
+        const logoPath = theme === 'dark'
+            ? '/assets/images/logo-hotones-light.svg'
+            : '/assets/images/logo-hotones-dark.svg';
+
+        logo.src = logoPath;
     }
 
     /**
