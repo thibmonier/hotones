@@ -74,6 +74,35 @@ liip_imagine:
                     mode: outbound
                     allow_upscale: true
 
+        # === PUBLIC PAGES UNIT404 FILTERS ===
+
+        # Unit404 - Hero pages publiques (600x600)
+        unit404_hero:
+            quality: 90
+            filters:
+                thumbnail:
+                    size: [600, 600]
+                    mode: outbound
+                    allow_upscale: false
+
+        # Unit404 - Sections (400x400)
+        unit404_section:
+            quality: 85
+            filters:
+                thumbnail:
+                    size: [400, 400]
+                    mode: outbound
+                    allow_upscale: false
+
+        # Unit404 - Pricing cards (300x300)
+        unit404_pricing:
+            quality: 85
+            filters:
+                thumbnail:
+                    size: [300, 300]
+                    mode: outbound
+                    allow_upscale: false
+
         # === BLOG IMAGE FILTERS ===
 
         # Blog Hero - Large OG image for social sharing and hero sections (1200x630)
