@@ -1,0 +1,146 @@
+/**
+ * HotOnes - Public Pages Theme System
+ * Light/Dark theme avec détection automatique prefers-color-scheme
+ */
+
+/* ====================================
+   LIGHT THEME (Default)
+   ==================================== */
+:root {
+    /* Primary Colors */
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary-color: #8b5cf6;
+    --accent-color: #ec4899;
+
+    /* Background Colors - LIGHT */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-hero: #ffffff;
+
+    /* Border Colors - LIGHT */
+    --border-color: #e9ecef;
+    --border-light: #f0f0f0;
+
+    /* Text Colors - LIGHT */
+    --text-primary: #1a1a1a;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+
+    /* Shadow - LIGHT */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+    /* Gradient Overlays - LIGHT */
+    --gradient-overlay: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+    --gradient-pulse-1: radial-gradient(circle, rgba(99, 102, 241, 0.08), transparent 70%);
+    --gradient-pulse-2: radial-gradient(circle, rgba(139, 92, 246, 0.08), transparent 70%);
+}
+
+/* ====================================
+   DARK THEME
+   ==================================== */
+[data-bs-theme="dark"] {
+    /* Background Colors - DARK */
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #111111;
+    --bg-card: #1a1a1a;
+    --bg-hero: #0a0a0a;
+
+    /* Border Colors - DARK */
+    --border-color: #2d2d2d;
+    --border-light: #1f1f1f;
+
+    /* Text Colors - DARK */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #6c757d;
+
+    /* Shadow - DARK */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+    /* Gradient Overlays - DARK */
+    --gradient-overlay: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    --gradient-pulse-1: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+    --gradient-pulse-2: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+}
+
+/* ====================================
+   AUTO-DETECT SYSTEM PREFERENCE
+   ==================================== */
+@media (prefers-color-scheme: dark) {
+    /* Applique le thème dark si aucun thème n'est explicitement défini */
+    :root:not([data-bs-theme]) {
+        /* Background Colors - DARK */
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #111111;
+        --bg-card: #1a1a1a;
+        --bg-hero: #0a0a0a;
+
+        /* Border Colors - DARK */
+        --border-color: #2d2d2d;
+        --border-light: #1f1f1f;
+
+        /* Text Colors - DARK */
+        --text-primary: #ffffff;
+        --text-secondary: #a0a0a0;
+        --text-muted: #6c757d;
+
+        /* Shadow - DARK */
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+        /* Gradient Overlays - DARK */
+        --gradient-overlay: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        --gradient-pulse-1: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+        --gradient-pulse-2: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+    }
+}
+
+/* ====================================
+   THEME TRANSITION
+   ==================================== */
+html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* ====================================
+   THEME TOGGLE BUTTON
+   ==================================== */
+#theme-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+#theme-toggle:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+#theme-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Icon animation */
+#theme-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+[data-bs-theme="dark"] #theme-icon {
+    transform: rotate(180deg);
+}
