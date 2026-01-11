@@ -71,7 +71,7 @@
     <nav class="navbar navbar-expand-lg navbar-public">
         <div class="container">
             <a class="navbar-brand" href="{{ path('public_homepage') }}">
-                <img src="{{ asset('assets/images/logo-hotones-light.svg') }}" alt="HotOnes">
+                <img src="{{ asset('assets/images/logo-hotones-dark.svg') }}" alt="HotOnes">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -94,7 +94,7 @@
                         <a class="nav-link" href="{{ path('public_contact') }}">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ path('api_documentation') }}">
+                        <a class="nav-link" href="{{ path('api_docs_ui') }}">
                             <i class="bx bx-code-alt me-1"></i>Intégrateurs
                         </a>
                     </li>
@@ -160,18 +160,34 @@
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-4 mb-4">
-                    <h5 class="footer-title">Support</h5>
+                    <h5 class="footer-title">Sécurité & Conformité</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ path('public_contact') }}">Nous contacter</a></li>
-                        <li class="mb-2"><a href="#">Documentation</a></li>
+                        <li class="mb-2">
+                            <i class="bx bx-server text-success me-1"></i>
+                            Hébergement France 🇫🇷
+                        </li>
+                        <li class="mb-2">
+                            <i class="bx bx-shield-alt-2 text-success me-1"></i>
+                            Conformité RGPD
+                        </li>
+                        <li class="mb-2">
+                            <i class="bx bx-lock text-success me-1"></i>
+                            Chiffrement SSL/TLS
+                        </li>
+                        <li class="mb-2">
+                            <i class="bx bx-check-shield text-success me-1"></i>
+                            ISO 27001
+                        </li>
                     </ul>
                 </div>
             </div>
             <hr class="my-4" style="border-color: rgba(255,255,255,0.1)">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <p class="mb-0 text-muted">
-                        &copy; {{ 'now'|date('Y') }} HotOnes. Tous droits réservés.
+                    <p class="mb-0 text-muted small">
+                        &copy; {{ 'now'|date('Y') }} HotOnes. Tous droits réservés. •
+                        <i class="bx bx-server"></i> Hébergé en France 🇫🇷 •
+                        <i class="bx bx-shield-alt-2"></i> RGPD Compliant
                     </p>
                 </div>
             </div>
