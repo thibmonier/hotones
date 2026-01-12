@@ -58,8 +58,8 @@ class PublicController extends AbstractController
         return $this->render('public/pricing.html.twig');
     }
 
-    #[Route('/about', name: 'public_about', options: ['sitemap' => true])]
-    public function about(): Response
+    #[Route('/public/about', name: 'public_about', options: ['sitemap' => true])]
+    public function publicAbout(): Response
     {
         return $this->render('public/about.html.twig');
     }
