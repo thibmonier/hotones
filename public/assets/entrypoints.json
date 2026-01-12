@@ -57,6 +57,32 @@
         "/assets/runtime.js",
         "/assets/form-wizard.js"
       ]
+    },
+    "public-theme": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/public-theme.js"
+      ],
+      "css": [
+        "/assets/css/public-theme.min.css",
+        "/assets/css/public-theme-rtl.min.css"
+      ]
+    },
+    "public-pages": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/public-pages.js"
+      ],
+      "css": [
+        "/assets/css/public-pages.min.css",
+        "/assets/css/public-pages-rtl.min.css"
+      ]
+    },
+    "public-theme-toggle": {
+      "js": [
+        "/assets/runtime.js",
+        "/assets/public-theme-toggle.js"
+      ]
     }
   }
 }

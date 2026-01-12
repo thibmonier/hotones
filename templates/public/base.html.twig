@@ -38,12 +38,12 @@
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- Public Pages Theme System -->
-    <link href="{{ asset('assets/css/public-theme.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/public-pages.css') }}" rel="stylesheet">
+    <!-- Public Pages Theme System (built by Webpack) -->
+    {{ encore_entry_link_tags('public-theme') }}
+    {{ encore_entry_link_tags('public-pages') }}
 
     {# Theme toggle script - chargé en premier pour éviter le FOUC #}
-    <script src="{{ asset('assets/js/public-theme-toggle.js') }}"></script>
+    {{ encore_entry_script_tags('public-theme-toggle') }}
 
     {% block stylesheets %}{% endblock %}
 

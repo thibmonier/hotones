@@ -23,13 +23,6 @@ RUN --mount=type=cache,target=/root/.yarn-cache,sharing=locked \
 # Build assets (seulement si les sources changent)
 COPY assets/ assets/
 COPY webpack.config.js ./
-
-# Copy static public CSS/JS that are not built by Webpack
-# These need to be in the assets stage so they're included in the final COPY
-# Note: Images are in assets/images/ and will be copied by Webpack
-COPY public/assets/css/public-*.css public/assets/css/
-COPY public/assets/js/public-*.js public/assets/js/
-
 RUN yarn build
 
 # ============================================

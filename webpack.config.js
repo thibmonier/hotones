@@ -12,6 +12,10 @@ Encore
   .addEntry('form-validation', './assets/js/form-validation.js')
   .addEntry('dependent-fields', './assets/js/dependent-fields.js')
   .addEntry('form-wizard', './assets/js/form-wizard.js')
+  // Public pages theme system
+  .addEntry('public-theme', './assets/scss/public-theme.scss')
+  .addEntry('public-pages', './assets/scss/public-pages.scss')
+  .addEntry('public-theme-toggle', './assets/js/public-theme-toggle.js')
   // .addEntry('custom', './assets/scss/custom.scss')
   .enableSingleRuntimeChunk()
   .enableSassLoader()
