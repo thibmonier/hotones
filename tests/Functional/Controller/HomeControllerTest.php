@@ -18,7 +18,7 @@ class HomeControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', '/');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'rentabilité'); // Check for key content
+        $this->assertSelectorTextContains('h1', 'sérénité'); // Check for key content (updated after marketing rewrite)
     }
 
     public function testHomepageLoadsForAuthenticatedUser(): void
