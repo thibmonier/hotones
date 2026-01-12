@@ -107,6 +107,12 @@ RUN --mount=type=cache,target=/root/.composer/cache,sharing=locked \
 # Copy built assets from assets stage
 COPY --from=assets --chown=www-data:www-data /app/public/assets/ public/assets/
 
+# Copy static public assets (CSS/JS/Images not built by Webpack)
+# These files are overwritten by the previous COPY, so we restore them
+COPY --chown=www-data:www-data public/assets/css/public-*.css public/assets/css/
+COPY --chown=www-data:www-data public/assets/js/public-*.js public/assets/js/
+COPY --chown=www-data:www-data public/assets/images/ public/assets/images/
+
 # Install AssetMapper vendor files and compile assets
 # Use SQLite for build-time database connection (DB container not available during build)
 RUN APP_ENV=prod DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console importmap:install \
