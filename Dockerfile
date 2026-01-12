@@ -23,6 +23,13 @@ RUN --mount=type=cache,target=/root/.yarn-cache,sharing=locked \
 # Build assets (seulement si les sources changent)
 COPY assets/ assets/
 COPY webpack.config.js ./
+
+# Copy static public assets that are not built by Webpack
+# These need to be in the assets stage so they're included in the final COPY at line 108
+COPY public/assets/css/public-*.css public/assets/css/
+COPY public/assets/js/public-*.js public/assets/js/
+COPY public/assets/images/ public/assets/images/
+
 RUN yarn build
 
 # ============================================
@@ -104,14 +111,8 @@ RUN --mount=type=cache,target=/root/.composer/cache,sharing=locked \
     --apcu-autoloader \
     --ignore-platform-req=php
 
-# Copy built assets from assets stage
+# Copy built assets from assets stage (includes both Webpack-built and static files)
 COPY --from=assets --chown=www-data:www-data /app/public/assets/ public/assets/
-
-# Copy static public assets (CSS/JS/Images not built by Webpack)
-# These files are overwritten by the previous COPY, so we restore them
-COPY --chown=www-data:www-data public/assets/css/public-*.css public/assets/css/
-COPY --chown=www-data:www-data public/assets/js/public-*.js public/assets/js/
-COPY --chown=www-data:www-data public/assets/images/ public/assets/images/
 
 # Install AssetMapper vendor files and compile assets
 # Use SQLite for build-time database connection (DB container not available during build)
