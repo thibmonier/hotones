@@ -193,7 +193,7 @@ class BlogCategory implements Stringable
     public function getPublishedPostCount(): int
     {
         return $this->posts->filter(
-            fn (BlogPost $post) => $post->isPublished(),
+            fn (BlogPost $post): bool => $post->isPublished(),
         )->count();
     }
 

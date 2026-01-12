@@ -297,7 +297,7 @@ class BlogPost implements CompanyOwnedInterface, Stringable
         // Auto-generate excerpt from content
         $text = strip_tags($this->content ?? '');
         $text = preg_replace('/\s+/', ' ', $text); // Normalize whitespace
-        $text = trim($text);
+        $text = trim((string) $text);
 
         return mb_substr($text, 0, 200).(mb_strlen($text) > 200 ? '...' : '');
     }
@@ -493,7 +493,7 @@ class BlogPost implements CompanyOwnedInterface, Stringable
         }
 
         return array_map(
-            'trim',
+            trim(...),
             explode(',', $this->keywords),
         );
     }

@@ -24,12 +24,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class BlogImageGenerationService
 {
-    private const RATE_LIMIT_PER_HOUR = 5;
-    private const MIN_PROMPT_LENGTH   = 10;
-    private const MAX_PROMPT_LENGTH   = 1000;
-    private const MAX_IMAGE_SIZE      = 5 * 1024 * 1024; // 5 MB
+    private const int RATE_LIMIT_PER_HOUR = 5;
+    private const int MIN_PROMPT_LENGTH   = 10;
+    private const int MAX_PROMPT_LENGTH   = 1000;
+    private const MAX_IMAGE_SIZE          = 5 * 1024 * 1024; // 5 MB
 
-    private const PROHIBITED_KEYWORDS = [
+    private const array PROHIBITED_KEYWORDS = [
         'nude',
         'nsfw',
         'explicit',
@@ -219,7 +219,6 @@ class BlogImageGenerationService
     {
         $finfo    = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $tempPath);
-        finfo_close($finfo);
 
         if (!in_array($mimeType, ['image/png', 'image/jpeg', 'image/webp'], true)) {
             unlink($tempPath);

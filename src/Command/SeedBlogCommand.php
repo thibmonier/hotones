@@ -277,19 +277,19 @@ class SeedBlogCommand extends Command
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
 
         // Transliterate
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', (string) $text);
 
         // Remove unwanted characters
-        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = preg_replace('~[^\-\w]+~', '', $text);
 
         // Trim
-        $text = trim($text, '-');
+        $text = trim((string) $text, '-');
 
         // Remove duplicate -
         $text = preg_replace('~-+~', '-', $text);
 
         // Lowercase
-        $text = strtolower($text);
+        $text = strtolower((string) $text);
 
         if (empty($text)) {
             return 'n-a';

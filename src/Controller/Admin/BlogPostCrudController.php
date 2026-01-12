@@ -163,7 +163,7 @@ class BlogPostCrudController extends AbstractCrudController
         yield AssociationField::new('author', 'Auteur')
             ->setHelp('Auteur de l\'article (auto-assigné si non spécifié)')
             ->hideOnForm()
-            ->formatValue(fn ($value, BlogPost $entity) => $entity->getAuthor()->getFullName());
+            ->formatValue(fn ($value, BlogPost $entity): string => $entity->getAuthor()->getFullName());
 
         yield DateTimeField::new('publishedAt', 'Date de publication')
             ->setHelp('Date de publication (auto-définie lors du passage en "Publié")')
@@ -198,11 +198,9 @@ class BlogPostCrudController extends AbstractCrudController
     {
         // Custom action: Preview on public site
         $previewOnSite = Action::new('previewOnSite', 'Voir sur le site')
-            ->linkToUrl(function (BlogPost $post): string {
-                return $this->generateUrl('blog_show', ['slug' => $post->getSlug()]);
-            })
+            ->linkToUrl(fn (BlogPost $post): string => $this->generateUrl('blog_show', ['slug' => $post->getSlug()]))
             ->setIcon('fa fa-external-link-alt')
-            ->displayIf(static fn (BlogPost $post) => $post->isPublished())
+            ->displayIf(static fn (BlogPost $post): bool => $post->isPublished())
             ->addCssClass('btn btn-info')
             ->setHtmlAttributes(['target' => '_blank', 'rel' => 'noopener noreferrer']);
 
@@ -210,7 +208,7 @@ class BlogPostCrudController extends AbstractCrudController
         $regenerateImage = Action::new('regenerateImage', 'Régénérer l\'image IA')
             ->linkToCrudAction('regenerateImageAction')
             ->setIcon('fa fa-refresh')
-            ->displayIf(static fn (BlogPost $post) => $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
+            ->displayIf(static fn (BlogPost $post): bool => $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
                 && $post->imagePrompt !== null)
             ->addCssClass('btn btn-warning');
 

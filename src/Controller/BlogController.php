@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class BlogController extends AbstractController
 {
-    private const POSTS_PER_PAGE = 12;
+    private const int POSTS_PER_PAGE = 12;
 
     public function __construct(
         private readonly BlogPostRepository $postRepository,

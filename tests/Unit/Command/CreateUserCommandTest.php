@@ -54,12 +54,10 @@ class CreateUserCommandTest extends TestCase
 
         // Configure EntityManager to return appropriate repositories
         $this->entityManager->method('getRepository')->willReturnCallback(
-            function ($entityClass) use ($userRepository, $companyRepository) {
-                return match ($entityClass) {
-                    User::class    => $userRepository,
-                    Company::class => $companyRepository,
-                    default        => throw new Exception('Unexpected repository requested: '.$entityClass),
-                };
+            fn ($entityClass): \PHPUnit\Framework\MockObject\MockObject => match ($entityClass) {
+                User::class    => $userRepository,
+                Company::class => $companyRepository,
+                default        => throw new Exception('Unexpected repository requested: '.$entityClass),
             },
         );
 
