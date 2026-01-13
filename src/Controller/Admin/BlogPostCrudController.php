@@ -9,7 +9,6 @@ use App\Entity\User;
 use App\Exception\BlogImageGenerationException;
 use App\Security\CompanyContext;
 use App\Service\AI\BlogImageGenerationService;
-use App\Service\SecureFileUploadService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -43,7 +42,6 @@ class BlogPostCrudController extends AbstractCrudController
     public function __construct(
         private readonly CompanyContext $companyContext,
         private readonly BlogImageGenerationService $imageGenerationService,
-        private readonly SecureFileUploadService $uploadService,
         private readonly RequestStack $requestStack
     ) {
     }
