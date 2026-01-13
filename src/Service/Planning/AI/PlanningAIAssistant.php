@@ -153,9 +153,8 @@ class PlanningAIAssistant
         $prompt .= "  ],\n";
         $prompt .= "  \"insights\": [\"Observation 1\", \"Observation 2\"],\n";
         $prompt .= "  \"confidence\": 0.85\n";
-        $prompt .= "}\n";
 
-        return $prompt;
+        return $prompt."}\n";
     }
 
     /**

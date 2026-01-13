@@ -20,10 +20,8 @@ final readonly class AiAssistantService
     public function __construct(
         #[Autowire(service: 'ai.agent.sentiment_analyzer')]
         private AgentInterface $sentimentAgent,
-
         #[Autowire(service: 'ai.agent.email_responder')]
         private AgentInterface $emailAgent,
-
         #[Autowire(service: 'ai.agent.quote_generator')]
         private AgentInterface $quoteAgent,
     ) {
@@ -58,10 +56,8 @@ final readonly class AiAssistantService
             Message::ofUser($prompt),
         );
 
-        $response = $this->emailAgent->call($messages);
-
         /* @phpstan-ignore return.type */
-        return $response;
+        return $this->emailAgent->call($messages);
     }
 
     /**

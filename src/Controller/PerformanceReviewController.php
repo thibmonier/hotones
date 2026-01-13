@@ -41,11 +41,7 @@ class PerformanceReviewController extends AbstractController
         } else {
             // Contributors see only their own reviews
             $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
-            if (null === $contributor) {
-                $reviews = [];
-            } else {
-                $reviews = $this->reviewRepository->findByContributor($contributor);
-            }
+            $reviews     = null === $contributor ? [] : $this->reviewRepository->findByContributor($contributor);
         }
 
         // Apply filters

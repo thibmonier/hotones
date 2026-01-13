@@ -380,11 +380,7 @@ class ProfitabilityService
         }
 
         // Si c'est une tâche qui ne compte pas pour la rentabilité (AVV, non-vendu)
-        if (!$task->getCountsForProfitability()) {
-            return false;
-        }
-
-        return true;
+        return $task->getCountsForProfitability();
     }
 
     /**
@@ -423,11 +419,7 @@ class ProfitabilityService
             return false;
         }
 
-        if ($endDate && $date > $endDate) {
-            return false;
-        }
-
-        return true;
+        return !($endDate && $date > $endDate);
     }
 
     /**

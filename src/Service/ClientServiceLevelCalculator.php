@@ -91,7 +91,7 @@ class ClientServiceLevelCalculator
             if (!$order->getProject()) {
                 continue;
             }
-            if (!($order->getProject()->getClient() === $client)) {
+            if ($order->getProject()->getClient() !== $client) {
                 continue;
             }
             // Vérifier le statut (signe ou gagne)
@@ -101,7 +101,7 @@ class ClientServiceLevelCalculator
             if (!$order->getValidatedAt()) {
                 continue;
             }
-            if (!((int) $order->getValidatedAt()->format('Y') === $year)) {
+            if ((int) $order->getValidatedAt()->format('Y') !== $year) {
                 continue;
             }
             $total += (float) $order->getTotalAmount();

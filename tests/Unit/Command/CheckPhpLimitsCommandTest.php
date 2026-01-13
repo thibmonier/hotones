@@ -133,7 +133,7 @@ class CheckPhpLimitsCommandTest extends TestCase
         $resultM = $method->invoke($this->command, '2m');
         $resultK = $method->invoke($this->command, '3k');
 
-        $this->assertEquals(1 * 1024 * 1024 * 1024, $resultG);
+        $this->assertEquals(1024 * 1024 * 1024, $resultG);
         $this->assertEquals(2 * 1024 * 1024, $resultM);
         $this->assertEquals(3 * 1024, $resultK);
     }

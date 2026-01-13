@@ -35,7 +35,7 @@ class GdprDataExportService
     {
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
-        $data = [
+        return [
             'export_metadata' => [
                 'export_date'    => new DateTimeImmutable()->format('c'),
                 'format_version' => '1.0',
@@ -58,8 +58,6 @@ class GdprDataExportService
             // Statistiques générales
             'statistics' => $this->exportStatistics($user, $contributor),
         ];
-
-        return $data;
     }
 
     private function exportUserAccount(User $user): array

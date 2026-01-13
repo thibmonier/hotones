@@ -315,9 +315,11 @@ class BlogPostCrudController extends AbstractCrudController
         // For now, we focus on AI generation workflow
 
         // Priority 2: AI generation
-        if ($blogPost->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
+        if (
+            $blogPost->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
             && $blogPost->imagePrompt !== null
-            && $blogPost->imageGeneratedAt === null) {
+            && $blogPost->imageGeneratedAt === null
+        ) {
             error_log('[BlogPost] AI generation triggered!');
             try {
                 $this->imageGenerationService->generateImage(
@@ -340,9 +342,11 @@ class BlogPostCrudController extends AbstractCrudController
         // Priority 3: External URL (backward compatibility)
         if ($blogPost->imageSource === BlogPost::IMAGE_SOURCE_EXTERNAL) {
             // Validate URL format if provided
-            if ($blogPost->featuredImage    !== null
+            if (
+                $blogPost->featuredImage    !== null
                 && $blogPost->featuredImage !== ''
-                && !filter_var($blogPost->featuredImage, FILTER_VALIDATE_URL)) {
+                && !filter_var($blogPost->featuredImage, FILTER_VALIDATE_URL)
+            ) {
                 $this->addFlash('error', 'L\'URL de l\'image externe n\'est pas valide.');
                 $blogPost->featuredImage = null;
             }

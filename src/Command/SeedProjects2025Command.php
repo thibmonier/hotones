@@ -174,7 +174,7 @@ class SeedProjects2025Command extends Command
             if (!$c) {
                 $c = new Contributor();
                 $c->setCompany($company);
-                $c->setFirstName($firstName)->setLastName($lastName)->setActive(true)->setCjm((string) (400 + ($i % 4) * 50).'.00');
+                $c->setFirstName($firstName)->setLastName($lastName)->setActive(true)->setCjm((400 + ($i % 4) * 50).'.00');
                 // Associer 1 profil
                 if (isset($profiles[$i % count($profiles)])) {
                     $c->addProfile($profiles[$i % count($profiles)]);
@@ -233,7 +233,7 @@ class SeedProjects2025Command extends Command
 
             // Achats globaux aléatoires
             if (random_int(0, 1)) {
-                $project->setPurchasesAmount((string) random_int(0, 3000).'.00');
+                $project->setPurchasesAmount(random_int(0, 3000).'.00');
                 $project->setPurchasesDescription('Achats tests (licenses, outils)');
             }
 
@@ -288,11 +288,11 @@ class SeedProjects2025Command extends Command
                 ->setPosition($i + 1)
                 ->setType('service')
                 ->setProfile($profiles[$i % count($profiles)])
-                ->setDailyRate((string) (400 + random_int(0, 250)).'.00')
+                ->setDailyRate((400 + random_int(0, 250)).'.00')
                 ->setDays((string) (1 + random_int(1, 15)));
             // Attacher un achat ponctuel parfois
             if (random_int(0, 3) === 0) {
-                $line->setAttachedPurchaseAmount((string) random_int(200, 1200).'.00');
+                $line->setAttachedPurchaseAmount(random_int(200, 1200).'.00');
             }
             $section->addLine($line);
             $this->em->persist($line);
@@ -312,7 +312,7 @@ class SeedProjects2025Command extends Command
                 ->setDescription('Licence annuelle')
                 ->setType('fixed_amount')
                 ->setPosition(1)
-                ->setDirectAmount((string) random_int(300, 2000).'.00');
+                ->setDirectAmount(random_int(300, 2000).'.00');
             $sec2->addLine($purchase);
 
             $this->em->persist($sec2);
@@ -344,7 +344,7 @@ class SeedProjects2025Command extends Command
                 ->setStatus('in_progress')
                 ->setEstimatedHoursSold(random_int(16, 80))
                 ->setEstimatedHoursRevised(random_int(16, 100))
-                ->setDailyRate((string) (450 + random_int(0, 200)).'.00');
+                ->setDailyRate((450 + random_int(0, 200)).'.00');
             // assigner un contrib éventuel
             if (!empty($contributors)) {
                 $task->setAssignedContributor($contributors[array_rand($contributors)]);

@@ -125,12 +125,8 @@ class HealthCheckController extends AbstractController
         ];
 
         // Try to read version file if it exists
-        $versionFile = $this->getParameter('kernel.project_dir').'/VERSION';
-        if (file_exists($versionFile)) {
-            $metadata['version'] = trim(file_get_contents($versionFile));
-        } else {
-            $metadata['version'] = 'unknown';
-        }
+        $versionFile         = $this->getParameter('kernel.project_dir').'/VERSION';
+        $metadata['version'] = file_exists($versionFile) ? trim(file_get_contents($versionFile)) : 'unknown';
 
         return $this->json([
             'status'    => $overallStatus,

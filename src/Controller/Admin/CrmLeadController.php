@@ -143,13 +143,15 @@ class CrmLeadController extends AbstractController
 
         $newStatus = $request->request->get('status');
 
-        if (!in_array($newStatus, [
-            LeadCapture::STATUS_NEW,
-            LeadCapture::STATUS_NURTURING,
-            LeadCapture::STATUS_QUALIFIED,
-            LeadCapture::STATUS_CONVERTED,
-            LeadCapture::STATUS_LOST,
-        ], true)) {
+        if (
+            !in_array($newStatus, [
+                LeadCapture::STATUS_NEW,
+                LeadCapture::STATUS_NURTURING,
+                LeadCapture::STATUS_QUALIFIED,
+                LeadCapture::STATUS_CONVERTED,
+                LeadCapture::STATUS_LOST,
+            ], true)
+        ) {
             $this->addFlash('error', 'Statut invalide');
 
             return $this->redirectToRoute('admin_crm_leads_show', ['id' => $id]);

@@ -52,11 +52,8 @@ class MyTasksController extends AbstractController
                 if ($ts && $ts > $endDate) {
                     return false;
                 }
-                if ($te && $te < $startDate) {
-                    return false;
-                }
 
-                return true;
+                return !($te && $te < $startDate);
             }));
 
             if (!empty($tasksForWeek)) {
