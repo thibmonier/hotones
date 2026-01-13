@@ -31,8 +31,11 @@
     <rule ref="Generic.CodeAnalysis.EmptyStatement">
         <severity>0</severity>
     </rule>
-    <!-- Import statement grouping (legacy code with mixed imports) -->
+    <!-- Import/Use statement rules (legacy code with mixed imports) -->
     <rule ref="PSR12.Files.ImportStatement">
+        <severity>0</severity>
+    </rule>
+    <rule ref="PSR2.Namespaces.UseDeclaration">
         <severity>0</severity>
     </rule>
 
