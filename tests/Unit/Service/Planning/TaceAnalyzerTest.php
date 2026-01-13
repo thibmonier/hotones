@@ -323,7 +323,13 @@ class TaceAnalyzerTest extends TestCase
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function ($start, $end, $granularity, $profile, $contributor) use (
+            function (
+                $start,
+                $end,
+                $granularity,
+                $profile,
+                $contributor
+            ) use (
                 $optimalContributor,
                 $overloadedContributor,
                 $underutilizedContributor,
@@ -377,7 +383,13 @@ class TaceAnalyzerTest extends TestCase
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function ($start, $end, $granularity, $profile, $contributor) use ($contributor1, $contributor2, $contributor3) {
+            function (
+                $start,
+                $end,
+                $granularity,
+                $profile,
+                $contributor
+            ) use ($contributor1, $contributor2, $contributor3) {
                 if ($contributor === $contributor1) {
                     return [$this->createMockMetric(92.0, 20.0, 18.4)];
                 }
@@ -413,7 +425,13 @@ class TaceAnalyzerTest extends TestCase
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function ($start, $end, $granularity, $profile, $contributor) use ($contributor1, $contributor2, $contributor3) {
+            function (
+                $start,
+                $end,
+                $granularity,
+                $profile,
+                $contributor
+            ) use ($contributor1, $contributor2, $contributor3) {
                 if ($contributor === $contributor1) {
                     return [$this->createMockMetric(65.0, 20.0, 13.0)];
                 }
@@ -449,7 +467,13 @@ class TaceAnalyzerTest extends TestCase
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function ($start, $end, $granularity, $profile, $contributor) use ($contributor1, $contributor2, $contributor3) {
+            function (
+                $start,
+                $end,
+                $granularity,
+                $profile,
+                $contributor
+            ) use ($contributor1, $contributor2, $contributor3) {
                 if ($contributor === $contributor1) {
                     return [$this->createMockMetric(115.0, 20.0, 23.0)]; // deviation from 80 = 35
                 }

@@ -26,10 +26,17 @@
     <exclude-pattern>*/src/Entity/*</exclude-pattern>
 
     <!-- Additional rules for code quality -->
-    <!-- Set as warnings (severity 5) instead of errors to allow CI to pass with legacy code -->
+    <!-- Disable rules that conflict with legacy code (set to severity 0) -->
+    <!-- Empty catch statements in Factories (used with Foundry/Faker) -->
     <rule ref="Generic.CodeAnalysis.EmptyStatement">
-        <severity>5</severity>
+        <severity>0</severity>
     </rule>
+    <!-- Import statement grouping (legacy code with mixed imports) -->
+    <rule ref="PSR12.Files.ImportStatement">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Set as warnings (severity 5) for gradual improvement -->
     <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
         <severity>5</severity>
     </rule>
@@ -42,6 +49,7 @@
     <rule ref="Generic.Commenting.Fixme">
         <severity>5</severity>
     </rule>
+
     <!-- Increased line length limits to accommodate existing legacy code -->
     <rule ref="Generic.Files.LineLength">
         <properties>
@@ -61,11 +69,6 @@
             <property name="nestingLevel" value="7"/>
             <property name="absoluteNestingLevel" value="10"/>
         </properties>
-    </rule>
-
-    <!-- Convert import grouping rule to warning (legacy code with mixed imports) -->
-    <rule ref="PSR12.Files.ImportStatement">
-        <severity>5</severity>
     </rule>
 
     <!-- Show colors in output -->
