@@ -311,6 +311,7 @@
       <path value="$PROJECT_DIR$/vendor/zenstruck/foundry" />
       <path value="$PROJECT_DIR$/vendor/zenstruck/assert" />
       <path value="$PROJECT_DIR$/vendor/willdurand/negotiation" />
+      <path value="$PROJECT_DIR$/vendor/rector/rector" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

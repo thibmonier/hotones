@@ -262,6 +262,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/ahmed-bhs/doctrine-doctor" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpmyadmin/sql-parser" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/stof/doctrine-extensions-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/rector/rector" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

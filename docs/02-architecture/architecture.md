@@ -1,7 +1,7 @@
 # 🏢 Architecture technique
 
 ## Stack
-- Backend : Symfony 7.3 + PHP 8.4
+- Backend : Symfony 8.0.1 + PHP 8.5
 - Base de données : MariaDB 11.4
 - Frontend : Twig + Bootstrap 5 (thème "Skote", templates de référence dans `templates/`)
 - Assets : Webpack Encore + Sass
