@@ -9,22 +9,23 @@ use App\Domain\Shared\Interface\DomainEventInterface;
 use App\Domain\Shared\ValueObject\Email;
 use App\Domain\User\ValueObject\UserId;
 use App\Domain\User\ValueObject\UserRole;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when a new user is created.
  */
 final readonly class UserCreatedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private UserId $userId,
         private CompanyId $companyId,
         private Email $email,
         private UserRole $role,
-        ?\DateTimeImmutable $occurredOn = null,
+        ?DateTimeImmutable $occurredOn = null,
     ) {
-        $this->occurredOn = $occurredOn ?? new \DateTimeImmutable();
+        $this->occurredOn = $occurredOn ?? new DateTimeImmutable();
     }
 
     public static function create(
@@ -56,12 +57,12 @@ final readonly class UserCreatedEvent implements DomainEventInterface
         return $this->role;
     }
 
-    public function occurredOn(): \DateTimeImmutable
+    public function occurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

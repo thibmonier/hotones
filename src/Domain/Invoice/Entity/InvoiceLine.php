@@ -7,6 +7,8 @@ namespace App\Domain\Invoice\Entity;
 use App\Domain\Invoice\ValueObject\InvoiceLineId;
 use App\Domain\Invoice\ValueObject\TaxRate;
 use App\Domain\Shared\ValueObject\Money;
+use DateTimeImmutable;
+use InvalidArgumentException;
 
 /**
  * Invoice line entity (child of Invoice aggregate).
@@ -22,8 +24,8 @@ final class InvoiceLine
     private TaxRate $taxRate;
     private ?string $unit;
     private int $position;
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
         InvoiceLineId $id,
@@ -36,15 +38,15 @@ final class InvoiceLine
         $this->validateDescription($description);
         $this->validateQuantity($quantity);
 
-        $this->id = $id;
+        $this->id          = $id;
         $this->description = $description;
-        $this->quantity = $quantity;
+        $this->quantity    = $quantity;
         $this->unitPriceHt = $unitPriceHt;
-        $this->taxRate = $taxRate;
-        $this->unit = null;
-        $this->position = $position;
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = null;
+        $this->taxRate     = $taxRate;
+        $this->unit        = null;
+        $this->position    = $position;
+        $this->createdAt   = new DateTimeImmutable();
+        $this->updatedAt   = null;
     }
 
     public static function create(
@@ -68,22 +70,22 @@ final class InvoiceLine
         $this->validateQuantity($quantity);
 
         $this->description = $description;
-        $this->quantity = $quantity;
+        $this->quantity    = $quantity;
         $this->unitPriceHt = $unitPriceHt;
-        $this->taxRate = $taxRate;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->taxRate     = $taxRate;
+        $this->updatedAt   = new DateTimeImmutable();
     }
 
     public function setUnit(?string $unit): void
     {
-        $this->unit = $unit;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->unit      = $unit;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updatePosition(int $position): void
     {
-        $this->position = $position;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->position  = $position;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Calculated values
@@ -117,14 +119,14 @@ final class InvoiceLine
     private function validateDescription(string $description): void
     {
         if (trim($description) === '') {
-            throw new \InvalidArgumentException('Invoice line description cannot be empty');
+            throw new InvalidArgumentException('Invoice line description cannot be empty');
         }
     }
 
     private function validateQuantity(float $quantity): void
     {
         if ($quantity <= 0) {
-            throw new \InvalidArgumentException('Invoice line quantity must be positive');
+            throw new InvalidArgumentException('Invoice line quantity must be positive');
         }
     }
 
@@ -165,12 +167,12 @@ final class InvoiceLine
         return $this->position;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

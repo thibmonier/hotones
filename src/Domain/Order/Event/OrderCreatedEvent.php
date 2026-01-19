@@ -7,6 +7,7 @@ namespace App\Domain\Order\Event;
 use App\Domain\Client\ValueObject\ClientId;
 use App\Domain\Order\ValueObject\OrderId;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 final readonly class OrderCreatedEvent implements DomainEventInterface
 {
@@ -14,13 +15,13 @@ final readonly class OrderCreatedEvent implements DomainEventInterface
         private OrderId $orderId,
         private ClientId $clientId,
         private string $reference,
-        private \DateTimeImmutable $occurredOn,
+        private DateTimeImmutable $occurredOn,
     ) {
     }
 
     public static function create(OrderId $orderId, ClientId $clientId, string $reference): self
     {
-        return new self($orderId, $clientId, $reference, new \DateTimeImmutable());
+        return new self($orderId, $clientId, $reference, new DateTimeImmutable());
     }
 
     public function getOrderId(): OrderId
@@ -38,7 +39,7 @@ final readonly class OrderCreatedEvent implements DomainEventInterface
         return $this->reference;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

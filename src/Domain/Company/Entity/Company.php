@@ -16,6 +16,7 @@ use App\Domain\Company\ValueObject\CompanyStatus;
 use App\Domain\Company\ValueObject\SubscriptionTier;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
+use DateTimeImmutable;
 
 /**
  * Company aggregate root - multi-tenant SAAS root entity.
@@ -39,7 +40,7 @@ final class Company implements AggregateRootInterface
     private int $maxStorageMb;
 
     // Billing configuration
-    private ?\DateTimeImmutable $billingStartDate;
+    private ?DateTimeImmutable $billingStartDate;
     private int $billingDayOfMonth;
     private string $currency;
 
@@ -50,10 +51,10 @@ final class Company implements AggregateRootInterface
     private int $annualRttDays;
 
     // Timestamps
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
-    private ?\DateTimeImmutable $suspendedAt;
-    private ?\DateTimeImmutable $trialEndsAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
+    private ?DateTimeImmutable $suspendedAt;
+    private ?DateTimeImmutable $trialEndsAt;
 
     private function __construct(
         CompanyId $id,
@@ -61,35 +62,35 @@ final class Company implements AggregateRootInterface
         CompanySlug $slug,
         SubscriptionTier $subscriptionTier,
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->slug = $slug;
+        $this->id               = $id;
+        $this->name             = $name;
+        $this->slug             = $slug;
         $this->subscriptionTier = $subscriptionTier;
-        $this->status = CompanyStatus::TRIAL;
-        $this->enabledFeatures = array_map(
+        $this->status           = CompanyStatus::TRIAL;
+        $this->enabledFeatures  = array_map(
             fn (CompanyFeature $f) => $f->value,
-            CompanyFeature::getDefaultsForTier($subscriptionTier)
+            CompanyFeature::getDefaultsForTier($subscriptionTier),
         );
 
         // Default resource limits based on tier
         $this->setResourceLimitsForTier($subscriptionTier);
 
         // Billing defaults
-        $this->billingStartDate = null;
+        $this->billingStartDate  = null;
         $this->billingDayOfMonth = 1;
-        $this->currency = 'EUR';
+        $this->currency          = 'EUR';
 
         // Settings defaults
-        $this->structureCostCoefficient = 0.0;
+        $this->structureCostCoefficient   = 0.0;
         $this->employerChargesCoefficient = 0.45;
-        $this->annualPaidLeaveDays = 25;
-        $this->annualRttDays = 10;
+        $this->annualPaidLeaveDays        = 25;
+        $this->annualRttDays              = 10;
 
         // Timestamps
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = null;
+        $this->createdAt   = new DateTimeImmutable();
+        $this->updatedAt   = null;
         $this->suspendedAt = null;
-        $this->trialEndsAt = (new \DateTimeImmutable())->modify('+14 days');
+        $this->trialEndsAt = (new DateTimeImmutable())->modify('+14 days');
     }
 
     public static function create(
@@ -101,7 +102,7 @@ final class Company implements AggregateRootInterface
         $company = new self($id, $name, $slug, $subscriptionTier);
 
         $company->recordEvent(
-            CompanyCreatedEvent::create($id, $name, $slug, $subscriptionTier)
+            CompanyCreatedEvent::create($id, $name, $slug, $subscriptionTier),
         );
 
         return $company;
@@ -119,12 +120,12 @@ final class Company implements AggregateRootInterface
             throw InvalidCompanyStatusTransitionException::create($this->status, $newStatus);
         }
 
-        $previousStatus = $this->status;
-        $this->status = $newStatus;
-        $this->updatedAt = new \DateTimeImmutable();
+        $previousStatus  = $this->status;
+        $this->status    = $newStatus;
+        $this->updatedAt = new DateTimeImmutable();
 
         if ($newStatus === CompanyStatus::SUSPENDED) {
-            $this->suspendedAt = new \DateTimeImmutable();
+            $this->suspendedAt = new DateTimeImmutable();
         }
 
         if ($previousStatus === CompanyStatus::SUSPENDED && $newStatus === CompanyStatus::ACTIVE) {
@@ -132,7 +133,7 @@ final class Company implements AggregateRootInterface
         }
 
         $this->recordEvent(
-            CompanyStatusChangedEvent::create($this->id, $previousStatus, $newStatus)
+            CompanyStatusChangedEvent::create($this->id, $previousStatus, $newStatus),
         );
     }
 
@@ -159,26 +160,26 @@ final class Company implements AggregateRootInterface
             return;
         }
 
-        $previousTier = $this->subscriptionTier;
+        $previousTier           = $this->subscriptionTier;
         $this->subscriptionTier = $newTier;
         $this->setResourceLimitsForTier($newTier);
         $this->enabledFeatures = array_map(
             fn (CompanyFeature $f) => $f->value,
-            CompanyFeature::getDefaultsForTier($newTier)
+            CompanyFeature::getDefaultsForTier($newTier),
         );
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(
-            CompanySubscriptionChangedEvent::create($this->id, $previousTier, $newTier)
+            CompanySubscriptionChangedEvent::create($this->id, $previousTier, $newTier),
         );
     }
 
     private function setResourceLimitsForTier(SubscriptionTier $tier): void
     {
         [$this->maxUsers, $this->maxProjects, $this->maxStorageMb] = match ($tier) {
-            SubscriptionTier::STARTER => [5, 10, 1024],
+            SubscriptionTier::STARTER      => [5, 10, 1024],
             SubscriptionTier::PROFESSIONAL => [25, 50, 10240],
-            SubscriptionTier::ENTERPRISE => [999, 999, 102400],
+            SubscriptionTier::ENTERPRISE   => [999, 999, 102400],
         };
     }
 
@@ -193,7 +194,7 @@ final class Company implements AggregateRootInterface
     {
         if (!$this->isFeatureEnabled($feature)) {
             $this->enabledFeatures[] = $feature->value;
-            $this->updatedAt = new \DateTimeImmutable();
+            $this->updatedAt         = new DateTimeImmutable();
         }
     }
 
@@ -203,7 +204,7 @@ final class Company implements AggregateRootInterface
         if ($key !== false) {
             unset($this->enabledFeatures[$key]);
             $this->enabledFeatures = array_values($this->enabledFeatures);
-            $this->updatedAt = new \DateTimeImmutable();
+            $this->updatedAt       = new DateTimeImmutable();
         }
     }
 
@@ -246,22 +247,22 @@ final class Company implements AggregateRootInterface
         int $annualPaidLeaveDays,
         int $annualRttDays,
     ): void {
-        $this->structureCostCoefficient = $structureCostCoefficient;
+        $this->structureCostCoefficient   = $structureCostCoefficient;
         $this->employerChargesCoefficient = $employerChargesCoefficient;
-        $this->annualPaidLeaveDays = $annualPaidLeaveDays;
-        $this->annualRttDays = $annualRttDays;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->annualPaidLeaveDays        = $annualPaidLeaveDays;
+        $this->annualRttDays              = $annualRttDays;
+        $this->updatedAt                  = new DateTimeImmutable();
     }
 
     public function updateBilling(
-        \DateTimeImmutable $billingStartDate,
+        DateTimeImmutable $billingStartDate,
         int $billingDayOfMonth,
         string $currency,
     ): void {
-        $this->billingStartDate = $billingStartDate;
+        $this->billingStartDate  = $billingStartDate;
         $this->billingDayOfMonth = $billingDayOfMonth;
-        $this->currency = $currency;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->currency          = $currency;
+        $this->updatedAt         = new DateTimeImmutable();
     }
 
     // Calculated values
@@ -282,7 +283,7 @@ final class Company implements AggregateRootInterface
             return false;
         }
 
-        return $this->trialEndsAt > new \DateTimeImmutable();
+        return $this->trialEndsAt > new DateTimeImmutable();
     }
 
     public function isSuspended(): bool
@@ -347,7 +348,7 @@ final class Company implements AggregateRootInterface
         return $this->maxStorageMb;
     }
 
-    public function getBillingStartDate(): ?\DateTimeImmutable
+    public function getBillingStartDate(): ?DateTimeImmutable
     {
         return $this->billingStartDate;
     }
@@ -382,22 +383,22 @@ final class Company implements AggregateRootInterface
         return $this->annualRttDays;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function getSuspendedAt(): ?\DateTimeImmutable
+    public function getSuspendedAt(): ?DateTimeImmutable
     {
         return $this->suspendedAt;
     }
 
-    public function getTrialEndsAt(): ?\DateTimeImmutable
+    public function getTrialEndsAt(): ?DateTimeImmutable
     {
         return $this->trialEndsAt;
     }

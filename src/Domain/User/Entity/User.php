@@ -17,6 +17,7 @@ use App\Domain\User\Exception\InvalidUserStatusTransitionException;
 use App\Domain\User\ValueObject\UserId;
 use App\Domain\User\ValueObject\UserRole;
 use App\Domain\User\ValueObject\UserStatus;
+use DateTimeImmutable;
 
 /**
  * User aggregate root - represents a user within a company (multi-tenant).
@@ -43,10 +44,10 @@ final class User implements AggregateRootInterface
     private string $timezone;
 
     // Timestamps
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
-    private ?\DateTimeImmutable $lastLoginAt;
-    private ?\DateTimeImmutable $passwordChangedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
+    private ?DateTimeImmutable $lastLoginAt;
+    private ?DateTimeImmutable $passwordChangedAt;
 
     private function __construct(
         UserId $id,
@@ -57,28 +58,28 @@ final class User implements AggregateRootInterface
         string $hashedPassword,
         UserRole $role,
     ) {
-        $this->id = $id;
-        $this->companyId = $companyId;
-        $this->email = $email;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
+        $this->id             = $id;
+        $this->companyId      = $companyId;
+        $this->email          = $email;
+        $this->firstName      = $firstName;
+        $this->lastName       = $lastName;
         $this->hashedPassword = $hashedPassword;
-        $this->role = $role;
-        $this->status = UserStatus::PENDING;
+        $this->role           = $role;
+        $this->status         = UserStatus::PENDING;
 
         // 2FA disabled by default
         $this->twoFactorEnabled = false;
-        $this->twoFactorSecret = null;
+        $this->twoFactorSecret  = null;
 
         // Default preferences
-        $this->locale = 'fr';
+        $this->locale   = 'fr';
         $this->timezone = 'Europe/Paris';
 
         // Timestamps
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = null;
-        $this->lastLoginAt = null;
-        $this->passwordChangedAt = new \DateTimeImmutable();
+        $this->createdAt         = new DateTimeImmutable();
+        $this->updatedAt         = null;
+        $this->lastLoginAt       = null;
+        $this->passwordChangedAt = new DateTimeImmutable();
     }
 
     public static function create(
@@ -93,7 +94,7 @@ final class User implements AggregateRootInterface
         $user = new self($id, $companyId, $email, $firstName, $lastName, $hashedPassword, $role);
 
         $user->recordEvent(
-            UserCreatedEvent::create($id, $companyId, $email, $role)
+            UserCreatedEvent::create($id, $companyId, $email, $role),
         );
 
         return $user;
@@ -111,12 +112,12 @@ final class User implements AggregateRootInterface
             throw InvalidUserStatusTransitionException::create($this->status, $newStatus);
         }
 
-        $previousStatus = $this->status;
-        $this->status = $newStatus;
-        $this->updatedAt = new \DateTimeImmutable();
+        $previousStatus  = $this->status;
+        $this->status    = $newStatus;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(
-            UserStatusChangedEvent::create($this->id, $previousStatus, $newStatus)
+            UserStatusChangedEvent::create($this->id, $previousStatus, $newStatus),
         );
     }
 
@@ -143,12 +144,12 @@ final class User implements AggregateRootInterface
             throw InvalidUserRoleChangeException::sameRole($newRole);
         }
 
-        $previousRole = $this->role;
-        $this->role = $newRole;
-        $this->updatedAt = new \DateTimeImmutable();
+        $previousRole    = $this->role;
+        $this->role      = $newRole;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(
-            UserRoleChangedEvent::create($this->id, $previousRole, $newRole)
+            UserRoleChangedEvent::create($this->id, $previousRole, $newRole),
         );
     }
 
@@ -175,8 +176,8 @@ final class User implements AggregateRootInterface
     public function enable2FA(string $secret): void
     {
         $this->twoFactorEnabled = true;
-        $this->twoFactorSecret = $secret;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->twoFactorSecret  = $secret;
+        $this->updatedAt        = new DateTimeImmutable();
 
         $this->recordEvent(User2FAEnabledEvent::create($this->id));
     }
@@ -184,8 +185,8 @@ final class User implements AggregateRootInterface
     public function disable2FA(): void
     {
         $this->twoFactorEnabled = false;
-        $this->twoFactorSecret = null;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->twoFactorSecret  = null;
+        $this->updatedAt        = new DateTimeImmutable();
     }
 
     // Profile management
@@ -193,33 +194,33 @@ final class User implements AggregateRootInterface
     public function updateProfile(string $firstName, string $lastName): void
     {
         $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->lastName  = $lastName;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updateEmail(Email $newEmail): void
     {
-        $this->email = $newEmail;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->email     = $newEmail;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updatePassword(string $newHashedPassword): void
     {
-        $this->hashedPassword = $newHashedPassword;
-        $this->passwordChangedAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->hashedPassword    = $newHashedPassword;
+        $this->passwordChangedAt = new DateTimeImmutable();
+        $this->updatedAt         = new DateTimeImmutable();
     }
 
     public function updatePreferences(string $locale, string $timezone): void
     {
-        $this->locale = $locale;
-        $this->timezone = $timezone;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->locale    = $locale;
+        $this->timezone  = $timezone;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function recordLogin(): void
     {
-        $this->lastLoginAt = new \DateTimeImmutable();
+        $this->lastLoginAt = new DateTimeImmutable();
     }
 
     // Calculated values
@@ -334,22 +335,22 @@ final class User implements AggregateRootInterface
         return $this->timezone;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function getLastLoginAt(): ?\DateTimeImmutable
+    public function getLastLoginAt(): ?DateTimeImmutable
     {
         return $this->lastLoginAt;
     }
 
-    public function getPasswordChangedAt(): ?\DateTimeImmutable
+    public function getPasswordChangedAt(): ?DateTimeImmutable
     {
         return $this->passwordChangedAt;
     }

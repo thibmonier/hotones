@@ -15,14 +15,14 @@ final class ContributorNotFoundException extends DomainException
     public static function withId(ContributorId $contributorId): self
     {
         return new self(
-            sprintf('Contributor with ID "%s" was not found.', $contributorId->getValue())
+            sprintf('Contributor with ID "%s" was not found.', $contributorId->getValue()),
         );
     }
 
     public static function withEmail(string $email): self
     {
         return new self(
-            sprintf('Contributor with email "%s" was not found.', $email)
+            sprintf('Contributor with email "%s" was not found.', $email),
         );
     }
 }

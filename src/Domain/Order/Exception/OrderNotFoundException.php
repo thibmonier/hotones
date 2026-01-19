@@ -12,7 +12,7 @@ final class OrderNotFoundException extends DomainException
     public static function withId(OrderId $id): self
     {
         return new self(
-            sprintf('Order with ID "%s" was not found', $id->getValue())
+            sprintf('Order with ID "%s" was not found', $id->getValue()),
         );
     }
 }

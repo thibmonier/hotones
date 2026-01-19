@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Domain\Timesheet\ValueObject;
 
+use InvalidArgumentException;
+
 /**
  * Hours value object representing time duration.
  */
 final readonly class Hours
 {
     private const float MAX_HOURS_PER_DAY = 24.0;
-    private const float MIN_HOURS = 0.0;
+    private const float MIN_HOURS         = 0.0;
 
     private function __construct(
         private float $value,
     ) {
         if ($value < self::MIN_HOURS) {
-            throw new \InvalidArgumentException('Hours cannot be negative.');
+            throw new InvalidArgumentException('Hours cannot be negative.');
         }
 
         if ($value > self::MAX_HOURS_PER_DAY) {
-            throw new \InvalidArgumentException(
-                sprintf('Hours cannot exceed %s per entry.', self::MAX_HOURS_PER_DAY)
-            );
+            throw new InvalidArgumentException(sprintf('Hours cannot exceed %s per entry.', self::MAX_HOURS_PER_DAY));
         }
     }
 
@@ -34,9 +34,7 @@ final readonly class Hours
     public static function fromString(string $value): self
     {
         if (!is_numeric($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid hours format: %s', $value)
-            );
+            throw new InvalidArgumentException(sprintf('Invalid hours format: %s', $value));
         }
 
         return new self((float) $value);

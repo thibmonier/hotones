@@ -21,6 +21,8 @@ use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Money;
+use DateTimeImmutable;
+use InvalidArgumentException;
 
 /**
  * Invoice aggregate root.
@@ -43,11 +45,11 @@ final class Invoice implements AggregateRootInterface
     private Money $amountTtc;
     private ?string $notes;
     private ?string $paymentTerms;
-    private ?\DateTimeImmutable $issuedAt;
-    private ?\DateTimeImmutable $dueDate;
-    private ?\DateTimeImmutable $paidAt;
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private ?DateTimeImmutable $issuedAt;
+    private ?DateTimeImmutable $dueDate;
+    private ?DateTimeImmutable $paidAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     /** @var array<InvoiceLine> */
     private array $lines = [];
@@ -60,23 +62,23 @@ final class Invoice implements AggregateRootInterface
         ?OrderId $orderId,
         ?ProjectId $projectId,
     ) {
-        $this->id = $id;
-        $this->number = $number;
-        $this->companyId = $companyId;
-        $this->clientId = $clientId;
-        $this->orderId = $orderId;
-        $this->projectId = $projectId;
-        $this->status = InvoiceStatus::DRAFT;
-        $this->amountHt = Money::zero();
-        $this->amountTva = Money::zero();
-        $this->amountTtc = Money::zero();
-        $this->notes = null;
+        $this->id           = $id;
+        $this->number       = $number;
+        $this->companyId    = $companyId;
+        $this->clientId     = $clientId;
+        $this->orderId      = $orderId;
+        $this->projectId    = $projectId;
+        $this->status       = InvoiceStatus::DRAFT;
+        $this->amountHt     = Money::zero();
+        $this->amountTva    = Money::zero();
+        $this->amountTtc    = Money::zero();
+        $this->notes        = null;
         $this->paymentTerms = null;
-        $this->issuedAt = null;
-        $this->dueDate = null;
-        $this->paidAt = null;
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = null;
+        $this->issuedAt     = null;
+        $this->dueDate      = null;
+        $this->paidAt       = null;
+        $this->createdAt    = new DateTimeImmutable();
+        $this->updatedAt    = null;
     }
 
     public static function create(
@@ -90,7 +92,7 @@ final class Invoice implements AggregateRootInterface
         $invoice = new self($id, $number, $companyId, $clientId, $orderId, $projectId);
 
         $invoice->recordEvent(
-            InvoiceCreatedEvent::create($id, $number, $companyId, $clientId)
+            InvoiceCreatedEvent::create($id, $number, $companyId, $clientId),
         );
 
         return $invoice;
@@ -108,11 +110,11 @@ final class Invoice implements AggregateRootInterface
         $this->ensureEditable();
 
         $position = count($this->lines) + 1;
-        $line = InvoiceLine::create($lineId, $description, $quantity, $unitPriceHt, $taxRate, $position);
+        $line     = InvoiceLine::create($lineId, $description, $quantity, $unitPriceHt, $taxRate, $position);
 
         $this->lines[] = $line;
         $this->recalculateTotals();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updateLine(
@@ -128,7 +130,7 @@ final class Invoice implements AggregateRootInterface
         $line->update($description, $quantity, $unitPriceHt, $taxRate);
 
         $this->recalculateTotals();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function removeLine(InvoiceLineId $lineId): void
@@ -141,12 +143,12 @@ final class Invoice implements AggregateRootInterface
 
         $this->reorderLines();
         $this->recalculateTotals();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Status transitions
 
-    public function issue(\DateTimeImmutable $issuedAt, \DateTimeImmutable $dueDate): void
+    public function issue(DateTimeImmutable $issuedAt, DateTimeImmutable $dueDate): void
     {
         if (!$this->status->canTransitionTo(InvoiceStatus::SENT)) {
             throw InvalidInvoiceException::invalidStatusTransition($this->status, InvoiceStatus::SENT);
@@ -160,15 +162,15 @@ final class Invoice implements AggregateRootInterface
             throw InvalidInvoiceException::dueDateBeforeIssueDate();
         }
 
-        $this->status = InvoiceStatus::SENT;
-        $this->issuedAt = $issuedAt;
-        $this->dueDate = $dueDate;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->status    = InvoiceStatus::SENT;
+        $this->issuedAt  = $issuedAt;
+        $this->dueDate   = $dueDate;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(InvoiceIssuedEvent::create($this->id, $issuedAt, $dueDate));
     }
 
-    public function markAsPaid(\DateTimeImmutable $paidAt, Money $amountPaid): void
+    public function markAsPaid(DateTimeImmutable $paidAt, Money $amountPaid): void
     {
         if (!$this->status->canTransitionTo(InvoiceStatus::PAID)) {
             throw InvalidInvoiceException::invalidStatusTransition($this->status, InvoiceStatus::PAID);
@@ -178,9 +180,9 @@ final class Invoice implements AggregateRootInterface
             throw InvalidInvoiceException::invalidPaymentAmount();
         }
 
-        $this->status = InvoiceStatus::PAID;
-        $this->paidAt = $paidAt;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->status    = InvoiceStatus::PAID;
+        $this->paidAt    = $paidAt;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(InvoicePaidEvent::create($this->id, $amountPaid, $paidAt));
     }
@@ -191,8 +193,8 @@ final class Invoice implements AggregateRootInterface
             throw InvalidInvoiceException::invalidStatusTransition($this->status, InvoiceStatus::OVERDUE);
         }
 
-        $this->status = InvoiceStatus::OVERDUE;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->status    = InvoiceStatus::OVERDUE;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function cancel(string $reason): void
@@ -205,8 +207,8 @@ final class Invoice implements AggregateRootInterface
             throw InvalidInvoiceException::invalidStatusTransition($this->status, InvoiceStatus::CANCELLED);
         }
 
-        $this->status = InvoiceStatus::CANCELLED;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->status    = InvoiceStatus::CANCELLED;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(InvoiceCancelledEvent::create($this->id, $reason));
     }
@@ -216,15 +218,15 @@ final class Invoice implements AggregateRootInterface
     public function setNotes(?string $notes): void
     {
         $this->ensureEditable();
-        $this->notes = $notes;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->notes     = $notes;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function setPaymentTerms(?string $paymentTerms): void
     {
         $this->ensureEditable();
         $this->paymentTerms = $paymentTerms;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt    = new DateTimeImmutable();
     }
 
     // Validation helpers
@@ -244,9 +246,7 @@ final class Invoice implements AggregateRootInterface
             }
         }
 
-        throw new \InvalidArgumentException(
-            sprintf('Invoice line with ID %s not found', $lineId->getValue())
-        );
+        throw new InvalidArgumentException(sprintf('Invoice line with ID %s not found', $lineId->getValue()));
     }
 
     private function findLineIndex(InvoiceLineId $lineId): int
@@ -257,22 +257,20 @@ final class Invoice implements AggregateRootInterface
             }
         }
 
-        throw new \InvalidArgumentException(
-            sprintf('Invoice line with ID %s not found', $lineId->getValue())
-        );
+        throw new InvalidArgumentException(sprintf('Invoice line with ID %s not found', $lineId->getValue()));
     }
 
     private function recalculateTotals(): void
     {
-        $totalHt = Money::zero();
+        $totalHt  = Money::zero();
         $totalTva = Money::zero();
 
         foreach ($this->lines as $line) {
-            $totalHt = $totalHt->add($line->getTotalHt());
+            $totalHt  = $totalHt->add($line->getTotalHt());
             $totalTva = $totalTva->add($line->getTaxAmount());
         }
 
-        $this->amountHt = $totalHt;
+        $this->amountHt  = $totalHt;
         $this->amountTva = $totalTva;
         $this->amountTtc = $totalHt->add($totalTva);
     }
@@ -282,7 +280,7 @@ final class Invoice implements AggregateRootInterface
         $position = 1;
         foreach ($this->lines as $line) {
             $line->updatePosition($position);
-            $position++;
+            ++$position;
         }
     }
 
@@ -298,7 +296,7 @@ final class Invoice implements AggregateRootInterface
             return false;
         }
 
-        return $this->dueDate < new \DateTimeImmutable('today');
+        return $this->dueDate < new DateTimeImmutable('today');
     }
 
     public function getDaysUntilDue(): ?int
@@ -307,7 +305,7 @@ final class Invoice implements AggregateRootInterface
             return null;
         }
 
-        $now = new \DateTimeImmutable('today');
+        $now  = new DateTimeImmutable('today');
         $diff = $now->diff($this->dueDate);
 
         return $diff->invert ? -$diff->days : $diff->days;
@@ -375,27 +373,27 @@ final class Invoice implements AggregateRootInterface
         return $this->paymentTerms;
     }
 
-    public function getIssuedAt(): ?\DateTimeImmutable
+    public function getIssuedAt(): ?DateTimeImmutable
     {
         return $this->issuedAt;
     }
 
-    public function getDueDate(): ?\DateTimeImmutable
+    public function getDueDate(): ?DateTimeImmutable
     {
         return $this->dueDate;
     }
 
-    public function getPaidAt(): ?\DateTimeImmutable
+    public function getPaidAt(): ?DateTimeImmutable
     {
         return $this->paidAt;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

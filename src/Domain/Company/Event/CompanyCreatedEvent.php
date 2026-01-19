@@ -8,6 +8,7 @@ use App\Domain\Company\ValueObject\CompanyId;
 use App\Domain\Company\ValueObject\CompanySlug;
 use App\Domain\Company\ValueObject\SubscriptionTier;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 final readonly class CompanyCreatedEvent implements DomainEventInterface
 {
@@ -16,7 +17,7 @@ final readonly class CompanyCreatedEvent implements DomainEventInterface
         private string $name,
         private CompanySlug $slug,
         private SubscriptionTier $subscriptionTier,
-        private \DateTimeImmutable $occurredOn,
+        private DateTimeImmutable $occurredOn,
     ) {
     }
 
@@ -26,7 +27,7 @@ final readonly class CompanyCreatedEvent implements DomainEventInterface
         CompanySlug $slug,
         SubscriptionTier $subscriptionTier,
     ): self {
-        return new self($companyId, $name, $slug, $subscriptionTier, new \DateTimeImmutable());
+        return new self($companyId, $name, $slug, $subscriptionTier, new DateTimeImmutable());
     }
 
     public function getCompanyId(): CompanyId
@@ -49,7 +50,7 @@ final readonly class CompanyCreatedEvent implements DomainEventInterface
         return $this->subscriptionTier;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

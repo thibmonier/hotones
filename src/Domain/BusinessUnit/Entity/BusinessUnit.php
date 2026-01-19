@@ -13,6 +13,8 @@ use App\Domain\Company\ValueObject\CompanyId;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\User\ValueObject\UserId;
+use DateTimeImmutable;
+use InvalidArgumentException;
 
 /**
  * BusinessUnit aggregate root - represents a hierarchical sub-organization within a Company.
@@ -45,30 +47,30 @@ final class BusinessUnit implements AggregateRootInterface
     private ?string $costCenter;
 
     // Timestamps
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
         BusinessUnitId $id,
         CompanyId $companyId,
         string $name,
     ) {
-        $this->id = $id;
+        $this->id        = $id;
         $this->companyId = $companyId;
-        $this->name = $name;
+        $this->name      = $name;
 
         // Default values
-        $this->description = null;
-        $this->active = true;
-        $this->parentId = null;
-        $this->managerId = null;
+        $this->description         = null;
+        $this->active              = true;
+        $this->parentId            = null;
+        $this->managerId           = null;
         $this->annualRevenueTarget = null;
-        $this->annualMarginTarget = null;
-        $this->headcountTarget = null;
-        $this->costCenter = null;
+        $this->annualMarginTarget  = null;
+        $this->headcountTarget     = null;
+        $this->costCenter          = null;
 
         // Timestamps
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;
     }
 
@@ -78,11 +80,11 @@ final class BusinessUnit implements AggregateRootInterface
         string $name,
         ?BusinessUnitId $parentId = null,
     ): self {
-        $businessUnit = new self($id, $companyId, $name);
+        $businessUnit           = new self($id, $companyId, $name);
         $businessUnit->parentId = $parentId;
 
         $businessUnit->recordEvent(
-            BusinessUnitCreatedEvent::create($id, $companyId, $name, $parentId)
+            BusinessUnitCreatedEvent::create($id, $companyId, $name, $parentId),
         );
 
         return $businessUnit;
@@ -94,9 +96,9 @@ final class BusinessUnit implements AggregateRootInterface
         string $name,
         ?string $description = null,
     ): void {
-        $this->name = $name;
+        $this->name        = $name;
         $this->description = $description;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt   = new DateTimeImmutable();
     }
 
     // Hierarchy management
@@ -119,14 +121,14 @@ final class BusinessUnit implements AggregateRootInterface
             throw InvalidBusinessUnitHierarchyException::parentFromDifferentCompany();
         }
 
-        $this->parentId = $parentId;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->parentId  = $parentId;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function removeParent(): void
     {
-        $this->parentId = null;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->parentId  = null;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Manager management
@@ -134,13 +136,13 @@ final class BusinessUnit implements AggregateRootInterface
     public function assignManager(UserId $managerId): void
     {
         $this->managerId = $managerId;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function removeManager(): void
     {
         $this->managerId = null;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Business objectives management
@@ -151,21 +153,21 @@ final class BusinessUnit implements AggregateRootInterface
         ?int $headcountTarget = null,
     ): void {
         if ($annualRevenueTarget !== null && $annualRevenueTarget < 0) {
-            throw new \InvalidArgumentException('Annual revenue target cannot be negative.');
+            throw new InvalidArgumentException('Annual revenue target cannot be negative.');
         }
 
         if ($annualMarginTarget !== null && ($annualMarginTarget < 0 || $annualMarginTarget > 100)) {
-            throw new \InvalidArgumentException('Annual margin target must be between 0 and 100.');
+            throw new InvalidArgumentException('Annual margin target must be between 0 and 100.');
         }
 
         if ($headcountTarget !== null && $headcountTarget < 0) {
-            throw new \InvalidArgumentException('Headcount target cannot be negative.');
+            throw new InvalidArgumentException('Headcount target cannot be negative.');
         }
 
         $this->annualRevenueTarget = $annualRevenueTarget;
-        $this->annualMarginTarget = $annualMarginTarget;
-        $this->headcountTarget = $headcountTarget;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->annualMarginTarget  = $annualMarginTarget;
+        $this->headcountTarget     = $headcountTarget;
+        $this->updatedAt           = new DateTimeImmutable();
     }
 
     // Accounting integration
@@ -173,7 +175,7 @@ final class BusinessUnit implements AggregateRootInterface
     public function updateCostCenter(?string $costCenter): void
     {
         $this->costCenter = $costCenter;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt  = new DateTimeImmutable();
     }
 
     // Activation status management
@@ -184,8 +186,8 @@ final class BusinessUnit implements AggregateRootInterface
             return;
         }
 
-        $this->active = true;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->active    = true;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(BusinessUnitActivatedEvent::create($this->id));
     }
@@ -196,8 +198,8 @@ final class BusinessUnit implements AggregateRootInterface
             return;
         }
 
-        $this->active = false;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->active    = false;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(BusinessUnitDeactivatedEvent::create($this->id));
     }
@@ -217,8 +219,8 @@ final class BusinessUnit implements AggregateRootInterface
     public function hasBusinessObjectives(): bool
     {
         return $this->annualRevenueTarget !== null
-            || $this->annualMarginTarget !== null
-            || $this->headcountTarget !== null;
+            || $this->annualMarginTarget  !== null
+            || $this->headcountTarget     !== null;
     }
 
     // Getters
@@ -278,12 +280,12 @@ final class BusinessUnit implements AggregateRootInterface
         return $this->costCenter;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

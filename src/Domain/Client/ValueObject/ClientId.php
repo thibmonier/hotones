@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Client\ValueObject;
 
+use InvalidArgumentException;
 use Symfony\Component\Uid\Uuid;
 
 final readonly class ClientId
@@ -12,9 +13,7 @@ final readonly class ClientId
         private string $value,
     ) {
         if (!Uuid::isValid($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid UUID format for ClientId: %s', $value)
-            );
+            throw new InvalidArgumentException(sprintf('Invalid UUID format for ClientId: %s', $value));
         }
     }
 

@@ -14,6 +14,7 @@ use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Email;
 use App\Domain\User\ValueObject\UserId;
+use DateTimeImmutable;
 
 /**
  * Contributor aggregate root - represents a worker/employee within a company (multi-tenant).
@@ -29,7 +30,7 @@ final class Contributor implements AggregateRootInterface
     private Email $email;
     private ?string $phonePersonal;
     private ?string $phoneProfessional;
-    private ?\DateTimeImmutable $birthDate;
+    private ?DateTimeImmutable $birthDate;
     private Gender $gender;
     private ?string $address;
     private ?string $avatarFilename;
@@ -45,8 +46,8 @@ final class Contributor implements AggregateRootInterface
     private ?ContributorId $managerId;
 
     // Timestamps
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
         ContributorId $id,
@@ -55,28 +56,28 @@ final class Contributor implements AggregateRootInterface
         string $lastName,
         Email $email,
     ) {
-        $this->id = $id;
+        $this->id        = $id;
         $this->companyId = $companyId;
         $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->email = $email;
+        $this->lastName  = $lastName;
+        $this->email     = $email;
 
         // Default values
-        $this->phonePersonal = null;
+        $this->phonePersonal     = null;
         $this->phoneProfessional = null;
-        $this->birthDate = null;
-        $this->gender = Gender::NOT_SPECIFIED;
-        $this->address = null;
-        $this->avatarFilename = null;
-        $this->notes = null;
-        $this->cjm = null;
-        $this->tjm = null;
-        $this->active = true;
-        $this->userId = null;
-        $this->managerId = null;
+        $this->birthDate         = null;
+        $this->gender            = Gender::NOT_SPECIFIED;
+        $this->address           = null;
+        $this->avatarFilename    = null;
+        $this->notes             = null;
+        $this->cjm               = null;
+        $this->tjm               = null;
+        $this->active            = true;
+        $this->userId            = null;
+        $this->managerId         = null;
 
         // Timestamps
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;
     }
 
@@ -90,7 +91,7 @@ final class Contributor implements AggregateRootInterface
         $contributor = new self($id, $companyId, $firstName, $lastName, $email);
 
         $contributor->recordEvent(
-            ContributorCreatedEvent::create($id, $companyId, $email, $firstName, $lastName)
+            ContributorCreatedEvent::create($id, $companyId, $email, $firstName, $lastName),
         );
 
         return $contributor;
@@ -103,63 +104,63 @@ final class Contributor implements AggregateRootInterface
         string $lastName,
         ?string $phonePersonal = null,
         ?string $phoneProfessional = null,
-        ?\DateTimeImmutable $birthDate = null,
+        ?DateTimeImmutable $birthDate = null,
         ?Gender $gender = null,
         ?string $address = null,
     ): void {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->phonePersonal = $phonePersonal;
+        $this->firstName         = $firstName;
+        $this->lastName          = $lastName;
+        $this->phonePersonal     = $phonePersonal;
         $this->phoneProfessional = $phoneProfessional;
-        $this->birthDate = $birthDate;
-        $this->gender = $gender ?? $this->gender;
-        $this->address = $address;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->birthDate         = $birthDate;
+        $this->gender            = $gender ?? $this->gender;
+        $this->address           = $address;
+        $this->updatedAt         = new DateTimeImmutable();
     }
 
     public function updateEmail(Email $newEmail): void
     {
-        $this->email = $newEmail;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->email     = $newEmail;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updateAvatar(?string $filename): void
     {
         $this->avatarFilename = $filename;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt      = new DateTimeImmutable();
     }
 
     public function updateNotes(?string $notes): void
     {
-        $this->notes = $notes;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->notes     = $notes;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Work-related management
 
     public function updateRates(?float $cjm, ?float $tjm): void
     {
-        $this->cjm = $cjm;
-        $this->tjm = $tjm;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->cjm       = $cjm;
+        $this->tjm       = $tjm;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function assignManager(?ContributorId $managerId): void
     {
         $this->managerId = $managerId;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function linkUser(UserId $userId): void
     {
-        $this->userId = $userId;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->userId    = $userId;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function unlinkUser(): void
     {
-        $this->userId = null;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->userId    = null;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Activation status management
@@ -170,8 +171,8 @@ final class Contributor implements AggregateRootInterface
             return;
         }
 
-        $this->active = true;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->active    = true;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(ContributorActivatedEvent::create($this->id));
     }
@@ -182,8 +183,8 @@ final class Contributor implements AggregateRootInterface
             return;
         }
 
-        $this->active = false;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->active    = false;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(ContributorDeactivatedEvent::create($this->id));
     }
@@ -201,7 +202,7 @@ final class Contributor implements AggregateRootInterface
             return null;
         }
 
-        return $this->birthDate->diff(new \DateTimeImmutable())->y;
+        return $this->birthDate->diff(new DateTimeImmutable())->y;
     }
 
     public function hasLinkedUser(): bool
@@ -251,7 +252,7 @@ final class Contributor implements AggregateRootInterface
         return $this->phoneProfessional;
     }
 
-    public function getBirthDate(): ?\DateTimeImmutable
+    public function getBirthDate(): ?DateTimeImmutable
     {
         return $this->birthDate;
     }
@@ -301,12 +302,12 @@ final class Contributor implements AggregateRootInterface
         return $this->managerId;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

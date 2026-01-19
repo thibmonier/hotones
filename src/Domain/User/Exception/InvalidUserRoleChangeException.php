@@ -15,7 +15,7 @@ final class InvalidUserRoleChangeException extends DomainException
     public static function sameRole(UserRole $role): self
     {
         return new self(
-            sprintf('User already has the role "%s".', $role->value)
+            sprintf('User already has the role "%s".', $role->value),
         );
     }
 

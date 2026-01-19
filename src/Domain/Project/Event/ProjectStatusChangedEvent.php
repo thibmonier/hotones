@@ -7,6 +7,7 @@ namespace App\Domain\Project\Event;
 use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Project\ValueObject\ProjectStatus;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 final readonly class ProjectStatusChangedEvent implements DomainEventInterface
 {
@@ -14,7 +15,7 @@ final readonly class ProjectStatusChangedEvent implements DomainEventInterface
         private ProjectId $projectId,
         private ProjectStatus $previousStatus,
         private ProjectStatus $newStatus,
-        private \DateTimeImmutable $occurredOn,
+        private DateTimeImmutable $occurredOn,
     ) {
     }
 
@@ -23,7 +24,7 @@ final readonly class ProjectStatusChangedEvent implements DomainEventInterface
         ProjectStatus $previousStatus,
         ProjectStatus $newStatus,
     ): self {
-        return new self($projectId, $previousStatus, $newStatus, new \DateTimeImmutable());
+        return new self($projectId, $previousStatus, $newStatus, new DateTimeImmutable());
     }
 
     public function getProjectId(): ProjectId
@@ -41,7 +42,7 @@ final readonly class ProjectStatusChangedEvent implements DomainEventInterface
         return $this->newStatus;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

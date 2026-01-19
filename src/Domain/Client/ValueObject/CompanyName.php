@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Client\ValueObject;
 
+use InvalidArgumentException;
+
 final readonly class CompanyName
 {
     private const int MIN_LENGTH = 2;
@@ -15,15 +17,11 @@ final readonly class CompanyName
         $trimmed = trim($value);
 
         if (strlen($trimmed) < self::MIN_LENGTH) {
-            throw new \InvalidArgumentException(
-                sprintf('Company name must be at least %d characters', self::MIN_LENGTH)
-            );
+            throw new InvalidArgumentException(sprintf('Company name must be at least %d characters', self::MIN_LENGTH));
         }
 
         if (strlen($trimmed) > self::MAX_LENGTH) {
-            throw new \InvalidArgumentException(
-                sprintf('Company name cannot exceed %d characters', self::MAX_LENGTH)
-            );
+            throw new InvalidArgumentException(sprintf('Company name cannot exceed %d characters', self::MAX_LENGTH));
         }
     }
 

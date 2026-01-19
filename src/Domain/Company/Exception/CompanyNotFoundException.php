@@ -13,14 +13,14 @@ final class CompanyNotFoundException extends DomainException
     public static function withId(CompanyId $id): self
     {
         return new self(
-            sprintf('Company with ID "%s" not found', $id->getValue())
+            sprintf('Company with ID "%s" not found', $id->getValue()),
         );
     }
 
     public static function withSlug(CompanySlug $slug): self
     {
         return new self(
-            sprintf('Company with slug "%s" not found', $slug->getValue())
+            sprintf('Company with slug "%s" not found', $slug->getValue()),
         );
     }
 }

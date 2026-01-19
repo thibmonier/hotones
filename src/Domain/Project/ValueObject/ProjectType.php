@@ -10,7 +10,7 @@ namespace App\Domain\Project\ValueObject;
 enum ProjectType: string
 {
     case FORFAIT = 'forfait';
-    case REGIE = 'regie';
+    case REGIE   = 'regie';
 
     public function isFixedPrice(): bool
     {
@@ -26,7 +26,7 @@ enum ProjectType: string
     {
         return match ($this) {
             self::FORFAIT => 'Forfait',
-            self::REGIE => 'Régie',
+            self::REGIE   => 'Régie',
         };
     }
 }

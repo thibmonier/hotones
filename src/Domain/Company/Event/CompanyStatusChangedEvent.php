@@ -7,6 +7,7 @@ namespace App\Domain\Company\Event;
 use App\Domain\Company\ValueObject\CompanyId;
 use App\Domain\Company\ValueObject\CompanyStatus;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 final readonly class CompanyStatusChangedEvent implements DomainEventInterface
 {
@@ -14,7 +15,7 @@ final readonly class CompanyStatusChangedEvent implements DomainEventInterface
         private CompanyId $companyId,
         private CompanyStatus $previousStatus,
         private CompanyStatus $newStatus,
-        private \DateTimeImmutable $occurredOn,
+        private DateTimeImmutable $occurredOn,
     ) {
     }
 
@@ -23,7 +24,7 @@ final readonly class CompanyStatusChangedEvent implements DomainEventInterface
         CompanyStatus $previousStatus,
         CompanyStatus $newStatus,
     ): self {
-        return new self($companyId, $previousStatus, $newStatus, new \DateTimeImmutable());
+        return new self($companyId, $previousStatus, $newStatus, new DateTimeImmutable());
     }
 
     public function getCompanyId(): CompanyId
@@ -41,7 +42,7 @@ final readonly class CompanyStatusChangedEvent implements DomainEventInterface
         return $this->newStatus;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

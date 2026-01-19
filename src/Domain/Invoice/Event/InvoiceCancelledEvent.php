@@ -6,19 +6,20 @@ namespace App\Domain\Invoice\Event;
 
 use App\Domain\Invoice\ValueObject\InvoiceId;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when an invoice is cancelled.
  */
 final readonly class InvoiceCancelledEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private InvoiceId $invoiceId,
         private string $reason,
     ) {
-        $this->occurredOn = new \DateTimeImmutable();
+        $this->occurredOn = new DateTimeImmutable();
     }
 
     public static function create(
@@ -38,7 +39,7 @@ final readonly class InvoiceCancelledEvent implements DomainEventInterface
         return $this->reason;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

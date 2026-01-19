@@ -7,21 +7,22 @@ namespace App\Domain\User\Event;
 use App\Domain\Shared\Interface\DomainEventInterface;
 use App\Domain\User\ValueObject\UserId;
 use App\Domain\User\ValueObject\UserRole;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when a user's role is changed.
  */
 final readonly class UserRoleChangedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private UserId $userId,
         private UserRole $previousRole,
         private UserRole $newRole,
-        ?\DateTimeImmutable $occurredOn = null,
+        ?DateTimeImmutable $occurredOn = null,
     ) {
-        $this->occurredOn = $occurredOn ?? new \DateTimeImmutable();
+        $this->occurredOn = $occurredOn ?? new DateTimeImmutable();
     }
 
     public static function create(
@@ -57,12 +58,12 @@ final readonly class UserRoleChangedEvent implements DomainEventInterface
         return $this->previousRole->isHigherThan($this->newRole);
     }
 
-    public function occurredOn(): \DateTimeImmutable
+    public function occurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

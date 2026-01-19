@@ -15,7 +15,7 @@ final class TimesheetNotFoundException extends DomainException
     public static function withId(TimesheetId $timesheetId): self
     {
         return new self(
-            sprintf('Timesheet entry with ID "%s" was not found.', $timesheetId->getValue())
+            sprintf('Timesheet entry with ID "%s" was not found.', $timesheetId->getValue()),
         );
     }
 }

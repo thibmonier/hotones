@@ -10,6 +10,7 @@ use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Timesheet\Entity\Timesheet;
 use App\Domain\Timesheet\Exception\TimesheetNotFoundException;
 use App\Domain\Timesheet\ValueObject\TimesheetId;
+use DateTimeImmutable;
 
 /**
  * Repository interface for Timesheet aggregate root.
@@ -49,8 +50,8 @@ interface TimesheetRepositoryInterface
      */
     public function findByContributorAndDateRange(
         ContributorId $contributorId,
-        \DateTimeImmutable $startDate,
-        \DateTimeImmutable $endDate,
+        DateTimeImmutable $startDate,
+        DateTimeImmutable $endDate,
     ): array;
 
     /**
@@ -67,8 +68,8 @@ interface TimesheetRepositoryInterface
      */
     public function findByProjectAndDateRange(
         ProjectId $projectId,
-        \DateTimeImmutable $startDate,
-        \DateTimeImmutable $endDate,
+        DateTimeImmutable $startDate,
+        DateTimeImmutable $endDate,
     ): array;
 
     /**
@@ -76,7 +77,7 @@ interface TimesheetRepositoryInterface
      *
      * @return Timesheet[]
      */
-    public function findByDate(CompanyId $companyId, \DateTimeImmutable $date): array;
+    public function findByDate(CompanyId $companyId, DateTimeImmutable $date): array;
 
     /**
      * Find timesheet entries for a contributor on a specific date.
@@ -85,7 +86,7 @@ interface TimesheetRepositoryInterface
      */
     public function findByContributorAndDate(
         ContributorId $contributorId,
-        \DateTimeImmutable $date,
+        DateTimeImmutable $date,
     ): array;
 
     /**
@@ -94,7 +95,7 @@ interface TimesheetRepositoryInterface
     public function findByContributorProjectAndDate(
         ContributorId $contributorId,
         ProjectId $projectId,
-        \DateTimeImmutable $date,
+        DateTimeImmutable $date,
     ): ?Timesheet;
 
     /**
@@ -102,8 +103,8 @@ interface TimesheetRepositoryInterface
      */
     public function sumHoursByContributorAndDateRange(
         ContributorId $contributorId,
-        \DateTimeImmutable $startDate,
-        \DateTimeImmutable $endDate,
+        DateTimeImmutable $startDate,
+        DateTimeImmutable $endDate,
     ): float;
 
     /**
@@ -111,8 +112,8 @@ interface TimesheetRepositoryInterface
      */
     public function sumHoursByProjectAndDateRange(
         ProjectId $projectId,
-        \DateTimeImmutable $startDate,
-        \DateTimeImmutable $endDate,
+        DateTimeImmutable $startDate,
+        DateTimeImmutable $endDate,
     ): float;
 
     /**

@@ -22,8 +22,8 @@ final class InvalidBusinessUnitHierarchyException extends DomainException
         return new self(
             sprintf(
                 'Cannot set descendant business unit "%s" as parent (would create circular reference).',
-                $descendantId->getValue()
-            )
+                $descendantId->getValue(),
+            ),
         );
     }
 

@@ -9,13 +9,14 @@ use App\Domain\Company\ValueObject\CompanyId;
 use App\Domain\Invoice\ValueObject\InvoiceId;
 use App\Domain\Invoice\ValueObject\InvoiceNumber;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when an invoice is created.
  */
 final readonly class InvoiceCreatedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private InvoiceId $invoiceId,
@@ -23,7 +24,7 @@ final readonly class InvoiceCreatedEvent implements DomainEventInterface
         private CompanyId $companyId,
         private ClientId $clientId,
     ) {
-        $this->occurredOn = new \DateTimeImmutable();
+        $this->occurredOn = new DateTimeImmutable();
     }
 
     public static function create(
@@ -55,7 +56,7 @@ final readonly class InvoiceCreatedEvent implements DomainEventInterface
         return $this->clientId;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

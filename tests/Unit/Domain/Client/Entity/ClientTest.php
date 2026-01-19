@@ -10,6 +10,7 @@ use App\Domain\Client\ValueObject\ClientId;
 use App\Domain\Client\ValueObject\CompanyName;
 use App\Domain\Client\ValueObject\ServiceLevel;
 use App\Domain\Shared\ValueObject\Email;
+use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -29,11 +30,11 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_creates_a_client_with_required_fields(): void
+    public function itCreatesAClientWithRequiredFields(): void
     {
         // Given
-        $id = ClientId::generate();
-        $name = CompanyName::fromString('Acme Corporation');
+        $id           = ClientId::generate();
+        $name         = CompanyName::fromString('Acme Corporation');
         $serviceLevel = ServiceLevel::STANDARD;
 
         // When
@@ -52,15 +53,15 @@ final class ClientTest extends TestCase
         self::assertNull($client->getCountry());
         self::assertNull($client->getVatNumber());
         self::assertNull($client->getNotes());
-        self::assertInstanceOf(\DateTimeImmutable::class, $client->getCreatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $client->getCreatedAt());
         self::assertNull($client->getUpdatedAt());
     }
 
     #[Test]
-    public function it_creates_a_client_with_default_service_level(): void
+    public function itCreatesAClientWithDefaultServiceLevel(): void
     {
         // Given
-        $id = ClientId::generate();
+        $id   = ClientId::generate();
         $name = CompanyName::fromString('Default Level Corp');
 
         // When
@@ -71,10 +72,10 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_creates_a_client_with_premium_service_level(): void
+    public function itCreatesAClientWithPremiumServiceLevel(): void
     {
         // Given
-        $id = ClientId::generate();
+        $id   = ClientId::generate();
         $name = CompanyName::fromString('Premium Corp');
 
         // When
@@ -85,10 +86,10 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_creates_a_client_with_enterprise_service_level(): void
+    public function itCreatesAClientWithEnterpriseServiceLevel(): void
     {
         // Given
-        $id = ClientId::generate();
+        $id   = ClientId::generate();
         $name = CompanyName::fromString('Enterprise Corp');
 
         // When
@@ -103,10 +104,10 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_records_client_created_event_on_creation(): void
+    public function itRecordsClientCreatedEventOnCreation(): void
     {
         // Given
-        $id = ClientId::generate();
+        $id   = ClientId::generate();
         $name = CompanyName::fromString('Event Test Corp');
 
         // When
@@ -121,13 +122,13 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function pull_domain_events_clears_the_events_queue(): void
+    public function pullDomainEventsClearsTheEventsQueue(): void
     {
         // Given
         $client = $this->createClient();
 
         // When
-        $firstPull = $client->pullDomainEvents();
+        $firstPull  = $client->pullDomainEvents();
         $secondPull = $client->pullDomainEvents();
 
         // Then
@@ -140,17 +141,17 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_updates_contact_info_with_all_fields(): void
+    public function itUpdatesContactInfoWithAllFields(): void
     {
         // Given
         $client = $this->createClient();
         $client->pullDomainEvents(); // Clear creation event
-        $email = Email::fromString('contact@acme.com');
-        $phone = '+33 1 23 45 67 89';
-        $address = '123 Main Street';
-        $city = 'Paris';
+        $email      = Email::fromString('contact@acme.com');
+        $phone      = '+33 1 23 45 67 89';
+        $address    = '123 Main Street';
+        $city       = 'Paris';
         $postalCode = '75001';
-        $country = 'France';
+        $country    = 'France';
 
         // When
         $client->updateContactInfo($email, $phone, $address, $city, $postalCode, $country);
@@ -162,15 +163,15 @@ final class ClientTest extends TestCase
         self::assertSame($city, $client->getCity());
         self::assertSame($postalCode, $client->getPostalCode());
         self::assertSame($country, $client->getCountry());
-        self::assertInstanceOf(\DateTimeImmutable::class, $client->getUpdatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $client->getUpdatedAt());
     }
 
     #[Test]
-    public function it_updates_contact_info_with_partial_fields(): void
+    public function itUpdatesContactInfoWithPartialFields(): void
     {
         // Given
         $client = $this->createClient();
-        $email = Email::fromString('partial@test.com');
+        $email  = Email::fromString('partial@test.com');
 
         // When
         $client->updateContactInfo($email);
@@ -185,11 +186,11 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_updates_contact_info_with_null_email(): void
+    public function itUpdatesContactInfoWithNullEmail(): void
     {
         // Given
         $client = $this->createClient();
-        $phone = '+33 6 12 34 56 78';
+        $phone  = '+33 6 12 34 56 78';
 
         // When
         $client->updateContactInfo(null, $phone);
@@ -204,7 +205,7 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_updates_service_level(): void
+    public function itUpdatesServiceLevel(): void
     {
         // Given
         $client = $this->createClient();
@@ -221,7 +222,7 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_update_when_service_level_is_same(): void
+    public function itDoesNotUpdateWhenServiceLevelIsSame(): void
     {
         // Given
         $client = $this->createClient();
@@ -239,13 +240,13 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_upgrades_from_standard_to_enterprise(): void
+    public function itUpgradesFromStandardToEnterprise(): void
     {
         // Given
         $client = Client::create(
             ClientId::generate(),
             CompanyName::fromString('Upgrade Corp'),
-            ServiceLevel::STANDARD
+            ServiceLevel::STANDARD,
         );
 
         // When
@@ -260,7 +261,7 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_renames_the_client(): void
+    public function itRenamesTheClient(): void
     {
         // Given
         $client = $this->createClient();
@@ -272,15 +273,15 @@ final class ClientTest extends TestCase
 
         // Then
         self::assertTrue($newName->equals($client->getName()));
-        self::assertInstanceOf(\DateTimeImmutable::class, $client->getUpdatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $client->getUpdatedAt());
     }
 
     #[Test]
-    public function it_does_not_update_when_name_is_same(): void
+    public function itDoesNotUpdateWhenNameIsSame(): void
     {
         // Given
         $originalName = CompanyName::fromString('Same Name Corp');
-        $client = Client::create(ClientId::generate(), $originalName);
+        $client       = Client::create(ClientId::generate(), $originalName);
         $client->rename(CompanyName::fromString('Different Name'));
         $updatedAtAfterFirstRename = $client->getUpdatedAt();
 
@@ -298,7 +299,7 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_deactivates_an_active_client(): void
+    public function itDeactivatesAnActiveClient(): void
     {
         // Given
         $client = $this->createClient();
@@ -309,11 +310,11 @@ final class ClientTest extends TestCase
 
         // Then
         self::assertFalse($client->isActive());
-        self::assertInstanceOf(\DateTimeImmutable::class, $client->getUpdatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $client->getUpdatedAt());
     }
 
     #[Test]
-    public function it_activates_an_inactive_client(): void
+    public function itActivatesAnInactiveClient(): void
     {
         // Given
         $client = $this->createClient();
@@ -328,7 +329,7 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_update_when_already_active(): void
+    public function itDoesNotUpdateWhenAlreadyActive(): void
     {
         // Given
         $client = $this->createClient();
@@ -347,7 +348,7 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_update_when_already_inactive(): void
+    public function itDoesNotUpdateWhenAlreadyInactive(): void
     {
         // Given
         $client = $this->createClient();
@@ -368,10 +369,10 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_updates_vat_number(): void
+    public function itUpdatesVatNumber(): void
     {
         // Given
-        $client = $this->createClient();
+        $client    = $this->createClient();
         $vatNumber = 'FR12345678901';
 
         // When
@@ -379,11 +380,11 @@ final class ClientTest extends TestCase
 
         // Then
         self::assertSame($vatNumber, $client->getVatNumber());
-        self::assertInstanceOf(\DateTimeImmutable::class, $client->getUpdatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $client->getUpdatedAt());
     }
 
     #[Test]
-    public function it_clears_vat_number_with_null(): void
+    public function itClearsVatNumberWithNull(): void
     {
         // Given
         $client = $this->createClient();
@@ -402,22 +403,22 @@ final class ClientTest extends TestCase
     // ========================================================================
 
     #[Test]
-    public function it_adds_notes(): void
+    public function itAddsNotes(): void
     {
         // Given
         $client = $this->createClient();
-        $notes = 'Important client - handle with care';
+        $notes  = 'Important client - handle with care';
 
         // When
         $client->addNotes($notes);
 
         // Then
         self::assertSame($notes, $client->getNotes());
-        self::assertInstanceOf(\DateTimeImmutable::class, $client->getUpdatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $client->getUpdatedAt());
     }
 
     #[Test]
-    public function it_clears_notes_with_null(): void
+    public function itClearsNotesWithNull(): void
     {
         // Given
         $client = $this->createClient();
@@ -432,7 +433,7 @@ final class ClientTest extends TestCase
     }
 
     #[Test]
-    public function it_replaces_existing_notes(): void
+    public function itReplacesExistingNotes(): void
     {
         // Given
         $client = $this->createClient();
@@ -454,7 +455,7 @@ final class ClientTest extends TestCase
         return Client::create(
             ClientId::generate(),
             CompanyName::fromString('Test Company'),
-            ServiceLevel::STANDARD
+            ServiceLevel::STANDARD,
         );
     }
 }

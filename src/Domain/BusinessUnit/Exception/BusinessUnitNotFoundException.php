@@ -15,14 +15,14 @@ final class BusinessUnitNotFoundException extends DomainException
     public static function withId(BusinessUnitId $businessUnitId): self
     {
         return new self(
-            sprintf('Business unit with ID "%s" was not found.', $businessUnitId->getValue())
+            sprintf('Business unit with ID "%s" was not found.', $businessUnitId->getValue()),
         );
     }
 
     public static function withName(string $name): self
     {
         return new self(
-            sprintf('Business unit with name "%s" was not found.', $name)
+            sprintf('Business unit with name "%s" was not found.', $name),
         );
     }
 }

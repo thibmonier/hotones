@@ -15,8 +15,8 @@ final class InvalidOrderStatusTransitionException extends DomainException
             sprintf(
                 'Cannot transition order status from "%s" to "%s"',
                 $from->value,
-                $to->value
-            )
+                $to->value,
+            ),
         );
     }
 }

@@ -7,6 +7,7 @@ namespace App\Domain\Order\Event;
 use App\Domain\Order\ValueObject\OrderId;
 use App\Domain\Order\ValueObject\OrderStatus;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 final readonly class OrderStatusChangedEvent implements DomainEventInterface
 {
@@ -14,7 +15,7 @@ final readonly class OrderStatusChangedEvent implements DomainEventInterface
         private OrderId $orderId,
         private OrderStatus $previousStatus,
         private OrderStatus $newStatus,
-        private \DateTimeImmutable $occurredOn,
+        private DateTimeImmutable $occurredOn,
     ) {
     }
 
@@ -23,7 +24,7 @@ final readonly class OrderStatusChangedEvent implements DomainEventInterface
         OrderStatus $previousStatus,
         OrderStatus $newStatus,
     ): self {
-        return new self($orderId, $previousStatus, $newStatus, new \DateTimeImmutable());
+        return new self($orderId, $previousStatus, $newStatus, new DateTimeImmutable());
     }
 
     public function getOrderId(): OrderId
@@ -41,7 +42,7 @@ final readonly class OrderStatusChangedEvent implements DomainEventInterface
         return $this->newStatus;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

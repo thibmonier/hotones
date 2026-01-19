@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Timesheet\ValueObject;
 
+use InvalidArgumentException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -15,9 +16,7 @@ final readonly class TimesheetId
         private string $value,
     ) {
         if (!Uuid::isValid($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid TimesheetId format: %s', $value)
-            );
+            throw new InvalidArgumentException(sprintf('Invalid TimesheetId format: %s', $value));
         }
     }
 

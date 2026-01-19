@@ -6,18 +6,19 @@ namespace App\Domain\Timesheet\Event;
 
 use App\Domain\Shared\Interface\DomainEventInterface;
 use App\Domain\Timesheet\ValueObject\TimesheetId;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when a timesheet entry is updated.
  */
 final readonly class TimesheetUpdatedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private TimesheetId $timesheetId,
     ) {
-        $this->occurredOn = new \DateTimeImmutable();
+        $this->occurredOn = new DateTimeImmutable();
     }
 
     public static function create(TimesheetId $timesheetId): self
@@ -30,7 +31,7 @@ final readonly class TimesheetUpdatedEvent implements DomainEventInterface
         return $this->timesheetId;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

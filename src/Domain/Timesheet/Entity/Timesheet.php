@@ -15,6 +15,7 @@ use App\Domain\Timesheet\Event\TimesheetUpdatedEvent;
 use App\Domain\Timesheet\Exception\InvalidTimesheetException;
 use App\Domain\Timesheet\ValueObject\Hours;
 use App\Domain\Timesheet\ValueObject\TimesheetId;
+use DateTimeImmutable;
 
 /**
  * Timesheet aggregate root - represents a time entry logged by a contributor.
@@ -35,36 +36,36 @@ final class Timesheet implements AggregateRootInterface
     private ?string $taskId;
     private ?string $subTaskId;
 
-    private \DateTimeImmutable $date;
+    private DateTimeImmutable $date;
     private Hours $hours;
     private ?string $notes;
 
     // Timestamps
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
         TimesheetId $id,
         CompanyId $companyId,
         ContributorId $contributorId,
         ProjectId $projectId,
-        \DateTimeImmutable $date,
+        DateTimeImmutable $date,
         Hours $hours,
     ) {
-        $this->id = $id;
-        $this->companyId = $companyId;
+        $this->id            = $id;
+        $this->companyId     = $companyId;
         $this->contributorId = $contributorId;
-        $this->projectId = $projectId;
-        $this->date = $date;
-        $this->hours = $hours;
+        $this->projectId     = $projectId;
+        $this->date          = $date;
+        $this->hours         = $hours;
 
         // Default values
-        $this->taskId = null;
+        $this->taskId    = null;
         $this->subTaskId = null;
-        $this->notes = null;
+        $this->notes     = null;
 
         // Timestamps
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;
     }
 
@@ -73,7 +74,7 @@ final class Timesheet implements AggregateRootInterface
         CompanyId $companyId,
         ContributorId $contributorId,
         ProjectId $projectId,
-        \DateTimeImmutable $date,
+        DateTimeImmutable $date,
         Hours $hours,
         ?string $taskId = null,
         ?string $subTaskId = null,
@@ -84,13 +85,13 @@ final class Timesheet implements AggregateRootInterface
             throw InvalidTimesheetException::zeroHours();
         }
 
-        $timesheet = new self($id, $companyId, $contributorId, $projectId, $date, $hours);
-        $timesheet->taskId = $taskId;
+        $timesheet            = new self($id, $companyId, $contributorId, $projectId, $date, $hours);
+        $timesheet->taskId    = $taskId;
         $timesheet->subTaskId = $subTaskId;
-        $timesheet->notes = $notes;
+        $timesheet->notes     = $notes;
 
         $timesheet->recordEvent(
-            TimesheetCreatedEvent::create($id, $companyId, $contributorId, $projectId, $date)
+            TimesheetCreatedEvent::create($id, $companyId, $contributorId, $projectId, $date),
         );
 
         return $timesheet;
@@ -109,11 +110,11 @@ final class Timesheet implements AggregateRootInterface
             throw InvalidTimesheetException::zeroHours();
         }
 
-        $this->hours = $hours;
-        $this->taskId = $taskId;
+        $this->hours     = $hours;
+        $this->taskId    = $taskId;
         $this->subTaskId = $subTaskId;
-        $this->notes = $notes;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->notes     = $notes;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(TimesheetUpdatedEvent::create($this->id));
     }
@@ -127,8 +128,8 @@ final class Timesheet implements AggregateRootInterface
             throw InvalidTimesheetException::zeroHours();
         }
 
-        $this->hours = $hours;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->hours     = $hours;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(TimesheetUpdatedEvent::create($this->id));
     }
@@ -138,8 +139,8 @@ final class Timesheet implements AggregateRootInterface
      */
     public function updateNotes(?string $notes): void
     {
-        $this->notes = $notes;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->notes     = $notes;
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(TimesheetUpdatedEvent::create($this->id));
     }
@@ -149,9 +150,9 @@ final class Timesheet implements AggregateRootInterface
      */
     public function assignToTask(?string $taskId, ?string $subTaskId = null): void
     {
-        $this->taskId = $taskId;
+        $this->taskId    = $taskId;
         $this->subTaskId = $subTaskId;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(TimesheetUpdatedEvent::create($this->id));
     }
@@ -213,7 +214,7 @@ final class Timesheet implements AggregateRootInterface
         return $this->subTaskId;
     }
 
-    public function getDate(): \DateTimeImmutable
+    public function getDate(): DateTimeImmutable
     {
         return $this->date;
     }
@@ -228,12 +229,12 @@ final class Timesheet implements AggregateRootInterface
         return $this->notes;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

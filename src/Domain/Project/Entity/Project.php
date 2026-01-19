@@ -14,6 +14,8 @@ use App\Domain\Project\ValueObject\ProjectType;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Money;
+use DateTimeImmutable;
+use InvalidArgumentException;
 
 final class Project implements AggregateRootInterface
 {
@@ -29,14 +31,14 @@ final class Project implements AggregateRootInterface
     private ?Money $budget;
     private ?Money $soldAmount;
     private ?string $reference;
-    private ?\DateTimeImmutable $startDate;
-    private ?\DateTimeImmutable $endDate;
-    private ?\DateTimeImmutable $completedAt;
+    private ?DateTimeImmutable $startDate;
+    private ?DateTimeImmutable $endDate;
+    private ?DateTimeImmutable $completedAt;
     private ?string $repositoryUrl;
     private ?string $documentationUrl;
     private ?string $notes;
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
         ProjectId $id,
@@ -45,24 +47,24 @@ final class Project implements AggregateRootInterface
         ProjectType $projectType,
         bool $isInternal = false,
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->clientId = $clientId;
-        $this->projectType = $projectType;
-        $this->isInternal = $isInternal;
-        $this->status = ProjectStatus::DRAFT;
-        $this->description = null;
-        $this->budget = null;
-        $this->soldAmount = null;
-        $this->reference = null;
-        $this->startDate = null;
-        $this->endDate = null;
-        $this->completedAt = null;
-        $this->repositoryUrl = null;
+        $this->id               = $id;
+        $this->name             = $name;
+        $this->clientId         = $clientId;
+        $this->projectType      = $projectType;
+        $this->isInternal       = $isInternal;
+        $this->status           = ProjectStatus::DRAFT;
+        $this->description      = null;
+        $this->budget           = null;
+        $this->soldAmount       = null;
+        $this->reference        = null;
+        $this->startDate        = null;
+        $this->endDate          = null;
+        $this->completedAt      = null;
+        $this->repositoryUrl    = null;
         $this->documentationUrl = null;
-        $this->notes = null;
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = null;
+        $this->notes            = null;
+        $this->createdAt        = new DateTimeImmutable();
+        $this->updatedAt        = null;
     }
 
     public static function create(
@@ -75,7 +77,7 @@ final class Project implements AggregateRootInterface
         $project = new self($id, $name, $clientId, $projectType, $isInternal);
 
         $project->recordEvent(
-            ProjectCreatedEvent::create($id, $clientId, $name)
+            ProjectCreatedEvent::create($id, $clientId, $name),
         );
 
         return $project;
@@ -86,50 +88,50 @@ final class Project implements AggregateRootInterface
         ?string $description,
         ?string $reference,
     ): void {
-        $this->name = $name;
+        $this->name        = $name;
         $this->description = $description;
-        $this->reference = $reference;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->reference   = $reference;
+        $this->updatedAt   = new DateTimeImmutable();
     }
 
     public function setDates(
-        ?\DateTimeImmutable $startDate,
-        ?\DateTimeImmutable $endDate,
+        ?DateTimeImmutable $startDate,
+        ?DateTimeImmutable $endDate,
     ): void {
         if ($startDate !== null && $endDate !== null && $startDate > $endDate) {
-            throw new \InvalidArgumentException('Start date cannot be after end date');
+            throw new InvalidArgumentException('Start date cannot be after end date');
         }
 
         $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->endDate   = $endDate;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function setBudget(?Money $budget): void
     {
-        $this->budget = $budget;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->budget    = $budget;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function setSoldAmount(?Money $soldAmount): void
     {
         $this->soldAmount = $soldAmount;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt  = new DateTimeImmutable();
     }
 
     public function setTechnicalInfo(
         ?string $repositoryUrl,
         ?string $documentationUrl,
     ): void {
-        $this->repositoryUrl = $repositoryUrl;
+        $this->repositoryUrl    = $repositoryUrl;
         $this->documentationUrl = $documentationUrl;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt        = new DateTimeImmutable();
     }
 
     public function addNotes(string $notes): void
     {
-        $this->notes = $notes;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->notes     = $notes;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function changeStatus(ProjectStatus $newStatus): void
@@ -142,16 +144,16 @@ final class Project implements AggregateRootInterface
             throw InvalidProjectStatusTransitionException::create($this->status, $newStatus);
         }
 
-        $previousStatus = $this->status;
-        $this->status = $newStatus;
-        $this->updatedAt = new \DateTimeImmutable();
+        $previousStatus  = $this->status;
+        $this->status    = $newStatus;
+        $this->updatedAt = new DateTimeImmutable();
 
         if ($newStatus === ProjectStatus::COMPLETED) {
-            $this->completedAt = new \DateTimeImmutable();
+            $this->completedAt = new DateTimeImmutable();
         }
 
         $this->recordEvent(
-            ProjectStatusChangedEvent::create($this->id, $previousStatus, $newStatus)
+            ProjectStatusChangedEvent::create($this->id, $previousStatus, $newStatus),
         );
     }
 
@@ -258,17 +260,17 @@ final class Project implements AggregateRootInterface
         return $this->reference;
     }
 
-    public function getStartDate(): ?\DateTimeImmutable
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->startDate;
     }
 
-    public function getEndDate(): ?\DateTimeImmutable
+    public function getEndDate(): ?DateTimeImmutable
     {
         return $this->endDate;
     }
 
-    public function getCompletedAt(): ?\DateTimeImmutable
+    public function getCompletedAt(): ?DateTimeImmutable
     {
         return $this->completedAt;
     }
@@ -288,12 +290,12 @@ final class Project implements AggregateRootInterface
         return $this->notes;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

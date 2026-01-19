@@ -23,8 +23,8 @@ final class InvalidInvoiceException extends DomainException
             sprintf(
                 'Cannot transition invoice status from "%s" to "%s".',
                 $from->getLabel(),
-                $to->getLabel()
-            )
+                $to->getLabel(),
+            ),
         );
     }
 

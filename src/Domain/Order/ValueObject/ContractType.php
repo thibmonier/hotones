@@ -6,13 +6,13 @@ namespace App\Domain\Order\ValueObject;
 
 enum ContractType: string
 {
-    case FIXED_PRICE = 'forfait';
+    case FIXED_PRICE       = 'forfait';
     case TIME_AND_MATERIAL = 'regie';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::FIXED_PRICE => 'Forfait',
+            self::FIXED_PRICE       => 'Forfait',
             self::TIME_AND_MATERIAL => 'Régie',
         };
     }

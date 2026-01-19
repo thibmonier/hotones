@@ -8,6 +8,8 @@ use App\Domain\Order\ValueObject\OrderLineId;
 use App\Domain\Order\ValueObject\OrderLineType;
 use App\Domain\Order\ValueObject\OrderSectionId;
 use App\Domain\Shared\ValueObject\Money;
+use DateTimeImmutable;
+use InvalidArgumentException;
 
 /**
  * Order section entity (child of Order aggregate).
@@ -20,8 +22,8 @@ final class OrderSection
     private OrderSectionId $id;
     private string $title;
     private int $position;
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     /** @var array<OrderLine> */
     private array $lines = [];
@@ -33,10 +35,10 @@ final class OrderSection
     ) {
         $this->validateTitle($title);
 
-        $this->id = $id;
-        $this->title = $title;
-        $this->position = $position;
-        $this->createdAt = new \DateTimeImmutable();
+        $this->id        = $id;
+        $this->title     = $title;
+        $this->position  = $position;
+        $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;
     }
 
@@ -59,7 +61,7 @@ final class OrderSection
         float $taxRate,
     ): void {
         $linePosition = count($this->lines) + 1;
-        $line = OrderLine::create(
+        $line         = OrderLine::create(
             $lineId,
             $description,
             $type,
@@ -69,8 +71,8 @@ final class OrderSection
             $linePosition,
         );
 
-        $this->lines[] = $line;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->lines[]   = $line;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updateLine(
@@ -83,7 +85,7 @@ final class OrderSection
     ): void {
         $line = $this->findLine($lineId);
         $line->update($description, $type, $quantity, $unitPriceHt, $taxRate);
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function removeLine(OrderLineId $lineId): void
@@ -93,7 +95,7 @@ final class OrderSection
         $this->lines = array_values($this->lines);
 
         $this->reorderLines();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Update methods
@@ -101,14 +103,14 @@ final class OrderSection
     public function update(string $title): void
     {
         $this->validateTitle($title);
-        $this->title = $title;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->title     = $title;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updatePosition(int $position): void
     {
-        $this->position = $position;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->position  = $position;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Calculated values
@@ -159,9 +161,7 @@ final class OrderSection
             }
         }
 
-        throw new \InvalidArgumentException(
-            sprintf('Order line with ID %s not found in section', $lineId->getValue())
-        );
+        throw new InvalidArgumentException(sprintf('Order line with ID %s not found in section', $lineId->getValue()));
     }
 
     private function findLineIndex(OrderLineId $lineId): int
@@ -172,9 +172,7 @@ final class OrderSection
             }
         }
 
-        throw new \InvalidArgumentException(
-            sprintf('Order line with ID %s not found in section', $lineId->getValue())
-        );
+        throw new InvalidArgumentException(sprintf('Order line with ID %s not found in section', $lineId->getValue()));
     }
 
     private function reorderLines(): void
@@ -182,7 +180,7 @@ final class OrderSection
         $position = 1;
         foreach ($this->lines as $line) {
             $line->updatePosition($position);
-            $position++;
+            ++$position;
         }
     }
 
@@ -191,7 +189,7 @@ final class OrderSection
     private function validateTitle(string $title): void
     {
         if (trim($title) === '') {
-            throw new \InvalidArgumentException('Order section title cannot be empty');
+            throw new InvalidArgumentException('Order section title cannot be empty');
         }
     }
 
@@ -225,12 +223,12 @@ final class OrderSection
         return count($this->lines);
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

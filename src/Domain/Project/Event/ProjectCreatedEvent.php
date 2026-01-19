@@ -7,6 +7,7 @@ namespace App\Domain\Project\Event;
 use App\Domain\Client\ValueObject\ClientId;
 use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 final readonly class ProjectCreatedEvent implements DomainEventInterface
 {
@@ -14,13 +15,13 @@ final readonly class ProjectCreatedEvent implements DomainEventInterface
         private ProjectId $projectId,
         private ClientId $clientId,
         private string $name,
-        private \DateTimeImmutable $occurredOn,
+        private DateTimeImmutable $occurredOn,
     ) {
     }
 
     public static function create(ProjectId $projectId, ClientId $clientId, string $name): self
     {
-        return new self($projectId, $clientId, $name, new \DateTimeImmutable());
+        return new self($projectId, $clientId, $name, new DateTimeImmutable());
     }
 
     public function getProjectId(): ProjectId
@@ -38,7 +39,7 @@ final readonly class ProjectCreatedEvent implements DomainEventInterface
         return $this->name;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

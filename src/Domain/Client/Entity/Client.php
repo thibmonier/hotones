@@ -11,6 +11,7 @@ use App\Domain\Client\ValueObject\ServiceLevel;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Email;
+use DateTimeImmutable;
 
 final class Client implements AggregateRootInterface
 {
@@ -28,28 +29,28 @@ final class Client implements AggregateRootInterface
     private ServiceLevel $serviceLevel;
     private bool $isActive;
     private ?string $notes;
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
         ClientId $id,
         CompanyName $name,
         ServiceLevel $serviceLevel,
     ) {
-        $this->id = $id;
-        $this->name = $name;
+        $this->id           = $id;
+        $this->name         = $name;
         $this->serviceLevel = $serviceLevel;
-        $this->isActive = true;
-        $this->email = null;
-        $this->phone = null;
-        $this->address = null;
-        $this->city = null;
-        $this->postalCode = null;
-        $this->country = null;
-        $this->vatNumber = null;
-        $this->notes = null;
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = null;
+        $this->isActive     = true;
+        $this->email        = null;
+        $this->phone        = null;
+        $this->address      = null;
+        $this->city         = null;
+        $this->postalCode   = null;
+        $this->country      = null;
+        $this->vatNumber    = null;
+        $this->notes        = null;
+        $this->createdAt    = new DateTimeImmutable();
+        $this->updatedAt    = null;
     }
 
     public static function create(
@@ -60,7 +61,7 @@ final class Client implements AggregateRootInterface
         $client = new self($id, $name, $serviceLevel);
 
         $client->recordEvent(
-            ClientCreatedEvent::create($id, $name->getValue())
+            ClientCreatedEvent::create($id, $name->getValue()),
         );
 
         return $client;
@@ -74,13 +75,13 @@ final class Client implements AggregateRootInterface
         ?string $postalCode,
         ?string $country,
     ): void {
-        $this->email = $email;
-        $this->phone = $phone;
-        $this->address = $address;
-        $this->city = $city;
+        $this->email      = $email;
+        $this->phone      = $phone;
+        $this->address    = $address;
+        $this->city       = $city;
         $this->postalCode = $postalCode;
-        $this->country = $country;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->country    = $country;
+        $this->updatedAt  = new DateTimeImmutable();
     }
 
     public function updateServiceLevel(ServiceLevel $serviceLevel): void
@@ -90,13 +91,13 @@ final class Client implements AggregateRootInterface
         }
 
         $this->serviceLevel = $serviceLevel;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt    = new DateTimeImmutable();
     }
 
     public function updateVatNumber(?string $vatNumber): void
     {
         $this->vatNumber = $vatNumber;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function rename(CompanyName $name): void
@@ -105,8 +106,8 @@ final class Client implements AggregateRootInterface
             return;
         }
 
-        $this->name = $name;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->name      = $name;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function activate(): void
@@ -115,8 +116,8 @@ final class Client implements AggregateRootInterface
             return;
         }
 
-        $this->isActive = true;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->isActive  = true;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function deactivate(): void
@@ -125,14 +126,14 @@ final class Client implements AggregateRootInterface
             return;
         }
 
-        $this->isActive = false;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->isActive  = false;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function addNotes(string $notes): void
     {
-        $this->notes = $notes;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->notes     = $notes;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Getters
@@ -197,12 +198,12 @@ final class Client implements AggregateRootInterface
         return $this->notes;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

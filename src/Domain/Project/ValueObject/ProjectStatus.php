@@ -9,9 +9,9 @@ namespace App\Domain\Project\ValueObject;
  */
 enum ProjectStatus: string
 {
-    case DRAFT = 'draft';
-    case ACTIVE = 'active';
-    case ON_HOLD = 'on_hold';
+    case DRAFT     = 'draft';
+    case ACTIVE    = 'active';
+    case ON_HOLD   = 'on_hold';
     case COMPLETED = 'completed';
     case CANCELLED = 'cancelled';
 
@@ -23,9 +23,9 @@ enum ProjectStatus: string
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::DRAFT => [self::ACTIVE, self::CANCELLED],
-            self::ACTIVE => [self::ON_HOLD, self::COMPLETED, self::CANCELLED],
-            self::ON_HOLD => [self::ACTIVE, self::CANCELLED],
+            self::DRAFT     => [self::ACTIVE, self::CANCELLED],
+            self::ACTIVE    => [self::ON_HOLD, self::COMPLETED, self::CANCELLED],
+            self::ON_HOLD   => [self::ACTIVE, self::CANCELLED],
             self::COMPLETED => [],
             self::CANCELLED => [],
         };
@@ -54,9 +54,9 @@ enum ProjectStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::DRAFT => 'Brouillon',
-            self::ACTIVE => 'Actif',
-            self::ON_HOLD => 'En pause',
+            self::DRAFT     => 'Brouillon',
+            self::ACTIVE    => 'Actif',
+            self::ON_HOLD   => 'En pause',
             self::COMPLETED => 'Terminé',
             self::CANCELLED => 'Annulé',
         };

@@ -9,15 +9,15 @@ namespace App\Domain\Order\ValueObject;
  */
 enum OrderLineType: string
 {
-    case SERVICE = 'service';
-    case PURCHASE = 'purchase';
+    case SERVICE      = 'service';
+    case PURCHASE     = 'purchase';
     case FIXED_AMOUNT = 'fixed_amount';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::SERVICE => 'Service',
-            self::PURCHASE => 'Achat',
+            self::SERVICE      => 'Service',
+            self::PURCHASE     => 'Achat',
             self::FIXED_AMOUNT => 'Montant fixe',
         };
     }

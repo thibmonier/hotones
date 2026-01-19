@@ -13,19 +13,19 @@ namespace App\Domain\Invoice\ValueObject;
  */
 enum InvoiceStatus: string
 {
-    case DRAFT = 'brouillon';
-    case SENT = 'envoyee';
-    case PAID = 'payee';
-    case OVERDUE = 'en_retard';
+    case DRAFT     = 'brouillon';
+    case SENT      = 'envoyee';
+    case PAID      = 'payee';
+    case OVERDUE   = 'en_retard';
     case CANCELLED = 'annulee';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::DRAFT => 'Brouillon',
-            self::SENT => 'Envoyée',
-            self::PAID => 'Payée',
-            self::OVERDUE => 'En retard',
+            self::DRAFT     => 'Brouillon',
+            self::SENT      => 'Envoyée',
+            self::PAID      => 'Payée',
+            self::OVERDUE   => 'En retard',
             self::CANCELLED => 'Annulée',
         };
     }
@@ -68,8 +68,8 @@ enum InvoiceStatus: string
     public function canTransitionTo(self $newStatus): bool
     {
         return match ($this) {
-            self::DRAFT => in_array($newStatus, [self::SENT, self::CANCELLED], true),
-            self::SENT => in_array($newStatus, [self::PAID, self::OVERDUE, self::CANCELLED], true),
+            self::DRAFT   => in_array($newStatus, [self::SENT, self::CANCELLED], true),
+            self::SENT    => in_array($newStatus, [self::PAID, self::OVERDUE, self::CANCELLED], true),
             self::OVERDUE => in_array($newStatus, [self::PAID, self::CANCELLED], true),
             self::PAID, self::CANCELLED => false, // Terminal states
         };

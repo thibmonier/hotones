@@ -15,8 +15,8 @@ final class InvalidProjectStatusTransitionException extends DomainException
             sprintf(
                 'Cannot transition project status from "%s" to "%s"',
                 $from->value,
-                $to->value
-            )
+                $to->value,
+            ),
         );
     }
 }

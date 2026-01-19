@@ -9,9 +9,9 @@ namespace App\Domain\User\ValueObject;
  */
 enum UserStatus: string
 {
-    case PENDING = 'pending';
-    case ACTIVE = 'active';
-    case SUSPENDED = 'suspended';
+    case PENDING     = 'pending';
+    case ACTIVE      = 'active';
+    case SUSPENDED   = 'suspended';
     case DEACTIVATED = 'deactivated';
 
     /**
@@ -30,9 +30,9 @@ enum UserStatus: string
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::PENDING => [self::ACTIVE, self::DEACTIVATED],
-            self::ACTIVE => [self::SUSPENDED, self::DEACTIVATED],
-            self::SUSPENDED => [self::ACTIVE, self::DEACTIVATED],
+            self::PENDING     => [self::ACTIVE, self::DEACTIVATED],
+            self::ACTIVE      => [self::SUSPENDED, self::DEACTIVATED],
+            self::SUSPENDED   => [self::ACTIVE, self::DEACTIVATED],
             self::DEACTIVATED => [], // Terminal state
         };
     }
@@ -83,9 +83,9 @@ enum UserStatus: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::PENDING => 'En attente',
-            self::ACTIVE => 'Actif',
-            self::SUSPENDED => 'Suspendu',
+            self::PENDING     => 'En attente',
+            self::ACTIVE      => 'Actif',
+            self::SUSPENDED   => 'Suspendu',
             self::DEACTIVATED => 'Désactivé',
         };
     }

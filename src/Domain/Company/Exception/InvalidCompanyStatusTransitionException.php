@@ -15,8 +15,8 @@ final class InvalidCompanyStatusTransitionException extends DomainException
             sprintf(
                 'Cannot transition company status from "%s" to "%s"',
                 $from->value,
-                $to->value
-            )
+                $to->value,
+            ),
         );
     }
 }

@@ -8,13 +8,14 @@ use App\Domain\Company\ValueObject\CompanyId;
 use App\Domain\Contributor\ValueObject\ContributorId;
 use App\Domain\Shared\Interface\DomainEventInterface;
 use App\Domain\Shared\ValueObject\Email;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when a new contributor is created.
  */
 final readonly class ContributorCreatedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private ContributorId $contributorId,
@@ -23,7 +24,7 @@ final readonly class ContributorCreatedEvent implements DomainEventInterface
         private string $firstName,
         private string $lastName,
     ) {
-        $this->occurredOn = new \DateTimeImmutable();
+        $this->occurredOn = new DateTimeImmutable();
     }
 
     public static function create(
@@ -61,7 +62,7 @@ final readonly class ContributorCreatedEvent implements DomainEventInterface
         return $this->lastName;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

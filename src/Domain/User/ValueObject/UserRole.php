@@ -14,8 +14,8 @@ enum UserRole: string
 {
     case INTERVENANT = 'ROLE_INTERVENANT';
     case CHEF_PROJET = 'ROLE_CHEF_PROJET';
-    case MANAGER = 'ROLE_MANAGER';
-    case SUPERADMIN = 'ROLE_SUPERADMIN';
+    case MANAGER     = 'ROLE_MANAGER';
+    case SUPERADMIN  = 'ROLE_SUPERADMIN';
 
     /**
      * Get the numeric level of this role (higher = more permissions).
@@ -25,8 +25,8 @@ enum UserRole: string
         return match ($this) {
             self::INTERVENANT => 1,
             self::CHEF_PROJET => 2,
-            self::MANAGER => 3,
-            self::SUPERADMIN => 4,
+            self::MANAGER     => 3,
+            self::SUPERADMIN  => 4,
         };
     }
 
@@ -88,8 +88,8 @@ enum UserRole: string
         return match ($this) {
             self::INTERVENANT => 'Intervenant',
             self::CHEF_PROJET => 'Chef de Projet',
-            self::MANAGER => 'Manager',
-            self::SUPERADMIN => 'Super Administrateur',
+            self::MANAGER     => 'Manager',
+            self::SUPERADMIN  => 'Super Administrateur',
         };
     }
 

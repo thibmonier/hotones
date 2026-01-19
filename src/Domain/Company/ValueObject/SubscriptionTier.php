@@ -9,9 +9,9 @@ namespace App\Domain\Company\ValueObject;
  */
 enum SubscriptionTier: string
 {
-    case STARTER = 'starter';
+    case STARTER      = 'starter';
     case PROFESSIONAL = 'professional';
-    case ENTERPRISE = 'enterprise';
+    case ENTERPRISE   = 'enterprise';
 
     public function isStarter(): bool
     {
@@ -34,18 +34,18 @@ enum SubscriptionTier: string
     public function includes(self $tier): bool
     {
         return match ($this) {
-            self::ENTERPRISE => true,
+            self::ENTERPRISE   => true,
             self::PROFESSIONAL => $tier !== self::ENTERPRISE,
-            self::STARTER => $tier === self::STARTER,
+            self::STARTER      => $tier === self::STARTER,
         };
     }
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::STARTER => 'Starter',
+            self::STARTER      => 'Starter',
             self::PROFESSIONAL => 'Professional',
-            self::ENTERPRISE => 'Enterprise',
+            self::ENTERPRISE   => 'Enterprise',
         };
     }
 }

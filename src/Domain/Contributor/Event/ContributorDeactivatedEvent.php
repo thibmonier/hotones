@@ -6,18 +6,19 @@ namespace App\Domain\Contributor\Event;
 
 use App\Domain\Contributor\ValueObject\ContributorId;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when a contributor is deactivated.
  */
 final readonly class ContributorDeactivatedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private ContributorId $contributorId,
     ) {
-        $this->occurredOn = new \DateTimeImmutable();
+        $this->occurredOn = new DateTimeImmutable();
     }
 
     public static function create(ContributorId $contributorId): self
@@ -30,7 +31,7 @@ final readonly class ContributorDeactivatedEvent implements DomainEventInterface
         return $this->contributorId;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

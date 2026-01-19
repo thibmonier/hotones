@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Invoice\ValueObject;
 
 use App\Domain\Shared\ValueObject\Money;
+use InvalidArgumentException;
 
 /**
  * Tax rate value object (TVA).
@@ -14,17 +15,15 @@ use App\Domain\Shared\ValueObject\Money;
 final readonly class TaxRate
 {
     private const int STANDARD_RATE_FR = 2000; // 20.00%
-    private const int REDUCED_RATE_FR = 1000;  // 10.00%
+    private const int REDUCED_RATE_FR  = 1000;  // 10.00%
     private const int SUPER_REDUCED_FR = 550;  // 5.50%
-    private const int ZERO_RATE = 0;           // 0.00%
+    private const int ZERO_RATE        = 0;           // 0.00%
 
     private function __construct(
         private int $basisPoints,
     ) {
         if ($basisPoints < 0 || $basisPoints > 10000) {
-            throw new \InvalidArgumentException(
-                sprintf('Tax rate must be between 0%% and 100%%, got: %.2f%%', $basisPoints / 100)
-            );
+            throw new InvalidArgumentException(sprintf('Tax rate must be between 0%% and 100%%, got: %.2f%%', $basisPoints / 100));
         }
     }
 

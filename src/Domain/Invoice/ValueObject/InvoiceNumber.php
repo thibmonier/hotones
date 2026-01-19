@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Invoice\ValueObject;
 
+use InvalidArgumentException;
+
 /**
  * Invoice number value object.
  *
@@ -15,16 +17,14 @@ namespace App\Domain\Invoice\ValueObject;
  */
 final readonly class InvoiceNumber
 {
-    private const string PREFIX = 'F';
+    private const string PREFIX  = 'F';
     private const string PATTERN = '/^F\d{4}\d{2}\d{3,}$/';
 
     private function __construct(
         private string $value,
     ) {
         if (!$this->isValidFormat($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid invoice number format: %s. Expected format: F[YYYY][MM][NNN]', $value)
-            );
+            throw new InvalidArgumentException(sprintf('Invalid invoice number format: %s. Expected format: F[YYYY][MM][NNN]', $value));
         }
     }
 
@@ -36,21 +36,15 @@ final readonly class InvoiceNumber
     public static function generate(int $year, int $month, int $sequence): self
     {
         if ($year < 2000 || $year > 2100) {
-            throw new \InvalidArgumentException(
-                sprintf('Year must be between 2000 and 2100, got: %d', $year)
-            );
+            throw new InvalidArgumentException(sprintf('Year must be between 2000 and 2100, got: %d', $year));
         }
 
         if ($month < 1 || $month > 12) {
-            throw new \InvalidArgumentException(
-                sprintf('Month must be between 1 and 12, got: %d', $month)
-            );
+            throw new InvalidArgumentException(sprintf('Month must be between 1 and 12, got: %d', $month));
         }
 
         if ($sequence < 1) {
-            throw new \InvalidArgumentException(
-                sprintf('Sequence must be positive, got: %d', $sequence)
-            );
+            throw new InvalidArgumentException(sprintf('Sequence must be positive, got: %d', $sequence));
         }
 
         $number = sprintf(
@@ -58,7 +52,7 @@ final readonly class InvoiceNumber
             self::PREFIX,
             $year,
             $month,
-            $sequence
+            $sequence,
         );
 
         return new self($number);

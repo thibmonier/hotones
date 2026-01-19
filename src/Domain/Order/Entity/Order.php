@@ -17,6 +17,9 @@ use App\Domain\Order\ValueObject\OrderStatus;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Money;
+use DateTimeImmutable;
+use DomainException;
+use InvalidArgumentException;
 
 final class Order implements AggregateRootInterface
 {
@@ -31,12 +34,12 @@ final class Order implements AggregateRootInterface
     private ContractType $contractType;
     private Money $amount;
     private ?Money $discount;
-    private ?\DateTimeImmutable $startDate;
-    private ?\DateTimeImmutable $endDate;
-    private ?\DateTimeImmutable $signedAt;
+    private ?DateTimeImmutable $startDate;
+    private ?DateTimeImmutable $endDate;
+    private ?DateTimeImmutable $signedAt;
     private ?string $notes;
-    private \DateTimeImmutable $createdAt;
-    private ?\DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
 
     /** @var array<OrderSection> */
     private array $sections = [];
@@ -48,21 +51,21 @@ final class Order implements AggregateRootInterface
         ContractType $contractType,
         Money $amount,
     ) {
-        $this->id = $id;
-        $this->reference = $reference;
-        $this->clientId = $clientId;
+        $this->id           = $id;
+        $this->reference    = $reference;
+        $this->clientId     = $clientId;
         $this->contractType = $contractType;
-        $this->amount = $amount;
-        $this->status = OrderStatus::DRAFT;
-        $this->title = null;
-        $this->description = null;
-        $this->discount = null;
-        $this->startDate = null;
-        $this->endDate = null;
-        $this->signedAt = null;
-        $this->notes = null;
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = null;
+        $this->amount       = $amount;
+        $this->status       = OrderStatus::DRAFT;
+        $this->title        = null;
+        $this->description  = null;
+        $this->discount     = null;
+        $this->startDate    = null;
+        $this->endDate      = null;
+        $this->signedAt     = null;
+        $this->notes        = null;
+        $this->createdAt    = new DateTimeImmutable();
+        $this->updatedAt    = null;
     }
 
     public static function create(
@@ -75,7 +78,7 @@ final class Order implements AggregateRootInterface
         $order = new self($id, $reference, $clientId, $contractType, $amount);
 
         $order->recordEvent(
-            OrderCreatedEvent::create($id, $clientId, $reference)
+            OrderCreatedEvent::create($id, $clientId, $reference),
         );
 
         return $order;
@@ -86,23 +89,23 @@ final class Order implements AggregateRootInterface
         ?string $description,
         ?Money $discount,
     ): void {
-        $this->title = $title;
+        $this->title       = $title;
         $this->description = $description;
-        $this->discount = $discount;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->discount    = $discount;
+        $this->updatedAt   = new DateTimeImmutable();
     }
 
     public function setDates(
-        ?\DateTimeImmutable $startDate,
-        ?\DateTimeImmutable $endDate,
+        ?DateTimeImmutable $startDate,
+        ?DateTimeImmutable $endDate,
     ): void {
         if ($startDate !== null && $endDate !== null && $startDate > $endDate) {
-            throw new \InvalidArgumentException('Start date cannot be after end date');
+            throw new InvalidArgumentException('Start date cannot be after end date');
         }
 
         $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->endDate   = $endDate;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function changeStatus(OrderStatus $newStatus): void
@@ -115,43 +118,43 @@ final class Order implements AggregateRootInterface
             throw InvalidOrderStatusTransitionException::create($this->status, $newStatus);
         }
 
-        $previousStatus = $this->status;
-        $this->status = $newStatus;
-        $this->updatedAt = new \DateTimeImmutable();
+        $previousStatus  = $this->status;
+        $this->status    = $newStatus;
+        $this->updatedAt = new DateTimeImmutable();
 
         if ($newStatus === OrderStatus::SIGNED) {
-            $this->signedAt = new \DateTimeImmutable();
+            $this->signedAt = new DateTimeImmutable();
         }
 
         $this->recordEvent(
-            OrderStatusChangedEvent::create($this->id, $previousStatus, $newStatus)
+            OrderStatusChangedEvent::create($this->id, $previousStatus, $newStatus),
         );
     }
 
     public function updateAmount(Money $amount): void
     {
         if ($this->status->isClosed()) {
-            throw new \DomainException('Cannot update amount of a closed order');
+            throw new DomainException('Cannot update amount of a closed order');
         }
 
-        $this->amount = $amount;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->amount    = $amount;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function applyDiscount(Money $discount): void
     {
         if ($discount->isGreaterThan($this->amount)) {
-            throw new \InvalidArgumentException('Discount cannot be greater than order amount');
+            throw new InvalidArgumentException('Discount cannot be greater than order amount');
         }
 
-        $this->discount = $discount;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->discount  = $discount;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function addNotes(string $notes): void
     {
-        $this->notes = $notes;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->notes     = $notes;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Section management
@@ -161,10 +164,10 @@ final class Order implements AggregateRootInterface
         string $title,
     ): void {
         $sectionPosition = count($this->sections) + 1;
-        $section = OrderSection::create($sectionId, $title, $sectionPosition);
+        $section         = OrderSection::create($sectionId, $title, $sectionPosition);
 
         $this->sections[] = $section;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt  = new DateTimeImmutable();
     }
 
     public function updateSection(
@@ -173,7 +176,7 @@ final class Order implements AggregateRootInterface
     ): void {
         $section = $this->findSection($sectionId);
         $section->update($title);
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function removeSection(OrderSectionId $sectionId): void
@@ -183,7 +186,7 @@ final class Order implements AggregateRootInterface
         $this->sections = array_values($this->sections);
 
         $this->reorderSections();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Line management through sections
@@ -199,7 +202,7 @@ final class Order implements AggregateRootInterface
     ): void {
         $section = $this->findSection($sectionId);
         $section->addLine($lineId, $description, $type, $quantity, $unitPriceHt, $taxRate);
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function updateLineInSection(
@@ -213,7 +216,7 @@ final class Order implements AggregateRootInterface
     ): void {
         $section = $this->findSection($sectionId);
         $section->updateLine($lineId, $description, $type, $quantity, $unitPriceHt, $taxRate);
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function removeLineFromSection(
@@ -222,7 +225,7 @@ final class Order implements AggregateRootInterface
     ): void {
         $section = $this->findSection($sectionId);
         $section->removeLine($lineId);
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     // Helper methods
@@ -235,9 +238,7 @@ final class Order implements AggregateRootInterface
             }
         }
 
-        throw new \InvalidArgumentException(
-            sprintf('Order section with ID %s not found in order', $sectionId->getValue())
-        );
+        throw new InvalidArgumentException(sprintf('Order section with ID %s not found in order', $sectionId->getValue()));
     }
 
     private function findSectionIndex(OrderSectionId $sectionId): int
@@ -248,9 +249,7 @@ final class Order implements AggregateRootInterface
             }
         }
 
-        throw new \InvalidArgumentException(
-            sprintf('Order section with ID %s not found in order', $sectionId->getValue())
-        );
+        throw new InvalidArgumentException(sprintf('Order section with ID %s not found in order', $sectionId->getValue()));
     }
 
     private function reorderSections(): void
@@ -258,7 +257,7 @@ final class Order implements AggregateRootInterface
         $position = 1;
         foreach ($this->sections as $section) {
             $section->updatePosition($position);
-            $position++;
+            ++$position;
         }
     }
 
@@ -373,17 +372,17 @@ final class Order implements AggregateRootInterface
         return $this->discount;
     }
 
-    public function getStartDate(): ?\DateTimeImmutable
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->startDate;
     }
 
-    public function getEndDate(): ?\DateTimeImmutable
+    public function getEndDate(): ?DateTimeImmutable
     {
         return $this->endDate;
     }
 
-    public function getSignedAt(): ?\DateTimeImmutable
+    public function getSignedAt(): ?DateTimeImmutable
     {
         return $this->signedAt;
     }
@@ -393,12 +392,12 @@ final class Order implements AggregateRootInterface
         return $this->notes;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

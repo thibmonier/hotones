@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Project\ValueObject;
 
+use InvalidArgumentException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -24,9 +25,7 @@ final readonly class ProjectId
     public static function fromString(string $value): self
     {
         if (!Uuid::isValid($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid project ID format: %s', $value)
-            );
+            throw new InvalidArgumentException(sprintf('Invalid project ID format: %s', $value));
         }
 
         return new self($value);

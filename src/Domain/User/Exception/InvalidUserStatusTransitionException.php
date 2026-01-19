@@ -15,9 +15,9 @@ final class InvalidUserStatusTransitionException extends DomainException
     public static function create(UserStatus $from, UserStatus $to): self
     {
         $allowedTransitions = $from->allowedTransitions();
-        $allowedNames = array_map(
-            fn(UserStatus $status) => $status->value,
-            $allowedTransitions
+        $allowedNames       = array_map(
+            fn (UserStatus $status) => $status->value,
+            $allowedTransitions,
         );
 
         return new self(
@@ -25,8 +25,8 @@ final class InvalidUserStatusTransitionException extends DomainException
                 'Cannot transition user status from "%s" to "%s". Allowed transitions: [%s].',
                 $from->value,
                 $to->value,
-                implode(', ', $allowedNames)
-            )
+                implode(', ', $allowedNames),
+            ),
         );
     }
 }

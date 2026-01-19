@@ -15,14 +15,14 @@ final class UserNotFoundException extends DomainException
     public static function withId(UserId $userId): self
     {
         return new self(
-            sprintf('User with ID "%s" was not found.', $userId->getValue())
+            sprintf('User with ID "%s" was not found.', $userId->getValue()),
         );
     }
 
     public static function withEmail(string $email): self
     {
         return new self(
-            sprintf('User with email "%s" was not found.', $email)
+            sprintf('User with email "%s" was not found.', $email),
         );
     }
 }

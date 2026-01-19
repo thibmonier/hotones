@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Invoice\ValueObject;
 
+use InvalidArgumentException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -15,9 +16,7 @@ final readonly class InvoiceId
         private string $value,
     ) {
         if (!Uuid::isValid($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid UUID format for InvoiceId: %s', $value)
-            );
+            throw new InvalidArgumentException(sprintf('Invalid UUID format for InvoiceId: %s', $value));
         }
     }
 

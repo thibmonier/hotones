@@ -9,8 +9,8 @@ namespace App\Domain\Company\ValueObject;
  */
 enum CompanyStatus: string
 {
-    case ACTIVE = 'active';
-    case TRIAL = 'trial';
+    case ACTIVE    = 'active';
+    case TRIAL     = 'trial';
     case SUSPENDED = 'suspended';
     case CANCELLED = 'cancelled';
 
@@ -22,8 +22,8 @@ enum CompanyStatus: string
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::TRIAL => [self::ACTIVE, self::SUSPENDED, self::CANCELLED],
-            self::ACTIVE => [self::SUSPENDED, self::CANCELLED],
+            self::TRIAL     => [self::ACTIVE, self::SUSPENDED, self::CANCELLED],
+            self::ACTIVE    => [self::SUSPENDED, self::CANCELLED],
             self::SUSPENDED => [self::ACTIVE, self::CANCELLED],
             self::CANCELLED => [], // Terminal state
         };

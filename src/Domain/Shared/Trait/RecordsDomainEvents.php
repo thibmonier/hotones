@@ -21,7 +21,7 @@ trait RecordsDomainEvents
      */
     public function pullDomainEvents(): array
     {
-        $events = $this->domainEvents;
+        $events             = $this->domainEvents;
         $this->domainEvents = [];
 
         return $events;

@@ -6,26 +6,27 @@ namespace App\Domain\Invoice\Event;
 
 use App\Domain\Invoice\ValueObject\InvoiceId;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when an invoice is issued (sent to client).
  */
 final readonly class InvoiceIssuedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private InvoiceId $invoiceId,
-        private \DateTimeImmutable $issuedAt,
-        private \DateTimeImmutable $dueDate,
+        private DateTimeImmutable $issuedAt,
+        private DateTimeImmutable $dueDate,
     ) {
-        $this->occurredOn = new \DateTimeImmutable();
+        $this->occurredOn = new DateTimeImmutable();
     }
 
     public static function create(
         InvoiceId $invoiceId,
-        \DateTimeImmutable $issuedAt,
-        \DateTimeImmutable $dueDate,
+        DateTimeImmutable $issuedAt,
+        DateTimeImmutable $dueDate,
     ): self {
         return new self($invoiceId, $issuedAt, $dueDate);
     }
@@ -35,17 +36,17 @@ final readonly class InvoiceIssuedEvent implements DomainEventInterface
         return $this->invoiceId;
     }
 
-    public function getIssuedAt(): \DateTimeImmutable
+    public function getIssuedAt(): DateTimeImmutable
     {
         return $this->issuedAt;
     }
 
-    public function getDueDate(): \DateTimeImmutable
+    public function getDueDate(): DateTimeImmutable
     {
         return $this->dueDate;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }

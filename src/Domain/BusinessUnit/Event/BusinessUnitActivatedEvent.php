@@ -6,18 +6,19 @@ namespace App\Domain\BusinessUnit\Event;
 
 use App\Domain\BusinessUnit\ValueObject\BusinessUnitId;
 use App\Domain\Shared\Interface\DomainEventInterface;
+use DateTimeImmutable;
 
 /**
  * Domain event raised when a business unit is activated.
  */
 final readonly class BusinessUnitActivatedEvent implements DomainEventInterface
 {
-    private \DateTimeImmutable $occurredOn;
+    private DateTimeImmutable $occurredOn;
 
     public function __construct(
         private BusinessUnitId $businessUnitId,
     ) {
-        $this->occurredOn = new \DateTimeImmutable();
+        $this->occurredOn = new DateTimeImmutable();
     }
 
     public static function create(BusinessUnitId $businessUnitId): self
@@ -30,7 +31,7 @@ final readonly class BusinessUnitActivatedEvent implements DomainEventInterface
         return $this->businessUnitId;
     }
 
-    public function getOccurredOn(): \DateTimeImmutable
+    public function getOccurredOn(): DateTimeImmutable
     {
         return $this->occurredOn;
     }
