@@ -21,7 +21,7 @@
         "webpack-notifier": "^1.15.0"
     },
     "dependencies": {
-        "@hotwired/turbo": "^8.0.20",
+        "@hotwired/turbo": "^8.0.21",
         "@symfony/ux-live-component": "^2.31.0",
         "@symfony/ux-turbo": "^2.31.0",
         "bootstrap": "5.3.8",
