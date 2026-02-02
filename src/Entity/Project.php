@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     new ORM\Index(name: 'idx_project_type', columns: ['project_type']),
     new ORM\Index(name: 'idx_project_service_category', columns: ['service_category_id']),
     new ORM\Index(name: 'idx_project_company', columns: ['company_id']),
+    new ORM\Index(name: 'idx_project_boond_manager', columns: ['boond_manager_id']),
 ])]
 #[ApiResource(
     operations: [
@@ -259,6 +260,17 @@ class Project implements CompanyOwnedInterface
         get => $this->ftpAccess;
         set {
             $this->ftpAccess = $value;
+        }
+    }
+
+    /**
+     * ID du projet dans BoondManager pour la synchronisation.
+     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    public ?int $boondManagerId = null {
+        get => $this->boondManagerId;
+        set {
+            $this->boondManagerId = $value;
         }
     }
 
@@ -1175,5 +1187,25 @@ class Project implements CompanyOwnedInterface
     public function isInternal(): bool
     {
         return $this->isInternal;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->boondManagerId.
+     */
+    public function getBoondManagerId(): ?int
+    {
+        return $this->boondManagerId;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $project->boondManagerId = $value.
+     */
+    public function setBoondManagerId(?int $value): self
+    {
+        $this->boondManagerId = $value;
+
+        return $this;
     }
 }
