@@ -1,0 +1,387 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Configuration BoondManager{% endblock %}
+
+{% block body %}
+    {% include 'components/page_header.html.twig' with {
+        title: 'Configuration BoondManager',
+        subtitle: 'Synchronisation des temps passes depuis BoondManager',
+        breadcrumb: [
+            {label: 'BoondManager', path: null}
+        ]
+    } %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="post">
+                <input type="hidden" name="action" value="save_settings">
+
+                {# Configuration API #}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-plug me-2"></i>Configuration API
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="api_base_url" class="form-label">
+                                URL de base de l'API
+                                <span class="text-muted" data-bs-toggle="tooltip" title="Format: https://votrecompagnie.api.boondmanager.com">
+                                    <i class="bx bx-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="url"
+                                   class="form-control"
+                                   id="api_base_url"
+                                   name="api_base_url"
+                                   value="{{ settings.apiBaseUrl }}"
+                                   placeholder="https://votrecompagnie.api.boondmanager.com">
+                            <div class="form-text">Exemple: https://monentreprise.api.boondmanager.com</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Type d'authentification</label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="auth_type" id="auth_basic" value="basic" {{ settings.authType == 'basic' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="auth_basic">
+                                        Basic Auth (recommande)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="auth_type" id="auth_jwt" value="jwt" {{ settings.authType == 'jwt' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="auth_jwt">
+                                        JWT Token
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Basic Auth #}
+                        <div id="basic_auth_fields" class="{{ settings.authType == 'jwt' ? 'd-none' : '' }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="api_username" class="form-label">Nom d'utilisateur</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="api_username"
+                                           name="api_username"
+                                           value="{{ settings.apiUsername }}"
+                                           autocomplete="off">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="api_password" class="form-label">Mot de passe</label>
+                                    <input type="password"
+                                           class="form-control"
+                                           id="api_password"
+                                           name="api_password"
+                                           placeholder="{{ settings.apiPassword ? '••••••••' : '' }}"
+                                           autocomplete="new-password">
+                                    <div class="form-text">Laissez vide pour conserver le mot de passe actuel</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# JWT Auth #}
+                        <div id="jwt_auth_fields" class="{{ settings.authType == 'basic' ? 'd-none' : '' }}">
+                            <div class="mb-3">
+                                <label for="user_token" class="form-label">Token utilisateur</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="user_token"
+                                       name="user_token"
+                                       value="{{ settings.userToken }}"
+                                       autocomplete="off">
+                                <div class="form-text">Disponible dans BoondManager > Parametres > Securite</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="client_token" class="form-label">Token client</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="client_token"
+                                           name="client_token"
+                                           value="{{ settings.clientToken }}"
+                                           autocomplete="off">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="client_key" class="form-label">Cle client</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="client_key"
+                                           name="client_key"
+                                           value="{{ settings.clientKey }}"
+                                           autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-text">Tokens disponibles dans BoondManager > Administration > Espace developpeur > API / Sandbox</div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Parametres de synchronisation #}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-sync me-2"></i>Synchronisation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enabled" name="enabled" {{ settings.enabled ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="enabled">
+                                        <strong>Activer la synchronisation</strong>
+                                    </label>
+                                </div>
+                                <div class="form-text">Active/desactive completement le connecteur BoondManager</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="auto_sync_enabled" name="auto_sync_enabled" {{ settings.autoSyncEnabled ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="auto_sync_enabled">
+                                        <strong>Synchronisation automatique</strong>
+                                    </label>
+                                </div>
+                                <div class="form-text">Execute la synchronisation automatiquement</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sync_frequency_hours" class="form-label">Frequence de synchronisation (heures)</label>
+                            <select class="form-select" id="sync_frequency_hours" name="sync_frequency_hours">
+                                <option value="1" {{ settings.syncFrequencyHours == 1 ? 'selected' : '' }}>Chaque heure</option>
+                                <option value="6" {{ settings.syncFrequencyHours == 6 ? 'selected' : '' }}>Toutes les 6 heures</option>
+                                <option value="12" {{ settings.syncFrequencyHours == 12 ? 'selected' : '' }}>Toutes les 12 heures</option>
+                                <option value="24" {{ settings.syncFrequencyHours == 24 ? 'selected' : '' }}>Une fois par jour</option>
+                                <option value="168" {{ settings.syncFrequencyHours == 168 ? 'selected' : '' }}>Une fois par semaine</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save me-1"></i> Enregistrer les parametres
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {# Panneau lateral #}
+        <div class="col-lg-4">
+            {# Statut #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-stats me-2"></i>Statut
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <td>Configuration</td>
+                                <td class="text-end">
+                                    {% if settings.isConfigured %}
+                                        <span class="badge bg-success">Complete</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Incomplete</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Synchronisation</td>
+                                <td class="text-end">
+                                    {% if settings.enabled %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Desactivee</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Derniere sync</td>
+                                <td class="text-end">
+                                    {% if settings.lastSyncAt %}
+                                        {{ settings.lastSyncAt|date('d/m/Y H:i') }}
+                                    {% else %}
+                                        <span class="text-muted">Jamais</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if settings.lastSyncStatus %}
+                                <tr>
+                                    <td>Statut derniere sync</td>
+                                    <td class="text-end">
+                                        {% if settings.lastSyncStatus == 'success' %}
+                                            <span class="badge bg-success">Succes</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Erreur</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            {% if settings.lastSyncCount is not null %}
+                                <tr>
+                                    <td>Entrees synchronisees</td>
+                                    <td class="text-end"><strong>{{ settings.lastSyncCount }}</strong></td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+
+                    {% if settings.lastSyncError %}
+                        <div class="alert alert-danger mt-3 mb-0 small">
+                            <strong>Erreur:</strong> {{ settings.lastSyncError|slice(0, 200) }}{% if settings.lastSyncError|length > 200 %}...{% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Actions #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-play me-2"></i>Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {# Test de connexion #}
+                    <button type="button" class="btn btn-outline-info w-100 mb-2" id="btn-test-connection" {{ not settings.isConfigured ? 'disabled' : '' }}>
+                        <i class="bx bx-link me-1"></i> Tester la connexion
+                    </button>
+                    <div id="connection-result" class="mb-3"></div>
+
+                    {# Synchronisation manuelle #}
+                    <form method="post" action="{{ path('admin_boond_manager_sync') }}" class="mb-2">
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <input type="date" class="form-control form-control-sm" name="start_date" value="{{ 'now'|date_modify('-30 days')|date('Y-m-d') }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="date" class="form-control form-control-sm" name="end_date" value="{{ 'now'|date('Y-m-d') }}">
+                            </div>
+                        </div>
+                        <div class="form-check form-check-inline mb-2">
+                            <input class="form-check-input" type="checkbox" id="sync_resources" name="sync_resources">
+                            <label class="form-check-label small" for="sync_resources">Ressources</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-2">
+                            <input class="form-check-input" type="checkbox" id="sync_projects" name="sync_projects">
+                            <label class="form-check-label small" for="sync_projects">Projets</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" {{ not settings.isConfigured or not settings.enabled ? 'disabled' : '' }}>
+                            <i class="bx bx-sync me-1"></i> Synchroniser maintenant
+                        </button>
+                    </form>
+
+                    {# Sync en arriere-plan #}
+                    <form method="post" action="{{ path('admin_boond_manager_sync') }}">
+                        <input type="hidden" name="async" value="1">
+                        <input type="hidden" name="start_date" value="{{ 'now'|date_modify('-30 days')|date('Y-m-d') }}">
+                        <input type="hidden" name="end_date" value="{{ 'now'|date('Y-m-d') }}">
+                        <button type="submit" class="btn btn-outline-primary w-100" {{ not settings.isConfigured or not settings.enabled ? 'disabled' : '' }}>
+                            <i class="bx bx-time me-1"></i> Sync en arriere-plan
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {# Documentation #}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-book me-2"></i>Documentation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">Pour configurer l'API BoondManager:</p>
+                    <ol class="small text-muted ps-3">
+                        <li>Connectez-vous a BoondManager</li>
+                        <li>Allez dans Parametres > Securite</li>
+                        <li>Activez "Autoriser les appels API REST"</li>
+                        <li>Copiez vos identifiants ici</li>
+                    </ol>
+                    <hr>
+                    <p class="small mb-2">Liens utiles:</p>
+                    <ul class="list-unstyled small">
+                        <li><a href="https://doc.boondmanager.com/api-externe/" target="_blank" rel="noopener">
+                            <i class="bx bx-link-external me-1"></i>Documentation API
+                        </a></li>
+                        <li><a href="https://www.postman.com/boondmanager" target="_blank" rel="noopener">
+                            <i class="bx bx-link-external me-1"></i>Collection Postman
+                        </a></li>
+                    </ul>
+                    <hr>
+                    <p class="small mb-1">Commande console:</p>
+                    <code class="small">php bin/console app:sync-boond-manager</code>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Toggle auth type fields
+        const authBasic = document.getElementById('auth_basic');
+        const authJwt = document.getElementById('auth_jwt');
+        const basicFields = document.getElementById('basic_auth_fields');
+        const jwtFields = document.getElementById('jwt_auth_fields');
+
+        function toggleAuthFields() {
+            if (authBasic.checked) {
+                basicFields.classList.remove('d-none');
+                jwtFields.classList.add('d-none');
+            } else {
+                basicFields.classList.add('d-none');
+                jwtFields.classList.remove('d-none');
+            }
+        }
+
+        authBasic.addEventListener('change', toggleAuthFields);
+        authJwt.addEventListener('change', toggleAuthFields);
+
+        // Test connection
+        const btnTest = document.getElementById('btn-test-connection');
+        const resultDiv = document.getElementById('connection-result');
+
+        btnTest.addEventListener('click', async function() {
+            btnTest.disabled = true;
+            btnTest.innerHTML = '<i class="bx bx-loader-alt bx-spin me-1"></i> Test en cours...';
+            resultDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('{{ path('admin_boond_manager_test_connection') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = '<div class="alert alert-success py-2 small mb-0"><i class="bx bx-check me-1"></i>' + data.message + '</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="alert alert-danger py-2 small mb-0"><i class="bx bx-x me-1"></i>' + data.message + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="alert alert-danger py-2 small mb-0"><i class="bx bx-x me-1"></i>Erreur de connexion</div>';
+            }
+
+            btnTest.disabled = false;
+            btnTest.innerHTML = '<i class="bx bx-link me-1"></i> Tester la connexion';
+        });
+
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+{% endblock %}
