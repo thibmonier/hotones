@@ -1,0 +1,436 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Configuration HubSpot{% endblock %}
+
+{% block body %}
+    {% include 'components/page_header.html.twig' with {
+        title: 'Configuration HubSpot',
+        subtitle: 'Synchronisation des affaires, clients et contacts depuis HubSpot',
+        breadcrumb: [
+            {label: 'Administration', url: path('admin_dashboard')},
+            {label: 'HubSpot', active: true}
+        ]
+    } %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="post">
+                <input type="hidden" name="action" value="save_settings">
+
+                {# Configuration API #}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-plug me-2"></i>Configuration API
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-4">
+                            <i class="bx bx-info-circle me-1"></i>
+                            Pour obtenir un token d'acces prive, connectez-vous a HubSpot et allez dans
+                            <strong>Parametres &gt; Integrations &gt; Applications privees</strong>.
+                            Creez une nouvelle application avec les scopes <code>crm.objects.deals.read</code>,
+                            <code>crm.objects.contacts.read</code>, et <code>crm.objects.companies.read</code>.
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="access_token" class="form-label">
+                                Token d'acces prive (Private App Access Token)
+                                <span class="text-muted" data-bs-toggle="tooltip" title="Format: pat-na1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                    <i class="bx bx-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="access_token"
+                                   name="access_token"
+                                   placeholder="{{ settings.accessToken ? '***********' : 'pat-na1-...' }}"
+                                   autocomplete="new-password">
+                            <div class="form-text">Laissez vide pour conserver le token actuel</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="portal_id" class="form-label">
+                                Portal ID (Hub ID) - Optionnel
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="portal_id"
+                                   name="portal_id"
+                                   value="{{ settings.portalId }}"
+                                   placeholder="12345678">
+                            <div class="form-text">Visible dans l'URL de votre compte HubSpot</div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Parametres de synchronisation #}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-sync me-2"></i>Synchronisation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enabled" name="enabled" {{ settings.enabled ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="enabled">
+                                        <strong>Activer la synchronisation</strong>
+                                    </label>
+                                </div>
+                                <div class="form-text">Active/desactive completement le connecteur HubSpot</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="auto_sync_enabled" name="auto_sync_enabled" {{ settings.autoSyncEnabled ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="auto_sync_enabled">
+                                        <strong>Synchronisation automatique</strong>
+                                    </label>
+                                </div>
+                                <div class="form-text">Execute la synchronisation automatiquement</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sync_frequency_hours" class="form-label">Frequence de synchronisation (heures)</label>
+                            <select class="form-select" id="sync_frequency_hours" name="sync_frequency_hours">
+                                <option value="1" {{ settings.syncFrequencyHours == 1 ? 'selected' : '' }}>Chaque heure</option>
+                                <option value="6" {{ settings.syncFrequencyHours == 6 ? 'selected' : '' }}>Toutes les 6 heures</option>
+                                <option value="12" {{ settings.syncFrequencyHours == 12 ? 'selected' : '' }}>Toutes les 12 heures</option>
+                                <option value="24" {{ settings.syncFrequencyHours == 24 ? 'selected' : '' }}>Une fois par jour</option>
+                                <option value="168" {{ settings.syncFrequencyHours == 168 ? 'selected' : '' }}>Une fois par semaine</option>
+                            </select>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="mb-3">Donnees a synchroniser</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="sync_deals" name="sync_deals" {{ settings.syncDeals ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sync_deals">
+                                        Affaires (Deals)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="sync_companies" name="sync_companies" {{ settings.syncCompanies ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sync_companies">
+                                        Entreprises (Companies)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="sync_contacts" name="sync_contacts" {{ settings.syncContacts ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sync_contacts">
+                                        Contacts
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Filtres #}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bx bx-filter me-2"></i>Filtres des affaires
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="pipeline_filter" class="form-label">
+                                Pipeline IDs (optionnel)
+                                <span class="text-muted" data-bs-toggle="tooltip" title="Laissez vide pour synchroniser tous les pipelines">
+                                    <i class="bx bx-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="pipeline_filter"
+                                   name="pipeline_filter"
+                                   value="{{ settings.pipelineFilter }}"
+                                   placeholder="default, custom-pipeline-id">
+                            <div class="form-text">IDs des pipelines separes par des virgules. Laissez vide pour tous les pipelines.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="excluded_stages" class="form-label">
+                                Stages exclus
+                                <span class="text-muted" data-bs-toggle="tooltip" title="Stages a ne pas synchroniser (ex: deals gagnes ou perdus)">
+                                    <i class="bx bx-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="excluded_stages"
+                                   name="excluded_stages"
+                                   value="{{ settings.excludedStages }}"
+                                   placeholder="closedwon, closedlost">
+                            <div class="form-text">Stages a exclure separes par des virgules. Par defaut: closedwon, closedlost</div>
+                        </div>
+
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-load-pipelines">
+                            <i class="bx bx-download me-1"></i> Charger les pipelines disponibles
+                        </button>
+                        <div id="pipelines-list" class="mt-3"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save me-1"></i> Enregistrer les parametres
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {# Panneau lateral #}
+        <div class="col-lg-4">
+            {# Statut #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-stats me-2"></i>Statut
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <td>Configuration</td>
+                                <td class="text-end">
+                                    {% if settings.isConfigured %}
+                                        <span class="badge bg-success">Complete</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Incomplete</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Synchronisation</td>
+                                <td class="text-end">
+                                    {% if settings.enabled %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Desactivee</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Derniere sync</td>
+                                <td class="text-end">
+                                    {% if settings.lastSyncAt %}
+                                        {{ settings.lastSyncAt|date('d/m/Y H:i') }}
+                                    {% else %}
+                                        <span class="text-muted">Jamais</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if settings.lastSyncStatus %}
+                                <tr>
+                                    <td>Statut derniere sync</td>
+                                    <td class="text-end">
+                                        {% if settings.lastSyncStatus == 'success' %}
+                                            <span class="badge bg-success">Succes</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Erreur</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            {% if settings.lastSyncCount is not null %}
+                                <tr>
+                                    <td>Entrees synchronisees</td>
+                                    <td class="text-end"><strong>{{ settings.lastSyncCount }}</strong></td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+
+                    {% if settings.lastSyncError %}
+                        <div class="alert alert-danger mt-3 mb-0 small">
+                            <strong>Erreur:</strong> {{ settings.lastSyncError|slice(0, 200) }}{% if settings.lastSyncError|length > 200 %}...{% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Actions #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-play me-2"></i>Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {# Test de connexion #}
+                    <button type="button" class="btn btn-outline-info w-100 mb-2" id="btn-test-connection" {{ not settings.isConfigured ? 'disabled' : '' }}>
+                        <i class="bx bx-link me-1"></i> Tester la connexion
+                    </button>
+                    <div id="connection-result" class="mb-3"></div>
+
+                    <hr class="my-3">
+
+                    {# Synchronisation manuelle complete #}
+                    <form method="post" action="{{ path('admin_hubspot_sync') }}" class="mb-2">
+                        <button type="submit" class="btn btn-primary w-100" {{ not settings.isConfigured or not settings.enabled ? 'disabled' : '' }}>
+                            <i class="bx bx-sync me-1"></i> Synchroniser tout
+                        </button>
+                    </form>
+
+                    {# Sync par type #}
+                    <div class="d-flex gap-2">
+                        <form method="post" action="{{ path('admin_hubspot_sync_companies') }}" class="flex-fill">
+                            <button type="submit" class="btn btn-outline-primary w-100 btn-sm" {{ not settings.isConfigured or not settings.enabled ? 'disabled' : '' }}>
+                                <i class="bx bx-building me-1"></i> Clients
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('admin_hubspot_sync_contacts') }}" class="flex-fill">
+                            <button type="submit" class="btn btn-outline-primary w-100 btn-sm" {{ not settings.isConfigured or not settings.enabled ? 'disabled' : '' }}>
+                                <i class="bx bx-user me-1"></i> Contacts
+                            </button>
+                        </form>
+                    </div>
+
+                    <hr class="my-3">
+
+                    {# Liens vers les vues #}
+                    <a href="{{ path('admin_hubspot_deals') }}" class="btn btn-outline-secondary w-100 mb-2 {{ not settings.isConfigured or not settings.enabled ? 'disabled' : '' }}">
+                        <i class="bx bx-trending-up me-1"></i> Voir les affaires en cours
+                    </a>
+                    <a href="{{ path('admin_hubspot_clients') }}" class="btn btn-outline-secondary w-100 {{ not settings.isConfigured or not settings.enabled ? 'disabled' : '' }}">
+                        <i class="bx bx-building-house me-1"></i> Voir les clients et contacts
+                    </a>
+                </div>
+            </div>
+
+            {# Documentation #}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bx bx-book me-2"></i>Documentation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">Pour configurer l'API HubSpot:</p>
+                    <ol class="small text-muted ps-3">
+                        <li>Connectez-vous a HubSpot</li>
+                        <li>Allez dans Parametres &gt; Integrations &gt; Applications privees</li>
+                        <li>Creez une nouvelle application</li>
+                        <li>Ajoutez les scopes CRM necessaires</li>
+                        <li>Copiez le token d'acces ici</li>
+                    </ol>
+                    <hr>
+                    <p class="small mb-2">Liens utiles:</p>
+                    <ul class="list-unstyled small">
+                        <li><a href="https://developers.hubspot.com/docs/api/overview" target="_blank" rel="noopener">
+                            <i class="bx bx-link-external me-1"></i>Documentation API HubSpot
+                        </a></li>
+                        <li><a href="https://developers.hubspot.com/docs/api/private-apps" target="_blank" rel="noopener">
+                            <i class="bx bx-link-external me-1"></i>Guide des applications privees
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Test connection
+        const btnTest = document.getElementById('btn-test-connection');
+        const resultDiv = document.getElementById('connection-result');
+
+        btnTest.addEventListener('click', async function() {
+            btnTest.disabled = true;
+            btnTest.innerHTML = '<i class="bx bx-loader-alt bx-spin me-1"></i> Test en cours...';
+            resultDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('{{ path('admin_hubspot_test_connection') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let msg = data.message;
+                    if (data.info) {
+                        msg += '<br><small class="text-muted">' + data.info + '</small>';
+                    }
+                    resultDiv.innerHTML = '<div class="alert alert-success py-2 small mb-0"><i class="bx bx-check me-1"></i>' + msg + '</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="alert alert-danger py-2 small mb-0"><i class="bx bx-x me-1"></i>' + data.message + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="alert alert-danger py-2 small mb-0"><i class="bx bx-x me-1"></i>Erreur de connexion</div>';
+            }
+
+            btnTest.disabled = false;
+            btnTest.innerHTML = '<i class="bx bx-link me-1"></i> Tester la connexion';
+        });
+
+        // Load pipelines
+        const btnLoadPipelines = document.getElementById('btn-load-pipelines');
+        const pipelinesList = document.getElementById('pipelines-list');
+
+        btnLoadPipelines.addEventListener('click', async function() {
+            btnLoadPipelines.disabled = true;
+            btnLoadPipelines.innerHTML = '<i class="bx bx-loader-alt bx-spin me-1"></i> Chargement...';
+            pipelinesList.innerHTML = '';
+
+            try {
+                const response = await fetch('{{ path('admin_hubspot_pipelines') }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.pipelines.length > 0) {
+                    let html = '<div class="table-responsive"><table class="table table-sm table-bordered">';
+                    html += '<thead><tr><th>Pipeline</th><th>ID</th><th>Stages</th></tr></thead><tbody>';
+
+                    data.pipelines.forEach(function(pipeline) {
+                        const stages = (pipeline.stages || []).map(s => s.label || s.id).join(', ');
+                        html += '<tr>';
+                        html += '<td>' + (pipeline.label || pipeline.id) + '</td>';
+                        html += '<td><code class="small">' + pipeline.id + '</code></td>';
+                        html += '<td class="small text-muted">' + stages + '</td>';
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table></div>';
+                    pipelinesList.innerHTML = html;
+                } else {
+                    pipelinesList.innerHTML = '<div class="alert alert-warning py-2 small mb-0">Aucun pipeline trouve ou erreur de connexion</div>';
+                }
+            } catch (error) {
+                pipelinesList.innerHTML = '<div class="alert alert-danger py-2 small mb-0">Erreur lors du chargement des pipelines</div>';
+            }
+
+            btnLoadPipelines.disabled = false;
+            btnLoadPipelines.innerHTML = '<i class="bx bx-download me-1"></i> Charger les pipelines disponibles';
+        });
+
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+{% endblock %}
