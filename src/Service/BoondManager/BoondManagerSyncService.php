@@ -9,13 +9,13 @@ use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Entity\Project;
 use App\Entity\Timesheet;
-use App\Repository\BoondManagerSettingsRepository;
 use App\Repository\ContributorRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\TimesheetRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -29,7 +29,6 @@ class BoondManagerSyncService
         private readonly ContributorRepository $contributorRepository,
         private readonly ProjectRepository $projectRepository,
         private readonly TimesheetRepository $timesheetRepository,
-        private readonly BoondManagerSettingsRepository $settingsRepository,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -48,14 +47,14 @@ class BoondManagerSyncService
 
         if (!$settings->isConfigured()) {
             $result->success = false;
-            $result->error = 'BoondManager n\'est pas configure correctement';
+            $result->error   = 'BoondManager n\'est pas configure correctement';
 
             return $result;
         }
 
         if (!$settings->enabled) {
             $result->success = false;
-            $result->error = 'La synchronisation BoondManager est desactivee';
+            $result->error   = 'La synchronisation BoondManager est desactivee';
 
             return $result;
         }
@@ -63,7 +62,7 @@ class BoondManagerSyncService
         try {
             $this->logger->info('Starting BoondManager sync', [
                 'startDate' => $startDate->format('Y-m-d'),
-                'endDate' => $endDate->format('Y-m-d'),
+                'endDate'   => $endDate->format('Y-m-d'),
             ]);
 
             // Recuperer les temps depuis BoondManager
@@ -74,7 +73,7 @@ class BoondManagerSyncService
             foreach ($boondTimes as $boondTime) {
                 try {
                     $this->processTimeEntry($boondTime, $company, $settings, $result);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $result->errors[] = sprintf(
                         'Erreur traitement temps #%s: %s',
                         $boondTime['id'] ?? 'unknown',
@@ -83,7 +82,7 @@ class BoondManagerSyncService
                     ++$result->skipped;
                     $this->logger->warning('Failed to process time entry', [
                         'timeId' => $boondTime['id'] ?? null,
-                        'error' => $e->getMessage(),
+                        'error'  => $e->getMessage(),
                     ]);
                 }
             }
@@ -91,10 +90,10 @@ class BoondManagerSyncService
             $this->em->flush();
 
             // Mise a jour du statut de synchronisation
-            $settings->lastSyncAt = new DateTime();
+            $settings->lastSyncAt     = new DateTime();
             $settings->lastSyncStatus = 'success';
-            $settings->lastSyncError = null;
-            $settings->lastSyncCount = $result->created + $result->updated;
+            $settings->lastSyncError  = null;
+            $settings->lastSyncCount  = $result->created + $result->updated;
             $this->em->flush();
 
             $result->success = true;
@@ -104,14 +103,14 @@ class BoondManagerSyncService
                 'updated' => $result->updated,
                 'skipped' => $result->skipped,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result->success = false;
-            $result->error = $e->getMessage();
+            $result->error   = $e->getMessage();
 
             // Mise a jour du statut d'erreur
-            $settings->lastSyncAt = new DateTime();
+            $settings->lastSyncAt     = new DateTime();
             $settings->lastSyncStatus = 'error';
-            $settings->lastSyncError = $e->getMessage();
+            $settings->lastSyncError  = $e->getMessage();
             $this->em->flush();
 
             $this->logger->error('BoondManager sync failed', [
@@ -131,19 +130,19 @@ class BoondManagerSyncService
 
         if (!$settings->isConfigured() || !$settings->enabled) {
             $result->success = false;
-            $result->error = 'BoondManager n\'est pas configure ou est desactive';
+            $result->error   = 'BoondManager n\'est pas configure ou est desactive';
 
             return $result;
         }
 
         try {
             $boondResources = $this->client->getResources($settings);
-            $company = $settings->getCompany();
+            $company        = $settings->getCompany();
 
             foreach ($boondResources as $resource) {
                 try {
                     $this->processResource($resource, $company, $result);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $result->errors[] = sprintf(
                         'Erreur traitement ressource #%s: %s',
                         $resource['id'] ?? 'unknown',
@@ -155,9 +154,9 @@ class BoondManagerSyncService
 
             $this->em->flush();
             $result->success = true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result->success = false;
-            $result->error = $e->getMessage();
+            $result->error   = $e->getMessage();
         }
 
         return $result;
@@ -172,19 +171,19 @@ class BoondManagerSyncService
 
         if (!$settings->isConfigured() || !$settings->enabled) {
             $result->success = false;
-            $result->error = 'BoondManager n\'est pas configure ou est desactive';
+            $result->error   = 'BoondManager n\'est pas configure ou est desactive';
 
             return $result;
         }
 
         try {
             $boondProjects = $this->client->getProjects($settings);
-            $company = $settings->getCompany();
+            $company       = $settings->getCompany();
 
             foreach ($boondProjects as $project) {
                 try {
                     $this->processProject($project, $company, $result);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $result->errors[] = sprintf(
                         'Erreur traitement projet #%s: %s',
                         $project['id'] ?? 'unknown',
@@ -196,9 +195,9 @@ class BoondManagerSyncService
 
             $this->em->flush();
             $result->success = true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result->success = false;
-            $result->error = $e->getMessage();
+            $result->error   = $e->getMessage();
         }
 
         return $result;
@@ -217,10 +216,10 @@ class BoondManagerSyncService
     ): void {
         // Extraire les donnees de l'entree de temps
         $boondTimeId = (int) ($boondTime['id'] ?? 0);
-        $resourceId = $this->extractResourceId($boondTime);
-        $projectId = $this->extractProjectId($boondTime);
-        $date = $this->extractDate($boondTime);
-        $hours = $this->extractHours($boondTime);
+        $resourceId  = $this->extractResourceId($boondTime);
+        $projectId   = $this->extractProjectId($boondTime);
+        $date        = $this->extractDate($boondTime);
+        $hours       = $this->extractHours($boondTime);
 
         if ($boondTimeId === 0 || $resourceId === null || $date === null || $hours === null) {
             ++$result->skipped;
@@ -275,13 +274,13 @@ class BoondManagerSyncService
             ++$result->updated;
         } else {
             // Creer une nouvelle entree
-            $timesheet = new Timesheet();
-            $timesheet->company = $company;
+            $timesheet              = new Timesheet();
+            $timesheet->company     = $company;
             $timesheet->contributor = $contributor;
-            $timesheet->project = $project;
-            $timesheet->date = $date;
-            $timesheet->hours = $hours;
-            $timesheet->notes = sprintf(
+            $timesheet->project     = $project;
+            $timesheet->date        = $date;
+            $timesheet->hours       = $hours;
+            $timesheet->notes       = sprintf(
                 '[Boond #%d] %s',
                 $boondTimeId,
                 $boondTime['attributes']['comment'] ?? '',
@@ -348,7 +347,7 @@ class BoondManagerSyncService
     {
         return $this->contributorRepository->findOneBy([
             'boondManagerId' => $boondId,
-            'company' => $company,
+            'company'        => $company,
         ]);
     }
 
@@ -356,7 +355,7 @@ class BoondManagerSyncService
     {
         return $this->projectRepository->findOneBy([
             'boondManagerId' => $boondId,
-            'company' => $company,
+            'company'        => $company,
         ]);
     }
 
@@ -368,9 +367,9 @@ class BoondManagerSyncService
     ): ?Timesheet {
         return $this->timesheetRepository->findOneBy([
             'contributor' => $contributor,
-            'project' => $project,
-            'date' => $date,
-            'company' => $company,
+            'project'     => $project,
+            'date'        => $date,
+            'company'     => $company,
         ]);
     }
 
@@ -379,13 +378,13 @@ class BoondManagerSyncService
      */
     private function createContributorFromBoond(array $boondResource, Company $company): Contributor
     {
-        $contributor = new Contributor();
-        $contributor->company = $company;
+        $contributor                 = new Contributor();
+        $contributor->company        = $company;
         $contributor->boondManagerId = (int) $boondResource['id'];
-        $contributor->firstName = $boondResource['attributes']['firstName'] ?? 'Inconnu';
-        $contributor->lastName = $boondResource['attributes']['lastName'] ?? 'Inconnu';
-        $contributor->email = $boondResource['attributes']['email1'] ?? null;
-        $contributor->active = true;
+        $contributor->firstName      = $boondResource['attributes']['firstName'] ?? 'Inconnu';
+        $contributor->lastName       = $boondResource['attributes']['lastName']  ?? 'Inconnu';
+        $contributor->email          = $boondResource['attributes']['email1']    ?? null;
+        $contributor->active         = true;
 
         $this->em->persist($contributor);
 
@@ -413,12 +412,12 @@ class BoondManagerSyncService
      */
     private function createProjectFromBoond(array $boondProject, Company $company): Project
     {
-        $project = new Project();
-        $project->company = $company;
+        $project                 = new Project();
+        $project->company        = $company;
         $project->boondManagerId = (int) $boondProject['id'];
-        $project->name = $boondProject['attributes']['name'] ?? 'Projet Boond #' . $boondProject['id'];
-        $project->status = 'active';
-        $project->projectType = 'forfait';
+        $project->name           = $boondProject['attributes']['name'] ?? 'Projet Boond #'.$boondProject['id'];
+        $project->status         = 'active';
+        $project->projectType    = 'forfait';
 
         if (isset($boondProject['attributes']['startDate'])) {
             $project->startDate = new DateTime($boondProject['attributes']['startDate']);

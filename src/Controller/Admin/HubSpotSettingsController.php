@@ -44,13 +44,13 @@ class HubSpotSettingsController extends AbstractController
                 }
 
                 // Activation
-                $settings->enabled = $request->request->getBoolean('enabled');
+                $settings->enabled         = $request->request->getBoolean('enabled');
                 $settings->autoSyncEnabled = $request->request->getBoolean('auto_sync_enabled');
 
                 // Options de synchronisation
-                $settings->syncDeals = $request->request->getBoolean('sync_deals');
+                $settings->syncDeals     = $request->request->getBoolean('sync_deals');
                 $settings->syncCompanies = $request->request->getBoolean('sync_companies');
-                $settings->syncContacts = $request->request->getBoolean('sync_contacts');
+                $settings->syncContacts  = $request->request->getBoolean('sync_contacts');
 
                 // Filtres
                 $pipelineFilter = $request->request->get('pipeline_filter');
@@ -134,9 +134,9 @@ class HubSpotSettingsController extends AbstractController
         $result = $syncService->sync($settings);
 
         if ($result->success) {
-            $this->addFlash('success', 'Synchronisation: ' . $result->getSummary());
+            $this->addFlash('success', 'Synchronisation: '.$result->getSummary());
         } else {
-            $this->addFlash('error', 'Echec: ' . $result->error);
+            $this->addFlash('error', 'Echec: '.$result->error);
         }
 
         return $this->redirectToRoute('admin_hubspot_settings');
@@ -158,9 +158,9 @@ class HubSpotSettingsController extends AbstractController
         $result = $syncService->syncCompanies($settings);
 
         if ($result->success) {
-            $this->addFlash('success', 'Clients: ' . $result->getSummary());
+            $this->addFlash('success', 'Clients: '.$result->getSummary());
         } else {
-            $this->addFlash('error', 'Echec: ' . $result->error);
+            $this->addFlash('error', 'Echec: '.$result->error);
         }
 
         return $this->redirectToRoute('admin_hubspot_settings');
@@ -182,9 +182,9 @@ class HubSpotSettingsController extends AbstractController
         $result = $syncService->syncContacts($settings);
 
         if ($result->success) {
-            $this->addFlash('success', 'Contacts: ' . $result->getSummary());
+            $this->addFlash('success', 'Contacts: '.$result->getSummary());
         } else {
-            $this->addFlash('error', 'Echec: ' . $result->error);
+            $this->addFlash('error', 'Echec: '.$result->error);
         }
 
         return $this->redirectToRoute('admin_hubspot_settings');
@@ -206,7 +206,7 @@ class HubSpotSettingsController extends AbstractController
         $dealsData = $syncService->getOpenDeals($settings);
 
         return $this->render('admin/hubspot/deals.html.twig', [
-            'settings' => $settings,
+            'settings'  => $settings,
             'dealsData' => $dealsData,
         ]);
     }
@@ -227,7 +227,7 @@ class HubSpotSettingsController extends AbstractController
         $clientsData = $syncService->getClientsWithContacts($settings);
 
         return $this->render('admin/hubspot/clients.html.twig', [
-            'settings' => $settings,
+            'settings'    => $settings,
             'clientsData' => $clientsData,
         ]);
     }
@@ -241,8 +241,8 @@ class HubSpotSettingsController extends AbstractController
 
         if (!$settings->isConfigured()) {
             return new JsonResponse([
-                'success' => false,
-                'message' => 'HubSpot n\'est pas configure',
+                'success'   => false,
+                'message'   => 'HubSpot n\'est pas configure',
                 'pipelines' => [],
             ]);
         }
@@ -250,7 +250,7 @@ class HubSpotSettingsController extends AbstractController
         $pipelines = $client->getDealPipelines($settings);
 
         return new JsonResponse([
-            'success' => true,
+            'success'   => true,
             'pipelines' => $pipelines,
         ]);
     }

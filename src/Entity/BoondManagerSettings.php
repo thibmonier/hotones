@@ -211,13 +211,13 @@ class BoondManagerSettings implements CompanyOwnedInterface
 
         if ($this->authType === 'basic') {
             return $this->apiUsername !== null && $this->apiUsername !== ''
-                && $this->apiPassword !== null && $this->apiPassword !== '';
+                                               && $this->apiPassword !== null && $this->apiPassword !== '';
         }
 
         // JWT auth
-        return $this->userToken !== null && $this->userToken !== ''
-            && $this->clientToken !== null && $this->clientToken !== ''
-            && $this->clientKey !== null && $this->clientKey !== '';
+        return $this->userToken   !== null && $this->userToken !== ''
+                                           && $this->clientToken !== null && $this->clientToken !== ''
+                                           && $this->clientKey   !== null && $this->clientKey !== '';
     }
 
     public function needsSync(): bool
@@ -230,7 +230,7 @@ class BoondManagerSettings implements CompanyOwnedInterface
             return true;
         }
 
-        $nextSyncTime = (clone $this->lastSyncAt)->modify('+' . $this->syncFrequencyHours . ' hours');
+        $nextSyncTime = (clone $this->lastSyncAt)->modify('+'.$this->syncFrequencyHours.' hours');
 
         return new DateTime() >= $nextSyncTime;
     }

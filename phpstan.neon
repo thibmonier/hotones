@@ -37,7 +37,6 @@ parameters:
         - identifier: booleanAnd.leftNotBoolean
         - identifier: booleanAnd.rightNotBoolean
         - identifier: ternary.condNotBoolean
-        - identifier: elseif.condNotBoolean
 
         # Allow empty() construct (common and useful)
         - identifier: empty.notAllowed

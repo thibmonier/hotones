@@ -10,6 +10,7 @@ use App\Service\BoondManager\BoondManagerClient;
 use App\Service\BoondManager\BoondManagerSyncService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,7 +75,7 @@ class BoondManagerSettingsController extends AbstractController
                 }
 
                 // Activation
-                $settings->enabled = $request->request->getBoolean('enabled');
+                $settings->enabled         = $request->request->getBoolean('enabled');
                 $settings->autoSyncEnabled = $request->request->getBoolean('auto_sync_enabled');
 
                 // Frequence de sync
@@ -136,13 +137,13 @@ class BoondManagerSettingsController extends AbstractController
         }
 
         $startDateStr = $request->request->get('start_date', (new DateTime('-30 days'))->format('Y-m-d'));
-        $endDateStr = $request->request->get('end_date', (new DateTime())->format('Y-m-d'));
-        $async = $request->request->getBoolean('async');
+        $endDateStr   = $request->request->get('end_date', (new DateTime())->format('Y-m-d'));
+        $async        = $request->request->getBoolean('async');
 
         try {
             $startDate = new DateTime($startDateStr);
-            $endDate = new DateTime($endDateStr);
-        } catch (\Exception) {
+            $endDate   = new DateTime($endDateStr);
+        } catch (Exception) {
             $this->addFlash('error', 'Format de date invalide');
 
             return $this->redirectToRoute('admin_boond_manager_settings');
@@ -162,27 +163,27 @@ class BoondManagerSettingsController extends AbstractController
 
         // Sync synchrone
         $syncResources = $request->request->getBoolean('sync_resources');
-        $syncProjects = $request->request->getBoolean('sync_projects');
+        $syncProjects  = $request->request->getBoolean('sync_projects');
 
         $messages = [];
 
         if ($syncResources) {
             $resourceResult = $syncService->syncResources($settings);
-            $messages[] = 'Ressources: ' . $resourceResult->getSummary();
+            $messages[]     = 'Ressources: '.$resourceResult->getSummary();
         }
 
         if ($syncProjects) {
             $projectResult = $syncService->syncProjects($settings);
-            $messages[] = 'Projets: ' . $projectResult->getSummary();
+            $messages[]    = 'Projets: '.$projectResult->getSummary();
         }
 
-        $result = $syncService->sync($settings, $startDate, $endDate);
-        $messages[] = 'Temps: ' . $result->getSummary();
+        $result     = $syncService->sync($settings, $startDate, $endDate);
+        $messages[] = 'Temps: '.$result->getSummary();
 
         if ($result->success) {
             $this->addFlash('success', implode(' | ', $messages));
         } else {
-            $this->addFlash('error', 'Echec: ' . $result->error);
+            $this->addFlash('error', 'Echec: '.$result->error);
         }
 
         return $this->redirectToRoute('admin_boond_manager_settings');
@@ -204,9 +205,9 @@ class BoondManagerSettingsController extends AbstractController
         $result = $syncService->syncResources($settings);
 
         if ($result->success) {
-            $this->addFlash('success', 'Ressources: ' . $result->getSummary());
+            $this->addFlash('success', 'Ressources: '.$result->getSummary());
         } else {
-            $this->addFlash('error', 'Echec: ' . $result->error);
+            $this->addFlash('error', 'Echec: '.$result->error);
         }
 
         return $this->redirectToRoute('admin_boond_manager_settings');
@@ -228,9 +229,9 @@ class BoondManagerSettingsController extends AbstractController
         $result = $syncService->syncProjects($settings);
 
         if ($result->success) {
-            $this->addFlash('success', 'Projets: ' . $result->getSummary());
+            $this->addFlash('success', 'Projets: '.$result->getSummary());
         } else {
-            $this->addFlash('error', 'Echec: ' . $result->error);
+            $this->addFlash('error', 'Echec: '.$result->error);
         }
 
         return $this->redirectToRoute('admin_boond_manager_settings');

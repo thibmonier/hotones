@@ -221,7 +221,7 @@ class HubSpotSettings implements CompanyOwnedInterface
             return true;
         }
 
-        $nextSyncTime = (clone $this->lastSyncAt)->modify('+' . $this->syncFrequencyHours . ' hours');
+        $nextSyncTime = (clone $this->lastSyncAt)->modify('+'.$this->syncFrequencyHours.' hours');
 
         return new DateTime() >= $nextSyncTime;
     }
@@ -237,7 +237,7 @@ class HubSpotSettings implements CompanyOwnedInterface
             return [];
         }
 
-        return array_filter(array_map('trim', explode(',', $this->pipelineFilter)));
+        return array_filter(array_map('trim', explode(',', $this->pipelineFilter)), static fn (string $v): bool => $v !== '');
     }
 
     /**
@@ -251,7 +251,7 @@ class HubSpotSettings implements CompanyOwnedInterface
             return [];
         }
 
-        return array_filter(array_map('trim', explode(',', $this->excludedStages)));
+        return array_filter(array_map('trim', explode(',', $this->excludedStages)), static fn (string $v): bool => $v !== '');
     }
 
     public function getCompany(): Company

@@ -9,11 +9,11 @@ namespace App\Service\HubSpot;
  */
 class SyncResult
 {
-    public bool $success = false;
+    public bool $success  = false;
     public ?string $error = null;
-    public int $created = 0;
-    public int $updated = 0;
-    public int $skipped = 0;
+    public int $created   = 0;
+    public int $updated   = 0;
+    public int $skipped   = 0;
 
     /** @var string[] */
     public array $errors = [];
@@ -44,12 +44,12 @@ class SyncResult
     {
         return [
             'success' => $this->success,
-            'error' => $this->error,
+            'error'   => $this->error,
             'created' => $this->created,
             'updated' => $this->updated,
             'skipped' => $this->skipped,
-            'errors' => $this->errors,
-            'total' => $this->getTotal(),
+            'errors'  => $this->errors,
+            'total'   => $this->getTotal(),
             'summary' => $this->getSummary(),
         ];
     }

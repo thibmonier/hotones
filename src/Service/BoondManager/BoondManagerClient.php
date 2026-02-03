@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Service\BoondManager;
 
 use App\Entity\BoondManagerSettings;
+use DateTimeInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -15,7 +18,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class BoondManagerClient
 {
-    private const TIMEOUT = 30;
+    private const TIMEOUT              = 30;
     private const MAX_RESULTS_PER_PAGE = 100;
 
     public function __construct(
@@ -33,7 +36,7 @@ class BoondManagerClient
             $response = $this->request($settings, 'GET', '/api/application/dictionary');
 
             return $response->getStatusCode() === 200;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('BoondManager connection test failed', [
                 'error' => $e->getMessage(),
             ]);
@@ -45,31 +48,31 @@ class BoondManagerClient
     /**
      * Recupere les temps passes (timesheets) depuis BoondManager.
      *
-     * @param \DateTimeInterface $startDate Date de debut
-     * @param \DateTimeInterface $endDate   Date de fin
+     * @param DateTimeInterface $startDate Date de debut
+     * @param DateTimeInterface $endDate   Date de fin
      *
      * @return array<int, array<string, mixed>> Liste des temps passes
      */
     public function getTimes(
         BoondManagerSettings $settings,
-        \DateTimeInterface $startDate,
-        \DateTimeInterface $endDate,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
     ): array {
         $allTimes = [];
-        $page = 1;
+        $page     = 1;
 
         do {
             $response = $this->request($settings, 'GET', '/api/times', [
                 'query' => [
-                    'startDate' => $startDate->format('Y-m-d'),
-                    'endDate' => $endDate->format('Y-m-d'),
+                    'startDate'  => $startDate->format('Y-m-d'),
+                    'endDate'    => $endDate->format('Y-m-d'),
                     'maxResults' => self::MAX_RESULTS_PER_PAGE,
-                    'page' => $page,
+                    'page'       => $page,
                 ],
             ]);
 
-            $data = $response->toArray();
-            $times = $data['data'] ?? [];
+            $data     = $response->toArray();
+            $times    = $data['data'] ?? [];
             $allTimes = array_merge($allTimes, $times);
 
             $hasMore = isset($data['meta']['pagination']['hasMore']) && $data['meta']['pagination']['hasMore'];
@@ -77,9 +80,9 @@ class BoondManagerClient
         } while ($hasMore && $page < 100); // Safety limit
 
         $this->logger->info('BoondManager: Retrieved {count} time entries', [
-            'count' => count($allTimes),
+            'count'     => count($allTimes),
             'startDate' => $startDate->format('Y-m-d'),
-            'endDate' => $endDate->format('Y-m-d'),
+            'endDate'   => $endDate->format('Y-m-d'),
         ]);
 
         return $allTimes;
@@ -93,18 +96,18 @@ class BoondManagerClient
     public function getResources(BoondManagerSettings $settings): array
     {
         $allResources = [];
-        $page = 1;
+        $page         = 1;
 
         do {
             $response = $this->request($settings, 'GET', '/api/resources', [
                 'query' => [
                     'maxResults' => self::MAX_RESULTS_PER_PAGE,
-                    'page' => $page,
+                    'page'       => $page,
                 ],
             ]);
 
-            $data = $response->toArray();
-            $resources = $data['data'] ?? [];
+            $data         = $response->toArray();
+            $resources    = $data['data'] ?? [];
             $allResources = array_merge($allResources, $resources);
 
             $hasMore = isset($data['meta']['pagination']['hasMore']) && $data['meta']['pagination']['hasMore'];
@@ -126,14 +129,14 @@ class BoondManagerClient
     public function getResource(BoondManagerSettings $settings, int $resourceId): ?array
     {
         try {
-            $response = $this->request($settings, 'GET', '/api/resources/' . $resourceId);
-            $data = $response->toArray();
+            $response = $this->request($settings, 'GET', '/api/resources/'.$resourceId);
+            $data     = $response->toArray();
 
             return $data['data'] ?? null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('BoondManager: Failed to get resource', [
                 'resourceId' => $resourceId,
-                'error' => $e->getMessage(),
+                'error'      => $e->getMessage(),
             ]);
 
             return null;
@@ -148,18 +151,18 @@ class BoondManagerClient
     public function getProjects(BoondManagerSettings $settings): array
     {
         $allProjects = [];
-        $page = 1;
+        $page        = 1;
 
         do {
             $response = $this->request($settings, 'GET', '/api/projects', [
                 'query' => [
                     'maxResults' => self::MAX_RESULTS_PER_PAGE,
-                    'page' => $page,
+                    'page'       => $page,
                 ],
             ]);
 
-            $data = $response->toArray();
-            $projects = $data['data'] ?? [];
+            $data        = $response->toArray();
+            $projects    = $data['data'] ?? [];
             $allProjects = array_merge($allProjects, $projects);
 
             $hasMore = isset($data['meta']['pagination']['hasMore']) && $data['meta']['pagination']['hasMore'];
@@ -181,14 +184,14 @@ class BoondManagerClient
     public function getProject(BoondManagerSettings $settings, int $projectId): ?array
     {
         try {
-            $response = $this->request($settings, 'GET', '/api/projects/' . $projectId);
-            $data = $response->toArray();
+            $response = $this->request($settings, 'GET', '/api/projects/'.$projectId);
+            $data     = $response->toArray();
 
             return $data['data'] ?? null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('BoondManager: Failed to get project', [
                 'projectId' => $projectId,
-                'error' => $e->getMessage(),
+                'error'     => $e->getMessage(),
             ]);
 
             return null;
@@ -204,10 +207,10 @@ class BoondManagerClient
     {
         try {
             $response = $this->request($settings, 'GET', '/api/application/dictionary');
-            $data = $response->toArray();
+            $data     = $response->toArray();
 
             return $data['data'] ?? null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('BoondManager: Failed to get dictionary', [
                 'error' => $e->getMessage(),
             ]);
@@ -228,12 +231,12 @@ class BoondManagerClient
         array $options = [],
     ): ResponseInterface {
         $baseUrl = rtrim($settings->apiBaseUrl ?? '', '/');
-        $url = $baseUrl . $endpoint;
+        $url     = $baseUrl.$endpoint;
 
         $defaultOptions = [
             'timeout' => self::TIMEOUT,
             'headers' => [
-                'Accept' => 'application/json',
+                'Accept'       => 'application/json',
                 'Content-Type' => 'application/json',
             ],
         ];
@@ -246,15 +249,15 @@ class BoondManagerClient
             ];
         } else {
             // JWT Authentication
-            $jwtToken = $this->generateJwtToken($settings);
-            $defaultOptions['headers']['Authorization'] = 'Bearer ' . $jwtToken;
+            $jwtToken                                   = $this->generateJwtToken($settings);
+            $defaultOptions['headers']['Authorization'] = 'Bearer '.$jwtToken;
         }
 
         $mergedOptions = array_merge_recursive($defaultOptions, $options);
 
         $this->logger->debug('BoondManager API request', [
             'method' => $method,
-            'url' => $url,
+            'url'    => $url,
         ]);
 
         return $this->httpClient->request($method, $url, $mergedOptions);
@@ -267,29 +270,29 @@ class BoondManagerClient
     {
         // Le JWT BoondManager est construit avec: userToken + clientToken + clientKey
         // Format: base64(userToken).base64(clientToken).signature(clientKey)
-        $header = json_encode(['alg' => 'HS256', 'typ' => 'JWT']);
+        $header  = json_encode(['alg' => 'HS256', 'typ' => 'JWT']);
         $payload = json_encode([
-            'userToken' => $settings->userToken,
+            'userToken'   => $settings->userToken,
             'clientToken' => $settings->clientToken,
-            'iat' => time(),
-            'exp' => time() + 3600,
+            'iat'         => time(),
+            'exp'         => time() + 3600,
         ]);
 
         if ($header === false || $payload === false) {
-            throw new \RuntimeException('Failed to encode JWT components');
+            throw new RuntimeException('Failed to encode JWT components');
         }
 
-        $base64Header = $this->base64UrlEncode($header);
+        $base64Header  = $this->base64UrlEncode($header);
         $base64Payload = $this->base64UrlEncode($payload);
 
         $signature = hash_hmac(
             'sha256',
-            $base64Header . '.' . $base64Payload,
+            $base64Header.'.'.$base64Payload,
             $settings->clientKey ?? '',
             true,
         );
 
-        return $base64Header . '.' . $base64Payload . '.' . $this->base64UrlEncode($signature);
+        return $base64Header.'.'.$base64Payload.'.'.$this->base64UrlEncode($signature);
     }
 
     private function base64UrlEncode(string $data): string

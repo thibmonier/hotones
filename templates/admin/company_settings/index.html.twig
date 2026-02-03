@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}Paramètres de l'entreprise{% endblock %}
 
@@ -7,8 +7,7 @@
         title: 'Paramètres de l\'entreprise',
         subtitle: 'Configuration des coefficients pour le calcul du CJM',
         breadcrumb: [
-            {label: 'Administration', url: path('admin_dashboard')},
-            {label: 'Paramètres entreprise', active: true}
+            {label: 'Paramètres entreprise', path: null}
         ]
     } %}
 

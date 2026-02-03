@@ -76,6 +76,20 @@ services:
         arguments:
             $analyticsCache: '@cache.analytics'
 
+when@dev:
+    services:
+        # Enable DataFixtures in dev environment
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/'
+            autowire: true
+            autoconfigure: true
+
+        # Enable Foundry factories as services in dev environment
+        App\Factory\:
+            resource: '../src/Factory/'
+            autowire: true
+            autoconfigure: true
+
 when@test:
     services:
         # Enable Foundry factories as services in test environment

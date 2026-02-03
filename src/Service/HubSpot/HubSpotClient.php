@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\HubSpot;
 
 use App\Entity\HubSpotSettings;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -15,8 +16,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class HubSpotClient
 {
-    private const API_BASE_URL = 'https://api.hubapi.com';
-    private const TIMEOUT = 30;
+    private const API_BASE_URL         = 'https://api.hubapi.com';
+    private const TIMEOUT              = 30;
     private const MAX_RESULTS_PER_PAGE = 100;
 
     public function __construct(
@@ -36,7 +37,7 @@ class HubSpotClient
             ]);
 
             return $response->getStatusCode() === 200;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot connection test failed', [
                 'error' => $e->getMessage(),
             ]);
@@ -56,7 +57,7 @@ class HubSpotClient
             $response = $this->request($settings, 'GET', '/account-info/v3/details');
 
             return $response->toArray();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot: Failed to get account info', [
                 'error' => $e->getMessage(),
             ]);
@@ -74,14 +75,14 @@ class HubSpotClient
     {
         try {
             $response = $this->request($settings, 'GET', '/crm/v3/pipelines/deals');
-            $data = $response->toArray();
+            $data     = $response->toArray();
 
             $this->logger->info('HubSpot: Retrieved {count} deal pipelines', [
                 'count' => count($data['results'] ?? []),
             ]);
 
             return $data['results'] ?? [];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot: Failed to get deal pipelines', [
                 'error' => $e->getMessage(),
             ]);
@@ -103,8 +104,8 @@ class HubSpotClient
         array $excludedStages = [],
         array $pipelineIds = [],
     ): array {
-        $allDeals = [];
-        $after = null;
+        $allDeals   = [];
+        $after      = null;
         $properties = [
             'dealname',
             'amount',
@@ -119,8 +120,8 @@ class HubSpotClient
 
         do {
             $queryParams = [
-                'limit' => self::MAX_RESULTS_PER_PAGE,
-                'properties' => implode(',', $properties),
+                'limit'        => self::MAX_RESULTS_PER_PAGE,
+                'properties'   => implode(',', $properties),
                 'associations' => 'companies,contacts',
             ];
 
@@ -132,13 +133,13 @@ class HubSpotClient
                 'query' => $queryParams,
             ]);
 
-            $data = $response->toArray();
+            $data  = $response->toArray();
             $deals = $data['results'] ?? [];
 
             // Filtrer les deals selon les criteres
             foreach ($deals as $deal) {
-                $stage = $deal['properties']['dealstage'] ?? '';
-                $pipeline = $deal['properties']['pipeline'] ?? '';
+                $stage    = $deal['properties']['dealstage'] ?? '';
+                $pipeline = $deal['properties']['pipeline']  ?? '';
 
                 // Exclure les stages non desires
                 if (in_array($stage, $excludedStages, true)) {
@@ -157,9 +158,9 @@ class HubSpotClient
         } while ($after !== null && count($allDeals) < 10000); // Safety limit
 
         $this->logger->info('HubSpot: Retrieved {count} deals', [
-            'count' => count($allDeals),
+            'count'          => count($allDeals),
             'excludedStages' => $excludedStages,
-            'pipelineIds' => $pipelineIds,
+            'pipelineIds'    => $pipelineIds,
         ]);
 
         return $allDeals;
@@ -185,18 +186,18 @@ class HubSpotClient
                 'description',
             ];
 
-            $response = $this->request($settings, 'GET', '/crm/v3/objects/deals/' . $dealId, [
+            $response = $this->request($settings, 'GET', '/crm/v3/objects/deals/'.$dealId, [
                 'query' => [
-                    'properties' => implode(',', $properties),
+                    'properties'   => implode(',', $properties),
                     'associations' => 'companies,contacts',
                 ],
             ]);
 
             return $response->toArray();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot: Failed to get deal', [
                 'dealId' => $dealId,
-                'error' => $e->getMessage(),
+                'error'  => $e->getMessage(),
             ]);
 
             return null;
@@ -211,8 +212,8 @@ class HubSpotClient
     public function getCompanies(HubSpotSettings $settings): array
     {
         $allCompanies = [];
-        $after = null;
-        $properties = [
+        $after        = null;
+        $properties   = [
             'name',
             'domain',
             'description',
@@ -227,8 +228,8 @@ class HubSpotClient
 
         do {
             $queryParams = [
-                'limit' => self::MAX_RESULTS_PER_PAGE,
-                'properties' => implode(',', $properties),
+                'limit'        => self::MAX_RESULTS_PER_PAGE,
+                'properties'   => implode(',', $properties),
                 'associations' => 'contacts,deals',
             ];
 
@@ -240,8 +241,8 @@ class HubSpotClient
                 'query' => $queryParams,
             ]);
 
-            $data = $response->toArray();
-            $companies = $data['results'] ?? [];
+            $data         = $response->toArray();
+            $companies    = $data['results'] ?? [];
             $allCompanies = array_merge($allCompanies, $companies);
 
             $after = $data['paging']['next']['after'] ?? null;
@@ -273,18 +274,18 @@ class HubSpotClient
                 'country',
             ];
 
-            $response = $this->request($settings, 'GET', '/crm/v3/objects/companies/' . $companyId, [
+            $response = $this->request($settings, 'GET', '/crm/v3/objects/companies/'.$companyId, [
                 'query' => [
-                    'properties' => implode(',', $properties),
+                    'properties'   => implode(',', $properties),
                     'associations' => 'contacts,deals',
                 ],
             ]);
 
             return $response->toArray();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot: Failed to get company', [
                 'companyId' => $companyId,
-                'error' => $e->getMessage(),
+                'error'     => $e->getMessage(),
             ]);
 
             return null;
@@ -299,8 +300,8 @@ class HubSpotClient
     public function getContacts(HubSpotSettings $settings): array
     {
         $allContacts = [];
-        $after = null;
-        $properties = [
+        $after       = null;
+        $properties  = [
             'firstname',
             'lastname',
             'email',
@@ -314,8 +315,8 @@ class HubSpotClient
 
         do {
             $queryParams = [
-                'limit' => self::MAX_RESULTS_PER_PAGE,
-                'properties' => implode(',', $properties),
+                'limit'        => self::MAX_RESULTS_PER_PAGE,
+                'properties'   => implode(',', $properties),
                 'associations' => 'companies',
             ];
 
@@ -327,8 +328,8 @@ class HubSpotClient
                 'query' => $queryParams,
             ]);
 
-            $data = $response->toArray();
-            $contacts = $data['results'] ?? [];
+            $data        = $response->toArray();
+            $contacts    = $data['results'] ?? [];
             $allContacts = array_merge($allContacts, $contacts);
 
             $after = $data['paging']['next']['after'] ?? null;
@@ -359,18 +360,18 @@ class HubSpotClient
                 'company',
             ];
 
-            $response = $this->request($settings, 'GET', '/crm/v3/objects/contacts/' . $contactId, [
+            $response = $this->request($settings, 'GET', '/crm/v3/objects/contacts/'.$contactId, [
                 'query' => [
-                    'properties' => implode(',', $properties),
+                    'properties'   => implode(',', $properties),
                     'associations' => 'companies',
                 ],
             ]);
 
             return $response->toArray();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot: Failed to get contact', [
                 'contactId' => $contactId,
-                'error' => $e->getMessage(),
+                'error'     => $e->getMessage(),
             ]);
 
             return null;
@@ -388,10 +389,10 @@ class HubSpotClient
             $response = $this->request(
                 $settings,
                 'GET',
-                '/crm/v3/objects/companies/' . $companyId . '/associations/contacts',
+                '/crm/v3/objects/companies/'.$companyId.'/associations/contacts',
             );
 
-            $data = $response->toArray();
+            $data       = $response->toArray();
             $contactIds = array_map(
                 fn (array $assoc) => $assoc['id'],
                 $data['results'] ?? [],
@@ -411,10 +412,10 @@ class HubSpotClient
             }
 
             return $contacts;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot: Failed to get contacts by company', [
                 'companyId' => $companyId,
-                'error' => $e->getMessage(),
+                'error'     => $e->getMessage(),
             ]);
 
             return [];
@@ -442,7 +443,7 @@ class HubSpotClient
 
             $body = [
                 'properties' => $properties,
-                'limit' => self::MAX_RESULTS_PER_PAGE,
+                'limit'      => self::MAX_RESULTS_PER_PAGE,
             ];
 
             if (!empty($filters)) {
@@ -460,10 +461,10 @@ class HubSpotClient
             $data = $response->toArray();
 
             return $data['results'] ?? [];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('HubSpot: Failed to search deals', [
                 'filters' => $filters,
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ]);
 
             return [];
@@ -481,14 +482,14 @@ class HubSpotClient
         string $endpoint,
         array $options = [],
     ): ResponseInterface {
-        $url = self::API_BASE_URL . $endpoint;
+        $url = self::API_BASE_URL.$endpoint;
 
         $defaultOptions = [
             'timeout' => self::TIMEOUT,
             'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . $settings->accessToken,
+                'Accept'        => 'application/json',
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer '.$settings->accessToken,
             ],
         ];
 
@@ -496,7 +497,7 @@ class HubSpotClient
 
         $this->logger->debug('HubSpot API request', [
             'method' => $method,
-            'url' => $url,
+            'url'    => $url,
         ]);
 
         return $this->httpClient->request($method, $url, $mergedOptions);

@@ -7,10 +7,9 @@ namespace App\DataFixtures;
 use App\Entity\OnboardingTemplate;
 use App\Entity\Profile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class OnboardingTemplateFixtures extends Fixture implements DependentFixtureInterface
+class OnboardingTemplateFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
@@ -51,14 +50,6 @@ class OnboardingTemplateFixtures extends Fixture implements DependentFixtureInte
         $manager->persist($defaultTemplate);
 
         $manager->flush();
-    }
-
-    /**
-     * @return array<class-string<\Doctrine\Common\DataFixtures\FixtureInterface>>
-     */
-    public function getDependencies(): array
-    {
-        return [];
     }
 
     private function getProfileByName(ObjectManager $manager, string $name): ?Profile

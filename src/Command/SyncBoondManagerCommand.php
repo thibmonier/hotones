@@ -38,7 +38,7 @@ class SyncBoondManagerCommand extends Command
     {
         $this
             ->addOption('start-date', 's', InputOption::VALUE_OPTIONAL, 'Date de debut (YYYY-MM-DD)', (new DateTime('-30 days'))->format('Y-m-d'))
-            ->addOption('end-date', 'e', InputOption::VALUE_OPTIONAL, 'Date de fin (YYYY-MM-DD)', (new DateTime())->format('Y-m-d'))
+            ->addOption('end-date', 'f', InputOption::VALUE_OPTIONAL, 'Date de fin (YYYY-MM-DD)', (new DateTime())->format('Y-m-d'))
             ->addOption('sync-resources', null, InputOption::VALUE_NONE, 'Synchroniser aussi les ressources (contributeurs)')
             ->addOption('sync-projects', null, InputOption::VALUE_NONE, 'Synchroniser aussi les projets')
             ->addOption('test-connection', 't', InputOption::VALUE_NONE, 'Tester uniquement la connexion a l\'API')
@@ -49,7 +49,7 @@ Cette commande synchronise les temps passes depuis BoondManager vers HotOnes.
 
 Exemples :
   app:sync-boond-manager                           # Sync des 30 derniers jours
-  app:sync-boond-manager -s 2024-01-01 -e 2024-01-31  # Sync de janvier 2024
+  app:sync-boond-manager -s 2024-01-01 -f 2024-01-31  # Sync de janvier 2024
   app:sync-boond-manager --sync-resources          # Sync avec les contributeurs
   app:sync-boond-manager --sync-projects           # Sync avec les projets
   app:sync-boond-manager --test-connection         # Test de connexion uniquement
@@ -69,17 +69,17 @@ HELP
     {
         $io = new SymfonyStyle($input, $output);
 
-        $startDateStr = $input->getOption('start-date');
-        $endDateStr = $input->getOption('end-date');
-        $syncResources = $input->getOption('sync-resources');
-        $syncProjects = $input->getOption('sync-projects');
+        $startDateStr   = $input->getOption('start-date');
+        $endDateStr     = $input->getOption('end-date');
+        $syncResources  = $input->getOption('sync-resources');
+        $syncProjects   = $input->getOption('sync-projects');
         $testConnection = $input->getOption('test-connection');
-        $async = $input->getOption('async');
-        $all = $input->getOption('all');
+        $async          = $input->getOption('async');
+        $all            = $input->getOption('all');
 
         try {
             $startDate = new DateTime($startDateStr);
-            $endDate = new DateTime($endDateStr);
+            $endDate   = new DateTime($endDateStr);
         } catch (Exception $e) {
             $io->error('Format de date invalide. Utilisez YYYY-MM-DD');
 
@@ -93,7 +93,7 @@ HELP
 
             return $this->syncCurrentCompany($io, $startDate, $endDate, $async, $syncResources, $syncProjects, $testConnection);
         } catch (Exception $e) {
-            $io->error('Erreur: ' . $e->getMessage());
+            $io->error('Erreur: '.$e->getMessage());
 
             if ($output->isVerbose()) {
                 $io->writeln('Stack trace:');
@@ -124,7 +124,7 @@ HELP
         $io->info(sprintf('Synchronisation de %d entreprise(s)...', count($settingsList)));
 
         $successCount = 0;
-        $errorCount = 0;
+        $errorCount   = 0;
 
         foreach ($settingsList as $settings) {
             $companyName = $settings->getCompany()->getName();
@@ -261,7 +261,7 @@ HELP
 
             if (!empty($resourceResult->errors)) {
                 foreach (array_slice($resourceResult->errors, 0, 5) as $error) {
-                    $io->writeln('  - ' . $error);
+                    $io->writeln('  - '.$error);
                 }
             }
         }
@@ -273,7 +273,7 @@ HELP
 
             if (!empty($projectResult->errors)) {
                 foreach (array_slice($projectResult->errors, 0, 5) as $error) {
-                    $io->writeln('  - ' . $error);
+                    $io->writeln('  - '.$error);
                 }
             }
         }
@@ -297,19 +297,19 @@ HELP
             if (!empty($result->errors)) {
                 $io->warning('Quelques erreurs rencontrees:');
                 foreach (array_slice($result->errors, 0, 10) as $error) {
-                    $io->writeln('  - ' . $error);
+                    $io->writeln('  - '.$error);
                 }
             }
 
             return Command::SUCCESS;
         }
 
-        $io->error('Echec de la synchronisation: ' . $result->error);
+        $io->error('Echec de la synchronisation: '.$result->error);
 
         if (!empty($result->errors)) {
             $io->section('Erreurs detaillees:');
             foreach ($result->errors as $error) {
-                $io->writeln('  - ' . $error);
+                $io->writeln('  - '.$error);
             }
         }
 

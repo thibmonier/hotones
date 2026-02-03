@@ -47,17 +47,17 @@ final readonly class SyncBoondManagerTimesMessageHandler
         }
 
         $startDate = new DateTime($message->startDate);
-        $endDate = new DateTime($message->endDate);
+        $endDate   = new DateTime($message->endDate);
 
         $result = $this->syncService->sync($settings, $startDate, $endDate);
 
         $this->logger->info('SyncBoondManagerTimes completed', [
             'companyId' => $message->companyId,
-            'success' => $result->success,
-            'created' => $result->created,
-            'updated' => $result->updated,
-            'skipped' => $result->skipped,
-            'error' => $result->error,
+            'success'   => $result->success,
+            'created'   => $result->created,
+            'updated'   => $result->updated,
+            'skipped'   => $result->skipped,
+            'error'     => $result->error,
         ]);
     }
 }
