@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ContributorRepository::class)]
 #[ORM\Table(name: 'contributors')]
 #[ORM\Index(name: 'idx_contributor_company', columns: ['company_id'])]
+#[ORM\Index(name: 'idx_contributor_boond_manager', columns: ['boond_manager_id'])]
 #[ApiResource(
     operations: [
         new Get(security: "is_granted('ROLE_USER')"),
@@ -124,6 +125,17 @@ class Contributor implements CompanyOwnedInterface
         get => $this->notes;
         set {
             $this->notes = $value;
+        }
+    }
+
+    /**
+     * ID de la ressource dans BoondManager pour la synchronisation.
+     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    public ?int $boondManagerId = null {
+        get => $this->boondManagerId;
+        set {
+            $this->boondManagerId = $value;
         }
     }
 
@@ -805,6 +817,26 @@ class Contributor implements CompanyOwnedInterface
     public function setManager(?Contributor $value): self
     {
         $this->manager = $value;
+
+        return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->boondManagerId.
+     */
+    public function getBoondManagerId(): ?int
+    {
+        return $this->boondManagerId;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.4 property hooks, prefer direct access: $contributor->boondManagerId = $value.
+     */
+    public function setBoondManagerId(?int $value): self
+    {
+        $this->boondManagerId = $value;
 
         return $this;
     }

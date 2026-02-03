@@ -300,6 +300,12 @@
                                 Paramètres notifications
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ app.request.pathinfo starts with '/admin/boond-manager' ? 'active' : '' }}" href="{{ path('admin_boond_manager_settings') }}">
+                                <i class="bx bx-sync me-2"></i>
+                                BoondManager
+                            </a>
+                        </li>
                     </ul>
                     {% endif %}
                 </div>
