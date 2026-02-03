@@ -28,7 +28,7 @@ RUN yarn build
 # ============================================
 # Stage 2: Production PHP + Nginx image
 # ============================================
-FROM php:8.5.1-fpm-alpine3.23
+FROM php:8.5.3RC1-fpm-alpine3.23
 
 # Install system dependencies with cache mount
 # Cache APK évite de re-télécharger les packages à chaque build
