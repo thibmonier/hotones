@@ -55,28 +55,16 @@ parameters:
 			path: src/Entity/NpsSurvey.php
 
 		-
+			message: '#^Only booleans are allowed in an elseif condition, App\\Entity\\ProjectTask\|null given\.$#'
+			identifier: elseif.condNotBoolean
+			count: 1
+			path: src/Repository/TimesheetRepository.php
+
+		-
 			message: '#^Call to method Doctrine\\ORM\\QueryBuilder\:\:andWhere\(\) with incorrect case\: andwhere$#'
 			identifier: method.nameCase
 			count: 1
 			path: src/Repository/VacationRepository.php
-
-		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 1
-			path: src/Security/CompanyContext.php
-
-		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
-			count: 1
-			path: src/Security/CompanyContext.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: src/Security/CompanyContext.php
 
 		-
 			message: '#^Variable method call on \$this\(App\\Service\\ExcelExportService\)\.$#'

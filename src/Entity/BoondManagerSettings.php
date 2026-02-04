@@ -210,14 +210,14 @@ class BoondManagerSettings implements CompanyOwnedInterface
         }
 
         if ($this->authType === 'basic') {
-            return $this->apiUsername !== null && $this->apiUsername !== ''
-                                               && $this->apiPassword !== null && $this->apiPassword !== '';
+            return $this->apiUsername                                !== null && $this->apiUsername !== ''
+                                                                              && $this->apiPassword !== null && $this->apiPassword !== '';
         }
 
         // JWT auth
-        return $this->userToken   !== null && $this->userToken !== ''
-                                           && $this->clientToken !== null && $this->clientToken !== ''
-                                           && $this->clientKey   !== null && $this->clientKey !== '';
+        return $this->userToken                                  !== null && $this->userToken !== ''
+                                                                          && $this->clientToken !== null && $this->clientToken !== ''
+                                                                          && $this->clientKey   !== null && $this->clientKey !== '';
     }
 
     public function needsSync(): bool
