@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Technology;
+use App\Security\CompanyContext;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -18,8 +21,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Override;
 
+/**
+ * @extends AbstractCrudController<Technology>
+ */
 class TechnologyCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return Technology::class;
@@ -93,5 +104,17 @@ class TechnologyCrudController extends AbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+
+    /**
+     * Create a new Technology with company pre-assigned.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): Technology
+    {
+        $technology = new Technology();
+        $technology->setCompany($this->companyContext->getCurrentCompany());
+
+        return $technology;
     }
 }
