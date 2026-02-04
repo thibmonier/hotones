@@ -181,8 +181,9 @@ class EmploymentPeriodController extends AbstractController
     #[Route('/new', name: 'employment_period_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository, CjmCalculatorService $cjmCalculatorService): Response
     {
-        $period = new EmploymentPeriod();
-        $period->setCompany($this->companyContext->getCurrentCompany());
+        $company = $this->companyContext->getCurrentCompany();
+        $period  = new EmploymentPeriod();
+        $period->setCompany($company);
 
         // Pré-sélectionner le collaborateur si fourni dans l'URL
         if ($contributorId = $request->query->get('contributor')) {
@@ -211,27 +212,27 @@ class EmploymentPeriodController extends AbstractController
 
             // Données financières
             $salary = $request->request->get('salary');
-            $period->setSalary($salary !== '' ? (float) $salary : null);
+            $period->setSalary($salary !== '' && $salary !== null ? (string) $salary : null);
 
             // Calculer automatiquement le CJM si un salaire est fourni
             if ($period->getSalary()) {
                 $year          = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
-                $period->setCjm((float) $calculatedCjm);
+                $period->setCjm((string) $calculatedCjm);
             } else {
                 // Autoriser la saisie manuelle si pas de salaire
                 $cjm = $request->request->get('cjm');
-                $period->setCjm($cjm !== '' ? (float) $cjm : null);
+                $period->setCjm($cjm !== '' && $cjm !== null ? (string) $cjm : null);
             }
 
             $tjm = $request->request->get('tjm');
-            $period->setTjm($tjm !== '' ? (float) $tjm : null);
+            $period->setTjm($tjm !== '' && $tjm !== null ? (string) $tjm : null);
 
             $weeklyHours = $request->request->get('weekly_hours');
-            $period->setWeeklyHours($weeklyHours !== '' ? (float) $weeklyHours : 35.0);
+            $period->setWeeklyHours($weeklyHours !== '' && $weeklyHours !== null ? (string) $weeklyHours : '35.00');
 
             $workTimePercentage = $request->request->get('work_time_percentage');
-            $period->setWorkTimePercentage($workTimePercentage !== '' ? (float) $workTimePercentage : 100.0);
+            $period->setWorkTimePercentage($workTimePercentage !== '' && $workTimePercentage !== null ? (string) $workTimePercentage : '100.00');
 
             // Gestion des profils
             $profileIds = $request->request->all('profiles');
@@ -327,27 +328,27 @@ class EmploymentPeriodController extends AbstractController
 
             // Données financières
             $salary = $request->request->get('salary');
-            $period->setSalary($salary !== '' ? (float) $salary : null);
+            $period->setSalary($salary !== '' && $salary !== null ? (string) $salary : null);
 
             // Calculer automatiquement le CJM si un salaire est fourni
             if ($period->getSalary()) {
                 $year          = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
-                $period->setCjm((float) $calculatedCjm);
+                $period->setCjm((string) $calculatedCjm);
             } else {
                 // Autoriser la saisie manuelle si pas de salaire
                 $cjm = $request->request->get('cjm');
-                $period->setCjm($cjm !== '' ? (float) $cjm : null);
+                $period->setCjm($cjm !== '' && $cjm !== null ? (string) $cjm : null);
             }
 
             $tjm = $request->request->get('tjm');
-            $period->setTjm($tjm !== '' ? (float) $tjm : null);
+            $period->setTjm($tjm !== '' && $tjm !== null ? (string) $tjm : null);
 
             $weeklyHours = $request->request->get('weekly_hours');
-            $period->setWeeklyHours($weeklyHours !== '' ? (float) $weeklyHours : 35.0);
+            $period->setWeeklyHours($weeklyHours !== '' && $weeklyHours !== null ? (string) $weeklyHours : '35.00');
 
             $workTimePercentage = $request->request->get('work_time_percentage');
-            $period->setWorkTimePercentage($workTimePercentage !== '' ? (float) $workTimePercentage : 100.0);
+            $period->setWorkTimePercentage($workTimePercentage !== '' && $workTimePercentage !== null ? (string) $workTimePercentage : '100.00');
 
             // Gestion des profils
             $period->profiles->clear();
