@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Skill;
+use App\Security\CompanyContext;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -18,8 +21,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Override;
 
+/**
+ * @extends AbstractCrudController<Skill>
+ */
 class SkillCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return Skill::class;
@@ -87,5 +98,17 @@ class SkillCrudController extends AbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+
+    /**
+     * Create a new Skill with company pre-assigned.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): Skill
+    {
+        $skill = new Skill();
+        $skill->setCompany($this->companyContext->getCurrentCompany());
+
+        return $skill;
     }
 }

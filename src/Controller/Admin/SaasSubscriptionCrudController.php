@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\SaasSubscription;
+use App\Security\CompanyContext;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -22,8 +25,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use Override;
 
+/**
+ * @extends AbstractCrudController<SaasSubscription>
+ */
 class SaasSubscriptionCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return SaasSubscription::class;
@@ -48,7 +59,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
 
         yield AssociationField::new('service', 'Service')
             ->setRequired(true)
-            ->setQueryBuilder(fn ($qb) => $qb
+            ->setQueryBuilder(fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
                 ->leftJoin('entity.provider', 'p')
                 ->andWhere('entity.active = :active')
                 ->setParameter('active', true)
@@ -78,7 +89,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
             ->setNumDecimals(2)
             ->setRequired(true)
             ->setHelp('Prix unitaire (€)')
-            ->formatValue(fn ($value): string => number_format((float) $value, 2, ',', ' ').' €');
+            ->formatValue(static fn (mixed $value): string => number_format(is_numeric($value) ? (float) $value : 0.0, 2, ',', ' ').' €');
 
         yield ChoiceField::new('currency', 'Devise')
             ->setChoices([
@@ -146,5 +157,17 @@ class SaasSubscriptionCrudController extends AbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+
+    /**
+     * Create a new SaasSubscription with company pre-assigned.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): SaasSubscription
+    {
+        $subscription = new SaasSubscription();
+        $subscription->setCompany($this->companyContext->getCurrentCompany());
+
+        return $subscription;
     }
 }

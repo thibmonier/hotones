@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\SaasService;
+use App\Security\CompanyContext;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -22,8 +25,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use Override;
 
+/**
+ * @extends AbstractCrudController<SaasService>
+ */
 class SaasServiceCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return SaasService::class;
@@ -52,7 +63,7 @@ class SaasServiceCrudController extends AbstractCrudController
 
         yield AssociationField::new('provider', 'Fournisseur')
             ->setRequired(false)
-            ->setQueryBuilder(fn ($qb) => $qb
+            ->setQueryBuilder(fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
                 ->andWhere('entity.active = :active')
                 ->setParameter('active', true)
                 ->orderBy('entity.name', 'ASC'))
@@ -124,5 +135,17 @@ class SaasServiceCrudController extends AbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+
+    /**
+     * Create a new SaasService with company pre-assigned.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): SaasService
+    {
+        $service = new SaasService();
+        $service->setCompany($this->companyContext->getCurrentCompany());
+
+        return $service;
     }
 }

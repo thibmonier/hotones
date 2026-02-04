@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Profile;
+use App\Security\CompanyContext;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -18,8 +21,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use Override;
 
+/**
+ * @extends AbstractCrudController<Profile>
+ */
 class ProfileCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return Profile::class;
@@ -80,5 +91,17 @@ class ProfileCrudController extends AbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+
+    /**
+     * Create a new Profile with company pre-assigned.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): Profile
+    {
+        $profile = new Profile();
+        $profile->setCompany($this->companyContext->getCurrentCompany());
+
+        return $profile;
     }
 }

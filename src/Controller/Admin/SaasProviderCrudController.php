@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\SaasProvider;
+use App\Security\CompanyContext;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -20,8 +23,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use Override;
 
+/**
+ * @extends AbstractCrudController<SaasProvider>
+ */
 class SaasProviderCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return SaasProvider::class;
@@ -94,5 +105,17 @@ class SaasProviderCrudController extends AbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+
+    /**
+     * Create a new SaasProvider with company pre-assigned.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): SaasProvider
+    {
+        $provider = new SaasProvider();
+        $provider->setCompany($this->companyContext->getCurrentCompany());
+
+        return $provider;
     }
 }

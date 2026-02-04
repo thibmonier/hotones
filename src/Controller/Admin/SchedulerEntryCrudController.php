@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\SchedulerEntry;
+use App\Security\CompanyContext;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -16,8 +19,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use Override;
 
+/**
+ * @extends AbstractCrudController<SchedulerEntry>
+ */
 class SchedulerEntryCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return SchedulerEntry::class;
@@ -87,5 +98,17 @@ class SchedulerEntryCrudController extends AbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN');
+    }
+
+    /**
+     * Create a new SchedulerEntry with company pre-assigned.
+     */
+    #[Override]
+    public function createEntity(string $entityFqcn): SchedulerEntry
+    {
+        $entry = new SchedulerEntry();
+        $entry->setCompany($this->companyContext->getCurrentCompany());
+
+        return $entry;
     }
 }
