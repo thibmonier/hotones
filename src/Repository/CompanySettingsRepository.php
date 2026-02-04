@@ -21,15 +21,17 @@ class CompanySettingsRepository extends CompanyAwareRepository
     }
 
     /**
-     * Récupère l'instance unique des paramètres
+     * Récupère l'instance unique des paramètres pour la company courante.
      * Crée l'instance si elle n'existe pas.
      */
     public function getSettings(): CompanySettings
     {
-        $settings = $this->findOneBy([]);
+        $company  = $this->companyContext->getCurrentCompany();
+        $settings = $this->findOneBy(['company' => $company]);
 
         if (!$settings) {
             $settings = new CompanySettings();
+            $settings->setCompany($company);
             $this->getEntityManager()->persist($settings);
             $this->getEntityManager()->flush();
         }
