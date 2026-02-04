@@ -185,17 +185,17 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         // Create 3 months of data using relative dates (current month and 2 previous months)
         // This ensures data is always within the "last 12 months" range
-        $baseDate = new DateTime('first day of this month');
+        $baseDate       = new DateTime('first day of this month');
         $expectedMonths = [];
 
         for ($i = 2; $i >= 0; --$i) {
-            $date = (clone $baseDate)->modify("-{$i} months")->modify('+14 days');
+            $date    = (clone $baseDate)->modify("-{$i} months")->modify('+14 days');
             $dimTime = DimTimeFactory::createOne([
                 'date' => $date,
             ]);
 
             $multiplier = 3 - $i; // 1, 2, 3
-            $fact = new FactProjectMetrics()
+            $fact       = new FactProjectMetrics()
                 ->setCompany($this->getTestCompany())
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)

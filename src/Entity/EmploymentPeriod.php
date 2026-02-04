@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Interface\CompanyOwnedInterface;
@@ -14,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: EmploymentPeriodRepository::class)]
 #[ORM\Table(name: 'employment_periods')]
 #[ORM\Index(name: 'idx_employment_period_company', columns: ['company_id'])]
+#[ORM\Index(name: 'idx_employment_period_level', columns: ['employee_level_id'])]
 class EmploymentPeriod implements CompanyOwnedInterface
 {
     #[ORM\Id]
@@ -37,6 +40,18 @@ class EmploymentPeriod implements CompanyOwnedInterface
         get => $this->contributor;
         set {
             $this->contributor = $value;
+        }
+    }
+
+    /**
+     * Niveau d'emploi (1-12) associé à cette période.
+     */
+    #[ORM\ManyToOne(targetEntity: EmployeeLevel::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    public ?EmployeeLevel $employeeLevel = null {
+        get => $this->employeeLevel;
+        set {
+            $this->employeeLevel = $value;
         }
     }
 
@@ -451,5 +466,84 @@ class EmploymentPeriod implements CompanyOwnedInterface
         $this->notes = $notes;
 
         return $this;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->employeeLevel.
+     */
+    public function getEmployeeLevel(): ?EmployeeLevel
+    {
+        return $this->employeeLevel;
+    }
+
+    /**
+     * Compatibility method for existing code.
+     * With PHP 8.5 property hooks, prefer direct access: $period->employeeLevel = $value.
+     */
+    public function setEmployeeLevel(?EmployeeLevel $employeeLevel): self
+    {
+        $this->employeeLevel = $employeeLevel;
+
+        return $this;
+    }
+
+    /**
+     * Retourne le numéro du niveau (1-12) ou null si non défini.
+     */
+    public function getLevelNumber(): ?int
+    {
+        return $this->employeeLevel?->level;
+    }
+
+    /**
+     * Retourne la catégorie du niveau (junior, experienced, senior, lead).
+     */
+    public function getLevelCategory(): ?string
+    {
+        return $this->employeeLevel?->getCategory();
+    }
+
+    /**
+     * Retourne le label de la catégorie du niveau.
+     */
+    public function getLevelCategoryLabel(): ?string
+    {
+        return $this->employeeLevel?->getCategoryLabel();
+    }
+
+    /**
+     * Vérifie si le salaire actuel est dans la fourchette du niveau.
+     */
+    public function isSalaryInLevelRange(): ?bool
+    {
+        if ($this->employeeLevel === null || $this->salary === null) {
+            return null;
+        }
+
+        // Convertir salaire mensuel en annuel (x12)
+        $annualSalary = (float) $this->salary * 12;
+
+        return $this->employeeLevel->isSalaryInRange($annualSalary);
+    }
+
+    /**
+     * Retourne l'écart entre le salaire actuel et la fourchette du niveau.
+     * Positif = au-dessus de la fourchette, Négatif = en-dessous.
+     */
+    public function getSalaryGapFromLevel(): ?float
+    {
+        if ($this->employeeLevel === null || $this->salary === null) {
+            return null;
+        }
+
+        $annualSalary = (float) $this->salary * 12;
+        $target       = $this->employeeLevel->salaryTarget;
+
+        if ($target === null) {
+            return null;
+        }
+
+        return $annualSalary - (float) $target;
     }
 }

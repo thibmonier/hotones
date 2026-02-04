@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\Contributor;
+use App\Entity\EmployeeLevel;
 use App\Entity\EmploymentPeriod;
 use App\Entity\Profile;
+use App\Repository\EmployeeLevelRepository;
+use App\Security\CompanyContext;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -22,8 +25,15 @@ use Symfony\Component\Validator\Constraints\Range;
 
 class EmploymentPeriodType extends AbstractType
 {
+    public function __construct(
+        private readonly CompanyContext $companyContext,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $company = $this->companyContext->getCurrentCompany();
+
         $builder
             ->add('contributor', EntityType::class, [
                 'label'        => 'Collaborateur',
@@ -51,6 +61,27 @@ class EmploymentPeriodType extends AbstractType
                 'required' => false,
                 'attr'     => ['class' => 'form-control'],
                 'help'     => 'Laisser vide si la période est en cours',
+            ])
+            ->add('employeeLevel', EntityType::class, [
+                'label'        => 'Niveau',
+                'class'        => EmployeeLevel::class,
+                'choice_label' => fn (EmployeeLevel $level) => sprintf(
+                    'Niveau %d - %s (%s)',
+                    $level->level,
+                    $level->name,
+                    $level->getCategoryLabel(),
+                ),
+                'required'      => false,
+                'placeholder'   => '-- Sélectionner un niveau --',
+                'attr'          => ['class' => 'form-select'],
+                'query_builder' => fn (EmployeeLevelRepository $repo) => $repo->createQueryBuilder('el')
+                    ->andWhere('el.company = :company')
+                    ->andWhere('el.active = :active')
+                    ->setParameter('company', $company)
+                    ->setParameter('active', true)
+                    ->orderBy('el.level', 'ASC'),
+                'help'     => 'Niveau 1-3: Junior, 4-6: Expérimenté, 7-9: Senior, 10-12: Lead',
+                'group_by' => fn (EmployeeLevel $level) => $level->getCategoryLabel(),
             ])
             ->add('salary', MoneyType::class, [
                 'label'    => 'Salaire mensuel brut',
