@@ -183,22 +183,29 @@ class StarSchemaIntegrationTest extends KernelTestCase
             'status'      => 'active',
         ]);
 
-        // Create 3 months of data - only set date
-        for ($month = 1; $month <= 3; ++$month) {
+        // Create 3 months of data using relative dates (current month and 2 previous months)
+        // This ensures data is always within the "last 12 months" range
+        $baseDate = new DateTime('first day of this month');
+        $expectedMonths = [];
+
+        for ($i = 2; $i >= 0; --$i) {
+            $date = (clone $baseDate)->modify("-{$i} months")->modify('+14 days');
             $dimTime = DimTimeFactory::createOne([
-                'date' => new DateTime("2025-{$month}-15"),
+                'date' => $date,
             ]);
 
+            $multiplier = 3 - $i; // 1, 2, 3
             $fact = new FactProjectMetrics()
                 ->setCompany($this->getTestCompany())
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
                 ->setGranularity('monthly')
-                ->setTotalRevenue((string) ($month * 10000))
-                ->setTotalCosts((string) ($month * 7000))
-                ->setGrossMargin((string) ($month * 3000));
+                ->setTotalRevenue((string) ($multiplier * 10000))
+                ->setTotalCosts((string) ($multiplier * 7000))
+                ->setGrossMargin((string) ($multiplier * 3000));
 
             $this->entityManager->persist($fact);
+            $expectedMonths[] = $dimTime->getMonthName();
         }
 
         $this->entityManager->flush();
@@ -208,7 +215,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         // Should return 3 months
         $this->assertCount(3, $evolution);
-        $this->assertEquals('Janvier 2025', $evolution[0]['month']);
+        $this->assertEquals($expectedMonths[0], $evolution[0]['month']);
         $this->assertEquals(10000.0, $evolution[0]['revenue']);
         $this->assertEquals(7000.0, $evolution[0]['costs']);
         $this->assertEquals(3000.0, $evolution[0]['margin']);
