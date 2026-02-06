@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Entity\Planning;
 use App\Repository\ContributorRepository;
 use App\Repository\OrderRepository;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 class WorkloadPredictionService
 {
     public function __construct(
         private readonly OrderRepository $orderRepository,
-        private readonly ContributorRepository $contributorRepository
+        private readonly ContributorRepository $contributorRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -39,7 +43,10 @@ class WorkloadPredictionService
         $alerts             = [];
         $totalPotentialDays = 0;
 
-        // Ajouter la charge confirmée si demandé
+        // Toujours inclure la charge confirmée depuis les plannings
+        $this->addConfirmedWorkloadFromPlannings($workloadByMonth, $profileIds, $contributorIds);
+
+        // Ajouter la charge confirmée depuis les devis si demandé
         if ($includeConfirmed) {
             $confirmedOrders = $this->orderRepository->findBy(
                 ['status' => ['signe', 'gagne', 'en_cours']],
@@ -72,6 +79,9 @@ class WorkloadPredictionService
 
         // Trier le pipeline par probabilité décroissante
         usort($pipeline, fn ($a, $b): int => $b['winProbability'] <=> $a['winProbability']);
+
+        // Trier les mois chronologiquement
+        ksort($workloadByMonth);
 
         // Détecter les alertes de surcharge/sous-charge
         $alerts = $this->detectWorkloadAlerts($workloadByMonth);
@@ -279,15 +289,91 @@ class WorkloadPredictionService
     }
 
     /**
+     * Ajoute la charge confirmée depuis les entités Planning.
+     */
+    private function addConfirmedWorkloadFromPlannings(array &$workloadByMonth, array $profileIds = [], array $contributorIds = []): void
+    {
+        $qb = $this->entityManager->getRepository(Planning::class)
+            ->createQueryBuilder('p')
+            ->where('p.status IN (:statuses)')
+            ->andWhere('p.endDate >= :today')
+            ->setParameter('statuses', ['planned', 'confirmed'])
+            ->setParameter('today', new DateTime('first day of this month'));
+
+        if (!empty($contributorIds)) {
+            $qb->andWhere('p.contributor IN (:contributorIds)')
+               ->setParameter('contributorIds', $contributorIds);
+        }
+
+        $plannings = $qb->getQuery()->getResult();
+
+        foreach ($plannings as $planning) {
+            /** @var Planning $planning */
+            $start = max($planning->getStartDate(), new DateTime('first day of this month'));
+            $end   = $planning->getEndDate();
+
+            $dailyHours = (float) $planning->getDailyHours();
+            $dailyDays  = $dailyHours / 8.0;
+
+            // Distribuer les jours par mois
+            $current   = new DateTime($start->format('Y-m-01'));
+            $lastMonth = new DateTime($end->format('Y-m-01'));
+
+            while ($current <= $lastMonth) {
+                $month = $current->format('Y-m');
+
+                // Calculer les jours ouvrés de ce planning dans ce mois
+                $monthStart = max($start, new DateTime($current->format('Y-m-01')));
+                $monthEnd   = min($end, new DateTime($current->format('Y-m-t')));
+
+                $workingDays = $this->countWorkingDays($monthStart, $monthEnd);
+                $plannedDays = $workingDays * $dailyDays;
+
+                if ($plannedDays > 0) {
+                    if (!isset($workloadByMonth[$month])) {
+                        $workloadByMonth[$month] = [
+                            'potential' => 0,
+                            'confirmed' => 0,
+                            'orders'    => [],
+                        ];
+                    }
+
+                    $workloadByMonth[$month]['confirmed'] += $plannedDays;
+                }
+
+                $current->modify('+1 month');
+            }
+        }
+    }
+
+    /**
+     * Compte les jours ouvrés entre deux dates.
+     */
+    private function countWorkingDays(DateTimeInterface $start, DateTimeInterface $end): int
+    {
+        $days    = 0;
+        $current = clone $start;
+
+        while ($current <= $end) {
+            if (!in_array((int) $current->format('w'), [0, 6], true)) {
+                ++$days;
+            }
+            $current->modify('+1 day');
+        }
+
+        return $days;
+    }
+
+    /**
      * Détecte les alertes de surcharge ou sous-charge.
      */
     private function detectWorkloadAlerts(array $workloadByMonth): array
     {
         $alerts = [];
 
-        // Capacité de l'équipe (à paramétrer selon vos besoins)
-        // TODO: récupérer dynamiquement depuis la config ou les contributeurs actifs
-        $teamCapacityPerMonth = 20; // 20 jours/mois d'équipe
+        // Capacité de l'équipe = nombre de contributeurs actifs × 20 jours/mois
+        $activeContributors   = $this->contributorRepository->findBy(['active' => true]);
+        $teamCapacityPerMonth = max(20, count($activeContributors) * 20);
 
         foreach ($workloadByMonth as $month => $data) {
             $totalLoad    = $data['potential'] + $data['confirmed'];
