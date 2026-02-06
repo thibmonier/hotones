@@ -60,3 +60,4 @@ yarn-error.log
 /public/sitemap.default.xml
 /public/sitemap.xml
 .DS_Store
+/CONTEXT_*.md
