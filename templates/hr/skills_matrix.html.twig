@@ -2,6 +2,18 @@
 
 {% block title %}Matrice des compétences{% endblock %}
 
+{% set categoryLabels = {
+    'framework': 'Frameworks',
+    'language': 'Langages',
+    'database': 'Bases de données',
+    'cms': 'CMS',
+    'hosting': 'Hébergement',
+    'tool': 'Outils',
+    'no-code': 'No-Code',
+    'library': 'Bibliothèques',
+    'search': 'Recherche'
+} %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -24,107 +36,215 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="mb-3">
-                        <input type="text" id="searchContributor" class="form-control" placeholder="Rechercher un collaborateur...">
+                    <div class="mb-3 d-flex gap-2 align-items-center">
+                        <input type="text" id="searchContributor" class="form-control" style="max-width: 300px;" placeholder="Rechercher un collaborateur...">
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-sm">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="min-width: 200px;">Collaborateur</th>
-                                    <th class="text-center">Profil</th>
-                                    <th class="text-center">Compétences techniques</th>
-                                    <th class="text-center">Soft Skills</th>
-                                    <th class="text-center">Méthodologies</th>
-                                    <th class="text-center">Langues</th>
-                                    <th class="text-center">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contributorsTable">
-                                {% for contributor in contributors %}
-                                {% set currentPeriod = contributor.currentEmploymentPeriod %}
-                                {% set skillsByCategory = contributor.skillsByCategory %}
-                                <tr class="contributor-row">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div>
-                                                <strong>{{ contributor.fullName }}</strong>
-                                                {% if contributor.user %}
-                                                    <br><small class="text-muted">{{ contributor.user.email }}</small>
+                    <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#techTab" role="tab">
+                                <i class="bx bx-code-alt me-1"></i>Technologies
+                                <span class="badge bg-primary ms-1">{{ technologies|length }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#skillsTab" role="tab">
+                                <i class="bx bx-brain me-1"></i>Compétences
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content pt-3">
+                        {# ===================== TAB 1: TECHNOLOGIES ===================== #}
+                        <div class="tab-pane active" id="techTab" role="tabpanel">
+                            <div class="mb-3">
+                                <select id="categoryFilter" class="form-select" style="max-width: 250px;">
+                                    <option value="">Toutes les catégories</option>
+                                    {% for categoryKey, techs in technologiesByCategory %}
+                                        <option value="{{ categoryKey }}">{{ categoryLabels[categoryKey]|default(categoryKey|capitalize) }} ({{ techs|length }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover table-sm" id="techMatrix">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th rowspan="2" class="align-middle" style="min-width: 180px; position: sticky; left: 0; background: #f8f9fa; z-index: 2;">Collaborateur</th>
+                                            <th rowspan="2" class="text-center align-middle" style="min-width: 80px;">Profil</th>
+                                            <th rowspan="2" class="text-center align-middle" style="min-width: 50px;">Niv.</th>
+                                            {% for categoryKey, techs in technologiesByCategory %}
+                                                <th colspan="{{ techs|length }}" class="text-center tech-category-header" data-category="{{ categoryKey }}" style="border-bottom: 3px solid #556ee6;">
+                                                    {{ categoryLabels[categoryKey]|default(categoryKey|capitalize) }}
+                                                </th>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr>
+                                            {% for categoryKey, techs in technologiesByCategory %}
+                                                {% for tech in techs %}
+                                                    <th class="text-center tech-col" data-category="{{ categoryKey }}" style="font-size: 0.7rem; writing-mode: vertical-lr; text-orientation: mixed; height: 120px; min-width: 35px; white-space: nowrap;" title="{{ tech.name }}">
+                                                        {{ tech.name }}
+                                                    </th>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody id="techTableBody">
+                                        {% for contributor in contributors %}
+                                            {% set currentPeriod = contributor.currentEmploymentPeriod %}
+                                            {# Build lookup map: technology.id -> ContributorTechnology #}
+                                            {% set techMap = {} %}
+                                            {% for ct in contributor.contributorTechnologies %}
+                                                {% set techMap = techMap|merge({(ct.technology.id): ct}) %}
+                                            {% endfor %}
+                                            <tr class="contributor-row">
+                                                <td style="position: sticky; left: 0; background: #fff; z-index: 1;">
+                                                    <strong>{{ contributor.fullName }}</strong>
+                                                </td>
+                                                <td class="text-center">
+                                                    {% if currentPeriod %}
+                                                        {% for profile in currentPeriod.profiles %}
+                                                            <span class="badge bg-info" style="font-size: 0.65rem;">{{ profile.name }}</span>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-center">
+                                                    {% if currentPeriod and currentPeriod.employeeLevel %}
+                                                        <span class="badge bg-dark">{{ currentPeriod.employeeLevel.level }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                {% for categoryKey, techs in technologiesByCategory %}
+                                                    {% for tech in techs %}
+                                                        <td class="text-center tech-col" data-category="{{ categoryKey }}">
+                                                            {% if techMap[tech.id] is defined %}
+                                                                {% set ct = techMap[tech.id] %}
+                                                                <span class="badge bg-{{ ct.levelBadgeClass }}" title="{{ tech.name }} - {{ ct.effectiveLevelLabel }}">
+                                                                    {{ ct.effectiveLevel }}
+                                                                </span>
+                                                            {% endif %}
+                                                        </td>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-3">
+                                <h6>Légende des niveaux :</h6>
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-secondary">1 - Débutant</span>
+                                    <span class="badge bg-info">2 - Intermédiaire</span>
+                                    <span class="badge bg-primary">3 - Confirmé</span>
+                                    <span class="badge bg-success">4 - Expert</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# ===================== TAB 2: COMPETENCES (existant) ===================== #}
+                        <div class="tab-pane" id="skillsTab" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="min-width: 200px;">Collaborateur</th>
+                                            <th class="text-center">Profil</th>
+                                            <th class="text-center">Compétences techniques</th>
+                                            <th class="text-center">Soft Skills</th>
+                                            <th class="text-center">Méthodologies</th>
+                                            <th class="text-center">Langues</th>
+                                            <th class="text-center">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="skillsTableBody">
+                                        {% for contributor in contributors %}
+                                        {% set currentPeriod = contributor.currentEmploymentPeriod %}
+                                        {% set skillsByCategory = contributor.skillsByCategory %}
+                                        <tr class="contributor-row">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <strong>{{ contributor.fullName }}</strong>
+                                                        {% if contributor.user %}
+                                                            <br><small class="text-muted">{{ contributor.user.email }}</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                {% if currentPeriod %}
+                                                    {% for profile in currentPeriod.profiles %}
+                                                        <span class="badge bg-info me-1">{{ profile.name }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
                                                 {% endif %}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        {% if currentPeriod %}
-                                            {% for profile in currentPeriod.profiles %}
-                                                <span class="badge bg-info me-1">{{ profile.name }}</span>
-                                            {% endfor %}
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if skillsByCategory['technique'] is defined %}
-                                            {% for contributorSkill in skillsByCategory['technique'] %}
-                                                <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
-                                                    {{ contributorSkill.skill.name }}
-                                                </span>
-                                            {% endfor %}
-                                        {% else %}
-                                            <span class="text-muted small">Aucune</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if skillsByCategory['soft_skill'] is defined %}
-                                            {% for contributorSkill in skillsByCategory['soft_skill'] %}
-                                                <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
-                                                    {{ contributorSkill.skill.name }}
-                                                </span>
-                                            {% endfor %}
-                                        {% else %}
-                                            <span class="text-muted small">Aucune</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if skillsByCategory['methodologie'] is defined %}
-                                            {% for contributorSkill in skillsByCategory['methodologie'] %}
-                                                <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
-                                                    {{ contributorSkill.skill.name }}
-                                                </span>
-                                            {% endfor %}
-                                        {% else %}
-                                            <span class="text-muted small">Aucune</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if skillsByCategory['langue'] is defined %}
-                                            {% for contributorSkill in skillsByCategory['langue'] %}
-                                                <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
-                                                    {{ contributorSkill.skill.name }}
-                                                </span>
-                                            {% endfor %}
-                                        {% else %}
-                                            <span class="text-muted small">Aucune</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-primary">{{ contributor.contributorSkills|length }}</span>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                            </td>
+                                            <td>
+                                                {% if skillsByCategory['technique'] is defined %}
+                                                    {% for contributorSkill in skillsByCategory['technique'] %}
+                                                        <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
+                                                            {{ contributorSkill.skill.name }}
+                                                        </span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="text-muted small">Aucune</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if skillsByCategory['soft_skill'] is defined %}
+                                                    {% for contributorSkill in skillsByCategory['soft_skill'] %}
+                                                        <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
+                                                            {{ contributorSkill.skill.name }}
+                                                        </span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="text-muted small">Aucune</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if skillsByCategory['methodologie'] is defined %}
+                                                    {% for contributorSkill in skillsByCategory['methodologie'] %}
+                                                        <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
+                                                            {{ contributorSkill.skill.name }}
+                                                        </span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="text-muted small">Aucune</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if skillsByCategory['langue'] is defined %}
+                                                    {% for contributorSkill in skillsByCategory['langue'] %}
+                                                        <span class="badge {{ contributorSkill.levelBadgeClass }} me-1 mb-1" title="{{ contributorSkill.skill.name }} - Niveau {{ contributorSkill.effectiveLevel }}">
+                                                            {{ contributorSkill.skill.name }}
+                                                        </span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="text-muted small">Aucune</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary">{{ contributor.contributorSkills|length }}</span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
 
-                    <div class="mt-3">
-                        <h6>Légende des niveaux :</h6>
-                        <div class="d-flex gap-2">
-                            <span class="badge bg-secondary">1 - Débutant</span>
-                            <span class="badge bg-info">2 - Intermédiaire</span>
-                            <span class="badge bg-primary">3 - Confirmé</span>
-                            <span class="badge bg-success">4 - Expert</span>
+                            <div class="mt-3">
+                                <h6>Légende des niveaux :</h6>
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-secondary">1 - Débutant</span>
+                                    <span class="badge bg-info">2 - Intermédiaire</span>
+                                    <span class="badge bg-primary">3 - Confirmé</span>
+                                    <span class="badge bg-success">4 - Expert</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,18 +259,34 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchContributor');
-    const rows = document.querySelectorAll('.contributor-row');
+    const categoryFilter = document.getElementById('categoryFilter');
 
+    // Search filter: works on both tabs
     searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
-
-        rows.forEach(row => {
+        document.querySelectorAll('.contributor-row').forEach(function(row) {
             const text = row.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Category filter: show/hide technology columns
+    categoryFilter.addEventListener('change', function() {
+        const selected = this.value;
+        const headers = document.querySelectorAll('.tech-category-header');
+        const cols = document.querySelectorAll('.tech-col');
+
+        if (!selected) {
+            headers.forEach(function(h) { h.style.display = ''; });
+            cols.forEach(function(c) { c.style.display = ''; });
+            return;
+        }
+
+        headers.forEach(function(h) {
+            h.style.display = h.dataset.category === selected ? '' : 'none';
+        });
+        cols.forEach(function(c) {
+            c.style.display = c.dataset.category === selected ? '' : 'none';
         });
     });
 });

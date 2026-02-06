@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: \App\Repository\TechnologyRepository::class)]
 #[ORM\Table(name: 'technologies')]
 #[ORM\Index(name: 'idx_technology_company', columns: ['company_id'])]
 class Technology implements CompanyOwnedInterface
@@ -64,9 +64,20 @@ class Technology implements CompanyOwnedInterface
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'technologies')]
     private Collection $projects;
 
+    // Compétences associées à cette technologie
+    #[ORM\ManyToMany(targetEntity: Skill::class)]
+    #[ORM\JoinTable(name: 'technology_skills')]
+    private Collection $skills;
+
+    // Collaborateurs maîtrisant cette technologie
+    #[ORM\OneToMany(targetEntity: ContributorTechnology::class, mappedBy: 'technology')]
+    private Collection $contributorTechnologies;
+
     public function __construct()
     {
-        $this->projects = new ArrayCollection();
+        $this->projects                = new ArrayCollection();
+        $this->skills                  = new ArrayCollection();
+        $this->contributorTechnologies = new ArrayCollection();
     }
 
     /** @return Collection<int, Project> */
@@ -92,6 +103,54 @@ class Technology implements CompanyOwnedInterface
         }
 
         return $this;
+    }
+
+    /** @return Collection<int, Skill> */
+    public function getSkills(): Collection
+    {
+        return $this->skills;
+    }
+
+    public function addSkill(Skill $skill): self
+    {
+        if (!$this->skills->contains($skill)) {
+            $this->skills->add($skill);
+        }
+
+        return $this;
+    }
+
+    public function removeSkill(Skill $skill): self
+    {
+        $this->skills->removeElement($skill);
+
+        return $this;
+    }
+
+    /** @return Collection<int, ContributorTechnology> */
+    public function getContributorTechnologies(): Collection
+    {
+        return $this->contributorTechnologies;
+    }
+
+    /**
+     * Retourne le nombre de collaborateurs maîtrisant cette technologie.
+     */
+    public function getContributorCount(): int
+    {
+        return $this->contributorTechnologies->count();
+    }
+
+    /**
+     * Retourne les collaborateurs experts sur cette technologie.
+     *
+     * @return Collection<int, ContributorTechnology>
+     */
+    public function getExperts(): Collection
+    {
+        return $this->contributorTechnologies->filter(
+            fn (ContributorTechnology $ct) => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
+        );
     }
 
     public function isActive(): ?bool

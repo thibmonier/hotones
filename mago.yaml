@@ -1,0 +1,98 @@
+# Mago Configuration
+# https://mago.gitbook.io/mago
+
+paths:
+    - src
+    - tests
+
+exclude:
+    - var
+    - vendor
+    - migrations
+    - public
+    - assets
+    - bin
+    - node_modules
+    - cache
+    - build
+    # Temporary exclusions for Entity directory (PHP 8.5 property hooks support)
+    - src/Entity
+
+# Formatting rules (aligned with PHP-CS-Fixer PSR-12 + Symfony)
+format:
+    # Use PSR-12 coding standard
+    standard: psr12
+
+    # Additional rules
+    rules:
+        array_syntax: short
+        binary_operator_spaces: align_single_space_minimal
+        no_unused_imports: true
+        ordered_imports: alpha
+        trailing_comma_in_multiline: true
+        yoda_style: false
+
+# Linting rules
+lint:
+    # Syntax validation
+    syntax_check: true
+
+    # Code quality checks
+    checks:
+        cyclomatic_complexity:
+            enabled: true
+            max: 15
+
+        line_length:
+            enabled: true
+            max: 150
+
+        nesting_level:
+            enabled: true
+            max: 7
+
+        unused_variables: true
+        undefined_variables: true
+
+# Static analysis (aligned with PHPStan level 4)
+analyze:
+    level: 4
+
+    # Doctrine support
+    doctrine:
+        enabled: true
+
+    # Symfony support
+    symfony:
+        enabled: true
+
+    # Type checking
+    type_check:
+        enabled: true
+        strict: false
+        treat_phpdoc_as_certain: false
+
+    # Ignore patterns
+    ignoreErrors:
+        # Doctrine collection generics
+        - '#Property .+ type mapping mismatch#'
+        # Symfony Scheduler API
+        - '#Call to an undefined method .*CronExpressionTrigger::withDescription\(\)#'
+        - '#Call to method withName\(\) on an unknown class .*RecurringCommand#'
+        - '#Instantiated class .*RecurringCommand not found#'
+
+# Parallel processing
+parallel:
+    enabled: true
+    max_workers: 4
+
+# Reporting
+reporting:
+    # Progress display
+    progress: true
+
+    # Colors in output
+    colors: true
+
+    # Output format (console, github, json)
+    format: console

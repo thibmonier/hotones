@@ -1,0 +1,175 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Ajouter une technologie a {{ contributor.fullName }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Ajouter une technologie</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('contributor_technology_index', {contributorId: contributor.id}) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bx bx-arrow-back me-1"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Technologie pour {{ contributor.fullName }}</h5>
+
+                    {{ form_start(form) }}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.technology) }}
+                            {{ form_widget(form.technology) }}
+                            {{ form_errors(form.technology) }}
+                            {{ form_help(form.technology) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.selfAssessmentLevel) }}
+                            {{ form_widget(form.selfAssessmentLevel) }}
+                            {{ form_errors(form.selfAssessmentLevel) }}
+                            {{ form_help(form.selfAssessmentLevel) }}
+                        </div>
+                    </div>
+
+                    {% if is_granted('ROLE_MANAGER') %}
+                    <div class="mb-3">
+                        {{ form_label(form.managerAssessmentLevel) }}
+                        {{ form_widget(form.managerAssessmentLevel) }}
+                        {{ form_errors(form.managerAssessmentLevel) }}
+                        {{ form_help(form.managerAssessmentLevel) }}
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form_label(form.yearsOfExperience) }}
+                            {{ form_widget(form.yearsOfExperience) }}
+                            {{ form_errors(form.yearsOfExperience) }}
+                            {{ form_help(form.yearsOfExperience) }}
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            {{ form_label(form.firstUsedDate) }}
+                            {{ form_widget(form.firstUsedDate) }}
+                            {{ form_errors(form.firstUsedDate) }}
+                            {{ form_help(form.firstUsedDate) }}
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            {{ form_label(form.lastUsedDate) }}
+                            {{ form_widget(form.lastUsedDate) }}
+                            {{ form_errors(form.lastUsedDate) }}
+                            {{ form_help(form.lastUsedDate) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.primaryContext) }}
+                            {{ form_widget(form.primaryContext) }}
+                            {{ form_errors(form.primaryContext) }}
+                            {{ form_help(form.primaryContext) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.versionUsed) }}
+                            {{ form_widget(form.versionUsed) }}
+                            {{ form_errors(form.versionUsed) }}
+                            {{ form_help(form.versionUsed) }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form_widget(form.wantsToUse) }}
+                                {{ form_label(form.wantsToUse) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form_widget(form.wantsToImprove) }}
+                                {{ form_label(form.wantsToImprove) }}
+                                {{ form_help(form.wantsToImprove) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.notes) }}
+                        {{ form_widget(form.notes) }}
+                        {{ form_errors(form.notes) }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i>Ajouter la technologie
+                        </button>
+                        <a href="{{ path('contributor_technology_index', {contributorId: contributor.id}) }}" class="btn btn-light">Annuler</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bx bx-info-circle me-2"></i>Guide des niveaux
+                    </h5>
+                    <div class="mb-3">
+                        <span class="badge bg-secondary mb-1">1 - Debutant</span>
+                        <p class="text-muted small mb-0">Connaissance de base, necessite accompagnement</p>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-info mb-1">2 - Intermediaire</span>
+                        <p class="text-muted small mb-0">Autonome sur les taches courantes</p>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-primary mb-1">3 - Confirme</span>
+                        <p class="text-muted small mb-0">Maitrise avancee, peut former les autres</p>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-success mb-1">4 - Expert</span>
+                        <p class="text-muted small mb-0">Expertise reconnue, referent technique</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Technologies actuelles</h6>
+                    <div class="text-muted">
+                        {{ contributor.contributorTechnologies|length }} technologie(s) declaree(s)
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bx bx-bulb me-2 text-warning"></i>Conseils
+                    </h6>
+                    <ul class="text-muted small ps-3 mb-0">
+                        <li>Indiquez la date de derniere utilisation pour faciliter le staffing</li>
+                        <li>Cochez "Souhaite progresser" pour etre propose sur des projets formateurs</li>
+                        <li>Precisez la version pour des missions specifiques</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

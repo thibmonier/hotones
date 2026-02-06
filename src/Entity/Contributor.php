@@ -205,13 +205,18 @@ class Contributor implements CompanyOwnedInterface
     #[ORM\OneToMany(targetEntity: ContributorSkill::class, mappedBy: 'contributor', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $contributorSkills;
 
+    // Technologies maîtrisées par le contributeur
+    #[ORM\OneToMany(targetEntity: ContributorTechnology::class, mappedBy: 'contributor', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $contributorTechnologies;
+
     public function __construct()
     {
-        $this->profiles            = new ArrayCollection();
-        $this->employmentPeriods   = new ArrayCollection();
-        $this->timesheets          = new ArrayCollection();
-        $this->managedContributors = new ArrayCollection();
-        $this->contributorSkills   = new ArrayCollection();
+        $this->profiles                = new ArrayCollection();
+        $this->employmentPeriods       = new ArrayCollection();
+        $this->timesheets              = new ArrayCollection();
+        $this->managedContributors     = new ArrayCollection();
+        $this->contributorSkills       = new ArrayCollection();
+        $this->contributorTechnologies = new ArrayCollection();
     }
 
     public function getName(): string
@@ -489,6 +494,116 @@ class Contributor implements CompanyOwnedInterface
     public function getSkillsCount(): int
     {
         return $this->contributorSkills->count();
+    }
+
+    // === Gestion des technologies ===
+
+    /**
+     * @return Collection<int, ContributorTechnology>
+     */
+    public function getContributorTechnologies(): Collection
+    {
+        return $this->contributorTechnologies;
+    }
+
+    public function addContributorTechnology(ContributorTechnology $contributorTechnology): self
+    {
+        if (!$this->contributorTechnologies->contains($contributorTechnology)) {
+            $this->contributorTechnologies->add($contributorTechnology);
+            $contributorTechnology->setContributor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContributorTechnology(ContributorTechnology $contributorTechnology): self
+    {
+        if ($this->contributorTechnologies->removeElement($contributorTechnology)) {
+            if ($contributorTechnology->getContributor() === $this) {
+                $contributorTechnology->setContributor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retourne les technologies par catégorie.
+     *
+     * @return array<string, Collection<int, ContributorTechnology>>
+     */
+    public function getTechnologiesByCategory(): array
+    {
+        $byCategory = [];
+        foreach ($this->contributorTechnologies as $ct) {
+            $category = $ct->getTechnology()?->getCategory() ?? 'Autre';
+            if (!isset($byCategory[$category])) {
+                $byCategory[$category] = new ArrayCollection();
+            }
+            $byCategory[$category]->add($ct);
+        }
+
+        return $byCategory;
+    }
+
+    /**
+     * Retourne le nombre total de technologies maîtrisées.
+     */
+    public function getTechnologiesCount(): int
+    {
+        return $this->contributorTechnologies->count();
+    }
+
+    /**
+     * Retourne les technologies récemment utilisées (< 6 mois).
+     *
+     * @return Collection<int, ContributorTechnology>
+     */
+    public function getRecentTechnologies(): Collection
+    {
+        return $this->contributorTechnologies->filter(
+            fn (ContributorTechnology $ct) => $ct->isRecent(),
+        );
+    }
+
+    /**
+     * Retourne les technologies où le contributeur est expert.
+     *
+     * @return Collection<int, ContributorTechnology>
+     */
+    public function getExpertTechnologies(): Collection
+    {
+        return $this->contributorTechnologies->filter(
+            fn (ContributorTechnology $ct) => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
+        );
+    }
+
+    /**
+     * Vérifie si le contributeur maîtrise une technologie donnée.
+     */
+    public function hasTechnology(Technology $technology): bool
+    {
+        foreach ($this->contributorTechnologies as $ct) {
+            if ($ct->getTechnology()?->getId() === $technology->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Retourne le niveau du contributeur sur une technologie donnée.
+     */
+    public function getTechnologyLevel(Technology $technology): ?int
+    {
+        foreach ($this->contributorTechnologies as $ct) {
+            if ($ct->getTechnology()?->getId() === $technology->getId()) {
+                return $ct->getEffectiveLevel();
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -179,6 +179,9 @@
                             <a href="{{ path('contributor_skill_index', {'contributorId': contributor.id}) }}" class="btn btn-outline-success">
                                 <i class="bx bx-star me-1"></i> Gérer les compétences
                             </a>
+                            <a href="{{ path('contributor_technology_index', {'contributorId': contributor.id}) }}" class="btn btn-outline-warning">
+                                <i class="bx bx-code-alt me-1"></i> Gérer les technologies
+                            </a>
                             <a href="{{ path('contributor_employment_periods', {'id': contributor.id}) }}" class="btn btn-outline-info">
                                 <i class="bx bx-briefcase me-1"></i> Périodes d'emploi
                             </a>
@@ -285,6 +288,73 @@
                             {% if is_granted('ROLE_MANAGER') %}
                                 <a href="{{ path('contributor_skill_new', {'contributorId': contributor.id}) }}" class="btn btn-sm btn-primary mt-2">
                                     <i class="bx bx-plus me-1"></i> Ajouter une compétence
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Technologies -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Technologies</h5>
+                    {% if is_granted('ROLE_MANAGER') %}
+                        <a href="{{ path('contributor_technology_index', {'contributorId': contributor.id}) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bx bx-cog me-1"></i> Gérer
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if contributor.contributorTechnologies|length > 0 %}
+                        <div class="row">
+                            {% for ct in contributor.contributorTechnologies %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-xs me-3">
+                                                {% if ct.technology.color %}
+                                                    <div class="avatar-title rounded-circle" style="background-color: {{ ct.technology.color }};">
+                                                        <i class="bx bx-code-alt text-white" style="font-size: 12px;"></i>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="avatar-title bg-warning text-white rounded-circle">
+                                                        <i class="bx bx-code-alt"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ ct.technology.name }}</h6>
+                                                {% if ct.technology.category %}
+                                                    <small class="text-muted">{{ ct.technology.category|capitalize }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-{{ ct.levelBadgeClass }}">
+                                                {{ ct.effectiveLevelLabel }}
+                                            </span>
+                                            {% if ct.isRecent %}
+                                                <span class="badge bg-success ms-1" title="Utilisé récemment">
+                                                    <i class="bx bx-check"></i>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="avatar-sm mx-auto mb-3">
+                                <div class="avatar-title bg-light text-muted rounded-circle">
+                                    <i class="bx bx-code-alt"></i>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0">Aucune technologie déclarée</p>
+                            {% if is_granted('ROLE_MANAGER') %}
+                                <a href="{{ path('contributor_technology_new', {'contributorId': contributor.id}) }}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="bx bx-plus me-1"></i> Ajouter une technologie
                                 </a>
                             {% endif %}
                         </div>

@@ -7,6 +7,7 @@ use App\Factory\ClientFactory;
 use App\Factory\ContributorFactory;
 use App\Factory\OrderFactory;
 use App\Factory\OrderTaskFactory;
+use App\Factory\PlanningFactory;
 use App\Factory\ProfileFactory;
 use App\Factory\ProjectFactory;
 use App\Factory\ProjectSubTaskFactory;
@@ -35,6 +36,8 @@ class AppFixtures extends Fixture
             'subtasks_max'      => 8,
             'timesheets_min'    => 150,
             'timesheets_max'    => 300,
+            'plannings_min'     => 2,
+            'plannings_max'     => 5,
         ];
 
         // Users
@@ -136,6 +139,16 @@ class AppFixtures extends Fixture
                     'task'        => $task,
                     'subTask'     => $subTask,
                     // hours/date/notes from defaults
+                ]);
+            }
+
+            // Plannings: assign contributors to the project
+            $planningCount = random_int($V['plannings_min'], $V['plannings_max']);
+            for ($p = 0; $p < $planningCount; ++$p) {
+                PlanningFactory::createOne([
+                    'project'     => $project,
+                    'contributor' => ContributorFactory::random(),
+                    'profile'     => random_int(0, 1) ? ProfileFactory::random() : null,
                 ]);
             }
         }

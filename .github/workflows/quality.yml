@@ -20,6 +20,7 @@ jobs:
                     #- { name: 'PHP_CodeSniffer', script: 'phpcs' }
                     - { name: "Deptrac", script: "deptrac" }
                     - { name: "Rector", script: "rector" }
+                    - { name: "Mago", script: "mago" }
 
         steps:
             - name: Checkout
@@ -52,6 +53,10 @@ jobs:
                   DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
               run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+            - name: Setup Mago
+              if: matrix.tool.script == 'mago'
+              uses: nhedger/setup-mago@v1
+
             - name: Run ${{ matrix.tool.name }}
               run: composer ${{ matrix.tool.script }}
-              continue-on-error: ${{ matrix.tool.script == 'rector' || matrix.tool.script == 'deptrac' || matrix.tool.script == 'phpcs' }} # Rector/Deptrac/PHPCS ne bloquent pas
+              continue-on-error: ${{ matrix.tool.script == 'rector' || matrix.tool.script == 'deptrac' || matrix.tool.script == 'phpcs' || matrix.tool.script == 'mago' }} # Rector/Deptrac/PHPCS/Mago ne bloquent pas (initialement)

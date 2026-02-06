@@ -6,6 +6,8 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\PlanningRepository;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -94,9 +96,14 @@ class Planning implements CompanyOwnedInterface
         }
     }
 
+    // Compétences requises spécifiques à cette affectation (surcharge du projet)
+    #[ORM\OneToMany(targetEntity: PlanningSkill::class, mappedBy: 'planning', cascade: ['persist', 'remove'])]
+    private Collection $planningSkills;
+
     public function __construct()
     {
-        $this->createdAt = new DateTime();
+        $this->createdAt      = new DateTime();
+        $this->planningSkills = new ArrayCollection();
     }
 
     public function getContributor(): Contributor
@@ -185,6 +192,80 @@ class Planning implements CompanyOwnedInterface
     public function isActiveAt(DateTimeInterface $date): bool
     {
         return $date >= $this->startDate && $date <= $this->endDate;
+    }
+
+    // Gestion des compétences requises pour l'affectation
+
+    /** @return Collection<int, PlanningSkill> */
+    public function getPlanningSkills(): Collection
+    {
+        return $this->planningSkills;
+    }
+
+    public function addPlanningSkill(PlanningSkill $planningSkill): self
+    {
+        if (!$this->planningSkills->contains($planningSkill)) {
+            $this->planningSkills->add($planningSkill);
+            $planningSkill->setPlanning($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlanningSkill(PlanningSkill $planningSkill): self
+    {
+        if ($this->planningSkills->removeElement($planningSkill)) {
+            if ($planningSkill->getPlanning() === $this) {
+                $planningSkill->setPlanning(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retourne les compétences obligatoires non satisfaites par le collaborateur.
+     *
+     * @return Collection<int, PlanningSkill>
+     */
+    public function getUnmetMandatorySkills(): Collection
+    {
+        return $this->planningSkills->filter(
+            fn (PlanningSkill $ps) => $ps->isMandatory() && !$ps->isMetByAssignedContributor(),
+        );
+    }
+
+    /**
+     * Vérifie si le collaborateur satisfait toutes les compétences obligatoires.
+     */
+    public function contributorMeetsAllMandatorySkills(): bool
+    {
+        return $this->getUnmetMandatorySkills()->isEmpty();
+    }
+
+    /**
+     * Retourne le score de compatibilité du collaborateur (0-100).
+     * Basé sur le pourcentage de compétences satisfaites.
+     */
+    public function getContributorCompatibilityScore(): int
+    {
+        if ($this->planningSkills->isEmpty()) {
+            return 100;
+        }
+
+        $met   = 0;
+        $total = 0;
+
+        foreach ($this->planningSkills as $planningSkill) {
+            $weight = $planningSkill->isMandatory() ? 2 : 1;
+            $total += $weight;
+
+            if ($planningSkill->isMetByAssignedContributor()) {
+                $met += $weight;
+            }
+        }
+
+        return $total > 0 ? (int) round(($met / $total) * 100) : 100;
     }
 
     public function getCompany(): Company

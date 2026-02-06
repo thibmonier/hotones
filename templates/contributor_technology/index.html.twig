@@ -1,0 +1,232 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Technologies de {{ contributor.fullName }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Technologies de {{ contributor.fullName }}</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('contributor_technology_new', {contributorId: contributor.id}) }}" class="btn btn-primary btn-sm">
+                        <i class="bx bx-plus me-1"></i>Ajouter une technologie
+                    </a>
+                    <a href="{{ path('contributor_skill_index', {contributorId: contributor.id}) }}" class="btn btn-outline-secondary btn-sm ms-2">
+                        <i class="bx bx-badge-check me-1"></i>Voir les compétences
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Statistics Cards #}
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <span class="text-muted">Total technologies</span>
+                            <h4 class="mb-0 mt-1">{{ contributor.contributorTechnologies|length }}</h4>
+                        </div>
+                        <div class="avatar-sm bg-white rounded">
+                            <i class="bx bx-code-alt text-primary font-size-24"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% for level, label in {1: 'Debutant', 2: 'Intermediaire', 3: 'Confirme', 4: 'Expert'} %}
+        {% set count = countByLevel[level] ?? 0 %}
+        <div class="col-md-2">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span class="badge {% if level == 1 %}bg-secondary{% elseif level == 2 %}bg-info{% elseif level == 3 %}bg-primary{% else %}bg-success{% endif %} mb-2">
+                        {{ label }}
+                    </span>
+                    <h4 class="mb-0">{{ count }}</h4>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Technologies by Category #}
+    {% if technologiesByCategory|length > 0 %}
+        {% for category, technologies in technologiesByCategory %}
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <span class="badge bg-secondary me-2">{{ category|capitalize }}</span>
+                            {{ technologies|length }} technologie(s)
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-centered table-nowrap mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Technologie</th>
+                                        <th class="text-center">Niveau</th>
+                                        <th class="text-center">Experience</th>
+                                        <th>Derniere utilisation</th>
+                                        <th class="text-center">Souhaits</th>
+                                        <th>Version</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ct in technologies %}
+                                    <tr{% if ct.isObsolete %} class="table-warning"{% endif %}>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if ct.technology.color %}
+                                                <span class="avatar-xs rounded-circle me-2" style="background-color: {{ ct.technology.color }}; width: 24px; height: 24px; display: inline-block;"></span>
+                                                {% endif %}
+                                                <strong>{{ ct.technology.name }}</strong>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-{{ ct.levelBadgeClass }}">
+                                                {{ ct.effectiveLevelLabel }}
+                                            </span>
+                                            {% if ct.hasAssessmentGap %}
+                                                <i class="bx bx-error-circle text-warning" title="Ecart : {{ ct.assessmentGap }}"></i>
+                                            {% endif %}
+                                            {% if not ct.managerAssessmentLevel and is_granted('ROLE_MANAGER') %}
+                                                <button type="button" class="btn btn-sm btn-link p-0 ms-1" data-bs-toggle="modal" data-bs-target="#assessModal{{ ct.id }}" title="Evaluer">
+                                                    <i class="bx bx-edit-alt"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if ct.yearsOfExperience %}
+                                                {{ ct.yearsOfExperience }} an(s)
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if ct.lastUsedDate %}
+                                                {{ ct.lastUsedDate|date('d/m/Y') }}
+                                                {% if ct.isRecent %}
+                                                    <span class="badge bg-success ms-1">Recent</span>
+                                                {% elseif ct.isObsolete %}
+                                                    <span class="badge bg-warning ms-1">Obsolete</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if ct.wantsToUse %}
+                                                <i class="bx bx-check-circle text-success" title="Souhaite utiliser"></i>
+                                            {% else %}
+                                                <i class="bx bx-x-circle text-danger" title="Ne souhaite plus utiliser"></i>
+                                            {% endif %}
+                                            {% if ct.wantsToImprove %}
+                                                <i class="bx bx-trending-up text-info ms-1" title="Souhaite progresser"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if ct.versionUsed %}
+                                                <code>{{ ct.versionUsed }}</code>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ path('contributor_technology_edit', {contributorId: contributor.id, id: ct.id}) }}" class="btn btn-outline-primary" title="Modifier">
+                                                    <i class="bx bx-edit"></i>
+                                                </a>
+                                                <form method="post" action="{{ path('contributor_technology_delete', {contributorId: contributor.id, id: ct.id}) }}" class="d-inline" onsubmit="return confirm('Etes-vous sur de vouloir supprimer cette technologie ?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ct.id) }}" />
+                                                    <button type="submit" class="btn btn-outline-danger" title="Supprimer">
+                                                        <i class="bx bx-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    {# Assessment Modal #}
+                                    {% if is_granted('ROLE_MANAGER') %}
+                                    <div class="modal fade" id="assessModal{{ ct.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="post" action="{{ path('contributor_technology_assess', {contributorId: contributor.id, id: ct.id}) }}">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Evaluer {{ ct.technology.name }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('assess' ~ ct.id) }}" />
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Auto-evaluation du collaborateur</label>
+                                                            <div>
+                                                                <span class="badge bg-secondary">{{ ct.selfAssessmentLevel }} - {{ ct.selfAssessmentLevelLabel }}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        {% if ct.yearsOfExperience %}
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Experience declaree</label>
+                                                            <div>{{ ct.yearsOfExperience }} an(s)</div>
+                                                        </div>
+                                                        {% endif %}
+
+                                                        <div class="mb-3">
+                                                            <label for="managerLevel{{ ct.id }}" class="form-label">Votre evaluation</label>
+                                                            <select name="manager_level" id="managerLevel{{ ct.id }}" class="form-select" required>
+                                                                <option value="">Selectionnez un niveau</option>
+                                                                <option value="1">1 - Debutant</option>
+                                                                <option value="2">2 - Intermediaire</option>
+                                                                <option value="3">3 - Confirme</option>
+                                                                <option value="4">4 - Expert</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label for="notes{{ ct.id }}" class="form-label">Notes (optionnel)</label>
+                                                            <textarea name="notes" id="notes{{ ct.id }}" class="form-control" rows="3">{{ ct.notes }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                                                        <button type="submit" class="btn btn-primary">Enregistrer l'evaluation</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bx bx-code-alt text-muted" style="font-size: 48px;"></i>
+                    <h5 class="mt-3">Aucune technologie declaree</h5>
+                    <p class="text-muted">Commencez par ajouter des technologies a ce collaborateur.</p>
+                    <a href="{{ path('contributor_technology_new', {contributorId: contributor.id}) }}" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i>Ajouter une technologie
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

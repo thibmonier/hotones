@@ -222,6 +222,10 @@ class Project implements CompanyOwnedInterface
     #[ORM\OneToMany(targetEntity: Timesheet::class, mappedBy: 'project', cascade: ['remove'])]
     private Collection $timesheets;
 
+    // Compétences requises pour le projet
+    #[ORM\OneToMany(targetEntity: ProjectSkill::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
+    private Collection $projectSkills;
+
     // Liens et accès techniques (Sprint 9)
     #[ORM\Column(type: 'text', nullable: true)]
     public ?string $repoLinks = null { // Liens gestionnaires de sources (un par ligne)
@@ -281,6 +285,7 @@ class Project implements CompanyOwnedInterface
         $this->projectTechnologies = new ArrayCollection();
         $this->tasks               = new ArrayCollection();
         $this->timesheets          = new ArrayCollection();
+        $this->projectSkills       = new ArrayCollection();
     }
 
     /**
@@ -757,6 +762,60 @@ class Project implements CompanyOwnedInterface
         $this->timesheets->removeElement($timesheet);
 
         return $this;
+    }
+
+    // Gestion des compétences requises
+    /** @return Collection<int, ProjectSkill> */
+    public function getProjectSkills(): Collection
+    {
+        return $this->projectSkills;
+    }
+
+    public function addProjectSkill(ProjectSkill $projectSkill): self
+    {
+        if (!$this->projectSkills->contains($projectSkill)) {
+            $this->projectSkills->add($projectSkill);
+            $projectSkill->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectSkill(ProjectSkill $projectSkill): self
+    {
+        if ($this->projectSkills->removeElement($projectSkill)) {
+            if ($projectSkill->getProject() === $this) {
+                $projectSkill->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retourne les compétences requises critiques (priorité haute ou indispensable).
+     *
+     * @return Collection<int, ProjectSkill>
+     */
+    public function getCriticalSkills(): Collection
+    {
+        return $this->projectSkills->filter(
+            fn (ProjectSkill $ps) => $ps->getPriority() >= ProjectSkill::PRIORITY_HIGH,
+        );
+    }
+
+    /**
+     * Vérifie si un contributeur satisfait toutes les compétences critiques du projet.
+     */
+    public function contributorMeetsCriticalSkills(Contributor $contributor): bool
+    {
+        foreach ($this->getCriticalSkills() as $projectSkill) {
+            if (!$projectSkill->isMetByContributor($contributor)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function getCompany(): Company

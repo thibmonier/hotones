@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repository\TechnologyRepository;
 use App\Service\HrMetricsService;
 use App\Service\SkillGapAnalyzer;
 use DateTime;
@@ -19,7 +20,8 @@ class HrDashboardController extends AbstractController
 {
     public function __construct(
         private readonly HrMetricsService $hrMetricsService,
-        private readonly SkillGapAnalyzer $skillGapAnalyzer
+        private readonly SkillGapAnalyzer $skillGapAnalyzer,
+        private readonly TechnologyRepository $technologyRepository
     ) {
     }
 
@@ -61,12 +63,19 @@ class HrDashboardController extends AbstractController
     #[Route('/skills-matrix', name: 'hr_skills_matrix', methods: ['GET'])]
     public function skillsMatrix(): Response
     {
-        // Matrice de compétences : tous les collaborateurs actifs avec leurs compétences
         $contributorRepository = $this->hrMetricsService->contributorRepository;
         $contributors          = $contributorRepository->findBy(['active' => true], ['lastName' => 'ASC']);
 
+        $technologies           = $this->technologyRepository->findUsedByActiveContributors();
+        $technologiesByCategory = [];
+        foreach ($technologies as $technology) {
+            $technologiesByCategory[$technology->category][] = $technology;
+        }
+
         return $this->render('hr/skills_matrix.html.twig', [
-            'contributors' => $contributors,
+            'contributors'           => $contributors,
+            'technologies'           => $technologies,
+            'technologiesByCategory' => $technologiesByCategory,
         ]);
     }
 

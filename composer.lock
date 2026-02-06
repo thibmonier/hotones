@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db8c12519a059b8a54d0c076a0c97eb1",
+    "content-hash": "769e33d8bd6793b97605319ef760d0e1",
     "packages": [
         {
             "name": "anthropic-ai/sdk",
@@ -331,16 +331,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.369.26",
+            "version": "3.369.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "ad0916c6595d98f9052f60e1d7204f4740369e94"
+                "reference": "d19d88c4d9d709eb119f2d85a385a9e40b834e33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/ad0916c6595d98f9052f60e1d7204f4740369e94",
-                "reference": "ad0916c6595d98f9052f60e1d7204f4740369e94",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d19d88c4d9d709eb119f2d85a385a9e40b834e33",
+                "reference": "d19d88c4d9d709eb119f2d85a385a9e40b834e33",
                 "shasum": ""
             },
             "require": {
@@ -422,9 +422,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.369.26"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.369.28"
             },
-            "time": "2026-02-03T19:16:42+00:00"
+            "time": "2026-02-05T19:09:46+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -2223,16 +2223,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v4.28.0",
+            "version": "v4.28.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "ff284930473028f6be2acc8251a3041ee931d9c0"
+                "reference": "30950a2ecf70a09e7a8dc2f3064edb42cbc5c465"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/ff284930473028f6be2acc8251a3041ee931d9c0",
-                "reference": "ff284930473028f6be2acc8251a3041ee931d9c0",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/30950a2ecf70a09e7a8dc2f3064edb42cbc5c465",
+                "reference": "30950a2ecf70a09e7a8dc2f3064edb42cbc5c465",
                 "shasum": ""
             },
             "require": {
@@ -2316,7 +2316,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.28.0"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.28.1"
             },
             "funding": [
                 {
@@ -2324,7 +2324,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-28T19:50:24+00:00"
+            "time": "2026-02-05T20:39:12+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -2455,16 +2455,16 @@
         },
         {
             "name": "endroid/qr-code",
-            "version": "6.1.0",
+            "version": "6.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/endroid/qr-code.git",
-                "reference": "5a74873ba8873ddcc557d22755c914ac899563ae"
+                "reference": "5fa534856ed95649d67c0eab0cabc03ab1d8e0e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/endroid/qr-code/zipball/5a74873ba8873ddcc557d22755c914ac899563ae",
-                "reference": "5a74873ba8873ddcc557d22755c914ac899563ae",
+                "url": "https://api.github.com/repos/endroid/qr-code/zipball/5fa534856ed95649d67c0eab0cabc03ab1d8e0e2",
+                "reference": "5fa534856ed95649d67c0eab0cabc03ab1d8e0e2",
                 "shasum": ""
             },
             "require": {
@@ -2515,7 +2515,7 @@
             ],
             "support": {
                 "issues": "https://github.com/endroid/qr-code/issues",
-                "source": "https://github.com/endroid/qr-code/tree/6.1.0"
+                "source": "https://github.com/endroid/qr-code/tree/6.1.3"
             },
             "funding": [
                 {
@@ -2523,7 +2523,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-25T10:47:45+00:00"
+            "time": "2026-02-05T07:01:58+00:00"
         },
         {
             "name": "endroid/qr-code-bundle",
@@ -6378,12 +6378,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "57534122edd70a2b3dbb02b65f2091efc57e4ab7"
+                "reference": "7ea2d110787f6807213e27a1255c6b858ad99d89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/57534122edd70a2b3dbb02b65f2091efc57e4ab7",
-                "reference": "57534122edd70a2b3dbb02b65f2091efc57e4ab7",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/7ea2d110787f6807213e27a1255c6b858ad99d89",
+                "reference": "7ea2d110787f6807213e27a1255c6b858ad99d89",
                 "shasum": ""
             },
             "conflict": {
@@ -6863,7 +6863,7 @@
                 "microsoft/microsoft-graph": ">=1.16,<1.109.1|>=2,<2.0.1",
                 "microsoft/microsoft-graph-beta": "<2.0.1",
                 "microsoft/microsoft-graph-core": "<2.0.2",
-                "microweber/microweber": "<=2.0.19",
+                "microweber/microweber": "<2.0.20",
                 "mikehaertl/php-shellcommand": "<1.6.1",
                 "mineadmin/mineadmin": "<=3.0.9",
                 "miniorange/miniorange-saml": "<1.4.3",
@@ -7005,7 +7005,7 @@
                 "prestashop/blockwishlist": ">=2,<2.1.1",
                 "prestashop/contactform": ">=1.0.1,<4.3",
                 "prestashop/gamification": "<2.3.2",
-                "prestashop/prestashop": "<8.2.3",
+                "prestashop/prestashop": "<8.2.4|>=9.0.0.0-alpha1,<9.0.3",
                 "prestashop/productcomments": "<5.0.2",
                 "prestashop/ps_checkout": "<4.4.1|>=5,<5.0.5",
                 "prestashop/ps_contactinfo": "<=3.3.2",
@@ -7280,7 +7280,7 @@
                 "wikimedia/parsoid": "<0.12.2",
                 "willdurand/js-translation-bundle": "<2.1.1",
                 "winter/wn-backend-module": "<1.2.4",
-                "winter/wn-cms-module": "<1.0.476|>=1.1,<1.1.11|>=1.2,<1.2.7",
+                "winter/wn-cms-module": "<=1.2.9",
                 "winter/wn-dusk-plugin": "<2.1",
                 "winter/wn-system-module": "<1.2.4",
                 "wintercms/winter": "<=1.2.3",
@@ -7388,7 +7388,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-03T19:20:38+00:00"
+            "time": "2026-02-05T22:08:29+00:00"
         },
         {
             "name": "sabberworm/php-css-parser",
@@ -16144,6 +16144,65 @@
             "time": "2026-02-01T12:58:43+00:00"
         },
         {
+            "name": "carthage-software/mago",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/carthage-software/mago.git",
+                "reference": "0ce3f5d230f8ae330617b04299700347d3ca6806"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/carthage-software/mago/zipball/0ce3f5d230f8ae330617b04299700347d3ca6806",
+                "reference": "0ce3f5d230f8ae330617b04299700347d3ca6806",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.6",
+                "php": "~8.1 || ~8.2 || ~8.3 || ~8.4 || ~8.5 || ~8.6"
+            },
+            "require-dev": {
+                "composer/composer": "^2.8"
+            },
+            "bin": [
+                "composer/bin/mago"
+            ],
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Mago\\MagoPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mago\\": "composer/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT OR Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Saif Eddin Gmati",
+                    "email": "azjezz@carthage.software"
+                }
+            ],
+            "description": "Mago is a toolchain for PHP that aims to provide a set of tools to help developers write better code.",
+            "keywords": [
+                "dev"
+            ],
+            "support": {
+                "issues": "https://github.com/carthage-software/mago/issues",
+                "source": "https://github.com/carthage-software/mago/tree/1.5.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/azjezz",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-02-04T21:37:39+00:00"
+        },
+        {
             "name": "clue/ndjson-react",
             "version": "v1.3.0",
             "source": {
@@ -17191,12 +17250,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/infection.git",
-                "reference": "d5d1a4c78cf2d51123df60bf4b6b24f10874ba8e"
+                "reference": "07280fb02f4c48bb8ad053df3f9798ae8c46db76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/infection/zipball/d5d1a4c78cf2d51123df60bf4b6b24f10874ba8e",
-                "reference": "d5d1a4c78cf2d51123df60bf4b6b24f10874ba8e",
+                "url": "https://api.github.com/repos/infection/infection/zipball/07280fb02f4c48bb8ad053df3f9798ae8c46db76",
+                "reference": "07280fb02f4c48bb8ad053df3f9798ae8c46db76",
                 "shasum": ""
             },
             "require": {
@@ -17320,7 +17379,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-02-03T17:55:05+00:00"
+            "time": "2026-02-05T08:28:55+00:00"
         },
         {
             "name": "infection/mutator",
@@ -18319,16 +18378,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "12.5.2",
+            "version": "12.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "4a9739b51cbcb355f6e95659612f92e282a7077b"
+                "reference": "b015312f28dd75b75d3422ca37dff2cd1a565e8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/4a9739b51cbcb355f6e95659612f92e282a7077b",
-                "reference": "4a9739b51cbcb355f6e95659612f92e282a7077b",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/b015312f28dd75b75d3422ca37dff2cd1a565e8d",
+                "reference": "b015312f28dd75b75d3422ca37dff2cd1a565e8d",
                 "shasum": ""
             },
             "require": {
@@ -18384,7 +18443,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.5.2"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.5.3"
             },
             "funding": [
                 {
@@ -18404,7 +18463,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-24T07:03:04+00:00"
+            "time": "2026-02-06T06:01:44+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -18665,16 +18724,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.8",
+            "version": "12.5.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "37ddb96c14bfee10304825edbb7e66d341ec6889"
+                "reference": "83d4c158526c879b4c5cf7149d27958b6d912373"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/37ddb96c14bfee10304825edbb7e66d341ec6889",
-                "reference": "37ddb96c14bfee10304825edbb7e66d341ec6889",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/83d4c158526c879b4c5cf7149d27958b6d912373",
+                "reference": "83d4c158526c879b4c5cf7149d27958b6d912373",
                 "shasum": ""
             },
             "require": {
@@ -18689,7 +18748,7 @@
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.3",
                 "phpunit/php-code-coverage": "^12.5.2",
-                "phpunit/php-file-iterator": "^6.0.0",
+                "phpunit/php-file-iterator": "^6.0.1",
                 "phpunit/php-invoker": "^6.0.0",
                 "phpunit/php-text-template": "^5.0.0",
                 "phpunit/php-timer": "^8.0.0",
@@ -18700,6 +18759,7 @@
                 "sebastian/exporter": "^7.0.2",
                 "sebastian/global-state": "^8.0.2",
                 "sebastian/object-enumerator": "^7.0.0",
+                "sebastian/recursion-context": "^7.0.1",
                 "sebastian/type": "^6.0.3",
                 "sebastian/version": "^6.0.0",
                 "staabm/side-effects-detector": "^1.0.5"
@@ -18742,7 +18802,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.8"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.9"
             },
             "funding": [
                 {
@@ -18766,7 +18826,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-27T06:12:29+00:00"
+            "time": "2026-02-05T08:01:09+00:00"
         },
         {
             "name": "react/cache",
@@ -21240,16 +21300,16 @@
         },
         {
             "name": "zenstruck/foundry",
-            "version": "v2.8.7",
+            "version": "v2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenstruck/foundry.git",
-                "reference": "92027e03e5529b67c724039940f8547571afabe4"
+                "reference": "93328d425758fb38f520255acf8d7d87ec3484f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/92027e03e5529b67c724039940f8547571afabe4",
-                "reference": "92027e03e5529b67c724039940f8547571afabe4",
+                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/93328d425758fb38f520255acf8d7d87ec3484f6",
+                "reference": "93328d425758fb38f520255acf8d7d87ec3484f6",
                 "shasum": ""
             },
             "require": {
@@ -21348,7 +21408,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zenstruck/foundry/issues",
-                "source": "https://github.com/zenstruck/foundry/tree/v2.8.7"
+                "source": "https://github.com/zenstruck/foundry/tree/v2.9.0"
             },
             "funding": [
                 {
@@ -21360,7 +21420,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-03T13:01:05+00:00"
+            "time": "2026-02-04T10:34:12+00:00"
         }
     ],
     "aliases": [],

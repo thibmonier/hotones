@@ -24,7 +24,7 @@
         "doctrine/orm": "^3.6.2",
         "dompdf/dompdf": "^3.1.4",
         "dragonmantank/cron-expression": "^3.6",
-        "easycorp/easyadmin-bundle": "^4.28.0",
+        "easycorp/easyadmin-bundle": "^4.28.1",
         "endroid/qr-code-bundle": ">=6.1",
         "gedmo/doctrine-extensions": "dev-main || >=3.21",
         "knplabs/knp-paginator-bundle": "^6.10.0",
@@ -100,6 +100,7 @@
     },
     "require-dev": {
         "ahmed-bhs/doctrine-doctor": "^1.0@dev",
+        "carthage-software/mago": "^1.5.0",
         "dama/doctrine-test-bundle": "^8.6.0",
         "dbrekelmans/bdi": "^1.4.1",
         "deptrac/deptrac": ">=4.6",
@@ -112,7 +113,7 @@
         "phpstan/phpstan-doctrine": "^2.0.14",
         "phpstan/phpstan-strict-rules": "^2.0.8",
         "phpstan/phpstan-symfony": "^2.0.12",
-        "phpunit/phpunit": "^12.5.8",
+        "phpunit/phpunit": "^12.5.9",
         "rector/rector": "^2.3.5",
         "squizlabs/php_codesniffer": "^3.13.5",
         "symfony/browser-kit": "^8.0.4",
@@ -121,16 +122,17 @@
         "symfony/maker-bundle": "^1.65.1",
         "symfony/stopwatch": "^8.0",
         "symfony/web-profiler-bundle": "^8.0.4",
-        "zenstruck/foundry": "^2.8.7"
+        "zenstruck/foundry": "^2.9.0"
     },
     "config": {
         "allow-plugins": {
-            "php-http/discovery": true,
-            "symfony/flex": true,
-            "symfony/runtime": true,
+            "carthage-software/mago": true,
             "endroid/installer": true,
+            "infection/extension-installer": true,
+            "php-http/discovery": true,
             "phpstan/extension-installer": true,
-            "infection/extension-installer": true
+            "symfony/flex": true,
+            "symfony/runtime": true
         },
         "bump-after-update": true,
         "sort-packages": true
@@ -173,10 +175,20 @@
         "phpcsfixer-fix": "php-cs-fixer fix --ansi",
         "phpcs": "phpcs --standard=phpcs.xml",
         "phpcbf": "phpcbf --standard=phpcs.xml",
+        "mago-format": "mago format --dry-run",
+        "mago-format-fix": "mago format",
+        "mago-lint": "mago lint",
+        "mago-analyze": "mago analyze",
+        "mago": [
+            "@mago-format",
+            "@mago-lint",
+            "@mago-analyze"
+        ],
         "check-code": [
             "@phpcsfixer",
             "@phpstan",
-            "@phpcs"
+            "@phpcs",
+            "@mago"
         ],
         "check-architecture": "deptrac analyze --config-file=deptrac.yaml --no-interaction",
         "check-all": [
@@ -209,7 +221,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "^8.0",
             "docker": true
         }
