@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Interface\CompanyOwnedInterface;
@@ -80,7 +82,12 @@ class Client implements Stringable, CompanyOwnedInterface
         }
     }
 
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: ClientContact::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        mappedBy: 'client',
+        targetEntity: ClientContact::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
     private Collection $contacts;
 
     public function __construct()

@@ -14,24 +14,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:debug:planning-suggestions',
-    description: 'Debug planning suggestions for a project',
-)]
+#[AsCommand(name: 'app:debug:planning-suggestions', description: 'Debug planning suggestions for a project')]
 class DebugPlanningSuggestionsCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly ProjectPlanningAssistant $assistant
+        private readonly ProjectPlanningAssistant $assistant,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addArgument('project_id', InputArgument::REQUIRED, 'The project ID')
-        ;
+        $this->addArgument('project_id', InputArgument::REQUIRED, 'The project ID');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -56,15 +51,12 @@ class DebugPlanningSuggestionsCommand extends Command
 
         // Display statistics
         $io->section('Statistics');
-        $io->table(
-            ['Metric', 'Value'],
-            [
-                ['Total tasks', $result['statistics']['totalTasks']],
-                ['Assigned tasks', $result['statistics']['assignedTasks']],
-                ['Unassigned tasks', $result['statistics']['unassignedTasks']],
-                ['Average confidence', sprintf('%.2f%%', $result['statistics']['averageConfidence'] * 100)],
-            ],
-        );
+        $io->table(['Metric', 'Value'], [
+            ['Total tasks', $result['statistics']['totalTasks']],
+            ['Assigned tasks', $result['statistics']['assignedTasks']],
+            ['Unassigned tasks', $result['statistics']['unassignedTasks']],
+            ['Average confidence', sprintf('%.2f%%', $result['statistics']['averageConfidence'] * 100)],
+        ]);
 
         // Display suggestions
         if (count($result['suggestions']) > 0) {
@@ -81,10 +73,15 @@ class DebugPlanningSuggestionsCommand extends Command
                     $suggestion['reasoning'],
                 ];
             }
-            $io->table(
-                ['Task', 'Contributor', 'Start', 'End', 'Daily Hours', 'Confidence', 'Reasoning'],
-                $suggestionRows,
-            );
+            $io->table([
+                'Task',
+                'Contributor',
+                'Start',
+                'End',
+                'Daily Hours',
+                'Confidence',
+                'Reasoning',
+            ], $suggestionRows);
         } else {
             $io->warning('No suggestions generated');
         }
@@ -101,10 +98,7 @@ class DebugPlanningSuggestionsCommand extends Command
                     $task->getStatus(),
                 ];
             }
-            $io->table(
-                ['Task', 'Required Profile', 'Estimated Hours', 'Status'],
-                $unassignedRows,
-            );
+            $io->table(['Task', 'Required Profile', 'Estimated Hours', 'Status'], $unassignedRows);
         }
 
         // Additional debug: Check all tasks in project
@@ -122,10 +116,7 @@ class DebugPlanningSuggestionsCommand extends Command
                 sprintf('%.1fh', $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? 0),
             ];
         }
-        $io->table(
-            ['ID', 'Name', 'Active', 'Status', 'Counts', 'Profile', 'Hours'],
-            $taskRows,
-        );
+        $io->table(['ID', 'Name', 'Active', 'Status', 'Counts', 'Profile', 'Hours'], $taskRows);
 
         $io->success('Debug completed');
 

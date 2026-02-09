@@ -408,9 +408,11 @@ class BlogPost implements CompanyOwnedInterface, Stringable
      */
     public function isPublished(): bool
     {
-        return $this->status === self::STATUS_PUBLISHED
+        return
+            $this->status === self::STATUS_PUBLISHED
             && $this->publishedAt !== null
-            && $this->publishedAt <= new DateTimeImmutable();
+            && $this->publishedAt <= new DateTimeImmutable()
+        ;
     }
 
     /**
@@ -492,10 +494,7 @@ class BlogPost implements CompanyOwnedInterface, Stringable
             return [];
         }
 
-        return array_map(
-            trim(...),
-            explode(',', $this->keywords),
-        );
+        return array_map(trim(...), explode(',', $this->keywords));
     }
 
     public function __toString(): string

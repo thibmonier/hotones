@@ -50,7 +50,12 @@ class SeedProjects2025Command extends Command
         $this
             ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Nombre de projets à générer', '50')
             ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année de génération', '2025')
-            ->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
+            ->addOption(
+                'company-id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'ID de la Company (utilise la première si non spécifié)',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -160,13 +165,13 @@ class SeedProjects2025Command extends Command
             return $existing;
         }
         $names = [
-            ['Alice', 'Dupont'],
-            ['Bob', 'Martin'],
-            ['Claire', 'Rousseau'],
-            ['David', 'Moreau'],
-            ['Emma', 'Bernard'],
+            ['Alice',    'Dupont'],
+            ['Bob',      'Martin'],
+            ['Claire',   'Rousseau'],
+            ['David',    'Moreau'],
+            ['Emma',     'Bernard'],
             ['François', 'Petit'],
-            ['Gaël', 'Leroy'],
+            ['Gaël',     'Leroy'],
         ];
         $contributors = [];
         foreach ($names as $i => [$firstName, $lastName]) {
@@ -174,7 +179,11 @@ class SeedProjects2025Command extends Command
             if (!$c) {
                 $c = new Contributor();
                 $c->setCompany($company);
-                $c->setFirstName($firstName)->setLastName($lastName)->setActive(true)->setCjm((400 + ($i % 4) * 50).'.00');
+                $c
+                    ->setFirstName($firstName)
+                    ->setLastName($lastName)
+                    ->setActive(true)
+                    ->setCjm((400 + (($i % 4) * 50)).'.00');
                 // Associer 1 profil
                 if (isset($profiles[$i % count($profiles)])) {
                     $c->addProfile($profiles[$i % count($profiles)]);
@@ -198,7 +207,10 @@ class SeedProjects2025Command extends Command
         $techs   = ['Symfony', 'React', 'Vue.js', 'Angular', 'Node.js', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis'];
         $created = [];
         foreach ($techs as $t) {
-            $tech = $repo->findOneBy(['name' => $t, 'company' => $this->em->getRepository(Company::class)->findOneBy([])]);
+            $tech = $repo->findOneBy([
+                'name'    => $t,
+                'company' => $this->em->getRepository(Company::class)->findOneBy([]),
+            ]);
             if (!$tech) {
                 $tech    = new Technology();
                 $company = $this->em->getRepository(Company::class)->findOneBy([]);
@@ -259,7 +271,8 @@ class SeedProjects2025Command extends Command
         $createdAt = DateTimeImmutable::createFromMutable($project->getStartDate());
         $order     = new Order();
         $order->setCompany($project->getCompany());
-        $order->setProject($project)
+        $order
+            ->setProject($project)
             ->setOrderNumber($this->generateOrderNumberForDate($project->getStartDate()))
             ->setStatus(random_int(0, 1) ? 'signe' : 'gagne')
             ->setCreatedAt($createdAt);
@@ -274,16 +287,15 @@ class SeedProjects2025Command extends Command
         // Section prestations
         $section = new OrderSection();
         $section->setCompany($project->getCompany());
-        $section->setOrder($order)
-            ->setName('Prestations')
-            ->setSortOrder(1);
+        $section->setOrder($order)->setName('Prestations')->setSortOrder(1);
 
         // 2-4 lignes de service
         $numLines = random_int(2, 4);
         for ($i = 0; $i < $numLines; ++$i) {
             $line = new OrderLine();
             $line->setCompany($project->getCompany());
-            $line->setSection($section)
+            $line
+                ->setSection($section)
                 ->setDescription('Prestation #'.($i + 1))
                 ->setPosition($i + 1)
                 ->setType('service')
@@ -302,13 +314,12 @@ class SeedProjects2025Command extends Command
         if (random_int(0, 1)) {
             $sec2 = new OrderSection();
             $sec2->setCompany($project->getCompany());
-            $sec2->setOrder($order)
-                ->setName('Achats')
-                ->setSortOrder(2);
+            $sec2->setOrder($order)->setName('Achats')->setSortOrder(2);
 
             $purchase = new OrderLine();
             $purchase->setCompany($project->getCompany());
-            $purchase->setSection($sec2)
+            $purchase
+                ->setSection($sec2)
                 ->setDescription('Licence annuelle')
                 ->setType('fixed_amount')
                 ->setPosition(1)
@@ -336,7 +347,8 @@ class SeedProjects2025Command extends Command
         for ($i = 0; $i < $numTasks; ++$i) {
             $task = new ProjectTask();
             $task->setCompany($project->getCompany());
-            $task->setProject($project)
+            $task
+                ->setProject($project)
                 ->setName('Tâche #'.($i + 1))
                 ->setType(ProjectTask::TYPE_REGULAR)
                 ->setCountsForProfitability(true)
@@ -380,7 +392,8 @@ class SeedProjects2025Command extends Command
 
             $timesheet = new Timesheet();
             $timesheet->setCompany($project->getCompany());
-            $timesheet->setContributor($contributors[array_rand($contributors)])
+            $timesheet
+                ->setContributor($contributors[array_rand($contributors)])
                 ->setProject($project)
                 ->setDate($date)
                 ->setHours((string) random_int(4, 8))
@@ -396,8 +409,7 @@ class SeedProjects2025Command extends Command
         $key   = $year.$month;
 
         if (!isset($this->orderCounters[$key])) {
-            $last = $this->em->getRepository(Order::class)
-                ->findLastOrderNumberForMonth($year, $month);
+            $last = $this->em->getRepository(Order::class)->findLastOrderNumberForMonth($year, $month);
 
             $lastIncrement = 0;
             if ($last) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\Analytics\FactStaffingMetrics;
@@ -15,8 +17,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class FactStaffingMetricsFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly ?CompanyContext $companyContext)
-    {
+    public function __construct(
+        private readonly ?CompanyContext $companyContext,
+    ) {
         parent::__construct();
     }
 
@@ -57,13 +60,11 @@ final class FactStaffingMetricsFactory extends PersistentObjectFactory
     #[Override]
     protected function initialize(): static
     {
-        return $this
-            ->afterInstantiate(function (FactStaffingMetrics $factStaffingMetrics): void {
-                // Auto-calculate metrics after instantiation
-                $factStaffingMetrics->calculateMetrics();
-            })
-            ->afterPersist(function (FactStaffingMetrics $factStaffingMetrics): void {
-                // DimTime should already be persisted by cascade
-            });
+        return $this->afterInstantiate(function (FactStaffingMetrics $factStaffingMetrics): void {
+            // Auto-calculate metrics after instantiation
+            $factStaffingMetrics->calculateMetrics();
+        })->afterPersist(function (FactStaffingMetrics $factStaffingMetrics): void {
+            // DimTime should already be persisted by cascade
+        });
     }
 }

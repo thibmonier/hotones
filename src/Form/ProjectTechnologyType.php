@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\ProjectTechnology;
@@ -15,25 +17,21 @@ class ProjectTechnologyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('technology', EntityType::class, [
-                'class'        => Technology::class,
-                'choice_label' => 'name',
-                'label'        => 'Technologie',
-                'placeholder'  => '-- Sélectionner --',
-                'attr'         => ['class' => 'form-control'],
-            ])
-            ->add('version', TextType::class, [
-                'label'    => 'Version',
-                'required' => false,
-                'attr'     => ['class' => 'form-control', 'placeholder' => 'ex: 8.3.0'],
-            ])
-            ->add('notes', TextareaType::class, [
-                'label'    => 'Notes',
-                'required' => false,
-                'attr'     => ['class' => 'form-control', 'rows' => 2],
-            ])
-        ;
+        $builder->add('technology', EntityType::class, [
+            'class'        => Technology::class,
+            'choice_label' => 'name',
+            'label'        => 'Technologie',
+            'placeholder'  => '-- Sélectionner --',
+            'attr'         => ['class' => 'form-control'],
+        ])->add('version', TextType::class, [
+            'label'    => 'Version',
+            'required' => false,
+            'attr'     => ['class' => 'form-control', 'placeholder' => 'ex: 8.3.0'],
+        ])->add('notes', TextareaType::class, [
+            'label'    => 'Notes',
+            'required' => false,
+            'attr'     => ['class' => 'form-control', 'rows' => 2],
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

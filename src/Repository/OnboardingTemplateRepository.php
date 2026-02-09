@@ -14,10 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OnboardingTemplateRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, OnboardingTemplate::class, $companyContext);
     }
 
@@ -28,7 +26,8 @@ class OnboardingTemplateRepository extends CompanyAwareRepository
      */
     public function findActive(): array
     {
-        return $this->createCompanyQueryBuilder('ot')
+        return $this
+            ->createCompanyQueryBuilder('ot')
             ->andWhere('ot.active = :active')
             ->setParameter('active', true)
             ->orderBy('ot.name', 'ASC')
@@ -41,7 +40,8 @@ class OnboardingTemplateRepository extends CompanyAwareRepository
      */
     public function findByProfile(Profile $profile): ?OnboardingTemplate
     {
-        return $this->createCompanyQueryBuilder('ot')
+        return $this
+            ->createCompanyQueryBuilder('ot')
             ->andWhere('ot.profile = :profile')
             ->andWhere('ot.active = :active')
             ->setParameter('profile', $profile)
@@ -56,7 +56,8 @@ class OnboardingTemplateRepository extends CompanyAwareRepository
      */
     public function findDefault(): ?OnboardingTemplate
     {
-        return $this->createCompanyQueryBuilder('ot')
+        return $this
+            ->createCompanyQueryBuilder('ot')
             ->andWhere('ot.profile IS NULL')
             ->andWhere('ot.active = :active')
             ->setParameter('active', true)

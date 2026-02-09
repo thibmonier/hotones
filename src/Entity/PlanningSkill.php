@@ -24,10 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'idx_planningskill_planning', columns: ['planning_id'])]
 #[ORM\Index(name: 'idx_planningskill_skill', columns: ['skill_id'])]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(
-    fields: ['planning', 'skill'],
-    message: 'Cette compétence est déjà requise pour cette affectation',
-)]
+#[UniqueEntity(fields: ['planning', 'skill'], message: 'Cette compétence est déjà requise pour cette affectation')]
 class PlanningSkill implements CompanyOwnedInterface
 {
     public const LEVEL_BEGINNER     = 1;
@@ -64,10 +61,12 @@ class PlanningSkill implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotNull(message: 'Le niveau minimum requis est obligatoire')]
-    #[Assert\Choice(
-        choices: [self::LEVEL_BEGINNER, self::LEVEL_INTERMEDIATE, self::LEVEL_CONFIRMED, self::LEVEL_EXPERT],
-        message: 'Niveau invalide',
-    )]
+    #[Assert\Choice(choices: [
+        self::LEVEL_BEGINNER,
+        self::LEVEL_INTERMEDIATE,
+        self::LEVEL_CONFIRMED,
+        self::LEVEL_EXPERT,
+    ], message: 'Niveau invalide')]
     private int $requiredLevel = self::LEVEL_INTERMEDIATE;
 
     /**

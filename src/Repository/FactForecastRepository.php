@@ -14,19 +14,21 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class FactForecastRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, FactForecast::class, $companyContext);
     }
 
     /**
      * Find latest forecast for a given period and scenario.
      */
-    public function findLatestForPeriod(DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd, string $scenario): ?FactForecast
-    {
-        return $this->createCompanyQueryBuilder('f')
+    public function findLatestForPeriod(
+        DateTimeImmutable $periodStart,
+        DateTimeImmutable $periodEnd,
+        string $scenario,
+    ): ?FactForecast {
+        return $this
+            ->createCompanyQueryBuilder('f')
             ->andWhere('f.periodStart = :start')
             ->andWhere('f.periodEnd = :end')
             ->andWhere('f.scenario = :scenario')
@@ -46,7 +48,8 @@ class FactForecastRepository extends CompanyAwareRepository
      */
     public function findByDateRange(DateTimeImmutable $start, DateTimeImmutable $end, ?string $scenario = null): array
     {
-        $qb = $this->createCompanyQueryBuilder('f')
+        $qb = $this
+            ->createCompanyQueryBuilder('f')
             ->andWhere('f.periodStart >= :start')
             ->andWhere('f.periodEnd <= :end')
             ->setParameter('start', $start)
@@ -55,8 +58,7 @@ class FactForecastRepository extends CompanyAwareRepository
             ->addOrderBy('f.scenario', 'ASC');
 
         if ($scenario !== null) {
-            $qb->andWhere('f.scenario = :scenario')
-                ->setParameter('scenario', $scenario);
+            $qb->andWhere('f.scenario = :scenario')->setParameter('scenario', $scenario);
         }
 
         return $qb->getQuery()->getResult();
@@ -67,7 +69,8 @@ class FactForecastRepository extends CompanyAwareRepository
      */
     public function calculateAverageAccuracy(string $scenario, int $months = 6): ?float
     {
-        $result = $this->createCompanyQueryBuilder('f')
+        $result = $this
+            ->createCompanyQueryBuilder('f')
             ->select('AVG(f.accuracy) as avg_accuracy')
             ->andWhere('f.scenario = :scenario')
             ->andWhere('f.accuracy IS NOT NULL')

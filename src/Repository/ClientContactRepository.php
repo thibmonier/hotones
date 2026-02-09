@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\ClientContact;
@@ -11,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ClientContactRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ClientContact::class, $companyContext);
     }
 }

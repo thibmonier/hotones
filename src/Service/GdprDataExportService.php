@@ -84,22 +84,16 @@ class GdprDataExportService
             'recruitment_date' => $contributor->getRecruitmentDate()?->format('Y-m-d'),
             'departure_date'   => $contributor->getDepartureDate()?->format('Y-m-d'),
             'is_active'        => $contributor->isActive(),
-            'profiles'         => array_map(
-                fn ($profile): array => [
-                    'id'   => $profile->getId(),
-                    'name' => $profile->getName(),
-                ],
-                $contributor->getProfiles()->toArray(),
-            ),
+            'profiles'         => array_map(fn ($profile): array => [
+                'id'   => $profile->getId(),
+                'name' => $profile->getName(),
+            ], $contributor->getProfiles()->toArray()),
         ];
     }
 
     private function exportEmploymentPeriods($contributor): array
     {
-        $periods = $this->employmentPeriodRepository->findBy(
-            ['contributor' => $contributor],
-            ['startDate' => 'ASC'],
-        );
+        $periods = $this->employmentPeriodRepository->findBy(['contributor' => $contributor], ['startDate' => 'ASC']);
 
         return array_map(fn ($period): array => [
             'period_id'            => $period->getId(),
@@ -108,19 +102,13 @@ class GdprDataExportService
             'salary'               => $period->getSalary(),
             'weekly_hours'         => $period->getWeeklyHours(),
             'work_time_percentage' => $period->getWorkTimePercentage(),
-            'profiles'             => array_map(
-                fn ($profile): string => $profile->getName(),
-                $period->getProfiles()->toArray(),
-            ),
+            'profiles'             => array_map(fn ($profile): string => $profile->getName(), $period->getProfiles()->toArray()),
         ], $periods);
     }
 
     private function exportTimesheets($contributor): array
     {
-        $timesheets = $this->timesheetRepository->findBy(
-            ['contributor' => $contributor],
-            ['date' => 'DESC'],
-        );
+        $timesheets = $this->timesheetRepository->findBy(['contributor' => $contributor], ['date' => 'DESC']);
 
         return array_map(fn ($timesheet): array => [
             'timesheet_id' => $timesheet->getId(),
@@ -131,14 +119,16 @@ class GdprDataExportService
                 'id'   => $timesheet->getProject()->getId(),
                 'name' => $timesheet->getProject()->getName(),
             ],
-            'task' => $timesheet->getTask() ? [
-                'id'   => $timesheet->getTask()->getId(),
-                'name' => $timesheet->getTask()->getName(),
-            ] : null,
-            'sub_task' => $timesheet->getSubTask() ? [
-                'id'    => $timesheet->getSubTask()->getId(),
-                'title' => $timesheet->getSubTask()->getTitle(),
-            ] : null,
+            'task' => $timesheet->getTask()
+                ? [
+                    'id'   => $timesheet->getTask()->getId(),
+                    'name' => $timesheet->getTask()->getName(),
+                ] : null,
+            'sub_task' => $timesheet->getSubTask()
+                ? [
+                    'id'    => $timesheet->getSubTask()->getId(),
+                    'title' => $timesheet->getSubTask()->getTitle(),
+                ] : null,
         ], $timesheets);
     }
 
@@ -147,7 +137,8 @@ class GdprDataExportService
         // Get all consents for this user (including expired ones for full history)
         $company  = $this->companyContext->getCurrentCompany();
         $qb       = $this->em->createQueryBuilder();
-        $consents = $qb->select('c')
+        $consents = $qb
+            ->select('c')
             ->from(\App\Entity\CookieConsent::class, 'c')
             ->where('c.user = :user')
             ->andWhere('c.company = :company')
@@ -182,7 +173,9 @@ class GdprDataExportService
         if ($contributor) {
             $stats['total_timesheets']         = $this->timesheetRepository->count(['contributor' => $contributor]);
             $stats['total_hours_logged']       = $this->calculateTotalHours($contributor);
-            $stats['total_employment_periods'] = $this->employmentPeriodRepository->count(['contributor' => $contributor]);
+            $stats['total_employment_periods'] = $this->employmentPeriodRepository->count([
+                'contributor' => $contributor,
+            ]);
         }
 
         return $stats;
@@ -192,7 +185,8 @@ class GdprDataExportService
     {
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->em->createQueryBuilder();
-        $result  = $qb->select('SUM(t.hours) as total')
+        $result  = $qb
+            ->select('SUM(t.hours) as total')
             ->from(\App\Entity\Timesheet::class, 't')
             ->where('t.contributor = :contributor')
             ->andWhere('t.company = :company')

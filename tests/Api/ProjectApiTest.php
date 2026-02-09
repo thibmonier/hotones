@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
@@ -23,6 +25,7 @@ class ProjectApiTest extends ApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         // Pour les tests, créer un utilisateur et obtenir un token JWT
         // À adapter selon votre configuration de fixtures
     }
@@ -32,9 +35,10 @@ class ProjectApiTest extends ApiTestCase
         $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         // Test de récupération de la collection de projets
-        $response = static::createClient()->request('GET', '/api/projects', [
-            'headers' => ['Authorization' => 'Bearer '.$this->getToken()],
-        ]);
+        $response = static::createClient()
+            ->request('GET', '/api/projects', [
+                'headers' => ['Authorization' => 'Bearer '.$this->getToken()],
+            ]);
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
@@ -52,16 +56,17 @@ class ProjectApiTest extends ApiTestCase
         $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         // Test de création d'un projet
-        $response = static::createClient()->request('POST', '/api/projects', [
-            'headers' => ['Authorization' => 'Bearer '.$this->getTokenWithRole('ROLE_CHEF_PROJET')],
-            'json'    => [
-                'name'        => 'Projet Test API',
-                'description' => 'Description du projet test',
-                'status'      => 'active',
-                'projectType' => 'forfait',
-                'isInternal'  => false,
-            ],
-        ]);
+        $response = static::createClient()
+            ->request('POST', '/api/projects', [
+                'headers' => ['Authorization' => 'Bearer '.$this->getTokenWithRole('ROLE_CHEF_PROJET')],
+                'json'    => [
+                    'name'        => 'Projet Test API',
+                    'description' => 'Description du projet test',
+                    'status'      => 'active',
+                    'projectType' => 'forfait',
+                    'isInternal'  => false,
+                ],
+            ]);
 
         $this->assertResponseStatusCodeSame(201);
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');

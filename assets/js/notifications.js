@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
             <div class="flex-shrink-0">
-                <button type="button" class="btn btn-sm btn-link text-muted mark-as-read-btn" data-notification-id="${notification.id}" onclick="event.preventDefault(); event.stopPropagation(); markNotificationAsRead(${notification.id});">
+                <button type="button" class="btn btn-sm btn-link text-muted mark-as-read-btn" data-action="mark-read" data-notification-id="${notification.id}">
                     <i class="bx bx-check"></i>
                 </button>
             </div>
@@ -228,5 +228,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.remove();
             }
         });
+    });
+
+    // Delegated event listeners for data-action attributes (CSP-compliant)
+    document.addEventListener('click', function(e) {
+        const markAllBtn = e.target.closest('[data-action="mark-all-read"]');
+        if (markAllBtn) {
+            e.preventDefault();
+            markAllNotificationsAsRead();
+            return;
+        }
+
+        const markReadBtn = e.target.closest('[data-action="mark-read"]');
+        if (markReadBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            var notificationId = markReadBtn.dataset.notificationId;
+            markNotificationAsRead(notificationId);
+        }
     });
 });

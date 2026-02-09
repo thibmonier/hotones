@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Interface\CompanyOwnedInterface;
@@ -294,7 +296,7 @@ class OrderLine implements CompanyOwnedInterface
         $task->setActive(true);
 
         // Heures vendues = jours × 8
-        $soldHours = (int) round(bcmul($this->days, '8', 2));
+        $soldHours = (int) round((float) bcmul($this->days, '8', 2));
         $task->setEstimatedHoursSold($soldHours);
 
         // Profil requis

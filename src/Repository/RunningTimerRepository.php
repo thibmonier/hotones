@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Contributor;
@@ -12,16 +14,15 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class RunningTimerRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, RunningTimer::class, $companyContext);
     }
 
     public function findActiveByContributor(Contributor $contributor): ?RunningTimer
     {
-        return $this->createCompanyQueryBuilder('rt')
+        return $this
+            ->createCompanyQueryBuilder('rt')
             ->andWhere('rt.contributor = :contributor')
             ->andWhere('rt.stoppedAt IS NULL')
             ->setParameter('contributor', $contributor)

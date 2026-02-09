@@ -32,11 +32,7 @@ class MetricsCalculationServiceTest extends TestCase
         $this->companyContext = $this->createMock(CompanyContext::class);
         $this->logger         = $this->createMock(LoggerInterface::class);
 
-        $this->service = new MetricsCalculationService(
-            $this->entityManager,
-            $this->companyContext,
-            $this->logger,
-        );
+        $this->service = new MetricsCalculationService($this->entityManager, $this->companyContext, $this->logger);
     }
 
     public function testCalculateMetricsForPeriodWithMonthlyGranularity(): void
@@ -48,20 +44,14 @@ class MetricsCalculationServiceTest extends TestCase
         $dimTime     = $this->createMock(DimTime::class);
         $dimTime->method('getDate')->willReturn($date);
 
-        $dimTimeRepo->expects($this->once())
-            ->method('findOneBy')
-            ->with(['date' => $date])
-            ->willReturn($dimTime);
+        $dimTimeRepo->expects($this->once())->method('findOneBy')->with(['date' => $date])->willReturn($dimTime);
 
         // Mock Project repository
         $projectRepo  = $this->createMock(ProjectRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query        = $this->createMock(Query::class);
 
-        $projectRepo->expects($this->once())
-            ->method('createQueryBuilder')
-            ->with('p')
-            ->willReturn($queryBuilder);
+        $projectRepo->expects($this->once())->method('createQueryBuilder')->with('p')->willReturn($queryBuilder);
 
         $queryBuilder->method('where')->willReturnSelf();
         $queryBuilder->method('andWhere')->willReturnSelf();
@@ -69,12 +59,11 @@ class MetricsCalculationServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
 
         // Return empty projects list for simplicity
-        $query->expects($this->once())
-            ->method('getResult')
-            ->willReturn([]);
+        $query->expects($this->once())->method('getResult')->willReturn([]);
 
         // Mock repository creation
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager
+            ->expects($this->exactly(2))
             ->method('getRepository')
             ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
@@ -88,12 +77,10 @@ class MetricsCalculationServiceTest extends TestCase
             });
 
         // Expect flush to be called
-        $this->entityManager->expects($this->once())
-            ->method('flush');
+        $this->entityManager->expects($this->once())->method('flush');
 
         // Expect logging
-        $this->logger->expects($this->exactly(2))
-            ->method('info');
+        $this->logger->expects($this->exactly(2))->method('info');
 
         $this->service->calculateMetricsForPeriod($date, 'monthly');
     }
@@ -107,9 +94,7 @@ class MetricsCalculationServiceTest extends TestCase
         $dimTime     = new DimTime();
         $dimTime->setDate($date);
 
-        $dimTimeRepo->expects($this->once())
-            ->method('findOneBy')
-            ->willReturn($dimTime);
+        $dimTimeRepo->expects($this->once())->method('findOneBy')->willReturn($dimTime);
 
         // Mock Project repository
         $projectRepo  = $this->createMock(ProjectRepository::class);
@@ -123,7 +108,8 @@ class MetricsCalculationServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
         $query->method('getResult')->willReturn([]);
 
-        $this->entityManager->method('getRepository')
+        $this->entityManager
+            ->method('getRepository')
             ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
@@ -163,7 +149,8 @@ class MetricsCalculationServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
         $query->method('getResult')->willReturn([]);
 
-        $this->entityManager->method('getRepository')
+        $this->entityManager
+            ->method('getRepository')
             ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
@@ -187,10 +174,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock DimTime repository - return null (doesn't exist)
         $dimTimeRepo = $this->createMock(EntityRepository::class);
-        $dimTimeRepo->expects($this->once())
-            ->method('findOneBy')
-            ->with(['date' => $date])
-            ->willReturn(null);
+        $dimTimeRepo->expects($this->once())->method('findOneBy')->with(['date' => $date])->willReturn(null);
 
         // Mock Project repository
         $projectRepo  = $this->createMock(ProjectRepository::class);
@@ -204,7 +188,8 @@ class MetricsCalculationServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
         $query->method('getResult')->willReturn([]);
 
-        $this->entityManager->method('getRepository')
+        $this->entityManager
+            ->method('getRepository')
             ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
@@ -217,7 +202,8 @@ class MetricsCalculationServiceTest extends TestCase
             });
 
         // Expect persist to be called for new DimTime
-        $this->entityManager->expects($this->once())
+        $this->entityManager
+            ->expects($this->once())
             ->method('persist')
             ->with($this->isInstanceOf(DimTime::class));
 
@@ -234,17 +220,17 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock repository to throw exception
         $dimTimeRepo = $this->createMock(EntityRepository::class);
-        $dimTimeRepo->expects($this->once())
-            ->method('findOneBy')
-            ->willThrowException(new Exception($errorMessage));
+        $dimTimeRepo->expects($this->once())->method('findOneBy')->willThrowException(new Exception($errorMessage));
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager
+            ->expects($this->once())
             ->method('getRepository')
             ->with(DimTime::class)
             ->willReturn($dimTimeRepo);
 
         // Expect error logging
-        $this->logger->expects($this->once())
+        $this->logger
+            ->expects($this->once())
             ->method('error')
             ->with(
                 'Erreur lors du calcul des métriques',
@@ -265,7 +251,8 @@ class MetricsCalculationServiceTest extends TestCase
         $deleteQuery = $this->createMock(Query::class);
         $deleteQuery->method('getResult')->willReturn([]);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager
+            ->expects($this->once())
             ->method('createQuery')
             ->with($this->stringContains('DELETE FROM App\Entity\Analytics\FactProjectMetrics'))
             ->willReturn($deleteQuery);
@@ -284,7 +271,8 @@ class MetricsCalculationServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
         $query->method('getResult')->willReturn([]);
 
-        $this->entityManager->method('getRepository')
+        $this->entityManager
+            ->method('getRepository')
             ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
@@ -297,8 +285,7 @@ class MetricsCalculationServiceTest extends TestCase
             });
 
         // Expect initial info log
-        $this->logger->expects($this->atLeastOnce())
-            ->method('info');
+        $this->logger->expects($this->atLeastOnce())->method('info');
 
         $this->service->recalculateMetricsForYear($year);
     }
@@ -327,7 +314,8 @@ class MetricsCalculationServiceTest extends TestCase
         $queryBuilder->method('getQuery')->willReturn($query);
         $query->method('getResult')->willReturn([]);
 
-        $this->entityManager->method('getRepository')
+        $this->entityManager
+            ->method('getRepository')
             ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;

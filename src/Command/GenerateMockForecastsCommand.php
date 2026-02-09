@@ -14,23 +14,20 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:forecast:generate-mock',
-    description: 'Génère des prévisions simulées pour tester l\'interface',
-)]
+#[AsCommand(name: 'app:forecast:generate-mock', description: 'Génère des prévisions simulées pour tester l\'interface')]
 class GenerateMockForecastsCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addOption('months', 'm', InputOption::VALUE_OPTIONAL, 'Nombre de mois à générer', 12)
-            ->setHelp('Cette commande génère des prévisions fictives pour tester l\'interface sans calculs lourds.');
+        $this->addOption('months', 'm', InputOption::VALUE_OPTIONAL, 'Nombre de mois à générer', 12)->setHelp(
+            'Cette commande génère des prévisions fictives pour tester l\'interface sans calculs lourds.',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -114,10 +111,7 @@ class GenerateMockForecastsCommand extends Command
             ];
         }
 
-        $io->table(
-            ['Période', 'Prévision', 'Min', 'Max'],
-            $tableData,
-        );
+        $io->table(['Période', 'Prévision', 'Min', 'Max'], $tableData);
 
         $io->note('Données simulées créées. Consultez /analytics/forecasting pour voir le résultat.');
 

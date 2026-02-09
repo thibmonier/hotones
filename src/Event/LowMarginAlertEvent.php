@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Entity\Project;
@@ -11,11 +13,9 @@ class LowMarginAlertEvent extends NotificationEvent
         private readonly Project $project,
         private readonly float $predictedMargin,
         private readonly string $severity,
-        array $recipients
+        array $recipients,
     ) {
-        $title = $severity === 'critical'
-            ? 'Alerte marge critique'
-            : 'Alerte marge faible';
+        $title = $severity === 'critical' ? 'Alerte marge critique' : 'Alerte marge faible';
 
         $message = sprintf(
             'Le projet "%s" présente une marge prédite de %.1f%% (%s). Action requise pour améliorer la rentabilité.',

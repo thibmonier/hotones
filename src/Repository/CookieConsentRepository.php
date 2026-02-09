@@ -15,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CookieConsentRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, CookieConsent::class, $companyContext);
     }
 
@@ -31,7 +29,8 @@ class CookieConsentRepository extends CompanyAwareRepository
             return null;
         }
 
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->andWhere('c.user = :user')
             ->andWhere('c.expiresAt > :now')
             ->setParameter('user', $user)
@@ -47,7 +46,8 @@ class CookieConsentRepository extends CompanyAwareRepository
      */
     public function findExpiredConsents(): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->andWhere('c.expiresAt < :now')
             ->setParameter('now', new DateTimeImmutable())
             ->getQuery()
@@ -62,7 +62,8 @@ class CookieConsentRepository extends CompanyAwareRepository
         $threshold = new DateTimeImmutable('-30 days');
         $company   = $this->companyContext->getCurrentCompany();
 
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->delete()
             ->where('c.company = :company')
             ->andWhere('c.expiresAt < :threshold')
@@ -77,7 +78,8 @@ class CookieConsentRepository extends CompanyAwareRepository
      */
     public function getConsentStatistics(): array
     {
-        $qb = $this->createCompanyQueryBuilder('c')
+        $qb = $this
+            ->createCompanyQueryBuilder('c')
             ->select(
                 'COUNT(c.id) as total',
                 'SUM(CASE WHEN c.functional = true THEN 1 ELSE 0 END) as functional',

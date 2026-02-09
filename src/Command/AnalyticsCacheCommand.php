@@ -20,17 +20,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class AnalyticsCacheCommand extends Command
 {
     public function __construct(
-        private readonly AnalyticsCacheService $cacheService
+        private readonly AnalyticsCacheService $cacheService,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addOption('clear', 'c', InputOption::VALUE_NONE, 'Vider le cache analytics')
-            ->addOption('warmup', 'w', InputOption::VALUE_NONE, 'Préchauffer le cache avec métriques courantes')
-        ;
+        $this->addOption('clear', 'c', InputOption::VALUE_NONE, 'Vider le cache analytics')->addOption(
+            'warmup',
+            'w',
+            InputOption::VALUE_NONE,
+            'Préchauffer le cache avec métriques courantes',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

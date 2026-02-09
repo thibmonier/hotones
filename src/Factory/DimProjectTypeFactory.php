@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\Analytics\DimProjectType;
@@ -12,8 +14,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class DimProjectTypeFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly ?CompanyContext $companyContext)
-    {
+    public function __construct(
+        private readonly ?CompanyContext $companyContext,
+    ) {
         parent::__construct();
     }
 

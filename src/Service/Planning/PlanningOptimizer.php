@@ -24,7 +24,7 @@ class PlanningOptimizer
         private readonly TaceAnalyzer $taceAnalyzer,
         private readonly EntityManagerInterface $entityManager,
         private readonly CompanyContext $companyContext,
-        private readonly ProjectRepository $projectRepository
+        private readonly ProjectRepository $projectRepository,
     ) {
     }
 
@@ -47,32 +47,40 @@ class PlanningOptimizer
         // Recommandations pour les surcharges critiques
         foreach ($analysis['critical'] as $item) {
             if ($item['status'] === 'critical_high') {
-                $recommendations = array_merge(
-                    $recommendations,
-                    $this->generateOverloadRecommendations($item, $analysis, $startDate, $endDate),
-                );
+                $recommendations = array_merge($recommendations, $this->generateOverloadRecommendations(
+                    $item,
+                    $analysis,
+                    $startDate,
+                    $endDate,
+                ));
             } elseif ($item['status'] === 'critical_low') {
-                $recommendations = array_merge(
-                    $recommendations,
-                    $this->generateUnderutilizationRecommendations($item, $analysis, $startDate, $endDate),
-                );
+                $recommendations = array_merge($recommendations, $this->generateUnderutilizationRecommendations(
+                    $item,
+                    $analysis,
+                    $startDate,
+                    $endDate,
+                ));
             }
         }
 
         // Recommandations pour les surcharges non critiques
         foreach ($analysis['overloaded'] as $item) {
-            $recommendations = array_merge(
-                $recommendations,
-                $this->generateOverloadRecommendations($item, $analysis, $startDate, $endDate),
-            );
+            $recommendations = array_merge($recommendations, $this->generateOverloadRecommendations(
+                $item,
+                $analysis,
+                $startDate,
+                $endDate,
+            ));
         }
 
         // Recommandations pour les sous-utilisations
         foreach ($analysis['underutilized'] as $item) {
-            $recommendations = array_merge(
-                $recommendations,
-                $this->generateUnderutilizationRecommendations($item, $analysis, $startDate, $endDate),
-            );
+            $recommendations = array_merge($recommendations, $this->generateUnderutilizationRecommendations(
+                $item,
+                $analysis,
+                $startDate,
+                $endDate,
+            ));
         }
 
         // Trier par priorité (score)
@@ -92,8 +100,12 @@ class PlanningOptimizer
     /**
      * Génère des recommandations pour un contributeur surchargé.
      */
-    private function generateOverloadRecommendations(array $item, array $fullAnalysis, DateTime $start, DateTime $end): array
-    {
+    private function generateOverloadRecommendations(
+        array $item,
+        array $fullAnalysis,
+        DateTime $start,
+        DateTime $end,
+    ): array {
         /** @var Contributor $contributor */
         $contributor = $item['contributor'];
         $tace        = $item['tace'];
@@ -103,7 +115,8 @@ class PlanningOptimizer
 
         // Récupérer les plannings actuels du contributeur
         $planningRepo = $this->entityManager->getRepository(PlanningEntity::class);
-        $plannings    = $planningRepo->createQueryBuilder('p')
+        $plannings    = $planningRepo
+            ->createQueryBuilder('p')
             ->where('p.contributor = :contributor')
             ->andWhere('p.startDate <= :end')
             ->andWhere('p.endDate >= :start')
@@ -147,9 +160,17 @@ class PlanningOptimizer
             $projectsWorkload[$projectId]['plannings'][] = $planning;
         }
 
-        // Trier par heures décroissantes et niveau de service client
+        // Trier par priorité : projets internes d'abord (à décharger en premier),
+        // puis par niveau de service client croissant, puis par heures décroissantes
         usort($projectsWorkload, function ($a, $b) {
-            // Prioriser les clients à faible priorité
+            $aInternal = $a['project']->isInternal;
+            $bInternal = $b['project']->isInternal;
+
+            // Les projets internes sont toujours déchargés en premier
+            if ($aInternal !== $bInternal) {
+                return $bInternal <=> $aInternal; // true (1) avant false (0) → interne d'abord
+            }
+
             $levelPriority = ['low' => 1, 'standard' => 2, 'priority' => 3, 'vip' => 4];
             $aPrio         = $levelPriority[$a['client_level'] ?? 'standard'] ?? 2;
             $bPrio         = $levelPriority[$b['client_level'] ?? 'standard'] ?? 2;
@@ -211,9 +232,17 @@ class PlanningOptimizer
                     'severity_level' => $item['status'] === 'critical_high' ? 'critical' : 'high',
                     'actions'        => [
                         sprintf('Réduire l\'allocation de %s sur %s', $contributor->getFullName(), $project->getName()),
-                        sprintf('Augmenter l\'allocation de %s sur %s', $targetContributor->getFullName(), $project->getName()),
+                        sprintf(
+                            'Augmenter l\'allocation de %s sur %s',
+                            $targetContributor->getFullName(),
+                            $project->getName(),
+                        ),
                     ],
-                    'expected_impact' => sprintf('Réduction estimée du TACE de %s : %.1f points', $contributor->getFullName(), $targetReduction / count($projectsWorkload)),
+                    'expected_impact' => sprintf(
+                        'Réduction estimée du TACE de %s : %.1f points',
+                        $contributor->getFullName(),
+                        $targetReduction / count($projectsWorkload),
+                    ),
                     'client_priority' => $clientLevel,
                 ];
 
@@ -228,8 +257,12 @@ class PlanningOptimizer
     /**
      * Génère des recommandations pour un contributeur sous-utilisé.
      */
-    private function generateUnderutilizationRecommendations(array $item, array $fullAnalysis, DateTime $start, DateTime $end): array
-    {
+    private function generateUnderutilizationRecommendations(
+        array $item,
+        array $fullAnalysis,
+        DateTime $start,
+        DateTime $end,
+    ): array {
         /** @var Contributor $contributor */
         $contributor = $item['contributor'];
         $tace        = $item['tace'];
@@ -237,8 +270,8 @@ class PlanningOptimizer
 
         $recommendations = [];
 
-        // Trouver des projets en cours qui pourraient bénéficier de ressources supplémentaires
-        $activeProjects = $this->projectRepository->findActiveOrderedByName();
+        // Trouver des projets externes en cours qui pourraient bénéficier de ressources supplémentaires
+        $activeProjects = $this->projectRepository->findActiveExternalOrderedByName();
 
         // Filtrer les projets où le contributeur a les compétences
         $compatibleProjects = [];
@@ -291,7 +324,10 @@ class PlanningOptimizer
                     'actions'        => [
                         sprintf('Créer un planning pour %s sur %s', $contributor->getFullName(), $project->getName()),
                     ],
-                    'expected_impact' => sprintf('Augmentation estimée du TACE : %.1f points', abs($item['deviation']) / 3),
+                    'expected_impact' => sprintf(
+                        'Augmentation estimée du TACE : %.1f points',
+                        abs($item['deviation']) / 3,
+                    ),
                     'client_priority' => $clientLevel,
                 ];
             }
@@ -362,17 +398,32 @@ class PlanningOptimizer
     private function generateSummary(array $analysis, array $recommendations): array
     {
         return [
-            'total_contributors'      => count($analysis['critical']) + count($analysis['overloaded']) + count($analysis['underutilized']) + count($analysis['optimal']),
-            'critical_count'          => count($analysis['critical']),
-            'overloaded_count'        => count($analysis['overloaded']),
-            'underutilized_count'     => count($analysis['underutilized']),
-            'optimal_count'           => count($analysis['optimal']),
-            'total_recommendations'   => count($recommendations),
-            'high_priority_count'     => count(array_filter($recommendations, fn ($r): bool => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high')),
-            'medium_priority_count'   => count(array_filter($recommendations, fn ($r): bool => $r['severity_level'] === 'medium')),
-            'low_priority_count'      => count(array_filter($recommendations, fn ($r): bool => $r['severity_level'] === 'low')),
+            'total_contributors' => count($analysis['critical'])
+                    + count($analysis['overloaded'])
+                    + count($analysis['underutilized'])
+                    + count($analysis['optimal']),
+            'critical_count'        => count($analysis['critical']),
+            'overloaded_count'      => count($analysis['overloaded']),
+            'underutilized_count'   => count($analysis['underutilized']),
+            'optimal_count'         => count($analysis['optimal']),
+            'total_recommendations' => count($recommendations),
+            'high_priority_count'   => count(array_filter(
+                $recommendations,
+                fn ($r): bool => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high',
+            )),
+            'medium_priority_count' => count(array_filter(
+                $recommendations,
+                fn ($r): bool => $r['severity_level'] === 'medium',
+            )),
+            'low_priority_count' => count(array_filter(
+                $recommendations,
+                fn ($r): bool => $r['severity_level'] === 'low',
+            )),
             'critical_workload_count' => count($analysis['critical']),
-            'contributors_analyzed'   => count($analysis['critical']) + count($analysis['overloaded']) + count($analysis['underutilized']) + count($analysis['optimal']),
+            'contributors_analyzed'   => count($analysis['critical'])
+                    + count($analysis['overloaded'])
+                    + count($analysis['underutilized'])
+                    + count($analysis['optimal']),
         ];
     }
 
@@ -471,7 +522,8 @@ class PlanningOptimizer
 
         // Récupérer le planning existant du contributeur source
         $planningRepo      = $this->entityManager->getRepository(PlanningEntity::class);
-        $existingPlannings = $planningRepo->createQueryBuilder('p')
+        $existingPlannings = $planningRepo
+            ->createQueryBuilder('p')
             ->where('p.contributor = :contributor')
             ->andWhere('p.project = :project')
             ->andWhere('p.startDate <= :end')
@@ -516,7 +568,9 @@ class PlanningOptimizer
         $newPlanning->setEndDate($endDate);
         $newPlanning->setDailyHours((string) $newHours); // Même allocation
         $newPlanning->setStatus('planned');
-        $newPlanning->setNotes('Planning créé automatiquement par réaffectation depuis '.$sourceContributor->getFullName());
+        $newPlanning->setNotes(
+            'Planning créé automatiquement par réaffectation depuis '.$sourceContributor->getFullName(),
+        );
 
         $this->entityManager->persist($newPlanning);
         $this->entityManager->flush();

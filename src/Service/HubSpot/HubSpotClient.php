@@ -99,11 +99,8 @@ class HubSpotClient
      *
      * @return array<int, array<string, mixed>> Liste des deals
      */
-    public function getDeals(
-        HubSpotSettings $settings,
-        array $excludedStages = [],
-        array $pipelineIds = [],
-    ): array {
+    public function getDeals(HubSpotSettings $settings, array $excludedStages = [], array $pipelineIds = []): array
+    {
         $allDeals   = [];
         $after      = null;
         $properties = [
@@ -393,10 +390,7 @@ class HubSpotClient
             );
 
             $data       = $response->toArray();
-            $contactIds = array_map(
-                fn (array $assoc) => $assoc['id'],
-                $data['results'] ?? [],
-            );
+            $contactIds = array_map(fn (array $assoc) => $assoc['id'], $data['results'] ?? []);
 
             if (empty($contactIds)) {
                 return [];

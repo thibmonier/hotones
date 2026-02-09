@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ValidationController extends AbstractController
 {
     public function __construct(
-        private readonly ClientRepository $clientRepository
+        private readonly ClientRepository $clientRepository,
     ) {
     }
 

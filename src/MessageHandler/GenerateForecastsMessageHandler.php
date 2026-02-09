@@ -15,7 +15,7 @@ final readonly class GenerateForecastsMessageHandler
 {
     public function __construct(
         private ForecastingService $forecastingService,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

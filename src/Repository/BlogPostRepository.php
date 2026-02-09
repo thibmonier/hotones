@@ -22,10 +22,8 @@ use Exception;
  */
 class BlogPostRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, BlogPost::class, $companyContext);
     }
 
@@ -36,7 +34,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findPublishedForCompany(?int $limit = null, ?int $offset = null): array
     {
-        $qb = $this->createCompanyQueryBuilder('p')
+        $qb = $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
             ->andWhere('p.publishedAt <= :now')
@@ -60,7 +59,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function countPublishedForCompany(): int
     {
-        return (int) $this->createCompanyQueryBuilder('p')
+        return (int) $this
+            ->createCompanyQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
@@ -80,9 +80,7 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findByStatusForCompany(string $status, array $orderBy = ['publishedAt' => 'DESC']): array
     {
-        $qb = $this->createCompanyQueryBuilder('p')
-            ->andWhere('p.status = :status')
-            ->setParameter('status', $status);
+        $qb = $this->createCompanyQueryBuilder('p')->andWhere('p.status = :status')->setParameter('status', $status);
 
         foreach ($orderBy as $field => $direction) {
             $qb->addOrderBy("p.{$field}", $direction);
@@ -98,7 +96,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findByCategoryForCompany(?BlogCategory $category): array
     {
-        $qb = $this->createCompanyQueryBuilder('p')
+        $qb = $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
             ->andWhere('p.publishedAt <= :now')
@@ -107,8 +106,7 @@ class BlogPostRepository extends CompanyAwareRepository
             ->orderBy('p.publishedAt', 'DESC');
 
         if ($category !== null) {
-            $qb->andWhere('p.category = :category')
-                ->setParameter('category', $category);
+            $qb->andWhere('p.category = :category')->setParameter('category', $category);
         }
 
         return $qb->getQuery()->getResult();
@@ -121,7 +119,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findByTagForCompany(BlogTag $tag): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.tags', 't')
             ->andWhere('t = :tag')
             ->andWhere('p.status = :status')
@@ -142,7 +141,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findRecentPublished(int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
             ->andWhere('p.publishedAt <= :now')
@@ -161,7 +161,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function searchPublishedForCompany(string $query): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
             ->andWhere('p.publishedAt <= :now')
@@ -179,7 +180,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findPublishedBySlug(string $slug): ?BlogPost
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.author', 'a')
             ->addSelect('a')
             ->leftJoin('p.category', 'c')
@@ -204,7 +206,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findRelatedPosts(BlogPost $post, int $limit = 3): array
     {
-        $qb = $this->createCompanyQueryBuilder('p')
+        $qb = $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
             ->andWhere('p.publishedAt <= :now')
@@ -216,8 +219,7 @@ class BlogPostRepository extends CompanyAwareRepository
             ->setMaxResults($limit);
 
         if ($post->getCategory() !== null) {
-            $qb->andWhere('p.category = :category')
-                ->setParameter('category', $post->getCategory());
+            $qb->andWhere('p.category = :category')->setParameter('category', $post->getCategory());
         }
 
         return $qb->getQuery()->getResult();
@@ -228,7 +230,8 @@ class BlogPostRepository extends CompanyAwareRepository
      */
     public function findOneBySlugForAdmin(string $slug): ?BlogPost
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.author', 'a')
             ->addSelect('a')
             ->leftJoin('p.category', 'c')
@@ -257,7 +260,8 @@ class BlogPostRepository extends CompanyAwareRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->andWhere('p.company = :company')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
@@ -289,7 +293,8 @@ class BlogPostRepository extends CompanyAwareRepository
             return 0;
         }
 
-        return (int) $this->createQueryBuilder('p')
+        return (int) $this
+            ->createQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->andWhere('p.company = :company')
             ->andWhere('p.status = :status')
@@ -313,7 +318,8 @@ class BlogPostRepository extends CompanyAwareRepository
             return null;
         }
 
-        return $this->createQueryBuilder('p')
+        return $this
+            ->createQueryBuilder('p')
             ->leftJoin('p.author', 'a')
             ->addSelect('a')
             ->leftJoin('p.category', 'c')
@@ -346,7 +352,8 @@ class BlogPostRepository extends CompanyAwareRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->andWhere('p.company = :company')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
@@ -357,8 +364,7 @@ class BlogPostRepository extends CompanyAwareRepository
             ->orderBy('p.publishedAt', 'DESC');
 
         if ($category !== null) {
-            $qb->andWhere('p.category = :category')
-                ->setParameter('category', $category);
+            $qb->andWhere('p.category = :category')->setParameter('category', $category);
         }
 
         return $qb->getQuery()->getResult();
@@ -377,7 +383,8 @@ class BlogPostRepository extends CompanyAwareRepository
             return [];
         }
 
-        return $this->createQueryBuilder('p')
+        return $this
+            ->createQueryBuilder('p')
             ->leftJoin('p.tags', 't')
             ->andWhere('p.company = :company')
             ->andWhere('t = :tag')
@@ -406,7 +413,8 @@ class BlogPostRepository extends CompanyAwareRepository
             return [];
         }
 
-        return $this->createQueryBuilder('p')
+        return $this
+            ->createQueryBuilder('p')
             ->andWhere('p.company = :company')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
@@ -433,7 +441,8 @@ class BlogPostRepository extends CompanyAwareRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->andWhere('p.company = :company')
             ->andWhere('p.status = :status')
             ->andWhere('p.publishedAt IS NOT NULL')
@@ -447,8 +456,7 @@ class BlogPostRepository extends CompanyAwareRepository
             ->setMaxResults($limit);
 
         if ($post->getCategory() !== null) {
-            $qb->andWhere('p.category = :category')
-                ->setParameter('category', $post->getCategory());
+            $qb->andWhere('p.category = :category')->setParameter('category', $post->getCategory());
         }
 
         return $qb->getQuery()->getResult();
@@ -466,12 +474,10 @@ class BlogPostRepository extends CompanyAwareRepository
             return $this->companyContext->getCurrentCompany();
         } catch (Exception) {
             // User not authenticated - get first active company for public pages
-            return $this->getEntityManager()
+            return $this
+                ->getEntityManager()
                 ->getRepository(Company::class)
-                ->findOneBy(
-                    ['status' => Company::STATUS_ACTIVE],
-                    ['id' => 'ASC'],
-                );
+                ->findOneBy(['status' => Company::STATUS_ACTIVE], ['id' => 'ASC']);
         }
     }
 }

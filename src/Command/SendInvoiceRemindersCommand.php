@@ -33,25 +33,22 @@ class SendInvoiceRemindersCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulation sans envoi d\'emails')
-            ->setHelp(<<<'HELP'
-                Cette commande envoie automatiquement des relances par email pour les factures en retard.
+        $this->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulation sans envoi d\'emails')->setHelp(<<<'HELP'
+            Cette commande envoie automatiquement des relances par email pour les factures en retard.
 
-                Règles de relance:
-                  - J+30 : Première relance (courtoise)
-                  - J+45 : Deuxième relance (ferme)
-                  - J+60 : Relance finale (mention pénalités)
+            Règles de relance:
+              - J+30 : Première relance (courtoise)
+              - J+45 : Deuxième relance (ferme)
+              - J+60 : Relance finale (mention pénalités)
 
-                Les relances ne sont envoyées qu'une seule fois par palier.
+            Les relances ne sont envoyées qu'une seule fois par palier.
 
-                Exemples d'utilisation:
-                  <info>php bin/console app:invoice:send-reminders</info>
-                  <info>php bin/console app:invoice:send-reminders --dry-run</info>
+            Exemples d'utilisation:
+              <info>php bin/console app:invoice:send-reminders</info>
+              <info>php bin/console app:invoice:send-reminders --dry-run</info>
 
-                Cette commande devrait être schedulée quotidiennement via cron ou Symfony Scheduler.
-                HELP
-            );
+            Cette commande devrait être schedulée quotidiennement via cron ou Symfony Scheduler.
+            HELP);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -98,15 +95,12 @@ class SendInvoiceRemindersCommand extends Command
         $io->section('Statistiques des relances');
         $reminderStats = $this->reminderService->getReminderStats();
 
-        $io->table(
-            ['Type de relance', 'Nombre envoyé'],
-            [
-                ['J+30 (Première relance)', $reminderStats['by_delay'][30]],
-                ['J+45 (Deuxième relance)', $reminderStats['by_delay'][45]],
-                ['J+60 (Relance finale)', $reminderStats['by_delay'][60]],
-                ['<info>TOTAL</info>', '<info>'.$reminderStats['total_reminders'].'</info>'],
-            ],
-        );
+        $io->table(['Type de relance', 'Nombre envoyé'], [
+            ['J+30 (Première relance)', $reminderStats['by_delay'][30]],
+            ['J+45 (Deuxième relance)', $reminderStats['by_delay'][45]],
+            ['J+60 (Relance finale)', $reminderStats['by_delay'][60]],
+            ['<info>TOTAL</info>', '<info>'.$reminderStats['total_reminders'].'</info>'],
+        ]);
 
         return Command::SUCCESS;
     }

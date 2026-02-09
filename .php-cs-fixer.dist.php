@@ -16,7 +16,7 @@ return (new PhpCsFixer\Config())
         'array_syntax' => ['syntax' => 'short'],
         'binary_operator_spaces' => ['default' => 'align_single_space_minimal'],
         'blank_line_before_statement' => ['statements' => ['return']],
-        'declare_strict_types' => false,
+        'declare_strict_types' => true,
         'global_namespace_import' => [
             'import_constants' => true,
             'import_functions' => true,

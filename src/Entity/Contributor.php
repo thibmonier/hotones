@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -202,11 +204,21 @@ class Contributor implements CompanyOwnedInterface
     private Collection $timesheets;
 
     // Compétences du contributeur avec niveaux
-    #[ORM\OneToMany(targetEntity: ContributorSkill::class, mappedBy: 'contributor', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        targetEntity: ContributorSkill::class,
+        mappedBy: 'contributor',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
     private Collection $contributorSkills;
 
     // Technologies maîtrisées par le contributeur
-    #[ORM\OneToMany(targetEntity: ContributorTechnology::class, mappedBy: 'contributor', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        targetEntity: ContributorTechnology::class,
+        mappedBy: 'contributor',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
     private Collection $contributorTechnologies;
 
     public function __construct()
@@ -561,9 +573,7 @@ class Contributor implements CompanyOwnedInterface
      */
     public function getRecentTechnologies(): Collection
     {
-        return $this->contributorTechnologies->filter(
-            fn (ContributorTechnology $ct) => $ct->isRecent(),
-        );
+        return $this->contributorTechnologies->filter(fn (ContributorTechnology $ct) => $ct->isRecent());
     }
 
     /**

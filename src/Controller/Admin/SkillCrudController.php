@@ -50,44 +50,35 @@ class SkillCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('name', 'Nom')
-            ->setRequired(true);
+        yield TextField::new('name', 'Nom')->setRequired(true);
 
-        yield ChoiceField::new('category', 'Catégorie')
-            ->setChoices([
-                'Langage'      => 'language',
-                'Framework'    => 'framework',
-                'Outil'        => 'tool',
-                'Méthodologie' => 'methodology',
-                'Autre'        => 'other',
-            ])
-            ->setRequired(true);
+        yield ChoiceField::new('category', 'Catégorie')->setChoices([
+            'Langage'      => 'language',
+            'Framework'    => 'framework',
+            'Outil'        => 'tool',
+            'Méthodologie' => 'methodology',
+            'Autre'        => 'other',
+        ])->setRequired(true);
 
-        yield TextareaField::new('description', 'Description')
-            ->hideOnIndex();
+        yield TextareaField::new('description', 'Description')->hideOnIndex();
 
-        yield IntegerField::new('contributorCount', 'Collaborateurs')
-            ->hideOnForm();
+        yield IntegerField::new('contributorCount', 'Collaborateurs')->hideOnForm();
 
-        yield BooleanField::new('active', 'Actif')
-            ->renderAsSwitch(false);
+        yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);
     }
 
     #[Override]
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters
-            ->add(ChoiceFilter::new('category', 'Catégorie')->setChoices([
-                'Langage'      => 'language',
-                'Framework'    => 'framework',
-                'Outil'        => 'tool',
-                'Méthodologie' => 'methodology',
-                'Autre'        => 'other',
-            ]))
-            ->add(BooleanFilter::new('active', 'Actif'));
+        return $filters->add(ChoiceFilter::new('category', 'Catégorie')->setChoices([
+            'Langage'      => 'language',
+            'Framework'    => 'framework',
+            'Outil'        => 'tool',
+            'Méthodologie' => 'methodology',
+            'Autre'        => 'other',
+        ]))->add(BooleanFilter::new('active', 'Actif'));
     }
 
     #[Override]

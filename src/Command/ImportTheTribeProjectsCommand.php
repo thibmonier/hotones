@@ -548,10 +548,12 @@ class ImportTheTribeProjectsCommand extends Command
         }
 
         // Verifier si le projet a deja un devis (deduplication)
-        $existingOrders = $this->entityManager->getRepository(Order::class)->findBy([
-            'company' => $company,
-            'project' => $project,
-        ]);
+        $existingOrders = $this->entityManager
+            ->getRepository(Order::class)
+            ->findBy([
+                'company' => $company,
+                'project' => $project,
+            ]);
         if (count($existingOrders) > 0) {
             $io->writeln(sprintf('  Devis existant pour %s - ignoré', $data['name']));
 

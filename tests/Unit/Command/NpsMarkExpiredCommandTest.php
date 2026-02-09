@@ -64,9 +64,7 @@ class NpsMarkExpiredCommandTest extends TestCase
 
     public function testExecuteReturnsSuccess(): void
     {
-        $this->npsSurveyRepository
-            ->method('markExpiredSurveysAsExpired')
-            ->willReturn(3);
+        $this->npsSurveyRepository->method('markExpiredSurveysAsExpired')->willReturn(3);
 
         $exitCode = $this->commandTester->execute([]);
 
@@ -76,9 +74,7 @@ class NpsMarkExpiredCommandTest extends TestCase
 
     public function testExecuteCallsRepositoryMethod(): void
     {
-        $this->npsSurveyRepository
-            ->expects($this->once())
-            ->method('markExpiredSurveysAsExpired');
+        $this->npsSurveyRepository->expects($this->once())->method('markExpiredSurveysAsExpired');
 
         $this->commandTester->execute([]);
     }

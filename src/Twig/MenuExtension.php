@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Twig;
 
 use App\Menu\MenuBuilder;
@@ -9,8 +11,9 @@ use Twig\TwigFunction;
 
 class MenuExtension extends AbstractExtension
 {
-    public function __construct(private readonly MenuBuilder $menuBuilder)
-    {
+    public function __construct(
+        private readonly MenuBuilder $menuBuilder,
+    ) {
     }
 
     #[Override]

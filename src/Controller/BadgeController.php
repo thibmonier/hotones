@@ -22,7 +22,7 @@ class BadgeController extends AbstractController
     public function __construct(
         private readonly BadgeRepository $badgeRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 

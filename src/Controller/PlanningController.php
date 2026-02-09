@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Contributor;
@@ -27,26 +29,39 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PlanningController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
     #[Route('', name: 'planning_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em, ContributorRepository $contributorRepo, TaceAnalyzer $taceAnalyzer): Response
-    {
+    public function index(
+        Request $request,
+        EntityManagerInterface $em,
+        ContributorRepository $contributorRepo,
+        TaceAnalyzer $taceAnalyzer,
+    ): Response {
         $weeks      = max(1, (int) $request->query->get('weeks', 8));
         $startParam = $request->query->get('start');
 
         // Filters (arrays)
-        $selectedContributors = array_filter($request->query->all('contributors'), fn ($v): bool => $v !== null && $v !== '');
-        $selectedManagers     = array_filter($request->query->all('project_managers'), fn ($v): bool => $v !== null && $v !== '');
+        $selectedContributors = array_filter(
+            $request->query->all('contributors'),
+            fn ($v): bool => $v !== null && $v !== '',
+        );
+        $selectedManagers = array_filter(
+            $request->query->all('project_managers'),
+            fn ($v): bool => $v !== null && $v !== '',
+        );
         $selectedProjects     = array_filter($request->query->all('projects'), fn ($v): bool => $v !== null && $v !== '');
-        $selectedProjectTypes = array_filter($request->query->all('project_types'), fn ($v): bool => $v !== null && $v !== '');
+        $selectedProjectTypes = array_filter(
+            $request->query->all('project_types'),
+            fn ($v): bool => $v !== null && $v !== '',
+        );
 
         $today = new DateTime('today');
         // Start at Monday of the current week by default
         $start = $startParam ? new DateTime($startParam) : (clone $today)->modify('monday this week');
-        $end   = (clone $start)->modify('+'.($weeks * 7 - 1).' days');
+        $end   = (clone $start)->modify('+'.(($weeks * 7) - 1).' days');
 
         // Build timeline dates (inclusive)
         $period        = new DatePeriod($start, new DateInterval('P1D'), (clone $end)->modify('+1 day'));
@@ -55,14 +70,23 @@ class PlanningController extends AbstractController
         // Base contributors list (optionally filtered)
         $contributors = $contributorRepo->findActiveContributors();
         if (!empty($selectedContributors)) {
-            $contributors = array_values(array_filter($contributors, fn ($c): bool => in_array((string) $c->getId(), $selectedContributors, true)));
+            $contributors = array_values(array_filter($contributors, fn ($c): bool => in_array(
+                (string) $c->getId(),
+                $selectedContributors,
+                true,
+            )));
         }
 
         // Build query with filters
-        $qb = $em->getRepository(Planning::class)->createQueryBuilder('p')
-            ->leftJoin('p.contributor', 'c')->addSelect('c')
-            ->leftJoin('p.project', 'pr')->addSelect('pr')
-            ->leftJoin('p.profile', 'pf')->addSelect('pf')
+        $qb = $em
+            ->getRepository(Planning::class)
+            ->createQueryBuilder('p')
+            ->leftJoin('p.contributor', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.project', 'pr')
+            ->addSelect('pr')
+            ->leftJoin('p.profile', 'pf')
+            ->addSelect('pf')
             ->leftJoin('pr.projectManager', 'pm')
             ->where('p.endDate >= :start')
             ->andWhere('p.startDate <= :end')
@@ -127,7 +151,9 @@ class PlanningController extends AbstractController
         }
 
         // Build totals of worked hours per contributor per day (Timesheets) within the range and filters
-        $tsQb = $em->getRepository(Timesheet::class)->createQueryBuilder('t')
+        $tsQb = $em
+            ->getRepository(Timesheet::class)
+            ->createQueryBuilder('t')
             ->select('IDENTITY(t.contributor) as cid, t.date as d, SUM(t.hours) as hours')
             ->leftJoin('t.project', 'tp')
             ->where('t.date BETWEEN :start AND :end')
@@ -144,7 +170,10 @@ class PlanningController extends AbstractController
             $tsQb->andWhere('tp.projectType IN (:ptypes)')->setParameter('ptypes', $selectedProjectTypes);
         }
         if (!empty($selectedManagers)) {
-            $tsQb->leftJoin('tp.projectManager', 'tpm')->andWhere('tpm.id IN (:mids)')->setParameter('mids', $selectedManagers);
+            $tsQb
+                ->leftJoin('tp.projectManager', 'tpm')
+                ->andWhere('tpm.id IN (:mids)')
+                ->setParameter('mids', $selectedManagers);
         }
         $tsRows              = $tsQb->getQuery()->getResult();
         $totalsByContributor = [];
@@ -155,8 +184,11 @@ class PlanningController extends AbstractController
         }
 
         // Fetch vacations in the date range
-        $vacQb = $em->getRepository(Vacation::class)->createQueryBuilder('v')
-            ->leftJoin('v.contributor', 'vc')->addSelect('vc')
+        $vacQb = $em
+            ->getRepository(Vacation::class)
+            ->createQueryBuilder('v')
+            ->leftJoin('v.contributor', 'vc')
+            ->addSelect('vc')
             ->where('v.endDate >= :start')
             ->andWhere('v.startDate <= :end')
             ->andWhere('v.status = :approved')
@@ -196,8 +228,11 @@ class PlanningController extends AbstractController
         }
 
         // Fetch active employment periods for each contributor to get daily work hours
-        $employmentPeriods = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
-            ->leftJoin('ep.contributor', 'epc')->addSelect('epc')
+        $employmentPeriods = $em
+            ->getRepository(EmploymentPeriod::class)
+            ->createQueryBuilder('ep')
+            ->leftJoin('ep.contributor', 'epc')
+            ->addSelect('epc')
             ->where('ep.startDate <= :end')
             ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :start)')
             ->setParameter('start', $start)
@@ -213,7 +248,7 @@ class PlanningController extends AbstractController
             $weeklyHours = (float) $employmentPeriod->weeklyHours;
             $workPct     = (float) $employmentPeriod->workTimePercentage;
             // Daily hours = (weekly hours * work% / 100) / 5 days
-            $dailyHours = ($weeklyHours * $workPct / 100) / 5;
+            $dailyHours = (($weeklyHours * $workPct) / 100) / 5;
             $contributorDailyHours[$cid] ??= [];
             $contributorDailyHours[$cid][] = $dailyHours;
         }
@@ -275,10 +310,9 @@ class PlanningController extends AbstractController
         }
 
         // Get all projects for creation dropdown (only active projects with minimal data)
-        $allProjects = $em->getRepository(\App\Entity\Project::class)->findBy(
-            ['status' => 'active'],
-            ['name' => 'ASC'],
-        );
+        $allProjects = $em->getRepository(\App\Entity\Project::class)->findBy(['status' => 'active'], [
+            'name' => 'ASC',
+        ]);
 
         // Quick TACE analysis for optimization alerts (only for managers)
         $taceAnalysis = null;
@@ -328,7 +362,12 @@ class PlanningController extends AbstractController
         }
 
         // Validate required fields
-        if (!isset($data['contributorId']) || !isset($data['projectId']) || !isset($data['startDate']) || !isset($data['endDate'])) {
+        if (
+            !isset($data['contributorId'])
+            || !isset($data['projectId'])
+            || !isset($data['startDate'])
+            || !isset($data['endDate'])
+        ) {
             return new JsonResponse(['error' => 'Missing required fields'], 400);
         }
 
@@ -446,7 +485,9 @@ class PlanningController extends AbstractController
         $dailyHours  = (float) $planning->getDailyHours();
 
         // Get active employment period for this contributor
-        $period = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
+        $period = $em
+            ->getRepository(EmploymentPeriod::class)
+            ->createQueryBuilder('ep')
             ->where('ep.contributor = :contributor')
             ->andWhere('ep.startDate <= :date')
             ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :date)')
@@ -462,7 +503,7 @@ class PlanningController extends AbstractController
         } else {
             $weeklyHours   = (float) $period->getWeeklyHours();
             $workPct       = (float) $period->getWorkTimePercentage();
-            $maxDailyHours = ($weeklyHours * $workPct / 100) / 5;
+            $maxDailyHours = (($weeklyHours * $workPct) / 100) / 5;
         }
 
         if ($dailyHours > $maxDailyHours) {
@@ -499,7 +540,9 @@ class PlanningController extends AbstractController
 
         // Validate split date is within the planning range
         if ($splitDate <= $startDate || $splitDate > $endDate) {
-            return new JsonResponse(['error' => 'La date de division doit être comprise entre le début et la fin de la planification'], 400);
+            return new JsonResponse([
+                'error' => 'La date de division doit être comprise entre le début et la fin de la planification',
+            ], 400);
         }
 
         // Create the second part (from splitDate to endDate)

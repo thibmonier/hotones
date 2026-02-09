@@ -59,7 +59,7 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         string $entityClass,
-        protected CompanyContext $companyContext
+        protected CompanyContext $companyContext,
     ) {
         parent::__construct($registry, $entityClass);
     }
@@ -79,7 +79,8 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
     {
         $company = $this->companyContext->getCurrentCompany();
 
-        return $this->createQueryBuilder($alias, $indexBy)
+        return $this
+            ->createQueryBuilder($alias, $indexBy)
             ->andWhere("{$alias}.company = :company")
             ->setParameter('company', $company);
     }
@@ -99,9 +100,10 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
     protected function createQueryBuilderForCompany(
         Company $company,
         string $alias,
-        ?string $indexBy = null
+        ?string $indexBy = null,
     ): QueryBuilder {
-        return $this->createQueryBuilder($alias, $indexBy)
+        return $this
+            ->createQueryBuilder($alias, $indexBy)
             ->andWhere("{$alias}.company = :company")
             ->setParameter('company', $company);
     }
@@ -136,7 +138,8 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
      */
     public function findOneByIdForCompany(int $id): ?object
     {
-        return $this->createCompanyQueryBuilder('e')
+        return $this
+            ->createCompanyQueryBuilder('e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -157,7 +160,7 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
         array $criteria,
         ?array $orderBy = null,
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
         $qb = $this->createCompanyQueryBuilder('e');
 
@@ -165,8 +168,7 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
             if ($value === null) {
                 $qb->andWhere("e.{$field} IS NULL");
             } else {
-                $qb->andWhere("e.{$field} = :{$field}")
-                    ->setParameter($field, $value);
+                $qb->andWhere("e.{$field} = :{$field}")->setParameter($field, $value);
             }
         }
 
@@ -196,15 +198,13 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
      */
     public function countForCurrentCompany(array $criteria = []): int
     {
-        $qb = $this->createCompanyQueryBuilder('e')
-            ->select('COUNT(e.id)');
+        $qb = $this->createCompanyQueryBuilder('e')->select('COUNT(e.id)');
 
         foreach ($criteria as $field => $value) {
             if ($value === null) {
                 $qb->andWhere("e.{$field} IS NULL");
             } else {
-                $qb->andWhere("e.{$field} = :{$field}")
-                    ->setParameter($field, $value);
+                $qb->andWhere("e.{$field} = :{$field}")->setParameter($field, $value);
             }
         }
 
@@ -243,7 +243,8 @@ abstract class CompanyAwareRepository extends ServiceEntityRepository
      */
     public function existsForCompany(int $id): bool
     {
-        $count = $this->createCompanyQueryBuilder('e')
+        $count = $this
+            ->createCompanyQueryBuilder('e')
             ->select('COUNT(e.id)')
             ->andWhere('e.id = :id')
             ->setParameter('id', $id)

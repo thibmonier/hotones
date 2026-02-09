@@ -36,8 +36,11 @@ class WorkloadPredictionService
      *     totalPotentialDays: float
      * }
      */
-    public function analyzePipeline(array $profileIds = [], array $contributorIds = [], bool $includeConfirmed = false): array
-    {
+    public function analyzePipeline(
+        array $profileIds = [],
+        array $contributorIds = [],
+        bool $includeConfirmed = false,
+    ): array {
         $pipeline           = [];
         $workloadByMonth    = [];
         $alerts             = [];
@@ -48,9 +51,7 @@ class WorkloadPredictionService
 
         // Ajouter la charge confirmée depuis les devis si demandé
         if ($includeConfirmed) {
-            $confirmedOrders = $this->orderRepository->findBy(
-                ['status' => ['signe', 'gagne', 'en_cours']],
-            );
+            $confirmedOrders = $this->orderRepository->findBy(['status' => ['signe', 'gagne', 'en_cours']]);
 
             foreach ($confirmedOrders as $order) {
                 $this->addConfirmedWorkloadToMonth($workloadByMonth, $order, $profileIds, $contributorIds);
@@ -58,9 +59,7 @@ class WorkloadPredictionService
         }
 
         // Récupérer tous les devis en attente de signature
-        $pendingOrders = $this->orderRepository->findBy(
-            ['status' => 'a_signer'],
-        );
+        $pendingOrders = $this->orderRepository->findBy(['status' => 'a_signer']);
 
         foreach ($pendingOrders as $order) {
             $analysis = $this->analyzeOrder($order, $profileIds, $contributorIds);
@@ -71,7 +70,13 @@ class WorkloadPredictionService
 
                 // Accumuler la charge par mois si probabilité > 30%
                 if ($analysis['winProbability'] > 30) {
-                    $this->addWorkloadToMonth($workloadByMonth, $order, $analysis['winProbability'], $profileIds, $contributorIds);
+                    $this->addWorkloadToMonth(
+                        $workloadByMonth,
+                        $order,
+                        $analysis['winProbability'],
+                        $profileIds,
+                        $contributorIds,
+                    );
                     $totalPotentialDays += $analysis['totalDays'] * ($analysis['winProbability'] / 100);
                 }
             }
@@ -185,7 +190,8 @@ class WorkloadPredictionService
     private function getSalesPersonConversionRate(int $salesPersonId): float
     {
         // Récupérer tous les projets du commercial
-        $orders = $this->orderRepository->createQueryBuilder('o')
+        $orders = $this->orderRepository
+            ->createQueryBuilder('o')
             ->join('o.project', 'p')
             ->where('p.salesPerson = :salesPersonId')
             ->setParameter('salesPersonId', $salesPersonId)
@@ -251,20 +257,23 @@ class WorkloadPredictionService
     /**
      * Ajoute la charge d'un devis à la répartition mensuelle.
      */
-    private function addWorkloadToMonth(array &$workloadByMonth, Order $order, float $probability, array $profileIds = [], array $contributorIds = []): void
-    {
+    private function addWorkloadToMonth(
+        array &$workloadByMonth,
+        Order $order,
+        float $probability,
+        array $profileIds = [],
+        array $contributorIds = [],
+    ): void {
         $project = $order->getProject();
         if (!$project || !$project->getStartDate()) {
             return;
         }
 
         $startDate = $project->getStartDate();
-        $duration  = $project->getEndDate()
-            ? $startDate->diff($project->getEndDate())->days
-            : 90; // Par défaut 3 mois
+        $duration  = $project->getEndDate() ? $startDate->diff($project->getEndDate())->days : 90; // Par défaut 3 mois
 
         $totalDays    = $this->calculateOrderDays($order, $profileIds, $contributorIds);
-        $daysPerMonth = $duration > 0 ? $totalDays / (max(1, $duration / 30)) : $totalDays;
+        $daysPerMonth = $duration > 0 ? $totalDays / max(1, $duration / 30) : $totalDays;
 
         // Répartir sur 3 mois max
         $monthsToSpread = min(3, ceil($duration / 30));
@@ -291,9 +300,13 @@ class WorkloadPredictionService
     /**
      * Ajoute la charge confirmée depuis les entités Planning.
      */
-    private function addConfirmedWorkloadFromPlannings(array &$workloadByMonth, array $profileIds = [], array $contributorIds = []): void
-    {
-        $qb = $this->entityManager->getRepository(Planning::class)
+    private function addConfirmedWorkloadFromPlannings(
+        array &$workloadByMonth,
+        array $profileIds = [],
+        array $contributorIds = [],
+    ): void {
+        $qb = $this->entityManager
+            ->getRepository(Planning::class)
             ->createQueryBuilder('p')
             ->where('p.status IN (:statuses)')
             ->andWhere('p.endDate >= :today')
@@ -301,8 +314,7 @@ class WorkloadPredictionService
             ->setParameter('today', new DateTime('first day of this month'));
 
         if (!empty($contributorIds)) {
-            $qb->andWhere('p.contributor IN (:contributorIds)')
-               ->setParameter('contributorIds', $contributorIds);
+            $qb->andWhere('p.contributor IN (:contributorIds)')->setParameter('contributorIds', $contributorIds);
         }
 
         $plannings = $qb->getQuery()->getResult();
@@ -447,8 +459,12 @@ class WorkloadPredictionService
     /**
      * Ajoute la charge confirmée d'un devis à la répartition mensuelle.
      */
-    private function addConfirmedWorkloadToMonth(array &$workloadByMonth, Order $order, array $profileIds = [], array $contributorIds = []): void
-    {
+    private function addConfirmedWorkloadToMonth(
+        array &$workloadByMonth,
+        Order $order,
+        array $profileIds = [],
+        array $contributorIds = [],
+    ): void {
         $project = $order->project;
         if (!$project || !$project->startDate) {
             return;
@@ -469,7 +485,7 @@ class WorkloadPredictionService
             return;
         }
 
-        $daysPerMonth = $duration > 0 ? $totalDays / (max(1, $duration / 30)) : $totalDays;
+        $daysPerMonth = $duration > 0 ? $totalDays / max(1, $duration / 30) : $totalDays;
 
         // Répartir sur la durée du projet
         $monthsToSpread = max(1, ceil($duration / 30));

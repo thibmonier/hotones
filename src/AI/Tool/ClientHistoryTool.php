@@ -51,24 +51,14 @@ final readonly class ClientHistoryTool
         $client = $clients[0];
 
         // Récupérer tous les projets du client
-        $projects = $this->projectRepository->findBy(
-            ['client' => $client],
-            ['createdAt' => 'DESC'],
-        );
+        $projects = $this->projectRepository->findBy(['client' => $client], ['createdAt' => 'DESC']);
 
         // Formater les 5 derniers projets
-        $recentProjects = array_slice(
-            array_map(
-                fn ($project): array => [
-                    'name'   => $project->getName(),
-                    'status' => $project->getStatus(),
-                    'type'   => $project->getProjectType(),
-                ],
-                $projects,
-            ),
-            0,
-            5,
-        );
+        $recentProjects = array_slice(array_map(fn ($project): array => [
+            'name'   => $project->getName(),
+            'status' => $project->getStatus(),
+            'type'   => $project->getProjectType(),
+        ], $projects), 0, 5);
 
         return [
             'client_name'     => $client->getName(),

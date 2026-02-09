@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\E2E;
 
 use App\Factory\UserFactory;
@@ -26,10 +28,12 @@ class ProjectCreationE2ETest extends PantherTestCase
 
         // Login
         $crawler = $client->request('GET', '/login');
-        $form    = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form    = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
         $client->waitForElementToContain('body', '');
 
@@ -38,15 +42,20 @@ class ProjectCreationE2ETest extends PantherTestCase
         $client->waitFor('form');
 
         // Minimal form submission: only name (others optional)
-        $form = $crawler->filter('form')->form([
-            'project[name]'        => 'E2E Demo Project',
-            'project[status]'      => 'active',
-            'project[projectType]' => 'forfait',
-        ]);
+        $form = $crawler
+            ->filter('form')
+            ->form([
+                'project[name]'        => 'E2E Demo Project',
+                'project[status]'      => 'active',
+                'project[projectType]' => 'forfait',
+            ]);
         $client->submit($form);
 
         // Expect redirect to show page and project name visible
         $client->waitForElementToContain('h5, h1, h2, .page-title-box h4', 'E2E Demo Project');
-        $this->assertStringContainsString('/projects/', (string) parse_url((string) $client->getCurrentURL(), PHP_URL_PATH));
+        $this->assertStringContainsString(
+            '/projects/',
+            (string) parse_url((string) $client->getCurrentURL(), PHP_URL_PATH),
+        );
     }
 }

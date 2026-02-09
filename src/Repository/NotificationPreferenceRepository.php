@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\NotificationPreference;
@@ -13,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class NotificationPreferenceRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, NotificationPreference::class, $companyContext);
     }
 
@@ -51,8 +51,13 @@ class NotificationPreferenceRepository extends CompanyAwareRepository
     /**
      * Crée ou met à jour une préférence.
      */
-    public function upsert(User $user, NotificationType $eventType, bool $inApp, bool $email, bool $webhook): NotificationPreference
-    {
+    public function upsert(
+        User $user,
+        NotificationType $eventType,
+        bool $inApp,
+        bool $email,
+        bool $webhook,
+    ): NotificationPreference {
         $preference = $this->findByUserAndEventType($user, $eventType);
 
         if ($preference === null) {

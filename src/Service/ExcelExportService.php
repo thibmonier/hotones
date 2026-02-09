@@ -32,7 +32,7 @@ class ExcelExportService
         array $monthlyEvolution,
         DateTimeInterface $startDate,
         DateTimeInterface $endDate,
-        array $filters = []
+        array $filters = [],
     ): StreamedResponse {
         $spreadsheet = new Spreadsheet();
 
@@ -57,11 +57,7 @@ class ExcelExportService
         // Générer le fichier
         $writer = new Xlsx($spreadsheet);
 
-        $filename = sprintf(
-            'dashboard_analytics_%s_%s.xlsx',
-            $startDate->format('Y-m-d'),
-            $endDate->format('Y-m-d'),
-        );
+        $filename = sprintf('dashboard_analytics_%s_%s.xlsx', $startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
 
         $response = new StreamedResponse(function () use ($writer): void {
             $writer->save('php://output');
@@ -82,7 +78,7 @@ class ExcelExportService
         array $kpis,
         DateTimeInterface $startDate,
         DateTimeInterface $endDate,
-        array $filters
+        array $filters,
     ): void {
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('KPIs Principaux');
@@ -94,11 +90,7 @@ class ExcelExportService
 
         // Période
         $sheet->setCellValue('A2', 'Période :');
-        $sheet->setCellValue('B2', sprintf(
-            '%s au %s',
-            $startDate->format('d/m/Y'),
-            $endDate->format('d/m/Y'),
-        ));
+        $sheet->setCellValue('B2', sprintf('%s au %s', $startDate->format('d/m/Y'), $endDate->format('d/m/Y')));
 
         // Filtres actifs
         $row = 3;
@@ -122,7 +114,12 @@ class ExcelExportService
         $this->addKPILine($sheet, $row++, 'CA Total', number_format($kpis['totalRevenue'] ?? 0, 2, ',', ' ').' €');
         $this->addKPILine($sheet, $row++, 'Coûts Totaux', number_format($kpis['totalCosts'] ?? 0, 2, ',', ' ').' €');
         $this->addKPILine($sheet, $row++, 'Marge Brute', number_format($kpis['grossMargin'] ?? 0, 2, ',', ' ').' €');
-        $this->addKPILine($sheet, $row++, 'Taux de Marge', number_format($kpis['marginPercentage'] ?? 0, 2, ',', ' ').' %');
+        $this->addKPILine(
+            $sheet,
+            $row++,
+            'Taux de Marge',
+            number_format($kpis['marginPercentage'] ?? 0, 2, ',', ' ').' %',
+        );
 
         ++$row;
 
@@ -141,17 +138,37 @@ class ExcelExportService
         $this->addKPILine($sheet, $row++, 'Total Devis', (string) ($kpis['totalOrders'] ?? 0));
         $this->addKPILine($sheet, $row++, 'Devis en Attente', (string) ($kpis['pendingOrders'] ?? 0));
         $this->addKPILine($sheet, $row++, 'Devis Gagnés', (string) ($kpis['wonOrders'] ?? 0));
-        $this->addKPILine($sheet, $row++, 'CA en Attente', number_format($kpis['pendingRevenue'] ?? 0, 2, ',', ' ').' €');
-        $this->addKPILine($sheet, $row++, 'Taux de Conversion', number_format($kpis['conversionRate'] ?? 0, 2, ',', ' ').' %');
+        $this->addKPILine(
+            $sheet,
+            $row++,
+            'CA en Attente',
+            number_format($kpis['pendingRevenue'] ?? 0, 2, ',', ' ').' €',
+        );
+        $this->addKPILine(
+            $sheet,
+            $row++,
+            'Taux de Conversion',
+            number_format($kpis['conversionRate'] ?? 0, 2, ',', ' ').' %',
+        );
 
         ++$row;
 
         // Section Temps & Occupation
         $this->addSectionHeader($sheet, $row, 'Temps & Occupation');
         ++$row;
-        $this->addKPILine($sheet, $row++, 'Jours Travaillés', number_format($kpis['totalWorkedDays'] ?? 0, 2, ',', ' '));
+        $this->addKPILine(
+            $sheet,
+            $row++,
+            'Jours Travaillés',
+            number_format($kpis['totalWorkedDays'] ?? 0, 2, ',', ' '),
+        );
         $this->addKPILine($sheet, $row++, 'Jours Vendus', number_format($kpis['totalSoldDays'] ?? 0, 2, ',', ' '));
-        $this->addKPILine($sheet, $row++, 'Taux d\'Occupation', number_format($kpis['utilizationRate'] ?? 0, 2, ',', ' ').' %');
+        $this->addKPILine(
+            $sheet,
+            $row++,
+            'Taux d\'Occupation',
+            number_format($kpis['utilizationRate'] ?? 0, 2, ',', ' ').' %',
+        );
 
         // Ajuster largeurs
         $sheet->getColumnDimension('A')->setWidth(30);
@@ -294,12 +311,14 @@ class ExcelExportService
         $sheet->setCellValue('A'.$row, $title);
         $sheet->mergeCells('A'.$row.':B'.$row);
         $sheet->getStyle('A'.$row)->getFont()->setSize(14)->setBold(true);
-        $sheet->getStyle('A'.$row)->applyFromArray([
-            'fill' => [
-                'fillType'   => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'E2E8F0'],
-            ],
-        ]);
+        $sheet
+            ->getStyle('A'.$row)
+            ->applyFromArray([
+                'fill' => [
+                    'fillType'   => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'E2E8F0'],
+                ],
+            ]);
     }
 
     /**
@@ -307,10 +326,12 @@ class ExcelExportService
      */
     private function applyHeaderStyle($sheet, string $range): void
     {
-        $sheet->getStyle($range)->applyFromArray([
-            'font'      => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '3B82F6']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ]);
+        $sheet
+            ->getStyle($range)
+            ->applyFromArray([
+                'font'      => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
+                'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '3B82F6']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            ]);
     }
 }

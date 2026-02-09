@@ -14,10 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ContributorProgressRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ContributorProgress::class, $companyContext);
     }
 
@@ -43,7 +41,8 @@ class ContributorProgressRepository extends CompanyAwareRepository
      */
     public function getLeaderboard(int $limit = 10): array
     {
-        return $this->createCompanyQueryBuilder('cp')
+        return $this
+            ->createCompanyQueryBuilder('cp')
             ->leftJoin('cp.contributor', 'c')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -60,7 +59,8 @@ class ContributorProgressRepository extends CompanyAwareRepository
      */
     public function findByLevel(int $level): array
     {
-        return $this->createCompanyQueryBuilder('cp')
+        return $this
+            ->createCompanyQueryBuilder('cp')
             ->leftJoin('cp.contributor', 'c')
             ->andWhere('cp.level = :level')
             ->andWhere('c.active = :active')
@@ -81,7 +81,8 @@ class ContributorProgressRepository extends CompanyAwareRepository
             return 0;
         }
 
-        $higherCount = $this->createCompanyQueryBuilder('cp')
+        $higherCount = $this
+            ->createCompanyQueryBuilder('cp')
             ->select('COUNT(cp.id)')
             ->leftJoin('cp.contributor', 'c')
             ->andWhere('cp.totalXp > :xp')
@@ -99,7 +100,8 @@ class ContributorProgressRepository extends CompanyAwareRepository
      */
     public function getGlobalStats(): array
     {
-        $stats = $this->createCompanyQueryBuilder('cp')
+        $stats = $this
+            ->createCompanyQueryBuilder('cp')
             ->select('
                 COUNT(cp.id) as total_players,
                 AVG(cp.level) as average_level,

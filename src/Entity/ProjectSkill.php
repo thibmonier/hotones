@@ -24,10 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'idx_projectskill_project', columns: ['project_id'])]
 #[ORM\Index(name: 'idx_projectskill_skill', columns: ['skill_id'])]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(
-    fields: ['project', 'skill'],
-    message: 'Cette compétence est déjà requise pour ce projet',
-)]
+#[UniqueEntity(fields: ['project', 'skill'], message: 'Cette compétence est déjà requise pour ce projet')]
 class ProjectSkill implements CompanyOwnedInterface
 {
     public const LEVEL_BEGINNER     = 1;
@@ -76,17 +73,21 @@ class ProjectSkill implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotNull(message: 'Le niveau minimum requis est obligatoire')]
-    #[Assert\Choice(
-        choices: [self::LEVEL_BEGINNER, self::LEVEL_INTERMEDIATE, self::LEVEL_CONFIRMED, self::LEVEL_EXPERT],
-        message: 'Niveau invalide',
-    )]
+    #[Assert\Choice(choices: [
+        self::LEVEL_BEGINNER,
+        self::LEVEL_INTERMEDIATE,
+        self::LEVEL_CONFIRMED,
+        self::LEVEL_EXPERT,
+    ], message: 'Niveau invalide')]
     private int $requiredLevel = self::LEVEL_INTERMEDIATE;
 
     #[ORM\Column(type: 'integer')]
-    #[Assert\Choice(
-        choices: [self::PRIORITY_LOW, self::PRIORITY_MEDIUM, self::PRIORITY_HIGH, self::PRIORITY_CRITICAL],
-        message: 'Priorité invalide',
-    )]
+    #[Assert\Choice(choices: [
+        self::PRIORITY_LOW,
+        self::PRIORITY_MEDIUM,
+        self::PRIORITY_HIGH,
+        self::PRIORITY_CRITICAL,
+    ], message: 'Priorité invalide')]
     private int $priority = self::PRIORITY_MEDIUM;
 
     #[ORM\Column(type: 'text', nullable: true)]

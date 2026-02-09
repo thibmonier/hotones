@@ -29,7 +29,8 @@ class BlogCategoryRepository extends ServiceEntityRepository
      */
     public function findActive(): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->orderBy('c.name', 'ASC')
@@ -42,7 +43,8 @@ class BlogCategoryRepository extends ServiceEntityRepository
      */
     public function findBySlug(string $slug): ?BlogCategory
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->andWhere('c.slug = :slug')
             ->setParameter('slug', $slug)
             ->getQuery()
@@ -56,7 +58,8 @@ class BlogCategoryRepository extends ServiceEntityRepository
      */
     public function findWithPostCount(): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->leftJoin('c.posts', 'p')
             ->addSelect('p')
             ->orderBy('c.name', 'ASC')
@@ -71,7 +74,8 @@ class BlogCategoryRepository extends ServiceEntityRepository
      */
     public function findActiveWithPublishedPosts(): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->leftJoin('c.posts', 'p')
             ->andWhere('c.active = :active')
             ->andWhere('p.status = :status')

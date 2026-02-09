@@ -132,7 +132,11 @@ class ProjectTaskType extends AbstractType
                     'max'         => 100,
                 ],
                 'constraints' => [
-                    new Assert\Range(min: 0, max: 100, notInRangeMessage: 'L\'avancement doit être entre {{ min }}% et {{ max }}%'),
+                    new Assert\Range(
+                        min: 0,
+                        max: 100,
+                        notInRangeMessage: 'L\'avancement doit être entre {{ min }}% et {{ max }}%',
+                    ),
                 ],
                 'help' => 'Pourcentage d\'avancement de la tâche (0 à 100)',
             ])
@@ -144,13 +148,16 @@ class ProjectTaskType extends AbstractType
                 'attr'        => [
                     'class' => 'form-select',
                 ],
-                'query_builder' => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('c')
+                'query_builder' => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er
+                    ->createQueryBuilder('c')
                     ->where('c.active = :active')
                     ->setParameter('active', true)
                     ->orderBy('c.lastName', 'ASC')
                     ->addOrderBy('c.firstName', 'ASC'),
-                'choice_label' => fn ($contributor): string => $contributor->getFirstName().' '.$contributor->getLastName(),
-                'help'         => 'Collaborateur responsable de cette tâche',
+                'choice_label' => fn ($contributor): string => $contributor->getFirstName()
+                .' '
+                .$contributor->getLastName(),
+                'help' => 'Collaborateur responsable de cette tâche',
             ])
             ->add('requiredProfile', EntityType::class, [
                 'class'       => Profile::class,
@@ -206,8 +213,7 @@ class ProjectTaskType extends AbstractType
                     'class' => 'form-check-input',
                 ],
                 'help' => 'Décochez pour désactiver cette tâche',
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

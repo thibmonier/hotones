@@ -37,7 +37,7 @@ class CompanyContext
     public function __construct(
         private readonly Security $security,
         private readonly RequestStack $requestStack,
-        private readonly CompanyRepository $companyRepository
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 
@@ -156,9 +156,7 @@ class CompanyContext
         }
 
         // Standard user: only their assigned company
-        $userCompany = $user->getCompany();
-
-        return $userCompany && $userCompany->getId() === $company->getId();
+        return $user->getCompany()->getId() === $company->getId();
     }
 
     /**
@@ -176,16 +174,13 @@ class CompanyContext
 
         // SUPERADMIN sees all active companies
         if ($this->security->isGranted('ROLE_SUPERADMIN')) {
-            return $this->companyRepository->findBy(
-                ['status' => [Company::STATUS_ACTIVE, Company::STATUS_TRIAL]],
-                ['name' => 'ASC'],
-            );
+            return $this->companyRepository->findBy(['status' => [Company::STATUS_ACTIVE, Company::STATUS_TRIAL]], [
+                'name' => 'ASC',
+            ]);
         }
 
         // Standard user sees only their company
-        $company = $user->getCompany();
-
-        return $company ? [$company] : [];
+        return [$user->getCompany()];
     }
 
     /**
@@ -239,12 +234,6 @@ class CompanyContext
         }
 
         // Priority 3: User's primary company (default)
-        $company = $user->getCompany();
-
-        if (!$company) {
-            throw new CompanyContextMissingException(sprintf('User %d has no company assigned', $user->getId()));
-        }
-
-        return $company;
+        return $user->getCompany();
     }
 }

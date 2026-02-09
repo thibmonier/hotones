@@ -22,7 +22,7 @@ class BlogController extends AbstractController
     public function __construct(
         private readonly BlogPostRepository $postRepository,
         private readonly BlogCategoryRepository $categoryRepository,
-        private readonly BlogTagRepository $tagRepository
+        private readonly BlogTagRepository $tagRepository,
     ) {
     }
 
@@ -35,10 +35,7 @@ class BlogController extends AbstractController
         $page   = max(1, $request->query->getInt('page', 1));
         $offset = ($page - 1) * self::POSTS_PER_PAGE;
 
-        $posts = $this->postRepository->findPublishedPublic(
-            limit: self::POSTS_PER_PAGE,
-            offset: $offset,
-        );
+        $posts = $this->postRepository->findPublishedPublic(limit: self::POSTS_PER_PAGE, offset: $offset);
 
         $totalPosts = $this->postRepository->countPublishedPublic();
         $totalPages = (int) ceil($totalPosts / self::POSTS_PER_PAGE);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Contributor;
@@ -25,7 +27,7 @@ class HomeController extends AbstractController
 {
     public function __construct(
         private readonly DashboardReadService $dashboardReadService,
-        private readonly ?HrMetricsService $hrMetricsService = null
+        private readonly ?HrMetricsService $hrMetricsService = null,
     ) {
     }
 
@@ -155,9 +157,11 @@ class HomeController extends AbstractController
         $now                = new DateTimeImmutable();
         $currentMonthNumber = (int) $now->format('n'); // 1-12
         $quarterStartMonth  = (int) (floor(($currentMonthNumber - 1) / 3) * 3) + 1; // 1, 4, 7, ou 10
-        $quarterStart       = new DateTimeImmutable($now->format('Y').'-'.str_pad((string) $quarterStartMonth, 2, '0', STR_PAD_LEFT).'-01 00:00:00');
-        $quarterEnd         = $quarterStart->modify('+3 months')->modify('-1 second');
-        $currentQuarter     = (int) ceil($currentMonthNumber / 3); // 1, 2, 3, ou 4
+        $quarterStart       = new DateTimeImmutable(
+            $now->format('Y').'-'.str_pad((string) $quarterStartMonth, 2, '0', STR_PAD_LEFT).'-01 00:00:00',
+        );
+        $quarterEnd     = $quarterStart->modify('+3 months')->modify('-1 second');
+        $currentQuarter = (int) ceil($currentMonthNumber / 3); // 1, 2, 3, ou 4
 
         // Devis en attente du trimestre en cours
         $pendingOrders = $orderRepo->findPendingOrdersInPeriod($quarterStart, $quarterEnd, 5);

@@ -65,14 +65,19 @@ class LoadReferenceDataCommand extends Command
     ];
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
+        $this->addOption(
+            'company-id',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'ID de la Company (utilise la première si non spécifié)',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

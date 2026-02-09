@@ -102,10 +102,6 @@ class CsrfProtectionTest extends WebTestCase
         // Vérifier que le token CSRF est présent
         $csrfToken = $crawler->filter('input[name="_token"], input[name*="[_token]"]');
 
-        $this->assertGreaterThan(
-            0,
-            $csrfToken->count(),
-            'CSRF token should be present in forms',
-        );
+        $this->assertGreaterThan(0, $csrfToken->count(), 'CSRF token should be present in forms');
     }
 }

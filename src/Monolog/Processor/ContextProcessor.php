@@ -76,10 +76,6 @@ class ContextProcessor implements ProcessorInterface
      */
     private function generateRequestId(): string
     {
-        return sprintf(
-            '%s-%s',
-            date('YmdHis'),
-            bin2hex(random_bytes(4)),
-        );
+        return sprintf('%s-%s', date('YmdHis'), bin2hex(random_bytes(4)));
     }
 }

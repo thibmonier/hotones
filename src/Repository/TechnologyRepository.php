@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TechnologyRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Technology::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class TechnologyRepository extends CompanyAwareRepository
      */
     public function findUsedByActiveContributors(): array
     {
-        return $this->createCompanyQueryBuilder('t')
+        return $this
+            ->createCompanyQueryBuilder('t')
             ->innerJoin('t.contributorTechnologies', 'ct')
             ->innerJoin('ct.contributor', 'c')
             ->andWhere('c.active = :active')

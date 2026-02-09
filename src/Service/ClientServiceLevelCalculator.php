@@ -14,14 +14,14 @@ use function in_array;
 class ClientServiceLevelCalculator
 {
     // Paramètres configurables (à externaliser plus tard dans la config)
-    private const int TOP_VIP_RANK      = 20;  // Top 20 = VIP
-    private const int TOP_PRIORITY_RANK = 50;  // Top 50 = Prioritaire
+    private const int TOP_VIP_RANK      = 20; // Top 20 = VIP
+    private const int TOP_PRIORITY_RANK = 50; // Top 50 = Prioritaire
     private const int LOW_THRESHOLD     = 5000; // < 5000€ = Basse priorité
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ClientRepository $clientRepository,
-        private readonly OrderRepository $orderRepository
+        private readonly OrderRepository $orderRepository,
     ) {
     }
 

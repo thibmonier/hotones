@@ -153,11 +153,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
         foreach ($testCases as $case) {
             $result = $method->invoke($this->command, $case['input']);
-            $this->assertEquals(
-                $case['expected'],
-                $result,
-                "Failed for input: {$case['input']}",
-            );
+            $this->assertEquals($case['expected'], $result, "Failed for input: {$case['input']}");
         }
     }
 

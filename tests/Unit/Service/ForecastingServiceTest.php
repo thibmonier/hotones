@@ -24,22 +24,15 @@ use RuntimeException;
  */
 class ForecastingServiceTest extends TestCase
 {
-    private function createService(
-        ?ProjectRepository $projectRepository = null
-    ): ForecastingService {
+    private function createService(?ProjectRepository $projectRepository = null): ForecastingService
+    {
         $em                 = $this->createMock(EntityManagerInterface::class);
         $companyContext     = $this->createMock(CompanyContext::class);
         $forecastRepository = $this->createMock(FactForecastRepository::class);
         $projectRepository ??= $this->createMock(ProjectRepository::class);
         $dashboardService = $this->createMock(DashboardReadService::class);
 
-        return new ForecastingService(
-            $em,
-            $companyContext,
-            $forecastRepository,
-            $projectRepository,
-            $dashboardService,
-        );
+        return new ForecastingService($em, $companyContext, $forecastRepository, $projectRepository, $dashboardService);
     }
 
     public function testForecastRevenueThrowsExceptionForInvalidHorizon(): void
@@ -81,9 +74,7 @@ class ForecastingServiceTest extends TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query        = $this->createMock(Query::class);
 
-        $projectRepository->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
+        $projectRepository->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
 
         $queryBuilder->method('select')->willReturnSelf();
         $queryBuilder->method('where')->willReturnSelf();
@@ -125,9 +116,7 @@ class ForecastingServiceTest extends TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query        = $this->createMock(Query::class);
 
-        $projectRepository->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
+        $projectRepository->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
 
         $queryBuilder->method('select')->willReturnSelf();
         $queryBuilder->method('where')->willReturnSelf();
@@ -197,11 +186,11 @@ class ForecastingServiceTest extends TestCase
         // Create historical data spanning multiple years with clear seasonality
         $historical = [
             ['month' => '2023-01', 'actual' => 10000.0],
-            ['month' => '2023-08', 'actual' => 5000.0],  // August low
-            ['month' => '2023-12', 'actual' => 6000.0],  // December low
+            ['month' => '2023-08', 'actual' => 5000.0], // August low
+            ['month' => '2023-12', 'actual' => 6000.0], // December low
             ['month' => '2024-01', 'actual' => 12000.0],
-            ['month' => '2024-08', 'actual' => 4000.0],  // August low
-            ['month' => '2024-12', 'actual' => 5000.0],  // December low
+            ['month' => '2024-08', 'actual' => 4000.0], // August low
+            ['month' => '2024-12', 'actual' => 5000.0], // December low
         ];
 
         $result = $method->invoke($service, $historical);

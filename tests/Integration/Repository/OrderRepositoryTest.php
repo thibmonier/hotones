@@ -337,10 +337,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Act
-        $stats = $this->repository->getStatsByStatus(
-            new DateTime('2024-01-01'),
-            new DateTime('2024-01-31'),
-        );
+        $stats = $this->repository->getStatsByStatus(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
 
         // Assert
         $this->assertEquals(1, $stats['signe']['count']);
@@ -360,10 +357,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Act
-        $revenue = $this->repository->getSignedRevenueForPeriod(
-            new DateTime('2024-01-01'),
-            new DateTime('2024-01-31'),
-        );
+        $revenue = $this->repository->getSignedRevenueForPeriod(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
 
         // Assert
         $this->assertEquals(3000.0, $revenue);
@@ -394,10 +388,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->createOrder($project, 'Order 4', 'perdue');
 
         // Act - 2 signed out of 4 total = 50%
-        $rate = $this->repository->getConversionRate(
-            new DateTime('2020-01-01'),
-            new DateTime('2030-12-31'),
-        );
+        $rate = $this->repository->getConversionRate(new DateTime('2020-01-01'), new DateTime('2030-12-31'));
 
         // Assert
         $this->assertEquals(50.0, $rate);
@@ -406,10 +397,7 @@ class OrderRepositoryTest extends KernelTestCase
     public function testGetConversionRateNoOrders(): void
     {
         // Act
-        $rate = $this->repository->getConversionRate(
-            new DateTime('2024-01-01'),
-            new DateTime('2024-12-31'),
-        );
+        $rate = $this->repository->getConversionRate(new DateTime('2024-01-01'), new DateTime('2024-12-31'));
 
         // Assert
         $this->assertEquals(0.0, $rate);
@@ -465,10 +453,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Act
-        $count = $this->repository->countOrdersInPeriod(
-            new DateTime('2024-01-01'),
-            new DateTime('2024-02-28'),
-        );
+        $count = $this->repository->countOrdersInPeriod(new DateTime('2024-01-01'), new DateTime('2024-02-28'));
 
         // Assert
         $this->assertEquals(2, $count);
@@ -571,7 +556,7 @@ class OrderRepositoryTest extends KernelTestCase
         Project $project,
         string $name,
         string $status = 'draft',
-        float $totalAmount = 0.0
+        float $totalAmount = 0.0,
     ): Order {
         $order = new Order();
         $order->setCompany($this->getTestCompany());

@@ -31,12 +31,8 @@ class TreasuryController extends AbstractController
                 break;
             case 'quarter':
                 $currentMonth      = (int) $endDate->format('n');
-                $quarterStartMonth = ((int) (($currentMonth - 1) / 3)) * 3 + 1;
-                $startDate         = (clone $endDate)->setDate(
-                    (int) $endDate->format('Y'),
-                    $quarterStartMonth,
-                    1,
-                );
+                $quarterStartMonth = ((int) (($currentMonth - 1) / 3) * 3) + 1;
+                $startDate         = (clone $endDate)->setDate((int) $endDate->format('Y'), $quarterStartMonth, 1);
                 break;
             case 'year':
                 $startDate = (clone $endDate)->modify('first day of january this year');

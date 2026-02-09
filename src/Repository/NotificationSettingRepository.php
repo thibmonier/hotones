@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\NotificationSetting;
@@ -18,10 +20,8 @@ class NotificationSettingRepository extends CompanyAwareRepository
     public const KEY_WEBHOOK_TOKEN              = 'webhook_token'; // Token d'authentification
     public const KEY_TIMESHEET_WEEKLY_TOLERANCE = 'timesheet_weekly_tolerance'; // Tolérance (0.15 = 15%)
 
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, NotificationSetting::class, $companyContext);
     }
 

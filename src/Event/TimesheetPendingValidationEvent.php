@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Entity\Contributor;
@@ -11,7 +13,7 @@ class TimesheetPendingValidationEvent extends NotificationEvent
         private readonly Contributor $contributor,
         private readonly int $pendingCount,
         private readonly float $totalHours,
-        array $recipients
+        array $recipients,
     ) {
         $title   = 'Temps en attente de validation';
         $message = sprintf(

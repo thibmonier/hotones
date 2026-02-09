@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Order;
@@ -73,9 +75,7 @@ class BillingServiceTest extends TestCase
             ['year' => 2023, 'month' => 2, 'revenue' => 7500.00],
         ];
 
-        $this->timesheetRepositoryMock
-            ->method('getMonthlyRevenueForProjectUsingContributorTjm')
-            ->willReturn($mockData);
+        $this->timesheetRepositoryMock->method('getMonthlyRevenueForProjectUsingContributorTjm')->willReturn($mockData);
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
@@ -118,9 +118,7 @@ class BillingServiceTest extends TestCase
             ['year' => 2023, 'month' => 2, 'revenue' => 3000.00],
         ];
 
-        $this->timesheetRepositoryMock
-            ->method('getMonthlyRevenueForProjectUsingContributorTjm')
-            ->willReturn($mockData);
+        $this->timesheetRepositoryMock->method('getMonthlyRevenueForProjectUsingContributorTjm')->willReturn($mockData);
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
@@ -209,9 +207,7 @@ class BillingServiceTest extends TestCase
             ['year' => 2023, 'month' => 3, 'revenue' => null],
         ];
 
-        $this->timesheetRepositoryMock
-            ->method('getMonthlyRevenueForProjectUsingContributorTjm')
-            ->willReturn($mockData);
+        $this->timesheetRepositoryMock->method('getMonthlyRevenueForProjectUsingContributorTjm')->willReturn($mockData);
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
@@ -229,9 +225,7 @@ class BillingServiceTest extends TestCase
         $project->addOrder($regieOrder);
 
         // Mock empty timesheet data
-        $this->timesheetRepositoryMock
-            ->method('getMonthlyRevenueForProjectUsingContributorTjm')
-            ->willReturn([]);
+        $this->timesheetRepositoryMock->method('getMonthlyRevenueForProjectUsingContributorTjm')->willReturn([]);
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 

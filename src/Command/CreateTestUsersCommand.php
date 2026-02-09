@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\Company;
@@ -14,10 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[AsCommand(
-    name: 'app:create-test-users',
-    description: 'Create test users for each role in the system',
-)]
+#[AsCommand(name: 'app:create-test-users', description: 'Create test users for each role in the system')]
 class CreateTestUsersCommand extends Command
 {
     private const string DEFAULT_PASSWORD = 'password';
@@ -63,14 +62,19 @@ class CreateTestUsersCommand extends Command
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly UserPasswordHasherInterface $hasher
+        private readonly UserPasswordHasherInterface $hasher,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
+        $this->addOption(
+            'company-id',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'ID de la Company (utilise la première si non spécifié)',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -104,8 +108,7 @@ class CreateTestUsersCommand extends Command
 
         foreach (self::TEST_USERS as $userData) {
             // Check if user already exists
-            $existingUser = $this->em->getRepository(User::class)
-                ->findOneBy(['email' => $userData['email']]);
+            $existingUser = $this->em->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
 
             if ($existingUser !== null) {
                 $io->warning(sprintf(
@@ -118,9 +121,7 @@ class CreateTestUsersCommand extends Command
 
             // Create User
             $user = new User();
-            $user->setEmail($userData['email'])
-                ->setCompany($company)
-                ->setRoles($userData['roles']);
+            $user->setEmail($userData['email'])->setCompany($company)->setRoles($userData['roles']);
             $user->firstName = $userData['firstName'];
             $user->lastName  = $userData['lastName'];
 
@@ -133,7 +134,8 @@ class CreateTestUsersCommand extends Command
             // Create linked Contributor
             $contributor = new Contributor();
             $contributor->setCompany($company);
-            $contributor->setFirstName($userData['firstName'])
+            $contributor
+                ->setFirstName($userData['firstName'])
                 ->setLastName($userData['lastName'])
                 ->setEmail($user->email)
                 ->setUser($user)
@@ -159,10 +161,7 @@ class CreateTestUsersCommand extends Command
 
         if (count($createdUsers) > 0) {
             $io->newLine();
-            $io->table(
-                ['Email', 'Name', 'Roles', 'Contributor ID'],
-                array_map(array_values(...), $createdUsers),
-            );
+            $io->table(['Email', 'Name', 'Roles', 'Contributor ID'], array_map(array_values(...), $createdUsers));
 
             $io->newLine();
             $io->note([

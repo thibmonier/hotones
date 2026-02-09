@@ -20,7 +20,7 @@ class CompanyContextMissingException extends TenantIsolationException
     public function __construct(
         string $message = 'Company context is missing or cannot be determined',
         int $code = 0,
-        ?Throwable $previous = null
+        ?Throwable $previous = null,
     ) {
         parent::__construct($message, $code, $previous);
     }

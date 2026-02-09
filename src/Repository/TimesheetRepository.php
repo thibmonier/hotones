@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Contributor;
@@ -19,10 +21,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TimesheetRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Timesheet::class, $companyContext);
     }
 
@@ -30,9 +30,13 @@ class TimesheetRepository extends CompanyAwareRepository
      * Récupère les temps d'un contributeur pour une période donnée.
      * Optimisé avec eager loading des relations project et task.
      */
-    public function findByContributorAndDateRange(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
-    {
-        return $this->createCompanyQueryBuilder('t')
+    public function findByContributorAndDateRange(
+        Contributor $contributor,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+    ): array {
+        return $this
+            ->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.task', 'ta')
@@ -55,7 +59,8 @@ class TimesheetRepository extends CompanyAwareRepository
      */
     public function findRecentByContributor(Contributor $contributor, int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('t')
+        return $this
+            ->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.task', 'ta')
@@ -72,9 +77,13 @@ class TimesheetRepository extends CompanyAwareRepository
      * Récupère tous les temps pour une période avec filtrage optionnel par projet.
      * Optimisé avec eager loading des relations project et contributor.
      */
-    public function findForPeriodWithProject(DateTimeInterface $startDate, DateTimeInterface $endDate, ?Project $project = null): array
-    {
-        $qb = $this->createCompanyQueryBuilder('t')
+    public function findForPeriodWithProject(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        ?Project $project = null,
+    ): array {
+        $qb = $this
+            ->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.contributor', 'c')
@@ -91,8 +100,7 @@ class TimesheetRepository extends CompanyAwareRepository
             ->addOrderBy('c.firstName', 'ASC');
 
         if ($project) {
-            $qb->andWhere('p.id = :projectId')
-               ->setParameter('projectId', $project->getId());
+            $qb->andWhere('p.id = :projectId')->setParameter('projectId', $project->getId());
         }
 
         return $qb->getQuery()->getResult();
@@ -102,13 +110,17 @@ class TimesheetRepository extends CompanyAwareRepository
      * Récupère tous les temps pour une période et une liste de projets.
      * Optimisé avec eager loading des relations project et contributor.
      */
-    public function findForPeriodWithProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
-    {
+    public function findForPeriodWithProjects(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $projectIds,
+    ): array {
         if (empty($projectIds)) {
             return [];
         }
 
-        return $this->createCompanyQueryBuilder('t')
+        return $this
+            ->createCompanyQueryBuilder('t')
             ->leftJoin('t.project', 'p')
             ->addSelect('p')
             ->leftJoin('t.contributor', 'c')
@@ -134,7 +146,8 @@ class TimesheetRepository extends CompanyAwareRepository
      */
     public function getTotalHoursForMonth(DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
-        $result = $this->createCompanyQueryBuilder('t')
+        $result = $this
+            ->createCompanyQueryBuilder('t')
             ->select('SUM(t.hours)')
             ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
@@ -148,10 +161,16 @@ class TimesheetRepository extends CompanyAwareRepository
     /**
      * Récupère les temps avec totaux par projet pour un contributeur.
      */
-    public function getHoursGroupedByProjectForContributor(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
-    {
-        $results = $this->createCompanyQueryBuilder('t')
-            ->select('p.id AS projectId, p.name AS projectName, pc.name AS projectClientName, SUM(t.hours) AS totalHours')
+    public function getHoursGroupedByProjectForContributor(
+        Contributor $contributor,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+    ): array {
+        $results = $this
+            ->createCompanyQueryBuilder('t')
+            ->select(
+                'p.id AS projectId, p.name AS projectName, pc.name AS projectClientName, SUM(t.hours) AS totalHours',
+            )
             ->leftJoin('t.project', 'p')
             ->leftJoin('p.client', 'pc')
             ->andWhere('t.contributor = :contributor')
@@ -183,8 +202,11 @@ class TimesheetRepository extends CompanyAwareRepository
     /**
      * Trouve un timesheet existant pour éviter les doublons.
      */
-    public function findExistingTimesheet(Contributor $contributor, Project $project, DateTimeInterface $date): ?Timesheet
-    {
+    public function findExistingTimesheet(
+        Contributor $contributor,
+        Project $project,
+        DateTimeInterface $date,
+    ): ?Timesheet {
         return $this->findOneBy([
             'contributor' => $contributor,
             'project'     => $project,
@@ -200,9 +222,10 @@ class TimesheetRepository extends CompanyAwareRepository
         Project $project,
         DateTimeInterface $date,
         ?\App\Entity\ProjectTask $task = null,
-        ?\App\Entity\ProjectSubTask $subTask = null
+        ?\App\Entity\ProjectSubTask $subTask = null,
     ): ?Timesheet {
-        $qb = $this->createCompanyQueryBuilder('t')
+        $qb = $this
+            ->createCompanyQueryBuilder('t')
             ->andWhere('t.contributor = :contributor')
             ->andWhere('t.project = :project')
             ->andWhere('t.date = :date')
@@ -214,8 +237,7 @@ class TimesheetRepository extends CompanyAwareRepository
         if ($subTask) {
             $qb->andWhere('t.subTask = :subTask')->setParameter('subTask', $subTask);
         } elseif ($task) {
-            $qb->andWhere('t.task = :task')->setParameter('task', $task)
-               ->andWhere('t.subTask IS NULL');
+            $qb->andWhere('t.task = :task')->setParameter('task', $task)->andWhere('t.subTask IS NULL');
         } else {
             $qb->andWhere('t.task IS NULL')->andWhere('t.subTask IS NULL');
         }
@@ -227,8 +249,12 @@ class TimesheetRepository extends CompanyAwareRepository
      * (Déprécié) Trouve un timesheet existant avec tâche spécifique pour éviter les doublons.
      * Conserver pour compat ascendante.
      */
-    public function findExistingTimesheetWithTask(Contributor $contributor, Project $project, DateTimeInterface $date, ?\App\Entity\ProjectTask $task = null): ?Timesheet
-    {
+    public function findExistingTimesheetWithTask(
+        Contributor $contributor,
+        Project $project,
+        DateTimeInterface $date,
+        ?\App\Entity\ProjectTask $task = null,
+    ): ?Timesheet {
         return $this->findExistingTimesheetWithTaskAndSubTask($contributor, $project, $date, $task, null);
     }
 
@@ -237,8 +263,11 @@ class TimesheetRepository extends CompanyAwareRepository
      */
     public function getStatsPerContributor(DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
-        return $this->createCompanyQueryBuilder('t')
-            ->select('CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')
+        return $this
+            ->createCompanyQueryBuilder('t')
+            ->select(
+                'CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries',
+            )
             ->leftJoin('t.contributor', 'c')
             ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
@@ -252,14 +281,20 @@ class TimesheetRepository extends CompanyAwareRepository
     /**
      * Statistiques par contributeur restreintes à une liste de projets.
      */
-    public function getStatsPerContributorForProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
-    {
+    public function getStatsPerContributorForProjects(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $projectIds,
+    ): array {
         if (empty($projectIds)) {
             return [];
         }
 
-        return $this->createCompanyQueryBuilder('t')
-            ->select('CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries')
+        return $this
+            ->createCompanyQueryBuilder('t')
+            ->select(
+                'CONCAT(c.firstName, \' \', c.lastName) as contributorName, SUM(t.hours) as totalHours, COUNT(t.id) as totalEntries',
+            )
             ->leftJoin('t.contributor', 'c')
             ->leftJoin('t.project', 'p')
             ->andWhere('t.date BETWEEN :start AND :end')
@@ -276,13 +311,17 @@ class TimesheetRepository extends CompanyAwareRepository
     /**
      * Total d'heures pour une période restreint à des projets.
      */
-    public function getTotalHoursForPeriodAndProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): float
-    {
+    public function getTotalHoursForPeriodAndProjects(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $projectIds,
+    ): float {
         if (empty($projectIds)) {
             return 0;
         }
 
-        $result = $this->createCompanyQueryBuilder('t')
+        $result = $this
+            ->createCompanyQueryBuilder('t')
             ->select('SUM(t.hours)')
             ->leftJoin('t.project', 'p')
             ->andWhere('t.date BETWEEN :start AND :end')
@@ -299,9 +338,13 @@ class TimesheetRepository extends CompanyAwareRepository
     /**
      * Heures mensuelles (YYYY, MM, totalHours) pour un projet.
      */
-    public function getMonthlyHoursForProject(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
-    {
-        $qb = $this->createCompanyQueryBuilder('t')
+    public function getMonthlyHoursForProject(
+        Project $project,
+        ?DateTimeInterface $startDate = null,
+        ?DateTimeInterface $endDate = null,
+    ): array {
+        $qb = $this
+            ->createCompanyQueryBuilder('t')
             ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours) as totalHours')
             ->andWhere('t.project = :project')
             ->setParameter('project', $project)
@@ -323,12 +366,21 @@ class TimesheetRepository extends CompanyAwareRepository
      * Chiffre d'affaires mensuel en régie (TJM contributeur): Σ(hours * (tjm/8)).
      * Le TJM provient de la période d'emploi active à la date du timesheet.
      */
-    public function getMonthlyRevenueForProjectUsingContributorTjm(Project $project, ?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null): array
-    {
-        $qb = $this->createCompanyQueryBuilder('t')
+    public function getMonthlyRevenueForProjectUsingContributorTjm(
+        Project $project,
+        ?DateTimeInterface $startDate = null,
+        ?DateTimeInterface $endDate = null,
+    ): array {
+        $qb = $this
+            ->createCompanyQueryBuilder('t')
             ->select('YEAR(t.date) as year, MONTH(t.date) as month, SUM(t.hours * (COALESCE(ep.tjm, 0)/8)) as revenue')
             ->leftJoin('t.contributor', 'c')
-            ->leftJoin(\App\Entity\EmploymentPeriod::class, 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
+            ->leftJoin(
+                \App\Entity\EmploymentPeriod::class,
+                'ep',
+                'WITH',
+                'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)',
+            )
             ->andWhere('t.project = :project')
             ->setParameter('project', $project)
             ->groupBy('year, month')
@@ -351,8 +403,11 @@ class TimesheetRepository extends CompanyAwareRepository
      * - Revenu: Σ(hours × (effectiveTJM)/8), effectiveTJM = ep.tjm.
      * Les données financières proviennent uniquement de la période d'emploi active à la date du timesheet.
      */
-    public function getPeriodAggregatesForProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $projectIds): array
-    {
+    public function getPeriodAggregatesForProjects(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $projectIds,
+    ): array {
         if (empty($projectIds)) {
             return [
                 'totalHours'     => 0.0,
@@ -361,13 +416,21 @@ class TimesheetRepository extends CompanyAwareRepository
             ];
         }
 
-        $qb = $this->createCompanyQueryBuilder('t')
+        $qb = $this
+            ->createCompanyQueryBuilder('t')
             ->select('COALESCE(SUM(t.hours), 0) AS totalHours')
-            ->addSelect('COALESCE(SUM(t.hours * ((COALESCE(ep.cjm, 0) * (COALESCE(ep.workTimePercentage, 100)/100)) / 8)), 0) AS totalHumanCost')
+            ->addSelect(
+                'COALESCE(SUM(t.hours * ((COALESCE(ep.cjm, 0) * (COALESCE(ep.workTimePercentage, 100)/100)) / 8)), 0) AS totalHumanCost',
+            )
             ->addSelect('COALESCE(SUM(t.hours * (COALESCE(ep.tjm, 0) / 8)), 0) AS totalRevenue')
             ->leftJoin('t.contributor', 'c')
             ->leftJoin('t.project', 'p')
-            ->leftJoin(\App\Entity\EmploymentPeriod::class, 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
+            ->leftJoin(
+                \App\Entity\EmploymentPeriod::class,
+                'ep',
+                'WITH',
+                'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)',
+            )
             ->andWhere('t.date BETWEEN :start AND :end')
             ->andWhere('p.id IN (:projectIds)')
             ->setParameter('start', $startDate)
@@ -397,9 +460,10 @@ class TimesheetRepository extends CompanyAwareRepository
     public function getTotalHoursForContributorAndDate(
         Contributor $contributor,
         DateTimeInterface $date,
-        ?Timesheet $exclude = null
+        ?Timesheet $exclude = null,
     ): float {
-        $qb = $this->createCompanyQueryBuilder('t')
+        $qb = $this
+            ->createCompanyQueryBuilder('t')
             ->select('COALESCE(SUM(t.hours), 0)')
             ->andWhere('t.contributor = :contributor')
             ->andWhere('t.date = :date')
@@ -407,8 +471,7 @@ class TimesheetRepository extends CompanyAwareRepository
             ->setParameter('date', $date);
 
         if ($exclude && $exclude->getId()) {
-            $qb->andWhere('t.id != :excludeId')
-               ->setParameter('excludeId', $exclude->getId());
+            $qb->andWhere('t.id != :excludeId')->setParameter('excludeId', $exclude->getId());
         }
 
         return (float) $qb->getQuery()->getSingleScalarResult();

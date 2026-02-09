@@ -22,10 +22,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Entity(repositoryClass: StaffingMetricsRepository::class)]
 #[ORM\Table(name: 'fact_staffing_metrics')]
-#[ORM\UniqueConstraint(
-    name: 'unique_staffing_metrics',
-    columns: ['dim_time_id', 'dim_profile_id', 'contributor_id', 'granularity'],
-)]
+#[ORM\UniqueConstraint(name: 'unique_staffing_metrics', columns: [
+    'dim_time_id',
+    'dim_profile_id',
+    'contributor_id',
+    'granularity',
+])]
 #[ApiResource(
     operations: [
         new Get(security: "is_granted('ROLE_MANAGER')"),
@@ -276,11 +278,7 @@ class FactStaffingMetrics implements CompanyOwnedInterface
     {
         // Taux de staffing = (Temps staffé / Temps disponible) × 100
         if (bccomp($this->availableDays, '0', 2) > 0) {
-            $this->staffingRate = bcmul(
-                bcdiv($this->staffedDays, $this->availableDays, 4),
-                '100',
-                2,
-            );
+            $this->staffingRate = bcmul(bcdiv($this->staffedDays, $this->availableDays, 4), '100', 2);
         } else {
             $this->staffingRate = '0.00';
         }
@@ -291,11 +289,7 @@ class FactStaffingMetrics implements CompanyOwnedInterface
         if (bccomp($this->workedDays, '0', 2) > 0) {
             // Utiliser staffedDays + plannedDays pour inclure les plannings futurs
             $totalProductiveDays = bcadd($this->staffedDays, $this->plannedDays, 2);
-            $this->tace          = bcmul(
-                bcdiv($totalProductiveDays, $this->workedDays, 4),
-                '100',
-                2,
-            );
+            $this->tace          = bcmul(bcdiv($totalProductiveDays, $this->workedDays, 4), '100', 2);
         } else {
             $this->tace = '0.00';
         }

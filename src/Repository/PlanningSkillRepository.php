@@ -17,10 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PlanningSkillRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, PlanningSkill::class, $companyContext);
     }
 
@@ -31,7 +29,8 @@ class PlanningSkillRepository extends CompanyAwareRepository
      */
     public function findByPlanning(Planning $planning): array
     {
-        return $this->createCompanyQueryBuilder('ps')
+        return $this
+            ->createCompanyQueryBuilder('ps')
             ->join('ps.skill', 's')
             ->andWhere('ps.planning = :planning')
             ->setParameter('planning', $planning)
@@ -49,7 +48,8 @@ class PlanningSkillRepository extends CompanyAwareRepository
      */
     public function findMandatoryByPlanning(Planning $planning): array
     {
-        return $this->createCompanyQueryBuilder('ps')
+        return $this
+            ->createCompanyQueryBuilder('ps')
             ->join('ps.skill', 's')
             ->andWhere('ps.planning = :planning')
             ->setParameter('planning', $planning)
@@ -68,7 +68,8 @@ class PlanningSkillRepository extends CompanyAwareRepository
      */
     public function findBySkill(Skill $skill): array
     {
-        return $this->createCompanyQueryBuilder('ps')
+        return $this
+            ->createCompanyQueryBuilder('ps')
             ->join('ps.planning', 'p')
             ->andWhere('ps.skill = :skill')
             ->setParameter('skill', $skill)
@@ -86,7 +87,8 @@ class PlanningSkillRepository extends CompanyAwareRepository
      */
     public function findByProject(Project $project): array
     {
-        return $this->createCompanyQueryBuilder('ps')
+        return $this
+            ->createCompanyQueryBuilder('ps')
             ->join('ps.planning', 'p')
             ->join('ps.skill', 's')
             ->andWhere('p.project = :project')
@@ -193,7 +195,7 @@ class PlanningSkillRepository extends CompanyAwareRepository
             }
         }
 
-        return $total > 0 ? (int) round(($met / $total) * 100) : 100;
+        return (int) round(($met / $total) * 100);
     }
 
     /**
@@ -203,7 +205,8 @@ class PlanningSkillRepository extends CompanyAwareRepository
      */
     public function findPlanningsWithSkillMismatch(): array
     {
-        $plannings = $this->getEntityManager()
+        $plannings = $this
+            ->getEntityManager()
             ->getRepository(Planning::class)
             ->createQueryBuilder('p')
             ->andWhere('p.status != :cancelled')

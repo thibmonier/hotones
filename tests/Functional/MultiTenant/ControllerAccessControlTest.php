@@ -139,7 +139,11 @@ class ControllerAccessControlTest extends WebTestCase
     public function testProjectCreationAssignsCurrentUserCompany(): void
     {
         // Créer Company avec utilisateur
-        ['company' => $company, 'user' => $user] = $this->createCompanyWithUser('Company Test', 'user@test.com', ['ROLE_CHEF_PROJET']);
+        ['company' => $company, 'user' => $user] = $this->createCompanyWithUser(
+            'Company Test',
+            'user@test.com',
+            ['ROLE_CHEF_PROJET'],
+        );
 
         $this->loginAs($user);
 
@@ -148,11 +152,13 @@ class ControllerAccessControlTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         // Soumettre le formulaire (simplifié - ajustez selon vos champs réels)
-        $form = $crawler->selectButton('Créer')->form([
-            'project[name]'        => 'New Project',
-            'project[projectType]' => 'forfait',
-            'project[status]'      => 'active',
-        ]);
+        $form = $crawler
+            ->selectButton('Créer')
+            ->form([
+                'project[name]'        => 'New Project',
+                'project[projectType]' => 'forfait',
+                'project[status]'      => 'active',
+            ]);
 
         $this->client->submit($form);
 
@@ -197,8 +203,11 @@ class ControllerAccessControlTest extends WebTestCase
     /**
      * Helper pour créer une Company + Contributor + User.
      */
-    private function createCompanyWithUser(string $companyName, string $email, array $roles = ['ROLE_USER', 'ROLE_INTERVENANT']): array
-    {
+    private function createCompanyWithUser(
+        string $companyName,
+        string $email,
+        array $roles = ['ROLE_USER', 'ROLE_INTERVENANT'],
+    ): array {
         /** @var EntityManagerInterface $em */
         $em = static::getContainer()->get(EntityManagerInterface::class);
         /** @var UserPasswordHasherInterface $hasher */

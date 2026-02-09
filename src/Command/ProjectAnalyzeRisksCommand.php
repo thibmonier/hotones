@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ProjectAnalyzeRisksCommand extends Command
 {
     public function __construct(
-        private readonly ProjectRiskAnalyzer $riskAnalyzer
+        private readonly ProjectRiskAnalyzer $riskAnalyzer,
     ) {
         parent::__construct();
     }
@@ -27,25 +27,24 @@ class ProjectAnalyzeRisksCommand extends Command
     protected function configure(): void
     {
         $this->setHelp(<<<'HELP'
-Cette commande analyse la santé de tous les projets actifs et calcule leurs scores.
+            Cette commande analyse la santé de tous les projets actifs et calcule leurs scores.
 
-Utilisation:
-  php bin/console app:project:analyze-risks
+            Utilisation:
+              php bin/console app:project:analyze-risks
 
-Pour chaque projet, la commande calcule:
-- Score de budget (40%) : suivi des dépassements budgétaires
-- Score de planning (30%) : détection des retards
-- Score de vélocité (20%) : activité de l'équipe
-- Score de qualité (10%) : marge et qualité de livraison
+            Pour chaque projet, la commande calcule:
+            - Score de budget (40%) : suivi des dépassements budgétaires
+            - Score de planning (30%) : détection des retards
+            - Score de vélocité (20%) : activité de l'équipe
+            - Score de qualité (10%) : marge et qualité de livraison
 
-Les scores sont enregistrés dans la table project_health_score.
+            Les scores sont enregistrés dans la table project_health_score.
 
-Niveaux de santé:
-- Healthy (>80) : Projet en bonne santé
-- Warning (50-80) : Projet nécessitant une attention
-- Critical (<50) : Projet en danger, action immédiate requise
-HELP
-        );
+            Niveaux de santé:
+            - Healthy (>80) : Projet en bonne santé
+            - Warning (50-80) : Projet nécessitant une attention
+            - Critical (<50) : Projet en danger, action immédiate requise
+            HELP);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -76,10 +75,12 @@ HELP
             }
 
             $io->section('Résumé');
-            $io->horizontalTable(
-                ['Sains', 'Alerte', 'Critiques', 'Total'],
-                [[$healthy, $warning, $critical, count($healthScores)]],
-            );
+            $io->horizontalTable(['Sains', 'Alerte', 'Critiques', 'Total'], [[
+                $healthy,
+                $warning,
+                $critical,
+                count($healthScores),
+            ]]);
 
             // Display critical projects details
             if ($critical > 0) {
@@ -99,10 +100,7 @@ HELP
                     }
                 }
 
-                $io->table(
-                    ['Projet', 'Score', 'Budget', 'Planning', 'Recommandations'],
-                    $criticalData,
-                );
+                $io->table(['Projet', 'Score', 'Budget', 'Planning', 'Recommandations'], $criticalData);
 
                 $io->warning([
                     sprintf('%d projet(s) en état critique !', $critical),

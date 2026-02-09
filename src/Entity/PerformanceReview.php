@@ -166,10 +166,12 @@ class PerformanceReview implements CompanyOwnedInterface
      */
     public function isSelfEvaluationCompleted(): bool
     {
-        return null !== $this->selfEvaluation
+        return
+            null !== $this->selfEvaluation
             && isset($this->selfEvaluation['achievements'])
             && isset($this->selfEvaluation['strengths'])
-            && isset($this->selfEvaluation['improvements']);
+            && isset($this->selfEvaluation['improvements'])
+        ;
     }
 
     /**
@@ -177,11 +179,13 @@ class PerformanceReview implements CompanyOwnedInterface
      */
     public function isManagerEvaluationCompleted(): bool
     {
-        return null !== $this->managerEvaluation
+        return
+            null !== $this->managerEvaluation
             && isset($this->managerEvaluation['achievements'])
             && isset($this->managerEvaluation['strengths'])
             && isset($this->managerEvaluation['improvements'])
-            && isset($this->managerEvaluation['feedback']);
+            && isset($this->managerEvaluation['feedback'])
+        ;
     }
 
     /**

@@ -427,11 +427,13 @@ class LeadCapture implements CompanyOwnedInterface
      */
     public function shouldReceiveNurturingDay1(): bool
     {
-        return $this->marketingConsent
+        return
+            $this->marketingConsent
             && $this->nurturingDay1SentAt === null
             && $this->getDaysSinceCreation() >= 1
             && $this->status !== self::STATUS_CONVERTED
-            && $this->status !== self::STATUS_LOST;
+            && $this->status !== self::STATUS_LOST
+        ;
     }
 
     /**
@@ -439,11 +441,13 @@ class LeadCapture implements CompanyOwnedInterface
      */
     public function shouldReceiveNurturingDay3(): bool
     {
-        return $this->marketingConsent
+        return
+            $this->marketingConsent
             && $this->nurturingDay3SentAt === null
             && $this->getDaysSinceCreation() >= 3
             && $this->status !== self::STATUS_CONVERTED
-            && $this->status !== self::STATUS_LOST;
+            && $this->status !== self::STATUS_LOST
+        ;
     }
 
     /**
@@ -451,11 +455,13 @@ class LeadCapture implements CompanyOwnedInterface
      */
     public function shouldReceiveNurturingDay7(): bool
     {
-        return $this->marketingConsent
+        return
+            $this->marketingConsent
             && $this->nurturingDay7SentAt === null
             && $this->getDaysSinceCreation() >= 7
             && $this->status !== self::STATUS_CONVERTED
-            && $this->status !== self::STATUS_LOST;
+            && $this->status !== self::STATUS_LOST
+        ;
     }
 
     public function getCompany(): Company

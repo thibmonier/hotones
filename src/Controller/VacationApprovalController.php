@@ -25,7 +25,7 @@ class VacationApprovalController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly VacationRepository $vacationRepository,
         private readonly ContributorRepository $contributorRepository,
-        private readonly MessageBusInterface $messageBus
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
@@ -51,10 +51,9 @@ class VacationApprovalController extends AbstractController
         $allVacations     = [];
 
         foreach ($managedContributors as $contributor) {
-            $contributorVacations = $this->vacationRepository->findBy(
-                ['contributor' => $contributor],
-                ['createdAt' => 'DESC'],
-            );
+            $contributorVacations = $this->vacationRepository->findBy(['contributor' => $contributor], [
+                'createdAt' => 'DESC',
+            ]);
 
             foreach ($contributorVacations as $vacation) {
                 $allVacations[] = $vacation;

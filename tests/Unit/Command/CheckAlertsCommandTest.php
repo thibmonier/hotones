@@ -59,9 +59,7 @@ class CheckAlertsCommandTest extends TestCase
             'payment_alerts'  => 0,
         ];
 
-        $this->alertDetectionService
-            ->method('checkAllAlerts')
-            ->willReturn($stats);
+        $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
 
         $this->commandTester->execute([]);
 
@@ -80,9 +78,7 @@ class CheckAlertsCommandTest extends TestCase
             'payment_alerts'  => 4,
         ];
 
-        $this->alertDetectionService
-            ->method('checkAllAlerts')
-            ->willReturn($stats);
+        $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
 
         $this->commandTester->execute([]);
 
@@ -101,9 +97,7 @@ class CheckAlertsCommandTest extends TestCase
             'payment_alerts'  => 0,
         ];
 
-        $this->alertDetectionService
-            ->method('checkAllAlerts')
-            ->willReturn($stats);
+        $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
 
         $this->commandTester->execute([]);
 
@@ -137,7 +131,12 @@ class CheckAlertsCommandTest extends TestCase
                 'total' => 10,
             ],
             [
-                'stats' => ['budget_alerts' => 10, 'margin_alerts' => 5, 'overload_alerts' => 0, 'payment_alerts' => 15],
+                'stats' => [
+                    'budget_alerts'   => 10,
+                    'margin_alerts'   => 5,
+                    'overload_alerts' => 0,
+                    'payment_alerts'  => 15,
+                ],
                 'total' => 30,
             ],
         ];
@@ -197,9 +196,7 @@ class CheckAlertsCommandTest extends TestCase
             'payment_alerts'  => 4,
         ];
 
-        $this->alertDetectionService
-            ->method('checkAllAlerts')
-            ->willReturn($stats);
+        $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
 
         // Should not throw any errors accessing array keys
         $exitCode = $this->commandTester->execute([]);
@@ -216,9 +213,7 @@ class CheckAlertsCommandTest extends TestCase
             'payment_alerts'  => 0,
         ];
 
-        $this->alertDetectionService
-            ->method('checkAllAlerts')
-            ->willReturn($stats);
+        $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
 
         $this->commandTester->execute([]);
 

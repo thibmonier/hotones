@@ -52,20 +52,64 @@ class CreateTestDataCommand extends Command
 
     // Prénoms et noms français
     private const array FIRST_NAMES = [
-        'Alice', 'Bob', 'Claire', 'David', 'Emma', 'François', 'Gabrielle', 'Hugo',
-        'Isabelle', 'Julien', 'Karim', 'Léa', 'Marc', 'Nathalie', 'Olivier', 'Patricia',
-        'Quentin', 'Rachel', 'Sophie', 'Thomas', 'Valérie', 'William', 'Xavier', 'Yasmine', 'Zoé',
+        'Alice',
+        'Bob',
+        'Claire',
+        'David',
+        'Emma',
+        'François',
+        'Gabrielle',
+        'Hugo',
+        'Isabelle',
+        'Julien',
+        'Karim',
+        'Léa',
+        'Marc',
+        'Nathalie',
+        'Olivier',
+        'Patricia',
+        'Quentin',
+        'Rachel',
+        'Sophie',
+        'Thomas',
+        'Valérie',
+        'William',
+        'Xavier',
+        'Yasmine',
+        'Zoé',
     ];
 
     private const array LAST_NAMES = [
-        'Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert', 'Petit', 'Durand', 'Leroy',
-        'Moreau', 'Simon', 'Laurent', 'Lefebvre', 'Michel', 'Garcia', 'David', 'Bertrand',
-        'Roux', 'Vincent', 'Fournier', 'Morel', 'Girard', 'André', 'Lefevre', 'Mercier', 'Dupont',
+        'Martin',
+        'Bernard',
+        'Dubois',
+        'Thomas',
+        'Robert',
+        'Petit',
+        'Durand',
+        'Leroy',
+        'Moreau',
+        'Simon',
+        'Laurent',
+        'Lefebvre',
+        'Michel',
+        'Garcia',
+        'David',
+        'Bertrand',
+        'Roux',
+        'Vincent',
+        'Fournier',
+        'Morel',
+        'Girard',
+        'André',
+        'Lefevre',
+        'Mercier',
+        'Dupont',
     ];
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
         parent::__construct();
     }
@@ -195,9 +239,24 @@ Répartition des contributeurs :
         $io->section('Création des utilisateurs de test');
 
         $usersData = [
-            ['email' => 'chef.projet@test.com', 'firstName' => 'Alice', 'lastName' => 'Martin', 'roles' => ['ROLE_CHEF_PROJET']],
-            ['email' => 'commercial@test.com', 'firstName' => 'Bob', 'lastName' => 'Durand', 'roles' => ['ROLE_COMMERCIAL']],
-            ['email' => 'manager@test.com', 'firstName' => 'Claire', 'lastName' => 'Moreau', 'roles' => ['ROLE_MANAGER']],
+            [
+                'email'     => 'chef.projet@test.com',
+                'firstName' => 'Alice',
+                'lastName'  => 'Martin',
+                'roles'     => ['ROLE_CHEF_PROJET'],
+            ],
+            [
+                'email'     => 'commercial@test.com',
+                'firstName' => 'Bob',
+                'lastName'  => 'Durand',
+                'roles'     => ['ROLE_COMMERCIAL'],
+            ],
+            [
+                'email'     => 'manager@test.com',
+                'firstName' => 'Claire',
+                'lastName'  => 'Moreau',
+                'roles'     => ['ROLE_MANAGER'],
+            ],
             ['email' => 'admin@test.com', 'firstName' => 'David', 'lastName' => 'Admin', 'roles' => ['ROLE_ADMIN']],
         ];
 
@@ -361,8 +420,13 @@ Répartition des contributeurs :
     /**
      * @throws Exception
      */
-    private function createProjects(SymfonyStyle $io, array $clients, array $users, array $categories, Company $company): array
-    {
+    private function createProjects(
+        SymfonyStyle $io,
+        array $clients,
+        array $users,
+        array $categories,
+        Company $company,
+    ): array {
         $io->section('Création des projets');
 
         $techRepo     = $this->entityManager->getRepository(Technology::class);
@@ -467,14 +531,56 @@ Répartition des contributeurs :
         $io->section('Création des tâches de projet');
 
         $taskTemplates = [
-            ['name' => 'Analyse et spécifications', 'type' => 'regular', 'hours_sold' => 40, 'hours_revised' => 35, 'progress' => 100],
-            ['name' => 'Maquettage et design', 'type' => 'regular', 'hours_sold' => 80, 'hours_revised' => 75, 'progress' => 90],
-            ['name' => 'Développement Frontend', 'type' => 'regular', 'hours_sold' => 120, 'hours_revised' => 140, 'progress' => 60],
-            ['name' => 'Développement Backend', 'type' => 'regular', 'hours_sold' => 100, 'hours_revised' => 110, 'progress' => 70],
-            ['name' => 'Tests et validation', 'type' => 'regular', 'hours_sold' => 40, 'hours_revised' => 45, 'progress' => 30],
+            [
+                'name'          => 'Analyse et spécifications',
+                'type'          => 'regular',
+                'hours_sold'    => 40,
+                'hours_revised' => 35,
+                'progress'      => 100,
+            ],
+            [
+                'name'          => 'Maquettage et design',
+                'type'          => 'regular',
+                'hours_sold'    => 80,
+                'hours_revised' => 75,
+                'progress'      => 90,
+            ],
+            [
+                'name'          => 'Développement Frontend',
+                'type'          => 'regular',
+                'hours_sold'    => 120,
+                'hours_revised' => 140,
+                'progress'      => 60,
+            ],
+            [
+                'name'          => 'Développement Backend',
+                'type'          => 'regular',
+                'hours_sold'    => 100,
+                'hours_revised' => 110,
+                'progress'      => 70,
+            ],
+            [
+                'name'          => 'Tests et validation',
+                'type'          => 'regular',
+                'hours_sold'    => 40,
+                'hours_revised' => 45,
+                'progress'      => 30,
+            ],
             ['name' => 'Déploiement', 'type' => 'regular', 'hours_sold' => 20, 'hours_revised' => 25, 'progress' => 0],
-            ['name' => 'AVV - Avant-vente', 'type' => 'avv', 'hours_sold' => 0, 'hours_revised' => 16, 'progress' => 100],
-            ['name' => 'Non-vendu - Formation', 'type' => 'non_vendu', 'hours_sold' => 0, 'hours_revised' => 8, 'progress' => 50],
+            [
+                'name'          => 'AVV - Avant-vente',
+                'type'          => 'avv',
+                'hours_sold'    => 0,
+                'hours_revised' => 16,
+                'progress'      => 100,
+            ],
+            [
+                'name'          => 'Non-vendu - Formation',
+                'type'          => 'non_vendu',
+                'hours_sold'    => 0,
+                'hours_revised' => 8,
+                'progress'      => 50,
+            ],
         ];
 
         $contributorsByProfile = [];
@@ -508,26 +614,37 @@ Répartition des contributeurs :
                 $task->setEstimatedHoursRevised($taskData['hours_revised']);
                 $task->setProgressPercentage($taskData['progress']);
                 $task->setPosition($position++);
-                $task->setStatus($taskData['progress'] === 100 ? 'completed' : ($taskData['progress'] > 0 ? 'in_progress' : 'not_started'));
+                $task->setStatus(
+                    $taskData['progress'] === 100
+                        ? 'completed'
+                        : ($taskData['progress'] > 0 ? 'in_progress' : 'not_started'),
+                );
                 $task->setCountsForProfitability($taskData['type'] === 'regular');
                 $task->setActive(true);
 
                 // Assigner un contributeur approprié
-                $assignedContributor = $this->assignContributorToTask($taskData['name'], $contributors, $contributorsByProfile);
+                $assignedContributor = $this->assignContributorToTask(
+                    $taskData['name'],
+                    $contributors,
+                    $contributorsByProfile,
+                );
                 if ($assignedContributor) {
                     $task->setAssignedContributor($assignedContributor);
                 }
 
                 // Tarif journalier aléatoire
-                $task->setDailyRate(400 + random_int(0, 200).'.00');
+                $task->setDailyRate((400 + random_int(0, 200)).'.00');
 
                 $this->entityManager->persist($task);
             }
         }
     }
 
-    private function assignContributorToTask(string $taskName, array $contributors, array $contributorsByProfile): ?Contributor
-    {
+    private function assignContributorToTask(
+        string $taskName,
+        array $contributors,
+        array $contributorsByProfile,
+    ): ?Contributor {
         // Logique d'affectation basée sur le nom de la tâche
         if (str_contains($taskName, 'Frontend')) {
             return $contributorsByProfile['développeur frontend'][0] ?? $contributors[0];
@@ -538,11 +655,16 @@ Répartition des contributeurs :
         }
 
         if (str_contains($taskName, 'Design') || str_contains($taskName, 'Maquettage')) {
-            return $contributorsByProfile['UI designer'][0] ?? $contributorsByProfile['UX designer'][0] ?? $contributors[2];
+            return
+                $contributorsByProfile['UI designer'][0] ?? $contributorsByProfile['UX designer'][0] ?? $contributors[2]
+            ;
         }
 
         if (str_contains($taskName, 'Analyse') || str_contains($taskName, 'spécification')) {
-            return $contributorsByProfile['product owner'][0] ?? $contributorsByProfile['chef de projet'][0] ?? $contributors[0];
+            return
+                $contributorsByProfile['product owner'][0] ?? $contributorsByProfile['chef de projet'][0]
+                                                           ?? $contributors[0]
+            ;
         }
 
         // Par défaut, assigner un développeur fullstack ou aléatoire

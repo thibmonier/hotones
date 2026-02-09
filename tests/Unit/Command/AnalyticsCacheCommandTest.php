@@ -28,9 +28,7 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithClearOption(): void
     {
-        $this->cacheService
-            ->expects($this->once())
-            ->method('invalidateAll');
+        $this->cacheService->expects($this->once())->method('invalidateAll');
 
         $exitCode = $this->commandTester->execute([
             '--clear' => true,
@@ -63,13 +61,9 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithBothOptions(): void
     {
-        $this->cacheService
-            ->expects($this->once())
-            ->method('invalidateAll');
+        $this->cacheService->expects($this->once())->method('invalidateAll');
 
-        $this->cacheService
-            ->expects($this->once())
-            ->method('warmup');
+        $this->cacheService->expects($this->once())->method('warmup');
 
         $exitCode = $this->commandTester->execute([
             '--clear'  => true,
@@ -85,26 +79,24 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithNoOptionsShowsUsage(): void
     {
-        $this->cacheService
-            ->expects($this->never())
-            ->method('invalidateAll');
+        $this->cacheService->expects($this->never())->method('invalidateAll');
 
-        $this->cacheService
-            ->expects($this->never())
-            ->method('warmup');
+        $this->cacheService->expects($this->never())->method('warmup');
 
         $exitCode = $this->commandTester->execute([]);
 
         $this->assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Utilisation: php bin/console app:analytics:cache [--clear] [--warmup]', $output);
+        $this->assertStringContainsString(
+            'Utilisation: php bin/console app:analytics:cache [--clear] [--warmup]',
+            $output,
+        );
     }
 
     public function testExecuteReturnsSuccess(): void
     {
-        $this->cacheService
-            ->method('invalidateAll');
+        $this->cacheService->method('invalidateAll');
 
         $exitCode = $this->commandTester->execute(['--clear' => true]);
 
@@ -130,9 +122,7 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithClearShortOption(): void
     {
-        $this->cacheService
-            ->expects($this->once())
-            ->method('invalidateAll');
+        $this->cacheService->expects($this->once())->method('invalidateAll');
 
         $this->commandTester->execute(['-c' => true]);
 
@@ -142,9 +132,7 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithWarmupShortOption(): void
     {
-        $this->cacheService
-            ->expects($this->once())
-            ->method('warmup');
+        $this->cacheService->expects($this->once())->method('warmup');
 
         $this->commandTester->execute(['-w' => true]);
 

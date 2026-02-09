@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\ExpenseReport;
@@ -71,7 +73,8 @@ class ExpenseReportType extends AbstractType
                     'class'            => 'form-select select2-search',
                     'data-placeholder' => 'Rechercher un projet...',
                 ],
-                'query_builder' => fn ($er) => $er->createQueryBuilder('p')
+                'query_builder' => fn ($er) => $er
+                    ->createQueryBuilder('p')
                     ->leftJoin('p.client', 'c')
                     ->orderBy('p.name', 'ASC'),
             ])
@@ -95,7 +98,8 @@ class ExpenseReportType extends AbstractType
                     'class'            => 'form-select select2-search',
                     'data-placeholder' => 'Rechercher un devis...',
                 ],
-                'query_builder' => fn ($er) => $er->createQueryBuilder('o')
+                'query_builder' => fn ($er) => $er
+                    ->createQueryBuilder('o')
                     ->leftJoin('o.project', 'p')
                     ->orderBy('o.orderNumber', 'DESC'),
             ])
@@ -116,8 +120,7 @@ class ExpenseReportType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-control'],
                 'help' => 'Formats acceptés : PDF, JPG, PNG (max 5 Mo)',
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

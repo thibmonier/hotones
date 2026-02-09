@@ -50,50 +50,43 @@ class TechnologyCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('name', 'Nom')
-            ->setRequired(true);
+        yield TextField::new('name', 'Nom')->setRequired(true);
 
-        yield ChoiceField::new('category', 'Catégorie')
-            ->setChoices([
-                'Framework'       => 'framework',
-                'CMS'             => 'cms',
-                'Bibliothèque'    => 'library',
-                'Outil'           => 'tool',
-                'Hébergement'     => 'hosting',
-                'Base de données' => 'database',
-                'Langage'         => 'language',
-                'Autre'           => 'other',
-            ])
-            ->setRequired(true);
+        yield ChoiceField::new('category', 'Catégorie')->setChoices([
+            'Framework'       => 'framework',
+            'CMS'             => 'cms',
+            'Bibliothèque'    => 'library',
+            'Outil'           => 'tool',
+            'Hébergement'     => 'hosting',
+            'Base de données' => 'database',
+            'Langage'         => 'language',
+            'Autre'           => 'other',
+        ])->setRequired(true);
 
         yield ColorField::new('color', 'Couleur');
 
-        yield IntegerField::new('projects.count', 'Nombre de projets')
-            ->hideOnForm()
-            ->formatValue(fn ($value, Technology $entity) => $entity->getProjects()->count());
+        yield IntegerField::new('projects.count', 'Nombre de projets')->hideOnForm()->formatValue(
+            fn ($value, Technology $entity) => $entity->getProjects()->count(),
+        );
 
-        yield BooleanField::new('active', 'Actif')
-            ->renderAsSwitch(false);
+        yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);
     }
 
     #[Override]
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters
-            ->add(ChoiceFilter::new('category', 'Catégorie')->setChoices([
-                'Framework'       => 'framework',
-                'CMS'             => 'cms',
-                'Bibliothèque'    => 'library',
-                'Outil'           => 'tool',
-                'Hébergement'     => 'hosting',
-                'Base de données' => 'database',
-                'Langage'         => 'language',
-                'Autre'           => 'other',
-            ]))
-            ->add(BooleanFilter::new('active', 'Actif'));
+        return $filters->add(ChoiceFilter::new('category', 'Catégorie')->setChoices([
+            'Framework'       => 'framework',
+            'CMS'             => 'cms',
+            'Bibliothèque'    => 'library',
+            'Outil'           => 'tool',
+            'Hébergement'     => 'hosting',
+            'Base de données' => 'database',
+            'Langage'         => 'language',
+            'Autre'           => 'other',
+        ]))->add(BooleanFilter::new('active', 'Actif'));
     }
 
     #[Override]

@@ -15,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AccountDeletionRequestRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, AccountDeletionRequest::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
      */
     public function findActiveDeletionRequestForUser(User $user): ?AccountDeletionRequest
     {
-        return $this->createCompanyQueryBuilder('adr')
+        return $this
+            ->createCompanyQueryBuilder('adr')
             ->andWhere('adr.user = :user')
             ->andWhere('adr.status IN (:statuses)')
             ->setParameter('user', $user)
@@ -46,7 +45,8 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
      */
     public function findDueDeletions(): array
     {
-        return $this->createCompanyQueryBuilder('adr')
+        return $this
+            ->createCompanyQueryBuilder('adr')
             ->andWhere('adr.status = :status')
             ->andWhere('adr.scheduledDeletionAt <= :now')
             ->setParameter('status', AccountDeletionRequest::STATUS_CONFIRMED)
@@ -62,7 +62,8 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
     {
         $expiryThreshold = new DateTimeImmutable('-48 hours');
 
-        return $this->createCompanyQueryBuilder('adr')
+        return $this
+            ->createCompanyQueryBuilder('adr')
             ->andWhere('adr.status = :status')
             ->andWhere('adr.requestedAt < :threshold')
             ->setParameter('status', AccountDeletionRequest::STATUS_PENDING)
@@ -76,7 +77,8 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
      */
     public function findByConfirmationToken(string $token): ?AccountDeletionRequest
     {
-        return $this->createCompanyQueryBuilder('adr')
+        return $this
+            ->createCompanyQueryBuilder('adr')
             ->andWhere('adr.confirmationToken = :token')
             ->andWhere('adr.status = :status')
             ->setParameter('token', $token)

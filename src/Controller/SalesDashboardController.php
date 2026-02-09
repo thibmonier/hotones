@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Order;
@@ -34,9 +36,9 @@ class SalesDashboardController extends AbstractController
 
         // Filtres utilisateur - gestion robuste des paramètres
         $userIdParam    = $request->query->get('user_id');
-        $filterUserId   = ($userIdParam !== null && $userIdParam !== '') ? (int) $userIdParam : null;
+        $filterUserId   = $userIdParam !== null && $userIdParam !== '' ? (int) $userIdParam : null;
         $userRoleParam  = $request->query->get('user_role');
-        $filterUserRole = ($userRoleParam !== null && $userRoleParam !== '') ? $userRoleParam : null;
+        $filterUserRole = $userRoleParam !== null && $userRoleParam !== '' ? $userRoleParam : null;
 
         // Créer une clé de cache basée sur les filtres
         $cacheKey = sprintf(
@@ -48,42 +50,72 @@ class SalesDashboardController extends AbstractController
         );
 
         // KPI 1: Nombre de devis en attente de signature (avec cache)
-        $pendingCount = $cache->get($cacheKey.'_pending', function (ItemInterface $item) use ($orderRepository, $filterUserId, $filterUserRole) {
+        $pendingCount = $cache->get($cacheKey.'_pending', function (ItemInterface $item) use (
+            $orderRepository,
+            $filterUserId,
+            $filterUserRole,
+        ) {
             $item->expiresAfter(900); // 15 minutes
 
             return $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
         });
 
         // KPI 2: CA signé sur la période (avec cache)
-        $signedRevenue = $cache->get($cacheKey.'_signed', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate, $filterUserId, $filterUserRole) {
+        $signedRevenue = $cache->get($cacheKey.'_signed', function (ItemInterface $item) use (
+            $orderRepository,
+            $startDate,
+            $endDate,
+            $filterUserId,
+            $filterUserRole,
+        ) {
             $item->expiresAfter(900); // 15 minutes
 
             return $orderRepository->getSignedRevenueForPeriod($startDate, $endDate, $filterUserId, $filterUserRole);
         });
 
         // KPI 3: Taux de conversion (avec cache)
-        $conversionRate = $cache->get($cacheKey.'_conversion', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate, $filterUserId, $filterUserRole) {
+        $conversionRate = $cache->get($cacheKey.'_conversion', function (ItemInterface $item) use (
+            $orderRepository,
+            $startDate,
+            $endDate,
+            $filterUserId,
+            $filterUserRole,
+        ) {
             $item->expiresAfter(900); // 15 minutes
 
             return $orderRepository->getConversionRate($startDate, $endDate, $filterUserId, $filterUserRole);
         });
 
         // KPI 4: Évolution du CA signé (mensuelle) (avec cache)
-        $revenueEvolution = $cache->get($cacheKey.'_evolution', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate) {
+        $revenueEvolution = $cache->get($cacheKey.'_evolution', function (ItemInterface $item) use (
+            $orderRepository,
+            $startDate,
+            $endDate,
+        ) {
             $item->expiresAfter(1800); // 30 minutes
 
             return $orderRepository->getRevenueEvolution($startDate, $endDate);
         });
 
         // KPI 5: Évolution du volume de devis créés (mensuel) (avec cache)
-        $volumeEvolution = $cache->get($cacheKey.'_volume', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate) {
+        $volumeEvolution = $cache->get($cacheKey.'_volume', function (ItemInterface $item) use (
+            $orderRepository,
+            $startDate,
+            $endDate,
+        ) {
             $item->expiresAfter(1800); // 30 minutes
 
             return $orderRepository->getCreatedOrdersVolumeEvolution($startDate, $endDate);
         });
 
         // KPI 6: Somme de CA par statut (filtrée par période) (avec cache)
-        $statsByStatus = $cache->get($cacheKey.'_stats', function (ItemInterface $item) use ($orderRepository, $startDate, $endDate, $filterUserId, $filterUserRole) {
+        $statsByStatus = $cache->get($cacheKey.'_stats', function (ItemInterface $item) use (
+            $orderRepository,
+            $startDate,
+            $endDate,
+            $filterUserId,
+            $filterUserRole,
+        ) {
             $item->expiresAfter(900); // 15 minutes
 
             return $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
@@ -114,7 +146,12 @@ class SalesDashboardController extends AbstractController
         $yearComparison = null;
         if ($year > min($availableYears)) {
             $previousYear   = (int) $year - 1;
-            $yearComparison = $orderRepository->getYearComparison((int) $year, $previousYear, $filterUserId, $filterUserRole);
+            $yearComparison = $orderRepository->getYearComparison(
+                (int) $year,
+                $previousYear,
+                $filterUserId,
+                $filterUserRole,
+            );
         }
 
         // Liste des utilisateurs pour les filtres
@@ -140,8 +177,12 @@ class SalesDashboardController extends AbstractController
     /**
      * Prépare les données pour le graphique d'évolution mensuelle.
      */
-    private function prepareEvolutionChartData(array $revenueEvolution, array $volumeEvolution, DateTime $startDate, DateTime $endDate): array
-    {
+    private function prepareEvolutionChartData(
+        array $revenueEvolution,
+        array $volumeEvolution,
+        DateTime $startDate,
+        DateTime $endDate,
+    ): array {
         $labels      = [];
         $revenueData = [];
         $volumeData  = [];
@@ -203,13 +244,18 @@ class SalesDashboardController extends AbstractController
         $endDate   = new DateTime("$year-12-31");
 
         $userIdParam    = $request->query->get('user_id');
-        $filterUserId   = ($userIdParam !== null && $userIdParam !== '') ? (int) $userIdParam : null;
+        $filterUserId   = $userIdParam !== null && $userIdParam !== '' ? (int) $userIdParam : null;
         $userRoleParam  = $request->query->get('user_role');
-        $filterUserRole = ($userRoleParam !== null && $userRoleParam !== '') ? $userRoleParam : null;
+        $filterUserRole = $userRoleParam !== null && $userRoleParam !== '' ? $userRoleParam : null;
 
         // Récupération des données
-        $pendingCount   = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
-        $signedRevenue  = $orderRepository->getSignedRevenueForPeriod($startDate, $endDate, $filterUserId, $filterUserRole);
+        $pendingCount  = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
+        $signedRevenue = $orderRepository->getSignedRevenueForPeriod(
+            $startDate,
+            $endDate,
+            $filterUserId,
+            $filterUserRole,
+        );
         $conversionRate = $orderRepository->getConversionRate($startDate, $endDate, $filterUserId, $filterUserRole);
         $statsByStatus  = $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
 
@@ -230,7 +276,12 @@ class SalesDashboardController extends AbstractController
         $yearComparison = null;
         if ($year > min($availableYears)) {
             $previousYear   = (int) $year - 1;
-            $yearComparison = $orderRepository->getYearComparison((int) $year, $previousYear, $filterUserId, $filterUserRole);
+            $yearComparison = $orderRepository->getYearComparison(
+                (int) $year,
+                $previousYear,
+                $filterUserId,
+                $filterUserRole,
+            );
         }
 
         // Générer le HTML
@@ -255,13 +306,9 @@ class SalesDashboardController extends AbstractController
         $dompdf->render();
 
         // Retourner le PDF
-        return new Response(
-            $dompdf->output(),
-            200,
-            [
-                'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => sprintf('attachment; filename="dashboard-commercial-%s.pdf"', $year),
-            ],
-        );
+        return new Response($dompdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => sprintf('attachment; filename="dashboard-commercial-%s.pdf"', $year),
+        ]);
     }
 }

@@ -57,7 +57,10 @@ final class NotifyWeeklyTimesheetsCommand extends Command
 
             $expected = $this->getExpectedWeeklyHours($period);
             // Tolerance configurable (default 0.15)
-            $tolerance = (float) $this->settings->getValue(\App\Repository\NotificationSettingRepository::KEY_TIMESHEET_WEEKLY_TOLERANCE, 0.15);
+            $tolerance = (float) $this->settings->getValue(
+                \App\Repository\NotificationSettingRepository::KEY_TIMESHEET_WEEKLY_TOLERANCE,
+                0.15,
+            );
             if ($expected <= 0.0) {
                 continue;
             }
@@ -67,9 +70,10 @@ final class NotifyWeeklyTimesheetsCommand extends Command
 
             // Tolérance configurable (par défaut 15%)
             $threshold = $expected * (1.0 - $tolerance);
-            if ($logged + 0.0001 < $threshold) {
+            if (($logged + 0.0001) < $threshold) {
                 $notif = new Notification();
-                $notif->setRecipient($user)
+                $notif
+                    ->setRecipient($user)
                     ->setType(NotificationType::TIMESHEET_MISSING_WEEKLY)
                     ->setTitle('Rappel de saisie des temps')
                     ->setMessage(sprintf(
@@ -161,7 +165,8 @@ final class NotifyWeeklyTimesheetsCommand extends Command
 
     private function sumTimesheetHours(Contributor $c, DateTimeInterface $start, DateTimeInterface $end): float
     {
-        $qb = $this->em->createQueryBuilder()
+        $qb = $this->em
+            ->createQueryBuilder()
             ->select('COALESCE(SUM(ts.hours),0) as total')
             ->from(Timesheet::class, 'ts')
             ->where('ts.contributor = :c')

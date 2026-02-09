@@ -34,10 +34,7 @@ class ContributorSatisfactionType extends AbstractType
                 'attr'        => ['class' => 'form-select'],
                 'constraints' => [
                     new NotBlank(message: 'La satisfaction globale est obligatoire'),
-                    new Range(
-                        min: 1,
-                        max: 5,
-                    ),
+                    new Range(min: 1, max: 5),
                 ],
                 'help' => 'Comment évaluez-vous votre satisfaction générale ce mois-ci ?',
             ])
@@ -106,8 +103,7 @@ class ContributorSatisfactionType extends AbstractType
                     'placeholder' => 'Souhaitez-vous ajouter quelque chose ?',
                 ],
                 'help' => 'Espace libre pour tout commentaire supplémentaire',
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

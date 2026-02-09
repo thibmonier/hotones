@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\Client;
@@ -142,12 +144,20 @@ class ProjectType extends AbstractType
             ->add('repoLinks', TextareaType::class, [
                 'label'    => 'Liens dépôts (un par ligne)',
                 'required' => false,
-                'attr'     => ['class' => 'form-control', 'rows' => 3, 'placeholder' => "https://gitlab.com/..\nhttps://github.com/.."],
+                'attr'     => [
+                    'class'       => 'form-control',
+                    'rows'        => 3,
+                    'placeholder' => "https://gitlab.com/..\nhttps://github.com/..",
+                ],
             ])
             ->add('envLinks', TextareaType::class, [
                 'label'    => 'Liens environnements (un par ligne)',
                 'required' => false,
-                'attr'     => ['class' => 'form-control', 'rows' => 3, 'placeholder' => "https://staging.example.com\nhttps://prod.example.com"],
+                'attr'     => [
+                    'class'       => 'form-control',
+                    'rows'        => 3,
+                    'placeholder' => "https://staging.example.com\nhttps://prod.example.com",
+                ],
             ])
             ->add('dbAccess', TextareaType::class, [
                 'label'    => 'Accès BDD',
@@ -163,8 +173,7 @@ class ProjectType extends AbstractType
                 'label'    => 'Accès FTP',
                 'required' => false,
                 'attr'     => ['class' => 'form-control', 'rows' => 3],
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -14,10 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class XpHistoryRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, XpHistory::class, $companyContext);
     }
 
@@ -28,7 +26,8 @@ class XpHistoryRepository extends CompanyAwareRepository
      */
     public function findByContributor(Contributor $contributor, int $limit = 50): array
     {
-        return $this->createCompanyQueryBuilder('xh')
+        return $this
+            ->createCompanyQueryBuilder('xh')
             ->andWhere('xh.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('xh.gainedAt', 'DESC')
@@ -44,7 +43,8 @@ class XpHistoryRepository extends CompanyAwareRepository
      */
     public function findBySource(string $source, int $limit = 50): array
     {
-        return $this->createCompanyQueryBuilder('xh')
+        return $this
+            ->createCompanyQueryBuilder('xh')
             ->andWhere('xh.source = :source')
             ->setParameter('source', $source)
             ->orderBy('xh.gainedAt', 'DESC')
@@ -58,7 +58,8 @@ class XpHistoryRepository extends CompanyAwareRepository
      */
     public function getTotalXpByContributor(Contributor $contributor): int
     {
-        $result = $this->createCompanyQueryBuilder('xh')
+        $result = $this
+            ->createCompanyQueryBuilder('xh')
             ->select('SUM(xh.xpAmount)')
             ->andWhere('xh.contributor = :contributor')
             ->setParameter('contributor', $contributor)
@@ -73,7 +74,8 @@ class XpHistoryRepository extends CompanyAwareRepository
      */
     public function getXpBySource(Contributor $contributor): array
     {
-        $results = $this->createCompanyQueryBuilder('xh')
+        $results = $this
+            ->createCompanyQueryBuilder('xh')
             ->select('xh.source, SUM(xh.xpAmount) as total, COUNT(xh.id) as count')
             ->andWhere('xh.contributor = :contributor')
             ->setParameter('contributor', $contributor)
@@ -98,7 +100,8 @@ class XpHistoryRepository extends CompanyAwareRepository
      */
     public function getMonthlyXpEvolution(Contributor $contributor, int $year): array
     {
-        $results = $this->createCompanyQueryBuilder('xh')
+        $results = $this
+            ->createCompanyQueryBuilder('xh')
             ->select('MONTH(xh.gainedAt) as month, SUM(xh.xpAmount) as total')
             ->andWhere('xh.contributor = :contributor')
             ->andWhere('YEAR(xh.gainedAt) = :year')

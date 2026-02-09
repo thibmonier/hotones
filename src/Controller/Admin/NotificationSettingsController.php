@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Repository\NotificationSettingRepository;
@@ -16,7 +18,10 @@ class NotificationSettingsController extends AbstractController
     #[Route('/settings', name: 'admin_notification_settings', methods: ['GET', 'POST'])]
     public function settings(Request $request, NotificationSettingRepository $repo): Response
     {
-        $currentTolerance = (float) $repo->getValue(NotificationSettingRepository::KEY_TIMESHEET_WEEKLY_TOLERANCE, 0.15);
+        $currentTolerance = (float) $repo->getValue(
+            NotificationSettingRepository::KEY_TIMESHEET_WEEKLY_TOLERANCE,
+            0.15,
+        );
 
         if ($request->isMethod('POST')) {
             $t   = (string) $request->request->get('timesheet_weekly_tolerance', '0.15');

@@ -179,14 +179,18 @@ class DashboardControllerTest extends WebTestCase
         $admin = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $client->loginUser($admin);
 
-        $client->request('POST', '/analytics/recalculate', [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-        ]);
+        $client->request(
+            'POST',
+            '/analytics/recalculate',
+            [],
+            [],
+            [
+                'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            ],
+        );
 
         // Should redirect or return success
-        $this->assertTrue(
-            $client->getResponse()->isSuccessful() || $client->getResponse()->isRedirection(),
-        );
+        $this->assertTrue($client->getResponse()->isSuccessful() || $client->getResponse()->isRedirection());
     }
 
     public function testSessionPersistsPeriodSelection(): void

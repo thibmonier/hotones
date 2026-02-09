@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\E2E;
 
 use App\Entity\Order;
@@ -27,10 +29,7 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
 
         // Build a minimal order with one section/line totaling 5000€
         $order = new Order();
-        $order->setOrderNumber('DE2E-001')
-            ->setProject($project)
-            ->setStatus('a_signer')
-            ->setContractType('forfait');
+        $order->setOrderNumber('DE2E-001')->setProject($project)->setStatus('a_signer')->setContractType('forfait');
 
         $section = new OrderSection()
             ->setOrder($order)
@@ -66,10 +65,12 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
 
         // Login
         $crawler = $client->request('GET', '/login');
-        $form    = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form    = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
 
         // Go to edit order

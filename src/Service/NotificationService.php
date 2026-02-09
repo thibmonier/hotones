@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Notification;
@@ -19,7 +21,7 @@ class NotificationService
         private readonly NotificationRepository $notificationRepository,
         private readonly NotificationPreferenceRepository $preferenceRepository,
         private readonly CompanyContext $companyContext,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -33,7 +35,7 @@ class NotificationService
         string $message,
         ?array $data = null,
         ?string $entityType = null,
-        ?int $entityId = null
+        ?int $entityId = null,
     ): Notification {
         $notification = new Notification();
         $notification->setCompany($this->companyContext->getCurrentCompany());

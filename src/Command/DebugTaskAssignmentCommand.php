@@ -13,14 +13,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:debug:task-assignment',
-    description: 'Affiche les tâches assignées à un contributeur',
-)]
+#[AsCommand(name: 'app:debug:task-assignment', description: 'Affiche les tâches assignées à un contributeur')]
 class DebugTaskAssignmentCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
     ) {
         parent::__construct();
     }
@@ -55,21 +52,19 @@ class DebugTaskAssignmentCommand extends Command
         $io->title("Tâches assignées à {$contributor->getName()} (ID: {$contributor->getId()})");
 
         $io->section('Informations du contributeur');
-        $io->table(
-            ['Champ', 'Valeur'],
-            [
-                ['ID', $contributor->getId()],
-                ['Nom', $contributor->getName()],
-                ['Prénom', $contributor->getFirstName()],
-                ['Nom de famille', $contributor->getLastName()],
-                ['Email', $contributor->getEmail() ?? 'N/A'],
-                ['Actif', $contributor->isActive() ? 'Oui' : 'Non'],
-                ['Utilisateur lié', $contributor->getUser() ? $contributor->getUser()->getEmail() : 'Aucun'],
-            ],
-        );
+        $io->table(['Champ', 'Valeur'], [
+            ['ID', $contributor->getId()],
+            ['Nom', $contributor->getName()],
+            ['Prénom', $contributor->getFirstName()],
+            ['Nom de famille', $contributor->getLastName()],
+            ['Email', $contributor->getEmail() ?? 'N/A'],
+            ['Actif', $contributor->isActive() ? 'Oui' : 'Non'],
+            ['Utilisateur lié', $contributor->getUser() ? $contributor->getUser()->getEmail() : 'Aucun'],
+        ]);
 
         // Récupérer les tâches assignées
-        $tasks = $this->em->createQueryBuilder()
+        $tasks = $this->em
+            ->createQueryBuilder()
             ->select('t', 'p')
             ->from(\App\Entity\ProjectTask::class, 't')
             ->join('t.project', 'p')
@@ -100,17 +95,15 @@ class DebugTaskAssignmentCommand extends Command
             ];
         }
 
-        $io->table(
-            ['ID', 'Projet', 'Tâche', 'Active', 'Statut Projet', 'Statut Tâche'],
-            $rows,
-        );
+        $io->table(['ID', 'Projet', 'Tâche', 'Active', 'Statut Projet', 'Statut Tâche'], $rows);
     }
 
     private function showAllContributorsWithTasks(SymfonyStyle $io): void
     {
         $io->title('Contributeurs avec tâches assignées');
 
-        $results = $this->em->createQueryBuilder()
+        $results = $this->em
+            ->createQueryBuilder()
             ->select('c.id', 'c.firstName', 'c.lastName', 'c.active', 'COUNT(t.id) as taskCount')
             ->from(Contributor::class, 'c')
             ->leftJoin(\App\Entity\ProjectTask::class, 't', 'WITH', 't.assignedContributor = c.id')
@@ -136,10 +129,7 @@ class DebugTaskAssignmentCommand extends Command
             ];
         }
 
-        $io->table(
-            ['ID', 'Nom', 'Nb tâches', 'Actif'],
-            $rows,
-        );
+        $io->table(['ID', 'Nom', 'Nb tâches', 'Actif'], $rows);
 
         $io->note('Utilisez: php bin/console app:debug:task-assignment <ID> pour voir le détail');
     }

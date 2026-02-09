@@ -15,7 +15,7 @@ class GlobalSearchService
         private readonly ProjectRepository $projectRepository,
         private readonly ContributorRepository $contributorRepository,
         private readonly OrderRepository $orderRepository,
-        private readonly ClientRepository $clientRepository
+        private readonly ClientRepository $clientRepository,
     ) {
     }
 

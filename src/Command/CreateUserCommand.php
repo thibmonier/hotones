@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\Company;
@@ -18,8 +20,10 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[AsCommand(name: 'app:user:create', description: 'Create a user')]
 class CreateUserCommand extends Command
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly UserPasswordHasherInterface $hasher)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly UserPasswordHasherInterface $hasher,
+    ) {
         parent::__construct();
     }
 
@@ -30,8 +34,19 @@ class CreateUserCommand extends Command
             ->addArgument('password', InputArgument::REQUIRED, 'User password')
             ->addArgument('firstName', InputArgument::REQUIRED, 'User first name')
             ->addArgument('lastName', InputArgument::REQUIRED, 'User last name')
-            ->addOption('company-id', 'c', InputOption::VALUE_REQUIRED, 'Company ID (defaults to first company if not specified)')
-            ->addOption('role', 'r', InputOption::VALUE_REQUIRED, 'User role (ROLE_INTERVENANT, ROLE_CHEF_PROJET, ROLE_MANAGER, ROLE_SUPERADMIN)', 'ROLE_INTERVENANT');
+            ->addOption(
+                'company-id',
+                'c',
+                InputOption::VALUE_REQUIRED,
+                'Company ID (defaults to first company if not specified)',
+            )
+            ->addOption(
+                'role',
+                'r',
+                InputOption::VALUE_REQUIRED,
+                'User role (ROLE_INTERVENANT, ROLE_CHEF_PROJET, ROLE_MANAGER, ROLE_SUPERADMIN)',
+                'ROLE_INTERVENANT',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -92,7 +107,8 @@ class CreateUserCommand extends Command
 
         // Create linked Contributor automatically
         $contributor = new Contributor();
-        $contributor->setFirstName($user->firstName)
+        $contributor
+            ->setFirstName($user->firstName)
             ->setLastName($user->lastName)
             ->setEmail($user->email)
             ->setUser($user)

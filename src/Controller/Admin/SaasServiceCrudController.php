@@ -54,32 +54,29 @@ class SaasServiceCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('name', 'Nom')
-            ->setRequired(true)
-            ->setHelp('Nom du service (ex: Google Workspace, Slack Premium)');
+        yield TextField::new('name', 'Nom')->setRequired(true)->setHelp(
+            'Nom du service (ex: Google Workspace, Slack Premium)',
+        );
 
         yield AssociationField::new('provider', 'Fournisseur')
             ->setRequired(false)
-            ->setQueryBuilder(fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
-                ->andWhere('entity.active = :active')
-                ->setParameter('active', true)
-                ->orderBy('entity.name', 'ASC'))
+            ->setQueryBuilder(
+                fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
+                    ->andWhere('entity.active = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('entity.name', 'ASC'),
+            )
             ->setHelp('Laisser vide si souscription directe');
 
-        yield TextField::new('category', 'Catégorie')
-            ->setHelp('Ex: Communication, Productivité, Développement');
+        yield TextField::new('category', 'Catégorie')->setHelp('Ex: Communication, Productivité, Développement');
 
-        yield TextareaField::new('description', 'Description')
-            ->hideOnIndex();
+        yield TextareaField::new('description', 'Description')->hideOnIndex();
 
-        yield UrlField::new('serviceUrl', 'URL du service')
-            ->hideOnIndex();
+        yield UrlField::new('serviceUrl', 'URL du service')->hideOnIndex();
 
-        yield UrlField::new('logoUrl', 'URL du logo')
-            ->hideOnIndex();
+        yield UrlField::new('logoUrl', 'URL du logo')->hideOnIndex();
 
         yield NumberField::new('defaultMonthlyPrice', 'Prix mensuel')
             ->setNumDecimals(2)
@@ -91,40 +88,32 @@ class SaasServiceCrudController extends AbstractCrudController
             ->setHelp('Prix annuel de référence (€)')
             ->hideOnIndex();
 
-        yield ChoiceField::new('currency', 'Devise')
-            ->setChoices([
-                'EUR' => 'EUR',
-                'USD' => 'USD',
-                'GBP' => 'GBP',
-            ])
-            ->hideOnIndex();
+        yield ChoiceField::new('currency', 'Devise')->setChoices([
+            'EUR' => 'EUR',
+            'USD' => 'USD',
+            'GBP' => 'GBP',
+        ])->hideOnIndex();
 
-        yield TextareaField::new('notes', 'Notes')
-            ->hideOnIndex();
+        yield TextareaField::new('notes', 'Notes')->hideOnIndex();
 
-        yield IntegerField::new('subscriptions.count', 'Abonnements')
-            ->hideOnForm()
-            ->formatValue(fn ($value, SaasService $entity) => $entity->getSubscriptions()->count());
+        yield IntegerField::new('subscriptions.count', 'Abonnements')->hideOnForm()->formatValue(
+            fn ($value, SaasService $entity) => $entity->getSubscriptions()->count(),
+        );
 
-        yield BooleanField::new('active', 'Actif')
-            ->renderAsSwitch(false);
+        yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);
 
-        yield DateTimeField::new('createdAt', 'Date de création')
-            ->hideOnForm()
-            ->setFormat('dd/MM/yyyy HH:mm');
+        yield DateTimeField::new('createdAt', 'Date de création')->hideOnForm()->setFormat('dd/MM/yyyy HH:mm');
 
-        yield DateTimeField::new('updatedAt', 'Dernière modification')
-            ->hideOnForm()
-            ->setFormat('dd/MM/yyyy HH:mm');
+        yield DateTimeField::new('updatedAt', 'Dernière modification')->hideOnForm()->setFormat('dd/MM/yyyy HH:mm');
     }
 
     #[Override]
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters
-            ->add(EntityFilter::new('provider', 'Fournisseur'))
-            ->add('category')
-            ->add(BooleanFilter::new('active', 'Actif'));
+        return $filters->add(EntityFilter::new('provider', 'Fournisseur'))->add('category')->add(BooleanFilter::new(
+            'active',
+            'Actif',
+        ));
     }
 
     #[Override]

@@ -26,8 +26,8 @@ class PerformanceProcessor implements ProcessorInterface
         $executionTime = microtime(true) - $this->startTime;
 
         $extra = [
-            'memory_usage_mb'   => round(memory_get_usage(true) / 1024 / 1024, 2),
-            'memory_peak_mb'    => round(memory_get_peak_usage(true) / 1024 / 1024, 2),
+            'memory_usage_mb'   => round((memory_get_usage(true) / 1024) / 1024, 2),
+            'memory_peak_mb'    => round((memory_get_peak_usage(true) / 1024) / 1024, 2),
             'execution_time_ms' => round($executionTime * 1000, 2),
         ];
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\ProjectTask;
@@ -14,8 +16,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ProjectTaskFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly ?CompanyContext $companyContext)
-    {
+    public function __construct(
+        private readonly ?CompanyContext $companyContext,
+    ) {
         parent::__construct();
     }
 
@@ -38,7 +41,9 @@ final class ProjectTaskFactory extends PersistentObjectFactory
         ]);
 
         // Daily rate: more often 500-900, sometimes 900-1200
-        $dailyRate = $faker->boolean(70) ? (string) $faker->randomFloat(2, 500, 900) : (string) $faker->randomFloat(2, 900, 1200);
+        $dailyRate = $faker->boolean(70)
+            ? (string) $faker->randomFloat(2, 500, 900)
+            : (string) $faker->randomFloat(2, 900, 1200);
 
         // Try to get company from context (for multi-tenant tests), fallback to creating new company
         $company = null;
@@ -59,14 +64,16 @@ final class ProjectTaskFactory extends PersistentObjectFactory
             'position'               => $faker->numberBetween(1, 50),
             'active'                 => true,
             'estimatedHoursSold'     => $type === ProjectTask::TYPE_REGULAR ? $faker->numberBetween(8, 200) : null,
-            'estimatedHoursRevised'  => $type === ProjectTask::TYPE_REGULAR ? $faker->optional()->numberBetween(8, 220) : null,
-            'progressPercentage'     => 0, // adjusted in initialize based on status
-            'assignedContributor'    => $faker->boolean(70) ? ContributorFactory::random() : null,
-            'requiredProfile'        => $faker->boolean(70) ? ProfileFactory::random() : null,
-            'dailyRate'              => $faker->boolean(65) ? $dailyRate : null,
-            'startDate'              => $faker->optional()->dateTimeBetween('-6 months', 'now'),
-            'endDate'                => $faker->optional()->dateTimeBetween('now', '+6 months'),
-            'status'                 => $status,
+            'estimatedHoursRevised'  => $type === ProjectTask::TYPE_REGULAR
+                ? $faker->optional()->numberBetween(8, 220)
+                : null,
+            'progressPercentage'  => 0, // adjusted in initialize based on status
+            'assignedContributor' => $faker->boolean(70) ? ContributorFactory::random() : null,
+            'requiredProfile'     => $faker->boolean(70) ? ProfileFactory::random() : null,
+            'dailyRate'           => $faker->boolean(65) ? $dailyRate : null,
+            'startDate'           => $faker->optional()->dateTimeBetween('-6 months', 'now'),
+            'endDate'             => $faker->optional()->dateTimeBetween('now', '+6 months'),
+            'status'              => $status,
         ];
     }
 

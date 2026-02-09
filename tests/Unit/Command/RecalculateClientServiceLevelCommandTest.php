@@ -95,9 +95,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
             ->method('getConfiguration')
             ->willReturn($config);
 
-        $this->calculator
-            ->method('recalculateAllAutoClients')
-            ->willReturn(0);
+        $this->calculator->method('recalculateAllAutoClients')->willReturn(0);
 
         $this->commandTester->execute([]);
 
@@ -123,11 +121,13 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
 
         foreach ($counts as $count) {
             $calculator = $this->createMock(ClientServiceLevelCalculator::class);
-            $calculator->method('getConfiguration')->willReturn([
-                'top_vip_rank'      => 5,
-                'top_priority_rank' => 20,
-                'low_threshold'     => 5000,
-            ]);
+            $calculator
+                ->method('getConfiguration')
+                ->willReturn([
+                    'top_vip_rank'      => 5,
+                    'top_priority_rank' => 20,
+                    'low_threshold'     => 5000,
+                ]);
             $calculator->method('recalculateAllAutoClients')->willReturn($count);
 
             $command = new RecalculateClientServiceLevelCommand($calculator);
@@ -150,9 +150,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
                 'low_threshold'     => 5000,
             ]);
 
-        $this->calculator
-            ->method('recalculateAllAutoClients')
-            ->willReturn(5);
+        $this->calculator->method('recalculateAllAutoClients')->willReturn(5);
 
         $exitCode = $this->commandTester->execute([]);
 

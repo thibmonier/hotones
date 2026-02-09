@@ -13,39 +13,38 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:forecast:calculate',
-    description: 'Génère les prévisions de CA pour les prochains mois',
-)]
+#[AsCommand(name: 'app:forecast:calculate', description: 'Génère les prévisions de CA pour les prochains mois')]
 class ForecastCalculateCommand extends Command
 {
     public function __construct(
-        private readonly ForecastingService $forecastingService
+        private readonly ForecastingService $forecastingService,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addOption('months', 'm', InputOption::VALUE_OPTIONAL, 'Nombre de mois à prévoir (3, 6, ou 12)', 12)
-            ->setHelp(
-                <<<'HELP'
-Cette commande génère les prévisions de chiffre d'affaires pour les prochains mois.
+        $this->addOption(
+            'months',
+            'm',
+            InputOption::VALUE_OPTIONAL,
+            'Nombre de mois à prévoir (3, 6, ou 12)',
+            12,
+        )->setHelp(<<<'HELP'
+            Cette commande génère les prévisions de chiffre d'affaires pour les prochains mois.
 
-Utilisation:
-  php bin/console app:forecast:calculate
-  php bin/console app:forecast:calculate --months=6
-  php bin/console app:forecast:calculate -m 3
+            Utilisation:
+              php bin/console app:forecast:calculate
+              php bin/console app:forecast:calculate --months=6
+              php bin/console app:forecast:calculate -m 3
 
-La commande utilise:
-- Régression linéaire sur les 12 derniers mois
-- Analyse de saisonnalité (moyenne sur 3 ans)
-- Génération de 3 scénarios (réaliste, optimiste, pessimiste)
+            La commande utilise:
+            - Régression linéaire sur les 12 derniers mois
+            - Analyse de saisonnalité (moyenne sur 3 ans)
+            - Génération de 3 scénarios (réaliste, optimiste, pessimiste)
 
-Les prévisions sont enregistrées dans la table fact_forecast.
-HELP
-            );
+            Les prévisions sont enregistrées dans la table fact_forecast.
+            HELP);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -87,10 +86,7 @@ HELP
                 ];
             }
 
-            $io->table(
-                ['Période', 'Prévision', 'Confiance Min', 'Confiance Max'],
-                $tableData,
-            );
+            $io->table(['Période', 'Prévision', 'Confiance Min', 'Confiance Max'], $tableData);
 
             $io->note([
                 'Les prévisions sont disponibles dans l\'interface web à /analytics/forecasting',

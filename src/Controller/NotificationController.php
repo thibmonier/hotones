@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Notification;
@@ -19,7 +21,7 @@ class NotificationController extends AbstractController
 {
     public function __construct(
         private readonly NotificationService $notificationService,
-        private readonly NotificationRepository $notificationRepository
+        private readonly NotificationRepository $notificationRepository,
     ) {
     }
 
@@ -33,7 +35,8 @@ class NotificationController extends AbstractController
         $page  = max(1, $request->query->getInt('page', 1));
         $limit = 20;
 
-        $queryBuilder = $this->notificationRepository->createQueryBuilder('n')
+        $queryBuilder = $this->notificationRepository
+            ->createQueryBuilder('n')
             ->where('n.recipient = :user')
             ->setParameter('user', $user)
             ->orderBy('n.createdAt', 'DESC')
@@ -43,8 +46,7 @@ class NotificationController extends AbstractController
         // Filtrer par type si demandé
         $type = $request->query->get('type');
         if ($type) {
-            $queryBuilder->andWhere('n.type = :type')
-                ->setParameter('type', $type);
+            $queryBuilder->andWhere('n.type = :type')->setParameter('type', $type);
         }
 
         // Filtrer par statut lu/non lu
@@ -58,14 +60,14 @@ class NotificationController extends AbstractController
         $notifications = $queryBuilder->getQuery()->getResult();
 
         // Compter le total pour la pagination
-        $totalQuery = $this->notificationRepository->createQueryBuilder('n')
+        $totalQuery = $this->notificationRepository
+            ->createQueryBuilder('n')
             ->select('COUNT(n.id)')
             ->where('n.recipient = :user')
             ->setParameter('user', $user);
 
         if ($type) {
-            $totalQuery->andWhere('n.type = :type')
-                ->setParameter('type', $type);
+            $totalQuery->andWhere('n.type = :type')->setParameter('type', $type);
         }
 
         if ($status === 'unread') {

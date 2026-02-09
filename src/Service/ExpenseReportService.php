@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\ExpenseReport;
@@ -249,13 +251,17 @@ class ExpenseReportService
      *
      * @return array<string, mixed>
      */
-    public function calculateContributorStats(int $contributorId, DateTimeInterface $start, DateTimeInterface $end): array
-    {
+    public function calculateContributorStats(
+        int $contributorId,
+        DateTimeInterface $start,
+        DateTimeInterface $end,
+    ): array {
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->entityManager->createQueryBuilder();
 
         // Total des frais
-        $total = $qb->select('SUM(e.amountTTC)')
+        $total = $qb
+            ->select('SUM(e.amountTTC)')
             ->from(ExpenseReport::class, 'e')
             ->where('e.contributor = :contributor')
             ->andWhere('e.expenseDate >= :start')
@@ -269,7 +275,8 @@ class ExpenseReportService
             ->getSingleScalarResult();
 
         // Total validé
-        $validated = $this->entityManager->createQueryBuilder()
+        $validated = $this->entityManager
+            ->createQueryBuilder()
             ->select('SUM(e.amountTTC)')
             ->from(ExpenseReport::class, 'e')
             ->where('e.contributor = :contributor')
@@ -286,7 +293,8 @@ class ExpenseReportService
             ->getSingleScalarResult();
 
         // Répartition par catégorie
-        $byCategory = $this->entityManager->createQueryBuilder()
+        $byCategory = $this->entityManager
+            ->createQueryBuilder()
             ->select('e.category', 'SUM(e.amountTTC) as total')
             ->from(ExpenseReport::class, 'e')
             ->where('e.contributor = :contributor')

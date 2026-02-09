@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Client;
@@ -11,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ClientRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Client::class, $companyContext);
     }
 
@@ -23,7 +23,8 @@ class ClientRepository extends CompanyAwareRepository
      */
     public function findAllOrderedByName(): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->orderBy('c.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -36,7 +37,8 @@ class ClientRepository extends CompanyAwareRepository
      */
     public function search(string $query, int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->andWhere('c.name LIKE :query OR c.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->orderBy('c.name', 'ASC')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Scheduler;
 
 use App\Entity\SchedulerEntry;
@@ -12,8 +14,9 @@ use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
 
 class DbScheduleProvider implements ScheduleProviderInterface
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
     }
 
     public function getSchedule(): Schedule
@@ -22,15 +25,14 @@ class DbScheduleProvider implements ScheduleProviderInterface
 
         $entries = $this->em->getRepository(SchedulerEntry::class)->findBy(['enabled' => true]);
         foreach ($entries as $entry) {
-            $trigger = new CronExpressionTrigger($entry->getCronExpression(), new DateTimeZone($entry->getTimezone()))
-                ->withDescription($entry->getName());
+            $trigger = new CronExpressionTrigger(
+                $entry->getCronExpression(),
+                new DateTimeZone($entry->getTimezone()),
+            )->withDescription($entry->getName());
 
             $args = $entry->getPayload() ?? [];
 
-            $schedule->add(
-                new RecurringCommand($trigger, $entry->getCommand(), $args)
-                    ->withName($entry->getName()),
-            );
+            $schedule->add(new RecurringCommand($trigger, $entry->getCommand(), $args)->withName($entry->getName()));
         }
 
         return $schedule;

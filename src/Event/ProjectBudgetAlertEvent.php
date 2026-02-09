@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Entity\Project;
@@ -10,7 +12,7 @@ class ProjectBudgetAlertEvent extends NotificationEvent
     public function __construct(
         private readonly Project $project,
         private readonly float $usedPercentage,
-        array $recipients
+        array $recipients,
     ) {
         $title   = 'Alerte budget projet';
         $message = sprintf(

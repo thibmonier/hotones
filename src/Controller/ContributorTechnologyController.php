@@ -21,7 +21,7 @@ class ContributorTechnologyController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly ContributorTechnologyRepository $contributorTechnologyRepository
+        private readonly ContributorTechnologyRepository $contributorTechnologyRepository,
     ) {
     }
 
@@ -107,7 +107,12 @@ class ContributorTechnologyController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        if ($this->isCsrfTokenValid('delete'.$contributorTechnology->getId(), $request->getPayload()->getString('_token'))) {
+        if (
+            $this->isCsrfTokenValid(
+                'delete'.$contributorTechnology->getId(),
+                $request->getPayload()->getString('_token'),
+            )
+        ) {
             $this->em->remove($contributorTechnology);
             $this->em->flush();
 
@@ -125,11 +130,19 @@ class ContributorTechnologyController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        if ($this->isCsrfTokenValid('assess'.$contributorTechnology->getId(), $request->getPayload()->getString('_token'))) {
+        if (
+            $this->isCsrfTokenValid(
+                'assess'.$contributorTechnology->getId(),
+                $request->getPayload()->getString('_token'),
+            )
+        ) {
             $managerLevel = $request->getPayload()->getInt('manager_level');
             $notes        = $request->getPayload()->getString('notes');
 
-            if ($managerLevel >= ContributorTechnology::LEVEL_BEGINNER && $managerLevel <= ContributorTechnology::LEVEL_EXPERT) {
+            if (
+                $managerLevel >= ContributorTechnology::LEVEL_BEGINNER
+                && $managerLevel <= ContributorTechnology::LEVEL_EXPERT
+            ) {
                 $contributorTechnology->setManagerAssessmentLevel($managerLevel);
                 if ($notes) {
                     $contributorTechnology->setNotes($notes);

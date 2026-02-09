@@ -91,7 +91,13 @@ class StaffingDashboardController extends AbstractController
         );
 
         // Récupérer les métriques agrégées pour les graphiques (avec cache)
-        $metrics = $this->cache->get($cacheKey.'_metrics', function (ItemInterface $item) use ($startDate, $endDate, $granularity, $selectedProfile, $selectedContributor) {
+        $metrics = $this->cache->get($cacheKey.'_metrics', function (ItemInterface $item) use (
+            $startDate,
+            $endDate,
+            $granularity,
+            $selectedProfile,
+            $selectedContributor,
+        ) {
             $item->expiresAfter(1800); // 30 minutes
 
             return $this->staffingRepo->getAggregatedMetricsByPeriod(
@@ -104,7 +110,13 @@ class StaffingDashboardController extends AbstractController
         });
 
         // Récupérer les métriques par profil (avec cache)
-        $metricsByProfile = $this->cache->get($cacheKey.'_by_profile', function (ItemInterface $item) use ($startDate, $endDate, $granularity, $selectedProfile, $selectedContributor) {
+        $metricsByProfile = $this->cache->get($cacheKey.'_by_profile', function (ItemInterface $item) use (
+            $startDate,
+            $endDate,
+            $granularity,
+            $selectedProfile,
+            $selectedContributor,
+        ) {
             $item->expiresAfter(1800); // 30 minutes
 
             return $this->staffingRepo->getMetricsByProfile(
@@ -117,7 +129,13 @@ class StaffingDashboardController extends AbstractController
         });
 
         // Récupérer les métriques par collaborateur (avec cache)
-        $metricsByContributor = $this->cache->get($cacheKey.'_by_contributor', function (ItemInterface $item) use ($startDate, $endDate, $granularity, $selectedProfile, $selectedContributor) {
+        $metricsByContributor = $this->cache->get($cacheKey.'_by_contributor', function (ItemInterface $item) use (
+            $startDate,
+            $endDate,
+            $granularity,
+            $selectedProfile,
+            $selectedContributor,
+        ) {
             $item->expiresAfter(1800); // 30 minutes
 
             return $this->staffingRepo->getMetricsByContributor(
@@ -133,13 +151,19 @@ class StaffingDashboardController extends AbstractController
         $weeklyOccupancy  = [];
         $weeklyGlobalTACE = [];
         if ($viewMode === 'annual') {
-            $weeklyOccupancy = $this->cache->get($cacheKey.'_weekly_occupancy', function (ItemInterface $item) use ($year, $selectedProfile) {
+            $weeklyOccupancy = $this->cache->get($cacheKey.'_weekly_occupancy', function (ItemInterface $item) use (
+                $year,
+                $selectedProfile,
+            ) {
                 $item->expiresAfter(1800); // 30 minutes
 
                 return $this->staffingRepo->getWeeklyOccupancyByContributor($year, $selectedProfile);
             });
 
-            $weeklyGlobalTACE = $this->cache->get($cacheKey.'_weekly_tace', function (ItemInterface $item) use ($year, $selectedProfile) {
+            $weeklyGlobalTACE = $this->cache->get($cacheKey.'_weekly_tace', function (ItemInterface $item) use (
+                $year,
+                $selectedProfile,
+            ) {
                 $item->expiresAfter(1800); // 30 minutes
 
                 return $this->staffingRepo->getWeeklyGlobalTACE($year, $selectedProfile);

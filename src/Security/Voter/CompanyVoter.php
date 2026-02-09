@@ -43,18 +43,22 @@ class CompanyVoter extends Voter
 
     public function __construct(
         private readonly CompanyContext $companyContext,
-        private readonly LoggerInterface $securityLogger
+        private readonly LoggerInterface $securityLogger,
     ) {
     }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [self::VIEW, self::EDIT, self::DELETE], true)
-            && $subject instanceof CompanyOwnedInterface;
+        && $subject instanceof CompanyOwnedInterface;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?\Symfony\Component\Security\Core\Authorization\Voter\Vote $vote = null): bool
-    {
+    protected function voteOnAttribute(
+        string $attribute,
+        mixed $subject,
+        TokenInterface $token,
+        ?\Symfony\Component\Security\Core\Authorization\Voter\Vote $vote = null,
+    ): bool {
         $user = $token->getUser();
 
         if (!$user instanceof User) {
@@ -127,22 +131,16 @@ class CompanyVoter extends Voter
         return match (true) {
             // Projects: CHEF_PROJET or higher
             str_contains($className, 'Project') => $user->isChefProjet() || $user->isManager(),
-
             // Orders: CHEF_PROJET or higher
             str_contains($className, 'Order') => $user->isChefProjet() || $user->isManager(),
-
             // Clients: CHEF_PROJET or higher
             str_contains($className, 'Client') => $user->isChefProjet() || $user->isManager(),
-
             // Users: MANAGER or higher
             str_contains($className, 'User') => $user->isManager(),
-
             // Contributors: MANAGER or higher
             str_contains($className, 'Contributor') => $user->isManager(),
-
             // Timesheets: Owner or CHEF_PROJET
             str_contains($className, 'Timesheet') => $this->canEditTimesheet($user, $entity),
-
             // Default: MANAGER or higher
             default => $user->isManager(),
         };
@@ -204,7 +202,7 @@ class CompanyVoter extends Voter
         User $user,
         string $attribute,
         CompanyOwnedInterface $subject,
-        int $attemptedCompanyId
+        int $attemptedCompanyId,
     ): void {
         $currentCompany = $this->companyContext->getCurrentCompany();
 

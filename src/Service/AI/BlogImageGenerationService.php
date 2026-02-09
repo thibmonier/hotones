@@ -47,7 +47,7 @@ class BlogImageGenerationService
         private readonly FilesystemOperator $filesystem,
         private readonly HttpClientInterface $httpClient,
         private readonly CacheItemPoolInterface $cache,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -67,14 +67,16 @@ class BlogImageGenerationService
         try {
             // Call DALL-E 3 API
             $client   = $this->clientFactory->createClient();
-            $response = $client->images()->create([
-                'model'           => 'dall-e-3',
-                'prompt'          => $sanitizedPrompt,
-                'n'               => 1,
-                'size'            => '1024x1024',
-                'quality'         => 'standard',
-                'response_format' => 'url',
-            ]);
+            $response = $client
+                ->images()
+                ->create([
+                    'model'           => 'dall-e-3',
+                    'prompt'          => $sanitizedPrompt,
+                    'n'               => 1,
+                    'size'            => '1024x1024',
+                    'quality'         => 'standard',
+                    'response_format' => 'url',
+                ]);
 
             $imageUrl = $response->data[0]->url ?? null;
 
@@ -164,7 +166,7 @@ class BlogImageGenerationService
             // Validate file size
             $fileSize = strlen($imageContent);
             if ($fileSize > self::MAX_IMAGE_SIZE) {
-                throw new BlogImageGenerationException(sprintf('Downloaded image exceeds size limit (%d MB)', self::MAX_IMAGE_SIZE / 1024 / 1024));
+                throw new BlogImageGenerationException(sprintf('Downloaded image exceeds size limit (%d MB)', (self::MAX_IMAGE_SIZE / 1024) / 1024));
             }
 
             // Save to temporary file for MIME validation
@@ -289,13 +291,11 @@ class BlogImageGenerationService
         if ($count >= self::RATE_LIMIT_PER_HOUR) {
             $minutesRemaining = 60 - (int) date('i');
 
-            $exception = new RateLimitExceededException(
-                sprintf(
-                    'Rate limit exceeded: %d generations per hour. Try again in %d minutes.',
-                    self::RATE_LIMIT_PER_HOUR,
-                    $minutesRemaining,
-                ),
-            );
+            $exception = new RateLimitExceededException(sprintf(
+                'Rate limit exceeded: %d generations per hour. Try again in %d minutes.',
+                self::RATE_LIMIT_PER_HOUR,
+                $minutesRemaining,
+            ));
             $exception->setRetryAfterMinutes($minutesRemaining);
 
             throw $exception;
@@ -312,11 +312,6 @@ class BlogImageGenerationService
      */
     private function generateFilename(string $slug): string
     {
-        return sprintf(
-            'blog-%s-%s-%s.png',
-            $slug,
-            date('Ymd-His'),
-            uniqid(),
-        );
+        return sprintf('blog-%s-%s-%s.png', $slug, date('Ymd-His'), uniqid());
     }
 }

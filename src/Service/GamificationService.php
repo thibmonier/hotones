@@ -42,7 +42,7 @@ class GamificationService
         int $xpAmount,
         string $source,
         ?string $description = null,
-        ?array $metadata = null
+        ?array $metadata = null,
     ): array {
         if ($xpAmount <= 0) {
             throw new InvalidArgumentException('XP amount must be positive');

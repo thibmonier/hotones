@@ -23,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CalculateMetricsCommand extends Command
 {
     public function __construct(
-        private readonly MetricsCalculationService $metricsService
+        private readonly MetricsCalculationService $metricsService,
     ) {
         parent::__construct();
     }
@@ -32,7 +32,13 @@ class CalculateMetricsCommand extends Command
     {
         $this
             ->addArgument('period', InputArgument::OPTIONAL, 'Période à calculer (YYYY ou YYYY-MM)', date('Y'))
-            ->addOption('granularity', 'g', InputOption::VALUE_OPTIONAL, 'Granularité (monthly, quarterly, yearly)', 'monthly')
+            ->addOption(
+                'granularity',
+                'g',
+                InputOption::VALUE_OPTIONAL,
+                'Granularité (monthly, quarterly, yearly)',
+                'monthly',
+            )
             ->addOption('force-recalculate', 'f', InputOption::VALUE_NONE, 'Force le re-calcul complet de l\'année')
             ->setHelp('
 Cette commande calcule les métriques analytics pour une période donnée.
@@ -83,7 +89,7 @@ Exemples :
 
                         case 'quarterly':
                             for ($quarter = 1; $quarter <= 4; ++$quarter) {
-                                $month = ($quarter - 1) * 3 + 1;
+                                $month = (($quarter - 1) * 3) + 1;
                                 $date  = new DateTime("$year-$month-01");
                                 $this->metricsService->calculateMetricsForPeriod($date, 'quarterly');
                                 $io->writeln("  ✓ Q$quarter $year");

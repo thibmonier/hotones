@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class GdprController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -154,7 +154,7 @@ class GdprController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         AccountDeletionRequestRepository $deletionRepository,
-        GdprEmailService $emailService
+        GdprEmailService $emailService,
     ): JsonResponse {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -192,7 +192,10 @@ class GdprController extends AbstractController
             $message = 'Demande enregistrée mais l\'email de confirmation n\'a pas pu être envoyé. Contactez le support.';
         }
 
-        $this->addFlash('info', 'Demande de suppression enregistrée. Vérifiez votre email pour confirmer (lien valide 48h).');
+        $this->addFlash(
+            'info',
+            'Demande de suppression enregistrée. Vérifiez votre email pour confirmer (lien valide 48h).',
+        );
 
         return new JsonResponse([
             'success' => true,
@@ -209,7 +212,7 @@ class GdprController extends AbstractController
         string $token,
         EntityManagerInterface $em,
         AccountDeletionRequestRepository $deletionRepository,
-        GdprEmailService $emailService
+        GdprEmailService $emailService,
     ): Response {
         $deletionRequest = $deletionRepository->findByConfirmationToken($token);
 
@@ -255,7 +258,7 @@ class GdprController extends AbstractController
     public function cancelAccountDeletion(
         EntityManagerInterface $em,
         AccountDeletionRequestRepository $deletionRepository,
-        GdprEmailService $emailService
+        GdprEmailService $emailService,
     ): JsonResponse {
         /** @var User|null $user */
         $user = $this->getUser();

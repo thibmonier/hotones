@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Entity\Order;
@@ -12,7 +14,7 @@ class PaymentDueAlertEvent extends NotificationEvent
         private readonly Order $order,
         private readonly DateTimeInterface $dueDate,
         private readonly int $daysUntilDue,
-        array $recipients
+        array $recipients,
     ) {
         $title   = 'Échéance de paiement proche';
         $message = sprintf(

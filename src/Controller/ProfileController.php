@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Contributor;
@@ -43,7 +45,7 @@ class ProfileController extends AbstractController
     public function editProfile(
         Request $request,
         EntityManagerInterface $em,
-        SecureFileUploadService $uploadService
+        SecureFileUploadService $uploadService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -109,8 +111,11 @@ class ProfileController extends AbstractController
 
     #[Route('/me/password', name: 'profile_password', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function changePassword(Request $request, EntityManagerInterface $em, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher): Response
-    {
+    public function changePassword(
+        Request $request,
+        EntityManagerInterface $em,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher,
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
 
@@ -149,8 +154,11 @@ class ProfileController extends AbstractController
 
     #[Route('/me/notifications', name: 'profile_notifications', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function notifications(Request $request, EntityManagerInterface $em, \App\Repository\NotificationPreferenceRepository $prefs): Response
-    {
+    public function notifications(
+        Request $request,
+        EntityManagerInterface $em,
+        \App\Repository\NotificationPreferenceRepository $prefs,
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
 

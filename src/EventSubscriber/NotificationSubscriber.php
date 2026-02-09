@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\EventSubscriber;
 
 use App\Event\NotificationEvent;
@@ -15,7 +17,7 @@ class NotificationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly NotificationService $notificationService,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 

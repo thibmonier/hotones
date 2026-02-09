@@ -39,25 +39,28 @@ class ProcessAccountDeletionsCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulate deletion without actually deleting accounts')
-            ->setHelp(<<<'HELP'
-                This command processes account deletion requests that have passed their 30-day grace period.
+        $this->addOption(
+            'dry-run',
+            null,
+            InputOption::VALUE_NONE,
+            'Simulate deletion without actually deleting accounts',
+        )->setHelp(<<<'HELP'
+            This command processes account deletion requests that have passed their 30-day grace period.
 
-                <info>GDPR Workflow:</info>
-                1. User requests deletion → Email sent with confirmation link
-                2. User confirms → 30-day grace period starts
-                3. After 30 days → This command executes the deletion
-                4. User can cancel anytime during grace period
+            <info>GDPR Workflow:</info>
+            1. User requests deletion → Email sent with confirmation link
+            2. User confirms → 30-day grace period starts
+            3. After 30 days → This command executes the deletion
+            4. User can cancel anytime during grace period
 
-                <info>What gets deleted:</info>
-                - User account (soft delete or anonymization depending on legal requirements)
-                - Personal data (following GDPR guidelines)
-                - Some data may be retained for legal/accounting obligations
+            <info>What gets deleted:</info>
+            - User account (soft delete or anonymization depending on legal requirements)
+            - Personal data (following GDPR guidelines)
+            - Some data may be retained for legal/accounting obligations
 
-                <info>Cron setup (daily at 3 AM):</info>
-                0 3 * * * php /path/to/project/bin/console app:process-account-deletions >> /var/log/gdpr-deletions.log 2>&1
-                HELP);
+            <info>Cron setup (daily at 3 AM):</info>
+            0 3 * * * php /path/to/project/bin/console app:process-account-deletions >> /var/log/gdpr-deletions.log 2>&1
+            HELP);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -134,14 +137,11 @@ class ProcessAccountDeletionsCommand extends Command
 
         $io->newLine();
         $io->section('Summary');
-        $io->table(
-            ['Metric', 'Count'],
-            [
-                ['Total due deletions', count($dueDeletions)],
-                ['Successfully processed', $deletedCount],
-                ['Errors', $errorCount],
-            ],
-        );
+        $io->table(['Metric', 'Count'], [
+            ['Total due deletions',    count($dueDeletions)],
+            ['Successfully processed', $deletedCount],
+            ['Errors',                 $errorCount],
+        ]);
 
         if ($dryRun) {
             $io->note('This was a DRY RUN. No actual changes were made.');

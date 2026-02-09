@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -185,7 +187,11 @@ class Order implements CompanyOwnedInterface
             $this->status = $value;
 
             // Définir automatiquement validated_at lors du passage à un statut validé
-            if ($oldStatus !== $value && in_array($value, ['signe', 'gagne', 'termine'], true) && $this->validatedAt === null) {
+            if (
+                $oldStatus !== $value
+                && in_array($value, ['signe', 'gagne', 'termine'], true)
+                && $this->validatedAt === null
+            ) {
                 $this->validatedAt = new DateTime();
             }
         }
@@ -422,7 +428,10 @@ class Order implements CompanyOwnedInterface
     {
         $total = '0.00';
         foreach ($this->expenseReports as $expense) {
-            if ($expense->getStatus() === ExpenseReport::STATUS_VALIDATED || $expense->getStatus() === ExpenseReport::STATUS_PAID) {
+            if (
+                $expense->getStatus()    === ExpenseReport::STATUS_VALIDATED
+                || $expense->getStatus() === ExpenseReport::STATUS_PAID
+            ) {
                 $total = bcadd($total, (string) $expense->getAmountTTC(), 2);
             }
         }

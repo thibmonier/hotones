@@ -51,19 +51,19 @@ class PerformanceReviewServiceTest extends TestCase
             $this->createContributor(2, 'Jane', 'Smith', $user2),
         ];
 
-        $this->contributorRepository->expects($this->once())
+        $this->contributorRepository
+            ->expects($this->once())
             ->method('findActiveContributors')
             ->willReturn($contributors);
 
-        $this->reviewRepository->expects($this->exactly(2))
+        $this->reviewRepository
+            ->expects($this->exactly(2))
             ->method('existsForContributorAndYear')
             ->willReturn(false);
 
-        $this->em->expects($this->exactly(2))
-            ->method('persist');
+        $this->em->expects($this->exactly(2))->method('persist');
 
-        $this->em->expects($this->once())
-            ->method('flush');
+        $this->em->expects($this->once())->method('flush');
 
         $count = $this->service->createCampaign(2024);
 
@@ -80,19 +80,19 @@ class PerformanceReviewServiceTest extends TestCase
             $this->createContributor(2, 'Jane', 'Smith', $user2),
         ];
 
-        $this->contributorRepository->expects($this->once())
+        $this->contributorRepository
+            ->expects($this->once())
             ->method('findActiveContributors')
             ->willReturn($contributors);
 
-        $this->reviewRepository->expects($this->exactly(2))
+        $this->reviewRepository
+            ->expects($this->exactly(2))
             ->method('existsForContributorAndYear')
             ->willReturnOnConsecutiveCalls(true, false); // First exists, second doesn't
 
-        $this->em->expects($this->once())
-            ->method('persist'); // Only persist one
+        $this->em->expects($this->once())->method('persist'); // Only persist one
 
-        $this->em->expects($this->once())
-            ->method('flush');
+        $this->em->expects($this->once())->method('flush');
 
         $count = $this->service->createCampaign(2024);
 
@@ -110,11 +110,9 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setContributor($contributor);
         $review->setManager($manager);
 
-        $this->em->expects($this->once())
-            ->method('flush');
+        $this->em->expects($this->once())->method('flush');
 
-        $this->mailer->expects($this->once())
-            ->method('send');
+        $this->mailer->expects($this->once())->method('send');
 
         $this->service->completeSelfEvaluation(
             $review,
@@ -145,11 +143,9 @@ class PerformanceReviewServiceTest extends TestCase
 
         $review->setContributor($contributor);
 
-        $this->em->expects($this->once())
-            ->method('flush');
+        $this->em->expects($this->once())->method('flush');
 
-        $this->mailer->expects($this->once())
-            ->method('send');
+        $this->mailer->expects($this->once())->method('send');
 
         $this->service->completeManagerEvaluation(
             $review,
@@ -193,18 +189,11 @@ class PerformanceReviewServiceTest extends TestCase
 
         $interviewDate = new DateTimeImmutable('2024-12-15');
 
-        $this->em->expects($this->once())
-            ->method('flush');
+        $this->em->expects($this->once())->method('flush');
 
-        $this->mailer->expects($this->once())
-            ->method('send');
+        $this->mailer->expects($this->once())->method('send');
 
-        $this->service->validateReview(
-            $review,
-            $objectives,
-            $interviewDate,
-            'Great discussion',
-        );
+        $this->service->validateReview($review, $objectives, $interviewDate, 'Great discussion');
 
         $this->assertEquals('validee', $review->getStatus());
         $this->assertEquals($objectives, $review->getObjectives());
@@ -315,7 +304,8 @@ class PerformanceReviewServiceTest extends TestCase
             new PerformanceReview(),
         ];
 
-        $this->reviewRepository->expects($this->once())
+        $this->reviewRepository
+            ->expects($this->once())
             ->method('findByContributor')
             ->with($contributor)
             ->willReturn($reviews);

@@ -82,7 +82,8 @@ class TreasuryService
 
         // Récupérer toutes les factures non payées avec échéance dans la période
         $qb = $this->invoiceRepository->createQueryBuilder('i');
-        $qb->where('i.status IN (:statuses)')
+        $qb
+            ->where('i.status IN (:statuses)')
             ->andWhere('i.dueDate BETWEEN :start AND :end')
             ->setParameter('statuses', [Invoice::STATUS_SENT, Invoice::STATUS_OVERDUE])
             ->setParameter('start', $today)
@@ -181,7 +182,13 @@ class TreasuryService
     public function getClientStats(int $limit = 10): array
     {
         $qb = $this->invoiceRepository->createQueryBuilder('i');
-        $qb->select('c.id as client_id', 'c.name as client_name', 'COUNT(i.id) as invoice_count', 'SUM(i.amountHt) as total_billed')
+        $qb
+            ->select(
+                'c.id as client_id',
+                'c.name as client_name',
+                'COUNT(i.id) as invoice_count',
+                'SUM(i.amountHt) as total_billed',
+            )
             ->join('i.client', 'c')
             ->where('i.status IN (:statuses)')
             ->setParameter('statuses', [Invoice::STATUS_SENT, Invoice::STATUS_PAID, Invoice::STATUS_OVERDUE])
@@ -197,7 +204,8 @@ class TreasuryService
 
             // Calculer le montant payé pour ce client
             $qbPaid = $this->invoiceRepository->createQueryBuilder('i2');
-            $qbPaid->select('SUM(i2.amountHt) as total_paid')
+            $qbPaid
+                ->select('SUM(i2.amountHt) as total_paid')
                 ->where('i2.client = :clientId')
                 ->andWhere('i2.status = :statusPaid')
                 ->setParameter('clientId', $clientId)
@@ -208,7 +216,8 @@ class TreasuryService
 
             // Calculer le délai moyen de paiement pour ce client
             $qbDelay = $this->invoiceRepository->createQueryBuilder('i3');
-            $qbDelay->select('AVG(DATEDIFF(i3.paidAt, i3.issuedAt)) as avg_delay')
+            $qbDelay
+                ->select('AVG(DATEDIFF(i3.paidAt, i3.issuedAt)) as avg_delay')
                 ->where('i3.client = :clientId')
                 ->andWhere('i3.status = :statusPaid')
                 ->setParameter('clientId', $clientId)

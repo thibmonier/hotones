@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Contributor;
@@ -24,7 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminUserController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -52,7 +54,7 @@ class AdminUserController extends AbstractController
         int $id,
         Request $request,
         EntityManagerInterface $em,
-        SecureFileUploadService $uploadService
+        SecureFileUploadService $uploadService,
     ): Response {
         $user = $em->getReference(User::class, $id);
         if (!$user) {
@@ -70,7 +72,10 @@ class AdminUserController extends AbstractController
 
             // roles
             $roles = $request->request->all('roles');
-            $roles = array_values(array_unique(array_filter($roles, fn ($role): bool => $role !== null && $role !== '')));
+            $roles = array_values(array_unique(array_filter(
+                $roles,
+                fn ($role): bool => $role !== null && $role !== '',
+            )));
             $user->setRoles($roles);
 
             $avatarFile = $request->files->get('avatar');
@@ -102,7 +107,7 @@ class AdminUserController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher,
-        SecureFileUploadService $uploadService
+        SecureFileUploadService $uploadService,
     ): Response {
         if ($request->isMethod('POST')) {
             $email     = (string) $request->request->get('email');
@@ -111,9 +116,7 @@ class AdminUserController extends AbstractController
             $lastName  = (string) $request->request->get('last_name');
 
             $user = new User();
-            $user->setEmail($email)
-                ->setLastName($lastName)
-                ->setRoles(['ROLE_USER']);
+            $user->setEmail($email)->setLastName($lastName)->setRoles(['ROLE_USER']);
             $user->firstName = $firstName;
             $user->setPassword($hasher->hashPassword($user, $password));
             $em->persist($user);
@@ -134,7 +137,8 @@ class AdminUserController extends AbstractController
             // auto-link contributor
             $contributor = new Contributor();
             $contributor->setCompany($this->companyContext->getCurrentCompany());
-            $contributor->setFirstName($firstName)
+            $contributor
+                ->setFirstName($firstName)
                 ->setLastName($lastName)
                 ->setEmail($email)
                 ->setUser($user)

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class SubscriptionController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -29,7 +29,7 @@ class SubscriptionController extends AbstractController
     public function index(
         Request $request,
         SaasSubscriptionRepository $subscriptionRepository,
-        PaginatorInterface $paginator
+        PaginatorInterface $paginator,
     ): Response {
         $session = $request->getSession();
         $reset   = (bool) $request->query->get('reset', false);
@@ -41,22 +41,34 @@ class SubscriptionController extends AbstractController
         }
 
         $queryAll   = $request->query->all();
-        $filterKeys = ['search', 'status', 'billing_period', 'category', 'vendor', 'provider', 'per_page', 'sort', 'dir'];
-        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved      = $session->has('subscription_filters') ? (array) $session->get('subscription_filters') : [];
+        $filterKeys = [
+            'search',
+            'status',
+            'billing_period',
+            'category',
+            'vendor',
+            'provider',
+            'per_page',
+            'sort',
+            'dir',
+        ];
+        $hasFilter = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved     = $session->has('subscription_filters') ? (array) $session->get('subscription_filters') : [];
 
-        $search        = $hasFilter ? ($request->query->get('search') ?: '') : ($saved['search'] ?? '');
-        $status        = $hasFilter ? ($request->query->get('status') ?: '') : ($saved['status'] ?? '');
-        $billingPeriod = $hasFilter ? ($request->query->get('billing_period') ?: '') : ($saved['billing_period'] ?? '');
-        $category      = $hasFilter ? ($request->query->get('category') ?: '') : ($saved['category'] ?? '');
-        $vendorId      = $hasFilter ? ($request->query->get('vendor') ?: '') : ($saved['vendor'] ?? '');
-        $providerId    = $hasFilter ? ($request->query->get('provider') ?: '') : ($saved['provider'] ?? '');
+        $search        = $hasFilter ? ($request->query->get('search') ?: '') : $saved['search']                 ?? '';
+        $status        = $hasFilter ? ($request->query->get('status') ?: '') : $saved['status']                 ?? '';
+        $billingPeriod = $hasFilter ? ($request->query->get('billing_period') ?: '') : $saved['billing_period'] ?? '';
+        $category      = $hasFilter ? ($request->query->get('category') ?: '') : $saved['category']             ?? '';
+        $vendorId      = $hasFilter ? ($request->query->get('vendor') ?: '') : $saved['vendor']                 ?? '';
+        $providerId    = $hasFilter ? ($request->query->get('provider') ?: '') : $saved['provider']             ?? '';
 
-        $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'nextRenewalDate')) : ($saved['sort'] ?? 'nextRenewalDate');
-        $dir  = $hasFilter ? ($request->query->get('dir') ?: ($saved['dir'] ?? 'ASC')) : ($saved['dir'] ?? 'ASC');
+        $sort = $hasFilter
+            ? ($request->query->get('sort') ?: $saved['sort'] ?? 'nextRenewalDate')
+            : $saved['sort']                                                                        ?? 'nextRenewalDate';
+        $dir = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'ASC') : $saved['dir'] ?? 'ASC';
 
         $allowedPerPage = [10, 25, 50, 100];
-        $perPageParam   = (int) ($hasFilter ? ($request->query->get('per_page', 25)) : ($saved['per_page'] ?? 25));
+        $perPageParam   = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
         $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
 
         $session->set('subscription_filters', [
@@ -71,43 +83,40 @@ class SubscriptionController extends AbstractController
             'dir'            => $dir,
         ]);
 
-        $qb = $subscriptionRepository->createQueryBuilder('s')
+        $qb = $subscriptionRepository
+            ->createQueryBuilder('s')
             ->leftJoin('s.service', 'srv')
             ->addSelect('srv')
             ->leftJoin('srv.provider', 'p')
             ->addSelect('p');
 
         if ($search) {
-            $qb->andWhere('s.customName LIKE :search OR srv.name LIKE :search OR p.name LIKE :search OR s.notes LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere(
+                's.customName LIKE :search OR srv.name LIKE :search OR p.name LIKE :search OR s.notes LIKE :search',
+            )->setParameter('search', '%'.$search.'%');
         }
 
         if ($status !== '') {
-            $qb->andWhere('s.status = :status')
-                ->setParameter('status', $status);
+            $qb->andWhere('s.status = :status')->setParameter('status', $status);
         }
 
         if ($billingPeriod !== '') {
-            $qb->andWhere('s.billingPeriod = :billingPeriod')
-                ->setParameter('billingPeriod', $billingPeriod);
+            $qb->andWhere('s.billingPeriod = :billingPeriod')->setParameter('billingPeriod', $billingPeriod);
         }
 
         if ($category !== '') {
-            $qb->andWhere('srv.category = :category')
-                ->setParameter('category', $category);
+            $qb->andWhere('srv.category = :category')->setParameter('category', $category);
         }
 
         if ($vendorId !== '') {
-            $qb->andWhere('s.service = :service')
-                ->setParameter('service', $vendorId);
+            $qb->andWhere('s.service = :service')->setParameter('service', $vendorId);
         }
 
         if ($providerId !== '') {
             if ($providerId === 'null') {
                 $qb->andWhere('srv.provider IS NULL');
             } else {
-                $qb->andWhere('srv.provider = :provider')
-                    ->setParameter('provider', $providerId);
+                $qb->andWhere('srv.provider = :provider')->setParameter('provider', $providerId);
             }
         }
 
@@ -123,11 +132,7 @@ class SubscriptionController extends AbstractController
         $sortDir   = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($sortField, $sortDir);
 
-        $pagination = $paginator->paginate(
-            $qb->getQuery(),
-            $request->query->getInt('page', 1),
-            $perPage,
-        );
+        $pagination = $paginator->paginate($qb->getQuery(), $request->query->getInt('page', 1), $perPage);
 
         return $this->render('saas/subscription/index.html.twig', [
             'subscriptions' => $pagination,

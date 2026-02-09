@@ -54,17 +54,18 @@ class SaasSubscriptionCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
         yield AssociationField::new('service', 'Service')
             ->setRequired(true)
-            ->setQueryBuilder(fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
-                ->leftJoin('entity.provider', 'p')
-                ->andWhere('entity.active = :active')
-                ->setParameter('active', true)
-                ->orderBy('p.name', 'ASC')
-                ->addOrderBy('entity.name', 'ASC'))
+            ->setQueryBuilder(
+                fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
+                    ->leftJoin('entity.provider', 'p')
+                    ->andWhere('entity.active = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('p.name', 'ASC')
+                    ->addOrderBy('entity.name', 'ASC'),
+            )
             ->formatValue(function ($value, SaasSubscription $entity) {
                 $service = $entity->getService();
                 if (!$service) {
@@ -72,81 +73,68 @@ class SaasSubscriptionCrudController extends AbstractCrudController
                 }
                 $provider = $service->getProvider();
 
-                return $provider
-                    ? sprintf('%s (%s)', $service->getName(), $provider->getName())
-                    : $service->getName();
+                return $provider ? sprintf('%s (%s)', $service->getName(), $provider->getName()) : $service->getName();
             });
 
-        yield TextField::new('customName', 'Nom personnalisé')
-            ->setHelp('Si vide, le nom du service sera utilisé')
-            ->hideOnIndex();
+        yield TextField::new('customName', 'Nom personnalisé')->setHelp(
+            'Si vide, le nom du service sera utilisé',
+        )->hideOnIndex();
 
-        yield ChoiceField::new('billingPeriod', 'Périodicité')
-            ->setChoices(array_flip(SaasSubscription::BILLING_PERIODS))
-            ->setRequired(true);
+        yield ChoiceField::new(
+            'billingPeriod',
+            'Périodicité',
+        )->setChoices(array_flip(SaasSubscription::BILLING_PERIODS))->setRequired(true);
 
         yield NumberField::new('price', 'Prix')
             ->setNumDecimals(2)
             ->setRequired(true)
             ->setHelp('Prix unitaire (€)')
-            ->formatValue(static fn (mixed $value): string => number_format(is_numeric($value) ? (float) $value : 0.0, 2, ',', ' ').' €');
+            ->formatValue(
+                static fn (mixed $value): string => number_format(is_numeric($value) ? (float) $value : 0.0, 2, ',', ' ').' €'
+                ,
+            );
 
-        yield ChoiceField::new('currency', 'Devise')
-            ->setChoices([
-                'EUR' => 'EUR',
-                'USD' => 'USD',
-                'GBP' => 'GBP',
-            ])
-            ->hideOnIndex();
+        yield ChoiceField::new('currency', 'Devise')->setChoices([
+            'EUR' => 'EUR',
+            'USD' => 'USD',
+            'GBP' => 'GBP',
+        ])->hideOnIndex();
 
-        yield IntegerField::new('quantity', 'Quantité')
-            ->setHelp('Nombre de licences/utilisateurs');
+        yield IntegerField::new('quantity', 'Quantité')->setHelp('Nombre de licences/utilisateurs');
 
-        yield ChoiceField::new('status', 'Statut')
-            ->setChoices(array_flip(SaasSubscription::STATUSES))
-            ->setRequired(true);
+        yield ChoiceField::new('status', 'Statut')->setChoices(array_flip(SaasSubscription::STATUSES))->setRequired(
+            true,
+        );
 
-        yield DateField::new('startDate', 'Date de début')
-            ->setRequired(true)
-            ->setFormat('dd/MM/yyyy');
+        yield DateField::new('startDate', 'Date de début')->setRequired(true)->setFormat('dd/MM/yyyy');
 
-        yield DateField::new('nextRenewalDate', 'Prochain renouvellement')
-            ->setRequired(true)
-            ->setFormat('dd/MM/yyyy');
+        yield DateField::new('nextRenewalDate', 'Prochain renouvellement')->setRequired(true)->setFormat('dd/MM/yyyy');
 
-        yield DateField::new('endDate', 'Date de fin')
-            ->setFormat('dd/MM/yyyy')
-            ->hideOnIndex();
+        yield DateField::new('endDate', 'Date de fin')->setFormat('dd/MM/yyyy')->hideOnIndex();
 
-        yield DateField::new('lastRenewalDate', 'Dernier renouvellement')
-            ->setFormat('dd/MM/yyyy')
-            ->hideOnIndex();
+        yield DateField::new('lastRenewalDate', 'Dernier renouvellement')->setFormat('dd/MM/yyyy')->hideOnIndex();
 
-        yield BooleanField::new('autoRenewal', 'Renouvellement auto')
-            ->renderAsSwitch(false);
+        yield BooleanField::new('autoRenewal', 'Renouvellement auto')->renderAsSwitch(false);
 
-        yield TextField::new('externalReference', 'Référence externe')
-            ->hideOnIndex();
+        yield TextField::new('externalReference', 'Référence externe')->hideOnIndex();
 
-        yield TextareaField::new('notes', 'Notes')
-            ->hideOnIndex();
+        yield TextareaField::new('notes', 'Notes')->hideOnIndex();
 
-        yield DateTimeField::new('createdAt', 'Date de création')
-            ->hideOnForm()
-            ->setFormat('dd/MM/yyyy HH:mm');
+        yield DateTimeField::new('createdAt', 'Date de création')->hideOnForm()->setFormat('dd/MM/yyyy HH:mm');
 
-        yield DateTimeField::new('updatedAt', 'Dernière modification')
-            ->hideOnForm()
-            ->setFormat('dd/MM/yyyy HH:mm');
+        yield DateTimeField::new('updatedAt', 'Dernière modification')->hideOnForm()->setFormat('dd/MM/yyyy HH:mm');
     }
 
     #[Override]
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters
-            ->add(EntityFilter::new('service', 'Service'))
-            ->add(ChoiceFilter::new('status', 'Statut')->setChoices(array_flip(SaasSubscription::STATUSES)))
-            ->add(ChoiceFilter::new('billingPeriod', 'Périodicité')->setChoices(array_flip(SaasSubscription::BILLING_PERIODS)));
+        return $filters->add(EntityFilter::new('service', 'Service'))->add(ChoiceFilter::new(
+            'status',
+            'Statut',
+        )->setChoices(array_flip(SaasSubscription::STATUSES)))->add(ChoiceFilter::new(
+            'billingPeriod',
+            'Périodicité',
+        )->setChoices(array_flip(SaasSubscription::BILLING_PERIODS)));
     }
 
     #[Override]

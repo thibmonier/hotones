@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Integration\Repository;
 
 use App\Entity\Vacation;
@@ -42,10 +44,7 @@ class VacationRepositoryTest extends KernelTestCase
         // Rejected vacation (excluded)
         $this->createVacation($contributor, '2025-01-25', '2025-01-27', 'rejected');
 
-        $count = $this->repository->countApprovedDaysBetween(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-01-31'),
-        );
+        $count = $this->repository->countApprovedDaysBetween(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         // 5 days (Jan 10-14) + 4 days (Jan 28-31) = 9 days
         $this->assertEquals(9.0, $count);
@@ -53,10 +52,7 @@ class VacationRepositoryTest extends KernelTestCase
 
     public function testCountApprovedDaysBetweenWithNoVacations(): void
     {
-        $count = $this->repository->countApprovedDaysBetween(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-01-31'),
-        );
+        $count = $this->repository->countApprovedDaysBetween(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         $this->assertEquals(0.0, $count);
     }
@@ -68,10 +64,7 @@ class VacationRepositoryTest extends KernelTestCase
         // Vacation completely outside period
         $this->createVacation($contributor, '2024-12-01', '2024-12-15', 'approved');
 
-        $count = $this->repository->countApprovedDaysBetween(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-01-31'),
-        );
+        $count = $this->repository->countApprovedDaysBetween(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         $this->assertEquals(0.0, $count);
     }

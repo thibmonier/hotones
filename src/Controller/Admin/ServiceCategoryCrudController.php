@@ -49,30 +49,25 @@ class ServiceCategoryCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('name', 'Nom')
-            ->setRequired(true);
+        yield TextField::new('name', 'Nom')->setRequired(true);
 
-        yield TextareaField::new('description', 'Description')
-            ->hideOnIndex();
+        yield TextareaField::new('description', 'Description')->hideOnIndex();
 
         yield ColorField::new('color', 'Couleur');
 
-        yield IntegerField::new('projects.count', 'Nombre de projets')
-            ->hideOnForm()
-            ->formatValue(fn ($value, ServiceCategory $entity) => $entity->getProjects()->count());
+        yield IntegerField::new('projects.count', 'Nombre de projets')->hideOnForm()->formatValue(
+            fn ($value, ServiceCategory $entity) => $entity->getProjects()->count(),
+        );
 
-        yield BooleanField::new('active', 'Actif')
-            ->renderAsSwitch(false);
+        yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);
     }
 
     #[Override]
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters
-            ->add(BooleanFilter::new('active', 'Actif'));
+        return $filters->add(BooleanFilter::new('active', 'Actif'));
     }
 
     #[Override]

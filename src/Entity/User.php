@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -58,6 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         self::ROLE_MANAGER     => [self::ROLE_CHEF_PROJET],
         self::ROLE_SUPERADMIN  => [self::ROLE_MANAGER],
     ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

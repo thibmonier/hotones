@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\User;
@@ -86,10 +88,13 @@ class AppFixtures extends Fixture
             $order = OrderFactory::createOne([
                 'project' => $project,
             ]);
-            $orderTasks = OrderTaskFactory::createMany(random_int($V['order_tasks_min'], $V['order_tasks_max']), fn (): array => [
-                'order'   => $order,
-                'profile' => ProfileFactory::random(),
-            ]);
+            $orderTasks = OrderTaskFactory::createMany(
+                random_int($V['order_tasks_min'], $V['order_tasks_max']),
+                fn (): array => [
+                    'order'   => $order,
+                    'profile' => ProfileFactory::random(),
+                ],
+            );
             // Update order total from order tasks
             $sum = '0';
             foreach ($orderTasks as $ot) {
@@ -98,14 +103,20 @@ class AppFixtures extends Fixture
             $order->setTotalAmount($sum);
 
             // Project tasks
-            $tasks = ProjectTaskFactory::createMany(random_int($V['project_tasks_min'], $V['project_tasks_max']), fn (): array => [
-                'project'             => $project,
-                'assignedContributor' => random_int(0, 1) ? ContributorFactory::random() : null,
-                'requiredProfile'     => random_int(0, 1) ? ProfileFactory::random() : null,
-            ]);
+            $tasks = ProjectTaskFactory::createMany(
+                random_int($V['project_tasks_min'], $V['project_tasks_max']),
+                fn (): array => [
+                    'project'             => $project,
+                    'assignedContributor' => random_int(0, 1) ? ContributorFactory::random() : null,
+                    'requiredProfile'     => random_int(0, 1) ? ProfileFactory::random() : null,
+                ],
+            );
 
             // Subtasks for regular tasks
-            $regularTasks = array_filter($tasks, fn ($t): bool => $t->getType() === \App\Entity\ProjectTask::TYPE_REGULAR);
+            $regularTasks = array_filter(
+                $tasks,
+                fn ($t): bool => $t->getType() === \App\Entity\ProjectTask::TYPE_REGULAR,
+            );
             foreach ($regularTasks as $task) {
                 ProjectSubTaskFactory::createMany(random_int($V['subtasks_min'], $V['subtasks_max']), fn (): array => [
                     'task'     => $task,
@@ -130,8 +141,8 @@ class AppFixtures extends Fixture
 
                 // Choose contributor: bias to assigned contributor if available
                 $contrib = $task && $task->getAssignedContributor() && random_int(1, 100) <= 60
-                    ? $task->getAssignedContributor()
-                    : ContributorFactory::random();
+                        ? $task->getAssignedContributor()
+                        : ContributorFactory::random();
 
                 TimesheetFactory::createOne([
                     'project'     => $project,

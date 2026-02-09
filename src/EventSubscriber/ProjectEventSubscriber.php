@@ -18,7 +18,7 @@ class ProjectEventSubscriber
 {
     public function __construct(
         private readonly Security $security,
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -30,11 +30,7 @@ class ProjectEventSubscriber
             return;
         }
 
-        $this->createEvent(
-            $entity,
-            'project_created',
-            sprintf('Projet "%s" créé', $entity->getName()),
-        );
+        $this->createEvent($entity, 'project_created', sprintf('Projet "%s" créé', $entity->getName()));
     }
 
     public function postUpdate(LifecycleEventArgs $args): void
@@ -61,11 +57,7 @@ class ProjectEventSubscriber
 
         // Tracer les changements de dates
         if (isset($changeSet['startDate']) || isset($changeSet['endDate'])) {
-            $this->createEvent(
-                $entity,
-                'dates_updated',
-                'Dates du projet modifiées',
-            );
+            $this->createEvent($entity, 'dates_updated', 'Dates du projet modifiées');
         }
 
         // Tracer les changements de budget

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Project;
@@ -18,10 +20,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProjectRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Project::class, $companyContext);
     }
 
@@ -30,13 +30,16 @@ class ProjectRepository extends CompanyAwareRepository
      * Retourne un tableau indexé par projectId avec:
      * - total_revenue, total_margin, margin_rate, total_purchases, orders_count, signed_orders_count.
      */
-    public function getAggregatedMetricsFor(array $projectIds, array $signedStatuses = ['signed', 'won', 'completed', 'signe', 'gagne', 'termine']): array
-    {
+    public function getAggregatedMetricsFor(
+        array $projectIds,
+        array $signedStatuses = ['signed', 'won', 'completed', 'signe', 'gagne', 'termine'],
+    ): array {
         if (empty($projectIds)) {
             return [];
         }
 
-        $qb = $this->createCompanyQueryBuilder('p')
+        $qb = $this
+            ->createCompanyQueryBuilder('p')
             ->select('p.id AS projectId')
             ->leftJoin('p.orders', 'o')
             ->leftJoin('o.sections', 's')
@@ -101,7 +104,8 @@ class ProjectRepository extends CompanyAwareRepository
         }
 
         // Achats au niveau projet
-        $qb1 = $this->createCompanyQueryBuilder('p')
+        $qb1 = $this
+            ->createCompanyQueryBuilder('p')
             ->select('COALESCE(SUM(p.purchasesAmount), 0) AS totalProjectPurchases')
             ->andWhere('p.id IN (:ids)')
             ->setParameter('ids', $projectIds);
@@ -109,8 +113,11 @@ class ProjectRepository extends CompanyAwareRepository
         $projectPurchases = (string) ($row1['totalProjectPurchases'] ?? '0');
 
         // Achats attachés aux lignes de service
-        $qb2 = $this->createCompanyQueryBuilder('p')
-            ->select("COALESCE(SUM(CASE WHEN l.type = 'service' THEN COALESCE(l.attachedPurchaseAmount,0) ELSE 0 END), 0) AS totalLinePurchases")
+        $qb2 = $this
+            ->createCompanyQueryBuilder('p')
+            ->select(
+                "COALESCE(SUM(CASE WHEN l.type = 'service' THEN COALESCE(l.attachedPurchaseAmount,0) ELSE 0 END), 0) AS totalLinePurchases",
+            )
             ->leftJoin('p.orders', 'o')
             ->leftJoin('o.sections', 's')
             ->leftJoin('s.lines', 'l')
@@ -130,7 +137,8 @@ class ProjectRepository extends CompanyAwareRepository
     {
         $validStatuses = ['signe', 'gagne', 'termine', 'signed', 'won', 'completed'];
 
-        $result = $this->createCompanyQueryBuilder('p')
+        $result = $this
+            ->createCompanyQueryBuilder('p')
             ->select('COALESCE(SUM(o.totalAmount), 0) AS total')
             ->leftJoin('p.orders', 'o')
             ->andWhere('o.status IN (:validStatuses)')
@@ -147,7 +155,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function findAllOrderedByName(): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
@@ -163,7 +172,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function findActiveOrderedByName(): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
@@ -176,12 +186,35 @@ class ProjectRepository extends CompanyAwareRepository
     }
 
     /**
+     * Récupère les projets actifs non internes triés par nom.
+     * Optimisé avec eager loading des relations client et serviceCategory.
+     *
+     * @return Project[]
+     */
+    public function findActiveExternalOrderedByName(): array
+    {
+        return $this
+            ->createCompanyQueryBuilder('p')
+            ->leftJoin('p.client', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.serviceCategory', 'sc')
+            ->addSelect('sc')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.isInternal = false')
+            ->setParameter('status', 'active')
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Récupère les projets récents (limité) avec leurs relations.
      * Optimisé pour éviter les N+1 queries.
      */
     public function findRecentProjects(int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.projectManager', 'pm')
@@ -199,7 +232,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function countActiveProjects(): int
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->andWhere('p.status = :status')
             ->setParameter('status', 'active')
@@ -212,7 +246,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function getProjectsByStatus(): array
     {
-        $result = $this->createCompanyQueryBuilder('p')
+        $result = $this
+            ->createCompanyQueryBuilder('p')
             ->select('p.status, COUNT(p.id) as count')
             ->groupBy('p.status')
             ->getQuery()
@@ -231,7 +266,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function findOneWithRelations(int $id): ?Project
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')
@@ -259,7 +295,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function searchProjects(string $query): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->andWhere('p.name LIKE :query OR c.name LIKE :query')
@@ -278,7 +315,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function findActiveBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.status = :status')
             ->andWhere('p.startDate IS NULL OR p.startDate <= :end')
             ->andWhere('p.endDate IS NULL OR p.endDate >= :start')
@@ -307,9 +345,10 @@ class ProjectRepository extends CompanyAwareRepository
         ?int $projectManagerId = null,
         ?int $salesPersonId = null,
         ?int $serviceCategoryId = null,
-        ?string $search = null
+        ?string $search = null,
     ): array {
-        $qb = $this->createCompanyQueryBuilder('p')
+        $qb = $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.technologies', 't')
             ->addSelect('t')
             ->leftJoin('p.client', 'c')
@@ -360,8 +399,10 @@ class ProjectRepository extends CompanyAwareRepository
             $qb->andWhere('sc.id = :scId')->setParameter('scId', $serviceCategoryId);
         }
         if ($search) {
-            $qb->andWhere('p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere('p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search')->setParameter(
+                'search',
+                '%'.$search.'%',
+            );
         }
 
         // No GROUP BY needed: Doctrine's identity map handles entity deduplication automatically
@@ -392,9 +433,10 @@ class ProjectRepository extends CompanyAwareRepository
         ?string $projectType = null,
         ?int $technologyId = null,
         ?string $search = null,
-        ?int $serviceCategoryId = null
+        ?int $serviceCategoryId = null,
     ): int {
-        $qb = $this->createCompanyQueryBuilder('p')
+        $qb = $this
+            ->createCompanyQueryBuilder('p')
             ->select('COUNT(DISTINCT p.id)')
             ->leftJoin('p.technologies', 't')
             ->leftJoin('p.client', 'c')
@@ -417,8 +459,10 @@ class ProjectRepository extends CompanyAwareRepository
             $qb->andWhere('sc.id = :scId')->setParameter('scId', $serviceCategoryId);
         }
         if ($search) {
-            $qb->andWhere('p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere('p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search')->setParameter(
+                'search',
+                '%'.$search.'%',
+            );
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -430,7 +474,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function getDistinctProjectManagersBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createCompanyQueryBuilder('p')
+        $rows = $this
+            ->createCompanyQueryBuilder('p')
             ->select('pm.id AS id, pm.firstName AS firstName, pm.lastName AS lastName')
             ->leftJoin('p.projectManager', 'pm')
             ->andWhere('pm.id IS NOT NULL')
@@ -455,7 +500,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function getDistinctSalesPersonsBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createCompanyQueryBuilder('p')
+        $rows = $this
+            ->createCompanyQueryBuilder('p')
             ->select('sp.id AS id, sp.firstName AS firstName, sp.lastName AS lastName')
             ->leftJoin('p.salesPerson', 'sp')
             ->andWhere('sp.id IS NOT NULL')
@@ -480,7 +526,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function getDistinctTechnologiesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createCompanyQueryBuilder('p')
+        $rows = $this
+            ->createCompanyQueryBuilder('p')
             ->select('t.id AS id, t.name AS name')
             ->leftJoin('p.technologies', 't')
             ->andWhere('t.id IS NOT NULL')
@@ -504,7 +551,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function getDistinctServiceCategoriesBetweenDates(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $rows = $this->createCompanyQueryBuilder('p')
+        $rows = $this
+            ->createCompanyQueryBuilder('p')
             ->select('sc.id AS id, sc.name AS name')
             ->leftJoin('p.serviceCategory', 'sc')
             ->andWhere('sc.id IS NOT NULL')
@@ -528,14 +576,18 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function getDistinctProjectTypes(): array
     {
-        $rows = $this->createCompanyQueryBuilder('p')
+        $rows = $this
+            ->createCompanyQueryBuilder('p')
             ->select('DISTINCT p.projectType AS type')
             ->andWhere('p.projectType IS NOT NULL')
             ->orderBy('p.projectType', 'ASC')
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn ($r): mixed => $r['type'], $rows), fn ($v): bool => $v !== null && $v !== ''));
+        return array_values(array_filter(
+            array_map(fn ($r): mixed => $r['type'], $rows),
+            fn ($v): bool => $v !== null && $v !== '',
+        ));
     }
 
     /**
@@ -543,14 +595,18 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function getDistinctStatuses(): array
     {
-        $rows = $this->createCompanyQueryBuilder('p')
+        $rows = $this
+            ->createCompanyQueryBuilder('p')
             ->select('DISTINCT p.status AS status')
             ->andWhere('p.status IS NOT NULL')
             ->orderBy('p.status', 'ASC')
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(fn ($r): mixed => $r['status'], $rows), fn ($v): bool => $v !== null && $v !== ''));
+        return array_values(array_filter(
+            array_map(fn ($r): mixed => $r['status'], $rows),
+            fn ($v): bool => $v !== null && $v !== '',
+        ));
     }
 
     /**
@@ -561,7 +617,8 @@ class ProjectRepository extends CompanyAwareRepository
      */
     public function search(string $query, int $limit = 5): array
     {
-        $qb = $this->createCompanyQueryBuilder('p')
+        $qb = $this
+            ->createCompanyQueryBuilder('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c')
             ->leftJoin('p.serviceCategory', 'sc')

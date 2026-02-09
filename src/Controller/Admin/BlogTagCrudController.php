@@ -39,20 +39,19 @@ class BlogTagCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('name', 'Nom')
-            ->setRequired(true)
-            ->setHelp('Nom du tag (ex: "symfony", "performance", "sécurité")');
+        yield TextField::new('name', 'Nom')->setRequired(true)->setHelp(
+            'Nom du tag (ex: "symfony", "performance", "sécurité")',
+        );
 
-        yield SlugField::new('slug', 'Slug')
-            ->setTargetFieldName('name')
-            ->setHelp('URL-friendly identifier (auto-généré depuis le nom)');
+        yield SlugField::new('slug', 'Slug')->setTargetFieldName('name')->setHelp(
+            'URL-friendly identifier (auto-généré depuis le nom)',
+        );
 
-        yield IntegerField::new('posts.count', 'Nombre d\'articles')
-            ->hideOnForm()
-            ->formatValue(fn ($value, BlogTag $entity) => $entity->getPosts()->count());
+        yield IntegerField::new('posts.count', 'Nombre d\'articles')->hideOnForm()->formatValue(
+            fn ($value, BlogTag $entity) => $entity->getPosts()->count(),
+        );
     }
 
     #[Override]

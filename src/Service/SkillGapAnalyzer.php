@@ -16,7 +16,7 @@ class SkillGapAnalyzer
     public function __construct(
         private readonly SkillRepository $skillRepository,
         private readonly ContributorSkillRepository $contributorSkillRepository,
-        private readonly ProjectRepository $projectRepository
+        private readonly ProjectRepository $projectRepository,
     ) {
     }
 
@@ -269,19 +269,19 @@ class SkillGapAnalyzer
      *
      * @return array<int, array{type: string, priority: string, message: string, actions: array}>
      */
-    private function generateProjectRecommendations(Project $project, array $missingSkills, array $requiredSkills): array
-    {
+    private function generateProjectRecommendations(
+        Project $project,
+        array $missingSkills,
+        array $requiredSkills,
+    ): array {
         $recommendations = [];
 
         if (count($missingSkills) > 0) {
             $recommendations[] = [
                 'type'     => 'critical',
                 'priority' => 'high',
-                'message'  => sprintf(
-                    'Le projet manque de %d compétence(s) critique(s)',
-                    count($missingSkills),
-                ),
-                'actions' => [
+                'message'  => sprintf('Le projet manque de %d compétence(s) critique(s)', count($missingSkills)),
+                'actions'  => [
                     'Former des contributeurs sur ces technologies',
                     'Recruter un profil avec ces compétences',
                     'Faire appel à un freelance spécialisé',
@@ -290,7 +290,10 @@ class SkillGapAnalyzer
         }
 
         // Vérifier si certaines compétences ont peu de contributeurs disponibles
-        $lowAvailability = array_filter($requiredSkills, fn ($rs): bool => $rs['availableCount'] > 0 && $rs['availableCount'] <= 2);
+        $lowAvailability = array_filter(
+            $requiredSkills,
+            fn ($rs): bool => $rs['availableCount'] > 0 && $rs['availableCount'] <= 2,
+        );
         if (count($lowAvailability) > 0) {
             $recommendations[] = [
                 'type'     => 'warning',

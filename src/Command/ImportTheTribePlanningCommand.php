@@ -145,7 +145,11 @@ class ImportTheTribePlanningCommand extends Command
 
         // 6. Résumé
         $io->section('Résumé');
-        $io->writeln(sprintf('  %d plannings créés pour %d contributeurs', $stats['plannings'], $stats['contributors']));
+        $io->writeln(sprintf(
+            '  %d plannings créés pour %d contributeurs',
+            $stats['plannings'],
+            $stats['contributors'],
+        ));
         $io->writeln(sprintf('  %d contributeurs non trouvés en base', $stats['notFound']));
         $io->writeln(sprintf('  %d projets référencés non trouvés en base (ignorés)', count($this->missingProjects)));
 
@@ -207,7 +211,11 @@ class ImportTheTribePlanningCommand extends Command
             $this->contributorCache[$key] = $contributor;
         }
 
-        $io->writeln(sprintf('  %d projets, %d contributeurs', count($this->projectCache), count($this->contributorCache)));
+        $io->writeln(sprintf(
+            '  %d projets, %d contributeurs',
+            count($this->projectCache),
+            count($this->contributorCache),
+        ));
     }
 
     private function purgeExistingPlannings(Company $company, bool $dryRun): int

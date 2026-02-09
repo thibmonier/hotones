@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SkillRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Skill::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class SkillRepository extends CompanyAwareRepository
      */
     public function findActive(): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->orderBy('s.name', 'ASC')
@@ -42,7 +41,8 @@ class SkillRepository extends CompanyAwareRepository
      */
     public function findByCategory(string $category): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->andWhere('s.category = :category')
             ->andWhere('s.active = :active')
             ->setParameter('category', $category)
@@ -59,7 +59,8 @@ class SkillRepository extends CompanyAwareRepository
      */
     public function countByCategory(): array
     {
-        $results = $this->createCompanyQueryBuilder('s')
+        $results = $this
+            ->createCompanyQueryBuilder('s')
             ->select('s.category, COUNT(s.id) as count')
             ->andWhere('s.active = :active')
             ->setParameter('active', true)
@@ -82,7 +83,8 @@ class SkillRepository extends CompanyAwareRepository
      */
     public function search(string $query): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->andWhere('s.name LIKE :query OR s.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->andWhere('s.active = :active')
@@ -99,7 +101,8 @@ class SkillRepository extends CompanyAwareRepository
      */
     public function findWithContributorCount(): array
     {
-        $results = $this->createCompanyQueryBuilder('s')
+        $results = $this
+            ->createCompanyQueryBuilder('s')
             ->leftJoin('s.contributorSkills', 'cs')
             ->select('s', 'COUNT(DISTINCT cs.contributor) as contributorCount')
             ->andWhere('s.active = :active')
@@ -129,7 +132,8 @@ class SkillRepository extends CompanyAwareRepository
      */
     public function findMostPopular(int $limit = 10): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->leftJoin('s.contributorSkills', 'cs')
             ->select('s', 'COUNT(DISTINCT cs.contributor) as HIDDEN contributorCount')
             ->andWhere('s.active = :active')

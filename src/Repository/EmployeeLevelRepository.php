@@ -31,7 +31,8 @@ class EmployeeLevelRepository extends ServiceEntityRepository
      */
     public function findActiveByCompany(Company $company): array
     {
-        return $this->createQueryBuilder('el')
+        return $this
+            ->createQueryBuilder('el')
             ->andWhere('el.company = :company')
             ->andWhere('el.active = :active')
             ->setParameter('company', $company)
@@ -48,7 +49,8 @@ class EmployeeLevelRepository extends ServiceEntityRepository
      */
     public function findByCompany(Company $company): array
     {
-        return $this->createQueryBuilder('el')
+        return $this
+            ->createQueryBuilder('el')
             ->andWhere('el.company = :company')
             ->setParameter('company', $company)
             ->orderBy('el.level', 'ASC')
@@ -61,7 +63,8 @@ class EmployeeLevelRepository extends ServiceEntityRepository
      */
     public function findByCompanyAndLevel(Company $company, int $level): ?EmployeeLevel
     {
-        return $this->createQueryBuilder('el')
+        return $this
+            ->createQueryBuilder('el')
             ->andWhere('el.company = :company')
             ->andWhere('el.level = :level')
             ->setParameter('company', $company)
@@ -89,7 +92,8 @@ class EmployeeLevelRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('el')
+        return $this
+            ->createQueryBuilder('el')
             ->andWhere('el.company = :company')
             ->andWhere('el.level IN (:levels)')
             ->andWhere('el.active = :active')
@@ -136,7 +140,8 @@ class EmployeeLevelRepository extends ServiceEntityRepository
      */
     public function hasAllLevelsDefined(Company $company): bool
     {
-        $count = $this->createQueryBuilder('el')
+        $count = $this
+            ->createQueryBuilder('el')
             ->select('COUNT(el.id)')
             ->andWhere('el.company = :company')
             ->setParameter('company', $company)
@@ -153,7 +158,8 @@ class EmployeeLevelRepository extends ServiceEntityRepository
      */
     public function getMissingLevels(Company $company): array
     {
-        $existingLevels = $this->createQueryBuilder('el')
+        $existingLevels = $this
+            ->createQueryBuilder('el')
             ->select('el.level')
             ->andWhere('el.company = :company')
             ->setParameter('company', $company)

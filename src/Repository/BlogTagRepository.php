@@ -27,7 +27,8 @@ class BlogTagRepository extends ServiceEntityRepository
      */
     public function findBySlug(string $slug): ?BlogTag
     {
-        return $this->createQueryBuilder('t')
+        return $this
+            ->createQueryBuilder('t')
             ->andWhere('t.slug = :slug')
             ->setParameter('slug', $slug)
             ->getQuery()
@@ -41,7 +42,8 @@ class BlogTagRepository extends ServiceEntityRepository
      */
     public function findAllOrdered(): array
     {
-        return $this->createQueryBuilder('t')
+        return $this
+            ->createQueryBuilder('t')
             ->orderBy('t.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -54,7 +56,8 @@ class BlogTagRepository extends ServiceEntityRepository
      */
     public function findPopular(int $limit = 10): array
     {
-        return $this->createQueryBuilder('t')
+        return $this
+            ->createQueryBuilder('t')
             ->leftJoin('t.posts', 'p')
             ->andWhere('p.status = :status')
             ->setParameter('status', 'published')
@@ -91,7 +94,8 @@ class BlogTagRepository extends ServiceEntityRepository
      */
     public function findWithPublishedPosts(): array
     {
-        return $this->createQueryBuilder('t')
+        return $this
+            ->createQueryBuilder('t')
             ->leftJoin('t.posts', 'p')
             ->andWhere('p.status = :status')
             ->setParameter('status', 'published')

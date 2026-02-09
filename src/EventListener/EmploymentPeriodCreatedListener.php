@@ -29,43 +29,31 @@ class EmploymentPeriodCreatedListener
         $contributor = $employmentPeriod->getContributor();
 
         try {
-            $tasksCreated = $this->onboardingService->createOnboardingFromTemplate(
-                $contributor,
-                $employmentPeriod,
-            );
+            $tasksCreated = $this->onboardingService->createOnboardingFromTemplate($contributor, $employmentPeriod);
 
             if ($tasksCreated > 0) {
-                $this->logger->info(
-                    'Onboarding tasks created automatically',
-                    [
-                        'contributor_id'       => $contributor->getId(),
-                        'contributor_name'     => $contributor->getFullName(),
-                        'employment_period_id' => $employmentPeriod->getId(),
-                        'tasks_created'        => $tasksCreated,
-                    ],
-                );
+                $this->logger->info('Onboarding tasks created automatically', [
+                    'contributor_id'       => $contributor->getId(),
+                    'contributor_name'     => $contributor->getFullName(),
+                    'employment_period_id' => $employmentPeriod->getId(),
+                    'tasks_created'        => $tasksCreated,
+                ]);
             } else {
                 $profiles     = $contributor->getProfiles();
                 $profileNames = $profiles->isEmpty() ? 'none' : $profiles->first()->getName();
 
-                $this->logger->warning(
-                    'No onboarding template found for contributor',
-                    [
-                        'contributor_id'   => $contributor->getId(),
-                        'contributor_name' => $contributor->getFullName(),
-                        'profile'          => $profileNames,
-                    ],
-                );
+                $this->logger->warning('No onboarding template found for contributor', [
+                    'contributor_id'   => $contributor->getId(),
+                    'contributor_name' => $contributor->getFullName(),
+                    'profile'          => $profileNames,
+                ]);
             }
         } catch (Exception $e) {
-            $this->logger->error(
-                'Failed to create onboarding tasks automatically',
-                [
-                    'contributor_id'       => $contributor->getId(),
-                    'employment_period_id' => $employmentPeriod->id, // PHP 8.4 property hook
-                    'error'                => $e->getMessage(),
-                ],
-            );
+            $this->logger->error('Failed to create onboarding tasks automatically', [
+                'contributor_id'       => $contributor->getId(),
+                'employment_period_id' => $employmentPeriod->id, // PHP 8.4 property hook
+                'error'                => $e->getMessage(),
+            ]);
         }
     }
 }

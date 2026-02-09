@@ -49,11 +49,13 @@ class ApiRateLimiterSubscriber implements EventSubscriberInterface
         $limit   = $limiter->consume(1);
 
         // Ajouter les headers de rate limiting
-        $event->getResponse()?->headers->add([
-            'X-RateLimit-Limit'     => (string) $limit->getLimit(),
-            'X-RateLimit-Remaining' => (string) $limit->getRemainingTokens(),
-            'X-RateLimit-Reset'     => (string) $limit->getRetryAfter()->getTimestamp(),
-        ]);
+        $event
+            ->getResponse()
+            ?->headers->add([
+                'X-RateLimit-Limit'     => (string) $limit->getLimit(),
+                'X-RateLimit-Remaining' => (string) $limit->getRemainingTokens(),
+                'X-RateLimit-Reset'     => (string) $limit->getRetryAfter()->getTimestamp(),
+            ]);
 
         // Si la limite est atteinte, retourner une erreur 429
         if (!$limit->isAccepted()) {

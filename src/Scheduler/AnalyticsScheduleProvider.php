@@ -29,28 +29,19 @@ class AnalyticsScheduleProvider implements ScheduleProviderInterface
 
         return new Schedule()
             // Recalcul quotidien des métriques mensuelles à 6h du matin
-            ->add(
-                RecurringMessage::cron('0 6 * * *', new RecalculateMetricsMessage((string) $currentYear, 'monthly')),
-            )
+            ->add(RecurringMessage::cron('0 6 * * *', new RecalculateMetricsMessage((string) $currentYear, 'monthly')))
             // Recalcul trimestriel le 1er de chaque trimestre à 7h
-            ->add(
-                RecurringMessage::cron('0 7 1 1,4,7,10 *', new RecalculateMetricsMessage((string) $currentYear, 'quarterly')),
-            )
+            ->add(RecurringMessage::cron(
+                '0 7 1 1,4,7,10 *',
+                new RecalculateMetricsMessage((string) $currentYear, 'quarterly'),
+            ))
             // Recalcul annuel le 1er janvier à 8h
-            ->add(
-                RecurringMessage::cron('0 8 1 1 *', new RecalculateMetricsMessage((string) $currentYear, 'yearly')),
-            )
+            ->add(RecurringMessage::cron('0 8 1 1 *', new RecalculateMetricsMessage((string) $currentYear, 'yearly')))
             // Analyse quotidienne des risques projets à 8h (après le recalcul des métriques)
-            ->add(
-                RecurringMessage::cron('0 8 * * *', new AnalyzeProjectRisksMessage()),
-            )
+            ->add(RecurringMessage::cron('0 8 * * *', new AnalyzeProjectRisksMessage()))
             // Vérification quotidienne des alertes à 8h (budget, marge, surcharge, paiements)
-            ->add(
-                RecurringMessage::cron('0 8 * * *', new CheckAlertsMessage()),
-            )
+            ->add(RecurringMessage::cron('0 8 * * *', new CheckAlertsMessage()))
             // Génération mensuelle des prévisions le 1er de chaque mois à 9h
-            ->add(
-                RecurringMessage::cron('0 9 1 * *', new GenerateForecastsMessage(12)),
-            );
+            ->add(RecurringMessage::cron('0 9 1 * *', new GenerateForecastsMessage(12)));
     }
 }

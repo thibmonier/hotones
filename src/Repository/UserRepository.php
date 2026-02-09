@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UserRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, User::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class UserRepository extends CompanyAwareRepository
      */
     public function findByRole(string $role): array
     {
-        return $this->createCompanyQueryBuilder('u')
+        return $this
+            ->createCompanyQueryBuilder('u')
             ->andWhere('u.roles LIKE :role')
             ->setParameter('role', '%"'.$role.'"%')
             ->getQuery()

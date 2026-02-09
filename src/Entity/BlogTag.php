@@ -128,9 +128,7 @@ class BlogTag implements Stringable
      */
     public function getPublishedPostCount(): int
     {
-        return $this->posts->filter(
-            fn (BlogPost $post): bool => $post->isPublished(),
-        )->count();
+        return $this->posts->filter(fn (BlogPost $post): bool => $post->isPublished())->count();
     }
 
     public function getCreatedAt(): ?DateTimeInterface

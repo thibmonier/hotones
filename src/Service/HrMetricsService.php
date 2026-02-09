@@ -15,7 +15,7 @@ class HrMetricsService
     public function __construct(
         public ContributorRepository $contributorRepository,
         private readonly EmploymentPeriodRepository $employmentPeriodRepository,
-        private readonly VacationRepository $vacationRepository
+        private readonly VacationRepository $vacationRepository,
     ) {
     }
 
@@ -59,8 +59,11 @@ class HrMetricsService
 
         // Jours travaillés théoriques = effectif moyen * jours ouvrés dans la période
         $workingDays      = $this->countWorkingDays($startDate, $endDate);
-        $averageHeadcount = ($this->employmentPeriodRepository->countActiveAt($startDate)
-            + $this->employmentPeriodRepository->countActiveAt($endDate)) / 2;
+        $averageHeadcount = (
+                $this->employmentPeriodRepository->countActiveAt($startDate)
+                + $this->employmentPeriodRepository->countActiveAt($endDate)
+            )
+            / 2;
 
         $theoreticalDays = $averageHeadcount                                         * $workingDays;
         $absenteeismRate = $theoreticalDays > 0 ? ($vacationDays / $theoreticalDays) * 100 : 0;
@@ -163,9 +166,30 @@ class HrMetricsService
 
         // Structure pour la pyramide par genre
         $ageRangesByGender = [
-            'male'   => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
-            'female' => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
-            'other'  => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+            'male' => [
+                '< 25 ans'  => 0,
+                '25-30 ans' => 0,
+                '30-40 ans' => 0,
+                '40-50 ans' => 0,
+                '50-60 ans' => 0,
+                '> 60 ans'  => 0,
+            ],
+            'female' => [
+                '< 25 ans'  => 0,
+                '25-30 ans' => 0,
+                '30-40 ans' => 0,
+                '40-50 ans' => 0,
+                '50-60 ans' => 0,
+                '> 60 ans'  => 0,
+            ],
+            'other' => [
+                '< 25 ans'  => 0,
+                '25-30 ans' => 0,
+                '30-40 ans' => 0,
+                '40-50 ans' => 0,
+                '50-60 ans' => 0,
+                '> 60 ans'  => 0,
+            ],
         ];
 
         $genderCounts = ['male' => 0, 'female' => 0, 'other' => 0];
@@ -280,8 +304,8 @@ class HrMetricsService
     private function countWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
         $workingDays = 0;
-        $current     = (clone $startDate);
-        $end         = (clone $endDate);
+        $current     = clone $startDate;
+        $end         = clone $endDate;
 
         while ($current <= $end) {
             $dayOfWeek = (int) $current->format('N'); // 1 (lundi) à 7 (dimanche)

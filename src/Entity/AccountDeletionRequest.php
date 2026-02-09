@@ -26,10 +26,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class AccountDeletionRequest implements CompanyOwnedInterface
 {
-    public const STATUS_PENDING   = 'pending';           // En attente de confirmation email
-    public const STATUS_CONFIRMED = 'confirmed';       // Confirmé, période de grâce en cours
-    public const STATUS_CANCELLED = 'cancelled';       // Annulé par l'utilisateur
-    public const STATUS_COMPLETED = 'completed';       // Suppression effectuée
+    public const STATUS_PENDING   = 'pending'; // En attente de confirmation email
+    public const STATUS_CONFIRMED = 'confirmed'; // Confirmé, période de grâce en cours
+    public const STATUS_CANCELLED = 'cancelled'; // Annulé par l'utilisateur
+    public const STATUS_COMPLETED = 'completed'; // Suppression effectuée
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -267,9 +267,11 @@ class AccountDeletionRequest implements CompanyOwnedInterface
      */
     public function isInGracePeriod(): bool
     {
-        return self::STATUS_CONFIRMED === $this->status
+        return
+            self::STATUS_CONFIRMED === $this->status
             && null !== $this->scheduledDeletionAt
-            && $this->scheduledDeletionAt > new DateTimeImmutable();
+            && $this->scheduledDeletionAt > new DateTimeImmutable()
+        ;
     }
 
     /**
@@ -277,9 +279,11 @@ class AccountDeletionRequest implements CompanyOwnedInterface
      */
     public function isDeletionDue(): bool
     {
-        return self::STATUS_CONFIRMED === $this->status
+        return
+            self::STATUS_CONFIRMED === $this->status
             && null !== $this->scheduledDeletionAt
-            && $this->scheduledDeletionAt <= new DateTimeImmutable();
+            && $this->scheduledDeletionAt <= new DateTimeImmutable()
+        ;
     }
 
     /**

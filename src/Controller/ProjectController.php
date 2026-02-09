@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Project;
@@ -25,13 +27,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProjectController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
     #[Route('', name: 'project_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em, ProfitabilityService $profitabilityService): Response
-    {
+    public function index(
+        Request $request,
+        EntityManagerInterface $em,
+        ProfitabilityService $profitabilityService,
+    ): Response {
         $projectRepo = $em->getRepository(Project::class);
 
         $session = $request->getSession();
@@ -44,42 +49,83 @@ class ProjectController extends AbstractController
 
         // Charger filtres depuis la session si aucun filtre explicite n'est fourni
         $queryAll   = $request->query->all();
-        $filterKeys = ['year', 'start_date', 'end_date', 'project_type', 'status', 'technology', 'service_category', 'per_page', 'sort', 'dir', 'search'];
-        $hasFilter  = (bool) count(array_intersect(array_keys($queryAll), $filterKeys));
-        $saved      = $session->has('project_filters') ? (array) $session->get('project_filters') : [];
+        $filterKeys = [
+            'year',
+            'start_date',
+            'end_date',
+            'project_type',
+            'status',
+            'technology',
+            'service_category',
+            'per_page',
+            'sort',
+            'dir',
+            'search',
+        ];
+        $hasFilter = (bool) count(array_intersect(array_keys($queryAll), $filterKeys));
+        $saved     = $session->has('project_filters') ? (array) $session->get('project_filters') : [];
 
         // Filtres période: année courante par défaut
-        $yearParam  = $hasFilter ? ($request->query->get('year') ?? null) : ($saved['year'] ?? null);
+        $yearParam  = $hasFilter ? $request->query->get('year') ?? null : $saved['year'] ?? null;
         $year       = (int) ($yearParam ?: date('Y'));
-        $startParam = $hasFilter ? ($request->query->get('start_date') ?: null) : ($saved['start_date'] ?? null);
-        $endParam   = $hasFilter ? ($request->query->get('end_date') ?: null) : ($saved['end_date'] ?? null);
+        $startParam = $hasFilter ? ($request->query->get('start_date') ?: null) : $saved['start_date'] ?? null;
+        $endParam   = $hasFilter ? ($request->query->get('end_date') ?: null) : $saved['end_date']     ?? null;
 
         $startDate = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
         $endDate   = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
 
         // Filtres additionnels
-        $filterProjectType     = $hasFilter ? ($request->query->get('project_type') ?: null) : ($saved['project_type'] ?? null);
-        $filterStatus          = $hasFilter ? ($request->query->get('status') ?: null) : ($saved['status'] ?? 'active');
-        $filterTechnology      = $hasFilter ? ($request->query->get('technology') ? (int) $request->query->get('technology') : null) : (isset($saved['technology']) ? (int) $saved['technology'] : null);
-        $filterServiceCategory = $hasFilter ? ($request->query->get('service_category') ? (int) $request->query->get('service_category') : null) : (isset($saved['service_category']) ? (int) $saved['service_category'] : null);
-        $filterSearch          = $hasFilter ? ($request->query->get('search') ?: null) : ($saved['search'] ?? null);
+        $filterProjectType = $hasFilter
+            ? ($request->query->get('project_type') ?: null)
+            : $saved['project_type']                                                                 ?? null;
+        $filterStatus     = $hasFilter ? ($request->query->get('status') ?: null) : $saved['status'] ?? 'active';
+        $filterTechnology = $hasFilter
+            ? ($request->query->get('technology') ? (int) $request->query->get('technology') : null)
+            : (isset($saved['technology']) ? (int) $saved['technology'] : null);
+        $filterServiceCategory = $hasFilter
+            ? ($request->query->get('service_category') ? (int) $request->query->get('service_category') : null)
+            : (isset($saved['service_category']) ? (int) $saved['service_category'] : null);
+        $filterSearch = $hasFilter ? ($request->query->get('search') ?: null) : $saved['search'] ?? null;
 
         // Tri
-        $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'name')) : ($saved['sort'] ?? 'name');
-        $dir  = $hasFilter ? ($request->query->get('dir') ?: ($saved['dir'] ?? 'ASC')) : ($saved['dir'] ?? 'ASC');
+        $sort = $hasFilter ? ($request->query->get('sort') ?: $saved['sort'] ?? 'name') : $saved['sort'] ?? 'name';
+        $dir  = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'ASC') : $saved['dir']     ?? 'ASC';
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
-        $perPageParam   = (int) ($hasFilter ? ($request->query->get('per_page', 10)) : ($saved['per_page'] ?? 10));
+        $perPageParam   = (int) ($hasFilter ? $request->query->get('per_page', 10) : $saved['per_page'] ?? 10);
         $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 10;
         $page           = max(1, (int) $request->query->get('page', 1));
         $offset         = ($page - 1) * $perPage;
 
         // Total
-        $total = $projectRepo->countBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $filterSearch, $filterServiceCategory);
+        $total = $projectRepo->countBetweenDatesFiltered(
+            $startDate,
+            $endDate,
+            $filterStatus,
+            $filterProjectType,
+            $filterTechnology,
+            $filterSearch,
+            $filterServiceCategory,
+        );
 
         // Projets sur la période avec filtres (paginés)
-        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, $perPage, $offset, null, null, null, $filterServiceCategory, $filterSearch);
+        $projects = $projectRepo->findBetweenDatesFiltered(
+            $startDate,
+            $endDate,
+            $filterStatus,
+            $filterProjectType,
+            $filterTechnology,
+            $sort,
+            $dir,
+            $perPage,
+            $offset,
+            null,
+            null,
+            null,
+            $filterServiceCategory,
+            $filterSearch,
+        );
 
         // Agrégats SQL en batch pour éviter le parcours objet
         $projectIds = array_map(fn ($p) => $p->id, $projects);
@@ -121,8 +167,27 @@ class ProjectController extends AbstractController
         }
 
         // KPIs période (réel basé sur timesheets) - doivent refléter TOUT l'ensemble filtré (pas seulement la page)
-        $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, null, null, null, null, null, null, null, $filterServiceCategory, $filterSearch);
-        $periodKpis         = $profitabilityService->calculatePeriodMetricsForProjects($allProjectsForKpis, $startDate, $endDate);
+        $allProjectsForKpis = $projectRepo->findBetweenDatesFiltered(
+            $startDate,
+            $endDate,
+            $filterStatus,
+            $filterProjectType,
+            $filterTechnology,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $filterServiceCategory,
+            $filterSearch,
+        );
+        $periodKpis = $profitabilityService->calculatePeriodMetricsForProjects(
+            $allProjectsForKpis,
+            $startDate,
+            $endDate,
+        );
 
         $pagination = [
             'current_page' => $page,
@@ -130,7 +195,7 @@ class ProjectController extends AbstractController
             'total'        => $total,
             'total_pages'  => (int) ceil($total / $perPage),
             'has_prev'     => $page > 1,
-            'has_next'     => $page * $perPage < $total,
+            'has_next'     => ($page * $perPage) < $total,
         ];
 
         // Options de filtres
@@ -228,7 +293,7 @@ class ProjectController extends AbstractController
         EntityManagerInterface $em,
         ProjectRiskAnalyzer $riskAnalyzer,
         ProfitabilityPredictor $profitabilityPredictor,
-        ProjectHealthScoreRepository $healthScoreRepo
+        ProjectHealthScoreRepository $healthScoreRepo,
     ): Response {
         $project = $em->getRepository(Project::class)->findOneWithRelations($id);
 
@@ -270,7 +335,7 @@ class ProjectController extends AbstractController
             'total'        => $oTotal,
             'total_pages'  => (int) ceil($oTotal / $oPerPage),
             'has_prev'     => $oPage > 1,
-            'has_next'     => $oPage * $oPerPage < $oTotal,
+            'has_next'     => ($oPage * $oPerPage) < $oTotal,
         ];
 
         // Charger les événements du projet pour la timeline
@@ -399,13 +464,23 @@ class ProjectController extends AbstractController
             'margin_rate'         => $marginRate,
             'orders_count'        => $ordersCount,
             'orders_by_status'    => $ordersByStatus,
-            'signed_orders_count' => array_sum(array_intersect_key($ordersByStatus, array_flip(['signed', 'won', 'completed', 'signe', 'gagne', 'termine']))),
+            'signed_orders_count' => array_sum(array_intersect_key($ordersByStatus, array_flip([
+                'signed',
+                'won',
+                'completed',
+                'signe',
+                'gagne',
+                'termine',
+            ]))),
         ];
     }
 
     #[Route('/export.csv', name: 'project_export_csv', methods: ['GET'])]
-    public function exportCsv(Request $request, EntityManagerInterface $em, ProfitabilityService $profitabilityService): Response
-    {
+    public function exportCsv(
+        Request $request,
+        EntityManagerInterface $em,
+        ProfitabilityService $profitabilityService,
+    ): Response {
         $projectRepo = $em->getRepository(Project::class);
         $session     = $request->getSession();
         $saved       = $session->has('project_filters') ? (array) $session->get('project_filters') : [];
@@ -424,7 +499,21 @@ class ProjectController extends AbstractController
         $sort                  = (string) $request->query->get('sort', $saved['sort'] ?? 'name');
         $dir                   = (string) $request->query->get('dir', $saved['dir'] ?? 'ASC');
 
-        $projects = $projectRepo->findBetweenDatesFiltered($startDate, $endDate, $filterStatus, $filterProjectType, $filterTechnology, $sort, $dir, null, null, null, null, null, $filterServiceCategory);
+        $projects = $projectRepo->findBetweenDatesFiltered(
+            $startDate,
+            $endDate,
+            $filterStatus,
+            $filterProjectType,
+            $filterTechnology,
+            $sort,
+            $dir,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $filterServiceCategory,
+        );
 
         // CSV headers
         $rows   = [];
@@ -501,7 +590,10 @@ class ProjectController extends AbstractController
 
             return $this->json(['success' => true, 'deleted' => $deleted]);
         } catch (Exception $e) {
-            return $this->json(['success' => false, 'message' => 'Erreur lors de la suppression: '.$e->getMessage()], 500);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression: '.$e->getMessage(),
+            ], 500);
         }
     }
 
@@ -545,7 +637,10 @@ class ProjectController extends AbstractController
 
             return $this->json(['success' => true, 'archived' => $archived]);
         } catch (Exception $e) {
-            return $this->json(['success' => false, 'message' => 'Erreur lors de l\'archivage: '.$e->getMessage()], 500);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'archivage: '.$e->getMessage(),
+            ], 500);
         }
     }
 
@@ -554,7 +649,7 @@ class ProjectController extends AbstractController
     public function planningSuggestions(
         Project $project,
         Request $request,
-        \App\Service\Planning\ProjectPlanningAssistant $assistant
+        \App\Service\Planning\ProjectPlanningAssistant $assistant,
     ): Response {
         // Date de début préférée (par défaut: date de début du projet ou lundi prochain)
         $startParam = $request->query->get('start_date');
@@ -578,7 +673,7 @@ class ProjectController extends AbstractController
         Project $project,
         Request $request,
         EntityManagerInterface $em,
-        \App\Service\Planning\ProjectPlanningAssistant $assistant
+        \App\Service\Planning\ProjectPlanningAssistant $assistant,
     ): Response {
         $data = json_decode($request->getContent(), true);
 

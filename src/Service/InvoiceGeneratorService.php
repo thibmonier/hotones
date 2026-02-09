@@ -75,7 +75,13 @@ class InvoiceGeneratorService
         // Créer la ligne de facturation
         $line = new InvoiceLine();
         $line->setCompany($this->companyContext->getCurrentCompany());
-        $line->setDescription($schedule->getLabel() ?? sprintf('Échéance %s - %s', $schedule->getBillingDate()->format('d/m/Y'), $order->getName() ?? $project->getName()));
+        $line->setDescription(
+            $schedule->getLabel() ?? sprintf(
+                'Échéance %s - %s',
+                $schedule->getBillingDate()->format('d/m/Y'),
+                $order->getName() ?? $project->getName(),
+            ),
+        );
         $line->setQuantity('1.00');
         $line->setUnit('forfait');
         $line->setUnitPriceHt($amountHt);
@@ -113,8 +119,12 @@ class InvoiceGeneratorService
      *
      * @return Invoice|null La facture générée, ou null si aucun temps saisi
      */
-    public function generateMonthlyRegieInvoice(Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, bool $autoSave = true): ?Invoice
-    {
+    public function generateMonthlyRegieInvoice(
+        Project $project,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        bool $autoSave = true,
+    ): ?Invoice {
         $client = $project->getClient();
         if (!$client) {
             throw new InvalidArgumentException('Project must be linked to a client to generate an invoice.');
@@ -126,7 +136,11 @@ class InvoiceGeneratorService
         }
 
         // Récupérer le CA mensuel (basé sur TJM contributeur)
-        $monthlyRevenue = $this->timesheetRepository->getMonthlyRevenueForProjectUsingContributorTjm($project, $startDate, $endDate);
+        $monthlyRevenue = $this->timesheetRepository->getMonthlyRevenueForProjectUsingContributorTjm(
+            $project,
+            $startDate,
+            $endDate,
+        );
 
         if (empty($monthlyRevenue)) {
             $this->logger->warning('No timesheets found for regie invoice generation', [
@@ -154,10 +168,16 @@ class InvoiceGeneratorService
         }
 
         // Récupérer les détails par contributeur pour les lignes de facturation
-        $timesheetDetails = $this->timesheetRepository->createQueryBuilder('t')
+        $timesheetDetails = $this->timesheetRepository
+            ->createQueryBuilder('t')
             ->select('c.id as contributor_id, c.firstName, c.lastName, SUM(t.hours) as totalHours, ep.tjm')
             ->join('t.contributor', 'c')
-            ->leftJoin(\App\Entity\EmploymentPeriod::class, 'ep', 'WITH', 'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)')
+            ->leftJoin(
+                \App\Entity\EmploymentPeriod::class,
+                'ep',
+                'WITH',
+                'ep.contributor = c AND ep.startDate <= t.date AND (ep.endDate IS NULL OR ep.endDate >= t.date)',
+            )
             ->where('t.project = :project')
             ->andWhere('t.date BETWEEN :start AND :end')
             ->setParameter('project', $project)
@@ -254,7 +274,8 @@ class InvoiceGeneratorService
         $endDate   = (clone $month)->modify('last day of this month');
 
         // Récupérer tous les projets en régie actifs
-        $regieProjects = $this->entityManager->getRepository(Project::class)
+        $regieProjects = $this->entityManager
+            ->getRepository(Project::class)
             ->createQueryBuilder('p')
             ->where('p.projectType = :type')
             ->andWhere('p.status = :status')
@@ -291,7 +312,8 @@ class InvoiceGeneratorService
      */
     public function invoiceExistsForPaymentSchedule(OrderPaymentSchedule $schedule): bool
     {
-        $count = $this->invoiceRepository->createQueryBuilder('i')
+        $count = $this->invoiceRepository
+            ->createQueryBuilder('i')
             ->select('COUNT(i.id)')
             ->where('i.paymentSchedule = :schedule')
             ->setParameter('schedule', $schedule)
@@ -309,7 +331,8 @@ class InvoiceGeneratorService
         $startDate = (clone $month)->modify('first day of this month');
         $endDate   = (clone $month)->modify('last day of this month');
 
-        $count = $this->invoiceRepository->createQueryBuilder('i')
+        $count = $this->invoiceRepository
+            ->createQueryBuilder('i')
             ->select('COUNT(i.id)')
             ->where('i.project = :project')
             ->andWhere('i.issuedAt BETWEEN :start AND :end')

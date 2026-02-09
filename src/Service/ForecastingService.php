@@ -22,9 +22,9 @@ class ForecastingService
     private const string SCENARIO_PESSIMISTIC = 'pessimistic';
 
     private const array SCENARIO_ADJUSTMENTS = [
-        self::SCENARIO_OPTIMISTIC  => 1.10,   // +10%
-        self::SCENARIO_REALISTIC   => 1.00,    // baseline
-        self::SCENARIO_PESSIMISTIC => 0.85,  // -15%
+        self::SCENARIO_OPTIMISTIC  => 1.10, // +10%
+        self::SCENARIO_REALISTIC   => 1.00, // baseline
+        self::SCENARIO_PESSIMISTIC => 0.85, // -15%
     ];
 
     public function __construct(
@@ -126,7 +126,8 @@ class ForecastingService
         $endDate   = new DateTime();
         $startDate = (clone $endDate)->modify("-{$months} months");
 
-        $projects = $this->projectRepository->createQueryBuilder('p')
+        $projects = $this->projectRepository
+            ->createQueryBuilder('p')
             ->select('p')
             ->where('p.startDate >= :startDate')
             ->andWhere('p.status IN (:statuses)')
@@ -246,7 +247,7 @@ class ForecastingService
             $variance += ($value - $mean) ** 2;
         }
         $stdDev                 = sqrt($variance / count($values));
-        $coefficientOfVariation = $mean > 0 ? ($stdDev / $mean) : 0;
+        $coefficientOfVariation = $mean > 0 ? $stdDev / $mean : 0;
 
         // Plus la variation est faible, plus la confiance est élevée
         $confidenceAdjustment = max(0, 100 - ($coefficientOfVariation * 100));
@@ -313,7 +314,15 @@ class ForecastingService
             $basePrediction = ($trendPrediction * 0.70) + ($trendPrediction * $seasonalityFactor * 0.30);
 
             foreach (self::SCENARIO_ADJUSTMENTS as $scenario => $adjustment) {
-                $forecast    = $this->createForecastFromBase($periodStart, $periodEnd, $scenario, $adjustment, $basePrediction, $trendPrediction, $seasonalityFactor);
+                $forecast = $this->createForecastFromBase(
+                    $periodStart,
+                    $periodEnd,
+                    $scenario,
+                    $adjustment,
+                    $basePrediction,
+                    $trendPrediction,
+                    $seasonalityFactor,
+                );
                 $forecasts[] = $forecast;
                 $this->em->persist($forecast);
             }
@@ -420,7 +429,7 @@ class ForecastingService
         float $scenarioAdjustment,
         float $basePrediction,
         float $trendPrediction,
-        float $seasonalityFactor
+        float $seasonalityFactor,
     ): FactForecast {
         // Apply scenario adjustment
         $predictedRevenue = bcmul((string) $basePrediction, (string) $scenarioAdjustment, 2);

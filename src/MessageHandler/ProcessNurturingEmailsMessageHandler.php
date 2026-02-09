@@ -50,28 +50,19 @@ final readonly class ProcessNurturingEmailsMessageHandler
         foreach ($leads as $lead) {
             // Email J+1
             if ($lead->shouldReceiveNurturingDay1()) {
-                $this->messageBus->dispatch(new SendLeadNurturingEmailMessage(
-                    leadId: $lead->getId(),
-                    dayNumber: 1,
-                ));
+                $this->messageBus->dispatch(new SendLeadNurturingEmailMessage(leadId: $lead->getId(), dayNumber: 1));
                 ++$stats['day1'];
             }
 
             // Email J+3
             if ($lead->shouldReceiveNurturingDay3()) {
-                $this->messageBus->dispatch(new SendLeadNurturingEmailMessage(
-                    leadId: $lead->getId(),
-                    dayNumber: 3,
-                ));
+                $this->messageBus->dispatch(new SendLeadNurturingEmailMessage(leadId: $lead->getId(), dayNumber: 3));
                 ++$stats['day3'];
             }
 
             // Email J+7
             if ($lead->shouldReceiveNurturingDay7()) {
-                $this->messageBus->dispatch(new SendLeadNurturingEmailMessage(
-                    leadId: $lead->getId(),
-                    dayNumber: 7,
-                ));
+                $this->messageBus->dispatch(new SendLeadNurturingEmailMessage(leadId: $lead->getId(), dayNumber: 7));
                 ++$stats['day7'];
             }
         }

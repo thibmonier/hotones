@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\User;
@@ -20,7 +22,7 @@ final class UserFactory extends PersistentObjectFactory
 {
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly ?CompanyContext $companyContext
+        private readonly ?CompanyContext $companyContext,
     ) {
         parent::__construct();
     }
@@ -59,13 +61,11 @@ final class UserFactory extends PersistentObjectFactory
     #[Override]
     public function initialize(): static
     {
-        return $this
-            ->afterInstantiate(function (User $user): void {
-                // Hash the plain password set in defaults
-                $hashed = $this->passwordHasher->hashPassword($user, $user->getPassword());
-                $user->setPassword($hashed);
-            })
-        ;
+        return $this->afterInstantiate(function (User $user): void {
+            // Hash the plain password set in defaults
+            $hashed = $this->passwordHasher->hashPassword($user, $user->getPassword());
+            $user->setPassword($hashed);
+        });
     }
 
     public static function class(): string

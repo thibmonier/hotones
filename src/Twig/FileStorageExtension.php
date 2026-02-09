@@ -15,7 +15,7 @@ use Twig\TwigFunction;
 class FileStorageExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly SecureFileUploadService $uploadService
+        private readonly SecureFileUploadService $uploadService,
     ) {
     }
 

@@ -34,9 +34,7 @@ final readonly class AiAssistantService
      */
     public function analyzeSentiment(string $text): array
     {
-        $messages = new MessageBag(
-            Message::ofUser("Texte : \"{$text}\""),
-        );
+        $messages = new MessageBag(Message::ofUser("Texte : \"{$text}\""));
 
         $response = $this->sentimentAgent->call($messages);
 
@@ -52,9 +50,7 @@ final readonly class AiAssistantService
             ? "Contexte additionnel : {$context}\n\nEmail reçu : \"{$incomingEmail}\""
             : "Email reçu : \"{$incomingEmail}\"";
 
-        $messages = new MessageBag(
-            Message::ofUser($prompt),
-        );
+        $messages = new MessageBag(Message::ofUser($prompt));
 
         /* @phpstan-ignore return.type */
         return $this->emailAgent->call($messages);
@@ -67,9 +63,7 @@ final readonly class AiAssistantService
      */
     public function generateQuoteLines(string $projectDescription): array
     {
-        $messages = new MessageBag(
-            Message::ofUser("Projet : \"{$projectDescription}\""),
-        );
+        $messages = new MessageBag(Message::ofUser("Projet : \"{$projectDescription}\""));
 
         $response = $this->quoteAgent->call($messages);
 

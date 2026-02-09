@@ -16,10 +16,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProjectSkillRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ProjectSkill::class, $companyContext);
     }
 
@@ -30,7 +28,8 @@ class ProjectSkillRepository extends CompanyAwareRepository
      */
     public function findByProject(Project $project): array
     {
-        return $this->createCompanyQueryBuilder('ps')
+        return $this
+            ->createCompanyQueryBuilder('ps')
             ->join('ps.skill', 's')
             ->andWhere('ps.project = :project')
             ->setParameter('project', $project)
@@ -48,7 +47,8 @@ class ProjectSkillRepository extends CompanyAwareRepository
      */
     public function findCriticalByProject(Project $project): array
     {
-        return $this->createCompanyQueryBuilder('ps')
+        return $this
+            ->createCompanyQueryBuilder('ps')
             ->join('ps.skill', 's')
             ->andWhere('ps.project = :project')
             ->setParameter('project', $project)
@@ -67,7 +67,8 @@ class ProjectSkillRepository extends CompanyAwareRepository
      */
     public function findBySkill(Skill $skill): array
     {
-        return $this->createCompanyQueryBuilder('ps')
+        return $this
+            ->createCompanyQueryBuilder('ps')
             ->join('ps.project', 'p')
             ->andWhere('ps.skill = :skill')
             ->setParameter('skill', $skill)
@@ -135,7 +136,7 @@ class ProjectSkillRepository extends CompanyAwareRepository
                 ProjectSkill::PRIORITY_CRITICAL => 4,
                 ProjectSkill::PRIORITY_HIGH     => 3,
                 ProjectSkill::PRIORITY_MEDIUM   => 2,
-                ProjectSkill::PRIORITY_LOW      => 1,
+                default                         => 1,
             };
 
             $total += $weight;
@@ -145,7 +146,7 @@ class ProjectSkillRepository extends CompanyAwareRepository
             }
         }
 
-        return $total > 0 ? (int) round(($met / $total) * 100) : 100;
+        return (int) round(($met / $total) * 100);
     }
 
     /**

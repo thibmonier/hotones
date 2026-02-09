@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Contributor;
@@ -19,10 +21,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class EmploymentPeriodRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, EmploymentPeriod::class, $companyContext);
     }
 
@@ -31,13 +31,13 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function findWithOptionalContributorFilter(?int $contributorId = null): array
     {
-        $queryBuilder = $this->createCompanyQueryBuilder('ep')
+        $queryBuilder = $this
+            ->createCompanyQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->orderBy('ep.startDate', 'DESC');
 
         if ($contributorId) {
-            $queryBuilder->andWhere('ep.contributor = :contributor')
-                ->setParameter('contributor', $contributorId);
+            $queryBuilder->andWhere('ep.contributor = :contributor')->setParameter('contributor', $contributorId);
         }
 
         return $queryBuilder->getQuery()->getResult();
@@ -52,30 +52,29 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
             return false;
         }
 
-        $queryBuilder = $this->createCompanyQueryBuilder('ep')
+        $queryBuilder = $this
+            ->createCompanyQueryBuilder('ep')
             ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $period->contributor);
 
         if ($excludeId) {
-            $queryBuilder->andWhere('ep.id <> :excludeId')
-                ->setParameter('excludeId', $excludeId);
+            $queryBuilder->andWhere('ep.id <> :excludeId')->setParameter('excludeId', $excludeId);
         }
 
         // Vérifier les chevauchements
         $endDate = $period->endDate;
         if ($endDate) {
             // Période avec date de fin
-            $queryBuilder->andWhere(
-                '(ep.startDate <= :endDate AND (ep.endDate IS NULL OR ep.endDate >= :startDate))',
-            )
-            ->setParameter('startDate', $period->startDate)
-            ->setParameter('endDate', $endDate);
+            $queryBuilder
+                ->andWhere('(ep.startDate <= :endDate AND (ep.endDate IS NULL OR ep.endDate >= :startDate))')
+                ->setParameter('startDate', $period->startDate)
+                ->setParameter('endDate', $endDate);
         } else {
             // Période ouverte (sans date de fin)
-            $queryBuilder->andWhere(
-                '(ep.endDate IS NULL OR ep.endDate >= :startDate)',
-            )
-            ->setParameter('startDate', $period->startDate);
+            $queryBuilder->andWhere('(ep.endDate IS NULL OR ep.endDate >= :startDate)')->setParameter(
+                'startDate',
+                $period->startDate,
+            );
         }
 
         return $queryBuilder->getQuery()->getOneOrNullResult() !== null;
@@ -88,7 +87,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     {
         $now = new DateTime();
 
-        return $this->createCompanyQueryBuilder('ep')
+        return $this
+            ->createCompanyQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->addSelect('c')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
@@ -103,7 +103,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createCompanyQueryBuilder('ep')
+        return $this
+            ->createCompanyQueryBuilder('ep')
             ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ep.startDate', 'DESC')
@@ -118,7 +119,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     {
         $now = new DateTime();
 
-        return $this->createCompanyQueryBuilder('ep')
+        return $this
+            ->createCompanyQueryBuilder('ep')
             ->andWhere('ep.contributor = :contributor')
             ->andWhere('ep.startDate <= :now')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
@@ -135,7 +137,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function findWithProfiles(): array
     {
-        return $this->createCompanyQueryBuilder('ep')
+        return $this
+            ->createCompanyQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->leftJoin('ep.profiles', 'p')
             ->addSelect('c', 'p')
@@ -188,13 +191,12 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         $qb = $this->createCompanyQueryBuilder('ep');
 
         // Total des périodes
-        $totalPeriods = $qb->select('COUNT(ep.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $totalPeriods = $qb->select('COUNT(ep.id)')->getQuery()->getSingleScalarResult();
 
         // Périodes actives
         $now           = new DateTime();
-        $activePeriods = $this->createCompanyQueryBuilder('ep')
+        $activePeriods = $this
+            ->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :now')
             ->setParameter('now', $now)
@@ -202,7 +204,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
             ->getSingleScalarResult();
 
         // Coût moyen des CJM
-        $avgCjm = $this->createCompanyQueryBuilder('ep')
+        $avgCjm = $this
+            ->createCompanyQueryBuilder('ep')
             ->select('AVG(ep.cjm)')
             ->andWhere('ep.cjm IS NOT NULL')
             ->getQuery()
@@ -220,7 +223,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function countDepartures(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
-        return (int) $this->createCompanyQueryBuilder('ep')
+        return (int) $this
+            ->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
             ->andWhere('ep.endDate IS NOT NULL')
             ->andWhere('ep.endDate >= :startDate')
@@ -236,7 +240,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function countActiveAt(DateTimeInterface $date): int
     {
-        return (int) $this->createCompanyQueryBuilder('ep')
+        return (int) $this
+            ->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
             ->andWhere('ep.startDate <= :date')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :date')
@@ -250,7 +255,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      */
     public function findFirstByContributor(Contributor $contributor): ?EmploymentPeriod
     {
-        return $this->createCompanyQueryBuilder('ep')
+        return $this
+            ->createCompanyQueryBuilder('ep')
             ->andWhere('ep.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('ep.startDate', 'ASC')
@@ -266,15 +272,19 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
      *
      * @return EmploymentPeriod[]
      */
-    public function findByContributorsAndDateRange(array $contributors, DateTimeInterface $startDate, DateTimeInterface $endDate): array
-    {
+    public function findByContributorsAndDateRange(
+        array $contributors,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+    ): array {
         if (empty($contributors)) {
             return [];
         }
 
         $contributorIds = array_map(fn (Contributor $c): ?int => $c->getId(), $contributors);
 
-        return $this->createCompanyQueryBuilder('ep')
+        return $this
+            ->createCompanyQueryBuilder('ep')
             ->andWhere('ep.contributor IN (:contributorIds)')
             ->andWhere('ep.startDate <= :endDate')
             ->andWhere('ep.endDate IS NULL OR ep.endDate >= :startDate')

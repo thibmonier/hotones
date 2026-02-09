@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Contributor;
@@ -13,18 +15,19 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ContributorSatisfactionRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ContributorSatisfaction::class, $companyContext);
     }
 
     /**
      * Récupère la satisfaction d'un contributeur pour une période donnée.
      */
-    public function findByContributorAndPeriod(Contributor $contributor, int $year, int $month): ?ContributorSatisfaction
-    {
+    public function findByContributorAndPeriod(
+        Contributor $contributor,
+        int $year,
+        int $month,
+    ): ?ContributorSatisfaction {
         return $this->findOneBy([
             'contributor' => $contributor,
             'year'        => $year,
@@ -37,7 +40,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('cs.year', 'DESC')
@@ -51,7 +55,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function findByPeriod(int $year, int $month): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->andWhere('cs.year = :year')
             ->andWhere('cs.month = :month')
             ->setParameter('year', $year)
@@ -65,7 +70,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function findByYear(int $year): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->andWhere('cs.year = :year')
             ->setParameter('year', $year)
             ->orderBy('cs.month', 'DESC')
@@ -78,7 +84,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function getAverageScoreByPeriod(int $year, int $month): ?float
     {
-        $result = $this->createCompanyQueryBuilder('cs')
+        $result = $this
+            ->createCompanyQueryBuilder('cs')
             ->select('AVG(cs.overallScore) as avg_score')
             ->andWhere('cs.year = :year')
             ->andWhere('cs.month = :month')
@@ -95,7 +102,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function getAverageScoreByYear(int $year): ?float
     {
-        $result = $this->createCompanyQueryBuilder('cs')
+        $result = $this
+            ->createCompanyQueryBuilder('cs')
             ->select('AVG(cs.overallScore) as avg_score')
             ->andWhere('cs.year = :year')
             ->setParameter('year', $year)
@@ -164,13 +172,17 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
         }
 
         return [
-            'total'                     => $total,
-            'average_overall'           => round($sumOverall / $total, 2),
-            'average_projects'          => $countProjects        > 0 ? round($sumProjects / $countProjects, 2) : null,
-            'average_team'              => $countTeam            > 0 ? round($sumTeam / $countTeam, 2) : null,
-            'average_work_environment'  => $countWorkEnvironment > 0 ? round($sumWorkEnvironment / $countWorkEnvironment, 2) : null,
-            'average_work_life_balance' => $countWorkLifeBalance > 0 ? round($sumWorkLifeBalance / $countWorkLifeBalance, 2) : null,
-            'distribution'              => $distribution,
+            'total'                    => $total,
+            'average_overall'          => round($sumOverall / $total, 2),
+            'average_projects'         => $countProjects        > 0 ? round($sumProjects / $countProjects, 2) : null,
+            'average_team'             => $countTeam            > 0 ? round($sumTeam / $countTeam, 2) : null,
+            'average_work_environment' => $countWorkEnvironment > 0
+                ? round($sumWorkEnvironment / $countWorkEnvironment, 2)
+                : null,
+            'average_work_life_balance' => $countWorkLifeBalance > 0
+                ? round($sumWorkLifeBalance / $countWorkLifeBalance, 2)
+                : null,
+            'distribution' => $distribution,
         ];
     }
 
@@ -253,13 +265,17 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
         }
 
         return [
-            'total'                     => $total,
-            'average_overall'           => round($sumOverall / $total, 2),
-            'average_projects'          => $countProjects        > 0 ? round($sumProjects / $countProjects, 2) : null,
-            'average_team'              => $countTeam            > 0 ? round($sumTeam / $countTeam, 2) : null,
-            'average_work_environment'  => $countWorkEnvironment > 0 ? round($sumWorkEnvironment / $countWorkEnvironment, 2) : null,
-            'average_work_life_balance' => $countWorkLifeBalance > 0 ? round($sumWorkLifeBalance / $countWorkLifeBalance, 2) : null,
-            'monthly_averages'          => $monthlyAverages,
+            'total'                    => $total,
+            'average_overall'          => round($sumOverall / $total, 2),
+            'average_projects'         => $countProjects        > 0 ? round($sumProjects / $countProjects, 2) : null,
+            'average_team'             => $countTeam            > 0 ? round($sumTeam / $countTeam, 2) : null,
+            'average_work_environment' => $countWorkEnvironment > 0
+                ? round($sumWorkEnvironment / $countWorkEnvironment, 2)
+                : null,
+            'average_work_life_balance' => $countWorkLifeBalance > 0
+                ? round($sumWorkLifeBalance / $countWorkLifeBalance, 2)
+                : null,
+            'monthly_averages' => $monthlyAverages,
         ];
     }
 
@@ -268,7 +284,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function getContributorTrend(Contributor $contributor, int $months = 12): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('cs.year', 'DESC')
@@ -283,7 +300,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function countByPeriod(int $year, int $month): int
     {
-        return (int) $this->createCompanyQueryBuilder('cs')
+        return (int) $this
+            ->createCompanyQueryBuilder('cs')
             ->select('COUNT(DISTINCT cs.contributor)')
             ->andWhere('cs.year = :year')
             ->andWhere('cs.month = :month')
@@ -310,7 +328,9 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
 
         // Récupérer les contributeurs ayant travaillé sur le projet
         $company        = $this->companyContext->getCurrentCompany();
-        $contributorIds = $this->getEntityManager()->createQueryBuilder()
+        $contributorIds = $this
+            ->getEntityManager()
+            ->createQueryBuilder()
             ->select('DISTINCT IDENTITY(t.contributor)')
             ->from(\App\Entity\Timesheet::class, 't')
             ->where('t.project = :projectId')
@@ -329,13 +349,15 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
 
         // Récupérer les satisfactions de ces contributeurs pour la période
         $qb = $this->createCompanyQueryBuilder('cs');
-        $qb->where($qb->expr()->in('cs.contributor', ':contributorIds'))
+        $qb
+            ->where($qb->expr()->in('cs.contributor', ':contributorIds'))
             ->setParameter('contributorIds', $contributorIds)
             ->orderBy('cs.year', 'ASC')
             ->addOrderBy('cs.month', 'ASC');
 
         // Filtrer par période si nécessaire
-        $qb->andWhere('(cs.year > :startYear) OR (cs.year = :startYear AND cs.month >= :startMonth)')
+        $qb
+            ->andWhere('(cs.year > :startYear) OR (cs.year = :startYear AND cs.month >= :startMonth)')
             ->andWhere('(cs.year < :endYear) OR (cs.year = :endYear AND cs.month <= :endMonth)')
             ->setParameter('startYear', (int) $startDate->format('Y'))
             ->setParameter('startMonth', (int) $startDate->format('n'))
@@ -394,13 +416,19 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
         foreach ($grouped as $period => $data) {
             $count    = $data['responseCount'];
             $result[] = [
-                'period'             => $period,
-                'responseCount'      => $count,
-                'avgOverall'         => round($data['sumOverall'] / $count, 2),
-                'avgProjects'        => $data['countProjects']        > 0 ? round($data['sumProjects'] / $data['countProjects'], 2) : null,
+                'period'        => $period,
+                'responseCount' => $count,
+                'avgOverall'    => round($data['sumOverall'] / $count, 2),
+                'avgProjects'   => $data['countProjects'] > 0
+                    ? round($data['sumProjects'] / $data['countProjects'], 2)
+                    : null,
                 'avgTeam'            => $data['countTeam']            > 0 ? round($data['sumTeam'] / $data['countTeam'], 2) : null,
-                'avgWorkEnvironment' => $data['countWorkEnvironment'] > 0 ? round($data['sumWorkEnvironment'] / $data['countWorkEnvironment'], 2) : null,
-                'avgWorkLifeBalance' => $data['countWorkLifeBalance'] > 0 ? round($data['sumWorkLifeBalance'] / $data['countWorkLifeBalance'], 2) : null,
+                'avgWorkEnvironment' => $data['countWorkEnvironment'] > 0
+                    ? round($data['sumWorkEnvironment'] / $data['countWorkEnvironment'], 2)
+                    : null,
+                'avgWorkLifeBalance' => $data['countWorkLifeBalance'] > 0
+                    ? round($data['sumWorkLifeBalance'] / $data['countWorkLifeBalance'], 2)
+                    : null,
             ];
         }
 

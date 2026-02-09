@@ -29,8 +29,7 @@ class ProfitabilityServiceTest extends TestCase
             ->setOrderNumber('D202501-001')
             ->setStatus('signed'); // Note: service expects english statuses
 
-        $section = new OrderSection()
-            ->setTitle('Services');
+        $section = new OrderSection()->setTitle('Services');
 
         $profile = new Profile()
             ->setName('Dev')
@@ -422,7 +421,10 @@ class ProfitabilityServiceTest extends TestCase
         }
 
         $alerts                 = $service->generateProfitabilityAlerts($project);
-        $hasNegativeMarginAlert = array_any($alerts, fn ($alert): bool => $alert['type'] === 'danger' && $alert['title'] === 'Marge négative');
+        $hasNegativeMarginAlert = array_any(
+            $alerts,
+            fn ($alert): bool => $alert['type'] === 'danger' && $alert['title'] === 'Marge négative',
+        );
 
         $this->assertTrue($hasNegativeMarginAlert);
     }

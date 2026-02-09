@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class HubSpotSettingsRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, HubSpotSettings::class, $companyContext);
     }
 
@@ -45,7 +43,8 @@ class HubSpotSettingsRepository extends CompanyAwareRepository
      */
     public function findNeedingSync(): array
     {
-        return $this->createQueryBuilder('h')
+        return $this
+            ->createQueryBuilder('h')
             ->where('h.enabled = :enabled')
             ->andWhere('h.autoSyncEnabled = :autoSyncEnabled')
             ->andWhere('h.accessToken IS NOT NULL')

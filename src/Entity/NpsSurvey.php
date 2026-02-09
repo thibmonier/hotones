@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Interface\CompanyOwnedInterface;
@@ -26,9 +28,9 @@ class NpsSurvey implements CompanyOwnedInterface
     use Blameable;
 
     // Statuts possibles
-    public const STATUS_PENDING   = 'pending';      // En attente de réponse
-    public const STATUS_COMPLETED = 'completed';  // Répondu
-    public const STATUS_EXPIRED   = 'expired';      // Expiré
+    public const STATUS_PENDING   = 'pending'; // En attente de réponse
+    public const STATUS_COMPLETED = 'completed'; // Répondu
+    public const STATUS_EXPIRED   = 'expired'; // Expiré
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

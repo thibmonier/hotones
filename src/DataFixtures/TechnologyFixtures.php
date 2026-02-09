@@ -166,7 +166,7 @@ class TechnologyFixtures extends Fixture implements FixtureGroupInterface
     private function createTechnologiesForCompany(
         ObjectManager $manager,
         \Doctrine\ORM\EntityRepository $techRepository,
-        Company $company
+        Company $company,
     ): array {
         $created = 0;
         $skipped = 0;

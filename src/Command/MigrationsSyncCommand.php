@@ -17,16 +17,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:migrations:sync',
-    description: 'Synchronize migrations table with actual database state',
-)]
+#[AsCommand(name: 'app:migrations:sync', description: 'Synchronize migrations table with actual database state')]
 class MigrationsSyncCommand extends Command
 {
     public function __construct(
         private readonly DependencyFactory $dependencyFactory,
         private readonly Connection $connection,
-        private readonly string $projectDir
+        private readonly string $projectDir,
     ) {
         parent::__construct();
     }
@@ -35,24 +32,28 @@ class MigrationsSyncCommand extends Command
     {
         $this
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be done without executing')
-            ->addOption('mark-all', null, InputOption::VALUE_NONE, 'Mark all pending migrations as executed without checking')
+            ->addOption(
+                'mark-all',
+                null,
+                InputOption::VALUE_NONE,
+                'Mark all pending migrations as executed without checking',
+            )
             ->setHelp(<<<'HELP'
-This command helps synchronize the migrations tracking table with the actual database state.
+                This command helps synchronize the migrations tracking table with the actual database state.
 
-It checks each pending migration to see if its changes are already applied to the database,
-and offers to mark them as executed.
+                It checks each pending migration to see if its changes are already applied to the database,
+                and offers to mark them as executed.
 
-Usage:
-  # Dry run to see what would be done
-  php bin/console app:migrations:sync --dry-run --env=prod
+                Usage:
+                  # Dry run to see what would be done
+                  php bin/console app:migrations:sync --dry-run --env=prod
 
-  # Interactive mode - checks each migration
-  php bin/console app:migrations:sync --env=prod
+                  # Interactive mode - checks each migration
+                  php bin/console app:migrations:sync --env=prod
 
-  # Mark all pending migrations as executed (use with caution!)
-  php bin/console app:migrations:sync --mark-all --env=prod
-HELP
-            );
+                  # Mark all pending migrations as executed (use with caution!)
+                  php bin/console app:migrations:sync --mark-all --env=prod
+                HELP);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -224,7 +225,11 @@ HELP
 
     private function extractDescription(string $content): ?string
     {
-        if (preg_match('/public function getDescription\(\): string\s*{\s*return [\'"](.+?)[\'"];/s', $content, $matches)) {
+        if (preg_match(
+            '/public function getDescription\(\): string\s*{\s*return [\'"](.+?)[\'"];/s',
+            $content,
+            $matches,
+        )) {
             return $matches[1];
         }
 
@@ -283,7 +288,9 @@ HELP
                 }
             }
 
-            return empty($operations) ? '  <comment>(Complex migration - check manually)</comment>' : implode("\n", $operations);
+            return empty($operations)
+                ? '  <comment>(Complex migration - check manually)</comment>'
+                : implode("\n", $operations);
         }
 
         return null;

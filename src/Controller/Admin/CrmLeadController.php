@@ -52,22 +52,21 @@ class CrmLeadController extends AbstractController
         $search           = $request->query->get('search');
 
         // QueryBuilder avec filtres
-        $qb = $this->leadCaptureRepository->createQueryBuilder('l')
-            ->orderBy('l.createdAt', 'DESC');
+        $qb = $this->leadCaptureRepository->createQueryBuilder('l')->orderBy('l.createdAt', 'DESC');
 
         if ($status) {
-            $qb->andWhere('l.status = :status')
-                ->setParameter('status', $status);
+            $qb->andWhere('l.status = :status')->setParameter('status', $status);
         }
 
         if ($source) {
-            $qb->andWhere('l.source = :source')
-                ->setParameter('source', $source);
+            $qb->andWhere('l.source = :source')->setParameter('source', $source);
         }
 
         if ($marketingConsent !== null && $marketingConsent !== '') {
-            $qb->andWhere('l.marketingConsent = :marketingConsent')
-                ->setParameter('marketingConsent', (bool) $marketingConsent);
+            $qb->andWhere('l.marketingConsent = :marketingConsent')->setParameter(
+                'marketingConsent',
+                (bool) $marketingConsent,
+            );
         }
 
         if ($hasDownloaded !== null && $hasDownloaded !== '') {
@@ -79,17 +78,15 @@ class CrmLeadController extends AbstractController
         }
 
         if ($search) {
-            $qb->andWhere('l.email LIKE :search OR l.firstName LIKE :search OR l.lastName LIKE :search OR l.company LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere(
+                'l.email LIKE :search OR l.firstName LIKE :search OR l.lastName LIKE :search OR l.company LIKE :search',
+            )->setParameter('search', '%'.$search.'%');
         }
 
         // Pagination
         $query = $qb->getQuery();
         $total = count($query->getResult());
-        $leads = $query
-            ->setFirstResult(($page - 1) * $perPage)
-            ->setMaxResults($perPage)
-            ->getResult();
+        $leads = $query->setFirstResult(($page - 1) * $perPage)->setMaxResults($perPage)->getResult();
 
         $totalPages = (int) ceil($total / $perPage);
 
@@ -143,15 +140,17 @@ class CrmLeadController extends AbstractController
 
         $newStatus = $request->request->get('status');
 
-        if (
-            !in_array($newStatus, [
+        if (!in_array(
+            $newStatus,
+            [
                 LeadCapture::STATUS_NEW,
                 LeadCapture::STATUS_NURTURING,
                 LeadCapture::STATUS_QUALIFIED,
                 LeadCapture::STATUS_CONVERTED,
                 LeadCapture::STATUS_LOST,
-            ], true)
-        ) {
+            ],
+            true,
+        )) {
             $this->addFlash('error', 'Statut invalide');
 
             return $this->redirectToRoute('admin_crm_leads_show', ['id' => $id]);
@@ -196,17 +195,14 @@ class CrmLeadController extends AbstractController
         $status = $request->query->get('status');
         $source = $request->query->get('source');
 
-        $qb = $this->leadCaptureRepository->createQueryBuilder('l')
-            ->orderBy('l.createdAt', 'DESC');
+        $qb = $this->leadCaptureRepository->createQueryBuilder('l')->orderBy('l.createdAt', 'DESC');
 
         if ($status) {
-            $qb->andWhere('l.status = :status')
-                ->setParameter('status', $status);
+            $qb->andWhere('l.status = :status')->setParameter('status', $status);
         }
 
         if ($source) {
-            $qb->andWhere('l.source = :source')
-                ->setParameter('source', $source);
+            $qb->andWhere('l.source = :source')->setParameter('source', $source);
         }
 
         $leads = $qb->getQuery()->getResult();
@@ -258,7 +254,10 @@ class CrmLeadController extends AbstractController
         // Créer la réponse
         $response = new Response();
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment; filename="leads-hotones-'.date('Y-m-d').'.csv"');
+        $response->headers->set(
+            'Content-Disposition',
+            'attachment; filename="leads-hotones-'.date('Y-m-d').'.csv"',
+        );
 
         $output = fopen('php://temp', 'r+');
 
@@ -297,7 +296,8 @@ class CrmLeadController extends AbstractController
         }
 
         // Statistiques par statut
-        $qb = $this->leadCaptureRepository->createQueryBuilder('l')
+        $qb = $this->leadCaptureRepository
+            ->createQueryBuilder('l')
             ->select('l.status, COUNT(l.id) as count')
             ->groupBy('l.status');
         $statsByStatus = $qb->getQuery()->getResult();
@@ -308,7 +308,8 @@ class CrmLeadController extends AbstractController
         // Taux de conversion par source
         $conversionBySource = [];
         foreach ($statsBySourceRaw as $source => $totalBySource) {
-            $convertedQb = $this->leadCaptureRepository->createQueryBuilder('l')
+            $convertedQb = $this->leadCaptureRepository
+                ->createQueryBuilder('l')
                 ->select('COUNT(l.id)')
                 ->where('l.source = :source')
                 ->andWhere('l.status = :status')

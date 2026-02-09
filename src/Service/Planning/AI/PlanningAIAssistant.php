@@ -30,17 +30,17 @@ class PlanningAIAssistant
         private readonly HttpClientInterface $httpClient,
         ?string $openaiApiKey = null,
         ?string $anthropicApiKey = null,
-        ?string $geminiApiKey = null
+        ?string $geminiApiKey = null,
     ) {
         // Déterminer quel provider est disponible (ordre de priorité)
-        if ($openaiApiKey !== null && $openaiApiKey !== '') {
-            $this->enabled  = true;
-            $this->provider = 'openai';
-            $this->apiKey   = $openaiApiKey;
-        } elseif ($anthropicApiKey !== null && $anthropicApiKey !== '') {
+        if ($anthropicApiKey !== null && $anthropicApiKey !== '') {
             $this->enabled  = true;
             $this->provider = 'anthropic';
             $this->apiKey   = $anthropicApiKey;
+        } elseif ($openaiApiKey !== null && $openaiApiKey !== '') {
+            $this->enabled  = true;
+            $this->provider = 'openai';
+            $this->apiKey   = $openaiApiKey;
         } elseif ($geminiApiKey !== null && $geminiApiKey !== '') {
             $this->enabled  = true;
             $this->provider = 'gemini';
@@ -113,8 +113,23 @@ class PlanningAIAssistant
         $prompt .= sprintf("- %d contributeurs sous-utilisés\n", count($analysis['underutilized'] ?? []));
         $prompt .= sprintf("- %d projets actifs\n", count($projects));
 
+        if (!empty($projects)) {
+            $prompt .= "\n## Projets actifs:\n";
+            foreach ($projects as $project) {
+                $type   = $project->isInternal ? 'Interne' : 'Client';
+                $client = $project->getClient()?->getName()         ?? 'N/A';
+                $level  = $project->getClient()?->getServiceLevel() ?? 'standard';
+                $prompt .= sprintf(
+                    "- %s (%s%s)\n",
+                    $project->getName(),
+                    $type,
+                    $project->isInternal ? '' : sprintf(', Client: %s, Niveau: %s', $client, $level),
+                );
+            }
+        }
+
         $prompt .= "\n## Contributeurs en surcharge critique:\n";
-        foreach (($analysis['critical'] ?? []) as $item) {
+        foreach ($analysis['critical'] ?? [] as $item) {
             if ($item['status'] === 'critical_high') {
                 $prompt .= sprintf(
                     "- %s (TACE: %.1f%%, Écart: %+.1f points)\n",
@@ -126,7 +141,7 @@ class PlanningAIAssistant
         }
 
         $prompt .= "\n## Contributeurs sous-utilisés:\n";
-        foreach (($analysis['underutilized'] ?? []) as $item) {
+        foreach ($analysis['underutilized'] ?? [] as $item) {
             $prompt .= sprintf(
                 "- %s (TACE: %.1f%%, Disponible: %.1f%%)\n",
                 $item['contributor']->getFullName(),
@@ -140,7 +155,8 @@ class PlanningAIAssistant
         $prompt .= "1. Réduire la surcharge des contributeurs critiques\n";
         $prompt .= "2. Mieux utiliser les contributeurs sous-utilisés\n";
         $prompt .= "3. Optimiser la répartition globale en tenant compte des compétences\n";
-        $prompt .= "4. Prioriser les projets clients VIP/Prioritaires\n\n";
+        $prompt .= "4. Prioriser les projets clients VIP/Prioritaires\n";
+        $prompt .= "5. Ne PAS proposer d'allouer des contributeurs sur des projets internes — les projets internes doivent être déchargés en premier en cas de surcharge\n\n";
         $prompt .= "Format de réponse attendu (JSON):\n";
         $prompt .= "{\n";
         $prompt .= "  \"recommendations\": [\n";
@@ -184,15 +200,20 @@ class PlanningAIAssistant
     {
         $client = OpenAI::client($this->apiKey);
 
-        $response = $client->chat()->create([
-            'model'    => 'gpt-4o-mini', // Modèle plus rapide et moins cher que gpt-4
-            'messages' => [
-                ['role' => 'system', 'content' => 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.'],
-                ['role' => 'user', 'content' => $prompt],
-            ],
-            'temperature' => 0.7,
-            'max_tokens'  => 2000,
-        ]);
+        $response = $client
+            ->chat()
+            ->create([
+                'model'    => 'gpt-4o-mini', // Modèle plus rapide et moins cher que gpt-4
+                'messages' => [
+                    [
+                        'role'    => 'system',
+                        'content' => 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.',
+                    ],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+                'temperature' => 0.7,
+                'max_tokens'  => 2000,
+            ]);
 
         $content = $response->choices[0]->message->content;
 
@@ -217,10 +238,7 @@ class PlanningAIAssistant
             model: 'claude-3-5-haiku-20241022', // Modèle rapide et économique
             maxTokens: 2000,
             messages: [
-                MessageParam::with(
-                    role: 'user',
-                    content: $prompt,
-                ),
+                MessageParam::with(role: 'user', content: $prompt),
             ],
             system: 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.',
         );
@@ -250,21 +268,26 @@ class PlanningAIAssistant
     {
         $systemPrompt = 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.';
 
-        $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='.$this->apiKey, [
-            'json' => [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $systemPrompt."\n\n".$prompt],
+        $response = $this->httpClient->request(
+            'POST',
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='
+            .$this->apiKey,
+            [
+                'json' => [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $systemPrompt."\n\n".$prompt],
+                            ],
                         ],
                     ],
-                ],
-                'generationConfig' => [
-                    'temperature'     => 0.7,
-                    'maxOutputTokens' => 2000,
+                    'generationConfig' => [
+                        'temperature'     => 0.7,
+                        'maxOutputTokens' => 2000,
+                    ],
                 ],
             ],
-        ]);
+        );
 
         $data = $response->toArray();
 

@@ -108,7 +108,8 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         // Query aggregated data
         $qb     = $this->entityManager->createQueryBuilder();
-        $result = $qb->select('SUM(f.totalRevenue) as totalRevenue', 'SUM(f.projectCount) as totalProjects')
+        $result = $qb
+            ->select('SUM(f.totalRevenue) as totalRevenue', 'SUM(f.projectCount) as totalProjects')
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
             ->where('dt.year = :year')
@@ -156,10 +157,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Use the service to read KPIs
-        $kpis = $this->dashboardReadService->getKPIs(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-01-31'),
-        );
+        $kpis = $this->dashboardReadService->getKPIs(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         // Verify the structure and values
         $this->assertArrayHasKey('revenue', $kpis);
@@ -253,10 +251,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         // Measure query time
         $start = microtime(true);
 
-        $kpis = $this->dashboardReadService->getKPIs(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-12-31'),
-        );
+        $kpis = $this->dashboardReadService->getKPIs(new DateTime('2025-01-01'), new DateTime('2025-12-31'));
 
         $duration = microtime(true) - $start;
 

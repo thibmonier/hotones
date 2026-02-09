@@ -12,8 +12,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final readonly class RecalculateMetricsMessageHandler
 {
-    public function __construct(private MetricsCalculationService $service)
-    {
+    public function __construct(
+        private MetricsCalculationService $service,
+    ) {
     }
 
     public function __invoke(RecalculateMetricsMessage $message): void

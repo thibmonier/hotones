@@ -15,7 +15,7 @@ use DateTime;
 class CjmCalculatorService
 {
     public function __construct(
-        private readonly CompanySettingsRepository $companySettingsRepository
+        private readonly CompanySettingsRepository $companySettingsRepository,
     ) {
     }
 
@@ -40,11 +40,8 @@ class CjmCalculatorService
         $publicHolidays = $this->countPublicHolidaysInYear($year);
 
         // Jours ouvrés = Total - Weekends - Fériés - CP - RTT
-        $workingDays = $totalDays
-            - $weekends
-            - $publicHolidays
-            - $settings->getAnnualPaidLeaveDays()
-            - $settings->getAnnualRttDays();
+        $workingDays = $totalDays - $weekends - $publicHolidays - $settings->getAnnualPaidLeaveDays()
+                                  - $settings->getAnnualRttDays();
 
         return max($workingDays, 1); // Minimum 1 jour
     }
@@ -140,13 +137,13 @@ class CjmCalculatorService
         $e     = $b % 4;
         $f     = (int) (($b + 8) / 25);
         $g     = (int) (($b - $f + 1) / 3);
-        $h     = (19 * $a + $b - $d - $g + 15) % 30;
+        $h     = ((19 * $a) + $b - $d - $g + 15) % 30;
         $i     = (int) ($c / 4);
-        $k     = $c                               % 4;
-        $l     = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
-        $m     = (int) (($a + 11 * $h + 22 * $l) / 451);
-        $month = (int) (($h + $l - 7 * $m + 114) / 31);
-        $day   = (($h + $l - 7 * $m + 114) % 31) + 1;
+        $k     = $c                                   % 4;
+        $l     = (32 + (2 * $e) + (2 * $i) - $h - $k) % 7;
+        $m     = (int) (($a + (11 * $h) + (22 * $l)) / 451);
+        $month = (int) (($h + $l - (7 * $m) + 114) / 31);
+        $day   = (($h + $l - (7 * $m) + 114) % 31) + 1;
 
         return new DateTime(sprintf('%d-%02d-%02d', $year, $month, $day));
     }

@@ -52,7 +52,8 @@ class DashboardReadServiceTest extends TestCase
 
         // Mock QueryBuilder et Query
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())
+        $query
+            ->expects($this->once())
             ->method('getSingleResult')
             ->willReturn([
                 'totalRevenue'        => '10000.00',
@@ -80,14 +81,19 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
+            ->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
         // Mock cache to execute callback immediately
-        $this->cache->expects($this->once())
+        $this->cache
+            ->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn (
+                $key,
+                $callback,
+            ) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getKPIs($startDate, $endDate);
 
@@ -107,7 +113,8 @@ class DashboardReadServiceTest extends TestCase
 
         // Mock QueryBuilder qui retourne des données vides
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())
+        $query
+            ->expects($this->once())
             ->method('getSingleResult')
             ->willReturn([
                 'totalRevenue' => '0',
@@ -124,7 +131,8 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
+            ->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
@@ -140,22 +148,25 @@ class DashboardReadServiceTest extends TestCase
             'projects' => ['total' => 10, 'active' => 5, 'completed' => 5],
         ];
 
-        $this->realTimeService->expects($this->once())
+        $this->realTimeService
+            ->expects($this->once())
             ->method('calculateKPIs')
             ->with($startDate, $endDate, [])
             ->willReturn($realTimeData);
 
-        $this->logger->expects($this->once())
+        $this->logger
+            ->expects($this->once())
             ->method('warning')
-            ->with(
-                $this->stringContains('Aucune donnée dans le modèle en étoile'),
-                $this->anything(),
-            );
+            ->with($this->stringContains('Aucune donnée dans le modèle en étoile'), $this->anything());
 
         // Mock cache to execute callback immediately
-        $this->cache->expects($this->once())
+        $this->cache
+            ->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn (
+                $key,
+                $callback,
+            ) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getKPIs($startDate, $endDate);
 
@@ -166,7 +177,8 @@ class DashboardReadServiceTest extends TestCase
     {
         // Mock Query qui retourne l'évolution mensuelle
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())
+        $query
+            ->expects($this->once())
             ->method('getResult')
             ->willReturn([
                 [
@@ -199,14 +211,19 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('addOrderBy')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
+            ->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
         // Mock cache to execute callback immediately
-        $this->cache->expects($this->once())
+        $this->cache
+            ->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn (
+                $key,
+                $callback,
+            ) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getMonthlyEvolution(12);
 
@@ -222,9 +239,7 @@ class DashboardReadServiceTest extends TestCase
     {
         // Mock Query qui retourne aucune donnée
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())
-            ->method('getResult')
-            ->willReturn([]);
+        $query->expects($this->once())->method('getResult')->willReturn([]);
 
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
@@ -238,7 +253,8 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('addOrderBy')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
+            ->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
@@ -246,19 +262,25 @@ class DashboardReadServiceTest extends TestCase
             ['month' => 'Jan 2025', 'revenue' => 5000, 'costs' => 3000, 'margin' => 2000],
         ];
 
-        $this->realTimeService->expects($this->once())
+        $this->realTimeService
+            ->expects($this->once())
             ->method('calculateMonthlyEvolution')
             ->with(12, [])
             ->willReturn($realTimeEvolution);
 
-        $this->logger->expects($this->once())
+        $this->logger
+            ->expects($this->once())
             ->method('warning')
             ->with($this->stringContains('Pas de données d\'évolution'));
 
         // Mock cache to execute callback immediately
-        $this->cache->expects($this->once())
+        $this->cache
+            ->expects($this->once())
             ->method('get')
-            ->willReturnCallback(fn ($key, $callback) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
+            ->willReturnCallback(fn (
+                $key,
+                $callback,
+            ) => $callback($this->createMock(\Symfony\Contracts\Cache\ItemInterface::class)));
 
         $result = $this->service->getMonthlyEvolution(12);
 

@@ -37,7 +37,11 @@ class GenerateMonthlyRegieInvoicesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('month', InputArgument::OPTIONAL, 'Mois à facturer (format YYYY-MM). Si omis, utilise le mois dernier.')
+            ->addArgument(
+                'month',
+                InputArgument::OPTIONAL,
+                'Mois à facturer (format YYYY-MM). Si omis, utilise le mois dernier.',
+            )
             ->addOption('last-month', null, InputOption::VALUE_NONE, 'Facturer le mois dernier')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulation sans enregistrement en base')
             ->setHelp(<<<'HELP'
@@ -52,8 +56,7 @@ class GenerateMonthlyRegieInvoicesCommand extends Command
                 - Une ligne par contributeur ayant saisi des temps
                 - Le calcul du CA basé sur les TJM contributeurs
                 - Le statut initial en "brouillon"
-                HELP
-            );
+                HELP);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -113,18 +116,12 @@ class GenerateMonthlyRegieInvoicesCommand extends Command
             $totalTtc = bcadd($totalTtc, $invoice->getAmountTtc(), 2);
         }
 
-        $io->table(
-            ['Numéro', 'Projet', 'Client', 'Montant HT', 'Montant TTC', 'Statut'],
-            $rows,
-        );
+        $io->table(['Numéro', 'Projet', 'Client', 'Montant HT', 'Montant TTC', 'Statut'], $rows);
 
-        $io->horizontalTable(
-            ['Total HT', 'Total TTC'],
-            [[
-                number_format((float) $totalHt, 2, ',', ' ').' €',
-                number_format((float) $totalTtc, 2, ',', ' ').' €',
-            ]],
-        );
+        $io->horizontalTable(['Total HT', 'Total TTC'], [[
+            number_format((float) $totalHt, 2, ',', ' ').' €',
+            number_format((float) $totalTtc, 2, ',', ' ').' €',
+        ]]);
 
         if (!$isDryRun) {
             $io->note('Les factures ont été créées avec le statut "brouillon". Pensez à les valider avant envoi.');

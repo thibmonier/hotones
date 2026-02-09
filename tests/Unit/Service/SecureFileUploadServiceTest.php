@@ -61,10 +61,7 @@ class SecureFileUploadServiceTest extends TestCase
         $this->filesystem
             ->expects($this->once())
             ->method('writeStream')
-            ->with(
-                $this->matchesRegularExpression('#avatars/test-[a-z0-9]+\.jpg#'),
-                $this->anything(),
-            );
+            ->with($this->matchesRegularExpression('#avatars/test-[a-z0-9]+\.jpg#'), $this->anything());
 
         // When: upload image
         $result = $this->service->uploadImage($file);
@@ -147,9 +144,7 @@ class SecureFileUploadServiceTest extends TestCase
         $file = $this->createValidUploadedFile('test.jpg', 'image/jpeg', 1024);
 
         $this->slugger->method('slug')->willReturn(new UnicodeString('test'));
-        $this->filesystem
-            ->method('writeStream')
-            ->willThrowException(new Exception('Filesystem error'));
+        $this->filesystem->method('writeStream')->willThrowException(new Exception('Filesystem error'));
 
         // When/Then: exception thrown when filesystem fails
         $this->expectException(FileException::class);
@@ -176,10 +171,7 @@ class SecureFileUploadServiceTest extends TestCase
         $this->filesystem
             ->expects($this->once())
             ->method('writeStream')
-            ->with(
-                $this->matchesRegularExpression('#documents/contract-[a-z0-9]+\.pdf#'),
-                $this->anything(),
-            );
+            ->with($this->matchesRegularExpression('#documents/contract-[a-z0-9]+\.pdf#'), $this->anything());
 
         // When: upload document
         $result = $this->service->uploadDocument($file);
@@ -266,9 +258,7 @@ class SecureFileUploadServiceTest extends TestCase
             ->with('documents/missing.pdf')
             ->willReturn(false);
 
-        $this->filesystem
-            ->expects($this->never())
-            ->method('delete');
+        $this->filesystem->expects($this->never())->method('delete');
 
         // When: attempt to delete non-existent file
         $result = $this->service->deleteFile('missing.pdf', 'documents');
@@ -284,9 +274,7 @@ class SecureFileUploadServiceTest extends TestCase
     public function testDeleteFileWhenFilesystemThrowsExceptionReturnsFalse(): void
     {
         // Given: filesystem throws exception
-        $this->filesystem
-            ->method('fileExists')
-            ->willThrowException(new Exception('Filesystem error'));
+        $this->filesystem->method('fileExists')->willThrowException(new Exception('Filesystem error'));
 
         // When: attempt to delete file
         $result = $this->service->deleteFile('test.jpg', 'avatars');

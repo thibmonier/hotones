@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Notification;
@@ -13,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class NotificationRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Notification::class, $companyContext);
     }
 
@@ -27,7 +27,8 @@ class NotificationRepository extends CompanyAwareRepository
      */
     public function findUnreadByUser(User $user, ?int $limit = null): array
     {
-        $qb = $this->createCompanyQueryBuilder('n')
+        $qb = $this
+            ->createCompanyQueryBuilder('n')
             ->andWhere('n.recipient = :user')
             ->andWhere('n.readAt IS NULL')
             ->setParameter('user', $user)
@@ -45,7 +46,8 @@ class NotificationRepository extends CompanyAwareRepository
      */
     public function countUnreadByUser(User $user): int
     {
-        return (int) $this->createCompanyQueryBuilder('n')
+        return (int) $this
+            ->createCompanyQueryBuilder('n')
             ->select('COUNT(n.id)')
             ->andWhere('n.recipient = :user')
             ->andWhere('n.readAt IS NULL')
@@ -59,7 +61,8 @@ class NotificationRepository extends CompanyAwareRepository
      */
     public function markAllAsReadForUser(User $user): int
     {
-        return $this->createCompanyQueryBuilder('n')
+        return $this
+            ->createCompanyQueryBuilder('n')
             ->update()
             ->set('n.readAt', ':now')
             ->andWhere('n.recipient = :user')
@@ -77,7 +80,8 @@ class NotificationRepository extends CompanyAwareRepository
     {
         $date = new DateTimeImmutable("-{$daysOld} days");
 
-        return $this->createCompanyQueryBuilder('n')
+        return $this
+            ->createCompanyQueryBuilder('n')
             ->delete()
             ->andWhere('n.readAt IS NOT NULL')
             ->andWhere('n.readAt < :date')

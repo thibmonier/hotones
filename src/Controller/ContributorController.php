@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\DTO\Pagination;
 use App\Entity\Contributor;
 use App\Form\ContributorType;
 use App\Repository\ContributorRepository;
@@ -30,7 +31,7 @@ class ContributorController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SecureFileUploadService $uploadService,
         private readonly LoggerInterface $logger,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -50,63 +51,16 @@ class ContributorController extends AbstractController
         $hasFilter = count(array_intersect(array_keys($queryAll), $keys)) > 0;
         $saved     = $session->has('contributor_filters') ? (array) $session->get('contributor_filters') : [];
 
-        $search           = $hasFilter ? ($request->query->get('search', '')) : ($saved['search'] ?? '');
-        $active           = $hasFilter ? ($request->query->get('active', 'all')) : ($saved['active'] ?? 'all');
-        $employmentStatus = $hasFilter ? ($request->query->get('employment_status', 'all')) : ($saved['employment_status'] ?? 'all');
+        $search           = $hasFilter ? $request->query->get('search', '') : $saved['search']    ?? '';
+        $active           = $hasFilter ? $request->query->get('active', 'all') : $saved['active'] ?? 'all';
+        $employmentStatus = $hasFilter
+            ? $request->query->get('employment_status', 'all')
+            : $saved['employment_status']                                          ?? 'all';
+        $sort = $hasFilter ? $request->query->get('sort', 'name') : $saved['sort'] ?? 'name';
+        $dir  = $hasFilter ? $request->query->get('dir', 'ASC') : $saved['dir']    ?? 'ASC';
 
-        $qb = $this->contributorRepository->createQueryBuilder('c')
-            ->leftJoin('c.profiles', 'p')
-            ->addSelect('p');
-
-        if ($search) {
-            $qb->andWhere('c.firstName LIKE :search OR c.lastName LIKE :search OR c.email LIKE :search')
-               ->setParameter('search', '%'.$search.'%');
-        }
-
-        if ($active !== 'all') {
-            $qb->andWhere('c.active = :active')
-               ->setParameter('active', $active === 'active');
-        }
-
-        // Filtre par statut de période d'emploi
-        if ($employmentStatus === 'current') {
-            $today = new DateTime();
-            $qb->innerJoin('c.employmentPeriods', 'ep')
-               ->andWhere('ep.startDate <= :today')
-               ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :today)')
-               ->setParameter('today', $today);
-        } elseif ($employmentStatus === 'inactive_employment') {
-            $today = new DateTime();
-            // Utiliser une sous-requête pour exclure les collaborateurs avec des périodes en cours
-            $subQuery = $this->entityManager->createQueryBuilder()
-                ->select('IDENTITY(ep2.contributor)')
-                ->from(\App\Entity\EmploymentPeriod::class, 'ep2')
-                ->where('ep2.startDate <= :today')
-                ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
-                ->getDQL();
-            $qb->andWhere($qb->expr()->notIn('c.id', $subQuery))
-               ->setParameter('today', $today);
-        }
-
-        // Tri
-        $sort = $hasFilter ? ($request->query->get('sort', 'name')) : ($saved['sort'] ?? 'name');
-        $dir  = $hasFilter ? ($request->query->get('dir', 'ASC')) : ($saved['dir'] ?? 'ASC');
-        $map  = [
-            'name'   => ['c.lastName', 'c.firstName'],
-            'email'  => ['c.email'],
-            'active' => ['c.active'],
-        ];
-        $columns   = $map[$sort] ?? ['c.lastName', 'c.firstName'];
+        $qb        = $this->contributorRepository->buildFilteredQuery($search, $active, $employmentStatus, $sort, $dir);
         $direction = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
-        $first     = true;
-        foreach ($columns as $col) {
-            if ($first) {
-                $qb->orderBy($col, $direction);
-                $first = false;
-            } else {
-                $qb->addOrderBy($col, $direction);
-            }
-        }
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
@@ -115,7 +69,6 @@ class ContributorController extends AbstractController
         $page           = max(1, (int) $request->query->get('page', 1));
         $offset         = ($page - 1) * $perPage;
 
-        // For aggregate queries, we must reset ORDER BY to avoid conflicts with ONLY_FULL_GROUP_BY mode
         $countQb = clone $qb;
         $total   = (int) $countQb
             ->select('COUNT(DISTINCT c.id)')
@@ -136,7 +89,6 @@ class ContributorController extends AbstractController
         $contributors = $qb->getQuery()->getResult();
 
         // Calculer les moyennes CJM/TJM à partir des périodes d'emploi des collaborateurs
-        // Note: On récupère tous les collaborateurs (sans pagination) pour calculer les stats globales
         $allContributorsQb = clone $qb;
         $allContributorsQb->setFirstResult(0)->setMaxResults(null);
         $allContributors = $allContributorsQb->getQuery()->getResult();
@@ -154,17 +106,9 @@ class ContributorController extends AbstractController
             }
         }
 
-        $avgCjm = !empty($cjmValues) ? array_sum($cjmValues) / count($cjmValues) : null;
-        $avgTjm = !empty($tjmValues) ? array_sum($tjmValues) / count($tjmValues) : null;
-
-        $pagination = [
-            'current_page' => $page,
-            'per_page'     => $perPage,
-            'total'        => $total,
-            'total_pages'  => (int) ceil($total / $perPage),
-            'has_prev'     => $page > 1,
-            'has_next'     => $page * $perPage < $total,
-        ];
+        $avgCjm     = !empty($cjmValues) ? array_sum($cjmValues) / count($cjmValues) : null;
+        $avgTjm     = !empty($tjmValues) ? array_sum($tjmValues) / count($tjmValues) : null;
+        $pagination = Pagination::create($page, $perPage, $total);
 
         $session->set('contributor_filters', [
             'search'            => $search,
@@ -182,7 +126,7 @@ class ContributorController extends AbstractController
             'employment_status'  => $employmentStatus,
             'sort'               => $sort,
             'dir'                => $direction,
-            'pagination'         => $pagination,
+            'pagination'         => $pagination->toArray(),
             'stats_linked_users' => $withUser,
             'stats_avg_cjm'      => $avgCjm,
             'stats_avg_tjm'      => $avgTjm,
@@ -228,7 +172,8 @@ class ContributorController extends AbstractController
     public function show(Contributor $contributor, EntityManagerInterface $em): Response
     {
         // Agréger les ressources disponibles par compétence et niveau
-        $skillsData = $em->createQueryBuilder()
+        $skillsData = $em
+            ->createQueryBuilder()
             ->select('s.id', 's.name', 'cs.managerAssessmentLevel as level', 'COUNT(cs.id) as count')
             ->from(\App\Entity\ContributorSkill::class, 'cs')
             ->join('cs.skill', 's')
@@ -314,8 +259,9 @@ class ContributorController extends AbstractController
     #[IsGranted('ROLE_MANAGER')]
     public function employmentPeriods(Contributor $contributor): Response
     {
-        $periods = $this->entityManager->getRepository(\App\Entity\EmploymentPeriod::class)
-            ->findBy(['contributor' => $contributor], ['startDate' => 'DESC']);
+        $periods = $this->entityManager->getRepository(\App\Entity\EmploymentPeriod::class)->findBy([
+            'contributor' => $contributor,
+        ], ['startDate' => 'DESC']);
 
         return $this->render('contributor/employment_periods.html.twig', [
             'contributor' => $contributor,
@@ -396,44 +342,7 @@ class ContributorController extends AbstractController
         $sort             = $request->query->get('sort', $saved['sort'] ?? 'name');
         $dir              = $request->query->get('dir', $saved['dir'] ?? 'ASC');
 
-        $qb = $this->contributorRepository->createQueryBuilder('c')
-            ->leftJoin('c.profiles', 'p')->addSelect('p');
-        if ($search) {
-            $qb->andWhere('c.firstName LIKE :s OR c.lastName LIKE :s OR c.email LIKE :s')->setParameter('s', '%'.$search.'%');
-        }
-        if ($active !== 'all') {
-            $qb->andWhere('c.active = :a')->setParameter('a', $active === 'active');
-        }
-        if ($employmentStatus === 'current') {
-            $today = new DateTime();
-            $qb->innerJoin('c.employmentPeriods', 'ep')
-               ->andWhere('ep.startDate <= :today')
-               ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :today)')
-               ->setParameter('today', $today);
-        } elseif ($employmentStatus === 'inactive_employment') {
-            $today = new DateTime();
-            // Utiliser une sous-requête pour exclure les collaborateurs avec des périodes en cours
-            $subQuery = $this->entityManager->createQueryBuilder()
-                ->select('IDENTITY(ep2.contributor)')
-                ->from(\App\Entity\EmploymentPeriod::class, 'ep2')
-                ->where('ep2.startDate <= :today')
-                ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
-                ->getDQL();
-            $qb->andWhere($qb->expr()->notIn('c.id', $subQuery))
-               ->setParameter('today', $today);
-        }
-        $map       = ['name' => ['c.lastName', 'c.firstName'], 'email' => ['c.email'], 'active' => ['c.active']];
-        $cols      = $map[$sort] ?? ['c.lastName', 'c.firstName'];
-        $direction = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
-        $first     = true;
-        foreach ($cols as $col) {
-            if ($first) {
-                $qb->orderBy($col, $direction);
-                $first = false;
-            } else {
-                $qb->addOrderBy($col, $direction);
-            }
-        }
+        $qb           = $this->contributorRepository->buildFilteredQuery($search, $active, $employmentStatus, $sort, $dir);
         $contributors = $qb->getQuery()->getResult();
 
         $rows   = [];

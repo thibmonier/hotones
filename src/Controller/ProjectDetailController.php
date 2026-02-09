@@ -23,7 +23,7 @@ class ProjectDetailController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly \App\Service\ProfitabilityService $profitabilityService,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -34,8 +34,7 @@ class ProjectDetailController extends AbstractController
         $projectContributors = $project->getProjectContributorsWithHours();
 
         // Récupérer toutes les tâches du projet triées par position
-        $tasks = $this->entityManager->getRepository(ProjectTask::class)
-            ->findByProjectOrderedByPosition($project);
+        $tasks = $this->entityManager->getRepository(ProjectTask::class)->findByProjectOrderedByPosition($project);
 
         // Calculer les métriques du projet
         $metrics = $this->calculateProjectMetrics($project);
@@ -95,8 +94,7 @@ class ProjectDetailController extends AbstractController
         $task->setActive(true);
 
         // Définir la position par défaut (dernière position + 1)
-        $lastPosition = $this->entityManager->getRepository(ProjectTask::class)
-            ->findMaxPositionForProject($project);
+        $lastPosition = $this->entityManager->getRepository(ProjectTask::class)->findMaxPositionForProject($project);
         $task->setPosition($lastPosition + 1);
 
         $form = $this->createForm(ProjectTaskType::class, $task);
@@ -212,9 +210,15 @@ class ProjectDetailController extends AbstractController
             'global_progress' => $project->getGlobalProgress(),
 
             // Nombres - seulement les tâches qui comptent pour la rentabilité
-            'total_tasks'       => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasks($project),
-            'completed_tasks'   => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'completed'),
-            'in_progress_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus($project, 'in_progress'),
+            'total_tasks'     => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasks($project),
+            'completed_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus(
+                $project,
+                'completed',
+            ),
+            'in_progress_tasks' => $this->entityManager->getRepository(ProjectTask::class)->countProfitableTasksByStatus(
+                $project,
+                'in_progress',
+            ),
         ];
     }
 

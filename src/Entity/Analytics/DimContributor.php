@@ -128,7 +128,7 @@ class DimContributor implements CompanyOwnedInterface
             'project_manager'     => 'Chef de Projet',
             'project_director'    => 'Directeur de Projet',
             'sales_person'        => 'Commercial',
-            default               => ucfirst(str_replace('_', ' ', $this->role))
+            default               => ucfirst(str_replace('_', ' ', $this->role)),
         };
     }
 

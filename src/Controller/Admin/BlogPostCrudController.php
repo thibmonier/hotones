@@ -42,7 +42,7 @@ class BlogPostCrudController extends AbstractCrudController
     public function __construct(
         private readonly CompanyContext $companyContext,
         private readonly BlogImageGenerationService $imageGenerationService,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -65,16 +65,13 @@ class BlogPostCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('featuredImage', 'Image')
-            ->setTemplatePath('admin/field/blog_image_thumbnail.html.twig')
-            ->onlyOnIndex();
+        yield TextField::new('featuredImage', 'Image')->setTemplatePath(
+            'admin/field/blog_image_thumbnail.html.twig',
+        )->onlyOnIndex();
 
-        yield TextField::new('title', 'Titre')
-            ->setRequired(true)
-            ->setHelp('Titre de l\'article');
+        yield TextField::new('title', 'Titre')->setRequired(true)->setHelp('Titre de l\'article');
 
         yield SlugField::new('slug', 'Slug')
             ->setTargetFieldName('title')
@@ -90,9 +87,9 @@ class BlogPostCrudController extends AbstractCrudController
                 BlogPost::STATUS_ARCHIVED  => 'secondary',
             ]);
 
-        yield TextEditorField::new('content', 'Contenu')
-            ->setHelp('Contenu complet de l\'article (HTML supporté)')
-            ->hideOnIndex();
+        yield TextEditorField::new('content', 'Contenu')->setHelp(
+            'Contenu complet de l\'article (HTML supporté)',
+        )->hideOnIndex();
 
         yield TextareaField::new('excerpt', 'Extrait')
             ->setMaxLength(500)
@@ -130,7 +127,9 @@ class BlogPostCrudController extends AbstractCrudController
 
         yield TextareaField::new('imagePrompt', 'Prompt pour l\'IA')
             ->setMaxLength(1000)
-            ->setHelp('Décrivez l\'image souhaitée en détail (10-1000 caractères). Ex: "A modern minimalist office with plants and natural light"')
+            ->setHelp(
+                'Décrivez l\'image souhaitée en détail (10-1000 caractères). Ex: "A modern minimalist office with plants and natural light"',
+            )
             ->hideOnIndex()
             ->setFormTypeOption('attr', ['data-image-field' => 'ai_generated', 'rows' => 3]);
 
@@ -140,17 +139,13 @@ class BlogPostCrudController extends AbstractCrudController
             ->setFormTypeOption('disabled', true);
 
         // Metadata fields (readonly)
-        yield DateTimeField::new('imageGeneratedAt', 'Image générée le')
-            ->hideOnForm()
-            ->hideOnIndex();
+        yield DateTimeField::new('imageGeneratedAt', 'Image générée le')->hideOnForm()->hideOnIndex();
 
-        yield TextField::new('imageModel', 'Modèle IA utilisé')
-            ->hideOnForm()
-            ->hideOnIndex();
+        yield TextField::new('imageModel', 'Modèle IA utilisé')->hideOnForm()->hideOnIndex();
 
-        yield AssociationField::new('category', 'Catégorie')
-            ->setHelp('Catégorie principale de l\'article')
-            ->setRequired(false);
+        yield AssociationField::new('category', 'Catégorie')->setHelp(
+            'Catégorie principale de l\'article',
+        )->setRequired(false);
 
         yield AssociationField::new('tags', 'Tags')
             ->setHelp('Tags associés à l\'article')
@@ -163,16 +158,13 @@ class BlogPostCrudController extends AbstractCrudController
             ->hideOnForm()
             ->formatValue(fn ($value, BlogPost $entity): string => $entity->getAuthor()->getFullName());
 
-        yield DateTimeField::new('publishedAt', 'Date de publication')
-            ->setHelp('Date de publication (auto-définie lors du passage en "Publié")')
-            ->hideOnIndex();
+        yield DateTimeField::new('publishedAt', 'Date de publication')->setHelp(
+            'Date de publication (auto-définie lors du passage en "Publié")',
+        )->hideOnIndex();
 
-        yield DateTimeField::new('createdAt', 'Créé le')
-            ->hideOnForm();
+        yield DateTimeField::new('createdAt', 'Créé le')->hideOnForm();
 
-        yield DateTimeField::new('updatedAt', 'Modifié le')
-            ->hideOnForm()
-            ->hideOnIndex();
+        yield DateTimeField::new('updatedAt', 'Modifié le')->hideOnForm()->hideOnIndex();
     }
 
     #[Override]
@@ -206,8 +198,11 @@ class BlogPostCrudController extends AbstractCrudController
         $regenerateImage = Action::new('regenerateImage', 'Régénérer l\'image IA')
             ->linkToCrudAction('regenerateImageAction')
             ->setIcon('fa fa-refresh')
-            ->displayIf(static fn (BlogPost $post): bool => $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
-                && $post->imagePrompt !== null)
+            ->displayIf(
+                static fn (BlogPost $post): bool => $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
+                    && $post->imagePrompt !== null
+                ,
+            )
             ->addCssClass('btn btn-warning');
 
         return $actions
@@ -322,10 +317,7 @@ class BlogPostCrudController extends AbstractCrudController
         ) {
             error_log('[BlogPost] AI generation triggered!');
             try {
-                $this->imageGenerationService->generateImage(
-                    $blogPost->imagePrompt,
-                    $blogPost,
-                );
+                $this->imageGenerationService->generateImage($blogPost->imagePrompt, $blogPost);
 
                 $this->addFlash('success', 'Image générée avec succès par l\'IA (DALL-E 3).');
             } catch (BlogImageGenerationException $e) {
@@ -359,7 +351,7 @@ class BlogPostCrudController extends AbstractCrudController
     public function regenerateImageAction(
         AdminContext $context,
         AdminUrlGenerator $adminUrlGenerator,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ): Response {
         /** @var BlogPost $blogPost */
         $blogPost = $context->getEntity()->getInstance();

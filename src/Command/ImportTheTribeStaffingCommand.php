@@ -51,9 +51,48 @@ class ImportTheTribeStaffingCommand extends Command
      * TJM cible par type/niveau.
      */
     private const array TJM_MAP = [
-        'dev'    => [1 => 300, 2 => 550, 3 => 550, 4 => 550, 5 => 550, 6 => 680, 7 => 680, 8 => 680, 9 => 680, 10 => 800, 11 => 800, 12 => 800],
-        'pm'     => [1 => 300, 2 => 650, 3 => 650, 4 => 750, 5 => 750, 6 => 750, 7 => 750, 8 => 800, 9 => 800, 10 => 800, 11 => 850, 12 => 850],
-        'design' => [1 => 300, 2 => 650, 3 => 650, 4 => 750, 5 => 750, 6 => 750, 7 => 750, 8 => 800, 9 => 800, 10 => 800, 11 => 850, 12 => 850],
+        'dev' => [
+            1  => 300,
+            2  => 550,
+            3  => 550,
+            4  => 550,
+            5  => 550,
+            6  => 680,
+            7  => 680,
+            8  => 680,
+            9  => 680,
+            10 => 800,
+            11 => 800,
+            12 => 800,
+        ],
+        'pm' => [
+            1  => 300,
+            2  => 650,
+            3  => 650,
+            4  => 750,
+            5  => 750,
+            6  => 750,
+            7  => 750,
+            8  => 800,
+            9  => 800,
+            10 => 800,
+            11 => 850,
+            12 => 850,
+        ],
+        'design' => [
+            1  => 300,
+            2  => 650,
+            3  => 650,
+            4  => 750,
+            5  => 750,
+            6  => 750,
+            7  => 750,
+            8  => 800,
+            9  => 800,
+            10 => 800,
+            11 => 850,
+            12 => 850,
+        ],
     ];
 
     /**
@@ -70,7 +109,6 @@ class ImportTheTribeStaffingCommand extends Command
         'typescript'        => 'TypeScript',
         'rails'             => 'Ruby on Rails',
         'k8s'               => 'Kubernetes',
-        'postgresql'        => 'PostgreSQL',
         'postgresql'        => 'PostgreSQL',
     ];
 
@@ -252,12 +290,17 @@ class ImportTheTribeStaffingCommand extends Command
             $employeeLevel->setLevel($level);
             $employeeLevel->setName($levelNames[$level]);
             $employeeLevel->setSalaryTarget((string) $annualSalary);
-            $employeeLevel->setTargetTjm((string) (self::TJM_MAP['dev'][$level] ?? 0));
+            $employeeLevel->setTargetTjm((string) self::TJM_MAP['dev'][$level]);
 
             $this->entityManager->persist($employeeLevel);
             $this->levelCache[$level] = $employeeLevel;
             ++$created;
-            $io->writeln(sprintf('  <info>+</info> Niveau %d créé: %s (salaire cible: %d€/an)', $level, $levelNames[$level], $annualSalary));
+            $io->writeln(sprintf(
+                '  <info>+</info> Niveau %d créé: %s (salaire cible: %d€/an)',
+                $level,
+                $levelNames[$level],
+                $annualSalary,
+            ));
         }
 
         $io->writeln(sprintf('  <comment>%d niveaux créés</comment>', $created));
@@ -401,21 +444,32 @@ class ImportTheTribeStaffingCommand extends Command
             $parsedCf   = $this->parseCf($data['cf']);
 
             if (!$parsedCf) {
-                $io->warning(sprintf('  Ligne %d: CF invalide "%s" pour %s - ignoré', $data['row'], $data['cf'], $data['name']));
+                $io->warning(sprintf(
+                    '  Ligne %d: CF invalide "%s" pour %s - ignoré',
+                    $data['row'],
+                    $data['cf'],
+                    $data['name'],
+                ));
                 ++$skipped;
 
                 continue;
             }
 
             // Vérifier si le contributeur existe déjà
-            $existing = $this->entityManager->getRepository(Contributor::class)->findOneBy([
-                'company'   => $company,
-                'firstName' => $parsedName['firstName'],
-                'lastName'  => $parsedName['lastName'],
-            ]);
+            $existing = $this->entityManager
+                ->getRepository(Contributor::class)
+                ->findOneBy([
+                    'company'   => $company,
+                    'firstName' => $parsedName['firstName'],
+                    'lastName'  => $parsedName['lastName'],
+                ]);
 
             if ($existing) {
-                $io->writeln(sprintf('  Contributeur existant: %s %s - ignoré', $parsedName['firstName'], $parsedName['lastName']));
+                $io->writeln(sprintf(
+                    '  Contributeur existant: %s %s - ignoré',
+                    $parsedName['firstName'],
+                    $parsedName['lastName'],
+                ));
                 ++$skipped;
 
                 continue;
@@ -488,14 +542,16 @@ class ImportTheTribeStaffingCommand extends Command
         $type  = $parsedCf['type'];
 
         // Calculer TJM
-        $tjm = $data['tjm'] ?? (self::TJM_MAP[$type][$level] ?? null);
+        $tjm = $data['tjm'] ?? self::TJM_MAP[$type][$level] ?? null;
 
         // Salaire mensuel = annuel / 12
         $annualSalary  = self::ANNUAL_SALARIES[$level] ?? null;
         $monthlySalary = $annualSalary !== null ? round($annualSalary / 12, 2) : null;
 
         // CJM = (salaire annuel * charges) / jours travaillés par an
-        $cjm = $annualSalary !== null ? round(($annualSalary * self::CHARGES_RATE) / self::WORKING_DAYS_PER_YEAR, 2) : null;
+        $cjm = $annualSalary !== null
+            ? round(($annualSalary * self::CHARGES_RATE) / self::WORKING_DAYS_PER_YEAR, 2)
+            : null;
 
         // Temps de travail
         $jours              = $data['jours'] ?? 5.0;
@@ -538,17 +594,18 @@ class ImportTheTribeStaffingCommand extends Command
     /**
      * @param array<string> $techNames
      */
-    private function associateTechnologies(Contributor $contributor, Company $company, array $techNames, SymfonyStyle $io): void
-    {
+    private function associateTechnologies(
+        Contributor $contributor,
+        Company $company,
+        array $techNames,
+        SymfonyStyle $io,
+    ): void {
         foreach ($techNames as $techName) {
             if ($techName === '') {
                 continue;
             }
 
             $technology = $this->resolveTechnology($techName, $company, $io);
-            if (!$technology) {
-                continue;
-            }
 
             $ct = new ContributorTechnology();
             $ct->setCompany($company);
@@ -563,7 +620,7 @@ class ImportTheTribeStaffingCommand extends Command
         }
     }
 
-    private function resolveTechnology(string $rawName, Company $company, SymfonyStyle $io): ?Technology
+    private function resolveTechnology(string $rawName, Company $company, SymfonyStyle $io): Technology
     {
         $normalized = trim($rawName);
         $key        = mb_strtolower($normalized);
