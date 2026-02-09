@@ -17,10 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:debug:planning-optimization',
-    description: 'Debug planning optimization recommendations',
-)]
+#[AsCommand(name: 'app:debug:planning-optimization', description: 'Debug planning optimization recommendations')]
 class DebugPlanningOptimizationCommand extends Command
 {
     public function __construct(
@@ -28,17 +25,20 @@ class DebugPlanningOptimizationCommand extends Command
         private readonly TaceAnalyzer $taceAnalyzer,
         private readonly ContributorRepository $contributorRepository,
         private readonly StaffingMetricsRepository $staffingMetricsRepository,
-        private readonly StaffingMetricsCalculationService $staffingMetricsCalculationService
+        private readonly StaffingMetricsCalculationService $staffingMetricsCalculationService,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addOption('start', null, InputOption::VALUE_OPTIONAL, 'Start date (Y-m-d)', 'first day of this month')
-            ->addOption('end', null, InputOption::VALUE_OPTIONAL, 'End date (Y-m-d)', 'last day of next month')
-        ;
+        $this->addOption(
+            'start',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Start date (Y-m-d)',
+            'first day of this month',
+        )->addOption('end', null, InputOption::VALUE_OPTIONAL, 'End date (Y-m-d)', 'last day of next month');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -72,7 +72,11 @@ class DebugPlanningOptimizationCommand extends Command
             }
 
             // Calculate new metrics
-            $created = $this->staffingMetricsCalculationService->calculateAndStoreMetrics($startDate, $endDate, 'weekly');
+            $created = $this->staffingMetricsCalculationService->calculateAndStoreMetrics(
+                $startDate,
+                $endDate,
+                'weekly',
+            );
             $io->success(sprintf('Calculated %d metrics for the period', $created));
         }
 
@@ -80,15 +84,12 @@ class DebugPlanningOptimizationCommand extends Command
         $io->section('Analyzing contributors...');
         $analysis = $this->taceAnalyzer->analyzeAllContributors($startDate, $endDate);
 
-        $io->table(
-            ['Status', 'Count'],
-            [
-                ['Critical', count($analysis['critical'])],
-                ['Overloaded', count($analysis['overloaded'])],
-                ['Underutilized', count($analysis['underutilized'])],
-                ['Optimal', count($analysis['optimal'])],
-            ],
-        );
+        $io->table(['Status', 'Count'], [
+            ['Critical', count($analysis['critical'])],
+            ['Overloaded', count($analysis['overloaded'])],
+            ['Underutilized', count($analysis['underutilized'])],
+            ['Optimal', count($analysis['optimal'])],
+        ]);
 
         // Show critical contributors
         if (count($analysis['critical']) > 0) {
@@ -126,17 +127,14 @@ class DebugPlanningOptimizationCommand extends Command
 
         // Display summary
         $io->section('Summary');
-        $io->table(
-            ['Metric', 'Value'],
-            [
-                ['Total recommendations', $result['summary']['total_recommendations']],
-                ['High priority', $result['summary']['high_priority_count']],
-                ['Medium priority', $result['summary']['medium_priority_count']],
-                ['Low priority', $result['summary']['low_priority_count']],
-                ['Contributors analyzed', $result['summary']['contributors_analyzed']],
-                ['Critical workload', $result['summary']['critical_workload_count']],
-            ],
-        );
+        $io->table(['Metric', 'Value'], [
+            ['Total recommendations', $result['summary']['total_recommendations']],
+            ['High priority', $result['summary']['high_priority_count']],
+            ['Medium priority', $result['summary']['medium_priority_count']],
+            ['Low priority', $result['summary']['low_priority_count']],
+            ['Contributors analyzed', $result['summary']['contributors_analyzed']],
+            ['Critical workload', $result['summary']['critical_workload_count']],
+        ]);
 
         // Display recommendations
         if (count($result['recommendations']) > 0) {
@@ -152,10 +150,7 @@ class DebugPlanningOptimizationCommand extends Command
                     $rec['contributor']->getFullName(),
                 ];
             }
-            $io->table(
-                ['#', 'Type', 'Severity', 'Priority', 'Title', 'Contributor'],
-                $recRows,
-            );
+            $io->table(['#', 'Type', 'Severity', 'Priority', 'Title', 'Contributor'], $recRows);
 
             // Show details of first few recommendations
             $io->section('Top 3 Recommendations Details');

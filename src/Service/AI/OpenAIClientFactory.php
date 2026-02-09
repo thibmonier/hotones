@@ -17,7 +17,7 @@ class OpenAIClientFactory
     public function __construct(
         #[Autowire(param: 'env(OPENAI_API_KEY)')]
         private readonly string $openaiApiKey,
-        private readonly string $baseUri = 'https://api.openai.com/v1'
+        private readonly string $baseUri = 'https://api.openai.com/v1',
     ) {
     }
 

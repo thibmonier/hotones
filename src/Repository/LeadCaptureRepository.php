@@ -19,10 +19,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class LeadCaptureRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, LeadCapture::class, $companyContext);
     }
 
@@ -41,7 +39,8 @@ class LeadCaptureRepository extends CompanyAwareRepository
      */
     public function countBySource(): array
     {
-        $result = $this->createCompanyQueryBuilder('lc')
+        $result = $this
+            ->createCompanyQueryBuilder('lc')
             ->select('lc.source', 'COUNT(lc.id) as total')
             ->groupBy('lc.source')
             ->getQuery()
@@ -64,7 +63,8 @@ class LeadCaptureRepository extends CompanyAwareRepository
     {
         $since = new DateTime("-{$days} days");
 
-        return $this->createCompanyQueryBuilder('lc')
+        return $this
+            ->createCompanyQueryBuilder('lc')
             ->andWhere('lc.createdAt >= :since')
             ->setParameter('since', $since)
             ->orderBy('lc.createdAt', 'DESC')
@@ -79,7 +79,8 @@ class LeadCaptureRepository extends CompanyAwareRepository
      */
     public function findWithMarketingConsent(): array
     {
-        return $this->createCompanyQueryBuilder('lc')
+        return $this
+            ->createCompanyQueryBuilder('lc')
             ->where('lc.marketingConsent = :consent')
             ->setParameter('consent', true)
             ->orderBy('lc.createdAt', 'DESC')
@@ -96,24 +97,25 @@ class LeadCaptureRepository extends CompanyAwareRepository
     {
         $qb = $this->createCompanyQueryBuilder('lc');
 
-        $total = (int) $qb->select('COUNT(lc.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $total = (int) $qb->select('COUNT(lc.id)')->getQuery()->getSingleScalarResult();
 
-        $withConsent = (int) $this->createCompanyQueryBuilder('lc')
+        $withConsent = (int) $this
+            ->createCompanyQueryBuilder('lc')
             ->select('COUNT(lc.id)')
             ->andWhere('lc.marketingConsent = :true')
             ->setParameter('true', true)
             ->getQuery()
             ->getSingleScalarResult();
 
-        $downloaded = (int) $this->createCompanyQueryBuilder('lc')
+        $downloaded = (int) $this
+            ->createCompanyQueryBuilder('lc')
             ->select('COUNT(lc.id)')
             ->andWhere('lc.downloadedAt IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
 
-        $avgDownloads = (float) $this->createCompanyQueryBuilder('lc')
+        $avgDownloads = (float) $this
+            ->createCompanyQueryBuilder('lc')
             ->select('AVG(lc.downloadCount)')
             ->getQuery()
             ->getSingleScalarResult();

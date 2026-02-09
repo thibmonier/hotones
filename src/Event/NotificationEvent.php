@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Entity\User;
@@ -21,7 +23,7 @@ abstract class NotificationEvent extends Event
         private readonly array $recipients,
         private readonly ?array $data = null,
         private readonly ?string $entityType = null,
-        private readonly ?int $entityId = null
+        private readonly ?int $entityId = null,
     ) {
     }
 

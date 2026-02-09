@@ -22,10 +22,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'fact_project_metrics')]
-#[ORM\UniqueConstraint(
-    name: 'unique_fact_metrics',
-    columns: ['dim_time_id', 'dim_project_type_id', 'dim_project_manager_id', 'dim_sales_person_id', 'dim_project_director_id', 'granularity', 'project_id', 'order_id'],
-)]
+#[ORM\UniqueConstraint(name: 'unique_fact_metrics', columns: [
+    'dim_time_id',
+    'dim_project_type_id',
+    'dim_project_manager_id',
+    'dim_sales_person_id',
+    'dim_project_director_id',
+    'granularity',
+    'project_id',
+    'order_id',
+])]
 #[ApiResource(
     operations: [
         new Get(security: "is_granted('ROLE_MANAGER')"),
@@ -503,11 +509,7 @@ class FactProjectMetrics implements CompanyOwnedInterface
         $this->grossMargin = bcsub($this->totalRevenue, $this->totalCosts, 2);
 
         if (bccomp($this->totalRevenue, '0', 2) > 0) {
-            $this->marginPercentage = bcmul(
-                bcdiv($this->grossMargin, $this->totalRevenue, 4),
-                '100',
-                2,
-            );
+            $this->marginPercentage = bcmul(bcdiv($this->grossMargin, $this->totalRevenue, 4), '100', 2);
         } else {
             $this->marginPercentage = '0.00';
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -437,7 +439,11 @@ class Project implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getEstimatedHoursSold() && $task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
+            if (
+                $task->getEstimatedHoursSold()
+                && $task->getCountsForProfitability()
+                && $task->getType() === ProjectTask::TYPE_REGULAR
+            ) {
                 $total = bcadd($total, (string) $task->getEstimatedHoursSold(), 2);
             }
         }
@@ -571,7 +577,11 @@ class Project implements CompanyOwnedInterface
 
         // Récupérer les contributeurs des tâches
         foreach ($this->tasks as $task) {
-            if ($task->getAssignedContributor() && $task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
+            if (
+                $task->getAssignedContributor()
+                && $task->getCountsForProfitability()
+                && $task->getType() === ProjectTask::TYPE_REGULAR
+            ) {
                 $contributor   = $task->getAssignedContributor();
                 $contributorId = $contributor->id;
 
@@ -716,12 +726,15 @@ class Project implements CompanyOwnedInterface
         $marginVariance = bcsub($realMargin, $targetMargin, 2);
 
         // Calcul des pourcentages d'écart
-        $hoursVariancePercent = bccomp($targetHours, '0', 2) > 0 ?
-            bcmul(bcdiv($hoursVariance, $targetHours, 4), '100', 2) : '0.00';
-        $costVariancePercent = bccomp($targetCost, '0', 2) > 0 ?
-            bcmul(bcdiv($costVariance, $targetCost, 4), '100', 2) : '0.00';
-        $marginVariancePercent = bccomp($targetMargin, '0', 2) > 0 ?
-            bcmul(bcdiv($marginVariance, $targetMargin, 4), '100', 2) : '0.00';
+        $hoursVariancePercent = bccomp($targetHours, '0', 2) > 0
+            ? bcmul(bcdiv($hoursVariance, $targetHours, 4), '100', 2)
+            : '0.00';
+        $costVariancePercent = bccomp($targetCost, '0', 2) > 0
+            ? bcmul(bcdiv($costVariance, $targetCost, 4), '100', 2)
+            : '0.00';
+        $marginVariancePercent = bccomp($targetMargin, '0', 2) > 0
+            ? bcmul(bcdiv($marginVariance, $targetMargin, 4), '100', 2)
+            : '0.00';
 
         return [
             'target_hours'           => $targetHours,
@@ -799,9 +812,7 @@ class Project implements CompanyOwnedInterface
      */
     public function getCriticalSkills(): Collection
     {
-        return $this->projectSkills->filter(
-            fn (ProjectSkill $ps) => $ps->getPriority() >= ProjectSkill::PRIORITY_HIGH,
-        );
+        return $this->projectSkills->filter(fn (ProjectSkill $ps) => $ps->getPriority() >= ProjectSkill::PRIORITY_HIGH);
     }
 
     /**

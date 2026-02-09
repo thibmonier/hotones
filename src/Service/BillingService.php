@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Order;
@@ -10,8 +12,9 @@ use DateTime;
 
 class BillingService
 {
-    public function __construct(private readonly TimesheetRepository $timesheetRepository)
-    {
+    public function __construct(
+        private readonly TimesheetRepository $timesheetRepository,
+    ) {
     }
 
     /**

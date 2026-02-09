@@ -25,7 +25,7 @@ class DashboardController extends AbstractController
         private readonly DashboardReadService $dashboardReadService,
         private readonly ExcelExportService $excelExportService,
         private readonly MessageBusInterface $messageBus,
-        private readonly \App\Repository\ProjectRepository $projectRepository
+        private readonly \App\Repository\ProjectRepository $projectRepository,
     ) {
     }
 
@@ -52,12 +52,22 @@ class DashboardController extends AbstractController
 
         // Filtres (Lot 3.2)
         $filters = [
-            'project_type'        => $request->query->get('project_type') ?: null, // 'forfait' | 'regie'
-            'is_internal'         => $request->query->get('client_type') === 'internal' ? true : ($request->query->get('client_type') === 'client' ? false : null),
-            'project_manager_id'  => $request->query->get('project_manager_id') ? (int) $request->query->get('project_manager_id') : null,
-            'sales_person_id'     => $request->query->get('sales_person_id') ? (int) $request->query->get('sales_person_id') : null,
-            'technology_id'       => $request->query->get('technology_id') ? (int) $request->query->get('technology_id') : null,
-            'service_category_id' => $request->query->get('service_category_id') ? (int) $request->query->get('service_category_id') : null,
+            'project_type' => $request->query->get('project_type') ?: null, // 'forfait' | 'regie'
+            'is_internal'  => $request->query->get('client_type') === 'internal'
+                ? true
+                : ($request->query->get('client_type') === 'client' ? false : null),
+            'project_manager_id' => $request->query->get('project_manager_id')
+                ? (int) $request->query->get('project_manager_id')
+                : null,
+            'sales_person_id' => $request->query->get('sales_person_id')
+                ? (int) $request->query->get('sales_person_id')
+                : null,
+            'technology_id' => $request->query->get('technology_id')
+                ? (int) $request->query->get('technology_id')
+                : null,
+            'service_category_id' => $request->query->get('service_category_id')
+                ? (int) $request->query->get('service_category_id')
+                : null,
         ];
 
         // Récupérer les KPIs depuis le modèle en étoile (avec fallback temps réel)
@@ -65,10 +75,10 @@ class DashboardController extends AbstractController
 
         // Adapter le nombre de mois pour l'évolution selon la période
         $monthsToShow = match ($period) {
-            'today', 'week' => 3,      // 3 mois de contexte pour les courtes périodes
-            'month'   => 12,              // 12 mois glissants
-            'quarter' => 12,            // 12 mois pour voir les tendances
-            'year'    => 12,               // 12 derniers mois
+            'today', 'week' => 3, // 3 mois de contexte pour les courtes périodes
+            'month'   => 12, // 12 mois glissants
+            'quarter' => 12, // 12 mois pour voir les tendances
+            'year'    => 12, // 12 derniers mois
             'custom'  => max(3, min(12, (int) ceil($startDate->diff($endDate)->days / 30))), // Entre 3 et 12 mois
             default   => 12,
         };
@@ -78,10 +88,16 @@ class DashboardController extends AbstractController
 
         // Options de filtres (listes déroulantes)
         $filterOptions = [
-            'project_managers'   => $this->projectRepository->getDistinctProjectManagersBetweenDates($startDate, $endDate),
+            'project_managers' => $this->projectRepository->getDistinctProjectManagersBetweenDates(
+                $startDate,
+                $endDate,
+            ),
             'sales_persons'      => $this->projectRepository->getDistinctSalesPersonsBetweenDates($startDate, $endDate),
             'technologies'       => $this->projectRepository->getDistinctTechnologiesBetweenDates($startDate, $endDate),
-            'service_categories' => $this->projectRepository->getDistinctServiceCategoriesBetweenDates($startDate, $endDate),
+            'service_categories' => $this->projectRepository->getDistinctServiceCategoriesBetweenDates(
+                $startDate,
+                $endDate,
+            ),
         ];
 
         return $this->render('analytics/dashboard.html.twig', [
@@ -142,11 +158,7 @@ class DashboardController extends AbstractController
         $month             = (int) $date->format('n');
         $quarterStartMonth = (int) (floor(($month - 1) / 3) * 3) + 1;
 
-        return (clone $date)->setDate(
-            (int) $date->format('Y'),
-            $quarterStartMonth,
-            1,
-        )->setTime(0, 0);
+        return (clone $date)->setDate((int) $date->format('Y'), $quarterStartMonth, 1)->setTime(0, 0);
     }
 
     /**
@@ -172,12 +184,22 @@ class DashboardController extends AbstractController
 
         // Filtres
         $filters = [
-            'project_type'        => $request->query->get('project_type') ?: null,
-            'is_internal'         => $request->query->get('client_type') === 'internal' ? true : ($request->query->get('client_type') === 'client' ? false : null),
-            'project_manager_id'  => $request->query->get('project_manager_id') ? (int) $request->query->get('project_manager_id') : null,
-            'sales_person_id'     => $request->query->get('sales_person_id') ? (int) $request->query->get('sales_person_id') : null,
-            'technology_id'       => $request->query->get('technology_id') ? (int) $request->query->get('technology_id') : null,
-            'service_category_id' => $request->query->get('service_category_id') ? (int) $request->query->get('service_category_id') : null,
+            'project_type' => $request->query->get('project_type') ?: null,
+            'is_internal'  => $request->query->get('client_type') === 'internal'
+                ? true
+                : ($request->query->get('client_type') === 'client' ? false : null),
+            'project_manager_id' => $request->query->get('project_manager_id')
+                ? (int) $request->query->get('project_manager_id')
+                : null,
+            'sales_person_id' => $request->query->get('sales_person_id')
+                ? (int) $request->query->get('sales_person_id')
+                : null,
+            'technology_id' => $request->query->get('technology_id')
+                ? (int) $request->query->get('technology_id')
+                : null,
+            'service_category_id' => $request->query->get('service_category_id')
+                ? (int) $request->query->get('service_category_id')
+                : null,
         ];
 
         // Récupérer les données
@@ -197,9 +219,7 @@ class DashboardController extends AbstractController
 
         try {
             // Dispatch le message de recalcul
-            $this->messageBus->dispatch(
-                new RecalculateMetricsMessage($period, $granularity),
-            );
+            $this->messageBus->dispatch(new RecalculateMetricsMessage($period, $granularity));
 
             $this->addFlash('success', 'Recalcul des métriques lancé en arrière-plan.');
 

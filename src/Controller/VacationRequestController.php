@@ -27,7 +27,7 @@ class VacationRequestController extends AbstractController
         private readonly VacationRepository $vacationRepository,
         private readonly ContributorRepository $contributorRepository,
         private readonly MessageBusInterface $messageBus,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -47,10 +47,7 @@ class VacationRequestController extends AbstractController
         }
 
         // Récupérer toutes les demandes de congés du collaborateur
-        $vacations = $this->vacationRepository->findBy(
-            ['contributor' => $contributor],
-            ['createdAt' => 'DESC'],
-        );
+        $vacations = $this->vacationRepository->findBy(['contributor' => $contributor], ['createdAt' => 'DESC']);
 
         return $this->render('vacation_request/index.html.twig', [
             'vacations'   => $vacations,
@@ -97,7 +94,10 @@ class VacationRequestController extends AbstractController
             // Envoyer une notification au manager
             $this->messageBus->dispatch(new VacationNotificationMessage($vacation->getId(), 'created'));
 
-            $this->addFlash('success', 'Votre demande de congé a été enregistrée avec succès. Elle est en attente de validation.');
+            $this->addFlash(
+                'success',
+                'Votre demande de congé a été enregistrée avec succès. Elle est en attente de validation.',
+            );
 
             return $this->redirectToRoute('vacation_request_index');
         }

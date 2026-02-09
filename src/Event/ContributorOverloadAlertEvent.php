@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Entity\Contributor;
@@ -13,7 +15,7 @@ class ContributorOverloadAlertEvent extends NotificationEvent
         private readonly DateTimeImmutable $month,
         private readonly float $capacityRate,
         private readonly float $totalDays,
-        array $recipients
+        array $recipients,
     ) {
         $title = 'Alerte surcharge contributeur';
 

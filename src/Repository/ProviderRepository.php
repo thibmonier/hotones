@@ -14,10 +14,8 @@ use Override;
  */
 class ProviderRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Provider::class, $companyContext);
     }
 
@@ -26,7 +24,8 @@ class ProviderRepository extends CompanyAwareRepository
      */
     public function findAllActive(): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.active = :active')
             ->setParameter('active', true)
             ->orderBy('p.name', 'ASC')
@@ -40,7 +39,8 @@ class ProviderRepository extends CompanyAwareRepository
     #[Override]
     public function findAll(): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -51,7 +51,8 @@ class ProviderRepository extends CompanyAwareRepository
      */
     public function findByType(string $type): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.type = :type')
             ->andWhere('p.active = :active')
             ->setParameter('type', $type)

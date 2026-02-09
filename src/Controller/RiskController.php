@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class RiskController extends AbstractController
 {
     public function __construct(
-        private readonly ProjectRiskAnalyzer $riskAnalyzer
+        private readonly ProjectRiskAnalyzer $riskAnalyzer,
     ) {
     }
 
@@ -25,10 +25,9 @@ class RiskController extends AbstractController
     public function projectsDashboard(EntityManagerInterface $em): Response
     {
         // Récupérer tous les projets actifs ou en cours
-        $projects = $em->getRepository(Project::class)->findBy(
-            ['status' => ['in_progress', 'active']],
-            ['name' => 'ASC'],
-        );
+        $projects = $em->getRepository(Project::class)->findBy(['status' => ['in_progress', 'active']], [
+            'name' => 'ASC',
+        ]);
 
         // Analyser les projets et récupérer ceux à risque
         $atRiskProjects = $this->riskAnalyzer->analyzeMultipleProjects($projects);
@@ -37,9 +36,12 @@ class RiskController extends AbstractController
         $stats = [
             'total'    => count($projects),
             'atRisk'   => count($atRiskProjects),
-            'critical' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'critical')),
-            'high'     => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
-            'medium'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
+            'critical' => count(array_filter(
+                $atRiskProjects,
+                fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
+            )),
+            'high'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'medium' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
         return $this->render('risk/projects_dashboard.html.twig', [

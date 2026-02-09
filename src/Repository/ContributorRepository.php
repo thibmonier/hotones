@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Security\CompanyContext;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,10 +22,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ContributorRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Contributor::class, $companyContext);
     }
 
@@ -31,7 +32,8 @@ class ContributorRepository extends CompanyAwareRepository
      */
     public function findActiveContributors(): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
             ->orderBy('c.lastName', 'ASC')
@@ -45,7 +47,8 @@ class ContributorRepository extends CompanyAwareRepository
      */
     public function findActiveContributorsByProfile(Profile $profile): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->innerJoin('c.profiles', 'p')
             ->andWhere('c.active = :active')
             ->andWhere('p = :profile')
@@ -62,7 +65,8 @@ class ContributorRepository extends CompanyAwareRepository
      */
     public function countActiveContributors(): int
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->select('COUNT(c.id)')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -83,7 +87,8 @@ class ContributorRepository extends CompanyAwareRepository
      */
     public function findWithProfiles(): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->leftJoin('c.profiles', 'p')
             ->addSelect('p')
             ->andWhere('c.active = :active')
@@ -99,7 +104,8 @@ class ContributorRepository extends CompanyAwareRepository
      */
     public function searchByName(string $query): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->andWhere('c.firstName LIKE :query OR c.lastName LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->andWhere('c.active = :active')
@@ -115,7 +121,8 @@ class ContributorRepository extends CompanyAwareRepository
      */
     public function findWithHoursForPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->leftJoin('c.timesheets', 't', 'WITH', 't.date BETWEEN :start AND :end')
             ->addSelect('COALESCE(SUM(t.hours), 0) as totalHours')
             ->andWhere('c.active = :active')
@@ -135,7 +142,8 @@ class ContributorRepository extends CompanyAwareRepository
     {
         $company = $this->companyContext->getCurrentCompany();
 
-        return $this->getEntityManager()
+        return $this
+            ->getEntityManager()
             ->createQueryBuilder()
             ->select('DISTINCT p')
             ->from(\App\Entity\Project::class, 'p')
@@ -165,7 +173,8 @@ class ContributorRepository extends CompanyAwareRepository
         // Pour chaque projet, récupérer les tâches assignées au contributeur
         $result = [];
         foreach ($projects as $project) {
-            $assignedTasks = $this->getEntityManager()
+            $assignedTasks = $this
+                ->getEntityManager()
                 ->createQueryBuilder()
                 ->select('t')
                 ->from(\App\Entity\ProjectTask::class, 't')
@@ -193,13 +202,74 @@ class ContributorRepository extends CompanyAwareRepository
     }
 
     /**
+     * Builds a filtered query for contributors with optional search, active and employment status filters.
+     */
+    public function buildFilteredQuery(
+        string $search = '',
+        string $active = 'all',
+        string $employmentStatus = 'all',
+        string $sort = 'name',
+        string $dir = 'ASC',
+    ): \Doctrine\ORM\QueryBuilder {
+        $qb = $this
+            ->createQueryBuilder('c')
+            ->leftJoin('c.profiles', 'p')
+            ->addSelect('p');
+
+        if ($search) {
+            $qb->andWhere('c.firstName LIKE :search OR c.lastName LIKE :search OR c.email LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
+        }
+
+        if ($active !== 'all') {
+            $qb->andWhere('c.active = :active')
+                ->setParameter('active', $active === 'active');
+        }
+
+        if ($employmentStatus === 'current') {
+            $today = new DateTime();
+            $qb->innerJoin('c.employmentPeriods', 'ep')
+                ->andWhere('ep.startDate <= :today')
+                ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :today)')
+                ->setParameter('today', $today);
+        } elseif ($employmentStatus === 'inactive_employment') {
+            $today    = new DateTime();
+            $subQuery = $this->getEntityManager()
+                ->createQueryBuilder()
+                ->select('IDENTITY(ep2.contributor)')
+                ->from(\App\Entity\EmploymentPeriod::class, 'ep2')
+                ->where('ep2.startDate <= :today')
+                ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
+                ->getDQL();
+            $qb->andWhere($qb->expr()->notIn('c.id', $subQuery))
+                ->setParameter('today', $today);
+        }
+
+        $map       = ['name' => ['c.lastName', 'c.firstName'], 'email' => ['c.email'], 'active' => ['c.active']];
+        $columns   = $map[$sort] ?? ['c.lastName', 'c.firstName'];
+        $direction = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+        $first     = true;
+        foreach ($columns as $col) {
+            if ($first) {
+                $qb->orderBy($col, $direction);
+                $first = false;
+            } else {
+                $qb->addOrderBy($col, $direction);
+            }
+        }
+
+        return $qb;
+    }
+
+    /**
      * Recherche full-text dans les contributeurs.
      *
      * @return Contributor[]
      */
     public function search(string $query, int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('c')
+        return $this
+            ->createCompanyQueryBuilder('c')
             ->leftJoin('c.user', 'u')
             ->andWhere('c.firstName LIKE :query OR c.lastName LIKE :query OR u.email LIKE :query')
             ->setParameter('query', '%'.$query.'%')

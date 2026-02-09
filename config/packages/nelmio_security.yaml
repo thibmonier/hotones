@@ -44,9 +44,8 @@ nelmio_security:
                 - "'self'"
             script-src:
                 - "'self'"
-                - "'unsafe-inline'"  # Needed for Chart.js and inline handlers
+                - "'unsafe-inline'"  # TODO: Remove once all inline scripts in templates are extracted to external JS files
                 - "cdn.jsdelivr.net"
-                - "'unsafe-eval'"    # Needed for some Chart.js features
                 - "www.googletagmanager.com"  # Google Tag Manager
                 - "www.google-analytics.com"  # Google Analytics
                 - "*.googletagmanager.com"    # GTM subdomains

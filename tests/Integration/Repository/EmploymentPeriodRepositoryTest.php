@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Integration\Repository;
 
 use App\Entity\EmploymentPeriod;
@@ -335,10 +337,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         // No departure (still active)
         $this->createEmploymentPeriod($contributor1, '2025-02-01', null);
 
-        $count = $this->repository->countDepartures(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-03-31'),
-        );
+        $count = $this->repository->countDepartures(new DateTime('2025-01-01'), new DateTime('2025-03-31'));
 
         $this->assertEquals(1, $count);
     }

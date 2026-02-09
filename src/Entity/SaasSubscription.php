@@ -384,7 +384,7 @@ class SaasSubscription implements CompanyOwnedInterface, Stringable
         $price = (float) $this->price;
 
         if ($this->billingPeriod === self::BILLING_MONTHLY) {
-            return ($price * $this->quantity) * 12;
+            return $price * $this->quantity * 12;
         }
 
         return $price * $this->quantity;

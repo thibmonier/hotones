@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Menu;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class MenuBuilder
 {
-    public function __construct(private readonly AuthorizationCheckerInterface $security)
-    {
+    public function __construct(
+        private readonly AuthorizationCheckerInterface $security,
+    ) {
     }
 
     public function buildMainMenu(): array
@@ -72,17 +75,28 @@ class MenuBuilder
                 'children' => [
                     ['label' => 'Projets', 'route' => 'project_index', 'role' => 'ROLE_CHEF_PROJET'],
                     ['label' => 'Planning', 'route' => 'planning_index', 'role' => 'ROLE_CHEF_PROJET'],
-                    ['label'   => 'Optimisation', 'route' => 'planning_optimization_index',
-                        'role' => 'ROLE_MANAGER', 'icon' => 'bx-bulb'],
-                    ['label'   => 'Projets à risque', 'route' => 'risk_projects_dashboard',
-                        'role' => 'ROLE_MANAGER', 'icon' => 'bx-error-circle'],
+                    [
+                        'label' => 'Optimisation',
+                        'route' => 'planning_optimization_index',
+                        'role'  => 'ROLE_MANAGER',
+                        'icon'  => 'bx-bulb',
+                    ],
+                    [
+                        'label' => 'Projets à risque',
+                        'route' => 'risk_projects_dashboard',
+                        'role'  => 'ROLE_MANAGER',
+                        'icon'  => 'bx-error-circle',
+                    ],
                     ['label' => 'Mes tâches', 'route' => 'my_tasks_index', 'role' => 'ROLE_INTERVENANT'],
                     ['label' => 'Saisir mes temps', 'route' => 'timesheet_index', 'role' => 'ROLE_INTERVENANT'],
                     ['label' => 'Mon historique', 'route' => 'timesheet_my_time', 'role' => 'ROLE_INTERVENANT'],
                     ['label' => 'Mes congés', 'route' => 'vacation_request_index', 'role' => 'ROLE_INTERVENANT'],
                     ['label' => 'Validation congés', 'route' => 'vacation_approval_index', 'role' => 'ROLE_MANAGER'],
-                    ['label'   => 'Validation notes de frais', 'route' => 'expense_report_pending',
-                        'role' => 'ROLE_MANAGER'],
+                    [
+                        'label' => 'Validation notes de frais',
+                        'route' => 'expense_report_pending',
+                        'role'  => 'ROLE_MANAGER',
+                    ],
                     ['label' => 'Tous les temps', 'route' => 'timesheet_all', 'role' => 'ROLE_ADMIN'],
                 ],
             ],

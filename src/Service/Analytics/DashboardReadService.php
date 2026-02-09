@@ -27,7 +27,7 @@ readonly class DashboardReadService
         private RealTimeMetricsService $realTimeService,
         private CompanyContext $companyContext,
         private LoggerInterface $logger,
-        private CacheInterface $analyticsCache
+        private CacheInterface $analyticsCache,
     ) {
     }
 
@@ -40,8 +40,11 @@ readonly class DashboardReadService
      *
      * @return array KPIs agrégés
      */
-    public function getKPIs(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, array $filters = []): array
-    {
+    public function getKPIs(
+        ?DateTimeInterface $startDate = null,
+        ?DateTimeInterface $endDate = null,
+        array $filters = [],
+    ): array {
         // Dates par défaut pour la clé de cache
         $start = $startDate ?? new DateTime('first day of January this year');
         $end   = $endDate   ?? new DateTime();
@@ -54,7 +57,11 @@ readonly class DashboardReadService
             md5(json_encode($filters)),
         );
 
-        return $this->analyticsCache->get($cacheKey, function (ItemInterface $item) use ($startDate, $endDate, $filters) {
+        return $this->analyticsCache->get($cacheKey, function (ItemInterface $item) use (
+            $startDate,
+            $endDate,
+            $filters,
+        ) {
             $item->expiresAfter(1800); // 30 minutes
 
             // Tentative de lecture depuis le modèle en étoile
@@ -85,11 +92,7 @@ readonly class DashboardReadService
     public function getMonthlyEvolution(int $months = 12, array $filters = []): array
     {
         // Clé de cache basée sur le nombre de mois et filtres
-        $cacheKey = sprintf(
-            'analytics_monthly_evolution_%d_%s',
-            $months,
-            md5(json_encode($filters)),
-        );
+        $cacheKey = sprintf('analytics_monthly_evolution_%d_%s', $months, md5(json_encode($filters)));
 
         return $this->analyticsCache->get($cacheKey, function (ItemInterface $item) use ($months, $filters) {
             $item->expiresAfter(1800); // 30 minutes
@@ -100,14 +103,15 @@ readonly class DashboardReadService
             // Lire depuis le modèle en étoile
             $company = $this->companyContext->getCurrentCompany();
             $qb      = $this->entityManager->createQueryBuilder();
-            $qb->select(
-                'dt.year',
-                'dt.month',
-                'dt.monthName',
-                'SUM(f.totalRevenue) as totalRevenue',
-                'SUM(f.totalCosts) as totalCosts',
-                'SUM(f.grossMargin) as grossMargin',
-            )
+            $qb
+                ->select(
+                    'dt.year',
+                    'dt.month',
+                    'dt.monthName',
+                    'SUM(f.totalRevenue) as totalRevenue',
+                    'SUM(f.totalCosts) as totalCosts',
+                    'SUM(f.grossMargin) as grossMargin',
+                )
                 ->from(FactProjectMetrics::class, 'f')
                 ->join('f.dimTime', 'dt')
                 ->where('dt.date BETWEEN :start AND :end')
@@ -134,47 +138,54 @@ readonly class DashboardReadService
             }
 
             // Formatter les résultats
-            return array_map(fn ($row): array => [
-                'month'       => $row['monthName'],
-                'month_label' => $row['monthName'], // Pour le graphique Chart.js
-                'revenue'     => (float) $row['totalRevenue'],
-                'cost'        => (float) $row['totalCosts'], // Singulier pour Chart.js
-                'costs'       => (float) $row['totalCosts'], // Pluriel pour compatibilité
-                'margin'      => (float) $row['grossMargin'],
-            ], $results);
+            return array_map(
+                fn ($row): array => [
+                    'month'       => $row['monthName'],
+                    'month_label' => $row['monthName'], // Pour le graphique Chart.js
+                    'revenue'     => (float) $row['totalRevenue'],
+                    'cost'        => (float) $row['totalCosts'], // Singulier pour Chart.js
+                    'costs'       => (float) $row['totalCosts'], // Pluriel pour compatibilité
+                    'margin'      => (float) $row['grossMargin'],
+                ],
+                $results,
+            );
         });
     }
 
     /**
      * Lit les KPIs agrégés depuis le modèle en étoile.
      */
-    private function readFromStarSchema(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
-    {
+    private function readFromStarSchema(
+        ?DateTimeInterface $startDate,
+        ?DateTimeInterface $endDate,
+        array $filters,
+    ): array {
         // Dates par défaut
         $startDate ??= new DateTime('first day of January this year');
         $endDate   ??= new DateTime();
 
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->entityManager->createQueryBuilder();
-        $qb->select(
-            'SUM(f.totalRevenue) as totalRevenue',
-            'SUM(f.totalCosts) as totalCosts',
-            'SUM(f.grossMargin) as grossMargin',
-            'AVG(f.marginPercentage) as avgMarginPercentage',
-            'SUM(f.projectCount) as totalProjects',
-            'SUM(f.activeProjectCount) as activeProjects',
-            'SUM(f.completedProjectCount) as completedProjects',
-            'SUM(f.orderCount) as totalOrders',
-            'SUM(f.pendingOrderCount) as pendingOrders',
-            'SUM(f.wonOrderCount) as wonOrders',
-            'SUM(f.signedOrderCount) as signedOrders',
-            'SUM(f.lostOrderCount) as lostOrders',
-            'SUM(f.pendingRevenue) as pendingRevenue',
-            'SUM(f.totalWorkedDays) as totalWorkedDays',
-            'SUM(f.totalSoldDays) as totalSoldDays',
-            'AVG(f.utilizationRate) as avgUtilization',
-            'SUM(f.contributorCount) as contributorCount',
-        )
+        $qb
+            ->select(
+                'SUM(f.totalRevenue) as totalRevenue',
+                'SUM(f.totalCosts) as totalCosts',
+                'SUM(f.grossMargin) as grossMargin',
+                'AVG(f.marginPercentage) as avgMarginPercentage',
+                'SUM(f.projectCount) as totalProjects',
+                'SUM(f.activeProjectCount) as activeProjects',
+                'SUM(f.completedProjectCount) as completedProjects',
+                'SUM(f.orderCount) as totalOrders',
+                'SUM(f.pendingOrderCount) as pendingOrders',
+                'SUM(f.wonOrderCount) as wonOrders',
+                'SUM(f.signedOrderCount) as signedOrders',
+                'SUM(f.lostOrderCount) as lostOrders',
+                'SUM(f.pendingRevenue) as pendingRevenue',
+                'SUM(f.totalWorkedDays) as totalWorkedDays',
+                'SUM(f.totalSoldDays) as totalSoldDays',
+                'AVG(f.utilizationRate) as avgUtilization',
+                'SUM(f.contributorCount) as contributorCount',
+            )
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
             ->where('dt.date BETWEEN :start AND :end')
@@ -248,35 +259,40 @@ readonly class DashboardReadService
     {
         // Filtre par type de projet
         if (!empty($filters['projectType'])) {
-            $qb->join('f.dimProjectType', 'dpt')
+            $qb
+                ->join('f.dimProjectType', 'dpt')
                 ->andWhere('dpt.projectType = :projectType')
                 ->setParameter('projectType', $filters['projectType']);
         }
 
         // Filtre par chef de projet
         if (!empty($filters['projectManager'])) {
-            $qb->join('f.dimProjectManager', 'dpm')
+            $qb
+                ->join('f.dimProjectManager', 'dpm')
                 ->andWhere('dpm.contributorId = :projectManager')
                 ->setParameter('projectManager', $filters['projectManager']);
         }
 
         // Filtre par commercial
         if (!empty($filters['salesPerson'])) {
-            $qb->join('f.dimSalesPerson', 'dsp')
+            $qb
+                ->join('f.dimSalesPerson', 'dsp')
                 ->andWhere('dsp.contributorId = :salesPerson')
                 ->setParameter('salesPerson', $filters['salesPerson']);
         }
 
         // Filtre par directeur de projet
         if (!empty($filters['projectDirector'])) {
-            $qb->join('f.dimProjectDirector', 'dpd')
+            $qb
+                ->join('f.dimProjectDirector', 'dpd')
                 ->andWhere('dpd.contributorId = :projectDirector')
                 ->setParameter('projectDirector', $filters['projectDirector']);
         }
 
         // Filtre par technologie (nécessite join sur project)
         if (!empty($filters['technology'])) {
-            $qb->join('f.project', 'p')
+            $qb
+                ->join('f.project', 'p')
                 ->join('p.technologies', 't')
                 ->andWhere('t.id = :technology')
                 ->setParameter('technology', $filters['technology']);
@@ -284,7 +300,8 @@ readonly class DashboardReadService
 
         // Filtre par catégorie de service
         if (!empty($filters['serviceCategory'])) {
-            $qb->join('f.project', 'p')
+            $qb
+                ->join('f.project', 'p')
                 ->join('p.category', 'sc')
                 ->andWhere('sc.id = :serviceCategory')
                 ->setParameter('serviceCategory', $filters['serviceCategory']);
@@ -294,14 +311,15 @@ readonly class DashboardReadService
     /**
      * Récupère la répartition des projets par type (forfait/régie).
      */
-    private function getProjectsByType(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
-    {
+    private function getProjectsByType(
+        ?DateTimeInterface $startDate,
+        ?DateTimeInterface $endDate,
+        array $filters,
+    ): array {
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->entityManager->createQueryBuilder();
-        $qb->select(
-            'dpt.projectType as type',
-            'SUM(f.projectCount) as count',
-        )
+        $qb
+            ->select('dpt.projectType as type', 'SUM(f.projectCount) as count')
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
             ->join('f.dimProjectType', 'dpt')
@@ -328,14 +346,15 @@ readonly class DashboardReadService
     /**
      * Récupère la répartition des projets par type de client (interne/client).
      */
-    private function getProjectsByClientType(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
-    {
+    private function getProjectsByClientType(
+        ?DateTimeInterface $startDate,
+        ?DateTimeInterface $endDate,
+        array $filters,
+    ): array {
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->entityManager->createQueryBuilder();
-        $qb->select(
-            'dpt.isInternal',
-            'SUM(f.projectCount) as count',
-        )
+        $qb
+            ->select('dpt.isInternal', 'SUM(f.projectCount) as count')
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
             ->join('f.dimProjectType', 'dpt')
@@ -363,14 +382,15 @@ readonly class DashboardReadService
     /**
      * Récupère la répartition des projets par catégorie de service.
      */
-    private function getProjectsByCategory(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters): array
-    {
+    private function getProjectsByCategory(
+        ?DateTimeInterface $startDate,
+        ?DateTimeInterface $endDate,
+        array $filters,
+    ): array {
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->entityManager->createQueryBuilder();
-        $qb->select(
-            'dpt.serviceCategory as category',
-            'SUM(f.projectCount) as count',
-        )
+        $qb
+            ->select('dpt.serviceCategory as category', 'SUM(f.projectCount) as count')
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
             ->join('f.dimProjectType', 'dpt')
@@ -401,17 +421,22 @@ readonly class DashboardReadService
      *
      * @param int $limit Nombre de contributeurs à retourner (défaut 5)
      */
-    private function getTopContributors(?DateTimeInterface $startDate, ?DateTimeInterface $endDate, array $filters, int $limit = 5): array
-    {
+    private function getTopContributors(
+        ?DateTimeInterface $startDate,
+        ?DateTimeInterface $endDate,
+        array $filters,
+        int $limit = 5,
+    ): array {
         $company = $this->companyContext->getCurrentCompany();
         $qb      = $this->entityManager->createQueryBuilder();
-        $qb->select(
-            'dc.id',
-            'dc.name',
-            'SUM(f.totalRevenue) as totalRevenue',
-            'SUM(f.grossMargin) as totalMargin',
-            'SUM(f.totalWorkedDays) as totalDays',
-        )
+        $qb
+            ->select(
+                'dc.id',
+                'dc.name',
+                'SUM(f.totalRevenue) as totalRevenue',
+                'SUM(f.grossMargin) as totalMargin',
+                'SUM(f.totalWorkedDays) as totalDays',
+            )
             ->from(FactProjectMetrics::class, 'f')
             ->join('f.dimTime', 'dt')
             ->leftJoin('f.dimProjectManager', 'dc')

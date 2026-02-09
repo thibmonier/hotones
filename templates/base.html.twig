@@ -54,7 +54,7 @@
                     <div class="p-3 bg-primary text-white">
                         <div class="d-flex justify-content-between align-items-center">
                             <h6 class="m-0">Notifications</h6>
-                            <button type="button" class="btn btn-sm btn-light" onclick="markAllNotificationsAsRead()">
+                            <button type="button" class="btn btn-sm btn-light" data-action="mark-all-read">
                                 <i class="bx bx-check-double"></i>
                             </button>
                         </div>
@@ -343,21 +343,7 @@
     <script src="{{ asset('assets/js/form-validation.js') }}"></script>
     <!-- Notifications JS -->
     <script src="{{ asset('assets/js/notifications.js') }}"></script>
-    <script>
-        // Raccourci clavier Ctrl+K ou Cmd+K pour la recherche
-        document.addEventListener('DOMContentLoaded', function() {
-            document.addEventListener('keydown', function(e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                    e.preventDefault();
-                    const searchInput = document.getElementById('globalSearchInput');
-                    if (searchInput) {
-                        searchInput.focus();
-                        searchInput.select();
-                    }
-                }
-            });
-        });
-    </script>
+    <script src="{{ asset('assets/js/keyboard-shortcuts.js') }}"></script>
     {% endif %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
 </body>

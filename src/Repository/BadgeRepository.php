@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BadgeRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Badge::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class BadgeRepository extends CompanyAwareRepository
      */
     public function findAllActive(): array
     {
-        return $this->createCompanyQueryBuilder('b')
+        return $this
+            ->createCompanyQueryBuilder('b')
             ->andWhere('b.active = :active')
             ->setParameter('active', true)
             ->orderBy('b.category', 'ASC')
@@ -43,7 +42,8 @@ class BadgeRepository extends CompanyAwareRepository
      */
     public function findByCategory(string $category): array
     {
-        return $this->createCompanyQueryBuilder('b')
+        return $this
+            ->createCompanyQueryBuilder('b')
             ->andWhere('b.category = :category')
             ->andWhere('b.active = :active')
             ->setParameter('category', $category)
@@ -66,7 +66,8 @@ class BadgeRepository extends CompanyAwareRepository
 
     private function countByCategory(): array
     {
-        $results = $this->createCompanyQueryBuilder('b')
+        $results = $this
+            ->createCompanyQueryBuilder('b')
             ->select('b.category, COUNT(b.id) as count')
             ->andWhere('b.active = :active')
             ->setParameter('active', true)

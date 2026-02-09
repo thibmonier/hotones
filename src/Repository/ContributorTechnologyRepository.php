@@ -17,10 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ContributorTechnologyRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ContributorTechnology::class, $companyContext);
     }
 
@@ -31,7 +29,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.technology', 't')
             ->andWhere('ct.contributor = :contributor')
             ->setParameter('contributor', $contributor)
@@ -48,7 +47,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function findByTechnology(Technology $technology): array
     {
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->andWhere('ct.technology = :technology')
             ->setParameter('technology', $technology)
@@ -88,16 +88,15 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function findExpertsByTechnology(Technology $technology): array
     {
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->andWhere('ct.technology = :technology')
             ->setParameter('technology', $technology)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
-            ->andWhere(
-                'ct.managerAssessmentLevel = :expert OR
-                (ct.managerAssessmentLevel IS NULL AND ct.selfAssessmentLevel = :expert)',
-            )
+            ->andWhere('ct.managerAssessmentLevel = :expert OR
+                (ct.managerAssessmentLevel IS NULL AND ct.selfAssessmentLevel = :expert)')
             ->setParameter('expert', ContributorTechnology::LEVEL_EXPERT)
             ->orderBy('ct.yearsOfExperience', 'DESC')
             ->getQuery()
@@ -113,7 +112,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
     {
         $sixMonthsAgo = new DateTime('-6 months');
 
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->andWhere('ct.technology = :technology')
             ->setParameter('technology', $technology)
@@ -133,16 +133,15 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function findByTechnologyAndMinLevel(Technology $technology, int $minLevel): array
     {
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->andWhere('ct.technology = :technology')
             ->setParameter('technology', $technology)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
-            ->andWhere(
-                '(ct.managerAssessmentLevel >= :minLevel) OR
-                (ct.managerAssessmentLevel IS NULL AND ct.selfAssessmentLevel >= :minLevel)',
-            )
+            ->andWhere('(ct.managerAssessmentLevel >= :minLevel) OR
+                (ct.managerAssessmentLevel IS NULL AND ct.selfAssessmentLevel >= :minLevel)')
             ->setParameter('minLevel', $minLevel)
             ->orderBy('ct.managerAssessmentLevel', 'DESC')
             ->addOrderBy('ct.selfAssessmentLevel', 'DESC')
@@ -157,7 +156,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function findWantingToImprove(Technology $technology): array
     {
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->andWhere('ct.technology = :technology')
             ->setParameter('technology', $technology)
@@ -191,7 +191,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
         }
 
         // Récupérer toutes les associations pour ces technologies
-        $results = $this->createCompanyQueryBuilder('ct')
+        $results = $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->join('ct.technology', 't')
             ->andWhere('ct.technology IN (:technologies)')
@@ -251,14 +252,12 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function getLevelDistributionForTechnology(Technology $technology): array
     {
-        $results = $this->createCompanyQueryBuilder('ct')
-            ->select(
-                'CASE
+        $results = $this
+            ->createCompanyQueryBuilder('ct')
+            ->select('CASE
                     WHEN ct.managerAssessmentLevel IS NOT NULL THEN ct.managerAssessmentLevel
                     ELSE ct.selfAssessmentLevel
-                END as effectiveLevel',
-                'COUNT(ct.id) as count',
-            )
+                END as effectiveLevel', 'COUNT(ct.id) as count')
             ->andWhere('ct.technology = :technology')
             ->setParameter('technology', $technology)
             ->groupBy('effectiveLevel')
@@ -280,7 +279,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function findAssessmentGaps(): array
     {
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->join('ct.technology', 't')
             ->andWhere('ct.managerAssessmentLevel IS NOT NULL')
@@ -302,7 +302,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
     {
         $twoYearsAgo = new DateTime('-2 years');
 
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
@@ -320,7 +321,8 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
      */
     public function findTrainingNeeds(): array
     {
-        return $this->createCompanyQueryBuilder('ct')
+        return $this
+            ->createCompanyQueryBuilder('ct')
             ->join('ct.contributor', 'c')
             ->andWhere('c.active = :active')
             ->setParameter('active', true)

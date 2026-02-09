@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class StaffingMetricsRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, FactStaffingMetrics::class, $companyContext);
     }
 
@@ -36,9 +34,10 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         DateTimeInterface $endDate,
         string $granularity = 'monthly',
         ?Profile $profile = null,
-        ?Contributor $contributor = null
+        ?Contributor $contributor = null,
     ): array {
-        $qb = $this->createCompanyQueryBuilder('fsm')
+        $qb = $this
+            ->createCompanyQueryBuilder('fsm')
             ->join('fsm.dimTime', 'dt')
             ->andWhere('dt.date >= :startDate')
             ->andWhere('dt.date <= :endDate')
@@ -49,14 +48,11 @@ class StaffingMetricsRepository extends CompanyAwareRepository
             ->orderBy('dt.date', 'ASC');
 
         if ($profile) {
-            $qb->join('fsm.dimProfile', 'dp')
-               ->andWhere('dp.profile = :profile')
-               ->setParameter('profile', $profile);
+            $qb->join('fsm.dimProfile', 'dp')->andWhere('dp.profile = :profile')->setParameter('profile', $profile);
         }
 
         if ($contributor) {
-            $qb->andWhere('fsm.contributor = :contributor')
-               ->setParameter('contributor', $contributor);
+            $qb->andWhere('fsm.contributor = :contributor')->setParameter('contributor', $contributor);
         }
 
         return $qb->getQuery()->getResult();
@@ -81,9 +77,10 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         DateTimeInterface $endDate,
         string $granularity = 'monthly',
         ?Profile $profile = null,
-        ?Contributor $contributor = null
+        ?Contributor $contributor = null,
     ): array {
-        $qb = $this->createCompanyQueryBuilder('fsm')
+        $qb = $this
+            ->createCompanyQueryBuilder('fsm')
             ->select(
                 'dt.yearMonth as yearMonth',
                 'AVG(fsm.staffingRate) as staffingRate',
@@ -102,20 +99,17 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         // Ne filtrer par productivité que s'il y a un profil
         // Les métriques sans profil (dimProfile NULL) sont considérées comme productives par défaut
         if ($profile) {
-            $qb->andWhere('dp.profile = :profile')
-               ->setParameter('profile', $profile);
+            $qb->andWhere('dp.profile = :profile')->setParameter('profile', $profile);
         } else {
             // Si pas de filtre profil spécifique, inclure soit les profils productifs soit pas de profil du tout
             $qb->andWhere('dp.id IS NULL OR dp.isProductive = true');
         }
 
         if ($contributor) {
-            $qb->andWhere('fsm.contributor = :contributor')
-               ->setParameter('contributor', $contributor);
+            $qb->andWhere('fsm.contributor = :contributor')->setParameter('contributor', $contributor);
         }
 
-        $qb->groupBy('dt.yearMonth')
-           ->orderBy('dt.yearMonth', 'ASC');
+        $qb->groupBy('dt.yearMonth')->orderBy('dt.yearMonth', 'ASC');
 
         return $qb->getQuery()->getResult();
     }
@@ -138,14 +132,11 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         DateTimeInterface $endDate,
         string $granularity = 'monthly',
         ?Profile $profile = null,
-        ?Contributor $contributor = null
+        ?Contributor $contributor = null,
     ): array {
-        $qb = $this->createCompanyQueryBuilder('fsm')
-            ->select(
-                'dp.name as profileName',
-                'AVG(fsm.staffingRate) as staffingRate',
-                'AVG(fsm.tace) as tace',
-            )
+        $qb = $this
+            ->createCompanyQueryBuilder('fsm')
+            ->select('dp.name as profileName', 'AVG(fsm.staffingRate) as staffingRate', 'AVG(fsm.tace) as tace')
             ->join('fsm.dimTime', 'dt')
             ->join('fsm.dimProfile', 'dp')
             ->andWhere('dt.date >= :startDate')
@@ -157,17 +148,14 @@ class StaffingMetricsRepository extends CompanyAwareRepository
             ->setParameter('granularity', $granularity);
 
         if ($profile) {
-            $qb->andWhere('dp.profile = :profile')
-               ->setParameter('profile', $profile);
+            $qb->andWhere('dp.profile = :profile')->setParameter('profile', $profile);
         }
 
         if ($contributor) {
-            $qb->andWhere('fsm.contributor = :contributor')
-               ->setParameter('contributor', $contributor);
+            $qb->andWhere('fsm.contributor = :contributor')->setParameter('contributor', $contributor);
         }
 
-        $qb->groupBy('dp.name')
-           ->orderBy('staffingRate', 'DESC');
+        $qb->groupBy('dp.name')->orderBy('staffingRate', 'DESC');
 
         return $qb->getQuery()->getResult();
     }
@@ -191,9 +179,10 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         DateTimeInterface $endDate,
         string $granularity = 'monthly',
         ?Profile $profile = null,
-        ?Contributor $contributor = null
+        ?Contributor $contributor = null,
     ): array {
-        $qb = $this->createCompanyQueryBuilder('fsm')
+        $qb = $this
+            ->createCompanyQueryBuilder('fsm')
             ->select(
                 'c.id as contributorId',
                 'CONCAT(c.firstName, \' \' , c.lastName) as contributorName',
@@ -212,20 +201,17 @@ class StaffingMetricsRepository extends CompanyAwareRepository
             ->setParameter('granularity', $granularity);
 
         if ($profile) {
-            $qb->andWhere('dp.profile = :profile')
-               ->setParameter('profile', $profile);
+            $qb->andWhere('dp.profile = :profile')->setParameter('profile', $profile);
         } else {
             // Inclure les contributeurs avec profils productifs ou sans profil
             $qb->andWhere('dp.id IS NULL OR dp.isProductive = true');
         }
 
         if ($contributor) {
-            $qb->andWhere('fsm.contributor = :contributor')
-               ->setParameter('contributor', $contributor);
+            $qb->andWhere('fsm.contributor = :contributor')->setParameter('contributor', $contributor);
         }
 
-        $qb->groupBy('c.id', 'c.firstName', 'c.lastName')
-           ->orderBy('staffingRate', 'DESC');
+        $qb->groupBy('c.id', 'c.firstName', 'c.lastName')->orderBy('staffingRate', 'DESC');
 
         return $qb->getQuery()->getResult();
     }
@@ -238,7 +224,8 @@ class StaffingMetricsRepository extends CompanyAwareRepository
      */
     public function deleteForPeriod(DateTimeInterface $date, string $granularity): void
     {
-        $this->createCompanyQueryBuilder('fsm')
+        $this
+            ->createCompanyQueryBuilder('fsm')
             ->delete()
             ->join('fsm.dimTime', 'dt')
             ->andWhere('dt.date = :date')
@@ -256,10 +243,14 @@ class StaffingMetricsRepository extends CompanyAwareRepository
      * @param DateTimeInterface $endDate     Date de fin
      * @param string            $granularity Granularité
      */
-    public function deleteForDateRange(DateTimeInterface $startDate, DateTimeInterface $endDate, string $granularity): int
-    {
+    public function deleteForDateRange(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        string $granularity,
+    ): int {
         // D'abord, récupérer les IDs des métriques à supprimer (DQL DELETE ne supporte pas les JOINs)
-        $ids = $this->createCompanyQueryBuilder('fsm')
+        $ids = $this
+            ->createCompanyQueryBuilder('fsm')
             ->select('fsm.id')
             ->join('fsm.dimTime', 'dt')
             ->andWhere('dt.date >= :startDate')
@@ -279,7 +270,8 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         $idList = array_map(fn ($row): mixed => $row['id'], $ids);
 
         // Supprimer par IDs (sans createCompanyQueryBuilder car on filtre deja par IDs)
-        $result = $this->createQueryBuilder('fsm')
+        $result = $this
+            ->createQueryBuilder('fsm')
             ->delete()
             ->where('fsm.id IN (:ids)')
             ->setParameter('ids', $idList)
@@ -297,7 +289,8 @@ class StaffingMetricsRepository extends CompanyAwareRepository
      */
     public function existsForPeriod(DateTimeInterface $date, string $granularity): bool
     {
-        $count = $this->createCompanyQueryBuilder('fsm')
+        $count = $this
+            ->createCompanyQueryBuilder('fsm')
             ->select('COUNT(fsm.id)')
             ->join('fsm.dimTime', 'dt')
             ->andWhere('dt.date = :date')
@@ -331,7 +324,8 @@ class StaffingMetricsRepository extends CompanyAwareRepository
      */
     public function getWeeklyOccupancyByContributor(int $year, ?Profile $profile = null): array
     {
-        $qb = $this->createCompanyQueryBuilder('fsm')
+        $qb = $this
+            ->createCompanyQueryBuilder('fsm')
             ->select(
                 'c.id as contributorId',
                 'CONCAT(c.firstName, \' \', c.lastName) as contributorName',
@@ -353,9 +347,7 @@ class StaffingMetricsRepository extends CompanyAwareRepository
             ->addOrderBy('dt.date', 'ASC');
 
         if ($profile) {
-            $qb->leftJoin('fsm.dimProfile', 'dp')
-               ->andWhere('dp.profile = :profile')
-               ->setParameter('profile', $profile);
+            $qb->leftJoin('fsm.dimProfile', 'dp')->andWhere('dp.profile = :profile')->setParameter('profile', $profile);
         }
 
         $results = $qb->getQuery()->getResult();
@@ -399,7 +391,8 @@ class StaffingMetricsRepository extends CompanyAwareRepository
      */
     public function getWeeklyGlobalTACE(int $year, ?Profile $profile = null): array
     {
-        $qb = $this->createCompanyQueryBuilder('fsm')
+        $qb = $this
+            ->createCompanyQueryBuilder('fsm')
             ->select(
                 'dt.date as weekDate',
                 'AVG(fsm.tace) as tace',
@@ -417,8 +410,7 @@ class StaffingMetricsRepository extends CompanyAwareRepository
             ->orderBy('dt.date', 'ASC');
 
         if ($profile) {
-            $qb->andWhere('dp.profile = :profile')
-               ->setParameter('profile', $profile);
+            $qb->andWhere('dp.profile = :profile')->setParameter('profile', $profile);
         } else {
             // Inclure les profils productifs ou sans profil
             $qb->andWhere('dp.id IS NULL OR dp.isProductive = true');

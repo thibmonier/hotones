@@ -18,7 +18,7 @@ class ProjectHealthController extends AbstractController
 {
     public function __construct(
         private readonly ProjectHealthScoreRepository $healthScoreRepository,
-        private readonly ProjectRiskAnalyzer $riskAnalyzer
+        private readonly ProjectRiskAnalyzer $riskAnalyzer,
     ) {
     }
 
@@ -64,10 +64,7 @@ class ProjectHealthController extends AbstractController
     {
         try {
             $healthScores = $this->riskAnalyzer->analyzeAllActiveProjects();
-            $this->addFlash('success', sprintf(
-                '%d projets analysés avec succès',
-                count($healthScores),
-            ));
+            $this->addFlash('success', sprintf('%d projets analysés avec succès', count($healthScores)));
         } catch (Exception $e) {
             $this->addFlash('error', 'Erreur lors de l\'analyse : '.$e->getMessage());
         }

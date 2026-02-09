@@ -15,7 +15,7 @@ class VacationNotificationHandler
 {
     public function __construct(
         private readonly VacationRepository $vacationRepository,
-        private readonly MailerInterface $mailer
+        private readonly MailerInterface $mailer,
     ) {
     }
 

@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enum;
 
 enum OrderStatus: string
 {
-    case PENDING   = 'a_signer';  // À signer
-    case WON       = 'gagne';         // Gagné
-    case SIGNED    = 'signe';      // Signé
-    case LOST      = 'perdu';        // Perdu
+    case PENDING   = 'a_signer'; // À signer
+    case WON       = 'gagne'; // Gagné
+    case SIGNED    = 'signe'; // Signé
+    case LOST      = 'perdu'; // Perdu
     case COMPLETED = 'termine'; // Terminé
-    case STANDBY   = 'standby';   // Standby
+    case STANDBY   = 'standby'; // Standby
     case ABANDONED = 'abandonne'; // Abandonné
 
     public function getLabel(): string

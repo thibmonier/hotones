@@ -48,7 +48,8 @@ class CompanyRepository extends ServiceEntityRepository
      */
     public function findActiveCompanies(): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->where('c.status = :status')
             ->setParameter('status', Company::STATUS_ACTIVE)
             ->orderBy('c.name', 'ASC')
@@ -65,7 +66,8 @@ class CompanyRepository extends ServiceEntityRepository
      */
     public function findBySubscriptionTier(string $tier): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->where('c.subscriptionTier = :tier')
             ->setParameter('tier', $tier)
             ->orderBy('c.name', 'ASC')
@@ -85,7 +87,8 @@ class CompanyRepository extends ServiceEntityRepository
         $now    = new DateTimeImmutable();
         $future = $now->modify("+{$days} days");
 
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->where('c.status = :status')
             ->andWhere('c.trialEndsAt BETWEEN :now AND :future')
             ->setParameter('status', Company::STATUS_TRIAL)
@@ -103,7 +106,8 @@ class CompanyRepository extends ServiceEntityRepository
      */
     public function countByStatus(): array
     {
-        $results = $this->createQueryBuilder('c')
+        $results = $this
+            ->createQueryBuilder('c')
             ->select('c.status, COUNT(c.id) as count')
             ->groupBy('c.status')
             ->getQuery()
@@ -127,7 +131,8 @@ class CompanyRepository extends ServiceEntityRepository
      */
     public function search(string $query, int $limit = 20): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->where('c.name LIKE :query')
             ->orWhere('c.slug LIKE :query')
             ->setParameter('query', '%'.$query.'%')
@@ -147,14 +152,14 @@ class CompanyRepository extends ServiceEntityRepository
      */
     public function isSlugAvailable(string $slug, ?int $excludeId = null): bool
     {
-        $qb = $this->createQueryBuilder('c')
+        $qb = $this
+            ->createQueryBuilder('c')
             ->select('COUNT(c.id)')
             ->where('c.slug = :slug')
             ->setParameter('slug', $slug);
 
         if ($excludeId) {
-            $qb->andWhere('c.id != :excludeId')
-                ->setParameter('excludeId', $excludeId);
+            $qb->andWhere('c.id != :excludeId')->setParameter('excludeId', $excludeId);
         }
 
         $count = $qb->getQuery()->getSingleScalarResult();

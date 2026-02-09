@@ -285,12 +285,7 @@ class BoondManagerClient
         $base64Header  = $this->base64UrlEncode($header);
         $base64Payload = $this->base64UrlEncode($payload);
 
-        $signature = hash_hmac(
-            'sha256',
-            $base64Header.'.'.$base64Payload,
-            $settings->clientKey ?? '',
-            true,
-        );
+        $signature = hash_hmac('sha256', $base64Header.'.'.$base64Payload, $settings->clientKey ?? '', true);
 
         return $base64Header.'.'.$base64Payload.'.'.$this->base64UrlEncode($signature);
     }

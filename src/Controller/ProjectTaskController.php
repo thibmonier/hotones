@@ -25,7 +25,7 @@ class ProjectTaskController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly ProjectTaskRepository $taskRepo,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -37,10 +37,7 @@ class ProjectTaskController extends AbstractController
             throw $this->createNotFoundException('Projet non trouvé');
         }
 
-        $tasks = $this->taskRepo->findBy(
-            ['project' => $project],
-            ['position' => 'ASC', 'id' => 'ASC'],
-        );
+        $tasks = $this->taskRepo->findBy(['project' => $project], ['position' => 'ASC', 'id' => 'ASC']);
 
         return $this->render('project_task/index.html.twig', [
             'project' => $project,
@@ -156,7 +153,8 @@ class ProjectTaskController extends AbstractController
         $subTask->setTask($task);
 
         // Position par défaut
-        $maxPosition = $this->em->getRepository(ProjectSubTask::class)
+        $maxPosition = $this->em
+            ->getRepository(ProjectSubTask::class)
             ->createQueryBuilder('st')
             ->select('MAX(st.position)')
             ->where('st.task = :task')

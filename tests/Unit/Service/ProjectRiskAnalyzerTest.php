@@ -131,7 +131,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect missing timesheets
-        $timesheetRisks = array_filter($result['risks'], fn ($r): bool => str_contains((string) $r['type'], 'timesheet'));
+        $timesheetRisks = array_filter($result['risks'], fn ($r): bool => str_contains(
+            (string) $r['type'],
+            'timesheet',
+        ));
         $this->assertNotEmpty($timesheetRisks);
     }
 
@@ -188,14 +191,11 @@ class ProjectRiskAnalyzerTest extends TestCase
 
         // Should only return projects with score < 80 (some penalties may apply)
         $this->assertGreaterThanOrEqual(2, count($result)); // At least 2 at-risk projects
-        $this->assertLessThanOrEqual(4, count($result));    // At most all 4
+        $this->assertLessThanOrEqual(4, count($result)); // At most all 4
 
         // Should be sorted by health score (ascending) - verify first is lowest or equal
         if (count($result) > 1) {
-            $this->assertLessThanOrEqual(
-                $result[1]['analysis']['healthScore'],
-                $result[0]['analysis']['healthScore'],
-            );
+            $this->assertLessThanOrEqual($result[1]['analysis']['healthScore'], $result[0]['analysis']['healthScore']);
         }
     }
 

@@ -11,10 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:nps:mark-expired',
-    description: 'Marque les enquêtes NPS expirées comme expirées',
-)]
+#[AsCommand(name: 'app:nps:mark-expired', description: 'Marque les enquêtes NPS expirées comme expirées')]
 class NpsMarkExpiredCommand extends Command
 {
     public function __construct(

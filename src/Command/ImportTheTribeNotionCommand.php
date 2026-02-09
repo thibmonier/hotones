@@ -194,7 +194,11 @@ class ImportTheTribeNotionCommand extends Command
         $io->newLine();
         $io->section('Résumé');
         $io->writeln(sprintf('  %d projets enrichis sur %d lignes CSV', $this->projectsEnriched, count($rows)));
-        $io->writeln(sprintf('  %d users créés, %d users existants réutilisés', $this->usersCreated, $this->usersReused));
+        $io->writeln(sprintf(
+            '  %d users créés, %d users existants réutilisés',
+            $this->usersCreated,
+            $this->usersReused,
+        ));
         $io->writeln(sprintf('  %d associations ProjectTechnology créées', $this->techAssociationsCreated));
         $io->writeln(sprintf('  %d lignes CSV sans correspondance en base', $this->projectsSkipped));
 
@@ -618,10 +622,18 @@ class ImportTheTribeNotionCommand extends Command
 
         // Essayer aussi "F j, Y" avec des variantes de mois français
         $frenchMonths = [
-            'janvier' => 'January', 'février' => 'February', 'mars' => 'March',
-            'avril'   => 'April', 'mai' => 'May', 'juin' => 'June',
-            'juillet' => 'July', 'août' => 'August', 'septembre' => 'September',
-            'octobre' => 'October', 'novembre' => 'November', 'décembre' => 'December',
+            'janvier'   => 'January',
+            'février'   => 'February',
+            'mars'      => 'March',
+            'avril'     => 'April',
+            'mai'       => 'May',
+            'juin'      => 'June',
+            'juillet'   => 'July',
+            'août'      => 'August',
+            'septembre' => 'September',
+            'octobre'   => 'October',
+            'novembre'  => 'November',
+            'décembre'  => 'December',
         ];
 
         $lower = mb_strtolower($dateString);

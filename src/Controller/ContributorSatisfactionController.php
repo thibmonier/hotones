@@ -28,7 +28,7 @@ class ContributorSatisfactionController extends AbstractController
         private readonly ContributorRepository $contributorRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly GamificationService $gamificationService,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -118,7 +118,10 @@ class ContributorSatisfactionController extends AbstractController
                     );
 
                     if ($xpResult['level_up']) {
-                        $this->addFlash('success', sprintf('Félicitations ! Vous êtes passé au niveau %d !', $xpResult['new_level']));
+                        $this->addFlash('success', sprintf(
+                            'Félicitations ! Vous êtes passé au niveau %d !',
+                            $xpResult['new_level'],
+                        ));
                     }
 
                     if (!empty($xpResult['badges_unlocked'])) {
@@ -208,7 +211,10 @@ class ContributorSatisfactionController extends AbstractController
     #[IsGranted('ROLE_MANAGER')]
     public function delete(ContributorSatisfaction $satisfaction, Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('satisfaction_delete'.$satisfaction->getId(), (string) $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid(
+            'satisfaction_delete'.$satisfaction->getId(),
+            (string) $request->request->get('_token'),
+        )) {
             $this->addFlash('error', 'Token CSRF invalide');
 
             return $this->redirectToRoute('satisfaction_stats');
@@ -239,7 +245,21 @@ class ContributorSatisfactionController extends AbstractController
 
         // Créer le contenu CSV
         $csv   = [];
-        $csv[] = ['ID', 'Collaborateur', 'Année', 'Mois', 'Score global', 'Score projets', 'Score équipe', 'Score environnement', 'Score équilibre', 'Points positifs', 'Points d\'amélioration', 'Commentaire', 'Saisi le'];
+        $csv[] = [
+            'ID',
+            'Collaborateur',
+            'Année',
+            'Mois',
+            'Score global',
+            'Score projets',
+            'Score équipe',
+            'Score environnement',
+            'Score équilibre',
+            'Points positifs',
+            'Points d\'amélioration',
+            'Commentaire',
+            'Saisi le',
+        ];
 
         foreach ($satisfactions as $satisfaction) {
             $csv[] = [

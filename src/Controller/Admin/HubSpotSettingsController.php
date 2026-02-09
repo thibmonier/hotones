@@ -83,10 +83,8 @@ class HubSpotSettingsController extends AbstractController
     }
 
     #[Route('/test-connection', name: 'admin_hubspot_test_connection', methods: ['POST'])]
-    public function testConnection(
-        HubSpotSettingsRepository $settingsRepository,
-        HubSpotClient $client,
-    ): JsonResponse {
+    public function testConnection(HubSpotSettingsRepository $settingsRepository, HubSpotClient $client): JsonResponse
+    {
         $settings = $settingsRepository->getSettings();
 
         if (!$settings->isConfigured()) {
@@ -102,10 +100,7 @@ class HubSpotSettingsController extends AbstractController
         if ($isConnected) {
             $accountInfo = $client->getAccountInfo($settings);
             if ($accountInfo !== null) {
-                $additionalInfo = sprintf(
-                    'Connecte au portal: %s',
-                    $accountInfo['portalId'] ?? 'N/A',
-                );
+                $additionalInfo = sprintf('Connecte au portal: %s', $accountInfo['portalId'] ?? 'N/A');
             }
         }
 
@@ -119,10 +114,8 @@ class HubSpotSettingsController extends AbstractController
     }
 
     #[Route('/sync', name: 'admin_hubspot_sync', methods: ['POST'])]
-    public function sync(
-        HubSpotSettingsRepository $settingsRepository,
-        HubSpotSyncService $syncService,
-    ): Response {
+    public function sync(HubSpotSettingsRepository $settingsRepository, HubSpotSyncService $syncService): Response
+    {
         $settings = $settingsRepository->getSettings();
 
         if (!$settings->isConfigured() || !$settings->enabled) {
@@ -191,10 +184,8 @@ class HubSpotSettingsController extends AbstractController
     }
 
     #[Route('/deals', name: 'admin_hubspot_deals', methods: ['GET'])]
-    public function deals(
-        HubSpotSettingsRepository $settingsRepository,
-        HubSpotSyncService $syncService,
-    ): Response {
+    public function deals(HubSpotSettingsRepository $settingsRepository, HubSpotSyncService $syncService): Response
+    {
         $settings = $settingsRepository->getSettings();
 
         if (!$settings->isConfigured() || !$settings->enabled) {
@@ -212,10 +203,8 @@ class HubSpotSettingsController extends AbstractController
     }
 
     #[Route('/clients', name: 'admin_hubspot_clients', methods: ['GET'])]
-    public function clients(
-        HubSpotSettingsRepository $settingsRepository,
-        HubSpotSyncService $syncService,
-    ): Response {
+    public function clients(HubSpotSettingsRepository $settingsRepository, HubSpotSyncService $syncService): Response
+    {
         $settings = $settingsRepository->getSettings();
 
         if (!$settings->isConfigured() || !$settings->enabled) {
@@ -233,10 +222,8 @@ class HubSpotSettingsController extends AbstractController
     }
 
     #[Route('/pipelines', name: 'admin_hubspot_pipelines', methods: ['GET'])]
-    public function pipelines(
-        HubSpotSettingsRepository $settingsRepository,
-        HubSpotClient $client,
-    ): JsonResponse {
+    public function pipelines(HubSpotSettingsRepository $settingsRepository, HubSpotClient $client): JsonResponse
+    {
         $settings = $settingsRepository->getSettings();
 
         if (!$settings->isConfigured()) {

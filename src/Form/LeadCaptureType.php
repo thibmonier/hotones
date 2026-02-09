@@ -104,8 +104,7 @@ class LeadCaptureType extends AbstractType
             ])
             ->add('contentType', HiddenType::class, [
                 'data' => $options['content_type'] ?? 'guide-kpis',
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

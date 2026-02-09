@@ -15,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProjectHealthScoreRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ProjectHealthScore::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class ProjectHealthScoreRepository extends CompanyAwareRepository
      */
     public function findLatestForProject(Project $project): ?ProjectHealthScore
     {
-        return $this->createCompanyQueryBuilder('phs')
+        return $this
+            ->createCompanyQueryBuilder('phs')
             ->andWhere('phs.project = :project')
             ->setParameter('project', $project)
             ->orderBy('phs.calculatedAt', 'DESC')
@@ -45,7 +44,8 @@ class ProjectHealthScoreRepository extends CompanyAwareRepository
     {
         $since = new DateTimeImmutable("-{$days} days");
 
-        return $this->createCompanyQueryBuilder('phs')
+        return $this
+            ->createCompanyQueryBuilder('phs')
             ->andWhere('phs.project = :project')
             ->andWhere('phs.calculatedAt >= :since')
             ->setParameter('project', $project)
@@ -63,11 +63,13 @@ class ProjectHealthScoreRepository extends CompanyAwareRepository
     public function findProjectsAtRisk(): array
     {
         // Get latest score for each project
-        $subQuery = $this->createCompanyQueryBuilder('phs2')
+        $subQuery = $this
+            ->createCompanyQueryBuilder('phs2')
             ->select('MAX(phs2.id)')
             ->where('phs2.project = phs.project');
 
-        return $this->createCompanyQueryBuilder('phs')
+        return $this
+            ->createCompanyQueryBuilder('phs')
             ->where($this->getEntityManager()->getExpressionBuilder()->in('phs.id', $subQuery->getDQL()))
             ->andWhere('phs.healthLevel IN (:levels)')
             ->setParameter('levels', ['warning', 'critical'])
@@ -82,11 +84,10 @@ class ProjectHealthScoreRepository extends CompanyAwareRepository
     public function countByHealthLevel(): array
     {
         // Get latest score for each project
-        $subQuery = $this->createCompanyQueryBuilder('phs2')
-            ->select('MAX(phs2.id)')
-            ->groupBy('phs2.project');
+        $subQuery = $this->createCompanyQueryBuilder('phs2')->select('MAX(phs2.id)')->groupBy('phs2.project');
 
-        $results = $this->createCompanyQueryBuilder('phs')
+        $results = $this
+            ->createCompanyQueryBuilder('phs')
             ->select('phs.healthLevel', 'COUNT(phs.id) as count')
             ->where($this->getEntityManager()->getExpressionBuilder()->in('phs.id', $subQuery->getDQL()))
             ->groupBy('phs.healthLevel')

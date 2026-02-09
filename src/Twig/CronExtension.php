@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Twig;
 
 use Cron\CronExpression;
@@ -90,8 +92,12 @@ class CronExtension extends AbstractExtension
         }
         // 4c) At specific hours list
         if ($hourInfo['type'] === 'list' && $dom === '*' && $mon === '*' && $dow === '*') {
-            $times = array_map(fn ($h): string => sprintf('%02d:%02d', $h, (int) ($min === '*' ? 0 : $min)), $hourInfo['list']);
-            $glue  = $locale === 'en' ? ', ' : ', ';
+            $times = array_map(fn ($h): string => sprintf(
+                '%02d:%02d',
+                $h,
+                (int) ($min === '*' ? 0 : $min),
+            ), $hourInfo['list']);
+            $glue = $locale === 'en' ? ', ' : ', ';
 
             return sprintf($this->t('at times %s', $locale), implode($glue, $times));
         }
@@ -116,7 +122,11 @@ class CronExtension extends AbstractExtension
                 $minuteTxt = $min === '*' ? $this->t('any minute', $locale) : sprintf('%02d', (int) $min);
                 $timeTxt   = sprintf($this->t('every %d hours at minute %s', $locale), $hourInfo['step'], $minuteTxt);
             } elseif ($hourInfo['type'] === 'list') {
-                $times   = array_map(fn ($h): string => sprintf('%02d:%02d', $h, (int) ($min === '*' ? 0 : $min)), $hourInfo['list']);
+                $times = array_map(fn ($h): string => sprintf(
+                    '%02d:%02d',
+                    $h,
+                    (int) ($min === '*' ? 0 : $min),
+                ), $hourInfo['list']);
                 $timeTxt = sprintf($this->t('at times %s', $locale), implode(', ', $times));
             } else {
                 $timeTxt = $fmtTime($hour, $min, $locale);
@@ -133,7 +143,9 @@ class CronExtension extends AbstractExtension
         // 8) Specific months (with optional dom)
         if ($mon !== '*' && $dow === '*') {
             $months = $this->listToLabels($mon, $names['months']);
-            $onDom  = $dom !== '*' ? sprintf($this->t('on day %s', $locale), $this->listToText($dom, $locale, 'day')) : $this->t('every day', $locale);
+            $onDom  = $dom !== '*'
+                ? sprintf($this->t('on day %s', $locale), $this->listToText($dom, $locale, 'day'))
+                : $this->t('every day', $locale);
 
             return sprintf($this->t('%s in %s %s', $locale), $fmtTime($hour, $min, $locale), $months, $onDom);
         }
@@ -174,13 +186,57 @@ class CronExtension extends AbstractExtension
 
     private function names(string $locale): array
     {
-        $days_fr   = [0 => 'dimanche', 1 => 'lundi', 2 => 'mardi', 3 => 'mercredi', 4 => 'jeudi', 5 => 'vendredi', 6 => 'samedi', 7 => 'dimanche'];
-        $days_en   = [0 => 'Sunday', 1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday'];
-        $months_fr = [1 => 'janvier', 2 => 'février', 3 => 'mars', 4 => 'avril', 5 => 'mai', 6 => 'juin', 7 => 'juillet', 8 => 'août', 9 => 'septembre', 10 => 'octobre', 11 => 'novembre', 12 => 'décembre'];
-        $months_en = [1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'];
+        $days_fr = [
+            0 => 'dimanche',
+            1 => 'lundi',
+            2 => 'mardi',
+            3 => 'mercredi',
+            4 => 'jeudi',
+            5 => 'vendredi',
+            6 => 'samedi',
+            7 => 'dimanche',
+        ];
+        $days_en = [
+            0 => 'Sunday',
+            1 => 'Monday',
+            2 => 'Tuesday',
+            3 => 'Wednesday',
+            4 => 'Thursday',
+            5 => 'Friday',
+            6 => 'Saturday',
+            7 => 'Sunday',
+        ];
+        $months_fr = [
+            1  => 'janvier',
+            2  => 'février',
+            3  => 'mars',
+            4  => 'avril',
+            5  => 'mai',
+            6  => 'juin',
+            7  => 'juillet',
+            8  => 'août',
+            9  => 'septembre',
+            10 => 'octobre',
+            11 => 'novembre',
+            12 => 'décembre',
+        ];
+        $months_en = [
+            1  => 'January',
+            2  => 'February',
+            3  => 'March',
+            4  => 'April',
+            5  => 'May',
+            6  => 'June',
+            7  => 'July',
+            8  => 'August',
+            9  => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December',
+        ];
 
         return [
-            'days'   => $locale === 'en' ? $days_en : $days_fr,
+            'days'   => $locale   === 'en' ? $days_en : $days_fr,
             'months' => $locale === 'en' ? $months_en : $months_fr,
         ];
     }
@@ -214,7 +270,14 @@ class CronExtension extends AbstractExtension
         $fmt   = function (string $n) use ($locale) {
             $i = (int) $n;
             if ($locale === 'en') {
-                return $i.(in_array($i % 100, [11, 12, 13], true) ? 'th' : (['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][$i % 10] ?? 'th'));
+                return
+                    $i
+                    .(
+                        in_array($i % 100, [11, 12, 13], true)
+                            ? 'th'
+                            : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][$i % 10] ?? 'th'
+                    )
+                ;
             }
 
             return (string) $i; // FR no ordinal for DOM

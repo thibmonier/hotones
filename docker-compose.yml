@@ -6,7 +6,7 @@ services:
     container_name: hotones_app
     working_dir: /var/www/html
     volumes:
-      - ./:/var/www/html:cached
+      - ./:/var/www/html
     environment:
       APP_ENV: dev
     depends_on:
@@ -35,7 +35,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./:/var/www/html:cached
+      - ./:/var/www/html
       - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
     depends_on:

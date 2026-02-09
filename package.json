@@ -23,7 +23,7 @@
     "dependencies": {
         "@hotwired/turbo": "^8.0.22",
         "@symfony/ux-live-component": "^2.32.0",
-        "@symfony/ux-turbo": "^2.31.0",
+        "@symfony/ux-turbo": "^2.32.0",
         "bootstrap": "5.3.8",
         "choices.js": "^11.1.0",
         "toastr": "^2.1.4"

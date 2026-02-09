@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repository\ProjectRepository;
 use App\Service\Planning\AI\PlanningAIAssistant;
 use App\Service\Planning\PlanningOptimizer;
 use App\Service\Planning\TaceAnalyzer;
@@ -29,7 +30,8 @@ class PlanningOptimizationController extends AbstractController
         private readonly TaceAnalyzer $taceAnalyzer,
         private readonly PlanningAIAssistant $aiAssistant,
         private readonly CacheItemPoolInterface $cachePool,
-        private readonly CacheInterface $cache
+        private readonly CacheInterface $cache,
+        private readonly ProjectRepository $projectRepository,
     ) {
     }
 
@@ -46,11 +48,7 @@ class PlanningOptimizationController extends AbstractController
             : new DateTime('last day of next month');
 
         // Créer une clé de cache basée sur la période
-        $cacheKey = sprintf(
-            'planning_optimization_%s_%s',
-            $startDate->format('Y-m-d'),
-            $endDate->format('Y-m-d'),
-        );
+        $cacheKey = sprintf('planning_optimization_%s_%s', $startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
 
         // Vérifier si les données sont en cache
         $fromCache = false;
@@ -76,7 +74,7 @@ class PlanningOptimizationController extends AbstractController
                 return $this->aiAssistant->enhanceRecommendations([
                     'analysis'        => $result['analysis'],
                     'recommendations' => $result['recommendations'],
-                    'projects'        => [], // TODO: Ajouter les projets actifs
+                    'projects'        => $this->projectRepository->findActiveOrderedByName(),
                 ]);
             });
         }
@@ -160,9 +158,7 @@ class PlanningOptimizationController extends AbstractController
             ? new DateTime($data['start_date'])
             : new DateTime('first day of this month');
 
-        $endDate = isset($data['end_date'])
-            ? new DateTime($data['end_date'])
-            : new DateTime('last day of next month');
+        $endDate = isset($data['end_date']) ? new DateTime($data['end_date']) : new DateTime('last day of next month');
 
         // Régénérer les recommandations pour obtenir celle à l'index demandé
         $result = $this->optimizer->generateRecommendations($startDate, $endDate);
@@ -201,11 +197,7 @@ class PlanningOptimizationController extends AbstractController
             : new DateTime('last day of next month');
 
         // Créer la clé de cache
-        $cacheKey = sprintf(
-            'planning_optimization_%s_%s',
-            $startDate->format('Y-m-d'),
-            $endDate->format('Y-m-d'),
-        );
+        $cacheKey = sprintf('planning_optimization_%s_%s', $startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
 
         // Supprimer le cache
         $this->cache->delete($cacheKey);

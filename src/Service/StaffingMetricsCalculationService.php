@@ -33,7 +33,7 @@ class StaffingMetricsCalculationService
         private readonly CompanyContext $companyContext,
         private readonly ContributorRepository $contributorRepo,
         private readonly TimesheetRepository $timesheetRepo,
-        private readonly EmploymentPeriodRepository $employmentPeriodRepo
+        private readonly EmploymentPeriodRepository $employmentPeriodRepo,
     ) {
     }
 
@@ -47,7 +47,7 @@ class StaffingMetricsCalculationService
     public function calculateAndStoreMetrics(
         DateTimeInterface $startDate,
         DateTimeInterface $endDate,
-        string $granularity = 'monthly'
+        string $granularity = 'monthly',
     ): int {
         $metricsCreated = 0;
 
@@ -58,8 +58,11 @@ class StaffingMetricsCalculationService
         $contributors = $this->contributorRepo->findActiveContributors();
 
         // Batch load TOUS les employment periods en une requête pour la période globale
-        $employmentPeriods = $this->employmentPeriodRepo
-            ->findByContributorsAndDateRange($contributors, $startDate, $endDate);
+        $employmentPeriods = $this->employmentPeriodRepo->findByContributorsAndDateRange(
+            $contributors,
+            $startDate,
+            $endDate,
+        );
 
         // Index par contributor ID pour lookup O(1)
         $periodsByContributor = [];
@@ -72,8 +75,7 @@ class StaffingMetricsCalculationService
         foreach ($periods as $period) {
             // Récupérer ou créer la dimension temporelle (avec cache local)
             $periodKey = $period->format('Y-m-d');
-            $dimTime   = $this->dimTimeCache[$periodKey]
-                ??= $this->getOrCreateDimTime($period);
+            $dimTime   = $this->dimTimeCache[$periodKey] ??= $this->getOrCreateDimTime($period);
 
             // Calculer le début et la fin de la période selon la granularité
             $periodStart = clone $period;
@@ -85,7 +87,12 @@ class StaffingMetricsCalculationService
                 $employmentPeriod   = $this->findActivePeriod($contributorPeriods, $period);
 
                 // Calculer les métriques pour ce contributeur sur cette période
-                $metrics = $this->calculateMetricsForContributor($contributor, $periodStart, $periodEnd, $employmentPeriod);
+                $metrics = $this->calculateMetricsForContributor(
+                    $contributor,
+                    $periodStart,
+                    $periodEnd,
+                    $employmentPeriod,
+                );
 
                 // Créer l'entrée de fait
                 $fact = new FactStaffingMetrics();
@@ -113,7 +120,7 @@ class StaffingMetricsCalculationService
                 ++$metricsCreated;
 
                 // Flush par batch
-                if ($metricsCreated % 50 === 0) {
+                if (($metricsCreated % 50) === 0) {
                     $this->entityManager->flush();
                 }
             }
@@ -155,7 +162,7 @@ class StaffingMetricsCalculationService
         Contributor $contributor,
         DateTimeInterface $periodStart,
         DateTimeInterface $periodEnd,
-        ?EmploymentPeriod $employmentPeriod
+        ?EmploymentPeriod $employmentPeriod,
     ): array {
         // 1. Calculer les jours ouvrés disponibles dans la période (hors week-ends)
         $totalWorkingDays = $this->calculateWorkingDays($periodStart, $periodEnd);
@@ -209,9 +216,10 @@ class StaffingMetricsCalculationService
     private function calculateVacationDays(
         Contributor $contributor,
         DateTimeInterface $start,
-        DateTimeInterface $end
+        DateTimeInterface $end,
     ): float {
-        $vacations = $this->entityManager->getRepository(\App\Entity\Vacation::class)
+        $vacations = $this->entityManager
+            ->getRepository(\App\Entity\Vacation::class)
             ->createQueryBuilder('v')
             ->where('v.contributor = :contributor')
             ->andWhere('v.startDate <= :end')
@@ -244,7 +252,7 @@ class StaffingMetricsCalculationService
     private function calculateStaffedDays(
         Contributor $contributor,
         DateTimeInterface $start,
-        DateTimeInterface $end
+        DateTimeInterface $end,
     ): float {
         // Récupérer tous les timesheets du contributeur sur la période
         $timesheets = $this->timesheetRepo->findByContributorAndDateRange($contributor, $start, $end);
@@ -265,10 +273,11 @@ class StaffingMetricsCalculationService
     private function calculatePlannedDays(
         Contributor $contributor,
         DateTimeInterface $start,
-        DateTimeInterface $end
+        DateTimeInterface $end,
     ): float {
         // Récupérer les planifications du contributeur sur la période (statut planned ou confirmed)
-        $plannings = $this->entityManager->getRepository(\App\Entity\Planning::class)
+        $plannings = $this->entityManager
+            ->getRepository(\App\Entity\Planning::class)
             ->createQueryBuilder('p')
             ->where('p.contributor = :contributor')
             ->andWhere('p.startDate <= :end')
@@ -340,11 +349,7 @@ class StaffingMetricsCalculationService
         $dimProfileRepo = $this->entityManager->getRepository(DimProfile::class);
 
         // Rechercher par composite key
-        $compositeKey = sprintf(
-            '%s_%s_productive_active',
-            $profile->getId(),
-            md5($profile->getName()),
-        );
+        $compositeKey = sprintf('%s_%s_productive_active', $profile->getId(), md5($profile->getName()));
 
         $dimProfile = $dimProfileRepo->findOneBy(['compositeKey' => $compositeKey]);
 
@@ -402,15 +407,15 @@ class StaffingMetricsCalculationService
     private function generatePeriods(
         DateTimeInterface $startDate,
         DateTimeInterface $endDate,
-        string $granularity
+        string $granularity,
     ): array {
         $periods = [];
 
         switch ($granularity) {
             case 'monthly':
                 $interval = new DateInterval('P1M');
-                $current  = (new DateTime($startDate->format('Y-m-01')));
-                $end      = (new DateTime($endDate->format('Y-m-01')));
+                $current  = new DateTime($startDate->format('Y-m-01'));
+                $end      = new DateTime($endDate->format('Y-m-01'));
 
                 while ($current <= $end) {
                     $periods[] = clone $current;
@@ -425,7 +430,7 @@ class StaffingMetricsCalculationService
 
                 for ($year = $currentYear; $year <= $endYear; ++$year) {
                     for ($quarter = 1; $quarter <= 4; ++$quarter) {
-                        $month        = ($quarter - 1) * 3 + 1;
+                        $month        = (($quarter - 1) * 3) + 1;
                         $quarterStart = new DateTime(sprintf('%d-%02d-01', $year, $month));
 
                         if ($quarterStart >= $startDate && $quarterStart <= $endDate) {
@@ -441,9 +446,7 @@ class StaffingMetricsCalculationService
                     ? clone $startDate
                     : new DateTime($startDate->format('Y-m-d'));
 
-                $end = $endDate instanceof DateTime
-                    ? clone $endDate
-                    : new DateTime($endDate->format('Y-m-d'));
+                $end = $endDate instanceof DateTime ? clone $endDate : new DateTime($endDate->format('Y-m-d'));
 
                 while ($current <= $end) {
                     $periods[] = clone $current;

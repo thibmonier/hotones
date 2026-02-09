@@ -11,7 +11,7 @@ use Twig\Environment;
 class PdfGeneratorService
 {
     public function __construct(
-        private readonly Environment $twig
+        private readonly Environment $twig,
     ) {
     }
 
@@ -65,7 +65,7 @@ class PdfGeneratorService
         array $data,
         string $filename,
         bool $inline = false,
-        array $pdfOptions = []
+        array $pdfOptions = [],
     ): \Symfony\Component\HttpFoundation\Response {
         $pdfContent = $this->generatePdf($template, $data, $pdfOptions, $inline);
 

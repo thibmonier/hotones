@@ -12,14 +12,14 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectRiskAnalyzer
 {
-    private const float WEIGHT_BUDGET   = 0.40;    // 40%
-    private const float WEIGHT_TIMELINE = 0.30;  // 30%
-    private const float WEIGHT_VELOCITY = 0.20;  // 20%
-    private const float WEIGHT_QUALITY  = 0.10;   // 10%
+    private const float WEIGHT_BUDGET   = 0.40; // 40%
+    private const float WEIGHT_TIMELINE = 0.30; // 30%
+    private const float WEIGHT_VELOCITY = 0.20; // 20%
+    private const float WEIGHT_QUALITY  = 0.10; // 10%
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -164,12 +164,8 @@ class ProjectRiskAnalyzer
             return [
                 'type'     => 'schedule_delay',
                 'severity' => 'critical',
-                'message'  => sprintf(
-                    'Projet en retard de %d jours (progression : %.0f%%)',
-                    $daysLate,
-                    $progress,
-                ),
-                'score' => 25,
+                'message'  => sprintf('Projet en retard de %d jours (progression : %.0f%%)', $daysLate, $progress),
+                'score'    => 25,
             ];
         }
 
@@ -249,11 +245,8 @@ class ProjectRiskAnalyzer
             return [
                 'type'     => 'margin_warning',
                 'severity' => 'medium',
-                'message'  => sprintf(
-                    'Marge sous le seuil optimal : %.1f%% (objectif 20%%+)',
-                    $margin,
-                ),
-                'score' => 10,
+                'message'  => sprintf('Marge sous le seuil optimal : %.1f%% (objectif 20%%+)', $margin),
+                'score'    => 10,
             ];
         }
 
@@ -390,12 +383,10 @@ class ProjectRiskAnalyzer
         $qualityScore  = $this->calculateQualityScore($project);
 
         // Calculate weighted overall score
-        $overallScore = (int) round(
-            ($budgetScore * self::WEIGHT_BUDGET)
-            + ($timelineScore * self::WEIGHT_TIMELINE)
-            + ($velocityScore * self::WEIGHT_VELOCITY)
-            + ($qualityScore * self::WEIGHT_QUALITY),
-        );
+        $overallScore = (int) round(($budgetScore * self::WEIGHT_BUDGET)
+        + ($timelineScore * self::WEIGHT_TIMELINE)
+        + ($velocityScore * self::WEIGHT_VELOCITY)
+        + ($qualityScore * self::WEIGHT_QUALITY));
 
         // Determine health level
         $healthLevel = $this->determineHealthLevel($overallScore);
@@ -450,13 +441,13 @@ class ProjectRiskAnalyzer
             return 100; // Under budget
         }
         if ($overrunPercentage <= 10) {
-            return 80;  // Slight overrun
+            return 80; // Slight overrun
         }
         if ($overrunPercentage <= 20) {
-            return 60;  // Moderate overrun
+            return 60; // Moderate overrun
         }
         if ($overrunPercentage <= 30) {
-            return 40;  // Significant overrun
+            return 40; // Significant overrun
         }
 
         return 20; // Critical overrun
@@ -507,13 +498,13 @@ class ProjectRiskAnalyzer
                     return 100; // On track
                 }
                 if ($progressGap <= 15) {
-                    return 80;  // Slightly behind
+                    return 80; // Slightly behind
                 }
                 if ($progressGap <= 30) {
-                    return 60;  // Behind schedule
+                    return 60; // Behind schedule
                 }
                 if ($progressGap <= 50) {
-                    return 40;  // Significantly behind
+                    return 40; // Significantly behind
                 }
 
                 return 20; // Critical delay
@@ -647,9 +638,11 @@ class ProjectRiskAnalyzer
      */
     public function analyzeAllActiveProjects(): array
     {
-        $projects = $this->em->getRepository(Project::class)->findBy([
-            'status' => ['in_progress', 'active'],
-        ]);
+        $projects = $this->em
+            ->getRepository(Project::class)
+            ->findBy([
+                'status' => ['in_progress', 'active'],
+            ]);
 
         $healthScores = [];
         foreach ($projects as $project) {

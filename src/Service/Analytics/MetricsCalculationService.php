@@ -28,7 +28,7 @@ readonly class MetricsCalculationService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private CompanyContext $companyContext,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -76,7 +76,8 @@ readonly class MetricsCalculationService
         [$startDate, $endDate] = $this->getPeriodBoundsFromDimTime($dimTime, $granularity);
 
         // Précharger les timesheets du projet pour la période (réutilisés coûts + temps)
-        $timesheets = $this->entityManager->getRepository(Timesheet::class)
+        $timesheets = $this->entityManager
+            ->getRepository(Timesheet::class)
             ->createQueryBuilder('t')
             ->join('t.project', 'p')
             ->where('p.id = :projectId')
@@ -124,8 +125,14 @@ readonly class MetricsCalculationService
     /**
      * Met à jour les métriques à partir d'un projet et optionnellement d'un devis.
      */
-    private function updateMetricsFromProject(FactProjectMetrics $metrics, Project $project, ?Order $order, DateTimeInterface $startDate, DateTimeInterface $endDate, array $timesheets): void
-    {
+    private function updateMetricsFromProject(
+        FactProjectMetrics $metrics,
+        Project $project,
+        ?Order $order,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $timesheets,
+    ): void {
         // Métriques de base
         $metrics->setProjectCount($metrics->getProjectCount() + 1);
 
@@ -142,22 +149,20 @@ readonly class MetricsCalculationService
             switch ($order->getStatus()) {
                 case 'a_signer':
                     $metrics->setPendingOrderCount($metrics->getPendingOrderCount() + 1);
-                    $metrics->setPendingRevenue(
-                        bcadd($metrics->getPendingRevenue(), (string) $order->getTotalAmount(), 2),
-                    );
+                    $metrics->setPendingRevenue(bcadd(
+                        $metrics->getPendingRevenue(),
+                        (string) $order->getTotalAmount(),
+                        2,
+                    ));
                     break;
                 case 'gagne':
                     $metrics->setWonOrderCount($metrics->getWonOrderCount() + 1);
-                    $metrics->setTotalRevenue(
-                        bcadd($metrics->getTotalRevenue(), (string) $order->getTotalAmount(), 2),
-                    );
+                    $metrics->setTotalRevenue(bcadd($metrics->getTotalRevenue(), (string) $order->getTotalAmount(), 2));
                     break;
                 case 'signe':
                     $metrics->setWonOrderCount($metrics->getWonOrderCount() + 1);
                     $metrics->setSignedOrderCount($metrics->getSignedOrderCount() + 1);
-                    $metrics->setTotalRevenue(
-                        bcadd($metrics->getTotalRevenue(), (string) $order->getTotalAmount(), 2),
-                    );
+                    $metrics->setTotalRevenue(bcadd($metrics->getTotalRevenue(), (string) $order->getTotalAmount(), 2));
                     break;
                 case 'perdu':
                     $metrics->setLostOrderCount($metrics->getLostOrderCount() + 1);
@@ -167,9 +172,7 @@ readonly class MetricsCalculationService
             // Calcul de la valeur moyenne des devis
             if ($metrics->getOrderCount() > 0) {
                 $totalOrderValue = bcadd($metrics->getTotalRevenue(), $metrics->getPendingRevenue(), 2);
-                $metrics->setAverageOrderValue(
-                    bcdiv($totalOrderValue, (string) $metrics->getOrderCount(), 2),
-                );
+                $metrics->setAverageOrderValue(bcdiv($totalOrderValue, (string) $metrics->getOrderCount(), 2));
             }
         }
 
@@ -192,8 +195,13 @@ readonly class MetricsCalculationService
     /**
      * Calcule les coûts d'un projet.
      */
-    private function calculateProjectCosts(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, array $timesheets): void
-    {
+    private function calculateProjectCosts(
+        FactProjectMetrics $metrics,
+        Project $project,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $timesheets,
+    ): void {
         $totalCosts = '0.00';
 
         // Coûts des achats sur le projet (si pas de date, imputer au début du projet)
@@ -225,7 +233,9 @@ readonly class MetricsCalculationService
                             $totalCosts = bcadd($totalCosts, (string) $line->getAttachedPurchaseAmount(), 2);
                         }
                         // Lignes d'achat direct ou montant fixe
-                        if (in_array($line->getType(), ['purchase', 'fixed_amount'], true) && $line->getDirectAmount()) {
+                        if (
+                            in_array($line->getType(), ['purchase', 'fixed_amount'], true) && $line->getDirectAmount()
+                        ) {
                             $totalCosts = bcadd($totalCosts, (string) $line->getDirectAmount(), 2);
                         }
                     }
@@ -239,8 +249,13 @@ readonly class MetricsCalculationService
     /**
      * Calcule les métriques de temps.
      */
-    private function calculateTimeMetrics(FactProjectMetrics $metrics, Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, array $timesheets): void
-    {
+    private function calculateTimeMetrics(
+        FactProjectMetrics $metrics,
+        Project $project,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $timesheets,
+    ): void {
         // Jours vendus (total projet)
         $soldDays = $project->getTotalSoldDays();
         $metrics->setTotalSoldDays(bcadd($metrics->getTotalSoldDays(), $soldDays, 2));
@@ -257,11 +272,7 @@ readonly class MetricsCalculationService
 
         // Taux d'occupation
         if (bccomp($metrics->getTotalSoldDays(), '0', 2) > 0) {
-            $utilizationRate = bcmul(
-                bcdiv($metrics->getTotalWorkedDays(), $metrics->getTotalSoldDays(), 4),
-                '100',
-                2,
-            );
+            $utilizationRate = bcmul(bcdiv($metrics->getTotalWorkedDays(), $metrics->getTotalSoldDays(), 4), '100', 2);
             $metrics->setUtilizationRate($utilizationRate);
         }
     }
@@ -307,7 +318,8 @@ readonly class MetricsCalculationService
         if (!$dimProjectType) {
             $dimProjectType = new DimProjectType();
             $dimProjectType->setCompany($this->companyContext->getCurrentCompany());
-            $dimProjectType->setProjectType($project->getProjectType())
+            $dimProjectType
+                ->setProjectType($project->getProjectType())
                 ->setServiceCategory($serviceCategory)
                 ->setStatus($project->getStatus())
                 ->setIsInternal($project->getIsInternal());
@@ -333,10 +345,7 @@ readonly class MetricsCalculationService
         if (!$dimContributor) {
             $dimContributor = new DimContributor();
             $dimContributor->setCompany($this->companyContext->getCurrentCompany());
-            $dimContributor->setUser($user)
-                ->setName($user->getFullName())
-                ->setRole($role)
-                ->setIsActive(true);
+            $dimContributor->setUser($user)->setName($user->getFullName())->setRole($role)->setIsActive(true);
             $this->entityManager->persist($dimContributor);
             $this->entityManager->flush();
         }
@@ -353,11 +362,12 @@ readonly class MetricsCalculationService
         ?DimContributor $dimProjectManager,
         ?DimContributor $dimSalesPerson,
         ?DimContributor $dimProjectDirector,
-        string $granularity
+        string $granularity,
     ): FactProjectMetrics {
         $repo = $this->entityManager->getRepository(FactProjectMetrics::class);
 
-        $qb = $repo->createQueryBuilder('f')
+        $qb = $repo
+            ->createQueryBuilder('f')
             ->where('f.dimTime = :dimTime')
             ->andWhere('f.dimProjectType = :dimProjectType')
             ->andWhere('f.granularity = :granularity')
@@ -366,22 +376,25 @@ readonly class MetricsCalculationService
             ->setParameter('granularity', $granularity);
 
         if ($dimProjectManager) {
-            $qb->andWhere('f.dimProjectManager = :dimProjectManager')
-               ->setParameter('dimProjectManager', $dimProjectManager);
+            $qb->andWhere('f.dimProjectManager = :dimProjectManager')->setParameter(
+                'dimProjectManager',
+                $dimProjectManager,
+            );
         } else {
             $qb->andWhere('f.dimProjectManager IS NULL');
         }
 
         if ($dimSalesPerson) {
-            $qb->andWhere('f.dimSalesPerson = :dimSalesPerson')
-               ->setParameter('dimSalesPerson', $dimSalesPerson);
+            $qb->andWhere('f.dimSalesPerson = :dimSalesPerson')->setParameter('dimSalesPerson', $dimSalesPerson);
         } else {
             $qb->andWhere('f.dimSalesPerson IS NULL');
         }
 
         if ($dimProjectDirector) {
-            $qb->andWhere('f.dimProjectDirector = :dimProjectDirector')
-               ->setParameter('dimProjectDirector', $dimProjectDirector);
+            $qb->andWhere('f.dimProjectDirector = :dimProjectDirector')->setParameter(
+                'dimProjectDirector',
+                $dimProjectDirector,
+            );
         } else {
             $qb->andWhere('f.dimProjectDirector IS NULL');
         }
@@ -391,7 +404,8 @@ readonly class MetricsCalculationService
         if (!$metrics) {
             $metrics = new FactProjectMetrics();
             $metrics->setCompany($this->companyContext->getCurrentCompany());
-            $metrics->setDimTime($dimTime)
+            $metrics
+                ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
                 ->setDimProjectManager($dimProjectManager)
                 ->setDimSalesPerson($dimSalesPerson)
@@ -414,7 +428,8 @@ readonly class MetricsCalculationService
 
         [$startDate, $endDate] = $this->getPeriodBounds($date, $granularity);
 
-        return $qb->where('p.startDate <= :endDate')
+        return $qb
+            ->where('p.startDate <= :endDate')
             ->andWhere('p.endDate >= :startDate OR p.endDate IS NULL')
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
@@ -432,13 +447,16 @@ readonly class MetricsCalculationService
         $this->logger->info('Recalcul des métriques pour l\'année', ['year' => $year]);
 
         // Supprimer les métriques existantes pour cette année
-        $this->entityManager->createQuery('
+        $this->entityManager
+            ->createQuery('
             DELETE FROM App\Entity\Analytics\FactProjectMetrics f
             WHERE f.dimTime IN (
                 SELECT t.id FROM App\Entity\Analytics\DimTime t
                 WHERE t.year = :year
             )
-        ')->setParameter('year', $year)->getResult();
+        ')
+            ->setParameter('year', $year)
+            ->getResult();
 
         // Recalculer mois par mois
         for ($month = 1; $month <= 12; ++$month) {
@@ -448,7 +466,7 @@ readonly class MetricsCalculationService
 
         // Recalculer par trimestre
         for ($quarter = 1; $quarter <= 4; ++$quarter) {
-            $month = ($quarter - 1) * 3 + 1;
+            $month = (($quarter - 1) * 3) + 1;
             $date  = new DateTime("$year-$month-01");
             $this->calculateMetricsForPeriod($date, 'quarterly');
         }
@@ -470,10 +488,13 @@ readonly class MetricsCalculationService
                 break;
             case 'quarterly':
                 $quarter    = (int) ceil((int) $date->format('n') / 3);
-                $startMonth = ($quarter - 1) * 3 + 1;
+                $startMonth = (($quarter - 1) * 3) + 1;
                 $startDate  = new DateTime($date->format('Y').'-'.$startMonth.'-01');
                 $startDate  = $startDate->setTime(0, 0, 0);
-                $endDate    = (clone $startDate)->modify('+2 months')->modify('last day of this month')->setTime(23, 59, 59);
+                $endDate    = (clone $startDate)
+                    ->modify('+2 months')
+                    ->modify('last day of this month')
+                    ->setTime(23, 59, 59);
                 break;
             case 'yearly':
                 $startDate = new DateTime($date->format('Y').'-01-01')->setTime(0, 0, 0);

@@ -72,7 +72,11 @@ class PerformanceReviewController extends AbstractController
     {
         // Check access: contributor can see their own, manager can see their managed reviews
         $user = $this->getUser();
-        if ($review->getContributor()->getUser() !== $user && $review->getManager() !== $user && !$this->isGranted('ROLE_ADMIN')) {
+        if (
+            $review->getContributor()->getUser() !== $user
+            && $review->getManager()             !== $user
+            && !$this->isGranted('ROLE_ADMIN')
+        ) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette évaluation.');
         }
 

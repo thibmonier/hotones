@@ -25,14 +25,9 @@ class DependentFieldsController extends AbstractController
      * Used in cascading selects: Client → Projects
      */
     #[Route('/clients/{id}/projects', name: 'api_client_projects', methods: ['GET'])]
-    public function getClientProjects(
-        int $id,
-        ProjectRepository $projectRepository
-    ): JsonResponse {
-        $projects = $projectRepository->findBy(
-            ['client' => $id, 'status' => 'active'],
-            ['name' => 'ASC'],
-        );
+    public function getClientProjects(int $id, ProjectRepository $projectRepository): JsonResponse
+    {
+        $projects = $projectRepository->findBy(['client' => $id, 'status' => 'active'], ['name' => 'ASC']);
 
         $data = array_map(fn ($project): array => [
             'id'   => $project->getId(),
@@ -48,14 +43,9 @@ class DependentFieldsController extends AbstractController
      * Used in cascading selects: Project → Tasks
      */
     #[Route('/projects/{id}/tasks', name: 'api_project_tasks', methods: ['GET'])]
-    public function getProjectTasks(
-        int $id,
-        ProjectTaskRepository $taskRepository
-    ): JsonResponse {
-        $tasks = $taskRepository->findBy(
-            ['project' => $id, 'active' => true],
-            ['position' => 'ASC'],
-        );
+    public function getProjectTasks(int $id, ProjectTaskRepository $taskRepository): JsonResponse
+    {
+        $tasks = $taskRepository->findBy(['project' => $id, 'active' => true], ['position' => 'ASC']);
 
         $data = array_map(fn ($task): array => [
             'id'          => $task->getId(),
@@ -72,14 +62,9 @@ class DependentFieldsController extends AbstractController
      * Used in cascading selects: Task → Subtasks
      */
     #[Route('/tasks/{id}/subtasks', name: 'api_task_subtasks', methods: ['GET'])]
-    public function getTaskSubtasks(
-        int $id,
-        ProjectSubTaskRepository $subTaskRepository
-    ): JsonResponse {
-        $subTasks = $subTaskRepository->findBy(
-            ['task' => $id],
-            ['position' => 'ASC'],
-        );
+    public function getTaskSubtasks(int $id, ProjectSubTaskRepository $subTaskRepository): JsonResponse
+    {
+        $subTasks = $subTaskRepository->findBy(['task' => $id], ['position' => 'ASC']);
 
         $data = array_map(fn ($subTask): array => [
             'id'   => $subTask->getId(),

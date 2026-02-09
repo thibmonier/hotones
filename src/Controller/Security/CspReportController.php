@@ -60,7 +60,10 @@ class CspReportController extends AbstractController
             $report = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
             if (!isset($report['csp-report'])) {
-                return new JsonResponse(['status' => 'error', 'message' => 'Invalid CSP report format'], Response::HTTP_BAD_REQUEST);
+                return new JsonResponse([
+                    'status'  => 'error',
+                    'message' => 'Invalid CSP report format',
+                ], Response::HTTP_BAD_REQUEST);
             }
 
             $cspReport = $report['csp-report'];

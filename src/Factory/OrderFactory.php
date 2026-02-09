@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\Order;
@@ -15,8 +17,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class OrderFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly ?CompanyContext $companyContext)
-    {
+    public function __construct(
+        private readonly ?CompanyContext $companyContext,
+    ) {
         parent::__construct();
     }
 
@@ -42,12 +45,14 @@ final class OrderFactory extends PersistentObjectFactory
             'name'        => $faker->sentence(3),
             'description' => $faker->optional()->paragraph(2, true),
             // Mostly small contingency (0-5%), sometimes up to 10%
-            'contingencyPercentage' => (string) ($faker->boolean(75) ? $faker->randomFloat(2, 0, 5) : $faker->randomFloat(2, 5, 10)),
-            'validUntil'            => $faker->optional()->dateTimeBetween('now', '+3 months'),
-            'orderNumber'           => Order::generateOrderNumber($date),
-            'notes'                 => $faker->optional()->sentence(10),
-            'contingenceAmount'     => (string) $faker->randomFloat(2, 0, 2000),
-            'contingenceReason'     => $faker->optional()->sentence(8),
+            'contingencyPercentage' => (string) (
+                $faker->boolean(75) ? $faker->randomFloat(2, 0, 5) : $faker->randomFloat(2, 5, 10)
+            ),
+            'validUntil'        => $faker->optional()->dateTimeBetween('now', '+3 months'),
+            'orderNumber'       => Order::generateOrderNumber($date),
+            'notes'             => $faker->optional()->sentence(10),
+            'contingenceAmount' => (string) $faker->randomFloat(2, 0, 2000),
+            'contingenceReason' => $faker->optional()->sentence(8),
             // provisional, may be updated by fixtures after creating tasks/sections
             'totalAmount' => (string) $faker->randomFloat(2, 1000, 50000),
             'createdAt'   => $date,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Contributor;
@@ -24,13 +26,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class EmploymentPeriodController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
     #[Route('', name: 'employment_period_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator, ContributorRepository $contributorRepository): Response
-    {
+    public function index(
+        Request $request,
+        EntityManagerInterface $em,
+        PaginatorInterface $paginator,
+        ContributorRepository $contributorRepository,
+    ): Response {
         $session = $request->getSession();
         $reset   = (bool) $request->query->get('reset', false);
         if ($reset) {
@@ -46,16 +52,18 @@ class EmploymentPeriodController extends AbstractController
         $saved      = $session->has('employment_period_filters') ? (array) $session->get('employment_period_filters') : [];
 
         // Filtres
-        $contributorId = $hasFilter ? ($request->query->get('contributor') ?: '') : ($saved['contributor'] ?? '');
-        $status        = $hasFilter ? ($request->query->get('status') ?: '') : ($saved['status'] ?? '');
+        $contributorId = $hasFilter ? ($request->query->get('contributor') ?: '') : $saved['contributor'] ?? '';
+        $status        = $hasFilter ? ($request->query->get('status') ?: '') : $saved['status']           ?? '';
 
         // Tri
-        $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'startDate')) : ($saved['sort'] ?? 'startDate');
-        $dir  = $hasFilter ? ($request->query->get('dir') ?: ($saved['dir'] ?? 'DESC')) : ($saved['dir'] ?? 'DESC');
+        $sort = $hasFilter
+            ? ($request->query->get('sort') ?: $saved['sort'] ?? 'startDate')
+            : $saved['sort']                                                                         ?? 'startDate';
+        $dir = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'DESC') : $saved['dir'] ?? 'DESC';
 
         // Pagination
         $allowedPerPage = [10, 25, 50, 100];
-        $perPageParam   = (int) ($hasFilter ? ($request->query->get('per_page', 25)) : ($saved['per_page'] ?? 25));
+        $perPageParam   = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
         $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
 
         // Sauvegarder en session
@@ -68,21 +76,20 @@ class EmploymentPeriodController extends AbstractController
         ]);
 
         // Query builder avec filtres
-        $qb = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
+        $qb = $em
+            ->getRepository(EmploymentPeriod::class)
+            ->createQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->addSelect('c');
 
         if ($contributorId) {
-            $qb->andWhere('ep.contributor = :contributor')
-                ->setParameter('contributor', $contributorId);
+            $qb->andWhere('ep.contributor = :contributor')->setParameter('contributor', $contributorId);
         }
 
         if ($status === 'active') {
-            $qb->andWhere('ep.endDate IS NULL OR ep.endDate >= :today')
-                ->setParameter('today', new DateTime());
+            $qb->andWhere('ep.endDate IS NULL OR ep.endDate >= :today')->setParameter('today', new DateTime());
         } elseif ($status === 'ended') {
-            $qb->andWhere('ep.endDate < :today')
-                ->setParameter('today', new DateTime());
+            $qb->andWhere('ep.endDate < :today')->setParameter('today', new DateTime());
         }
 
         // Tri
@@ -98,11 +105,7 @@ class EmploymentPeriodController extends AbstractController
         $qb->orderBy($sortField, $sortDir);
 
         // Pagination
-        $pagination = $paginator->paginate(
-            $qb->getQuery(),
-            $request->query->getInt('page', 1),
-            $perPage,
-        );
+        $pagination = $paginator->paginate($qb->getQuery(), $request->query->getInt('page', 1), $perPage);
 
         $contributors = $contributorRepository->findActiveContributors();
 
@@ -125,22 +128,21 @@ class EmploymentPeriodController extends AbstractController
         $contributorId = $request->query->get('contributor', '');
         $status        = $request->query->get('status', '');
 
-        $qb = $em->getRepository(EmploymentPeriod::class)->createQueryBuilder('ep')
+        $qb = $em
+            ->getRepository(EmploymentPeriod::class)
+            ->createQueryBuilder('ep')
             ->leftJoin('ep.contributor', 'c')
             ->addSelect('c')
             ->orderBy('ep.startDate', 'DESC');
 
         if ($contributorId) {
-            $qb->andWhere('ep.contributor = :contributor')
-                ->setParameter('contributor', $contributorId);
+            $qb->andWhere('ep.contributor = :contributor')->setParameter('contributor', $contributorId);
         }
 
         if ($status === 'active') {
-            $qb->andWhere('ep.endDate IS NULL OR ep.endDate >= :today')
-                ->setParameter('today', new DateTime());
+            $qb->andWhere('ep.endDate IS NULL OR ep.endDate >= :today')->setParameter('today', new DateTime());
         } elseif ($status === 'ended') {
-            $qb->andWhere('ep.endDate < :today')
-                ->setParameter('today', new DateTime());
+            $qb->andWhere('ep.endDate < :today')->setParameter('today', new DateTime());
         }
 
         $periods = $qb->getQuery()->getResult();
@@ -179,8 +181,13 @@ class EmploymentPeriodController extends AbstractController
     }
 
     #[Route('/new', name: 'employment_period_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository, CjmCalculatorService $cjmCalculatorService): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        EmploymentPeriodRepository $employmentPeriodRepository,
+        ContributorRepository $contributorRepository,
+        CjmCalculatorService $cjmCalculatorService,
+    ): Response {
         $company = $this->companyContext->getCurrentCompany();
         $period  = new EmploymentPeriod();
         $period->setCompany($company);
@@ -232,7 +239,9 @@ class EmploymentPeriodController extends AbstractController
             $period->setWeeklyHours($weeklyHours !== '' && $weeklyHours !== null ? (string) $weeklyHours : '35.00');
 
             $workTimePercentage = $request->request->get('work_time_percentage');
-            $period->setWorkTimePercentage($workTimePercentage !== '' && $workTimePercentage !== null ? (string) $workTimePercentage : '100.00');
+            $period->setWorkTimePercentage(
+                $workTimePercentage !== '' && $workTimePercentage !== null ? (string) $workTimePercentage : '100.00',
+            );
 
             // Gestion des profils
             $profileIds = $request->request->all('profiles');
@@ -307,8 +316,14 @@ class EmploymentPeriodController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'employment_period_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EmploymentPeriod $period, EntityManagerInterface $em, EmploymentPeriodRepository $employmentPeriodRepository, ContributorRepository $contributorRepository, CjmCalculatorService $cjmCalculatorService): Response
-    {
+    public function edit(
+        Request $request,
+        EmploymentPeriod $period,
+        EntityManagerInterface $em,
+        EmploymentPeriodRepository $employmentPeriodRepository,
+        ContributorRepository $contributorRepository,
+        CjmCalculatorService $cjmCalculatorService,
+    ): Response {
         if ($request->isMethod('POST')) {
             // Contributeur
             if ($contributorId = $request->request->get('contributor_id')) {
@@ -348,7 +363,9 @@ class EmploymentPeriodController extends AbstractController
             $period->setWeeklyHours($weeklyHours !== '' && $weeklyHours !== null ? (string) $weeklyHours : '35.00');
 
             $workTimePercentage = $request->request->get('work_time_percentage');
-            $period->setWorkTimePercentage($workTimePercentage !== '' && $workTimePercentage !== null ? (string) $workTimePercentage : '100.00');
+            $period->setWorkTimePercentage(
+                $workTimePercentage !== '' && $workTimePercentage !== null ? (string) $workTimePercentage : '100.00',
+            );
 
             // Gestion des profils
             $period->profiles->clear();

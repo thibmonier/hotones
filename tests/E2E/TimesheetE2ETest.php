@@ -55,10 +55,12 @@ class TimesheetE2ETest extends PantherTestCase
         $crawler = $client->request('GET', '/login');
         $client->waitFor('form');
 
-        $form = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
         $client->waitFor('body');
         sleep(1);
@@ -132,10 +134,12 @@ class TimesheetE2ETest extends PantherTestCase
         $crawler = $client->request('GET', '/login');
         $client->waitFor('form');
 
-        $form = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
         $client->waitFor('body');
         sleep(1);
@@ -172,10 +176,12 @@ class TimesheetE2ETest extends PantherTestCase
         $crawler = $client->request('GET', '/login');
         $client->waitFor('form');
 
-        $form = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
         $client->waitFor('body');
         sleep(1);
@@ -185,7 +191,9 @@ class TimesheetE2ETest extends PantherTestCase
         $client->waitFor('#timesheet-table');
 
         // Cliquer sur le bouton "Dupliquer semaine"
-        $duplicateBtn = $client->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector('[data-bs-target="#duplicateWeekModal"]'));
+        $duplicateBtn = $client->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector(
+            '[data-bs-target="#duplicateWeekModal"]',
+        ));
         $duplicateBtn->click();
         sleep(1); // Attendre que la modal s'ouvre
 
@@ -202,7 +210,9 @@ class TimesheetE2ETest extends PantherTestCase
         $this->assertSelectorTextContains('.alert-info', 'Les projets, tâches et heures seront copiés');
 
         // Fermer la modal en cliquant sur Annuler
-        $cancelBtn = $client->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector('#duplicateWeekModal .btn-secondary'));
+        $cancelBtn = $client->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector(
+            '#duplicateWeekModal .btn-secondary',
+        ));
         $cancelBtn->click();
         sleep(1);
 
@@ -226,10 +236,12 @@ class TimesheetE2ETest extends PantherTestCase
         $crawler = $client->request('GET', '/login');
         $client->waitFor('form');
 
-        $form = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
         $client->waitFor('body');
         sleep(1);
@@ -258,7 +270,9 @@ class TimesheetE2ETest extends PantherTestCase
         sleep(1);
 
         // Vérifier qu'on est revenu à la semaine initiale
-        $backToCurrentText = $client->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector('.card-title'))->getText();
+        $backToCurrentText = $client
+            ->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector('.card-title'))
+            ->getText();
         $this->assertEquals($currentWeekText, $backToCurrentText);
     }
 }

@@ -49,24 +49,6 @@ parameters:
 			path: src/Controller/VacationRequestController.php
 
 		-
-			message: '#^Attribute class App\\Entity\\SensitiveParameter does not exist\.$#'
-			identifier: attribute.notFound
-			count: 1
-			path: src/Entity/NpsSurvey.php
-
-		-
-			message: '#^Only booleans are allowed in an elseif condition, App\\Entity\\ProjectTask\|null given\.$#'
-			identifier: elseif.condNotBoolean
-			count: 1
-			path: src/Repository/TimesheetRepository.php
-
-		-
-			message: '#^Call to method Doctrine\\ORM\\QueryBuilder\:\:andWhere\(\) with incorrect case\: andwhere$#'
-			identifier: method.nameCase
-			count: 1
-			path: src/Repository/VacationRepository.php
-
-		-
 			message: '#^Variable method call on \$this\(App\\Service\\ExcelExportService\)\.$#'
 			identifier: method.dynamicName
 			count: 1
@@ -77,9 +59,3 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: src/Service/ExpenseReportService.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 2
-			path: src/Service/WorkloadPredictionService.php

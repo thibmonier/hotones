@@ -18,14 +18,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:generate-test-data',
-    description: 'Génère des données de test pour les métriques analytics',
-)]
+#[AsCommand(name: 'app:generate-test-data', description: 'Génère des données de test pour les métriques analytics')]
 class GenerateTestDataCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
     }
@@ -102,19 +99,25 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function clearExistingData(int $year): void
     {
         // Supprimer les métriques existantes
-        $this->entityManager->createQuery('
+        $this->entityManager
+            ->createQuery('
             DELETE FROM App\Entity\Analytics\FactProjectMetrics f 
             WHERE f.dimTime IN (
                 SELECT t.id FROM App\Entity\Analytics\DimTime t 
                 WHERE t.year = :year
             )
-        ')->setParameter('year', $year)->execute();
+        ')
+            ->setParameter('year', $year)
+            ->execute();
 
         // Supprimer les dimensions temporelles
-        $this->entityManager->createQuery('
+        $this->entityManager
+            ->createQuery('
             DELETE FROM App\Entity\Analytics\DimTime t 
             WHERE t.year = :year
-        ')->setParameter('year', $year)->execute();
+        ')
+            ->setParameter('year', $year)
+            ->execute();
     }
 
     private function createTimeDimensions(int $year): array
@@ -137,19 +140,20 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function createProjectTypes(): array
     {
         $types = [
-            ['forfait', 'E-commerce', 'active', false],
-            ['forfait', 'Brand', 'active', false],
-            ['regie', 'E-commerce', 'active', false],
-            ['regie', 'Brand', 'active', false],
-            ['forfait', null, 'completed', false],
-            ['forfait', 'E-commerce', 'active', true], // Projet interne
+            ['forfait', 'E-commerce', 'active',    false],
+            ['forfait', 'Brand',      'active',    false],
+            ['regie',   'E-commerce', 'active',    false],
+            ['regie',   'Brand',      'active',    false],
+            ['forfait', null,         'completed', false],
+            ['forfait', 'E-commerce', 'active',    true], // Projet interne
         ];
 
         $projectTypes = [];
 
         foreach ($types as [$projectType, $serviceCategory, $status, $isInternal]) {
             $dimProjectType = new DimProjectType();
-            $dimProjectType->setProjectType($projectType)
+            $dimProjectType
+                ->setProjectType($projectType)
                 ->setServiceCategory($serviceCategory)
                 ->setStatus($status)
                 ->setIsInternal($isInternal);
@@ -164,21 +168,19 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function createContributors(): array
     {
         $contributors_data = [
-            ['Alice Dupont', 'project_manager'],
-            ['Bob Martin', 'project_manager'],
+            ['Alice Dupont',    'project_manager'],
+            ['Bob Martin',      'project_manager'],
             ['Claire Rousseau', 'sales_person'],
-            ['David Moreau', 'sales_person'],
-            ['Emma Bernard', 'project_director'],
-            ['François Petit', 'key_account_manager'],
+            ['David Moreau',    'sales_person'],
+            ['Emma Bernard',    'project_director'],
+            ['François Petit',  'key_account_manager'],
         ];
 
         $contributors = [];
 
         foreach ($contributors_data as [$name, $role]) {
             $contributor = new DimContributor();
-            $contributor->setName($name)
-                ->setRole($role)
-                ->setIsActive(true);
+            $contributor->setName($name)->setRole($role)->setIsActive(true);
 
             $this->entityManager->persist($contributor);
             $contributors[] = $contributor;
@@ -200,7 +202,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
                 $salesPerson    = $salesPersons[array_rand($salesPersons)];
 
                 $metric = new FactProjectMetrics();
-                $metric->setDimTime($dimTime)
+                $metric
+                    ->setDimTime($dimTime)
                     ->setDimProjectType($projectType)
                     ->setDimProjectManager($projectManager)
                     ->setDimSalesPerson($salesPerson)
@@ -222,14 +225,15 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         // Variations saisonnières (moins d'activité en août et décembre)
         $seasonalFactor = match ($month) {
             8, 12 => 0.6, // Août et décembre
-            1, 7 => 0.8,  // Janvier et juillet
-            default => 1.0
+            1, 7 => 0.8, // Janvier et juillet
+            default => 1.0,
         };
 
         $baseRevenue = random_int(10000, 50000) * $seasonalFactor;
         $baseCosts   = $baseRevenue             * (0.6 + (random_int(0, 20) / 100)); // 60-80% du CA
 
-        $metric->setProjectCount(random_int(1, 5))
+        $metric
+            ->setProjectCount(random_int(1, 5))
             ->setActiveProjectCount(random_int(1, 3))
             ->setCompletedProjectCount(random_int(0, 2))
             ->setOrderCount(random_int(1, 8))
@@ -248,18 +252,12 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         // Valeur moyenne des devis
         if ($metric->getOrderCount() > 0) {
             $totalOrderValue = bcadd($metric->getTotalRevenue(), $metric->getPendingRevenue(), 2);
-            $metric->setAverageOrderValue(
-                bcdiv($totalOrderValue, (string) $metric->getOrderCount(), 2),
-            );
+            $metric->setAverageOrderValue(bcdiv($totalOrderValue, (string) $metric->getOrderCount(), 2));
         }
 
         // Taux d'occupation
         if (bccomp($metric->getTotalSoldDays(), '0', 2) > 0) {
-            $utilizationRate = bcmul(
-                bcdiv($metric->getTotalWorkedDays(), $metric->getTotalSoldDays(), 4),
-                '100',
-                2,
-            );
+            $utilizationRate = bcmul(bcdiv($metric->getTotalWorkedDays(), $metric->getTotalSoldDays(), 4), '100', 2);
             $metric->setUtilizationRate($utilizationRate);
         }
     }
@@ -269,7 +267,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         $io->section('Statistiques générées');
 
         // Total CA sur l'année
-        $totalRevenue = $this->entityManager->createQuery('
+        $totalRevenue = $this->entityManager
+            ->createQuery('
             SELECT SUM(f.totalRevenue) as total 
             FROM App\Entity\Analytics\FactProjectMetrics f
             JOIN f.dimTime t
@@ -282,7 +281,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         $io->writeln('💰 CA total généré : '.number_format((float) $totalRevenue, 0, ',', ' ').'€');
 
         // Nombre de projets
-        $totalProjects = $this->entityManager->createQuery('
+        $totalProjects = $this->entityManager
+            ->createQuery('
             SELECT SUM(f.projectCount) as total 
             FROM App\Entity\Analytics\FactProjectMetrics f
             JOIN f.dimTime t

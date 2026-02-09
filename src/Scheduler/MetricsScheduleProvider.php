@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Scheduler;
 
 use DateTimeZone;
@@ -15,13 +17,14 @@ class MetricsScheduleProvider implements ScheduleProviderInterface
         $schedule = new Schedule();
 
         // Recalcul KPI quotidien à 02:30
-        $trigger = new CronExpressionTrigger('30 2 * * *', new DateTimeZone('Europe/Paris'))
-            ->withDescription('Recalcul quotidien des métriques');
-
-        $schedule->add(
-            new RecurringCommand($trigger, 'app:metrics:dispatch', ['--date' => 'today', '--granularity' => 'daily'])
-                ->withName('metrics:daily'),
+        $trigger = new CronExpressionTrigger('30 2 * * *', new DateTimeZone('Europe/Paris'))->withDescription(
+            'Recalcul quotidien des métriques',
         );
+
+        $schedule->add(new RecurringCommand($trigger, 'app:metrics:dispatch', [
+            '--date'        => 'today',
+            '--granularity' => 'daily',
+        ])->withName('metrics:daily'));
 
         return $schedule;
     }

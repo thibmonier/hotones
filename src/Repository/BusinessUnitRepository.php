@@ -32,7 +32,8 @@ class BusinessUnitRepository extends CompanyAwareRepository
      */
     public function findActiveBusinessUnits(): array
     {
-        return $this->createCompanyQueryBuilder('bu')
+        return $this
+            ->createCompanyQueryBuilder('bu')
             ->andWhere('bu.active = :active')
             ->setParameter('active', true)
             ->orderBy('bu.name', 'ASC')
@@ -47,7 +48,8 @@ class BusinessUnitRepository extends CompanyAwareRepository
      */
     public function findRootBusinessUnits(): array
     {
-        return $this->createCompanyQueryBuilder('bu')
+        return $this
+            ->createCompanyQueryBuilder('bu')
             ->andWhere('bu.parent IS NULL')
             ->andWhere('bu.active = :active')
             ->setParameter('active', true)
@@ -66,14 +68,14 @@ class BusinessUnitRepository extends CompanyAwareRepository
      */
     public function findChildren(BusinessUnit $parent, bool $activeOnly = true): array
     {
-        $qb = $this->createCompanyQueryBuilder('bu')
+        $qb = $this
+            ->createCompanyQueryBuilder('bu')
             ->andWhere('bu.parent = :parent')
             ->setParameter('parent', $parent)
             ->orderBy('bu.name', 'ASC');
 
         if ($activeOnly) {
-            $qb->andWhere('bu.active = :active')
-                ->setParameter('active', true);
+            $qb->andWhere('bu.active = :active')->setParameter('active', true);
         }
 
         return $qb->getQuery()->getResult();
@@ -89,7 +91,8 @@ class BusinessUnitRepository extends CompanyAwareRepository
     public function findHierarchicalTree(): array
     {
         // Get all BUs for current company
-        $allBUs = $this->createCompanyQueryBuilder('bu')
+        $allBUs = $this
+            ->createCompanyQueryBuilder('bu')
             ->andWhere('bu.active = :active')
             ->setParameter('active', true)
             ->orderBy('bu.name', 'ASC')
@@ -125,7 +128,8 @@ class BusinessUnitRepository extends CompanyAwareRepository
      */
     public function findByManager(int $managerId): array
     {
-        return $this->createCompanyQueryBuilder('bu')
+        return $this
+            ->createCompanyQueryBuilder('bu')
             ->join('bu.manager', 'm')
             ->andWhere('m.id = :managerId')
             ->setParameter('managerId', $managerId)
@@ -144,7 +148,8 @@ class BusinessUnitRepository extends CompanyAwareRepository
      */
     public function search(string $query, int $limit = 20): array
     {
-        return $this->createCompanyQueryBuilder('bu')
+        return $this
+            ->createCompanyQueryBuilder('bu')
             ->andWhere('bu.name LIKE :query OR bu.description LIKE :query')
             ->setParameter('query', '%'.$query.'%')
             ->andWhere('bu.active = :active')

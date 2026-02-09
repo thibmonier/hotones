@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BoondManagerSettingsRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, BoondManagerSettings::class, $companyContext);
     }
 
@@ -45,7 +43,8 @@ class BoondManagerSettingsRepository extends CompanyAwareRepository
      */
     public function findNeedingSync(): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->where('b.enabled = :enabled')
             ->andWhere('b.autoSyncEnabled = :autoSyncEnabled')
             ->andWhere('b.apiBaseUrl IS NOT NULL')

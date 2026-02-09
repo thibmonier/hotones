@@ -100,7 +100,7 @@
     },
     "require-dev": {
         "ahmed-bhs/doctrine-doctor": "^1.0@dev",
-        "carthage-software/mago": "^1.5.0",
+        "carthage-software/mago": "^1.6.0",
         "dama/doctrine-test-bundle": "^8.6.0",
         "dbrekelmans/bdi": "^1.4.1",
         "deptrac/deptrac": ">=4.6",
@@ -113,8 +113,8 @@
         "phpstan/phpstan-doctrine": "^2.0.14",
         "phpstan/phpstan-strict-rules": "^2.0.8",
         "phpstan/phpstan-symfony": "^2.0.12",
-        "phpunit/phpunit": "^12.5.9",
-        "rector/rector": "^2.3.5",
+        "phpunit/phpunit": "^12.5.10",
+        "rector/rector": "^2.3.6",
         "squizlabs/php_codesniffer": "^3.13.5",
         "symfony/browser-kit": "^8.0.4",
         "symfony/css-selector": "^8.0",
@@ -180,7 +180,6 @@
         "mago-lint": "mago lint",
         "mago-analyze": "mago analyze",
         "mago": [
-            "@mago-format",
             "@mago-lint",
             "@mago-analyze"
         ],

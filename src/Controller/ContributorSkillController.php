@@ -23,7 +23,7 @@ class ContributorSkillController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly ContributorSkillRepository $contributorSkillRepository,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 

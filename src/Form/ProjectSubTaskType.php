@@ -57,8 +57,7 @@ class ProjectSubTaskType extends AbstractType
                 'label'       => 'Position',
                 'attr'        => ['class' => 'form-control', 'min' => 1],
                 'constraints' => [new Assert\GreaterThanOrEqual(1)],
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

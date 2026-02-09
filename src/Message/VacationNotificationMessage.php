@@ -8,7 +8,7 @@ class VacationNotificationMessage
 {
     public function __construct(
         private readonly int $vacationId,
-        private readonly string $type // 'created', 'approved', 'rejected'
+        private readonly string $type, // 'created', 'approved', 'rejected'
     ) {
     }
 

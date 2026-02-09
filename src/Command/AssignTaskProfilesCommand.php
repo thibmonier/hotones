@@ -68,7 +68,7 @@ class AssignTaskProfilesCommand extends Command
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProjectTaskRepository $taskRepository,
-        private readonly ProfileRepository $profileRepository
+        private readonly ProfileRepository $profileRepository,
     ) {
         parent::__construct();
     }
@@ -76,10 +76,14 @@ class AssignTaskProfilesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('project-id', null, InputOption::VALUE_OPTIONAL, 'Only assign profiles to tasks of a specific project')
+            ->addOption(
+                'project-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Only assign profiles to tasks of a specific project',
+            )
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be assigned without persisting')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Override existing profile assignments')
-        ;
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Override existing profile assignments');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -100,7 +104,8 @@ class AssignTaskProfilesCommand extends Command
 
         // Get tasks to process
         if ($projectId) {
-            $tasks = $this->taskRepository->createQueryBuilder('t')
+            $tasks = $this->taskRepository
+                ->createQueryBuilder('t')
                 ->where('t.project = :projectId')
                 ->setParameter('projectId', $projectId)
                 ->getQuery()
@@ -144,12 +149,7 @@ class AssignTaskProfilesCommand extends Command
             }
 
             ++$assigned;
-            $io->text(sprintf(
-                '  ✓ %s"%s" → %s',
-                $dryRun ? '[DRY RUN] ' : '',
-                $task->name,
-                $profile->getName(),
-            ));
+            $io->text(sprintf('  ✓ %s"%s" → %s', $dryRun ? '[DRY RUN] ' : '', $task->name, $profile->getName()));
         }
 
         if (!$dryRun && $assigned > 0) {
@@ -158,15 +158,12 @@ class AssignTaskProfilesCommand extends Command
 
         $io->newLine();
         $io->section('Summary');
-        $io->table(
-            ['Status', 'Count'],
-            [
-                ['Assigned', $assigned],
-                ['Skipped (already has profile)', $skipped],
-                ['No match found', $noMatch],
-                ['Total processed', count($tasks)],
-            ],
-        );
+        $io->table(['Status', 'Count'], [
+            ['Assigned',                      $assigned],
+            ['Skipped (already has profile)', $skipped],
+            ['No match found',                $noMatch],
+            ['Total processed',               count($tasks)],
+        ]);
 
         if ($dryRun && $assigned > 0) {
             $io->warning('DRY RUN mode - no changes were persisted. Remove --dry-run to apply changes.');

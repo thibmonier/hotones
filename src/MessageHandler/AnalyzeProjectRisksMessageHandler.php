@@ -15,7 +15,7 @@ final readonly class AnalyzeProjectRisksMessageHandler
 {
     public function __construct(
         private ProjectRiskAnalyzer $riskAnalyzer,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

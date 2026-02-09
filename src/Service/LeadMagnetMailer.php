@@ -90,11 +90,7 @@ class LeadMagnetMailer
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        $pricingUrl = $this->urlGenerator->generate(
-            'public_pricing',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        $pricingUrl = $this->urlGenerator->generate('public_pricing', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))
@@ -117,11 +113,7 @@ class LeadMagnetMailer
      */
     public function sendNurturingDay7(LeadCapture $lead): void
     {
-        $pricingUrl = $this->urlGenerator->generate(
-            'public_pricing',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        $pricingUrl = $this->urlGenerator->generate('public_pricing', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $email = new TemplatedEmail()
             ->from(new Address($this->fromEmail, $this->fromName))

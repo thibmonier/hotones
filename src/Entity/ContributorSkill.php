@@ -17,10 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'contributor_skill_unique', columns: ['contributor_id', 'skill_id'])]
 #[ORM\Index(name: 'idx_contributorskill_company', columns: ['company_id'])]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(
-    fields: ['contributor', 'skill'],
-    message: 'Ce contributeur possède déjà cette compétence',
-)]
+#[UniqueEntity(fields: ['contributor', 'skill'], message: 'Ce contributeur possède déjà cette compétence')]
 class ContributorSkill implements CompanyOwnedInterface
 {
     public const LEVEL_BEGINNER     = 1;
@@ -57,17 +54,21 @@ class ContributorSkill implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotNull(message: 'Le niveau d\'auto-évaluation est obligatoire')]
-    #[Assert\Choice(
-        choices: [self::LEVEL_BEGINNER, self::LEVEL_INTERMEDIATE, self::LEVEL_CONFIRMED, self::LEVEL_EXPERT],
-        message: 'Niveau invalide',
-    )]
+    #[Assert\Choice(choices: [
+        self::LEVEL_BEGINNER,
+        self::LEVEL_INTERMEDIATE,
+        self::LEVEL_CONFIRMED,
+        self::LEVEL_EXPERT,
+    ], message: 'Niveau invalide')]
     private ?int $selfAssessmentLevel = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Assert\Choice(
-        choices: [self::LEVEL_BEGINNER, self::LEVEL_INTERMEDIATE, self::LEVEL_CONFIRMED, self::LEVEL_EXPERT],
-        message: 'Niveau invalide',
-    )]
+    #[Assert\Choice(choices: [
+        self::LEVEL_BEGINNER,
+        self::LEVEL_INTERMEDIATE,
+        self::LEVEL_CONFIRMED,
+        self::LEVEL_EXPERT,
+    ], message: 'Niveau invalide')]
     private ?int $managerAssessmentLevel = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
@@ -225,9 +226,11 @@ class ContributorSkill implements CompanyOwnedInterface
      */
     public function hasAssessmentGap(): bool
     {
-        return $this->managerAssessmentLevel !== null
+        return
+            $this->managerAssessmentLevel    !== null
             && $this->selfAssessmentLevel    !== null
-            && $this->managerAssessmentLevel !== $this->selfAssessmentLevel;
+            && $this->managerAssessmentLevel !== $this->selfAssessmentLevel
+        ;
     }
 
     /**

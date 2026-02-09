@@ -10,7 +10,7 @@ namespace App\Message;
 final readonly class GenerateForecastsMessage
 {
     public function __construct(
-        private int $months = 12
+        private int $months = 12,
     ) {
     }
 

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 class LoginRedirectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly UrlGeneratorInterface $urlGenerator
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -48,9 +48,7 @@ class LoginRedirectSubscriber implements EventSubscriberInterface
             foreach ($blockedPatterns as $pattern) {
                 if (str_contains($targetUrl, $pattern)) {
                     // Rediriger vers la page d'accueil au lieu de l'URL bloquée
-                    $event->setResponse(
-                        new RedirectResponse($this->urlGenerator->generate('home')),
-                    );
+                    $event->setResponse(new RedirectResponse($this->urlGenerator->generate('home')));
 
                     return;
                 }

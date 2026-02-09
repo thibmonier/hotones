@@ -72,11 +72,7 @@ class ContributorSatisfactionReminderCommand extends Command
             }
 
             // Vérifier si le collaborateur a déjà saisi sa satisfaction pour cette période
-            $satisfaction = $this->satisfactionRepository->findByContributorAndPeriod(
-                $contributor,
-                $year,
-                $month,
-            );
+            $satisfaction = $this->satisfactionRepository->findByContributorAndPeriod($contributor, $year, $month);
 
             if ($satisfaction) {
                 ++$skipped;
@@ -90,7 +86,11 @@ class ContributorSatisfactionReminderCommand extends Command
                     ++$sent;
                     $io->text(sprintf('✓ Email envoyé à %s', $contributor->getFullName()));
                 } catch (Exception $e) {
-                    $io->error(sprintf('Erreur lors de l\'envoi à %s : %s', $contributor->getFullName(), $e->getMessage()));
+                    $io->error(sprintf(
+                        'Erreur lors de l\'envoi à %s : %s',
+                        $contributor->getFullName(),
+                        $e->getMessage(),
+                    ));
                 }
             } else {
                 ++$sent;
@@ -98,11 +98,7 @@ class ContributorSatisfactionReminderCommand extends Command
             }
         }
 
-        $io->success(sprintf(
-            '%d email(s) envoyé(s), %d collaborateur(s) ignoré(s)',
-            $sent,
-            $skipped,
-        ));
+        $io->success(sprintf('%d email(s) envoyé(s), %d collaborateur(s) ignoré(s)', $sent, $skipped));
 
         return Command::SUCCESS;
     }
@@ -114,11 +110,11 @@ class ContributorSatisfactionReminderCommand extends Command
             ->to(new Address($contributor->getEmail(), $contributor->getFullName()))
             ->subject(sprintf('Rappel : Satisfaction mensuelle - %s %d', $this->getMonthLabel($month), $year))
             ->html(sprintf(
-                '<p>Bonjour %s,</p>'.
-                '<p>Nous aimerions connaître votre niveau de satisfaction pour le mois de %s %d.</p>'.
-                '<p>Prenez quelques minutes pour nous faire part de votre ressenti.</p>'.
-                '<p><a href="%s">Saisir ma satisfaction</a></p>'.
-                '<p>Merci !</p>',
+                '<p>Bonjour %s,</p>'
+                .'<p>Nous aimerions connaître votre niveau de satisfaction pour le mois de %s %d.</p>'
+                .'<p>Prenez quelques minutes pour nous faire part de votre ressenti.</p>'
+                .'<p><a href="%s">Saisir ma satisfaction</a></p>'
+                .'<p>Merci !</p>',
                 $contributor->getFullName(),
                 $this->getMonthLabel($month),
                 $year,

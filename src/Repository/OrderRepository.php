@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Order;
@@ -14,10 +16,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OrderRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Order::class, $companyContext);
     }
 
@@ -31,22 +31,21 @@ class OrderRepository extends CompanyAwareRepository
         ?string $sortField = 'createdAt',
         ?string $sortDir = 'DESC',
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
-        $qb = $this->createCompanyQueryBuilder('o')
+        $qb = $this
+            ->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->leftJoin('p.client', 'c')
             ->addSelect('c');
 
         if ($project) {
-            $qb->andWhere('o.project = :project')
-                ->setParameter('project', $project);
+            $qb->andWhere('o.project = :project')->setParameter('project', $project);
         }
 
         if ($status) {
-            $qb->andWhere('o.status = :status')
-                ->setParameter('status', $status);
+            $qb->andWhere('o.status = :status')->setParameter('status', $status);
         }
 
         // Tri sécurisé par liste blanche
@@ -78,18 +77,14 @@ class OrderRepository extends CompanyAwareRepository
 
     public function countWithFilters(?Project $project = null, ?string $status = null): int
     {
-        $qb = $this->createCompanyQueryBuilder('o')
-            ->select('COUNT(DISTINCT o.id)')
-            ->leftJoin('o.project', 'p');
+        $qb = $this->createCompanyQueryBuilder('o')->select('COUNT(DISTINCT o.id)')->leftJoin('o.project', 'p');
 
         if ($project) {
-            $qb->andWhere('o.project = :project')
-                ->setParameter('project', $project);
+            $qb->andWhere('o.project = :project')->setParameter('project', $project);
         }
 
         if ($status) {
-            $qb->andWhere('o.status = :status')
-                ->setParameter('status', $status);
+            $qb->andWhere('o.status = :status')->setParameter('status', $status);
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -100,7 +95,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function findLastOrderNumberForMonth(string $year, string $month): ?Order
     {
-        return $this->createCompanyQueryBuilder('o')
+        return $this
+            ->createCompanyQueryBuilder('o')
             ->andWhere('o.orderNumber LIKE :pattern')
             ->setParameter('pattern', "D{$year}{$month}%")
             ->orderBy('o.orderNumber', 'DESC')
@@ -114,7 +110,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function findByProject(Project $project): array
     {
-        return $this->createCompanyQueryBuilder('o')
+        return $this
+            ->createCompanyQueryBuilder('o')
             ->andWhere('o.project = :project')
             ->orderBy('o.createdAt', 'DESC')
             ->setParameter('project', $project)
@@ -127,7 +124,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createCompanyQueryBuilder('o')
+        return $this
+            ->createCompanyQueryBuilder('o')
             ->andWhere('o.status = :status')
             ->orderBy('o.createdAt', 'DESC')
             ->setParameter('status', $status)
@@ -146,7 +144,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function findPendingOrdersInPeriod(DateTimeInterface $start, DateTimeInterface $end, int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('o')
+        return $this
+            ->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->leftJoin('p.client', 'c')
@@ -167,7 +166,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function findOneWithRelations(int $id): ?Order
     {
-        return $this->createCompanyQueryBuilder('o')
+        return $this
+            ->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->leftJoin('o.sections', 's')
@@ -191,7 +191,8 @@ class OrderRepository extends CompanyAwareRepository
             return;
         }
 
-        $this->createCompanyQueryBuilder('o')
+        $this
+            ->createCompanyQueryBuilder('o')
             ->addSelect('s', 'l')
             ->leftJoin('o.sections', 's')
             ->leftJoin('s.lines', 'l')
@@ -206,7 +207,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function countByStatus(string $status, ?int $userId = null, ?string $userRole = null): int
     {
-        $qb = $this->createCompanyQueryBuilder('o')
+        $qb = $this
+            ->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
             ->andWhere('o.status = :status')
             ->setParameter('status', $status);
@@ -229,7 +231,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function getTotalAmountByStatus(string $status): float
     {
-        $result = $this->createCompanyQueryBuilder('o')
+        $result = $this
+            ->createCompanyQueryBuilder('o')
             ->select('SUM(o.totalAmount)')
             ->andWhere('o.status = :status')
             ->setParameter('status', $status)
@@ -242,14 +245,20 @@ class OrderRepository extends CompanyAwareRepository
     /**
      * Obtient les statistiques par statut (count + CA).
      */
-    public function getStatsByStatus(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, ?int $userId = null, ?string $userRole = null): array
-    {
-        $qb = $this->createCompanyQueryBuilder('o')
+    public function getStatsByStatus(
+        ?DateTimeInterface $startDate = null,
+        ?DateTimeInterface $endDate = null,
+        ?int $userId = null,
+        ?string $userRole = null,
+    ): array {
+        $qb = $this
+            ->createCompanyQueryBuilder('o')
             ->select('o.status, COUNT(o.id) as count, SUM(o.totalAmount) as total')
             ->groupBy('o.status');
 
         if ($startDate && $endDate) {
-            $qb->andWhere('o.createdAt BETWEEN :start AND :end')
+            $qb
+                ->andWhere('o.createdAt BETWEEN :start AND :end')
                 ->setParameter('start', $startDate)
                 ->setParameter('end', $endDate);
         }
@@ -281,9 +290,14 @@ class OrderRepository extends CompanyAwareRepository
      * Calcule le CA signé sur une période.
      * Statuts considérés comme signés: signe, gagne, termine.
      */
-    public function getSignedRevenueForPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): float
-    {
-        $qb = $this->createCompanyQueryBuilder('o')
+    public function getSignedRevenueForPeriod(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        ?int $userId = null,
+        ?string $userRole = null,
+    ): float {
+        $qb = $this
+            ->createCompanyQueryBuilder('o')
             ->select('SUM(o.totalAmount)')
             ->andWhere('o.status IN (:statuses)')
             ->andWhere('o.validatedAt BETWEEN :start AND :end')
@@ -374,13 +388,10 @@ class OrderRepository extends CompanyAwareRepository
             ORDER BY month ASC
         ";
 
-        $results = $conn->executeQuery(
-            $sql,
-            [
-                'start' => $startDate->format('Y-m-d'),
-                'end'   => $endDate->format('Y-m-d'),
-            ],
-        )->fetchAllAssociative();
+        $results = $conn->executeQuery($sql, [
+            'start' => $startDate->format('Y-m-d'),
+            'end'   => $endDate->format('Y-m-d'),
+        ])->fetchAllAssociative();
 
         $evolution = [];
         foreach ($results as $row) {
@@ -395,7 +406,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function getRecentOrders(int $limit = 10): array
     {
-        return $this->createCompanyQueryBuilder('o')
+        return $this
+            ->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->addSelect('p')
             ->orderBy('o.createdAt', 'DESC')
@@ -408,9 +420,14 @@ class OrderRepository extends CompanyAwareRepository
      * Calcule le taux de conversion sur une période.
      * Retourne le pourcentage de devis signés par rapport au total de devis créés.
      */
-    public function getConversionRate(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): float
-    {
-        $qbTotal = $this->createCompanyQueryBuilder('o')
+    public function getConversionRate(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        ?int $userId = null,
+        ?string $userRole = null,
+    ): float {
+        $qbTotal = $this
+            ->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
             ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
@@ -432,7 +449,8 @@ class OrderRepository extends CompanyAwareRepository
             return 0.0;
         }
 
-        $qbSigned = $this->createCompanyQueryBuilder('o')
+        $qbSigned = $this
+            ->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
             ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->andWhere('o.status IN (:statuses)')
@@ -458,8 +476,12 @@ class OrderRepository extends CompanyAwareRepository
     /**
      * Obtient les statistiques comparatives entre deux années.
      */
-    public function getYearComparison(int $currentYear, int $previousYear, ?int $userId = null, ?string $userRole = null): array
-    {
+    public function getYearComparison(
+        int $currentYear,
+        int $previousYear,
+        ?int $userId = null,
+        ?string $userRole = null,
+    ): array {
         $currentStart  = new DateTime("$currentYear-01-01");
         $currentEnd    = new DateTime("$currentYear-12-31");
         $previousStart = new DateTime("$previousYear-01-01");
@@ -484,9 +506,14 @@ class OrderRepository extends CompanyAwareRepository
     /**
      * Compte le nombre de devis créés sur une période.
      */
-    public function countOrdersInPeriod(DateTimeInterface $startDate, DateTimeInterface $endDate, ?int $userId = null, ?string $userRole = null): int
-    {
-        $qb = $this->createCompanyQueryBuilder('o')
+    public function countOrdersInPeriod(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        ?int $userId = null,
+        ?string $userRole = null,
+    ): int {
+        $qb = $this
+            ->createCompanyQueryBuilder('o')
             ->select('COUNT(o.id)')
             ->andWhere('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
@@ -512,7 +539,8 @@ class OrderRepository extends CompanyAwareRepository
      */
     public function search(string $query, int $limit = 5): array
     {
-        return $this->createCompanyQueryBuilder('o')
+        return $this
+            ->createCompanyQueryBuilder('o')
             ->leftJoin('o.project', 'p')
             ->leftJoin('p.client', 'c')
             ->andWhere('o.orderNumber LIKE :query OR o.name LIKE :query OR c.name LIKE :query')

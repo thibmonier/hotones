@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\Contributor;
@@ -16,8 +18,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ContributorFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly ?CompanyContext $companyContext)
-    {
+    public function __construct(
+        private readonly ?CompanyContext $companyContext,
+    ) {
         parent::__construct();
     }
 
@@ -58,12 +61,12 @@ final class ContributorFactory extends PersistentObjectFactory
             $faker            = self::faker();
             $employmentPeriod = new EmploymentPeriod();
             $employmentPeriod
-                ->setCompany($contributor->getCompany()) // Multi-tenant: inherit company from contributor
+                ->setCompany($contributor->getCompany())
                 ->setContributor($contributor)
                 ->setStartDate(new DateTime('-6 months'))
                 ->setCjm((float) $faker->numberBetween(300, 700))
                 ->setTjm((float) $faker->numberBetween(450, 1000))
-                ->setWeeklyHours(35.0);
+                ->setWeeklyHours(35.0); // Multi-tenant: inherit company from contributor
             $contributor->addEmploymentPeriod($employmentPeriod);
         });
     }

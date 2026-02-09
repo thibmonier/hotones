@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SaasProviderRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, SaasProvider::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class SaasProviderRepository extends CompanyAwareRepository
      */
     public function findActive(): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.active = :active')
             ->setParameter('active', true)
             ->orderBy('p.name', 'ASC')
@@ -42,7 +41,8 @@ class SaasProviderRepository extends CompanyAwareRepository
      */
     public function searchByName(string $search): array
     {
-        return $this->createCompanyQueryBuilder('p')
+        return $this
+            ->createCompanyQueryBuilder('p')
             ->andWhere('p.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('p.name', 'ASC')
@@ -57,7 +57,8 @@ class SaasProviderRepository extends CompanyAwareRepository
      */
     public function getProvidersWithServiceCount(): array
     {
-        $results = $this->createCompanyQueryBuilder('p')
+        $results = $this
+            ->createCompanyQueryBuilder('p')
             ->select('p', 'COUNT(s.id) as serviceCount')
             ->leftJoin('p.services', 's')
             ->groupBy('p.id')

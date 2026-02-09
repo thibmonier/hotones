@@ -47,7 +47,7 @@ class SecureFileUploadService
         #[Autowire(param: 'env(S3_PUBLIC_URL)')]
         private readonly string $publicUrl = '',
         #[Autowire(param: 'kernel.environment')]
-        private readonly string $environment = 'dev'
+        private readonly string $environment = 'dev',
     ) {
     }
 
@@ -61,7 +61,7 @@ class SecureFileUploadService
     public function uploadImage(
         UploadedFile $file,
         string $subdirectory = 'avatars',
-        bool $convertToWebP = false
+        bool $convertToWebP = false,
     ): string {
         // Validation du fichier
         $this->validateFile($file, self::ALLOWED_IMAGE_MIMES);
@@ -120,10 +120,8 @@ class SecureFileUploadService
      *
      * @return string Le nom du fichier uploadé
      */
-    public function uploadDocument(
-        UploadedFile $file,
-        string $subdirectory = 'documents'
-    ): string {
+    public function uploadDocument(UploadedFile $file, string $subdirectory = 'documents'): string
+    {
         $this->validateFile($file, self::ALLOWED_DOCUMENT_MIMES);
 
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -170,7 +168,7 @@ class SecureFileUploadService
     {
         // Vérification de la taille
         if ($file->getSize() > self::MAX_FILE_SIZE) {
-            throw new FileException(sprintf('Le fichier est trop volumineux (%.2f Mo). Taille maximale: %.2f Mo', $file->getSize() / 1024 / 1024, self::MAX_FILE_SIZE / 1024 / 1024));
+            throw new FileException(sprintf('Le fichier est trop volumineux (%.2f Mo). Taille maximale: %.2f Mo', ($file->getSize() / 1024) / 1024, (self::MAX_FILE_SIZE / 1024) / 1024));
         }
 
         // Vérification du type MIME réel (pas juste l'extension)
@@ -285,11 +283,7 @@ class SecureFileUploadService
      */
     public function uploadBlogImage(UploadedFile $file, string $slug): string
     {
-        return $this->uploadImage(
-            file: $file,
-            subdirectory: 'blog-images',
-            convertToWebP: true,
-        );
+        return $this->uploadImage(file: $file, subdirectory: 'blog-images', convertToWebP: true);
     }
 
     /**

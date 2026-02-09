@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\ProjectSubTask;
@@ -14,8 +16,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class ProjectSubTaskFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly ?CompanyContext $companyContext)
-    {
+    public function __construct(
+        private readonly ?CompanyContext $companyContext,
+    ) {
         parent::__construct();
     }
 
@@ -25,9 +28,7 @@ final class ProjectSubTaskFactory extends PersistentObjectFactory
         $faker = self::faker();
 
         $initial   = (string) $faker->randomFloat(2, 1, 40);
-        $remaining = $faker->boolean(70)
-            ? (string) $faker->randomFloat(2, 0, (float) $initial)
-            : '0.00';
+        $remaining = $faker->boolean(70) ? (string) $faker->randomFloat(2, 0, (float) $initial) : '0.00';
 
         // Try to get company from context (for multi-tenant tests), fallback to creating new company
         $company = null;

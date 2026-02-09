@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Order;
@@ -18,10 +20,14 @@ class OrderPaymentScheduleCoverageTest extends TestCase
         $order = new Order();
         $order->setOrderNumber('DTEST-001');
 
-        $section = new OrderSection()->setOrder($order)->setTitle('S1');
+        $section = new OrderSection()
+            ->setOrder($order)
+            ->setTitle('S1');
 
-        $profile = new Profile()->setName('Dev')->setDefaultDailyRate('600');
-        $line    = new OrderLine()
+        $profile = new Profile()
+            ->setName('Dev')
+            ->setDefaultDailyRate('600');
+        $line = new OrderLine()
             ->setSection($section)
             ->setDescription('L1')
             ->setType('service')

@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class InvoiceController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -44,19 +44,21 @@ class InvoiceController extends AbstractController
         $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
         $saved      = $session->has('invoice_filters') ? (array) $session->get('invoice_filters') : [];
 
-        $clientId  = $hasFilter ? ($request->query->get('client') ?? null) : ($saved['client'] ?? null);
-        $projectId = $hasFilter ? ($request->query->get('project') ?? null) : ($saved['project'] ?? null);
-        $status    = $hasFilter ? ($request->query->get('status') ?? null) : ($saved['status'] ?? null);
-        $startDate = $hasFilter ? ($request->query->get('start_date') ?? null) : ($saved['start_date'] ?? null);
-        $endDate   = $hasFilter ? ($request->query->get('end_date') ?? null) : ($saved['end_date'] ?? null);
+        $clientId  = $hasFilter ? $request->query->get('client')     ?? null : $saved['client'] ?? null;
+        $projectId = $hasFilter ? $request->query->get('project')    ?? null : $saved['project'] ?? null;
+        $status    = $hasFilter ? $request->query->get('status')     ?? null : $saved['status'] ?? null;
+        $startDate = $hasFilter ? $request->query->get('start_date') ?? null : $saved['start_date'] ?? null;
+        $endDate   = $hasFilter ? $request->query->get('end_date')   ?? null : $saved['end_date'] ?? null;
 
         // Optimisation: getReference() pour les filtres QueryBuilder (accepte les proxies)
         $client  = $clientId ? $em->getReference(Client::class, $clientId) : null;
         $project = $projectId ? $em->getReference(Project::class, $projectId) : null;
 
         // Tri
-        $sort = $hasFilter ? ($request->query->get('sort') ?? ($saved['sort'] ?? 'issuedAt')) : ($saved['sort'] ?? 'issuedAt');
-        $dir  = $hasFilter ? ($request->query->get('dir') ?? ($saved['dir'] ?? 'DESC')) : ($saved['dir'] ?? 'DESC');
+        $sort = $hasFilter
+            ? $request->query->get('sort')              ?? $saved['sort'] ?? 'issuedAt'
+            : $saved['sort']                            ?? 'issuedAt';
+        $dir = $hasFilter ? $request->query->get('dir') ?? $saved['dir'] ?? 'DESC' : $saved['dir'] ?? 'DESC';
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
@@ -66,7 +68,9 @@ class InvoiceController extends AbstractController
         $offset         = ($page - 1) * $perPage;
 
         // Requête avec filtres
-        $qb = $em->getRepository(Invoice::class)->createQueryBuilder('i')
+        $qb = $em
+            ->getRepository(Invoice::class)
+            ->createQueryBuilder('i')
             ->leftJoin('i.client', 'c')
             ->leftJoin('i.project', 'p')
             ->addSelect('c', 'p');
@@ -101,7 +105,8 @@ class InvoiceController extends AbstractController
         $qb->orderBy($sortField, strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC');
 
         // Total - recréer les joins pour le comptage
-        $qbCount = $em->createQueryBuilder()
+        $qbCount = $em
+            ->createQueryBuilder()
             ->select('COUNT(i2.id)')
             ->from(Invoice::class, 'i2')
             ->leftJoin('i2.client', 'c2')
@@ -138,7 +143,7 @@ class InvoiceController extends AbstractController
             'total'        => $total,
             'total_pages'  => (int) ceil($total / $perPage),
             'has_prev'     => $page > 1,
-            'has_next'     => $page * $perPage < $total,
+            'has_next'     => ($page * $perPage) < $total,
         ];
 
         // Sauvegarder les filtres
@@ -235,7 +240,9 @@ class InvoiceController extends AbstractController
     #[Route('/{id}', name: 'invoice_show', methods: ['GET'])]
     public function show(int $id, EntityManagerInterface $em): Response
     {
-        $invoice = $em->getRepository(Invoice::class)->createQueryBuilder('i')
+        $invoice = $em
+            ->getRepository(Invoice::class)
+            ->createQueryBuilder('i')
             ->leftJoin('i.client', 'c')
             ->leftJoin('i.project', 'p')
             ->leftJoin('i.order', 'o')
@@ -369,19 +376,10 @@ class InvoiceController extends AbstractController
         ];
 
         // Générer le nom du fichier
-        $filename = sprintf(
-            'facture_%s_%s.pdf',
-            $invoice->getInvoiceNumber(),
-            new DateTime()->format('Y-m-d'),
-        );
+        $filename = sprintf('facture_%s_%s.pdf', $invoice->getInvoiceNumber(), new DateTime()->format('Y-m-d'));
 
         // Générer et retourner le PDF
-        return $pdfGenerator->createPdfResponse(
-            'invoice/pdf.html.twig',
-            $data,
-            $filename,
-            inline: false, // Force le téléchargement
-        );
+        return $pdfGenerator->createPdfResponse('invoice/pdf.html.twig', $data, $filename, inline: false); // Force le téléchargement
     }
 
     #[Route('/{id}/pdf/preview', name: 'invoice_pdf_preview', methods: ['GET'])]
@@ -405,12 +403,7 @@ class InvoiceController extends AbstractController
         $filename = sprintf('facture_%s_preview.pdf', $invoice->getInvoiceNumber());
 
         // Affiche le PDF dans le navigateur
-        return $pdfGenerator->createPdfResponse(
-            'invoice/pdf.html.twig',
-            $data,
-            $filename,
-            inline: true, // Affichage dans le navigateur
-        );
+        return $pdfGenerator->createPdfResponse('invoice/pdf.html.twig', $data, $filename, inline: true); // Affichage dans le navigateur
     }
 
     /**
@@ -440,7 +433,9 @@ class InvoiceController extends AbstractController
         $end   = new DateTime($endDate);
 
         // Construire la requête avec les mêmes filtres que l'index
-        $qb = $em->getRepository(Invoice::class)->createQueryBuilder('i')
+        $qb = $em
+            ->getRepository(Invoice::class)
+            ->createQueryBuilder('i')
             ->leftJoin('i.client', 'c')
             ->leftJoin('i.project', 'p')
             ->addSelect('c', 'p')
@@ -474,24 +469,24 @@ class InvoiceController extends AbstractController
 
         // En-têtes FEC (18 colonnes obligatoires)
         $headers = [
-            'JournalCode',      // Code journal
-            'JournalLib',       // Libellé journal
-            'EcritureNum',      // Numéro écriture
-            'EcritureDate',     // Date écriture (YYYYMMDD)
-            'CompteNum',        // Numéro compte
-            'CompteLib',        // Libellé compte
-            'CompAuxNum',       // Compte auxiliaire (client/fournisseur)
-            'CompAuxLib',       // Libellé compte auxiliaire
-            'PieceRef',         // Référence pièce
-            'PieceDate',        // Date pièce (YYYYMMDD)
-            'EcritureLib',      // Libellé écriture
-            'Debit',            // Montant débit
-            'Credit',           // Montant crédit
-            'EcritureLet',      // Lettrage
-            'DateLet',          // Date lettrage
-            'ValidDate',        // Date validation
-            'Montantdevise',    // Montant devise
-            'Idevise',          // Identifiant devise
+            'JournalCode', // Code journal
+            'JournalLib', // Libellé journal
+            'EcritureNum', // Numéro écriture
+            'EcritureDate', // Date écriture (YYYYMMDD)
+            'CompteNum', // Numéro compte
+            'CompteLib', // Libellé compte
+            'CompAuxNum', // Compte auxiliaire (client/fournisseur)
+            'CompAuxLib', // Libellé compte auxiliaire
+            'PieceRef', // Référence pièce
+            'PieceDate', // Date pièce (YYYYMMDD)
+            'EcritureLib', // Libellé écriture
+            'Debit', // Montant débit
+            'Credit', // Montant crédit
+            'EcritureLet', // Lettrage
+            'DateLet', // Date lettrage
+            'ValidDate', // Date validation
+            'Montantdevise', // Montant devise
+            'Idevise', // Identifiant devise
         ];
 
         $output .= implode('|', $headers)."\n";
@@ -500,11 +495,13 @@ class InvoiceController extends AbstractController
         foreach ($invoices as $invoice) {
             $invoiceNumber = $invoice->getInvoiceNumber();
             $ecritureNum   = str_replace('-', '', $invoiceNumber); // Numéro écriture unique
-            $clientCode    = $invoice->getClient() ? 'C'.str_pad((string) $invoice->getClient()->getId(), 6, '0', STR_PAD_LEFT) : 'C000000';
-            $clientName    = $invoice->getClient() ? $invoice->getClient()->getName() : 'Client inconnu';
-            $totalHT       = $invoice->getAmountHt();
-            $totalTTC      = $invoice->getAmountTtc();
-            $tva           = bcsub((string) $totalTTC, (string) $totalHT, 2);
+            $clientCode    = $invoice->getClient()
+                ? 'C'.str_pad((string) $invoice->getClient()->getId(), 6, '0', STR_PAD_LEFT)
+                : 'C000000';
+            $clientName = $invoice->getClient() ? $invoice->getClient()->getName() : 'Client inconnu';
+            $totalHT    = $invoice->getAmountHt();
+            $totalTTC   = $invoice->getAmountTtc();
+            $tva        = bcsub((string) $totalTTC, (string) $totalHT, 2);
 
             // Date au format YYYYMMDD
             $dateFormat      = $invoice->getIssuedAt()->format('Ymd');
@@ -512,11 +509,11 @@ class InvoiceController extends AbstractController
 
             // Ligne 1 : Débit client (411xxx)
             $line1 = [
-                'VTE',                                    // Journal des ventes
+                'VTE', // Journal des ventes
                 'Journal des ventes',
                 $ecritureNum,
                 $dateFormat,
-                '411000',                                 // Compte client
+                '411000', // Compte client
                 'Clients',
                 $clientCode,
                 $clientName,
@@ -524,9 +521,9 @@ class InvoiceController extends AbstractController
                 $dateFormat,
                 'Facture '.$invoiceNumber.' - '.$clientName,
                 number_format((float) $totalTTC, 2, '.', ''), // Débit TTC
-                '0.00',                                   // Crédit
-                '',                                       // Lettrage
-                '',                                       // Date lettrage
+                '0.00', // Crédit
+                '', // Lettrage
+                '', // Date lettrage
                 $validDateFormat,
                 number_format((float) $totalTTC, 2, '.', ''),
                 'EUR',
@@ -539,14 +536,14 @@ class InvoiceController extends AbstractController
                 'Journal des ventes',
                 $ecritureNum,
                 $dateFormat,
-                '707000',                                 // Compte de ventes de services
+                '707000', // Compte de ventes de services
                 'Prestations de services',
                 '',
                 '',
                 $invoiceNumber,
                 $dateFormat,
                 'Facture '.$invoiceNumber.' - '.$clientName,
-                '0.00',                                   // Débit
+                '0.00', // Débit
                 number_format((float) $totalHT, 2, '.', ''), // Crédit HT
                 '',
                 '',
@@ -563,14 +560,14 @@ class InvoiceController extends AbstractController
                     'Journal des ventes',
                     $ecritureNum,
                     $dateFormat,
-                    '445710',                             // TVA collectée
+                    '445710', // TVA collectée
                     'TVA collectée',
                     '',
                     '',
                     $invoiceNumber,
                     $dateFormat,
                     'TVA facture '.$invoiceNumber,
-                    '0.00',                               // Débit
+                    '0.00', // Débit
                     number_format((float) $tva, 2, '.', ''), // Crédit TVA
                     '',
                     '',
@@ -583,11 +580,7 @@ class InvoiceController extends AbstractController
         }
 
         // Générer le fichier CSV
-        $filename = sprintf(
-            'export_fec_%s_%s.csv',
-            $start->format('Y-m-d'),
-            $end->format('Y-m-d'),
-        );
+        $filename = sprintf('export_fec_%s_%s.csv', $start->format('Y-m-d'), $end->format('Y-m-d'));
 
         $response = new Response($output);
         $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');

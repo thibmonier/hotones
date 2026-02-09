@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use DateTimeInterface;
@@ -43,8 +45,12 @@ class TimeConversionService
                 return number_format($daysTruncated, 1, ',', ' ').'j';
             }
 
-            return number_format($daysTruncated, 1, ',', ' ').'j '.
-                   number_format(floatval($remainingHours), 1, ',', ' ').'h';
+            return
+                number_format($daysTruncated, 1, ',', ' ')
+                .'j '
+                .number_format(floatval($remainingHours), 1, ',', ' ')
+                .'h'
+            ;
         }
 
         return number_format($hoursFloat, 1, ',', ' ').'h';
@@ -113,8 +119,11 @@ class TimeConversionService
     /**
      * Calcule les heures théoriques d'une période.
      */
-    public static function getTheoreticalHours(DateTimeInterface $start, DateTimeInterface $end, float $dailyHours = self::HOURS_PER_DAY): string
-    {
+    public static function getTheoreticalHours(
+        DateTimeInterface $start,
+        DateTimeInterface $end,
+        float $dailyHours = self::HOURS_PER_DAY,
+    ): string {
         $workingDays = self::getWorkingDaysBetween($start, $end);
 
         return bcmul((string) $workingDays, (string) $dailyHours, 2);

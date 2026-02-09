@@ -27,11 +27,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $orderRepository       = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
 
-        $orderRepository
-            ->expects($this->once())
-            ->method('findBy')
-            ->with(['status' => 'a_signer'])
-            ->willReturn([]);
+        $orderRepository->expects($this->once())->method('findBy')->with(['status' => 'a_signer'])->willReturn([]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
         $result  = $service->analyzePipeline();
@@ -49,10 +45,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $orderRepository       = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
 
-        $orderRepository
-            ->expects($this->once())
-            ->method('findBy')
-            ->willReturn([]);
+        $orderRepository->expects($this->once())->method('findBy')->willReturn([]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
 
@@ -142,10 +135,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $order->setStatus('a_signer');
         $order->addSection($section);
 
-        $orderRepository
-            ->expects($this->once())
-            ->method('findBy')
-            ->willReturn([$order]);
+        $orderRepository->expects($this->once())->method('findBy')->willReturn([$order]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
 
@@ -180,10 +170,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $order->setCreatedAt(new DateTimeImmutable());
         $order->addSection($section);
 
-        $orderRepository
-            ->expects($this->once())
-            ->method('findBy')
-            ->willReturn([$order]);
+        $orderRepository->expects($this->once())->method('findBy')->willReturn([$order]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
         $result  = $service->analyzePipeline();

@@ -21,9 +21,6 @@ class LeadMagnetScheduleProvider implements ScheduleProviderInterface
         return new Schedule()
             // Envoi quotidien des emails de nurturing à 9h du matin
             // Cela donne le temps aux leads de télécharger le guide avant le premier email
-            ->add(
-                RecurringMessage::cron('0 9 * * *', new ProcessNurturingEmailsMessage()),
-            )
-        ;
+            ->add(RecurringMessage::cron('0 9 * * *', new ProcessNurturingEmailsMessage()));
     }
 }

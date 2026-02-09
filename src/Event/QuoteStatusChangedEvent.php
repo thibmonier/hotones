@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Entity\Order;
@@ -12,7 +14,7 @@ class QuoteStatusChangedEvent extends NotificationEvent
     public function __construct(
         private readonly Order $order,
         private readonly OrderStatus $newStatus,
-        array $recipients
+        array $recipients,
     ) {
         $type = match ($newStatus) {
             OrderStatus::WON     => NotificationType::QUOTE_WON,

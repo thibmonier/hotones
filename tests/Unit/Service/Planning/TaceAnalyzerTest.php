@@ -20,7 +20,7 @@ class TaceAnalyzerTest extends TestCase
 {
     private function createService(
         ?ContributorRepository $contributorRepository = null,
-        ?StaffingMetricsRepository $staffingMetricsRepository = null
+        ?StaffingMetricsRepository $staffingMetricsRepository = null,
     ): TaceAnalyzer {
         $contributorRepository     ??= $this->createMock(ContributorRepository::class);
         $staffingMetricsRepository ??= $this->createMock(StaffingMetricsRepository::class);
@@ -281,7 +281,8 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
 
         // Expect findByPeriod to be called with dates from current month
-        $staffingMetricsRepository->expects($this->once())
+        $staffingMetricsRepository
+            ->expects($this->once())
             ->method('findByPeriod')
             ->with(
                 $this->callback(function ($startDate) {
@@ -313,28 +314,25 @@ class TaceAnalyzerTest extends TestCase
         $criticalLowContributor   = $this->createMock(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $contributorRepository->method('findBy')->willReturn([
-            $optimalContributor,
-            $overloadedContributor,
-            $underutilizedContributor,
-            $criticalHighContributor,
-            $criticalLowContributor,
-        ]);
-
-        $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
-        $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function (
-                $start,
-                $end,
-                $granularity,
-                $profile,
-                $contributor
-            ) use (
+        $contributorRepository
+            ->method('findBy')
+            ->willReturn([
                 $optimalContributor,
                 $overloadedContributor,
                 $underutilizedContributor,
                 $criticalHighContributor,
-                $criticalLowContributor
+                $criticalLowContributor,
+            ]);
+
+        $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
+        $staffingMetricsRepository
+            ->method('findByPeriod')
+            ->willReturnCallback(function ($start, $end, $granularity, $profile, $contributor) use (
+                $optimalContributor,
+                $overloadedContributor,
+                $underutilizedContributor,
+                $criticalHighContributor,
+                $criticalLowContributor,
             ) {
                 if ($contributor === $optimalContributor) {
                     return [$this->createMockMetric(80.0, 20.0, 16.0)];
@@ -353,8 +351,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            },
-        );
+            });
 
         $service   = $this->createService($contributorRepository, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
@@ -382,17 +379,12 @@ class TaceAnalyzerTest extends TestCase
         $contributorRepository->method('findBy')->willReturn([$contributor1, $contributor2, $contributor3]);
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
-        $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function (
-                $start,
-                $end,
-                $granularity,
-                $profile,
-                $contributor
-            ) use (
+        $staffingMetricsRepository
+            ->method('findByPeriod')
+            ->willReturnCallback(function ($start, $end, $granularity, $profile, $contributor) use (
                 $contributor1,
                 $contributor2,
-                $contributor3
+                $contributor3,
             ) {
                 if ($contributor === $contributor1) {
                     return [$this->createMockMetric(92.0, 20.0, 18.4)];
@@ -405,8 +397,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            },
-        );
+            });
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
         $result  = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
@@ -428,17 +419,12 @@ class TaceAnalyzerTest extends TestCase
         $contributorRepository->method('findBy')->willReturn([$contributor1, $contributor2, $contributor3]);
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
-        $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function (
-                $start,
-                $end,
-                $granularity,
-                $profile,
-                $contributor
-            ) use (
+        $staffingMetricsRepository
+            ->method('findByPeriod')
+            ->willReturnCallback(function ($start, $end, $granularity, $profile, $contributor) use (
                 $contributor1,
                 $contributor2,
-                $contributor3
+                $contributor3,
             ) {
                 if ($contributor === $contributor1) {
                     return [$this->createMockMetric(65.0, 20.0, 13.0)];
@@ -451,8 +437,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            },
-        );
+            });
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
         $result  = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
@@ -474,17 +459,12 @@ class TaceAnalyzerTest extends TestCase
         $contributorRepository->method('findBy')->willReturn([$contributor1, $contributor2, $contributor3]);
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
-        $staffingMetricsRepository->method('findByPeriod')->willReturnCallback(
-            function (
-                $start,
-                $end,
-                $granularity,
-                $profile,
-                $contributor
-            ) use (
+        $staffingMetricsRepository
+            ->method('findByPeriod')
+            ->willReturnCallback(function ($start, $end, $granularity, $profile, $contributor) use (
                 $contributor1,
                 $contributor2,
-                $contributor3
+                $contributor3,
             ) {
                 if ($contributor === $contributor1) {
                     return [$this->createMockMetric(115.0, 20.0, 23.0)]; // deviation from 80 = 35
@@ -497,8 +477,7 @@ class TaceAnalyzerTest extends TestCase
                 }
 
                 return [];
-            },
-        );
+            });
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
         $result  = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
@@ -518,11 +497,11 @@ class TaceAnalyzerTest extends TestCase
         $method     = $reflection->getMethod('calculateSeverity');
 
         // Test various TACE values
-        $this->assertEquals(0, $method->invoke($service, 80.0));   // Ideal center
-        $this->assertEquals(20, $method->invoke($service, 90.0));  // abs(90-80) * 2
-        $this->assertEquals(20, $method->invoke($service, 70.0));  // abs(70-80) * 2
+        $this->assertEquals(0, $method->invoke($service, 80.0)); // Ideal center
+        $this->assertEquals(20, $method->invoke($service, 90.0)); // abs(90-80) * 2
+        $this->assertEquals(20, $method->invoke($service, 70.0)); // abs(70-80) * 2
         $this->assertEquals(60, $method->invoke($service, 110.0)); // abs(110-80) * 2
-        $this->assertEquals(70, $method->invoke($service, 45.0));  // abs(45-80) * 2
+        $this->assertEquals(70, $method->invoke($service, 45.0)); // abs(45-80) * 2
         $this->assertEquals(100, $method->invoke($service, 130.0)); // min(100, abs(130-80) * 2)
     }
 

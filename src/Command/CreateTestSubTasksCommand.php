@@ -36,9 +36,18 @@ class CreateTestSubTasksCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addOption('per-task', null, InputOption::VALUE_OPTIONAL, 'Nombre de sous-tâches par tâche (3 par défaut)', 3)
-            ->addOption('attach-timesheets', null, InputOption::VALUE_NONE, 'Affecter une partie des timesheets aux sous-tâches créées');
+        $this->addOption(
+            'per-task',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Nombre de sous-tâches par tâche (3 par défaut)',
+            3,
+        )->addOption(
+            'attach-timesheets',
+            null,
+            InputOption::VALUE_NONE,
+            'Affecter une partie des timesheets aux sous-tâches créées',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,7 +73,9 @@ class CreateTestSubTasksCommand extends Command
             foreach ($regularTasks as $task) {
                 /** @var ProjectTask $task */
                 if ($task->getSubTasks()->count() > 0) {
-                    $io->writeln("• Sous-tâches déjà présentes pour {$project->getName()} -> {$task->getName()} (skip)");
+                    $io->writeln(
+                        "• Sous-tâches déjà présentes pour {$project->getName()} -> {$task->getName()} (skip)",
+                    );
                     continue;
                 }
 
@@ -129,7 +140,7 @@ class CreateTestSubTasksCommand extends Command
     {
         $count = max(1, $count);
         $min   = 2;
-        if ($total < $count * $min) {
+        if ($total < ($count * $min)) {
             return array_fill(0, $count, (int) max(1, floor($total / $count)));
         }
         $remaining = $total - ($count * $min);
@@ -158,8 +169,13 @@ class CreateTestSubTasksCommand extends Command
                 continue;
             }
             // Si possible, choisir une sous-tâche assignée au même contributeur
-            $matching = array_values(array_filter($subTasks, fn (ProjectSubTask $st): bool => $st->getAssignee() && $st->getAssignee()->getId() === $ts->getContributor()->getId()));
-            $chosen   = $matching ? $matching[array_rand($matching)] : $subTasks[array_rand($subTasks)];
+            $matching = array_values(array_filter(
+                $subTasks,
+                fn (ProjectSubTask $st): bool => $st->getAssignee()
+                    && $st->getAssignee()->getId() === $ts->getContributor()->getId()
+                ,
+            ));
+            $chosen = $matching ? $matching[array_rand($matching)] : $subTasks[array_rand($subTasks)];
             $ts->setSubTask($chosen);
             ++$count;
         }

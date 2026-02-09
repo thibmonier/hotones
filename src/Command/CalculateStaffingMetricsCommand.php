@@ -26,7 +26,7 @@ class CalculateStaffingMetricsCommand extends Command
 {
     public function __construct(
         private readonly StaffingMetricsCalculationService $staffingService,
-        private readonly StaffingMetricsRepository $staffingRepo
+        private readonly StaffingMetricsRepository $staffingRepo,
     ) {
         parent::__construct();
     }
@@ -35,9 +35,26 @@ class CalculateStaffingMetricsCommand extends Command
     {
         $this
             ->addArgument('period', InputArgument::OPTIONAL, 'Période à calculer (YYYY ou YYYY-MM)', date('Y'))
-            ->addOption('granularity', 'g', InputOption::VALUE_OPTIONAL, 'Granularité (monthly, quarterly, weekly)', 'monthly')
-            ->addOption('force-recalculate', 'f', InputOption::VALUE_NONE, 'Force le re-calcul même si les données existent')
-            ->addOption('range', 'r', InputOption::VALUE_OPTIONAL, 'Range en mois (-6 à +6 par défaut pour dashboard)', '12')
+            ->addOption(
+                'granularity',
+                'g',
+                InputOption::VALUE_OPTIONAL,
+                'Granularité (monthly, quarterly, weekly)',
+                'monthly',
+            )
+            ->addOption(
+                'force-recalculate',
+                'f',
+                InputOption::VALUE_NONE,
+                'Force le re-calcul même si les données existent',
+            )
+            ->addOption(
+                'range',
+                'r',
+                InputOption::VALUE_OPTIONAL,
+                'Range en mois (-6 à +6 par défaut pour dashboard)',
+                '12',
+            )
             ->setHelp('
 Cette commande calcule les métriques de staffing pour une période donnée.
 Elle génère le taux de staffing et le TACE pour tous les contributeurs actifs.
@@ -114,17 +131,15 @@ Exemples :
                 $deleted = $this->staffingRepo->deleteForDateRange($startDate, $endDate, $granularity);
                 $io->info("$deleted métriques supprimées.");
             } elseif ($this->staffingRepo->existsForPeriod($startDate, $granularity)) {
-                $io->warning('Des métriques existent déjà pour cette période. Utilisez --force-recalculate pour recalculer.');
+                $io->warning(
+                    'Des métriques existent déjà pour cette période. Utilisez --force-recalculate pour recalculer.',
+                );
 
                 return Command::SUCCESS;
             }
 
             // Calculer et enregistrer les métriques
-            $metricsCreated = $this->staffingService->calculateAndStoreMetrics(
-                $startDate,
-                $endDate,
-                $granularity,
-            );
+            $metricsCreated = $this->staffingService->calculateAndStoreMetrics($startDate, $endDate, $granularity);
 
             $io->success("Calcul terminé ! $metricsCreated métriques créées.");
 
@@ -132,7 +147,9 @@ Exemples :
             $io->section('Prochaines étapes');
             $io->writeln('• Consultez le dashboard de staffing : /staffing/dashboard');
             $io->writeln('• Configurez une tâche cron pour un calcul automatique :');
-            $io->writeln('  0 6 * * * cd /path/to/project && php bin/console app:calculate-staffing-metrics --range=12');
+            $io->writeln(
+                '  0 6 * * * cd /path/to/project && php bin/console app:calculate-staffing-metrics --range=12',
+            );
 
             return Command::SUCCESS;
         } catch (Exception $e) {

@@ -15,10 +15,8 @@ use Override;
  */
 class SubscriptionRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Subscription::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class SubscriptionRepository extends CompanyAwareRepository
      */
     public function findAllActive(): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
@@ -47,7 +46,8 @@ class SubscriptionRepository extends CompanyAwareRepository
     #[Override]
     public function findAll(): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
@@ -62,7 +62,8 @@ class SubscriptionRepository extends CompanyAwareRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
@@ -82,7 +83,8 @@ class SubscriptionRepository extends CompanyAwareRepository
         $today   = new DateTime();
         $endDate = (clone $today)->modify("+{$days} days");
 
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')
@@ -134,11 +136,7 @@ class SubscriptionRepository extends CompanyAwareRepository
     {
         $qb = $this->createCompanyQueryBuilder('s');
 
-        $result = $qb
-            ->select('s.status', 'COUNT(s.id) as count')
-            ->groupBy('s.status')
-            ->getQuery()
-            ->getResult();
+        $result = $qb->select('s.status', 'COUNT(s.id) as count')->groupBy('s.status')->getQuery()->getResult();
 
         $counts = [];
         foreach ($result as $row) {
@@ -189,7 +187,8 @@ class SubscriptionRepository extends CompanyAwareRepository
      */
     public function countActive(): int
     {
-        return (int) $this->createCompanyQueryBuilder('s')
+        return (int) $this
+            ->createCompanyQueryBuilder('s')
             ->select('COUNT(s.id)')
             ->andWhere('s.active = :active')
             ->andWhere('s.status = :status')
@@ -204,7 +203,8 @@ class SubscriptionRepository extends CompanyAwareRepository
      */
     public function findDueForRenewal(): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->leftJoin('s.vendor', 'v')
             ->leftJoin('s.provider', 'p')
             ->addSelect('v', 'p')

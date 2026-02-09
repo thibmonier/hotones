@@ -15,14 +15,14 @@ use DateTime;
 class TaceAnalyzer
 {
     // Seuils de TACE (en pourcentage)
-    private const int TACE_IDEAL_MIN     = 70;  // En dessous = sous-utilisation
-    private const int TACE_IDEAL_MAX     = 90;  // Au-dessus = surcharge
-    private const int TACE_CRITICAL_LOW  = 50;  // Sous-utilisation critique
+    private const int TACE_IDEAL_MIN     = 70; // En dessous = sous-utilisation
+    private const int TACE_IDEAL_MAX     = 90; // Au-dessus = surcharge
+    private const int TACE_CRITICAL_LOW  = 50; // Sous-utilisation critique
     private const int TACE_CRITICAL_HIGH = 110; // Surcharge critique
 
     public function __construct(
         private readonly ContributorRepository $contributorRepository,
-        private readonly StaffingMetricsRepository $staffingMetricsRepository
+        private readonly StaffingMetricsRepository $staffingMetricsRepository,
     ) {
     }
 
@@ -81,13 +81,7 @@ class TaceAnalyzer
     public function analyzeContributor(Contributor $contributor, DateTime $startDate, DateTime $endDate): array
     {
         // Récupérer les métriques de staffing pour la période
-        $metrics = $this->staffingMetricsRepository->findByPeriod(
-            $startDate,
-            $endDate,
-            'weekly',
-            null,
-            $contributor,
-        );
+        $metrics = $this->staffingMetricsRepository->findByPeriod($startDate, $endDate, 'weekly', null, $contributor);
 
         if (empty($metrics)) {
             return [

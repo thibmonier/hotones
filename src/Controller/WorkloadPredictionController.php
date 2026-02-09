@@ -20,7 +20,7 @@ class WorkloadPredictionController extends AbstractController
 {
     public function __construct(
         private readonly WorkloadPredictionService $predictionService,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -33,22 +33,23 @@ class WorkloadPredictionController extends AbstractController
 
         // Convertir en entiers
         $profileIds     = array_map(intval(...), array_filter($profileIds, fn ($v): bool => $v !== null && $v !== ''));
-        $contributorIds = array_map(intval(...), array_filter($contributorIds, fn ($v): bool => $v !== null && $v !== ''));
+        $contributorIds = array_map(
+            intval(...),
+            array_filter($contributorIds, fn ($v): bool => $v !== null && $v !== ''),
+        );
 
         // Analyser le pipeline avec filtres
         $analysis = $this->predictionService->analyzePipeline($profileIds, $contributorIds);
 
         // Récupérer tous les profils actifs pour le filtre
-        $allProfiles = $this->entityManager->getRepository(Profile::class)->findBy(
-            ['active' => true],
-            ['name' => 'ASC'],
-        );
+        $allProfiles = $this->entityManager->getRepository(Profile::class)->findBy(['active' => true], [
+            'name' => 'ASC',
+        ]);
 
         // Récupérer tous les collaborateurs actifs pour le filtre
-        $allContributors = $this->entityManager->getRepository(Contributor::class)->findBy(
-            ['active' => true],
-            ['firstName' => 'ASC'],
-        );
+        $allContributors = $this->entityManager->getRepository(Contributor::class)->findBy(['active' => true], [
+            'firstName' => 'ASC',
+        ]);
 
         return $this->render('staffing/prediction.html.twig', [
             'pipeline'             => $analysis['pipeline'],

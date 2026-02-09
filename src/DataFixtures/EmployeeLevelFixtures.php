@@ -21,24 +21,108 @@ class EmployeeLevelFixtures extends Fixture implements DependentFixtureInterface
      */
     private const LEVELS_CONFIG = [
         // Juniors (1-3)
-        1 => ['name' => 'Junior 1', 'salaryMin' => 28000, 'salaryMax' => 32000, 'salaryTarget' => 30000, 'tjm' => 350, 'color' => '#90CAF9'],
-        2 => ['name' => 'Junior 2', 'salaryMin' => 32000, 'salaryMax' => 36000, 'salaryTarget' => 34000, 'tjm' => 400, 'color' => '#64B5F6'],
-        3 => ['name' => 'Junior 3', 'salaryMin' => 36000, 'salaryMax' => 40000, 'salaryTarget' => 38000, 'tjm' => 450, 'color' => '#42A5F5'],
+        1 => [
+            'name'         => 'Junior 1',
+            'salaryMin'    => 28000,
+            'salaryMax'    => 32000,
+            'salaryTarget' => 30000,
+            'tjm'          => 350,
+            'color'        => '#90CAF9',
+        ],
+        2 => [
+            'name'         => 'Junior 2',
+            'salaryMin'    => 32000,
+            'salaryMax'    => 36000,
+            'salaryTarget' => 34000,
+            'tjm'          => 400,
+            'color'        => '#64B5F6',
+        ],
+        3 => [
+            'name'         => 'Junior 3',
+            'salaryMin'    => 36000,
+            'salaryMax'    => 40000,
+            'salaryTarget' => 38000,
+            'tjm'          => 450,
+            'color'        => '#42A5F5',
+        ],
 
         // Expérimentés / Confirmés (4-6)
-        4 => ['name' => 'Confirmé 1', 'salaryMin' => 40000, 'salaryMax' => 45000, 'salaryTarget' => 42500, 'tjm' => 500, 'color' => '#81C784'],
-        5 => ['name' => 'Confirmé 2', 'salaryMin' => 45000, 'salaryMax' => 50000, 'salaryTarget' => 47500, 'tjm' => 550, 'color' => '#66BB6A'],
-        6 => ['name' => 'Confirmé 3', 'salaryMin' => 50000, 'salaryMax' => 55000, 'salaryTarget' => 52500, 'tjm' => 600, 'color' => '#4CAF50'],
+        4 => [
+            'name'         => 'Confirmé 1',
+            'salaryMin'    => 40000,
+            'salaryMax'    => 45000,
+            'salaryTarget' => 42500,
+            'tjm'          => 500,
+            'color'        => '#81C784',
+        ],
+        5 => [
+            'name'         => 'Confirmé 2',
+            'salaryMin'    => 45000,
+            'salaryMax'    => 50000,
+            'salaryTarget' => 47500,
+            'tjm'          => 550,
+            'color'        => '#66BB6A',
+        ],
+        6 => [
+            'name'         => 'Confirmé 3',
+            'salaryMin'    => 50000,
+            'salaryMax'    => 55000,
+            'salaryTarget' => 52500,
+            'tjm'          => 600,
+            'color'        => '#4CAF50',
+        ],
 
         // Seniors (7-9)
-        7 => ['name' => 'Senior 1', 'salaryMin' => 55000, 'salaryMax' => 62000, 'salaryTarget' => 58500, 'tjm' => 650, 'color' => '#FFB74D'],
-        8 => ['name' => 'Senior 2', 'salaryMin' => 62000, 'salaryMax' => 70000, 'salaryTarget' => 66000, 'tjm' => 700, 'color' => '#FFA726'],
-        9 => ['name' => 'Senior 3', 'salaryMin' => 70000, 'salaryMax' => 78000, 'salaryTarget' => 74000, 'tjm' => 750, 'color' => '#FF9800'],
+        7 => [
+            'name'         => 'Senior 1',
+            'salaryMin'    => 55000,
+            'salaryMax'    => 62000,
+            'salaryTarget' => 58500,
+            'tjm'          => 650,
+            'color'        => '#FFB74D',
+        ],
+        8 => [
+            'name'         => 'Senior 2',
+            'salaryMin'    => 62000,
+            'salaryMax'    => 70000,
+            'salaryTarget' => 66000,
+            'tjm'          => 700,
+            'color'        => '#FFA726',
+        ],
+        9 => [
+            'name'         => 'Senior 3',
+            'salaryMin'    => 70000,
+            'salaryMax'    => 78000,
+            'salaryTarget' => 74000,
+            'tjm'          => 750,
+            'color'        => '#FF9800',
+        ],
 
         // Leads / Experts (10-12)
-        10 => ['name' => 'Lead 1', 'salaryMin' => 78000, 'salaryMax' => 88000, 'salaryTarget' => 83000, 'tjm' => 850, 'color' => '#E57373'],
-        11 => ['name' => 'Lead 2', 'salaryMin' => 88000, 'salaryMax' => 100000, 'salaryTarget' => 94000, 'tjm' => 950, 'color' => '#EF5350'],
-        12 => ['name' => 'Expert', 'salaryMin' => 100000, 'salaryMax' => 120000, 'salaryTarget' => 110000, 'tjm' => 1100, 'color' => '#F44336'],
+        10 => [
+            'name'         => 'Lead 1',
+            'salaryMin'    => 78000,
+            'salaryMax'    => 88000,
+            'salaryTarget' => 83000,
+            'tjm'          => 850,
+            'color'        => '#E57373',
+        ],
+        11 => [
+            'name'         => 'Lead 2',
+            'salaryMin'    => 88000,
+            'salaryMax'    => 100000,
+            'salaryTarget' => 94000,
+            'tjm'          => 950,
+            'color'        => '#EF5350',
+        ],
+        12 => [
+            'name'         => 'Expert',
+            'salaryMin'    => 100000,
+            'salaryMax'    => 120000,
+            'salaryTarget' => 110000,
+            'tjm'          => 1100,
+            'color'        => '#F44336',
+        ],
     ];
 
     private const LEVELS_DESCRIPTIONS = [

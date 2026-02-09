@@ -24,7 +24,7 @@ class AnalyzeProjectRisksCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly ProjectRiskAnalyzer $riskAnalyzer
+        private readonly ProjectRiskAnalyzer $riskAnalyzer,
     ) {
         parent::__construct();
     }
@@ -33,7 +33,13 @@ class AnalyzeProjectRisksCommand extends Command
     {
         $this
             ->addOption('critical-only', 'c', InputOption::VALUE_NONE, 'Afficher uniquement les projets critiques')
-            ->addOption('min-score', 'm', InputOption::VALUE_REQUIRED, 'Score minimum (afficher les projets en dessous de ce score)', 80)
+            ->addOption(
+                'min-score',
+                'm',
+                InputOption::VALUE_REQUIRED,
+                'Score minimum (afficher les projets en dessous de ce score)',
+                80,
+            )
             ->addOption('verbose-risks', 'r', InputOption::VALUE_NONE, 'Afficher le détail des risques');
     }
 
@@ -50,10 +56,9 @@ class AnalyzeProjectRisksCommand extends Command
 
         // Récupérer tous les projets actifs ou en cours
         $io->section('Récupération des projets...');
-        $projects = $this->em->getRepository(Project::class)->findBy(
-            ['status' => ['in_progress', 'active']],
-            ['name' => 'ASC'],
-        );
+        $projects = $this->em->getRepository(Project::class)->findBy(['status' => ['in_progress', 'active']], [
+            'name' => 'ASC',
+        ]);
 
         $io->writeln(sprintf('✓ %d projets actifs trouvés', count($projects)));
 
@@ -63,16 +68,10 @@ class AnalyzeProjectRisksCommand extends Command
 
         // Filtrer selon les options
         if ($criticalOnly) {
-            $atRiskProjects = array_filter(
-                $atRiskProjects,
-                fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
-            );
+            $atRiskProjects = array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'critical');
             $io->writeln('Filtrage: projets critiques uniquement');
         } elseif ($minScore < 80) {
-            $atRiskProjects = array_filter(
-                $atRiskProjects,
-                fn ($p): bool => $p['analysis']['healthScore'] < $minScore,
-            );
+            $atRiskProjects = array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['healthScore'] < $minScore);
             $io->writeln(sprintf('Filtrage: score < %d', $minScore));
         }
 
@@ -80,22 +79,29 @@ class AnalyzeProjectRisksCommand extends Command
         $stats = [
             'total'    => count($projects),
             'atRisk'   => count($atRiskProjects),
-            'critical' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'critical')),
-            'high'     => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
-            'medium'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
+            'critical' => count(array_filter(
+                $atRiskProjects,
+                fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
+            )),
+            'high'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'medium' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
         $io->section('Résumé');
-        $io->horizontalTable(
-            ['Métrique', 'Valeur'],
+        $io->horizontalTable(['Métrique', 'Valeur'], [
+            ['Projets actifs', $stats['total']],
             [
-                ['Projets actifs', $stats['total']],
-                ['Projets à risque', sprintf('%d (%.1f%%)', $stats['atRisk'], $stats['total'] > 0 ? ($stats['atRisk'] / $stats['total']) * 100 : 0)],
-                ['Critiques', $stats['critical']],
-                ['Risque élevé', $stats['high']],
-                ['Risque moyen', $stats['medium']],
+                'Projets à risque',
+                sprintf(
+                    '%d (%.1f%%)',
+                    $stats['atRisk'],
+                    $stats['total'] > 0 ? ($stats['atRisk'] / $stats['total']) * 100 : 0,
+                ),
             ],
-        );
+            ['Critiques', $stats['critical']],
+            ['Risque élevé', $stats['high']],
+            ['Risque moyen', $stats['medium']],
+        ]);
 
         // Afficher les projets à risque
         if (count($atRiskProjects) === 0) {
@@ -122,7 +128,11 @@ class AnalyzeProjectRisksCommand extends Command
             };
 
             $table->addRow([
-                sprintf('<fg=%s>%d%%</>', $analysis['healthScore'] < 40 ? 'red' : ($analysis['healthScore'] < 60 ? 'yellow' : 'white'), $analysis['healthScore']),
+                sprintf(
+                    '<fg=%s>%d%%</>',
+                    $analysis['healthScore'] < 40 ? 'red' : ($analysis['healthScore'] < 60 ? 'yellow' : 'white'),
+                    $analysis['healthScore'],
+                ),
                 $riskLevel,
                 $project->getName(),
                 $project->getClient()?->getName() ?? '-',
@@ -164,10 +174,7 @@ class AnalyzeProjectRisksCommand extends Command
         }
 
         if ($stats['high'] > 0) {
-            $io->note(sprintf(
-                '%d projet(s) avec un risque élevé à surveiller.',
-                $stats['high'],
-            ));
+            $io->note(sprintf('%d projet(s) avec un risque élevé à surveiller.', $stats['high']));
         }
 
         // Lien vers le dashboard

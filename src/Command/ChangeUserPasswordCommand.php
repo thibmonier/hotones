@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\User;
@@ -24,9 +26,11 @@ class ChangeUserPasswordCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addArgument('email', InputArgument::REQUIRED, 'User email address')
-            ->addArgument('new-password', InputArgument::REQUIRED, 'New password');
+        $this->addArgument('email', InputArgument::REQUIRED, 'User email address')->addArgument(
+            'new-password',
+            InputArgument::REQUIRED,
+            'New password',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

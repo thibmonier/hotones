@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class SearchController extends AbstractController
 {
     public function __construct(
-        private readonly GlobalSearchService $searchService
+        private readonly GlobalSearchService $searchService,
     ) {
     }
 

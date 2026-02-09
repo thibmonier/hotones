@@ -16,8 +16,9 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class PlanningFactory extends PersistentObjectFactory
 {
-    public function __construct(private readonly ?CompanyContext $companyContext)
-    {
+    public function __construct(
+        private readonly ?CompanyContext $companyContext,
+    ) {
         parent::__construct();
     }
 

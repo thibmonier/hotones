@@ -50,37 +50,27 @@ class ProfileCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('name', 'Nom')
-            ->setRequired(true);
+        yield TextField::new('name', 'Nom')->setRequired(true);
 
-        yield TextareaField::new('description', 'Description')
-            ->hideOnIndex();
+        yield TextareaField::new('description', 'Description')->hideOnIndex();
 
-        yield MoneyField::new('defaultDailyRate', 'TJM par défaut')
-            ->setCurrency('EUR')
-            ->setNumDecimals(2);
+        yield MoneyField::new('defaultDailyRate', 'TJM par défaut')->setCurrency('EUR')->setNumDecimals(2);
 
-        yield MoneyField::new('cjm', 'CJM (Coût Journalier Moyen)')
-            ->setCurrency('EUR')
-            ->setNumDecimals(2);
+        yield MoneyField::new('cjm', 'CJM (Coût Journalier Moyen)')->setCurrency('EUR')->setNumDecimals(2);
 
-        yield NumberField::new('marginCoefficient', 'Coefficient de marge')
-            ->setNumDecimals(2);
+        yield NumberField::new('marginCoefficient', 'Coefficient de marge')->setNumDecimals(2);
 
         yield ColorField::new('color', 'Couleur');
 
-        yield BooleanField::new('active', 'Actif')
-            ->renderAsSwitch(false);
+        yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);
     }
 
     #[Override]
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters
-            ->add(BooleanFilter::new('active', 'Actif'));
+        return $filters->add(BooleanFilter::new('active', 'Actif'));
     }
 
     #[Override]

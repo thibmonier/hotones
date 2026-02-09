@@ -63,7 +63,14 @@ class ProfitabilityPredictor
         $currentMargin = $soldAmount > 0 ? (($soldAmount - $currentCost) / $soldAmount) * 100 : 0;
 
         // Prédiction de la marge finale
-        $predictedMargin = $this->calculatePredictedMargin($project, $progress, $soldAmount, $soldHours, $spentHours, $costPerDay);
+        $predictedMargin = $this->calculatePredictedMargin(
+            $project,
+            $progress,
+            $soldAmount,
+            $soldHours,
+            $spentHours,
+            $costPerDay,
+        );
 
         // Analyse de dérive budgétaire
         $budgetDrift = $this->analyzeBudgetDrift($progress, $soldHours, $spentHours);
@@ -94,7 +101,7 @@ class ProfitabilityPredictor
         float $soldAmount,
         float $soldHours,
         float $spentHours,
-        float $costPerDay
+        float $costPerDay,
     ): array {
         // Estimation linéaire basée sur le rythme actuel
         $burnRate            = $progress > 0 ? $spentHours / $progress : 0;
@@ -123,9 +130,7 @@ class ProfitabilityPredictor
     {
         $expectedHoursAtProgress = ($soldHours * $progress) / 100;
         $overrun                 = $spentHours - $expectedHoursAtProgress;
-        $overrunPercentage       = $expectedHoursAtProgress > 0
-            ? ($overrun / $expectedHoursAtProgress) * 100
-            : 0;
+        $overrunPercentage       = $expectedHoursAtProgress > 0 ? ($overrun / $expectedHoursAtProgress) * 100 : 0;
 
         $severity = 'low';
         if ($overrunPercentage > 30) {
@@ -255,7 +260,7 @@ class ProfitabilityPredictor
         float $soldHours,
         float $spentHours,
         float $progress,
-        float $costPerDay
+        float $costPerDay,
     ): array {
         $burnRate = $progress > 0 ? $spentHours / $progress : 0;
 

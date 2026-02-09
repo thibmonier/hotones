@@ -21,7 +21,7 @@ class HrDashboardController extends AbstractController
     public function __construct(
         private readonly HrMetricsService $hrMetricsService,
         private readonly SkillGapAnalyzer $skillGapAnalyzer,
-        private readonly TechnologyRepository $technologyRepository
+        private readonly TechnologyRepository $technologyRepository,
     ) {
     }
 

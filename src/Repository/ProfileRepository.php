@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProfileRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Profile::class, $companyContext);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\BlogCategory;
@@ -41,7 +43,6 @@ class BackofficeDashboardController extends AbstractDashboardController
         // if ('jane' === $this->getUser()->getUsername()) {
         //     return $this->redirect('...');
         // }
-
         // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
         // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
         //
@@ -60,8 +61,7 @@ class BackofficeDashboardController extends AbstractDashboardController
     #[Override]
     public function configureAssets(): Assets
     {
-        return Assets::new()
-            ->addJsFile('assets/js/admin/blog-post-image-fields.js');
+        return Assets::new()->addJsFile('assets/js/admin/blog-post-image-fields.js');
     }
 
     #[Override]

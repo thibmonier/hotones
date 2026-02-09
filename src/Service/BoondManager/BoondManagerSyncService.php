@@ -280,11 +280,7 @@ class BoondManagerSyncService
             $timesheet->project     = $project;
             $timesheet->date        = $date;
             $timesheet->hours       = $hours;
-            $timesheet->notes       = sprintf(
-                '[Boond #%d] %s',
-                $boondTimeId,
-                $boondTime['attributes']['comment'] ?? '',
-            );
+            $timesheet->notes       = sprintf('[Boond #%d] %s', $boondTimeId, $boondTime['attributes']['comment'] ?? '');
 
             $this->em->persist($timesheet);
             ++$result->created;

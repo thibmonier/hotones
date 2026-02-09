@@ -26,7 +26,7 @@ class NpsController extends AbstractController
         private readonly NpsSurveyRepository $npsSurveyRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly NpsMailerService $npsMailerService,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -36,19 +36,18 @@ class NpsController extends AbstractController
         $status    = $request->query->get('status', 'all');
         $projectId = $request->query->get('project');
 
-        $qb = $this->npsSurveyRepository->createQueryBuilder('n')
+        $qb = $this->npsSurveyRepository
+            ->createQueryBuilder('n')
             ->leftJoin('n.project', 'p')
             ->addSelect('p')
             ->orderBy('n.sentAt', 'DESC');
 
         if ($status !== 'all') {
-            $qb->andWhere('n.status = :status')
-               ->setParameter('status', $status);
+            $qb->andWhere('n.status = :status')->setParameter('status', $status);
         }
 
         if ($projectId) {
-            $qb->andWhere('n.project = :project')
-               ->setParameter('project', $projectId);
+            $qb->andWhere('n.project = :project')->setParameter('project', $projectId);
         }
 
         $surveys = $qb->getQuery()->getResult();
@@ -60,7 +59,8 @@ class NpsController extends AbstractController
         $responseRate     = $totalSurveys > 0 ? round(($completedCount / $totalSurveys) * 100, 1) : 0;
 
         // Calculer le NPS moyen sur toutes les réponses
-        $allCompleted = $this->npsSurveyRepository->createQueryBuilder('n')
+        $allCompleted = $this->npsSurveyRepository
+            ->createQueryBuilder('n')
             ->where('n.status = :status')
             ->andWhere('n.score IS NOT NULL')
             ->setParameter('status', NpsSurvey::STATUS_COMPLETED)
@@ -120,7 +120,10 @@ class NpsController extends AbstractController
                 $this->npsMailerService->sendNpsSurvey($survey);
                 $this->addFlash('success', 'L\'enquête NPS a été créée et envoyée avec succès au client.');
             } catch (Exception $e) {
-                $this->addFlash('warning', 'L\'enquête a été créée mais l\'email n\'a pas pu être envoyé : '.$e->getMessage());
+                $this->addFlash(
+                    'warning',
+                    'L\'enquête a été créée mais l\'email n\'a pas pu être envoyé : '.$e->getMessage(),
+                );
             }
 
             return $this->redirectToRoute('nps_show', ['id' => $survey->getId()]);
@@ -210,21 +213,33 @@ class NpsController extends AbstractController
     {
         $status = $request->query->get('status', 'all');
 
-        $qb = $this->npsSurveyRepository->createQueryBuilder('n')
+        $qb = $this->npsSurveyRepository
+            ->createQueryBuilder('n')
             ->leftJoin('n.project', 'p')
             ->addSelect('p')
             ->orderBy('n.sentAt', 'DESC');
 
         if ($status !== 'all') {
-            $qb->andWhere('n.status = :status')
-               ->setParameter('status', $status);
+            $qb->andWhere('n.status = :status')->setParameter('status', $status);
         }
 
         $surveys = $qb->getQuery()->getResult();
 
         // Créer le contenu CSV
         $csv   = [];
-        $csv[] = ['ID', 'Projet', 'Destinataire', 'Email', 'Envoyé le', 'Répondu le', 'Statut', 'Score', 'Catégorie', 'Commentaire', 'Expire le'];
+        $csv[] = [
+            'ID',
+            'Projet',
+            'Destinataire',
+            'Email',
+            'Envoyé le',
+            'Répondu le',
+            'Statut',
+            'Score',
+            'Catégorie',
+            'Commentaire',
+            'Expire le',
+        ];
 
         foreach ($surveys as $survey) {
             $csv[] = [

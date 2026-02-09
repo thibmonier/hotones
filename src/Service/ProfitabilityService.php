@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Contributor;
@@ -13,8 +15,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ProfitabilityService
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+    ) {
     }
 
     /**
@@ -28,8 +31,11 @@ class ProfitabilityService
      * - Marge nette % = (Marge nette / CA) × 100
      * - TJR réel = CA / (Σ heures / 8).
      */
-    public function calculatePeriodMetricsForProjects(array $projects, DateTimeInterface $startDate, DateTimeInterface $endDate): array
-    {
+    public function calculatePeriodMetricsForProjects(
+        array $projects,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+    ): array {
         $timesheetRepo = $this->entityManager->getRepository(Timesheet::class);
         $projectRepo   = $this->entityManager->getRepository(Project::class);
 
@@ -72,15 +78,9 @@ class ProfitabilityService
         $grossMargin = bcsub($totalRevenue, $totalPurchases, 2);
         $netMargin   = bcsub($grossMargin, $totalHumanCost, 2);
 
-        $grossPct = (bccomp($totalRevenue, '0', 2) > 0)
-            ? bcmul(bcdiv($grossMargin, $totalRevenue, 4), '100', 2)
-            : '0.00';
-        $netPct = (bccomp($totalRevenue, '0', 2) > 0)
-            ? bcmul(bcdiv($netMargin, $totalRevenue, 4), '100', 2)
-            : '0.00';
-        $realDailyRate = (bccomp($totalDays, '0', 2) > 0)
-            ? bcdiv($totalRevenue, $totalDays, 2)
-            : '0.00';
+        $grossPct      = bccomp($totalRevenue, '0', 2) > 0 ? bcmul(bcdiv($grossMargin, $totalRevenue, 4), '100', 2) : '0.00';
+        $netPct        = bccomp($totalRevenue, '0', 2) > 0 ? bcmul(bcdiv($netMargin, $totalRevenue, 4), '100', 2) : '0.00';
+        $realDailyRate = bccomp($totalDays, '0', 2)    > 0 ? bcdiv($totalRevenue, $totalDays, 2) : '0.00';
 
         return [
             'revenue'          => $totalRevenue,
@@ -104,8 +104,12 @@ class ProfitabilityService
      * - consumed: coût réel cumulé (heures × CJM/8)
      * - forecast: coût prévisionnel cumulé, distribution linéaire du coût estimé.
      */
-    public function buildConsumptionTimeline(Project $project, DateTimeInterface $startDate, DateTimeInterface $endDate, string $granularity = 'weekly'): array
-    {
+    public function buildConsumptionTimeline(
+        Project $project,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        string $granularity = 'weekly',
+    ): array {
         $timesheetRepo = $this->entityManager->getRepository(Timesheet::class);
 
         // Déterminer pas de temps
@@ -139,7 +143,9 @@ class ProfitabilityService
         foreach ($period as $dt) {
             ++$i;
             // Label
-            $labels[]     = $granularity === 'monthly' ? $dt->format('M Y') : sprintf('S%02d %s', (int) $dt->format('W'), $dt->format('Y'));
+            $labels[] = $granularity === 'monthly'
+                ? $dt->format('M Y')
+                : sprintf('S%02d %s', (int) $dt->format('W'), $dt->format('Y'));
             $budgetLine[] = (float) $budgetRevenue;
 
             // Fenêtre pour ce point
@@ -491,10 +497,16 @@ class ProfitabilityService
     /**
      * Calcule la performance d'un contributeur sur une période.
      */
-    public function calculateContributorPerformance(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): array
-    {
-        $timesheets = $this->entityManager->getRepository(Timesheet::class)
-            ->findByContributorAndDateRange($contributor, $startDate, $endDate);
+    public function calculateContributorPerformance(
+        Contributor $contributor,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+    ): array {
+        $timesheets = $this->entityManager->getRepository(Timesheet::class)->findByContributorAndDateRange(
+            $contributor,
+            $startDate,
+            $endDate,
+        );
 
         $totalHours     = '0';
         $billableHours  = '0';
@@ -524,9 +536,7 @@ class ProfitabilityService
         }
 
         $margin     = bcsub($totalRevenue, $totalCost, 2);
-        $marginRate = bccomp($totalRevenue, '0', 2) > 0
-            ? bcmul(bcdiv($margin, $totalRevenue, 4), '100', 2)
-            : '0';
+        $marginRate = bccomp($totalRevenue, '0', 2) > 0 ? bcmul(bcdiv($margin, $totalRevenue, 4), '100', 2) : '0';
 
         return [
             'total_hours'        => $totalHours,
@@ -581,9 +591,7 @@ class ProfitabilityService
             'days_overrun'       => number_format($daysOverrun, 2),
             'overrun_percentage' => number_format($overrunPercentage, 1),
             'is_overrun'         => $daysOverrun  > 0,
-            'efficiency_rate'    => $billableDays > 0
-                ? number_format(($soldDays / $billableDays) * 100, 1)
-                : '0',
+            'efficiency_rate'    => $billableDays > 0 ? number_format(($soldDays / $billableDays) * 100, 1) : '0',
         ];
     }
 
@@ -601,18 +609,23 @@ class ProfitabilityService
             $alerts[] = [
                 'type'    => 'danger',
                 'title'   => 'Marge négative',
-                'message' => 'Le projet présente une marge négative de '.
-                           number_format(floatval($profitability['margin']), 2).'€',
+                'message' => 'Le projet présente une marge négative de '
+                        .number_format(floatval($profitability['margin']), 2)
+                        .'€',
             ];
         }
 
         // Alerte taux de marge faible
-        if (bccomp((string) $profitability['margin_rate'], '10', 2) < 0 && bccomp((string) $profitability['margin_rate'], '0', 2) >= 0) {
+        if (
+            bccomp((string) $profitability['margin_rate'], '10', 2) < 0
+            && bccomp((string) $profitability['margin_rate'], '0', 2) >= 0
+        ) {
             $alerts[] = [
                 'type'    => 'warning',
                 'title'   => 'Taux de marge faible',
-                'message' => 'Le taux de marge est de seulement '.
-                           number_format(floatval($profitability['margin_rate']), 1).'%',
+                'message' => 'Le taux de marge est de seulement '
+                        .number_format(floatval($profitability['margin_rate']), 1)
+                        .'%',
             ];
         }
 
@@ -621,8 +634,11 @@ class ProfitabilityService
             $alerts[] = [
                 'type'    => 'warning',
                 'title'   => 'Dépassement budgétaire',
-                'message' => 'Le projet dépasse de '.$comparison['overrun_percentage'].
-                           '% le budget initial ('.$comparison['days_overrun'].' jours)',
+                'message' => 'Le projet dépasse de '
+                        .$comparison['overrun_percentage']
+                        .'% le budget initial ('
+                        .$comparison['days_overrun']
+                        .' jours)',
             ];
         }
 

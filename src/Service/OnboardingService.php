@@ -30,8 +30,10 @@ class OnboardingService
      *
      * @return int Number of tasks created
      */
-    public function createOnboardingFromTemplate(Contributor $contributor, ?EmploymentPeriod $employmentPeriod = null): int
-    {
+    public function createOnboardingFromTemplate(
+        Contributor $contributor,
+        ?EmploymentPeriod $employmentPeriod = null,
+    ): int {
         // Find appropriate template based on contributor's primary profile
         $profiles = $contributor->getProfiles();
         $template = null;
@@ -62,7 +64,7 @@ class OnboardingService
     public function createTasksFromTemplate(
         Contributor $contributor,
         OnboardingTemplate $template,
-        ?EmploymentPeriod $employmentPeriod = null
+        ?EmploymentPeriod $employmentPeriod = null,
     ): int {
         $tasks   = $template->getTasks();
         $created = 0;
@@ -234,7 +236,7 @@ class OnboardingService
         string $name,
         ?string $description,
         ?int $profileId,
-        array $tasks
+        array $tasks,
     ): OnboardingTemplate {
         $template = new OnboardingTemplate();
         $template->setCompany($this->companyContext->getCurrentCompany());
@@ -273,8 +275,11 @@ class OnboardingService
     /**
      * Duplicate template for a new profile.
      */
-    public function duplicateTemplate(OnboardingTemplate $sourceTemplate, string $newName, ?int $profileId = null): OnboardingTemplate
-    {
+    public function duplicateTemplate(
+        OnboardingTemplate $sourceTemplate,
+        string $newName,
+        ?int $profileId = null,
+    ): OnboardingTemplate {
         $newTemplate = new OnboardingTemplate();
         $newTemplate->setCompany($this->companyContext->getCurrentCompany());
         $newTemplate->setName($newName);

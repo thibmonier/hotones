@@ -27,7 +27,7 @@ class MetricsCalculationService
         private readonly ProjectRepository $projectRepo,
         private readonly OrderRepository $orderRepo,
         private readonly TimesheetRepository $timesheetRepo,
-        private readonly ContributorRepository $contributorRepo
+        private readonly ContributorRepository $contributorRepo,
     ) {
     }
 
@@ -35,12 +35,15 @@ class MetricsCalculationService
      * Calcule tous les KPIs pour une période donnée.
      */
     #[Deprecated(message: <<<'TXT'
-    Utilisez DashboardReadService::getKPIs() à la place.
-                 Cette méthode est conservée uniquement pour le fallback
-                 quand les données pré-calculées ne sont pas disponibles.
-    TXT)]
-    public function calculateKPIs(?DateTimeInterface $startDate = null, ?DateTimeInterface $endDate = null, array $filters = []): array
-    {
+        Utilisez DashboardReadService::getKPIs() à la place.
+                     Cette méthode est conservée uniquement pour le fallback
+                     quand les données pré-calculées ne sont pas disponibles.
+        TXT)]
+    public function calculateKPIs(
+        ?DateTimeInterface $startDate = null,
+        ?DateTimeInterface $endDate = null,
+        array $filters = [],
+    ): array {
         $startDate ??= new DateTime('first day of this month');
         $endDate   ??= new DateTime('last day of this month');
 
@@ -60,8 +63,11 @@ class MetricsCalculationService
     /**
      * Calcule les métriques de revenus et marges.
      */
-    private function calculateRevenue(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
-    {
+    private function calculateRevenue(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $filters = [],
+    ): array {
         // Projets filtrés (statut 'active' par défaut pour le CA)
         $projects = $this->getFilteredProjects($startDate, $endDate, $filters, 'active');
 
@@ -93,8 +99,11 @@ class MetricsCalculationService
     /**
      * Calcule les métriques projets.
      */
-    private function calculateProjectMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
-    {
+    private function calculateProjectMetrics(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $filters = [],
+    ): array {
         // Projets dans la période, avec filtres
         $projectsInPeriod = $this->getFilteredProjects($startDate, $endDate, $filters, null);
 
@@ -161,21 +170,23 @@ class MetricsCalculationService
     /**
      * Calcule les métriques devis.
      */
-    private function calculateOrderMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
-    {
+    private function calculateOrderMetrics(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $filters = [],
+    ): array {
         // Restreindre aux projets filtrés si des filtres sont fournis
         $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
         $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
-        $qb = $this->orderRepo->createQueryBuilder('o')
+        $qb = $this->orderRepo
+            ->createQueryBuilder('o')
             ->where('o.createdAt BETWEEN :start AND :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
 
         if (!empty($projectIds)) {
-            $qb->join('o.project', 'p')
-               ->andWhere('p.id IN (:pids)')
-               ->setParameter('pids', $projectIds);
+            $qb->join('o.project', 'p')->andWhere('p.id IN (:pids)')->setParameter('pids', $projectIds);
         }
 
         $ordersInPeriod = $qb->getQuery()->getResult();
@@ -205,9 +216,7 @@ class MetricsCalculationService
 
         // Taux de conversion
         $totalDecided   = $won + $signed + $lost;
-        $conversionRate = $totalDecided > 0
-            ? round((($won + $signed) / $totalDecided) * 100, 2)
-            : 0;
+        $conversionRate = $totalDecided > 0 ? round((($won + $signed) / $totalDecided) * 100, 2) : 0;
 
         return [
             'total'           => count($ordersInPeriod),
@@ -222,8 +231,11 @@ class MetricsCalculationService
     /**
      * Calcule les métriques contributeurs.
      */
-    private function calculateContributorMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
-    {
+    private function calculateContributorMetrics(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $filters = [],
+    ): array {
         $activeContributors = $this->contributorRepo->findBy(['active' => true]);
 
         // Restreindre aux projets filtrés si applicable
@@ -231,7 +243,11 @@ class MetricsCalculationService
         $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
         if (!empty($projectIds)) {
-            $topContributors = $this->timesheetRepo->getStatsPerContributorForProjects($startDate, $endDate, $projectIds);
+            $topContributors = $this->timesheetRepo->getStatsPerContributorForProjects(
+                $startDate,
+                $endDate,
+                $projectIds,
+            );
         } else {
             $topContributors = $this->timesheetRepo->getStatsPerContributor($startDate, $endDate);
         }
@@ -248,8 +264,11 @@ class MetricsCalculationService
     /**
      * Calcule les métriques de temps.
      */
-    private function calculateTimeMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = []): array
-    {
+    private function calculateTimeMetrics(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $filters = [],
+    ): array {
         // Restreindre les heures aux projets filtrés si applicable
         $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
         $projectIds = array_map(static fn ($p) => $p->id, $projects);
@@ -271,9 +290,7 @@ class MetricsCalculationService
         $theoreticalCapacity = $contributorCount * $workingDays * 8;
 
         // Taux d'occupation
-        $occupationRate = $theoreticalCapacity > 0
-            ? round(($totalHours / $theoreticalCapacity) * 100, 2)
-            : 0;
+        $occupationRate = $theoreticalCapacity > 0 ? round(($totalHours / $theoreticalCapacity) * 100, 2) : 0;
 
         return [
             'total_hours'            => $totalHours,
@@ -289,11 +306,7 @@ class MetricsCalculationService
      */
     private function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
-        $period = new DatePeriod(
-            $startDate,
-            new DateInterval('P1D'),
-            (clone $endDate)->modify('+1 day'),
-        );
+        $period = new DatePeriod($startDate, new DateInterval('P1D'), (clone $endDate)->modify('+1 day'));
 
         $workingDays = 0;
         foreach ($period as $date) {
@@ -335,9 +348,13 @@ class MetricsCalculationService
     /**
      * Récupère les projets de la période en appliquant les filtres fournis.
      */
-    private function getFilteredProjects(DateTimeInterface $startDate, DateTimeInterface $endDate, array $filters = [], ?string $statusOverride = null): array
-    {
-        $status            = $statusOverride                 ?? ($filters['status'] ?? null);
+    private function getFilteredProjects(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        array $filters = [],
+        ?string $statusOverride = null,
+    ): array {
+        $status            = $statusOverride                 ?? $filters['status'] ?? null;
         $projectType       = $filters['project_type']        ?? null;
         $technologyId      = $filters['technology_id']       ?? null;
         $isInternal        = $filters['is_internal']         ?? null;

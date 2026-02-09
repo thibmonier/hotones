@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Api;
 
 use App\Entity\Contributor;
@@ -14,8 +16,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class TaskApiController extends AbstractController
 {
-    public function __construct(private readonly \Doctrine\ORM\EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly \Doctrine\ORM\EntityManagerInterface $em,
+    ) {
     }
 
     #[Route('/overdue-count', name: 'tasks_api_overdue_count', methods: ['GET'])]
@@ -30,7 +33,8 @@ class TaskApiController extends AbstractController
             return new JsonResponse(['count' => 0, 'no_contributor' => true]);
         }
 
-        $qb = $repo->createQueryBuilder('t')
+        $qb = $repo
+            ->createQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->where('t.assignedContributor = :c')
             ->andWhere('t.active = true')
@@ -58,7 +62,8 @@ class TaskApiController extends AbstractController
             return new JsonResponse(['tasks' => [], 'no_contributor' => true]);
         }
 
-        $qb = $repo->createQueryBuilder('t')
+        $qb = $repo
+            ->createQueryBuilder('t')
             ->innerJoin('t.project', 'p')
             ->addSelect('p')
             ->where('t.assignedContributor = :c')

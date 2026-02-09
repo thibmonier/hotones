@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CheckAlertsCommand extends Command
 {
     public function __construct(
-        private readonly AlertDetectionService $alertDetectionService
+        private readonly AlertDetectionService $alertDetectionService,
     ) {
         parent::__construct();
     }
@@ -35,17 +35,14 @@ class CheckAlertsCommand extends Command
         $totalAlerts = array_sum($stats);
 
         // Display results table
-        $io->table(
-            ['Type d\'alerte', 'Nombre'],
-            [
-                ['Budget dépassé', $stats['budget_alerts']],
-                ['Marge faible', $stats['margin_alerts']],
-                ['Surcharge contributeur', $stats['overload_alerts']],
-                ['Paiement proche', $stats['payment_alerts']],
-                ['', ''],
-                ['TOTAL', $totalAlerts],
-            ],
-        );
+        $io->table(['Type d\'alerte', 'Nombre'], [
+            ['Budget dépassé', $stats['budget_alerts']],
+            ['Marge faible', $stats['margin_alerts']],
+            ['Surcharge contributeur', $stats['overload_alerts']],
+            ['Paiement proche', $stats['payment_alerts']],
+            ['', ''],
+            ['TOTAL', $totalAlerts],
+        ]);
 
         if ($totalAlerts === 0) {
             $io->success('Aucune alerte détectée.');

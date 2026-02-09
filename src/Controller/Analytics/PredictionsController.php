@@ -58,11 +58,7 @@ class PredictionsController extends AbstractController
      */
     private function getProfitabilityPredictions(): array
     {
-        $projects = $this->projectRepository->findBy(
-            ['status' => 'en_cours'],
-            ['id' => 'DESC'],
-            20, // Limit to 20 projects for performance
-        );
+        $projects = $this->projectRepository->findBy(['status' => 'en_cours'], ['id' => 'DESC'], 20); // Limit to 20 projects for performance
 
         $predictions = [];
 
@@ -134,7 +130,8 @@ class PredictionsController extends AbstractController
         $sevenDaysAgo = new DateTimeImmutable()->modify('-7 days');
 
         // Count alerts by type in last 7 days using query builder
-        $budgetAlerts = $this->notificationRepository->createQueryBuilder('n')
+        $budgetAlerts = $this->notificationRepository
+            ->createQueryBuilder('n')
             ->select('COUNT(n.id)')
             ->where('n.type = :type')
             ->andWhere('n.createdAt >= :since')
@@ -143,7 +140,8 @@ class PredictionsController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
-        $marginAlerts = $this->notificationRepository->createQueryBuilder('n')
+        $marginAlerts = $this->notificationRepository
+            ->createQueryBuilder('n')
             ->select('COUNT(n.id)')
             ->where('n.type = :type')
             ->andWhere('n.createdAt >= :since')
@@ -152,7 +150,8 @@ class PredictionsController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
-        $overloadAlerts = $this->notificationRepository->createQueryBuilder('n')
+        $overloadAlerts = $this->notificationRepository
+            ->createQueryBuilder('n')
             ->select('COUNT(n.id)')
             ->where('n.type = :type')
             ->andWhere('n.createdAt >= :since')
@@ -161,7 +160,8 @@ class PredictionsController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
-        $paymentAlerts = $this->notificationRepository->createQueryBuilder('n')
+        $paymentAlerts = $this->notificationRepository
+            ->createQueryBuilder('n')
             ->select('COUNT(n.id)')
             ->where('n.type = :type')
             ->andWhere('n.createdAt >= :since')
@@ -186,7 +186,8 @@ class PredictionsController extends AbstractController
     {
         $sevenDaysAgo = new DateTimeImmutable()->modify('-7 days');
 
-        return $this->notificationRepository->createQueryBuilder('n')
+        return $this->notificationRepository
+            ->createQueryBuilder('n')
             ->where('n.type IN (:types)')
             ->andWhere('n.createdAt >= :since')
             ->setParameter('types', [

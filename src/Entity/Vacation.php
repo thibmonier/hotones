@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Interface\CompanyOwnedInterface;
@@ -196,7 +198,7 @@ class Vacation implements CompanyOwnedInterface
             self::TYPE_SICK_LEAVE          => 'Arrêt maladie',
             self::TYPE_TRAINING            => 'Formation',
             self::TYPE_OTHER               => 'Autre',
-            default                        => 'Non défini'
+            default                        => 'Non défini',
         };
     }
 

@@ -21,7 +21,7 @@ class CrossTenantAccessException extends TenantIsolationException
     public function __construct(
         string $message = 'Attempt to access data from different company detected',
         int $code = 0,
-        ?Throwable $previous = null
+        ?Throwable $previous = null,
     ) {
         parent::__construct($message, $code, $previous);
     }
@@ -33,11 +33,8 @@ class CrossTenantAccessException extends TenantIsolationException
      * @param int $userCompanyId      User's current company ID
      * @param int $attemptedCompanyId Company ID being accessed
      */
-    public static function create(
-        int $userId,
-        int $userCompanyId,
-        int $attemptedCompanyId
-    ): self {
+    public static function create(int $userId, int $userCompanyId, int $attemptedCompanyId): self
+    {
         $message = sprintf(
             'User %d (company %d) attempted to access data from company %d',
             $userId,

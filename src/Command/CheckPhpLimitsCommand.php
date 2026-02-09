@@ -44,14 +44,24 @@ class CheckPhpLimitsCommand extends Command
         $postMaxBytes   = $this->parseSize(ini_get('post_max_size'));
         $memoryBytes    = $this->parseSize(ini_get('memory_limit'));
 
-        if ($uploadMaxBytes < 2 * 1024 * 1024) {
-            $io->warning(sprintf('upload_max_filesize (%s) est inférieur à 2M - les avatars de 2M seront rejetés !', ini_get('upload_max_filesize')));
+        if ($uploadMaxBytes < (2 * 1024 * 1024)) {
+            $io->warning(sprintf(
+                'upload_max_filesize (%s) est inférieur à 2M - les avatars de 2M seront rejetés !',
+                ini_get('upload_max_filesize'),
+            ));
         } else {
-            $io->success(sprintf('✓ upload_max_filesize (%s) est suffisant pour des fichiers de 2M', ini_get('upload_max_filesize')));
+            $io->success(sprintf(
+                '✓ upload_max_filesize (%s) est suffisant pour des fichiers de 2M',
+                ini_get('upload_max_filesize'),
+            ));
         }
 
         if ($postMaxBytes < $uploadMaxBytes) {
-            $io->error(sprintf('post_max_size (%s) doit être >= upload_max_filesize (%s)', ini_get('post_max_size'), ini_get('upload_max_filesize')));
+            $io->error(sprintf(
+                'post_max_size (%s) doit être >= upload_max_filesize (%s)',
+                ini_get('post_max_size'),
+                ini_get('upload_max_filesize'),
+            ));
         } else {
             $io->success(sprintf('✓ post_max_size (%s) est correct', ini_get('post_max_size')));
         }

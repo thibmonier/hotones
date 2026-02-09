@@ -33,7 +33,7 @@ class TestS3ConnectionCommand extends Command
         #[Autowire(param: 'env(S3_REGION)')]
         private readonly string $region = '',
         #[Autowire(param: 'env(FILESYSTEM_ADAPTER)')]
-        private readonly string $adapter = ''
+        private readonly string $adapter = '',
     ) {
         parent::__construct();
     }
@@ -46,17 +46,14 @@ class TestS3ConnectionCommand extends Command
 
         // Afficher la configuration
         $io->section('Configuration');
-        $io->table(
-            ['Variable', 'Valeur'],
-            [
-                ['APP_ENV', $this->environment],
-                ['FILESYSTEM_ADAPTER', $this->adapter],
-                ['S3_BUCKET', $this->bucket ?: '(vide)'],
-                ['S3_ENDPOINT', $this->endpoint ?: '(vide)'],
-                ['S3_REGION', $this->region ?: '(vide)'],
-                ['S3_PUBLIC_URL', $this->publicUrl ?: '(vide)'],
-            ],
-        );
+        $io->table(['Variable', 'Valeur'], [
+            ['APP_ENV', $this->environment],
+            ['FILESYSTEM_ADAPTER', $this->adapter],
+            ['S3_BUCKET', $this->bucket ?: '(vide)'],
+            ['S3_ENDPOINT', $this->endpoint ?: '(vide)'],
+            ['S3_REGION', $this->region ?: '(vide)'],
+            ['S3_PUBLIC_URL', $this->publicUrl ?: '(vide)'],
+        ]);
 
         // Test 1 : Lister les fichiers
         $io->section('Test 1 : Liste des fichiers dans /avatars');

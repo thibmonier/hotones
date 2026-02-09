@@ -86,11 +86,7 @@ class GdprEmailService
     {
         $user = $deletionRequest->getUser();
 
-        $cancelUrl = $this->urlGenerator->generate(
-            'gdpr_my_data',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        $cancelUrl = $this->urlGenerator->generate('gdpr_my_data', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $confirmedDate = $deletionRequest->getConfirmedAt();
         $scheduledDate = $deletionRequest->getScheduledDeletionAt();
@@ -141,11 +137,7 @@ class GdprEmailService
     {
         $user = $deletionRequest->getUser();
 
-        $cancelUrl = $this->urlGenerator->generate(
-            'gdpr_my_data',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        $cancelUrl = $this->urlGenerator->generate('gdpr_my_data', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $scheduledDate = $deletionRequest->getScheduledDeletionAt();
         $daysRemaining = new DateTimeImmutable()->diff($scheduledDate)->days;
@@ -191,11 +183,7 @@ class GdprEmailService
     {
         $user = $deletionRequest->getUser();
 
-        $loginUrl = $this->urlGenerator->generate(
-            'app_login',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        $loginUrl = $this->urlGenerator->generate('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $cancelledDate = $deletionRequest->getCancelledAt();
 

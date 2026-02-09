@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\BillingMarker;
@@ -14,10 +16,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BillingMarkerRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, BillingMarker::class, $companyContext);
     }
 
@@ -28,11 +28,14 @@ class BillingMarkerRepository extends CompanyAwareRepository
      */
     public function getMonthMarkers(DateTimeInterface $monthStart, DateTimeInterface $monthEnd): array
     {
-        $qb = $this->createCompanyQueryBuilder('m')
+        $qb = $this
+            ->createCompanyQueryBuilder('m')
             ->leftJoin('m.schedule', 's')
             ->leftJoin('m.order', 'o')
-            ->andWhere('(s.id IS NOT NULL AND s.billingDate BETWEEN :start AND :end)'
-                .' OR (o.id IS NOT NULL AND m.year = :y AND m.month = :m)')
+            ->andWhere(
+                '(s.id IS NOT NULL AND s.billingDate BETWEEN :start AND :end)'
+                .' OR (o.id IS NOT NULL AND m.year = :y AND m.month = :m)',
+            )
             ->setParameter('start', $monthStart)
             ->setParameter('end', $monthEnd)
             ->setParameter('y', (int) $monthStart->format('Y'))

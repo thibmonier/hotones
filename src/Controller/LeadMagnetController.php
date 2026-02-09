@@ -26,7 +26,7 @@ class LeadMagnetController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly LeadCaptureRepository $leadCaptureRepository,
         private readonly LeadMagnetMailer $leadMagnetMailer,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -90,7 +90,10 @@ class LeadMagnetController extends AbstractController
                 $this->addFlash('success', 'Un email avec le lien de téléchargement vous a été envoyé !');
             } catch (Exception) {
                 // Log l'erreur mais ne bloque pas l'utilisateur
-                $this->addFlash('warning', 'Votre inscription est confirmée ! Si vous ne recevez pas l\'email, vérifiez vos spams.');
+                $this->addFlash(
+                    'warning',
+                    'Votre inscription est confirmée ! Si vous ne recevez pas l\'email, vérifiez vos spams.',
+                );
             }
 
             return $this->redirectToRoute('lead_magnet_thank_you', [
@@ -166,7 +169,10 @@ class LeadMagnetController extends AbstractController
 
         // Vérifier que le fichier existe
         if (!file_exists($pdfPath)) {
-            $this->addFlash('error', 'Le guide n\'est pas encore disponible. Nous vous l\'enverrons par email dès qu\'il sera prêt.');
+            $this->addFlash(
+                'error',
+                'Le guide n\'est pas encore disponible. Nous vous l\'enverrons par email dès qu\'il sera prêt.',
+            );
 
             return $this->redirectToRoute('lead_magnet_thank_you', [
                 'email' => $emailEncoded,

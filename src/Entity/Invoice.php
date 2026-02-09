@@ -239,7 +239,12 @@ class Invoice implements CompanyOwnedInterface
      *
      * @var Collection<int, InvoiceLine>
      */
-    #[ORM\OneToMany(targetEntity: InvoiceLine::class, mappedBy: 'invoice', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        targetEntity: InvoiceLine::class,
+        mappedBy: 'invoice',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
     #[Groups(['invoice:read', 'invoice:write'])]
     private Collection $lines;
 

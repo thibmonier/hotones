@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Client;
@@ -21,7 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ClientController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 
@@ -43,16 +45,16 @@ class ClientController extends AbstractController
         $saved      = $session->has('client_filters') ? (array) $session->get('client_filters') : [];
 
         // Filtres
-        $search       = $hasFilter ? ($request->query->get('search') ?: '') : ($saved['search'] ?? '');
-        $serviceLevel = $hasFilter ? ($request->query->get('service_level') ?: '') : ($saved['service_level'] ?? '');
+        $search       = $hasFilter ? ($request->query->get('search') ?: '') : $saved['search']               ?? '';
+        $serviceLevel = $hasFilter ? ($request->query->get('service_level') ?: '') : $saved['service_level'] ?? '';
 
         // Tri
-        $sort = $hasFilter ? ($request->query->get('sort') ?: ($saved['sort'] ?? 'name')) : ($saved['sort'] ?? 'name');
-        $dir  = $hasFilter ? ($request->query->get('dir') ?: ($saved['dir'] ?? 'ASC')) : ($saved['dir'] ?? 'ASC');
+        $sort = $hasFilter ? ($request->query->get('sort') ?: $saved['sort'] ?? 'name') : $saved['sort'] ?? 'name';
+        $dir  = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'ASC') : $saved['dir']     ?? 'ASC';
 
         // Pagination
         $allowedPerPage = [10, 25, 50, 100];
-        $perPageParam   = (int) ($hasFilter ? ($request->query->get('per_page', 25)) : ($saved['per_page'] ?? 25));
+        $perPageParam   = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
         $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
 
         // Sauvegarder en session
@@ -68,13 +70,14 @@ class ClientController extends AbstractController
         $qb = $em->getRepository(Client::class)->createQueryBuilder('c');
 
         if ($search) {
-            $qb->andWhere('c.name LIKE :search OR c.website LIKE :search OR c.description LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere('c.name LIKE :search OR c.website LIKE :search OR c.description LIKE :search')->setParameter(
+                'search',
+                '%'.$search.'%',
+            );
         }
 
         if ($serviceLevel !== '') {
-            $qb->andWhere('c.serviceLevel = :serviceLevel')
-                ->setParameter('serviceLevel', $serviceLevel);
+            $qb->andWhere('c.serviceLevel = :serviceLevel')->setParameter('serviceLevel', $serviceLevel);
         }
 
         // Tri
@@ -84,11 +87,7 @@ class ClientController extends AbstractController
         $qb->orderBy($sortField, $sortDir);
 
         // Pagination
-        $pagination = $paginator->paginate(
-            $qb->getQuery(),
-            $request->query->getInt('page', 1),
-            $perPage,
-        );
+        $pagination = $paginator->paginate($qb->getQuery(), $request->query->getInt('page', 1), $perPage);
 
         return $this->render('client/index.html.twig', [
             'clients' => $pagination,
@@ -108,17 +107,17 @@ class ClientController extends AbstractController
         $search       = $request->query->get('search', '');
         $serviceLevel = $request->query->get('service_level', '');
 
-        $qb = $em->getRepository(Client::class)->createQueryBuilder('c')
-            ->orderBy('c.name', 'ASC');
+        $qb = $em->getRepository(Client::class)->createQueryBuilder('c')->orderBy('c.name', 'ASC');
 
         if ($search) {
-            $qb->andWhere('c.name LIKE :search OR c.website LIKE :search OR c.description LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere('c.name LIKE :search OR c.website LIKE :search OR c.description LIKE :search')->setParameter(
+                'search',
+                '%'.$search.'%',
+            );
         }
 
         if ($serviceLevel !== '') {
-            $qb->andWhere('c.serviceLevel = :serviceLevel')
-                ->setParameter('serviceLevel', $serviceLevel);
+            $qb->andWhere('c.serviceLevel = :serviceLevel')->setParameter('serviceLevel', $serviceLevel);
         }
 
         $clients = $qb->getQuery()->getResult();

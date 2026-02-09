@@ -130,7 +130,7 @@ class PerformanceReviewService
         PerformanceReview $review,
         string $achievements,
         string $strengths,
-        string $improvements
+        string $improvements,
     ): void {
         $review->setSelfEvaluation([
             'achievements' => $achievements,
@@ -156,7 +156,7 @@ class PerformanceReviewService
         string $strengths,
         string $improvements,
         string $feedback,
-        ?int $rating = null
+        ?int $rating = null,
     ): void {
         $review->setManagerEvaluation([
             'achievements' => $achievements,
@@ -187,7 +187,7 @@ class PerformanceReviewService
         PerformanceReview $review,
         array $objectives,
         ?DateTimeImmutable $interviewDate = null,
-        ?string $comments = null
+        ?string $comments = null,
     ): void {
         $review->setObjectives($objectives);
 
@@ -265,9 +265,9 @@ class PerformanceReviewService
     public function getStatistics(): array
     {
         // Get distinct years
-        $years = $this->em->createQuery(
-            'SELECT DISTINCT pr.year FROM App\Entity\PerformanceReview pr ORDER BY pr.year DESC',
-        )->getResult();
+        $years = $this->em
+            ->createQuery('SELECT DISTINCT pr.year FROM App\Entity\PerformanceReview pr ORDER BY pr.year DESC')
+            ->getResult();
 
         $years = array_column($years, 'year');
 
@@ -299,7 +299,7 @@ class PerformanceReviewService
     {
         // User must be the contributor and status must be en_attente or auto_eval_faite
         return $review->getContributor()->getUser() === $user
-            && in_array($review->getStatus(), ['en_attente', 'auto_eval_faite'], true);
+        && in_array($review->getStatus(), ['en_attente', 'auto_eval_faite'], true);
     }
 
     /**
@@ -309,7 +309,7 @@ class PerformanceReviewService
     {
         // User must be the manager and self-evaluation must be completed
         return $review->getManager() === $user
-            && in_array($review->getStatus(), ['auto_eval_faite', 'eval_manager_faite'], true);
+        && in_array($review->getStatus(), ['auto_eval_faite', 'eval_manager_faite'], true);
     }
 
     /**
@@ -318,7 +318,6 @@ class PerformanceReviewService
     public function canValidateReview(PerformanceReview $review, User $user): bool
     {
         // User must be the manager and both evaluations must be completed
-        return $review->getManager() === $user
-            && 'eval_manager_faite'  === $review->getStatus();
+        return $review->getManager() === $user && 'eval_manager_faite' === $review->getStatus();
     }
 }

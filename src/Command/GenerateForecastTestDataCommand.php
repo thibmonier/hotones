@@ -24,16 +24,20 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GenerateForecastTestDataCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addOption('months', 'm', InputOption::VALUE_REQUIRED, 'Nombre de mois d\'historique à générer', 24)
-            ->addOption('projects-per-month', 'p', InputOption::VALUE_REQUIRED, 'Nombre de projets par mois (moyenne)', 3);
+        $this->addOption(
+            'months',
+            'm',
+            InputOption::VALUE_REQUIRED,
+            'Nombre de mois d\'historique à générer',
+            24,
+        )->addOption('projects-per-month', 'p', InputOption::VALUE_REQUIRED, 'Nombre de projets par mois (moyenne)', 3);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -68,15 +72,15 @@ class GenerateForecastTestDataCommand extends Command
 
         // Coefficients de saisonnalité réalistes (industrie services IT)
         $seasonality = [
-            1  => 0.85,  // Janvier - calme post-fêtes
-            2  => 0.95,  // Février
-            3  => 1.10,  // Mars - reprise
-            4  => 1.05,  // Avril
-            5  => 1.00,  // Mai
-            6  => 0.90,  // Juin - ralentissement été
-            7  => 0.75,  // Juillet - vacances
-            8  => 0.80,  // Août - vacances
-            9  => 1.15,  // Septembre - forte reprise
+            1  => 0.85, // Janvier - calme post-fêtes
+            2  => 0.95, // Février
+            3  => 1.10, // Mars - reprise
+            4  => 1.05, // Avril
+            5  => 1.00, // Mai
+            6  => 0.90, // Juin - ralentissement été
+            7  => 0.75, // Juillet - vacances
+            8  => 0.80, // Août - vacances
+            9  => 1.15, // Septembre - forte reprise
             10 => 1.20, // Octobre - rush fin d'année
             11 => 1.15, // Novembre - rush fin d'année
             12 => 0.90, // Décembre - ralentissement fêtes
@@ -97,8 +101,17 @@ class GenerateForecastTestDataCommand extends Command
                 $project->setCompany($client->getCompany());
 
                 // Nom du projet
-                $projectTypes = ['Refonte site web', 'Application mobile', 'E-commerce', 'CRM custom', 'API REST', 'Migration cloud', 'Dashboard analytics', 'Portail client'];
-                $projectName  = sprintf(
+                $projectTypes = [
+                    'Refonte site web',
+                    'Application mobile',
+                    'E-commerce',
+                    'CRM custom',
+                    'API REST',
+                    'Migration cloud',
+                    'Dashboard analytics',
+                    'Portail client',
+                ];
+                $projectName = sprintf(
                     '%s %s %d',
                     $projectTypes[array_rand($projectTypes)],
                     $client->getName(),
@@ -161,7 +174,7 @@ class GenerateForecastTestDataCommand extends Command
                 $this->em->persist($order);
                 ++$createdCount;
 
-                if ($createdCount % 10 === 0) {
+                if (($createdCount % 10) === 0) {
                     $this->em->flush();
                     $io->write('.');
                 }
@@ -176,17 +189,20 @@ class GenerateForecastTestDataCommand extends Command
 
         // Statistiques
         $io->section('Statistiques des données générées');
-        $io->horizontalTable(
-            ['Métrique', 'Valeur'],
+        $io->horizontalTable(['Métrique', 'Valeur'], [
             [
-                ['Période couverte', sprintf('%d mois (de %s à aujourd\'hui)', $months, $now->modify("-{$months} months")->format('M Y'))],
-                ['Projets créés', $createdCount],
-                ['Devis créés', $createdCount],
-                ['Projets/mois (moyenne)', round($createdCount / $months, 1)],
-                ['Statut projets', sprintf('%d completed, %d in_progress', (int) ($createdCount * 0.8), (int) ($createdCount * 0.2))],
-                ['Statut devis', sprintf('%d signés, %d gagnés', (int) ($createdCount * 0.9), (int) ($createdCount * 0.1))],
+                'Période couverte',
+                sprintf('%d mois (de %s à aujourd\'hui)', $months, $now->modify("-{$months} months")->format('M Y')),
             ],
-        );
+            ['Projets créés', $createdCount],
+            ['Devis créés', $createdCount],
+            ['Projets/mois (moyenne)', round($createdCount / $months, 1)],
+            [
+                'Statut projets',
+                sprintf('%d completed, %d in_progress', (int) ($createdCount * 0.8), (int) ($createdCount * 0.2)),
+            ],
+            ['Statut devis', sprintf('%d signés, %d gagnés', (int) ($createdCount * 0.9), (int) ($createdCount * 0.1))],
+        ]);
 
         $io->note('Vous pouvez maintenant accéder au dashboard de forecasting : /forecasting/dashboard');
 

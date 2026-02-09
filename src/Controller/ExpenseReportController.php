@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Contributor;
@@ -29,7 +31,7 @@ class ExpenseReportController extends AbstractController
         private readonly ExpenseReportService $service,
         private readonly EntityManagerInterface $em,
         private readonly SecureFileUploadService $uploadService,
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
     ) {
     }
 

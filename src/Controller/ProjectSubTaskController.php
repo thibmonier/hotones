@@ -23,7 +23,7 @@ class ProjectSubTaskController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly ProjectSubTaskRepository $subTasks
+        private readonly ProjectSubTaskRepository $subTasks,
     ) {
     }
 

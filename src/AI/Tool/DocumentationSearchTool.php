@@ -125,7 +125,7 @@ final readonly class DocumentationSearchTool
         $firstPos    = stripos($content, $query);
 
         // High: 3+ occurrences OU présent dans les 500 premiers caractères
-        if ($occurrences >= 3 || ($firstPos !== false && $firstPos < 500)) {
+        if ($occurrences >= 3 || $firstPos !== false && $firstPos < 500) {
             return 'high';
         }
 

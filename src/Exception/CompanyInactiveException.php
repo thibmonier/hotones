@@ -21,11 +21,8 @@ class CompanyInactiveException extends TenantIsolationException
 {
     private ?string $companyStatus = null;
 
-    public function __construct(
-        string $message = 'Company is not active',
-        int $code = 0,
-        ?Throwable $previous = null
-    ) {
+    public function __construct(string $message = 'Company is not active', int $code = 0, ?Throwable $previous = null)
+    {
         parent::__construct($message, $code, $previous);
     }
 
@@ -49,11 +46,7 @@ class CompanyInactiveException extends TenantIsolationException
      */
     public static function create(int $companyId, string $companyStatus): self
     {
-        $message = sprintf(
-            'Company %d is %s and cannot be accessed',
-            $companyId,
-            $companyStatus,
-        );
+        $message = sprintf('Company %d is %s and cannot be accessed', $companyId, $companyStatus);
 
         $exception = new self($message);
         $exception->setAttemptedCompanyId($companyId);

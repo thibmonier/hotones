@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\E2E;
 
 use App\Factory\UserFactory;
@@ -27,10 +29,12 @@ class LoginAndNavigationE2ETest extends PantherTestCase
         $crawler = $client->request('GET', '/login');
         $client->waitFor('form'); // Ensure page loaded in WebDriver mode
 
-        $form = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
 
         // Wait for navigation after login (either to / or to 2FA page)
@@ -64,10 +68,12 @@ class LoginAndNavigationE2ETest extends PantherTestCase
 
         // Login
         $crawler = $client->request('GET', '/login');
-        $form    = $crawler->filter('form')->form([
-            '_username' => $user->getEmail(),
-            '_password' => 'password',
-        ]);
+        $form    = $crawler
+            ->filter('form')
+            ->form([
+                '_username' => $user->getEmail(),
+                '_password' => 'password',
+            ]);
         $client->submit($form);
         $client->waitFor('body');
         sleep(1); // Wait for login redirect

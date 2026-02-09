@@ -42,11 +42,7 @@ class SqlInjectionTest extends WebTestCase
         // Vérifier qu'aucune erreur SQL n'est exposée dans la réponse
         $content = $response->getContent();
         $this->assertIsString($content);
-        $this->assertStringNotContainsStringIgnoringCase(
-            'SQL',
-            $content,
-            'SQL errors should not be exposed to users',
-        );
+        $this->assertStringNotContainsStringIgnoringCase('SQL', $content, 'SQL errors should not be exposed to users');
         $this->assertStringNotContainsStringIgnoringCase(
             'syntax error',
             $content,
@@ -82,11 +78,7 @@ class SqlInjectionTest extends WebTestCase
 
         // Devrait retourner un tableau vide (aucun projet avec ce nom exact)
         $this->assertIsArray($projects);
-        $this->assertCount(
-            0,
-            $projects,
-            'Query should not be vulnerable to SQL injection',
-        );
+        $this->assertCount(0, $projects, 'Query should not be vulnerable to SQL injection');
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
@@ -112,11 +104,7 @@ class SqlInjectionTest extends WebTestCase
         $this->assertIsString($content);
 
         // Le payload ne devrait pas être exécuté (script tags doivent être échappés)
-        $this->assertStringNotContainsString(
-            '<script>',
-            $content,
-            'Script tags should be escaped in output',
-        );
+        $this->assertStringNotContainsString('<script>', $content, 'Script tags should be escaped in output');
     }
 
     /**

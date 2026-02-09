@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
+use App\DTO\Pagination;
 use App\Entity\Order;
 use App\Entity\OrderLine;
 use App\Entity\OrderPaymentSchedule;
@@ -13,6 +16,7 @@ use App\Enum\OrderStatus;
 use App\Event\QuoteStatusChangedEvent;
 use App\Form\OrderType as OrderFormType;
 use App\Security\CompanyContext;
+use App\Service\Order\OrderCalculationService;
 
 use function array_key_exists;
 
@@ -30,7 +34,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class OrderController extends AbstractController
 {
     public function __construct(
-        private readonly CompanyContext $companyContext
+        private readonly CompanyContext $companyContext,
+        private readonly OrderCalculationService $orderCalculationService,
     ) {
     }
 
@@ -50,13 +55,15 @@ class OrderController extends AbstractController
         $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
         $saved      = $session->has('order_filters') ? (array) $session->get('order_filters') : [];
 
-        $projectId = $hasFilter ? ($request->query->get('project') ?? null) : ($saved['project'] ?? null);
-        $status    = $hasFilter ? ($request->query->get('status') ?? null) : ($saved['status'] ?? null);
+        $projectId = $hasFilter ? $request->query->get('project') ?? null : $saved['project'] ?? null;
+        $status    = $hasFilter ? $request->query->get('status')  ?? null : $saved['status'] ?? null;
 
         $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
         // Tri
-        $sort = $hasFilter ? ($request->query->get('sort') ?? ($saved['sort'] ?? 'createdAt')) : ($saved['sort'] ?? 'createdAt');
-        $dir  = $hasFilter ? ($request->query->get('dir') ?? ($saved['dir'] ?? 'DESC')) : ($saved['dir'] ?? 'DESC');
+        $sort = $hasFilter
+            ? $request->query->get('sort')              ?? $saved['sort'] ?? 'createdAt'
+            : $saved['sort']                            ?? 'createdAt';
+        $dir = $hasFilter ? $request->query->get('dir') ?? $saved['dir'] ?? 'DESC' : $saved['dir'] ?? 'DESC';
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
@@ -69,14 +76,7 @@ class OrderController extends AbstractController
         $total    = $em->getRepository(Order::class)->countWithFilters($project, $status);
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
 
-        $pagination = [
-            'current_page' => $page,
-            'per_page'     => $perPage,
-            'total'        => $total,
-            'total_pages'  => (int) ceil($total / $perPage),
-            'has_prev'     => $page > 1,
-            'has_next'     => $page * $perPage < $total,
-        ];
+        $pagination = Pagination::create($page, $perPage, $total);
 
         $session->set('order_filters', [
             'project'  => $projectId,
@@ -92,10 +92,16 @@ class OrderController extends AbstractController
             'selectedProject' => $projectId,
             'selectedStatus'  => $status,
             'statusOptions'   => Order::STATUS_OPTIONS,
-            'filters_query'   => ['project' => $projectId, 'status' => $status, 'sort' => $sort, 'dir' => $dir, 'per_page' => $perPage],
-            'sort'            => $sort,
-            'dir'             => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
-            'pagination'      => $pagination,
+            'filters_query'   => [
+                'project'  => $projectId,
+                'status'   => $status,
+                'sort'     => $sort,
+                'dir'      => $dir,
+                'per_page' => $perPage,
+            ],
+            'sort'       => $sort,
+            'dir'        => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
+            'pagination' => $pagination->toArray(),
         ]);
     }
 
@@ -143,54 +149,16 @@ class OrderController extends AbstractController
             throw $this->createNotFoundException('Devis non trouvé');
         }
 
-        // Total basé sur les sections (incluant achats et montants fixes)
-        $sectionsTotal = (float) $order->calculateTotalFromSections();
-        if ($sectionsTotal <= 0 && $order->getTotalAmount()) {
-            // Fallback sur la colonne totalAmount si sections non définies
-            $sectionsTotal = (float) $order->getTotalAmount();
-        }
-
-        // Détail prestations vs achats
-        $servicesSubtotal  = 0.0; // Prestations hors achats
-        $purchasesSubtotal = 0.0; // Achats attachés + lignes d'achat/direct/fixe
-        foreach ($order->getSections() as $section) {
-            foreach ($section->getLines() as $line) {
-                // Prestations (services uniquement), sans achats attachés
-                $servicesSubtotal += (float) $line->getServiceAmount();
-
-                // Achats attachés à une ligne de service
-                if ($line->getPurchaseAmount()) {
-                    $purchasesSubtotal += (float) $line->getPurchaseAmount();
-                }
-
-                // Lignes d'achat direct ou montant fixe
-                if (in_array($line->getType(), ['purchase', 'fixed_amount'], true) && $line->getDirectAmount()) {
-                    $purchasesSubtotal += (float) $line->getDirectAmount();
-                }
-            }
-        }
-
-        // Contingence
-        $contPct           = $order->getContingencyPercentage() ? (float) $order->getContingencyPercentage() : 0.0;
-        $contingencyAmount = $sectionsTotal * ($contPct / 100.0);
-        $finalTotal        = $sectionsTotal - $contingencyAmount;
-
-        // Couverture de l'échéancier (si forfait)
-        $scheduledTotal = 0.0;
-        if ($order->getContractType() === 'forfait') {
-            foreach ($order->getPaymentSchedules() as $s) {
-                $scheduledTotal += (float) $s->computeAmount(number_format($finalTotal, 2, '.', ''));
-            }
-        }
+        $totals = $this->orderCalculationService->calculateOrderTotals($order);
 
         return $this->render('order/show.html.twig', [
             'order'             => $order,
-            'sectionsTotal'     => $sectionsTotal,
-            'servicesSubtotal'  => $servicesSubtotal,
-            'purchasesSubtotal' => $purchasesSubtotal,
-            'contingencyAmount' => $contingencyAmount,
-            'finalAmount'       => $finalTotal,
-            'scheduledTotal'    => $scheduledTotal,
+            'sectionsTotal'     => $totals['sectionsTotal'],
+            'servicesSubtotal'  => $totals['servicesSubtotal'],
+            'purchasesSubtotal' => $totals['purchasesSubtotal'],
+            'contingencyAmount' => $totals['contingencyAmount'],
+            'finalAmount'       => $totals['finalAmount'],
+            'scheduledTotal'    => $totals['scheduledTotal'],
             'statusOptions'     => Order::STATUS_OPTIONS,
         ]);
     }
@@ -225,10 +193,7 @@ class OrderController extends AbstractController
     #[Route('/{id}/sections', name: 'order_sections', methods: ['GET'])]
     public function sections(Order $order, EntityManagerInterface $em): Response
     {
-        $profiles = $em->getRepository(Profile::class)->findBy(
-            ['active' => true],
-            ['name' => 'ASC'],
-        );
+        $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         return $this->render('order/sections.html.twig', [
             'order'    => $order,
@@ -321,7 +286,10 @@ class OrderController extends AbstractController
                 $skippedCount,
             ));
         } else {
-            $this->addFlash('info', 'Aucune tâche créée. Toutes les lignes sont déjà liées à des tâches ou ne sont pas éligibles.');
+            $this->addFlash(
+                'info',
+                'Aucune tâche créée. Toutes les lignes sont déjà liées à des tâches ou ne sont pas éligibles.',
+            );
         }
 
         return $this->redirectToRoute('order_show', ['id' => $order->id]);
@@ -362,7 +330,7 @@ class OrderController extends AbstractController
         $em->persist($line);
 
         // Recalculer le total du devis
-        $this->updateOrderTotals($order, $em);
+        $this->orderCalculationService->updateOrderTotals($order);
 
         $em->flush();
 
@@ -385,8 +353,13 @@ class OrderController extends AbstractController
 
     #[Route('/{orderId}/section/{sectionId}/line/{lineId}/edit', name: 'order_edit_line', methods: ['POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function editLine(Request $request, int $orderId, int $sectionId, int $lineId, EntityManagerInterface $em): Response
-    {
+    public function editLine(
+        Request $request,
+        int $orderId,
+        int $sectionId,
+        int $lineId,
+        EntityManagerInterface $em,
+    ): Response {
         $order   = $em->getRepository(Order::class)->find($orderId);
         $section = $em->getRepository(OrderSection::class)->find($sectionId);
         $line    = $em->getRepository(OrderLine::class)->find($lineId);
@@ -414,7 +387,7 @@ class OrderController extends AbstractController
         $line->setPurchaseAmount($purchaseAmount !== '' ? (string) $purchaseAmount : null);
 
         // Recalculer le total du devis
-        $this->updateOrderTotals($order, $em);
+        $this->orderCalculationService->updateOrderTotals($order);
 
         $em->flush();
 
@@ -425,8 +398,13 @@ class OrderController extends AbstractController
 
     #[Route('/{orderId}/section/{sectionId}/line/{lineId}/delete', name: 'order_delete_line', methods: ['POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function deleteLine(Request $request, int $orderId, int $sectionId, int $lineId, EntityManagerInterface $em): Response
-    {
+    public function deleteLine(
+        Request $request,
+        int $orderId,
+        int $sectionId,
+        int $lineId,
+        EntityManagerInterface $em,
+    ): Response {
         $order   = $em->getRepository(Order::class)->find($orderId);
         $section = $em->getRepository(OrderSection::class)->find($sectionId);
         $line    = $em->getRepository(OrderLine::class)->find($lineId);
@@ -445,7 +423,7 @@ class OrderController extends AbstractController
         $em->remove($line);
 
         // Recalculer le total du devis
-        $this->updateOrderTotals($order, $em);
+        $this->orderCalculationService->updateOrderTotals($order);
 
         $em->flush();
 
@@ -521,7 +499,7 @@ class OrderController extends AbstractController
         Request $request,
         Order $order,
         EntityManagerInterface $em,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ): Response {
         if (!$this->isCsrfTokenValid('status'.$order->id, $request->request->get('_token'))) {
             $this->addFlash('danger', 'Action non autorisée (CSRF).');
@@ -542,7 +520,11 @@ class OrderController extends AbstractController
 
         // Dispatcher l'événement de notification si le statut a changé
         $newStatus = OrderStatus::fromString($statusString);
-        if ($oldStatus !== $statusString && $newStatus && in_array($newStatus, [OrderStatus::WON, OrderStatus::LOST, OrderStatus::PENDING], true)) {
+        if (
+            $oldStatus !== $statusString
+            && $newStatus
+            && in_array($newStatus, [OrderStatus::WON, OrderStatus::LOST, OrderStatus::PENDING], true)
+        ) {
             // Déterminer les destinataires : chef de projet, commercial, KAM
             $recipients = [];
             if ($project = $order->getProject()) {
@@ -589,8 +571,7 @@ class OrderController extends AbstractController
         $month = date('m');
 
         // Trouver le dernier numéro de devis pour ce mois
-        $lastOrder = $em->getRepository(Order::class)
-            ->findLastOrderNumberForMonth($year, $month);
+        $lastOrder = $em->getRepository(Order::class)->findLastOrderNumberForMonth($year, $month);
 
         $increment = 1;
         if ($lastOrder) {
@@ -601,20 +582,6 @@ class OrderController extends AbstractController
         return sprintf('D%s%s%03d', $year, $month, $increment);
     }
 
-    /**
-     * Met à jour automatiquement le montant total du devis.
-     */
-    private function updateOrderTotals(Order $order, EntityManagerInterface $em): void
-    {
-        $totalAmount = '0';
-
-        foreach ($order->getSections() as $section) {
-            $totalAmount = bcadd($totalAmount, (string) $section->getTotalAmount(), 2);
-        }
-
-        $order->setTotalAmount($totalAmount);
-    }
-
     #[Route('/{id}/schedule/add', name: 'order_schedule_add', methods: ['POST'])]
     public function addSchedule(Request $request, Order $order, EntityManagerInterface $em): Response
     {
@@ -623,7 +590,9 @@ class OrderController extends AbstractController
         }
 
         if ($order->getContractType() !== 'forfait') {
-            return $this->json(['error' => 'L\'\u00e9ch\u00e9ancier n\'est disponible que pour les contrats au forfait'], 422);
+            return $this->json([
+                'error' => 'L\'\u00e9ch\u00e9ancier n\'est disponible que pour les contrats au forfait',
+            ], 422);
         }
 
         $label       = (string) $request->request->get('label');
@@ -639,7 +608,8 @@ class OrderController extends AbstractController
         }
 
         $schedule = new OrderPaymentSchedule();
-        $schedule->setOrder($order)
+        $schedule
+            ->setOrder($order)
             ->setLabel($label ?: null)
             ->setBillingDate(new DateTime($billingDate))
             ->setAmountType($amountType);
@@ -658,7 +628,12 @@ class OrderController extends AbstractController
         if ($ok) {
             $this->addFlash('success', 'Échéance ajoutée. Couverture à 100% du devis.');
         } else {
-            $this->addFlash('warning', sprintf('Échéance ajoutée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format((float) $scheduled, 2, ',', ' ')));
+            $this->addFlash('warning', sprintf('Échéance ajoutée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format(
+                (float) $scheduled,
+                2,
+                ',',
+                ' ',
+            )));
         }
 
         return $this->redirectToRoute('order_edit', ['id' => $order->id]);
@@ -680,7 +655,12 @@ class OrderController extends AbstractController
         if ($ok) {
             $this->addFlash('success', 'Échéance supprimée. Couverture à 100% du devis.');
         } else {
-            $this->addFlash('warning', sprintf('Échéance supprimée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format((float) $scheduled, 2, ',', ' ')));
+            $this->addFlash('warning', sprintf('Échéance supprimée. Couverture actuelle: %s€ (doit couvrir 100%% du devis).', number_format(
+                (float) $scheduled,
+                2,
+                ',',
+                ' ',
+            )));
         }
 
         return $this->redirectToRoute('order_edit', ['id' => $order->id]);
@@ -740,32 +720,23 @@ class OrderController extends AbstractController
         // Données pour le template PDF
         $data = [
             'order'           => $order,
-            'company_name'    => 'HotOnes Agency',  // À configurer
-            'company_address' => 'Adresse de l\'entreprise',  // À configurer
-            'company_postal'  => 'Code postal',  // À configurer
-            'company_city'    => 'Ville',  // À configurer
-            'company_phone'   => '01 23 45 67 89',  // À configurer
-            'company_email'   => 'contact@hotones.com',  // À configurer
-            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',  // À configurer
+            'company_name'    => 'HotOnes Agency', // À configurer
+            'company_address' => 'Adresse de l\'entreprise', // À configurer
+            'company_postal'  => 'Code postal', // À configurer
+            'company_city'    => 'Ville', // À configurer
+            'company_phone'   => '01 23 45 67 89', // À configurer
+            'company_email'   => 'contact@hotones.com', // À configurer
+            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX', // À configurer
             'payment_terms'   => '30% à la commande, 70% à la livraison',
             'delivery_time'   => 'Selon planning défini',
             'notes'           => $order->getNotes(),
         ];
 
         // Générer le nom du fichier
-        $filename = sprintf(
-            'devis_%s_%s.pdf',
-            $order->getReference(),
-            new DateTime()->format('Y-m-d'),
-        );
+        $filename = sprintf('devis_%s_%s.pdf', $order->getReference(), new DateTime()->format('Y-m-d'));
 
         // Générer et retourner le PDF
-        return $pdfGenerator->createPdfResponse(
-            'order/pdf.html.twig',
-            $data,
-            $filename,
-            inline: false,  // Force le téléchargement
-        );
+        return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: false); // Force le téléchargement
     }
 
     #[Route('/{id}/pdf/preview', name: 'order_pdf_preview', methods: ['GET'])]
@@ -789,11 +760,6 @@ class OrderController extends AbstractController
         $filename = sprintf('devis_%s_preview.pdf', $order->getReference());
 
         // Affiche le PDF dans le navigateur
-        return $pdfGenerator->createPdfResponse(
-            'order/pdf.html.twig',
-            $data,
-            $filename,
-            inline: true,  // Affichage dans le navigateur
-        );
+        return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: true); // Affichage dans le navigateur
     }
 }

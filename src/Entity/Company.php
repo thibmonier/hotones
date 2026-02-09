@@ -88,10 +88,7 @@ class Company implements Stringable
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 100)]
-    #[Assert\Regex(
-        pattern: '/^[a-z0-9-]+$/',
-        message: 'Slug can only contain lowercase letters, numbers, and hyphens',
-    )]
+    #[Assert\Regex(pattern: '/^[a-z0-9-]+$/', message: 'Slug can only contain lowercase letters, numbers, and hyphens')]
     public string $slug {
         get => $this->slug;
         set {
@@ -377,9 +374,7 @@ class Company implements Stringable
 
     public function isTrialActive(): bool
     {
-        return $this->isTrial()
-            && $this->trialEndsAt !== null
-            && $this->trialEndsAt > new DateTimeImmutable();
+        return $this->isTrial() && $this->trialEndsAt !== null && $this->trialEndsAt > new DateTimeImmutable();
     }
 
     public function isSuspended(): bool
@@ -410,9 +405,7 @@ class Company implements Stringable
 
     public function disableFeature(string $feature): self
     {
-        $this->enabledFeatures = array_values(
-            array_filter($this->enabledFeatures, fn ($f): bool => $f !== $feature),
-        );
+        $this->enabledFeatures = array_values(array_filter($this->enabledFeatures, fn ($f): bool => $f !== $feature));
 
         return $this;
     }

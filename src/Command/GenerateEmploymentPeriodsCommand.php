@@ -24,7 +24,7 @@ class GenerateEmploymentPeriodsCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly ContributorRepository $contributorRepository
+        private readonly ContributorRepository $contributorRepository,
     ) {
         parent::__construct();
     }
@@ -33,12 +33,22 @@ class GenerateEmploymentPeriodsCommand extends Command
     {
         $this
             ->addOption('start-date', null, InputOption::VALUE_OPTIONAL, 'Start date (Y-m-d)', date('Y').'-01-01')
-            ->addOption('end-date', null, InputOption::VALUE_OPTIONAL, 'End date (Y-m-d) - leave empty for open-ended contract', null)
+            ->addOption(
+                'end-date',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'End date (Y-m-d) - leave empty for open-ended contract',
+                null,
+            )
             ->addOption('weekly-hours', null, InputOption::VALUE_OPTIONAL, 'Weekly hours', '35')
             ->addOption('work-percentage', null, InputOption::VALUE_OPTIONAL, 'Work time percentage', '100')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be created without persisting')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Create contracts even for contributors who already have one')
-        ;
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Create contracts even for contributors who already have one',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -56,16 +66,13 @@ class GenerateEmploymentPeriodsCommand extends Command
         $io->title('Generate Employment Periods');
 
         $io->section('Configuration');
-        $io->table(
-            ['Parameter', 'Value'],
-            [
-                ['Start Date', $startDate->format('Y-m-d')],
-                ['End Date', $endDate ? $endDate->format('Y-m-d') : 'Open-ended (NULL)'],
-                ['Weekly Hours', $weeklyHours],
-                ['Work Percentage', $workPercentage.'%'],
-                ['Mode', $dryRun ? 'DRY RUN' : 'LIVE'],
-            ],
-        );
+        $io->table(['Parameter', 'Value'], [
+            ['Start Date', $startDate->format('Y-m-d')],
+            ['End Date', $endDate ? $endDate->format('Y-m-d') : 'Open-ended (NULL)'],
+            ['Weekly Hours', $weeklyHours],
+            ['Work Percentage', $workPercentage.'%'],
+            ['Mode', $dryRun ? 'DRY RUN' : 'LIVE'],
+        ]);
 
         // Get all contributors
         $allContributors = $this->contributorRepository->findAll();
@@ -138,7 +145,10 @@ class GenerateEmploymentPeriodsCommand extends Command
             $this->entityManager->flush();
             $io->success(sprintf('Created %d employment period(s)', $created));
         } elseif ($dryRun) {
-            $io->warning(sprintf('DRY RUN: Would create %d employment period(s). Use without --dry-run to persist.', $created));
+            $io->warning(sprintf(
+                'DRY RUN: Would create %d employment period(s). Use without --dry-run to persist.',
+                $created,
+            ));
         }
 
         return Command::SUCCESS;
@@ -146,7 +156,8 @@ class GenerateEmploymentPeriodsCommand extends Command
 
     private function hasActiveEmploymentPeriod(Contributor $contributor, DateTime $date): bool
     {
-        $qb = $this->entityManager->getRepository(EmploymentPeriod::class)
+        $qb = $this->entityManager
+            ->getRepository(EmploymentPeriod::class)
             ->createQueryBuilder('ep')
             ->select('COUNT(ep.id)')
             ->where('ep.contributor = :contributor')

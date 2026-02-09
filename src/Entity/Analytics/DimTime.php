@@ -72,9 +72,18 @@ class DimTime implements CompanyOwnedInterface
         $this->yearQuarter = $this->year.'-Q'.$this->quarter;
 
         $monthNames = [
-            1 => 'Janvier', 2 => 'Février', 3 => 'Mars', 4 => 'Avril',
-            5 => 'Mai', 6 => 'Juin', 7 => 'Juillet', 8 => 'Août',
-            9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
+            1  => 'Janvier',
+            2  => 'Février',
+            3  => 'Mars',
+            4  => 'Avril',
+            5  => 'Mai',
+            6  => 'Juin',
+            7  => 'Juillet',
+            8  => 'Août',
+            9  => 'Septembre',
+            10 => 'Octobre',
+            11 => 'Novembre',
+            12 => 'Décembre',
         ];
 
         $this->monthName   = $monthNames[$this->month].' '.$this->year;

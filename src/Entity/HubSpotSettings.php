@@ -237,7 +237,10 @@ class HubSpotSettings implements CompanyOwnedInterface
             return [];
         }
 
-        return array_filter(array_map('trim', explode(',', $this->pipelineFilter)), static fn (string $v): bool => $v !== '');
+        return array_filter(
+            array_map('trim', explode(',', $this->pipelineFilter)),
+            static fn (string $v): bool => $v !== '',
+        );
     }
 
     /**
@@ -251,7 +254,10 @@ class HubSpotSettings implements CompanyOwnedInterface
             return [];
         }
 
-        return array_filter(array_map('trim', explode(',', $this->excludedStages)), static fn (string $v): bool => $v !== '');
+        return array_filter(
+            array_map('trim', explode(',', $this->excludedStages)),
+            static fn (string $v): bool => $v !== '',
+        );
     }
 
     public function getCompany(): Company

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Interface\CompanyOwnedInterface;
@@ -240,7 +242,7 @@ class ProjectTask implements CompanyOwnedInterface
             self::TYPE_AVV       => 'Avant-vente (AVV)',
             self::TYPE_NON_VENDU => 'Non-vendu',
             self::TYPE_REGULAR   => 'Tâche vendue',
-            default              => 'Non défini'
+            default              => 'Non défini',
         };
     }
 
@@ -343,7 +345,7 @@ class ProjectTask implements CompanyOwnedInterface
             'in_progress' => 'En cours',
             'completed'   => 'Terminée',
             'on_hold'     => 'En attente',
-            default       => 'Non défini'
+            default       => 'Non défini',
         };
     }
 

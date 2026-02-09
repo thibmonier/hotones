@@ -49,10 +49,7 @@ class Skill implements Stringable, CompanyOwnedInterface
 
     #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank(message: 'La catégorie est obligatoire')]
-    #[Assert\Choice(
-        choices: ['technique', 'soft_skill', 'methodologie', 'langue'],
-        message: 'Catégorie invalide',
-    )]
+    #[Assert\Choice(choices: ['technique', 'soft_skill', 'methodologie', 'langue'], message: 'Catégorie invalide')]
     public ?string $category = null {
         get => $this->category;
         set {

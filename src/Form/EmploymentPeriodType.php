@@ -74,7 +74,8 @@ class EmploymentPeriodType extends AbstractType
                 'required'      => false,
                 'placeholder'   => '-- Sélectionner un niveau --',
                 'attr'          => ['class' => 'form-select'],
-                'query_builder' => fn (EmployeeLevelRepository $repo) => $repo->createQueryBuilder('el')
+                'query_builder' => fn (EmployeeLevelRepository $repo) => $repo
+                    ->createQueryBuilder('el')
                     ->andWhere('el.company = :company')
                     ->andWhere('el.active = :active')
                     ->setParameter('company', $company)
@@ -164,17 +165,21 @@ class EmploymentPeriodType extends AbstractType
                     'class' => 'form-control',
                     'rows'  => 3,
                 ],
-            ])
-        ;
+            ]);
 
         // Validation personnalisée : endDate doit être après startDate
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             $period = $event->getData();
 
             if ($period->endDate && $period->endDate < $period->startDate) {
-                $event->getForm()->get('endDate')->addError(
-                    new \Symfony\Component\Form\FormError('La date de fin doit être postérieure à la date de début'),
-                );
+                $event
+                    ->getForm()
+                    ->get('endDate')
+                    ->addError(
+                        new \Symfony\Component\Form\FormError(
+                            'La date de fin doit être postérieure à la date de début',
+                        ),
+                    );
             }
         });
     }

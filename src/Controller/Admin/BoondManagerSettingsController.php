@@ -136,8 +136,8 @@ class BoondManagerSettingsController extends AbstractController
             return $this->redirectToRoute('admin_boond_manager_settings');
         }
 
-        $startDateStr = $request->request->get('start_date', (new DateTime('-30 days'))->format('Y-m-d'));
-        $endDateStr   = $request->request->get('end_date', (new DateTime())->format('Y-m-d'));
+        $startDateStr = $request->request->get('start_date', new DateTime('-30 days')->format('Y-m-d'));
+        $endDateStr   = $request->request->get('end_date', new DateTime()->format('Y-m-d'));
         $async        = $request->request->getBoolean('async');
 
         try {
@@ -150,11 +150,13 @@ class BoondManagerSettingsController extends AbstractController
         }
 
         if ($async) {
-            $messageBus->dispatch(new SyncBoondManagerTimesMessage(
-                $settings->getCompany()->getId(),
-                $startDate->format('Y-m-d'),
-                $endDate->format('Y-m-d'),
-            ));
+            $messageBus->dispatch(
+                new SyncBoondManagerTimesMessage(
+                    $settings->getCompany()->getId(),
+                    $startDate->format('Y-m-d'),
+                    $endDate->format('Y-m-d'),
+                ),
+            );
 
             $this->addFlash('success', 'Synchronisation lancee en arriere-plan');
 

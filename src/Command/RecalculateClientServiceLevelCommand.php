@@ -19,17 +19,16 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class RecalculateClientServiceLevelCommand extends Command
 {
     public function __construct(
-        private readonly ClientServiceLevelCalculator $calculator
+        private readonly ClientServiceLevelCalculator $calculator,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année pour le calcul du CA', date('Y'))
-            ->setHelp('Cette commande recalcule le niveau de service de tous les clients en mode automatique basé sur leur CA.')
-        ;
+        $this->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'Année pour le calcul du CA', date('Y'))->setHelp(
+            'Cette commande recalcule le niveau de service de tous les clients en mode automatique basé sur leur CA.',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

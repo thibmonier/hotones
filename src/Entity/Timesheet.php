@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -28,7 +30,9 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(security: "is_granted('ROLE_USER')"),
         new Post(security: "is_granted('ROLE_INTERVENANT')"),
         new Put(security: "is_granted('ROLE_INTERVENANT') and object.contributor.getUser() == user"),
-        new Delete(security: "is_granted('ROLE_CHEF_PROJET') or (is_granted('ROLE_INTERVENANT') and object.contributor.getUser() == user)"),
+        new Delete(
+            security: "is_granted('ROLE_CHEF_PROJET') or (is_granted('ROLE_INTERVENANT') and object.contributor.getUser() == user)",
+        ),
     ],
     normalizationContext: ['groups' => ['timesheet:read']],
     denormalizationContext: ['groups' => ['timesheet:write']],

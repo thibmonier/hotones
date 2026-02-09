@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Order;
@@ -18,21 +20,28 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/billing')]
 class BillingController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
     }
 
     #[Route('', name: 'billing_index', methods: ['GET'])]
     #[IsGranted('ROLE_COMPTA')]
-    public function index(Request $request, TimesheetRepository $timesheets, BillingMarkerRepository $markersRepo): Response
-    {
-        $monthParam = (string) ($request->query->get('month') ?? new DateTime('first day of this month')->format('Y-m'));
-        $month      = DateTime::createFromFormat('Y-m-d', $monthParam.'-01') ?: new DateTime('first day of this month');
-        $start      = (clone $month)->modify('first day of this month')->setTime(0, 0, 0);
-        $end        = (clone $month)->modify('last day of this month')->setTime(23, 59, 59);
+    public function index(
+        Request $request,
+        TimesheetRepository $timesheets,
+        BillingMarkerRepository $markersRepo,
+    ): Response {
+        $monthParam = (string) (
+            $request->query->get('month') ?? new DateTime('first day of this month')->format('Y-m')
+        );
+        $month = DateTime::createFromFormat('Y-m-d', $monthParam.'-01') ?: new DateTime('first day of this month');
+        $start = (clone $month)->modify('first day of this month')->setTime(0, 0, 0);
+        $end   = (clone $month)->modify('last day of this month')->setTime(23, 59, 59);
 
         // Forfait: échéances dans le mois
-        $schedules = $this->em->createQueryBuilder()
+        $schedules = $this->em
+            ->createQueryBuilder()
             ->select('s, o, p')
             ->from(OrderPaymentSchedule::class, 's')
             ->join('s.order', 'o')
@@ -41,10 +50,12 @@ class BillingController extends AbstractController
             ->setParameter('start', $start->format('Y-m-d'))
             ->setParameter('end', $end->format('Y-m-d'))
             ->orderBy('s.billingDate', 'ASC')
-            ->getQuery()->getResult();
+            ->getQuery()
+            ->getResult();
 
         // Régie: CA du mois par projet pour tous les devis en régie signés/gagnés/terminés
-        $ordersRegie = $this->em->createQueryBuilder()
+        $ordersRegie = $this->em
+            ->createQueryBuilder()
             ->select('o, p')
             ->from(Order::class, 'o')
             ->join('o.project', 'p')
@@ -52,7 +63,8 @@ class BillingController extends AbstractController
             ->andWhere('o.status IN (:st)')
             ->setParameter('ct', 'regie')
             ->setParameter('st', ['gagne', 'signe', 'termine'])
-            ->getQuery()->getResult();
+            ->getQuery()
+            ->getResult();
 
         $regieEntries = [];
         foreach ($ordersRegie as $order) {
@@ -60,7 +72,11 @@ class BillingController extends AbstractController
             $rows    = $timesheets->getMonthlyRevenueForProjectUsingContributorTjm($project, $start, $end);
             foreach ($rows as $r) {
                 $regieEntries[] = [
-                    'date'    => DateTime::createFromFormat('Y-m-d', sprintf('%04d-%02d-01', (int) $r['year'], (int) $r['month'])),
+                    'date' => DateTime::createFromFormat('Y-m-d', sprintf(
+                        '%04d-%02d-01',
+                        (int) $r['year'],
+                        (int) $r['month'],
+                    )),
                     'type'    => 'regie',
                     'order'   => $order,
                     'project' => $project,
@@ -88,7 +104,10 @@ class BillingController extends AbstractController
         }
 
         $entries = array_merge($forfaitEntries, $regieEntries);
-        usort($entries, fn ($a, $b): int => ($a['date'] <=> $b['date']) ?: ($a['project']->getName() <=> $b['project']->getName()));
+        usort(
+            $entries,
+            fn ($a, $b): int => $a['date'] <=> $b['date'] ?: $a['project']->getName() <=> $b['project']->getName(),
+        );
 
         // Récupérer les marqueurs existants pour le mois
         $monthMarkers = $markersRepo->getMonthMarkers($start, $end);
@@ -108,8 +127,11 @@ class BillingController extends AbstractController
 
     #[Route('/mark/schedule/{id}', name: 'billing_mark_schedule', methods: ['POST'])]
     #[IsGranted('ROLE_COMPTA')]
-    public function markSchedule(OrderPaymentSchedule $schedule, Request $request, BillingMarkerRepository $repo): Response
-    {
+    public function markSchedule(
+        OrderPaymentSchedule $schedule,
+        Request $request,
+        BillingMarkerRepository $repo,
+    ): Response {
         $bm = $repo->getOrCreateForSchedule($schedule);
         $bm->setIsIssued($request->request->getBoolean('is_issued'));
         $issuedAt = $request->request->get('issued_at');

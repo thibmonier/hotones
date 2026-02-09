@@ -44,39 +44,36 @@ class BlogCategoryCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')
-            ->hideOnForm();
+        yield IdField::new('id')->hideOnForm();
 
-        yield TextField::new('name', 'Nom')
-            ->setRequired(true)
-            ->setHelp('Nom de la catégorie (ex: "Gestion de projet", "KPIs")');
+        yield TextField::new('name', 'Nom')->setRequired(true)->setHelp(
+            'Nom de la catégorie (ex: "Gestion de projet", "KPIs")',
+        );
 
-        yield SlugField::new('slug', 'Slug')
-            ->setTargetFieldName('name')
-            ->setHelp('URL-friendly identifier (auto-généré depuis le nom)');
+        yield SlugField::new('slug', 'Slug')->setTargetFieldName('name')->setHelp(
+            'URL-friendly identifier (auto-généré depuis le nom)',
+        );
 
         yield TextareaField::new('description', 'Description')
             ->setMaxLength(500)
             ->setHelp('Description courte de la catégorie')
             ->hideOnIndex();
 
-        yield ColorField::new('color', 'Couleur')
-            ->setHelp('Couleur pour l\'affichage (ex: #6366f1)');
+        yield ColorField::new('color', 'Couleur')->setHelp('Couleur pour l\'affichage (ex: #6366f1)');
 
-        yield BooleanField::new('active', 'Active')
-            ->renderAsSwitch(false)
-            ->setHelp('Catégories inactives ne sont pas affichées dans le frontend');
+        yield BooleanField::new('active', 'Active')->renderAsSwitch(false)->setHelp(
+            'Catégories inactives ne sont pas affichées dans le frontend',
+        );
 
-        yield IntegerField::new('posts.count', 'Nombre d\'articles')
-            ->hideOnForm()
-            ->formatValue(fn ($value, BlogCategory $entity) => $entity->getPosts()->count());
+        yield IntegerField::new('posts.count', 'Nombre d\'articles')->hideOnForm()->formatValue(
+            fn ($value, BlogCategory $entity) => $entity->getPosts()->count(),
+        );
     }
 
     #[Override]
     public function configureFilters(Filters $filters): Filters
     {
-        return $filters
-            ->add(BooleanFilter::new('active', 'Active'));
+        return $filters->add(BooleanFilter::new('active', 'Active'));
     }
 
     #[Override]

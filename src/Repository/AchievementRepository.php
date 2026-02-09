@@ -15,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AchievementRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Achievement::class, $companyContext);
     }
 
@@ -29,7 +27,8 @@ class AchievementRepository extends CompanyAwareRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createCompanyQueryBuilder('a')
+        return $this
+            ->createCompanyQueryBuilder('a')
             ->leftJoin('a.badge', 'b')
             ->andWhere('a.contributor = :contributor')
             ->setParameter('contributor', $contributor)
@@ -56,7 +55,8 @@ class AchievementRepository extends CompanyAwareRepository
      */
     public function findRecentAchievements(int $limit = 10): array
     {
-        return $this->createCompanyQueryBuilder('a')
+        return $this
+            ->createCompanyQueryBuilder('a')
             ->leftJoin('a.contributor', 'c')
             ->leftJoin('a.badge', 'b')
             ->orderBy('a.unlockedAt', 'DESC')
@@ -72,7 +72,8 @@ class AchievementRepository extends CompanyAwareRepository
      */
     public function findUnnotified(): array
     {
-        return $this->createCompanyQueryBuilder('a')
+        return $this
+            ->createCompanyQueryBuilder('a')
             ->andWhere('a.notified = :notified')
             ->setParameter('notified', false)
             ->orderBy('a.unlockedAt', 'ASC')

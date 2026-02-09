@@ -15,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ContributorSkillRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ContributorSkill::class, $companyContext);
     }
 
@@ -29,7 +27,8 @@ class ContributorSkillRepository extends CompanyAwareRepository
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->join('cs.skill', 's')
             ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
@@ -46,7 +45,8 @@ class ContributorSkillRepository extends CompanyAwareRepository
      */
     public function findBySkill(Skill $skill): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
             ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
@@ -86,13 +86,16 @@ class ContributorSkillRepository extends CompanyAwareRepository
      */
     public function findExpertsBySkill(Skill $skill): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
             ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
-            ->andWhere('cs.managerAssessmentLevel = :expert OR (cs.managerAssessmentLevel IS NULL AND cs.selfAssessmentLevel = :expert)')
+            ->andWhere(
+                'cs.managerAssessmentLevel = :expert OR (cs.managerAssessmentLevel IS NULL AND cs.selfAssessmentLevel = :expert)',
+            )
             ->setParameter('expert', ContributorSkill::LEVEL_EXPERT)
             ->orderBy('cs.dateAcquired', 'DESC')
             ->getQuery()
@@ -106,14 +109,12 @@ class ContributorSkillRepository extends CompanyAwareRepository
      */
     public function getLevelDistributionForSkill(Skill $skill): array
     {
-        $results = $this->createCompanyQueryBuilder('cs')
-            ->select(
-                'CASE
+        $results = $this
+            ->createCompanyQueryBuilder('cs')
+            ->select('CASE
                     WHEN cs.managerAssessmentLevel IS NOT NULL THEN cs.managerAssessmentLevel
                     ELSE cs.selfAssessmentLevel
-                END as effectiveLevel',
-                'COUNT(cs.id) as count',
-            )
+                END as effectiveLevel', 'COUNT(cs.id) as count')
             ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->groupBy('effectiveLevel')
@@ -135,7 +136,8 @@ class ContributorSkillRepository extends CompanyAwareRepository
      */
     public function findAssessmentGaps(): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
             ->join('cs.skill', 's')
             ->andWhere('cs.managerAssessmentLevel IS NOT NULL')
@@ -155,14 +157,12 @@ class ContributorSkillRepository extends CompanyAwareRepository
      */
     public function countByLevelForContributor(Contributor $contributor): array
     {
-        $results = $this->createCompanyQueryBuilder('cs')
-            ->select(
-                'CASE
+        $results = $this
+            ->createCompanyQueryBuilder('cs')
+            ->select('CASE
                     WHEN cs.managerAssessmentLevel IS NOT NULL THEN cs.managerAssessmentLevel
                     ELSE cs.selfAssessmentLevel
-                END as effectiveLevel',
-                'COUNT(cs.id) as count',
-            )
+                END as effectiveLevel', 'COUNT(cs.id) as count')
             ->andWhere('cs.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->groupBy('effectiveLevel')
@@ -184,16 +184,15 @@ class ContributorSkillRepository extends CompanyAwareRepository
      */
     public function findBySkillAndMinLevel(Skill $skill, int $minLevel): array
     {
-        return $this->createCompanyQueryBuilder('cs')
+        return $this
+            ->createCompanyQueryBuilder('cs')
             ->join('cs.contributor', 'c')
             ->andWhere('cs.skill = :skill')
             ->setParameter('skill', $skill)
             ->andWhere('c.active = :active')
             ->setParameter('active', true)
-            ->andWhere(
-                '(cs.managerAssessmentLevel >= :minLevel) OR
-                (cs.managerAssessmentLevel IS NULL AND cs.selfAssessmentLevel >= :minLevel)',
-            )
+            ->andWhere('(cs.managerAssessmentLevel >= :minLevel) OR
+                (cs.managerAssessmentLevel IS NULL AND cs.selfAssessmentLevel >= :minLevel)')
             ->setParameter('minLevel', $minLevel)
             ->orderBy('cs.managerAssessmentLevel', 'DESC')
             ->addOrderBy('cs.selfAssessmentLevel', 'DESC')

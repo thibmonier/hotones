@@ -14,10 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SaasServiceRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, SaasService::class, $companyContext);
     }
 
@@ -28,7 +26,8 @@ class SaasServiceRepository extends CompanyAwareRepository
      */
     public function findActive(): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->andWhere('s.active = :active')
             ->setParameter('active', true)
             ->orderBy('s.name', 'ASC')
@@ -43,7 +42,8 @@ class SaasServiceRepository extends CompanyAwareRepository
      */
     public function findByProvider(SaasProvider $provider): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->andWhere('s.provider = :provider')
             ->setParameter('provider', $provider)
             ->orderBy('s.name', 'ASC')
@@ -58,7 +58,8 @@ class SaasServiceRepository extends CompanyAwareRepository
      */
     public function findByCategory(string $category): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->andWhere('s.category = :category')
             ->setParameter('category', $category)
             ->orderBy('s.name', 'ASC')
@@ -73,7 +74,8 @@ class SaasServiceRepository extends CompanyAwareRepository
      */
     public function searchByName(string $search): array
     {
-        return $this->createCompanyQueryBuilder('s')
+        return $this
+            ->createCompanyQueryBuilder('s')
             ->andWhere('s.name LIKE :search')
             ->setParameter('search', '%'.$search.'%')
             ->orderBy('s.name', 'ASC')
@@ -88,7 +90,8 @@ class SaasServiceRepository extends CompanyAwareRepository
      */
     public function findAllCategories(): array
     {
-        $result = $this->createCompanyQueryBuilder('s')
+        $result = $this
+            ->createCompanyQueryBuilder('s')
             ->select('DISTINCT s.category')
             ->andWhere('s.category IS NOT NULL')
             ->orderBy('s.category', 'ASC')
@@ -105,7 +108,8 @@ class SaasServiceRepository extends CompanyAwareRepository
      */
     public function getServicesWithSubscriptionCount(): array
     {
-        $results = $this->createCompanyQueryBuilder('s')
+        $results = $this
+            ->createCompanyQueryBuilder('s')
             ->select('s', 'COUNT(sub.id) as subscriptionCount')
             ->leftJoin('s.subscriptions', 'sub')
             ->groupBy('s.id')

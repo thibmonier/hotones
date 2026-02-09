@@ -53,13 +53,13 @@ class CreateUserCommandTest extends TestCase
         $companyRepository->method('find')->willReturn($company);
 
         // Configure EntityManager to return appropriate repositories
-        $this->entityManager->method('getRepository')->willReturnCallback(
-            fn ($entityClass): \PHPUnit\Framework\MockObject\MockObject => match ($entityClass) {
+        $this->entityManager
+            ->method('getRepository')
+            ->willReturnCallback(fn ($entityClass): \PHPUnit\Framework\MockObject\MockObject => match ($entityClass) {
                 User::class    => $userRepository,
                 Company::class => $companyRepository,
                 default        => throw new Exception('Unexpected repository requested: '.$entityClass),
-            },
-        );
+            });
 
         $this->command       = new CreateUserCommand($this->entityManager, $this->passwordHasher);
         $this->commandTester = new CommandTester($this->command);
@@ -88,9 +88,7 @@ class CreateUserCommandTest extends TestCase
                 $persistedEntities[] = $entity;
             });
 
-        $this->entityManager
-            ->expects($this->exactly(2))
-            ->method('flush');
+        $this->entityManager->expects($this->exactly(2))->method('flush');
 
         // Execute command
         $exitCode = $this->commandTester->execute([
@@ -128,9 +126,7 @@ class CreateUserCommandTest extends TestCase
         $email = 'output@example.com';
 
         // Mock password hasher
-        $this->passwordHasher
-            ->method('hashPassword')
-            ->willReturn('hashed');
+        $this->passwordHasher->method('hashPassword')->willReturn('hashed');
 
         // Mock entity manager to set contributor ID
         $contributorId = 42;

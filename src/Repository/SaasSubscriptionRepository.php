@@ -15,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SaasSubscriptionRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, SaasSubscription::class, $companyContext);
     }
 
@@ -29,7 +27,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
      */
     public function findActive(): array
     {
-        return $this->createCompanyQueryBuilder('sub')
+        return $this
+            ->createCompanyQueryBuilder('sub')
             ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
             ->orderBy('sub.nextRenewalDate', 'ASC')
@@ -44,7 +43,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
      */
     public function findByStatus(string $status): array
     {
-        return $this->createCompanyQueryBuilder('sub')
+        return $this
+            ->createCompanyQueryBuilder('sub')
             ->andWhere('sub.status = :status')
             ->setParameter('status', $status)
             ->orderBy('sub.nextRenewalDate', 'ASC')
@@ -59,7 +59,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
      */
     public function findByService(SaasService $service): array
     {
-        return $this->createCompanyQueryBuilder('sub')
+        return $this
+            ->createCompanyQueryBuilder('sub')
             ->where('sub.service = :service')
             ->setParameter('service', $service)
             ->orderBy('sub.startDate', 'DESC')
@@ -78,7 +79,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
         $today = new DateTime();
         $today->setTime(0, 0, 0);
 
-        return $this->createCompanyQueryBuilder('sub')
+        return $this
+            ->createCompanyQueryBuilder('sub')
             ->andWhere('sub.status = :status')
             ->andWhere('sub.autoRenewal = :autoRenewal')
             ->andWhere('sub.nextRenewalDate <= :today')
@@ -103,7 +105,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
         $futureDate = clone $today;
         $futureDate->modify("+{$days} days");
 
-        return $this->createCompanyQueryBuilder('sub')
+        return $this
+            ->createCompanyQueryBuilder('sub')
             ->andWhere('sub.status = :status')
             ->andWhere('sub.nextRenewalDate BETWEEN :today AND :futureDate')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
@@ -151,7 +154,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
      */
     public function getStatsByStatus(): array
     {
-        $results = $this->createCompanyQueryBuilder('sub')
+        $results = $this
+            ->createCompanyQueryBuilder('sub')
             ->select('sub.status', 'COUNT(sub.id) as count')
             ->groupBy('sub.status')
             ->getQuery()
@@ -172,7 +176,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
      */
     public function getStatsByBillingPeriod(): array
     {
-        $results = $this->createCompanyQueryBuilder('sub')
+        $results = $this
+            ->createCompanyQueryBuilder('sub')
             ->select('sub.billingPeriod', 'COUNT(sub.id) as count')
             ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
@@ -193,7 +198,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
      */
     public function countActive(): int
     {
-        return (int) $this->createCompanyQueryBuilder('sub')
+        return (int) $this
+            ->createCompanyQueryBuilder('sub')
             ->select('COUNT(sub.id)')
             ->andWhere('sub.status = :status')
             ->setParameter('status', SaasSubscription::STATUS_ACTIVE)
@@ -208,7 +214,8 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
      */
     public function searchByName(string $search): array
     {
-        return $this->createCompanyQueryBuilder('sub')
+        return $this
+            ->createCompanyQueryBuilder('sub')
             ->leftJoin('sub.service', 's')
             ->addSelect('s')
             ->andWhere('sub.customName LIKE :search OR s.name LIKE :search')

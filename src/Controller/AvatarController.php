@@ -25,7 +25,7 @@ class AvatarController extends AbstractController
         #[Autowire(param: 'env(S3_PUBLIC_URL)')]
         private readonly string $publicUrl = '',
         #[Autowire(param: 'kernel.environment')]
-        private readonly string $environment = 'dev'
+        private readonly string $environment = 'dev',
     ) {
     }
 

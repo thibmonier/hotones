@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\OrderLine;
@@ -9,14 +11,17 @@ use PHPUnit\Framework\TestCase;
 
 class OrderLineTest extends TestCase
 {
-    private function createServiceLine(string $days, string $tjm, ?string $purchase = null, ?string $defaultProfileRate = '500'): OrderLine
-    {
+    private function createServiceLine(
+        string $days,
+        string $tjm,
+        ?string $purchase = null,
+        ?string $defaultProfileRate = '500',
+    ): OrderLine {
         $profile = new Profile()
             ->setName('Dev')
             ->setDefaultDailyRate($defaultProfileRate);
 
-        $section = new OrderSection()
-            ->setTitle('Section 1');
+        $section = new OrderSection()->setTitle('Section 1');
 
         $line = new OrderLine()
             ->setSection($section)

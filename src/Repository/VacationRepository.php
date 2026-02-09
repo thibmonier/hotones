@@ -19,10 +19,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class VacationRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, Vacation::class, $companyContext);
     }
 
@@ -31,7 +29,8 @@ class VacationRepository extends CompanyAwareRepository
      */
     public function countApprovedDaysBetween(DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
-        $vacations = $this->createCompanyQueryBuilder('v')
+        $vacations = $this
+            ->createCompanyQueryBuilder('v')
             ->andWhere('v.status = :approved')
             ->andWhere('v.startDate <= :endDate')
             ->andWhere('v.endDate >= :startDate')
@@ -70,7 +69,8 @@ class VacationRepository extends CompanyAwareRepository
             return [];
         }
 
-        return $this->createCompanyQueryBuilder('v')
+        return $this
+            ->createCompanyQueryBuilder('v')
             ->leftJoin('v.contributor', 'c')
             ->addSelect('c')
             ->andwhere('v.contributor IN (:contributors)')

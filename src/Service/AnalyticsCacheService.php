@@ -17,7 +17,7 @@ class AnalyticsCacheService
     private const string CACHE_KEY_PREFIX = 'analytics_';
 
     public function __construct(
-        private readonly CacheInterface $cache
+        private readonly CacheInterface $cache,
     ) {
     }
 

@@ -24,7 +24,7 @@ class ForecastingController extends AbstractController
     public function __construct(
         private readonly ForecastingService $forecastingService,
         private readonly FactForecastRepository $forecastRepository,
-        private readonly MessageBusInterface $messageBus
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 

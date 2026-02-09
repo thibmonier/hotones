@@ -14,10 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:gamification:seed-badges',
-    description: 'Crée les badges par défaut du système de gamification',
-)]
+#[AsCommand(name: 'app:gamification:seed-badges', description: 'Crée les badges par défaut du système de gamification')]
 class GamificationSeedBadgesCommand extends Command
 {
     public function __construct(
@@ -28,7 +25,12 @@ class GamificationSeedBadgesCommand extends Command
 
     protected function configure(): void
     {
-        $this->addOption('company-id', null, InputOption::VALUE_REQUIRED, 'ID de la Company (utilise la première si non spécifié)');
+        $this->addOption(
+            'company-id',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'ID de la Company (utilise la première si non spécifié)',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -55,8 +55,11 @@ class OnboardingControllerTest extends WebTestCase
         return $contributor;
     }
 
-    private function createTask(Contributor $contributor, string $title = 'Test Task', string $status = 'a_faire'): OnboardingTask
-    {
+    private function createTask(
+        Contributor $contributor,
+        string $title = 'Test Task',
+        string $status = 'a_faire',
+    ): OnboardingTask {
         $task = new OnboardingTask();
         $task->setContributor($contributor);
         $task->setTitle($title);

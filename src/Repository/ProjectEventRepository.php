@@ -13,10 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProjectEventRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ProjectEvent::class, $companyContext);
     }
 
@@ -27,7 +25,8 @@ class ProjectEventRepository extends CompanyAwareRepository
      */
     public function findByProject(int $projectId, int $limit = 50): array
     {
-        return $this->createCompanyQueryBuilder('e')
+        return $this
+            ->createCompanyQueryBuilder('e')
             ->leftJoin('e.actor', 'u')
             ->addSelect('u')
             ->andWhere('e.project = :projectId')

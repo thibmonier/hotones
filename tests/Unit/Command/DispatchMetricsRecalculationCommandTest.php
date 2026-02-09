@@ -202,9 +202,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithoutOptionsReturnsInvalid(): void
     {
-        $this->messageBus
-            ->expects($this->never())
-            ->method('dispatch');
+        $this->messageBus->expects($this->never())->method('dispatch');
 
         $exitCode = $this->commandTester->execute([]);
 
@@ -232,15 +230,17 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->assertTrue($definition->hasOption('granularity'));
 
         // Verify they are all optional (not required by Symfony, but VALUE_REQUIRED means value is needed if option is used)
-        $this->assertFalse($definition->getOption('year')->isValueRequired() && $definition->getOption('year')->isValueOptional());
-        $this->assertFalse($definition->getOption('date')->isValueRequired() && $definition->getOption('date')->isValueOptional());
+        $this->assertFalse(
+            $definition->getOption('year')->isValueRequired() && $definition->getOption('year')->isValueOptional(),
+        );
+        $this->assertFalse(
+            $definition->getOption('date')->isValueRequired() && $definition->getOption('date')->isValueOptional(),
+        );
     }
 
     public function testExecuteReturnsSuccessForValidInputs(): void
     {
-        $this->messageBus
-            ->method('dispatch')
-            ->willReturn(new Envelope(new stdClass()));
+        $this->messageBus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
         // Test with year
         $exitCode = $this->commandTester->execute(['--year' => '2024']);

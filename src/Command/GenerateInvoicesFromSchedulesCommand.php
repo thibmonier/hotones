@@ -39,7 +39,12 @@ class GenerateInvoicesFromSchedulesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('date', null, InputOption::VALUE_REQUIRED, 'Date de référence (format YYYY-MM-DD). Par défaut : aujourd\'hui')
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Date de référence (format YYYY-MM-DD). Par défaut : aujourd\'hui',
+            )
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulation sans enregistrement en base')
             ->addOption('skip-existing', null, InputOption::VALUE_NONE, 'Ignorer les échéances déjà facturées')
             ->setHelp(<<<'HELP'
@@ -55,8 +60,7 @@ class GenerateInvoicesFromSchedulesCommand extends Command
                 - La date de facturation est <= à la date de référence
                 - Le devis est signé (statut 'signe')
                 - Aucune facture n'existe déjà (si --skip-existing)
-                HELP
-            );
+                HELP);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -87,7 +91,8 @@ class GenerateInvoicesFromSchedulesCommand extends Command
         }
 
         // Récupérer les échéances éligibles
-        $qb = $this->entityManager->getRepository(OrderPaymentSchedule::class)
+        $qb = $this->entityManager
+            ->getRepository(OrderPaymentSchedule::class)
             ->createQueryBuilder('s')
             ->join('s.order', 'o')
             ->where('s.billingDate <= :date')
@@ -172,18 +177,20 @@ class GenerateInvoicesFromSchedulesCommand extends Command
             $totalTtc = bcadd($totalTtc, $invoice->getAmountTtc(), 2);
         }
 
-        $io->table(
-            ['Numéro facture', 'Numéro devis', 'Projet', 'Client', 'Montant HT', 'Montant TTC', 'Statut'],
-            $rows,
-        );
+        $io->table([
+            'Numéro facture',
+            'Numéro devis',
+            'Projet',
+            'Client',
+            'Montant HT',
+            'Montant TTC',
+            'Statut',
+        ], $rows);
 
-        $io->horizontalTable(
-            ['Total HT', 'Total TTC'],
-            [[
-                number_format((float) $totalHt, 2, ',', ' ').' €',
-                number_format((float) $totalTtc, 2, ',', ' ').' €',
-            ]],
-        );
+        $io->horizontalTable(['Total HT', 'Total TTC'], [[
+            number_format((float) $totalHt, 2, ',', ' ').' €',
+            number_format((float) $totalTtc, 2, ',', ' ').' €',
+        ]]);
 
         if (!$isDryRun) {
             $io->note('Les factures ont été créées avec le statut "brouillon". Pensez à les valider avant envoi.');

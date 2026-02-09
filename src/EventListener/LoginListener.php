@@ -16,7 +16,7 @@ class LoginListener
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
     ) {
     }
 

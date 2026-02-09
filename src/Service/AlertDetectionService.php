@@ -53,9 +53,7 @@ class AlertDetectionService
         $alertCount = 0;
 
         // Find active projects
-        $projects = $this->projectRepository->findBy(
-            ['status' => ['en_cours', 'planifie']],
-        );
+        $projects = $this->projectRepository->findBy(['status' => ['en_cours', 'planifie']]);
 
         foreach ($projects as $project) {
             // Skip projects without budget data
@@ -73,9 +71,7 @@ class AlertDetectionService
             if ($consumedPct >= 80 && $timeRemaining < 20) {
                 $recipients = $this->getBudgetAlertRecipients($project);
 
-                $this->eventDispatcher->dispatch(
-                    new ProjectBudgetAlertEvent($project, $consumedPct, $recipients),
-                );
+                $this->eventDispatcher->dispatch(new ProjectBudgetAlertEvent($project, $consumedPct, $recipients));
 
                 ++$alertCount;
             }
@@ -93,9 +89,7 @@ class AlertDetectionService
         $alertCount = 0;
 
         // Find active projects with sufficient progress for prediction
-        $projects = $this->projectRepository->findBy(
-            ['status' => ['en_cours']],
-        );
+        $projects = $this->projectRepository->findBy(['status' => ['en_cours']]);
 
         foreach ($projects as $project) {
             $prediction = $this->profitabilityPredictor->predictProfitability($project);
@@ -184,9 +178,7 @@ class AlertDetectionService
         $sevenDaysFromNow = new DateTimeImmutable()->modify('+7 days');
 
         // Find all active orders
-        $orders = $this->orderRepository->findBy(
-            ['status' => ['signe', 'gagne', 'en_cours']],
-        );
+        $orders = $this->orderRepository->findBy(['status' => ['signe', 'gagne', 'en_cours']]);
 
         foreach ($orders as $order) {
             foreach ($order->getPaymentSchedules() as $schedule) {
@@ -197,12 +189,7 @@ class AlertDetectionService
                     $daysUntilDue = new DateTime()->diff($schedule->getBillingDate())->days;
 
                     $this->eventDispatcher->dispatch(
-                        new PaymentDueAlertEvent(
-                            $order,
-                            $schedule->getBillingDate(),
-                            $daysUntilDue,
-                            $recipients,
-                        ),
+                        new PaymentDueAlertEvent($order, $schedule->getBillingDate(), $daysUntilDue, $recipients),
                     );
 
                     ++$alertCount;
@@ -222,7 +209,8 @@ class AlertDetectionService
         $yearMonth = $month->format('Y-m');
 
         $qb = $this->staffingMetricsRepository->createQueryBuilder('sm');
-        $qb->leftJoin('sm.dimTime', 'dt')
+        $qb
+            ->leftJoin('sm.dimTime', 'dt')
             ->where('sm.contributor = :contributorId')
             ->andWhere('dt.yearMonth = :yearMonth')
             ->andWhere('sm.granularity = :granularity')

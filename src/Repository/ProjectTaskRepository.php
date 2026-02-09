@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Project;
@@ -13,10 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProjectTaskRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ProjectTask::class, $companyContext);
     }
 
@@ -25,7 +25,8 @@ class ProjectTaskRepository extends CompanyAwareRepository
      */
     public function findByProjectOrderedByPosition(Project $project): array
     {
-        return $this->createCompanyQueryBuilder('t')
+        return $this
+            ->createCompanyQueryBuilder('t')
             ->andWhere('t.project = :project')
             ->orderBy('t.position', 'ASC')
             ->addOrderBy('t.id', 'ASC')
@@ -39,7 +40,8 @@ class ProjectTaskRepository extends CompanyAwareRepository
      */
     public function findMaxPositionForProject(Project $project): int
     {
-        return (int) $this->createCompanyQueryBuilder('t')
+        return (int) $this
+            ->createCompanyQueryBuilder('t')
             ->select('MAX(t.position)')
             ->andWhere('t.project = :project')
             ->setParameter('project', $project)
@@ -60,7 +62,8 @@ class ProjectTaskRepository extends CompanyAwareRepository
      */
     public function findProfitableTasksByProject(Project $project): array
     {
-        return $this->createCompanyQueryBuilder('t')
+        return $this
+            ->createCompanyQueryBuilder('t')
             ->andWhere('t.project = :project')
             ->andWhere('t.countsForProfitability = true')
             ->andWhere('t.type = :type')
@@ -76,7 +79,8 @@ class ProjectTaskRepository extends CompanyAwareRepository
      */
     public function countProfitableTasksByStatus(Project $project, string $status): int
     {
-        return (int) $this->createCompanyQueryBuilder('t')
+        return (int) $this
+            ->createCompanyQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->andWhere('t.project = :project')
             ->andWhere('t.status = :status')
@@ -94,7 +98,8 @@ class ProjectTaskRepository extends CompanyAwareRepository
      */
     public function countProfitableTasks(Project $project): int
     {
-        return (int) $this->createCompanyQueryBuilder('t')
+        return (int) $this
+            ->createCompanyQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->andWhere('t.project = :project')
             ->andWhere('t.countsForProfitability = true')
@@ -112,7 +117,8 @@ class ProjectTaskRepository extends CompanyAwareRepository
      */
     public function findOverdueTasksByContributor(\App\Entity\Contributor $contributor): array
     {
-        return $this->createCompanyQueryBuilder('t')
+        return $this
+            ->createCompanyQueryBuilder('t')
             ->andWhere('t.assignedContributor = :contributor')
             ->andWhere('t.endDate < :today')
             ->andWhere('t.status != :status_completed')

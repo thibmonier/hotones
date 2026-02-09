@@ -29,13 +29,12 @@ final class SaasRenewSubscriptionsCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addOption(
-                'dry-run',
-                null,
-                InputOption::VALUE_NONE,
-                'Affiche les abonnements à renouveler sans les modifier',
-            );
+        $this->addOption(
+            'dry-run',
+            null,
+            InputOption::VALUE_NONE,
+            'Affiche les abonnements à renouveler sans les modifier',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -56,10 +55,7 @@ final class SaasRenewSubscriptionsCommand extends Command
             return Command::SUCCESS;
         }
 
-        $io->title(sprintf(
-            '%d abonnement(s) à renouveler',
-            count($subscriptionsDue),
-        ));
+        $io->title(sprintf('%d abonnement(s) à renouveler', count($subscriptionsDue)));
 
         $renewed = 0;
         $errors  = 0;
@@ -83,19 +79,13 @@ final class SaasRenewSubscriptionsCommand extends Command
                     $subscription->renew();
 
                     $newRenewalDate = $subscription->getNextRenewalDate();
-                    $io->success(sprintf(
-                        'Abonnement renouvelé. Prochaine date: %s',
-                        $newRenewalDate->format('d/m/Y'),
-                    ));
+                    $io->success(sprintf('Abonnement renouvelé. Prochaine date: %s', $newRenewalDate->format('d/m/Y')));
 
                     ++$renewed;
                 } else {
                     // Calculer la future date sans modifier l'entité
                     $futureDate = $subscription->calculateNextRenewalDate($oldRenewalDate);
-                    $io->text(sprintf(
-                        '[DRY-RUN] Serait renouvelé. Prochaine date: %s',
-                        $futureDate->format('d/m/Y'),
-                    ));
+                    $io->text(sprintf('[DRY-RUN] Serait renouvelé. Prochaine date: %s', $futureDate->format('d/m/Y')));
                     ++$renewed;
                 }
             } catch (Exception $e) {
@@ -111,15 +101,9 @@ final class SaasRenewSubscriptionsCommand extends Command
         // Sauvegarder les modifications si pas en mode dry-run
         if (!$dryRun && $renewed > 0) {
             $this->em->flush();
-            $io->success(sprintf(
-                '%d abonnement(s) renouvelé(s) avec succès',
-                $renewed,
-            ));
+            $io->success(sprintf('%d abonnement(s) renouvelé(s) avec succès', $renewed));
         } elseif ($dryRun && $renewed > 0) {
-            $io->note(sprintf(
-                '[DRY-RUN] %d abonnement(s) auraient été renouvelés',
-                $renewed,
-            ));
+            $io->note(sprintf('[DRY-RUN] %d abonnement(s) auraient été renouvelés', $renewed));
         }
 
         if ($errors > 0) {

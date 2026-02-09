@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
 use App\Enum\NotificationType;
@@ -11,7 +13,7 @@ class KpiThresholdExceededEvent extends NotificationEvent
         private readonly float $currentValue,
         private readonly float $thresholdValue,
         private readonly string $condition, // 'above' ou 'below'
-        array $recipients
+        array $recipients,
     ) {
         $title = 'Seuil KPI dépassé';
 
@@ -28,11 +30,7 @@ class KpiThresholdExceededEvent extends NotificationEvent
                 $currentValue,
                 $thresholdValue,
             ),
-            default => sprintf(
-                'Le KPI "%s" a une valeur anormale : %.2f',
-                $kpiName,
-                $currentValue,
-            ),
+            default => sprintf('Le KPI "%s" a une valeur anormale : %.2f', $kpiName, $currentValue),
         };
 
         parent::__construct(

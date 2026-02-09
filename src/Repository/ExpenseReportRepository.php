@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Contributor;
@@ -15,10 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ExpenseReportRepository extends CompanyAwareRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        CompanyContext $companyContext
-    ) {
+    public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
+    {
         parent::__construct($registry, ExpenseReport::class, $companyContext);
     }
 
@@ -31,7 +31,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function findByContributor(Contributor $contributor, array $filters = []): array
     {
-        $qb = $this->createCompanyQueryBuilder('e')
+        $qb = $this
+            ->createCompanyQueryBuilder('e')
             ->andWhere('e.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('e.expenseDate', 'DESC')
@@ -39,31 +40,26 @@ class ExpenseReportRepository extends CompanyAwareRepository
 
         // Filtre par statut
         if (isset($filters['status']) && $filters['status']) {
-            $qb->andWhere('e.status = :status')
-                ->setParameter('status', $filters['status']);
+            $qb->andWhere('e.status = :status')->setParameter('status', $filters['status']);
         }
 
         // Filtre par catégorie
         if (isset($filters['category']) && $filters['category']) {
-            $qb->andWhere('e.category = :category')
-                ->setParameter('category', $filters['category']);
+            $qb->andWhere('e.category = :category')->setParameter('category', $filters['category']);
         }
 
         // Filtre par projet
         if (isset($filters['project']) && $filters['project'] instanceof Project) {
-            $qb->andWhere('e.project = :project')
-                ->setParameter('project', $filters['project']);
+            $qb->andWhere('e.project = :project')->setParameter('project', $filters['project']);
         }
 
         // Filtre par période
         if (isset($filters['start_date']) && $filters['start_date'] instanceof DateTimeInterface) {
-            $qb->andWhere('e.expenseDate >= :start_date')
-                ->setParameter('start_date', $filters['start_date']);
+            $qb->andWhere('e.expenseDate >= :start_date')->setParameter('start_date', $filters['start_date']);
         }
 
         if (isset($filters['end_date']) && $filters['end_date'] instanceof DateTimeInterface) {
-            $qb->andWhere('e.expenseDate <= :end_date')
-                ->setParameter('end_date', $filters['end_date']);
+            $qb->andWhere('e.expenseDate <= :end_date')->setParameter('end_date', $filters['end_date']);
         }
 
         return $qb->getQuery()->getResult();
@@ -76,7 +72,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function findPending(): array
     {
-        return $this->createCompanyQueryBuilder('e')
+        return $this
+            ->createCompanyQueryBuilder('e')
             ->andWhere('e.status = :status')
             ->setParameter('status', ExpenseReport::STATUS_PENDING)
             ->orderBy('e.expenseDate', 'ASC')
@@ -91,7 +88,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function findByProject(Project $project): array
     {
-        return $this->createCompanyQueryBuilder('e')
+        return $this
+            ->createCompanyQueryBuilder('e')
             ->andWhere('e.project = :project')
             ->setParameter('project', $project)
             ->orderBy('e.expenseDate', 'DESC')
@@ -106,7 +104,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function findByOrder(Order $order): array
     {
-        return $this->createCompanyQueryBuilder('e')
+        return $this
+            ->createCompanyQueryBuilder('e')
             ->andWhere('e.order = :order')
             ->setParameter('order', $order)
             ->orderBy('e.expenseDate', 'DESC')
@@ -121,7 +120,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function calculateTotalByCategory(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $results = $this->createCompanyQueryBuilder('e')
+        $results = $this
+            ->createCompanyQueryBuilder('e')
             ->select('e.category', 'SUM(e.amountTTC) as total', 'COUNT(e.id) as count')
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -150,7 +150,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function calculateTotalRebillable(Order $order): string
     {
-        $result = $this->createCompanyQueryBuilder('e')
+        $result = $this
+            ->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC) as total')
             ->andWhere('e.order = :order')
             ->andWhere('e.status IN (:statuses)')
@@ -169,19 +170,19 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function calculateStats(DateTimeInterface $start, DateTimeInterface $end): array
     {
-        $qb = $this->createCompanyQueryBuilder('e')
+        $qb = $this
+            ->createCompanyQueryBuilder('e')
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
             ->setParameter('start', $start)
             ->setParameter('end', $end);
 
         // Total TTC
-        $total = $qb->select('SUM(e.amountTTC)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $total = $qb->select('SUM(e.amountTTC)')->getQuery()->getSingleScalarResult();
 
         // Total validé (à rembourser)
-        $validated = $this->createCompanyQueryBuilder('e')
+        $validated = $this
+            ->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC)')
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -193,7 +194,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
             ->getSingleScalarResult();
 
         // Total en attente
-        $pending = $this->createCompanyQueryBuilder('e')
+        $pending = $this
+            ->createCompanyQueryBuilder('e')
             ->select('SUM(e.amountTTC)')
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -205,9 +207,7 @@ class ExpenseReportRepository extends CompanyAwareRepository
             ->getSingleScalarResult();
 
         // Nombre de frais
-        $count = $qb->select('COUNT(e.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $count = $qb->select('COUNT(e.id)')->getQuery()->getSingleScalarResult();
 
         return [
             'total'     => $total ? (string) $total : '0.00',
@@ -224,7 +224,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function findTopContributors(DateTimeInterface $start, DateTimeInterface $end, int $limit = 5): array
     {
-        $results = $this->createCompanyQueryBuilder('e')
+        $results = $this
+            ->createCompanyQueryBuilder('e')
             ->select('IDENTITY(e.contributor) as contributor_id', 'SUM(e.amountTTC) as total', 'COUNT(e.id) as count')
             ->andWhere('e.expenseDate >= :start')
             ->andWhere('e.expenseDate <= :end')
@@ -264,7 +265,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
      */
     public function findAllWithFilters(array $filters = []): array
     {
-        $qb = $this->createCompanyQueryBuilder('e')
+        $qb = $this
+            ->createCompanyQueryBuilder('e')
             ->leftJoin('e.contributor', 'c')
             ->leftJoin('e.project', 'p')
             ->leftJoin('e.order', 'o')
@@ -274,33 +276,28 @@ class ExpenseReportRepository extends CompanyAwareRepository
 
         // Filtre par statut
         if (isset($filters['status']) && $filters['status']) {
-            $qb->andWhere('e.status = :status')
-                ->setParameter('status', $filters['status']);
+            $qb->andWhere('e.status = :status')->setParameter('status', $filters['status']);
         }
 
         // Filtre par catégorie
         if (isset($filters['category']) && $filters['category']) {
-            $qb->andWhere('e.category = :category')
-                ->setParameter('category', $filters['category']);
+            $qb->andWhere('e.category = :category')->setParameter('category', $filters['category']);
         }
 
         // Filtre par contributeur
         if (isset($filters['contributor']) && $filters['contributor'] instanceof Contributor) {
-            $qb->andWhere('e.contributor = :contributor')
-                ->setParameter('contributor', $filters['contributor']);
+            $qb->andWhere('e.contributor = :contributor')->setParameter('contributor', $filters['contributor']);
         }
 
         // Filtre par projet
         if (isset($filters['project']) && $filters['project'] instanceof Project) {
-            $qb->andWhere('e.project = :project')
-                ->setParameter('project', $filters['project']);
+            $qb->andWhere('e.project = :project')->setParameter('project', $filters['project']);
         }
 
         // Filtre refacturable
         if (isset($filters['rebillable'])) {
             if ($filters['rebillable']) {
-                $qb->andWhere('e.order IS NOT NULL')
-                    ->andWhere('o.expensesRebillable = true');
+                $qb->andWhere('e.order IS NOT NULL')->andWhere('o.expensesRebillable = true');
             } else {
                 $qb->andWhere('e.order IS NULL OR o.expensesRebillable = false');
             }
@@ -308,13 +305,11 @@ class ExpenseReportRepository extends CompanyAwareRepository
 
         // Filtre par période
         if (isset($filters['start_date']) && $filters['start_date'] instanceof DateTimeInterface) {
-            $qb->andWhere('e.expenseDate >= :start_date')
-                ->setParameter('start_date', $filters['start_date']);
+            $qb->andWhere('e.expenseDate >= :start_date')->setParameter('start_date', $filters['start_date']);
         }
 
         if (isset($filters['end_date']) && $filters['end_date'] instanceof DateTimeInterface) {
-            $qb->andWhere('e.expenseDate <= :end_date')
-                ->setParameter('end_date', $filters['end_date']);
+            $qb->andWhere('e.expenseDate <= :end_date')->setParameter('end_date', $filters['end_date']);
         }
 
         return $qb->getQuery()->getResult();

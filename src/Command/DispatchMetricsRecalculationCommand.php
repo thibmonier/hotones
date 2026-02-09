@@ -19,15 +19,21 @@ use Symfony\Component\Messenger\MessageBusInterface;
 )]
 final class DispatchMetricsRecalculationCommand extends Command
 {
-    public function __construct(private readonly MessageBusInterface $bus)
-    {
+    public function __construct(
+        private readonly MessageBusInterface $bus,
+    ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this
-            ->addOption('year', null, InputOption::VALUE_REQUIRED, 'Recalculate for the given year (dispatch monthly, quarterly, yearly)')
+            ->addOption(
+                'year',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Recalculate for the given year (dispatch monthly, quarterly, yearly)',
+            )
             ->addOption('date', null, InputOption::VALUE_REQUIRED, 'Reference date (Y-m-d)')
             ->addOption('granularity', null, InputOption::VALUE_REQUIRED, 'monthly|quarterly|yearly');
     }
@@ -46,8 +52,10 @@ final class DispatchMetricsRecalculationCommand extends Command
             }
             // quarterly
             for ($q = 1; $q <= 4; ++$q) {
-                $startMonth = ($q - 1) * 3 + 1;
-                $this->bus->dispatch(new RecalculateMetricsMessage(sprintf('%04d-%02d-01', $y, $startMonth), 'quarterly'));
+                $startMonth = (($q - 1) * 3) + 1;
+                $this->bus->dispatch(
+                    new RecalculateMetricsMessage(sprintf('%04d-%02d-01', $y, $startMonth), 'quarterly'),
+                );
             }
             // yearly
             $this->bus->dispatch(new RecalculateMetricsMessage(sprintf('%04d-01-01', $y), 'yearly'));

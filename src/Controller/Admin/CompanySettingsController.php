@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Repository\CompanySettingsRepository;
@@ -20,7 +22,7 @@ class CompanySettingsController extends AbstractController
         Request $request,
         CompanySettingsRepository $companySettingsRepository,
         CjmCalculatorService $cjmCalculatorService,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
     ): Response {
         $settings = $companySettingsRepository->getSettings();
 

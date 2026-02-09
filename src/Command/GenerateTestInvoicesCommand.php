@@ -23,15 +23,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GenerateTestInvoicesCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->addOption('count', 'c', InputOption::VALUE_REQUIRED, 'Nombre de factures à générer', 20);
+        $this->addOption('count', 'c', InputOption::VALUE_REQUIRED, 'Nombre de factures à générer', 20);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -59,9 +58,9 @@ class GenerateTestInvoicesCommand extends Command
         }
 
         $statuses = [
-            Invoice::STATUS_SENT    => 40,     // 40% envoyées
-            Invoice::STATUS_PAID    => 45,     // 45% payées
-            Invoice::STATUS_OVERDUE => 15,  // 15% en retard
+            Invoice::STATUS_SENT    => 40, // 40% envoyées
+            Invoice::STATUS_PAID    => 45, // 45% payées
+            Invoice::STATUS_OVERDUE => 15, // 15% en retard
         ];
 
         $today        = new DateTime();
@@ -81,13 +80,13 @@ class GenerateTestInvoicesCommand extends Command
             $invoice->setCompany($project->getCompany());
 
             // Numéro de facture unique
-            $invoiceNumber = sprintf('FAC-TEST-%s-%03d', $today->format('Ym'), $i + 1 + time() % 100);
+            $invoiceNumber = sprintf('FAC-TEST-%s-%03d', $today->format('Ym'), $i + 1 + (time() % 100));
             $invoice->setInvoiceNumber($invoiceNumber);
 
             // Montant aléatoire entre 2000€ et 25000€
             $amountHt  = random_int(2000, 25000);
             $tvaRate   = 20.00;
-            $amountTva = $amountHt * $tvaRate / 100;
+            $amountTva = ($amountHt * $tvaRate) / 100;
             $amountTtc = $amountHt + $amountTva;
 
             $invoice->setAmountHt((string) $amountHt);
@@ -127,7 +126,7 @@ class GenerateTestInvoicesCommand extends Command
             $this->em->persist($invoice);
             ++$createdCount;
 
-            if ($createdCount % 10 === 0) {
+            if (($createdCount % 10) === 0) {
                 $this->em->flush();
                 $io->write('.');
             }

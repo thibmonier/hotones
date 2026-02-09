@@ -29,7 +29,8 @@ class ContributorTechnologyType extends AbstractType
                 'attr'          => ['class' => 'form-select'],
                 'placeholder'   => 'Sélectionnez une technologie',
                 'required'      => true,
-                'query_builder' => fn ($repository) => $repository->createQueryBuilder('t')
+                'query_builder' => fn ($repository) => $repository
+                    ->createQueryBuilder('t')
                     ->where('t.active = :active')
                     ->setParameter('active', true)
                     ->orderBy('t.category', 'ASC')
@@ -120,8 +121,7 @@ class ContributorTechnologyType extends AbstractType
                     'placeholder' => 'Notes sur cette technologie (projets, certifications, remarques, etc.)',
                 ],
                 'required' => false,
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
