@@ -1043,15 +1043,15 @@
     loader-utils "^2.0.0 || ^3.0.0"
     schema-utils "^3.0.0 || ^4.0.0"
 
-"@symfony/ux-live-component@^2.31.0":
-  version "2.31.0"
-  resolved "https://registry.npmjs.org/@symfony/ux-live-component/-/ux-live-component-2.31.0.tgz"
-  integrity sha512-bBrnVoyKpHZpXZFRTRxz+PaY6wKM0bTF0sM2IrtmE9oHn3xaahV6G7hBq5R12/8IGKzZx1ct4S4qO7Ar+80UYA==
+"@symfony/ux-live-component@^2.32.0":
+  version "2.32.0"
+  resolved "https://registry.yarnpkg.com/@symfony/ux-live-component/-/ux-live-component-2.32.0.tgz#9357805b6d0008a404798ca0dd3c934c2b32e5a8"
+  integrity sha512-ATE7wKAguAH6JlTg5IF3/gCMhbnV3M0y3kx98wH1ALXpLTOWiskijvLBw/4zbPQBJ9nXMf+WJ0Pfa3ANLdzW6Q==
 
-"@symfony/ux-turbo@^2.31.0":
-  version "2.31.0"
-  resolved "https://registry.npmjs.org/@symfony/ux-turbo/-/ux-turbo-2.31.0.tgz"
-  integrity sha512-Nr08xK8CSObJ9ZVELv4Gehe1PkIjC6tr4UTcPQZ2Lvx+wsOc1LRiHA5nWqBZi+puVf5UaJI78wi8LqgwYQ7Zdg==
+"@symfony/ux-turbo@^2.32.0":
+  version "2.32.0"
+  resolved "https://registry.yarnpkg.com/@symfony/ux-turbo/-/ux-turbo-2.32.0.tgz#82c047285f9ec684041889129357dd443e0b984d"
+  integrity sha512-uWidS6yHdG9+ipoYH4N5t32QgNjk30RQFOctcWCy0VfIY9siBh5RWHg3J8sqsdNGAe59aMWW9m+oVllL4WF3cA==
 
 "@symfony/webpack-encore@^5.3.1":
   version "5.3.1"
@@ -3483,9 +3483,9 @@ punycode@^2.1.0:
   integrity sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==
 
 qs@~6.14.0:
-  version "6.14.1"
-  resolved "https://registry.npmjs.org/qs/-/qs-6.14.1.tgz"
-  integrity sha512-4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==
+  version "6.14.2"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.14.2.tgz#b5634cf9d9ad9898e31fba3504e866e8efb6798c"
+  integrity sha512-V/yCWTTF7VJ9hIh18Ugr2zhJMP01MY7c5kh4J870L7imm6/DIzBsNLTXzMwUA3yZ5b/KBqLx8Kp3uRvd7xSe3Q==
   dependencies:
     side-channel "^1.1.0"
 
