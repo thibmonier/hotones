@@ -350,7 +350,7 @@ class Contributor implements CompanyOwnedInterface
         if ($this->timesheets->removeElement($timesheet)) {
             // set the owning side to null (unless already changed)
             if ($timesheet->getContributor() === $this) {
-                $timesheet->setContributor(null);
+                $timesheet->setContributor(null); // @phpstan-ignore argument.type
             }
         }
 

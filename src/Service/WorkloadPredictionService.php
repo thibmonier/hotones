@@ -159,8 +159,8 @@ class WorkloadPredictionService
             'totalDays'      => $totalDays,
             'amount'         => $amount,
             'daysOld'        => $daysOld,
-            'client'         => $client?->name  ?? 'N/A',
-            'project'        => $project?->name ?? 'N/A',
+            'client'         => $client->name  ?? 'N/A',
+            'project'        => $project->name ?? 'N/A',
         ];
     }
 

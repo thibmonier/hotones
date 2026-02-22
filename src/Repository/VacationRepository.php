@@ -73,7 +73,7 @@ class VacationRepository extends CompanyAwareRepository
             ->createCompanyQueryBuilder('v')
             ->leftJoin('v.contributor', 'c')
             ->addSelect('c')
-            ->andwhere('v.contributor IN (:contributors)')
+            ->andWhere('v.contributor IN (:contributors)')
             ->andWhere('v.status = :status')
             ->setParameter('contributors', $contributors)
             ->setParameter('status', 'pending')

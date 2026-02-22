@@ -102,8 +102,8 @@ class TimesheetController extends AbstractController
             'startDate'         => $startDate,
             'endDate'           => $endDate,
             'currentWeek'       => $currentWeek,
-            'previousWeek'      => $year.'-W'.str_pad($week - 1, 2, '0', STR_PAD_LEFT),
-            'nextWeek'          => $year.'-W'.str_pad($week + 1, 2, '0', STR_PAD_LEFT),
+            'previousWeek'      => $year.'-W'.str_pad((string) ($week - 1), 2, '0', STR_PAD_LEFT),
+            'nextWeek'          => $year.'-W'.str_pad((string) ($week + 1), 2, '0', STR_PAD_LEFT),
             'activeTimer'       => $activeTimer,
             'hoursPerDay'       => $contributor ? $contributor->getHoursPerDay() : 7.0,
         ]);
@@ -181,7 +181,7 @@ class TimesheetController extends AbstractController
         }
 
         if ($hours > 0) {
-            $timesheet->setHours($hours);
+            $timesheet->setHours((string) $hours);
             $timesheet->setNotes($notes);
             $em->persist($timesheet);
         } else {

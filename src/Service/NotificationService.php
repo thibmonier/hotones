@@ -13,6 +13,7 @@ use App\Repository\NotificationRepository;
 use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class NotificationService
 {
@@ -104,7 +105,7 @@ class NotificationService
     /**
      * Marque toutes les notifications d'un utilisateur comme lues.
      */
-    public function markAllAsRead(User $user): int
+    public function markAllAsRead(UserInterface $user): int
     {
         return $this->notificationRepository->markAllAsReadForUser($user);
     }
@@ -123,7 +124,7 @@ class NotificationService
      *
      * @return Notification[]
      */
-    public function getUnreadNotifications(User $user, ?int $limit = null): array
+    public function getUnreadNotifications(UserInterface $user, ?int $limit = null): array
     {
         return $this->notificationRepository->findUnreadByUser($user, $limit);
     }
@@ -131,7 +132,7 @@ class NotificationService
     /**
      * Compte les notifications non lues d'un utilisateur.
      */
-    public function countUnreadNotifications(User $user): int
+    public function countUnreadNotifications(UserInterface $user): int
     {
         return $this->notificationRepository->countUnreadByUser($user);
     }

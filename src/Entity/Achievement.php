@@ -67,7 +67,7 @@ class Achievement implements CompanyOwnedInterface
         return $this->badge;
     }
 
-    public function setBadge(Badge $badge): static
+    public function setBadge(?Badge $badge): static
     {
         $this->badge = $badge;
 

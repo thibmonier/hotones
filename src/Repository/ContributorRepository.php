@@ -6,11 +6,11 @@ namespace App\Repository;
 
 use App\Entity\Contributor;
 use App\Entity\Profile;
-use App\Entity\User;
 use App\Security\CompanyContext;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends CompanyAwareRepository<Contributor>
@@ -77,7 +77,7 @@ class ContributorRepository extends CompanyAwareRepository
     /**
      * Trouve un contributeur par utilisateur associé.
      */
-    public function findByUser(User $user): ?Contributor
+    public function findByUser(?UserInterface $user): ?Contributor
     {
         return $this->findOneBy(['user' => $user]);
     }

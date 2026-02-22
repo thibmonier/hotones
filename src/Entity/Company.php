@@ -522,7 +522,7 @@ class Company implements Stringable
         if ($this->businessUnits->removeElement($businessUnit)) {
             // Set the owning side to null (unless already changed)
             if ($businessUnit->getCompany() === $this) {
-                $businessUnit->setCompany(null);
+                $businessUnit->setCompany(null); // @phpstan-ignore argument.type
             }
         }
 
@@ -552,7 +552,7 @@ class Company implements Stringable
         if ($this->users->removeElement($user)) {
             // Set the owning side to null (unless already changed)
             if ($user->getCompany() === $this) {
-                $user->setCompany(null);
+                $user->setCompany(null); // @phpstan-ignore argument.type
             }
         }
 

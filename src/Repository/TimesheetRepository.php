@@ -236,7 +236,7 @@ class TimesheetRepository extends CompanyAwareRepository
 
         if ($subTask) {
             $qb->andWhere('t.subTask = :subTask')->setParameter('subTask', $subTask);
-        } elseif ($task) {
+        } elseif ($task !== null) {
             $qb->andWhere('t.task = :task')->setParameter('task', $task)->andWhere('t.subTask IS NULL');
         } else {
             $qb->andWhere('t.task IS NULL')->andWhere('t.subTask IS NULL');

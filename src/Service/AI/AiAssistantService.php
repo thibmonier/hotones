@@ -38,7 +38,10 @@ final readonly class AiAssistantService
 
         $response = $this->sentimentAgent->call($messages);
 
-        return json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+        /** @var string $content */
+        $content = $response->getContent();
+
+        return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -67,6 +70,9 @@ final readonly class AiAssistantService
 
         $response = $this->quoteAgent->call($messages);
 
-        return json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+        /** @var string $content */
+        $content = $response->getContent();
+
+        return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 }

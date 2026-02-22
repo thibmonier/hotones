@@ -72,8 +72,8 @@ class MyTasksController extends AbstractController
             'startDate'    => $startDate,
             'endDate'      => $endDate,
             'currentWeek'  => $currentWeek,
-            'previousWeek' => $year.'-W'.str_pad($week - 1, 2, '0', STR_PAD_LEFT),
-            'nextWeek'     => $year.'-W'.str_pad($week + 1, 2, '0', STR_PAD_LEFT),
+            'previousWeek' => $year.'-W'.str_pad((string) ($week - 1), 2, '0', STR_PAD_LEFT),
+            'nextWeek'     => $year.'-W'.str_pad((string) ($week + 1), 2, '0', STR_PAD_LEFT),
         ]);
     }
 }

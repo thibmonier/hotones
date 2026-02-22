@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Notification;
-use App\Entity\User;
 use App\Security\CompanyContext;
 use DateTimeImmutable;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends CompanyAwareRepository<Notification>
@@ -25,7 +25,7 @@ class NotificationRepository extends CompanyAwareRepository
      *
      * @return Notification[]
      */
-    public function findUnreadByUser(User $user, ?int $limit = null): array
+    public function findUnreadByUser(UserInterface $user, ?int $limit = null): array
     {
         $qb = $this
             ->createCompanyQueryBuilder('n')
@@ -44,7 +44,7 @@ class NotificationRepository extends CompanyAwareRepository
     /**
      * Compte les notifications non lues d'un utilisateur.
      */
-    public function countUnreadByUser(User $user): int
+    public function countUnreadByUser(UserInterface $user): int
     {
         return (int) $this
             ->createCompanyQueryBuilder('n')
@@ -59,7 +59,7 @@ class NotificationRepository extends CompanyAwareRepository
     /**
      * Marque toutes les notifications d'un utilisateur comme lues.
      */
-    public function markAllAsReadForUser(User $user): int
+    public function markAllAsReadForUser(UserInterface $user): int
     {
         return $this
             ->createCompanyQueryBuilder('n')

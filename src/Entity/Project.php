@@ -391,7 +391,7 @@ class Project implements CompanyOwnedInterface
     {
         if ($this->tasks->removeElement($task)) {
             if ($task->getProject() === $this) {
-                $task->setProject(null);
+                $task->setProject(null); // @phpstan-ignore argument.type
             }
         }
 

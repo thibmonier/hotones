@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class PerformanceReviewService
 {
@@ -295,7 +296,7 @@ class PerformanceReviewService
     /**
      * Check if contributor can edit self-evaluation.
      */
-    public function canEditSelfEvaluation(PerformanceReview $review, User $user): bool
+    public function canEditSelfEvaluation(PerformanceReview $review, ?UserInterface $user): bool
     {
         // User must be the contributor and status must be en_attente or auto_eval_faite
         return $review->getContributor()->getUser() === $user
@@ -305,7 +306,7 @@ class PerformanceReviewService
     /**
      * Check if manager can edit manager evaluation.
      */
-    public function canEditManagerEvaluation(PerformanceReview $review, User $user): bool
+    public function canEditManagerEvaluation(PerformanceReview $review, ?UserInterface $user): bool
     {
         // User must be the manager and self-evaluation must be completed
         return $review->getManager() === $user
@@ -315,7 +316,7 @@ class PerformanceReviewService
     /**
      * Check if manager can validate review.
      */
-    public function canValidateReview(PerformanceReview $review, User $user): bool
+    public function canValidateReview(PerformanceReview $review, ?UserInterface $user): bool
     {
         // User must be the manager and both evaluations must be completed
         return $review->getManager() === $user && 'eval_manager_faite' === $review->getStatus();

@@ -6,6 +6,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\Project;
 use App\Entity\ProjectEvent;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
@@ -95,7 +96,8 @@ class ProjectEventSubscriber
         $event->setEventType($type);
         $event->setDescription($description);
         $event->setData($data);
-        $event->setActor($this->security->getUser());
+        $user = $this->security->getUser();
+        $event->setActor($user instanceof User ? $user : null);
 
         $this->em->persist($event);
         $this->em->flush();

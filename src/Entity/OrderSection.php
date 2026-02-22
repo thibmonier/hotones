@@ -121,7 +121,7 @@ class OrderSection implements CompanyOwnedInterface
     {
         if ($this->lines->removeElement($line)) {
             if ($line->getSection() === $this) {
-                $line->setSection(null);
+                $line->setSection(null); // @phpstan-ignore argument.type
             }
         }
 

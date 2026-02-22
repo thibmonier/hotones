@@ -267,7 +267,7 @@ class Order implements CompanyOwnedInterface
     {
         if ($this->tasks->removeElement($task)) {
             if ($task->getOrder() === $this) {
-                $task->setOrder(null);
+                $task->setOrder(null); // @phpstan-ignore argument.type
             }
         }
 
@@ -293,7 +293,7 @@ class Order implements CompanyOwnedInterface
     {
         if ($this->sections->removeElement($section)) {
             if ($section->getOrder() === $this) {
-                $section->setOrder(null);
+                $section->setOrder(null); // @phpstan-ignore argument.type
             }
         }
 

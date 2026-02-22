@@ -166,10 +166,10 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     /**
      * Calcule le nombre de jours ouvrés entre deux dates.
      */
-    public function calculateWorkingDays(DateTime $startDate, DateTime $endDate): int
+    public function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
         $workingDays = 0;
-        $current     = clone $startDate;
+        $current     = new DateTime($startDate->format('Y-m-d'));
 
         while ($current <= $endDate) {
             // Exclure les weekends (samedi = 6, dimanche = 0)

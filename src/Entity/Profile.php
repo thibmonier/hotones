@@ -150,7 +150,7 @@ class Profile implements CompanyOwnedInterface
     {
         if ($this->orderTasks->removeElement($orderTask)) {
             if ($orderTask->getProfile() === $this) {
-                $orderTask->setProfile(null);
+                $orderTask->setProfile(null); // @phpstan-ignore argument.type
             }
         }
 

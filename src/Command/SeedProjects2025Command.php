@@ -268,8 +268,11 @@ class SeedProjects2025Command extends Command
 
     private function createSignedOrderForProject(Project $project, array $profiles, Company $company, User $user): void
     {
-        $createdAt = DateTimeImmutable::createFromMutable($project->getStartDate());
-        $order     = new Order();
+        $startDate = $project->getStartDate();
+        $createdAt = $startDate instanceof DateTime
+            ? DateTimeImmutable::createFromMutable($startDate)
+            : new DateTimeImmutable();
+        $order = new Order();
         $order->setCompany($project->getCompany());
         $order
             ->setProject($project)

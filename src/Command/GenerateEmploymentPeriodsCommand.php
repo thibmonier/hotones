@@ -115,8 +115,8 @@ class GenerateEmploymentPeriodsCommand extends Command
             if ($endDate) {
                 $period->setEndDate($endDate);
             }
-            $period->setWeeklyHours($weeklyHours);
-            $period->setWorkTimePercentage($workPercentage);
+            $period->setWeeklyHours((string) $weeklyHours);
+            $period->setWorkTimePercentage((string) $workPercentage);
 
             // Copy profiles from contributor to employment period
             foreach ($contributor->getProfiles() as $profile) {

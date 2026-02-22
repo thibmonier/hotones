@@ -15,6 +15,7 @@ use App\Repository\VacationRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -89,7 +90,7 @@ class ProjectPlanningAssistant
     /**
      * Suggère une affectation pour une tâche donnée.
      */
-    private function suggestAssignment(ProjectTask $task, Project $project, DateTime $preferredStartDate): ?array
+    private function suggestAssignment(ProjectTask $task, Project $project, DateTimeInterface $preferredStartDate): ?array
     {
         $requiredProfile = $task->getRequiredProfile();
         if (!$requiredProfile) {
@@ -141,7 +142,7 @@ class ProjectPlanningAssistant
      *     currentLoad: float
      * }>
      */
-    private function findCandidates($profile, DateTime $startDate, float $estimatedDays): array
+    private function findCandidates($profile, DateTimeInterface $startDate, float $estimatedDays): array
     {
         // Récupérer les contributeurs avec le profil requis
         $contributors = $this->contributorRepository->findActiveContributorsByProfile($profile);
@@ -162,7 +163,7 @@ class ProjectPlanningAssistant
      */
     private function evaluateContributorAvailability(
         Contributor $contributor,
-        DateTime $startDate,
+        DateTimeInterface $startDate,
         float $estimatedDays,
     ): ?array {
         // Calculer la date de fin estimée
@@ -209,7 +210,7 @@ class ProjectPlanningAssistant
     private function selectBestCandidate(
         array $candidates,
         ProjectTask $task,
-        DateTime $preferredStartDate,
+        DateTimeInterface $preferredStartDate,
         float $estimatedDays,
     ): ?array {
         if (empty($candidates)) {
@@ -319,9 +320,9 @@ class ProjectPlanningAssistant
     /**
      * Calcule la date de fin en fonction des jours ouvrés.
      */
-    private function calculateEndDate(DateTime $startDate, float $days): DateTime
+    private function calculateEndDate(DateTimeInterface $startDate, float $days): DateTime
     {
-        $endDate    = clone $startDate;
+        $endDate    = new DateTime($startDate->format('Y-m-d'));
         $daysAdded  = 0;
         $targetDays = ceil($days);
 
@@ -341,7 +342,7 @@ class ProjectPlanningAssistant
     /**
      * Récupère la période d'emploi active pour un contributeur.
      */
-    private function getActiveEmploymentPeriod(Contributor $contributor, DateTime $date): ?EmploymentPeriod
+    private function getActiveEmploymentPeriod(Contributor $contributor, DateTimeInterface $date): ?EmploymentPeriod
     {
         return $this->entityManager
             ->getRepository(EmploymentPeriod::class)
@@ -377,7 +378,7 @@ class ProjectPlanningAssistant
     /**
      * Calcule la charge actuelle moyenne pour un contributeur sur une période.
      */
-    private function calculateCurrentLoad(Contributor $contributor, DateTime $startDate, DateTime $endDate): float
+    private function calculateCurrentLoad(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
         $plannings = $this->planningRepository
             ->createQueryBuilder('p')
@@ -395,7 +396,9 @@ class ProjectPlanningAssistant
         $totalHours = 0;
         $workDays   = 0;
 
-        $period = new DatePeriod($startDate, new DateInterval('P1D'), (clone $endDate)->modify('+1 day'));
+        $periodEnd = new DateTime($endDate->format('Y-m-d'));
+        $periodEnd->modify('+1 day');
+        $period = new DatePeriod(new DateTime($startDate->format('Y-m-d')), new DateInterval('P1D'), $periodEnd);
         foreach ($period as $date) {
             $dayOfWeek = (int) $date->format('N');
             if ($dayOfWeek < 6) {
@@ -414,7 +417,7 @@ class ProjectPlanningAssistant
     /**
      * Vérifie si le contributeur a des congés sur la période.
      */
-    private function hasVacations(Contributor $contributor, DateTime $startDate, DateTime $endDate): bool
+    private function hasVacations(Contributor $contributor, DateTimeInterface $startDate, DateTimeInterface $endDate): bool
     {
         $vacations = $this->vacationRepository
             ->createQueryBuilder('v')

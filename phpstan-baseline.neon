@@ -47,15 +47,3 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: src/Controller/VacationRequestController.php
-
-		-
-			message: '#^Variable method call on \$this\(App\\Service\\ExcelExportService\)\.$#'
-			identifier: method.dynamicName
-			count: 1
-			path: src/Service/ExcelExportService.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Order\:\:isExpensesRebillable\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Service/ExpenseReportService.php

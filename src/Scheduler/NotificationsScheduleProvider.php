@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Scheduler;
 
+use Cron\CronExpression;
 use DateTimeZone;
 use Symfony\Component\Scheduler\RecurringCommand;
 use Symfony\Component\Scheduler\Schedule;
@@ -17,7 +18,7 @@ class NotificationsScheduleProvider implements ScheduleProviderInterface
         $schedule = new Schedule();
 
         // Rappel de saisie des temps hebdo: vendredi 12:00 (Europe/Paris)
-        $trigger = new CronExpressionTrigger('0 12 * * 5', new DateTimeZone('Europe/Paris'))->withDescription(
+        $trigger = new CronExpressionTrigger(new CronExpression('0 12 * * 5'), new DateTimeZone('Europe/Paris'))->withDescription(
             'Rappel hebdomadaire de saisie des temps',
         );
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Scheduler;
 
+use Cron\CronExpression;
 use DateTimeZone;
 use Symfony\Component\Scheduler\RecurringCommand;
 use Symfony\Component\Scheduler\Schedule;
@@ -17,7 +18,7 @@ class MetricsScheduleProvider implements ScheduleProviderInterface
         $schedule = new Schedule();
 
         // Recalcul KPI quotidien à 02:30
-        $trigger = new CronExpressionTrigger('30 2 * * *', new DateTimeZone('Europe/Paris'))->withDescription(
+        $trigger = new CronExpressionTrigger(new CronExpression('30 2 * * *'), new DateTimeZone('Europe/Paris'))->withDescription(
             'Recalcul quotidien des métriques',
         );
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Scheduler;
 
 use App\Entity\SchedulerEntry;
+use Cron\CronExpression;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Scheduler\RecurringCommand;
@@ -26,7 +27,7 @@ class DbScheduleProvider implements ScheduleProviderInterface
         $entries = $this->em->getRepository(SchedulerEntry::class)->findBy(['enabled' => true]);
         foreach ($entries as $entry) {
             $trigger = new CronExpressionTrigger(
-                $entry->getCronExpression(),
+                new CronExpression($entry->getCronExpression()),
                 new DateTimeZone($entry->getTimezone()),
             )->withDescription($entry->getName());
 
