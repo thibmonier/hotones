@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Devis {{ order.reference }}</title>
+    <title>Devis {{ order.orderNumber }}</title>
     <style>
         * {
             margin: 0;
@@ -154,9 +154,9 @@
         <div class="document-info">
             <h2>DEVIS</h2>
             <p>
-                <strong>N° {{ order.reference }}</strong><br>
+                <strong>N° {{ order.orderNumber }}</strong><br>
                 Date: {{ order.createdAt|date('d/m/Y') }}<br>
-                {% if order.validUntil %}Valable jusqu'au: {{ order.validUntil|date('d/m/Y') }}{% endif %}
+                {% if validity_duration is defined %}Validité: {{ validity_duration }}{% endif %}
             </p>
         </div>
     </div>
@@ -209,27 +209,26 @@
                 {% for line in section.lines %}
                 <tr>
                     <td>
-                        <strong>{{ line.label }}</strong>
-                        {% if line.description %}<br><small>{{ line.description }}</small>{% endif %}
+                        <strong>{{ line.description }}</strong>
                         {% if line.profile %}<br><small>Profil: {{ line.profile.name }}</small>{% endif %}
                     </td>
                     <td class="text-center">
-                        {% if line.type == 'service' %}
+                        {% if line.type == 'service' and line.days %}
                             {{ line.days|number_format(2, ',', ' ') }} j
                         {% else %}
                             -
                         {% endif %}
                     </td>
                     <td class="text-right">
-                        {% if line.type == 'service' and line.dailyRate %}
-                            {{ line.dailyRate|number_format(2, ',', ' ') }} €
+                        {% if line.type == 'service' and line.tjm %}
+                            {{ line.tjm|number_format(2, ',', ' ') }} €
                         {% else %}
                             -
                         {% endif %}
                     </td>
                     <td class="text-right">
-                        {% if line.attachedPurchaseAmount > 0 %}
-                            {{ line.attachedPurchaseAmount|number_format(2, ',', ' ') }} €
+                        {% if line.purchaseAmount > 0 %}
+                            {{ line.purchaseAmount|number_format(2, ',', ' ') }} €
                         {% elseif line.type in ['purchase', 'fixed_amount'] and line.directAmount %}
                             {{ line.directAmount|number_format(2, ',', ' ') }} €
                         {% else %}
@@ -237,7 +236,7 @@
                         {% endif %}
                     </td>
                     <td class="text-right">
-                        <strong>{{ line.totalHT|number_format(2, ',', ' ') }} €</strong>
+                        <strong>{{ line.totalAmount|number_format(2, ',', ' ') }} €</strong>
                     </td>
                 </tr>
                 {% endfor %}
@@ -250,17 +249,19 @@
     <div class="clearfix">
         <div class="totals">
             <table>
-                <tr>
-                    <td>Total HT:</td>
-                    <td class="text-right">{{ order.totalHT|number_format(2, ',', ' ') }} €</td>
+                <tr class="total-ht">
+                    <td><strong>Total HT:</strong></td>
+                    <td class="text-right"><strong>{{ totals.sectionsTotal|number_format(2, ',', ' ') }} €</strong></td>
                 </tr>
+                {% if totals.contingencyAmount > 0 %}
                 <tr>
-                    <td>TVA ({{ order.vatRate }}%):</td>
-                    <td class="text-right">{{ order.vatAmount|number_format(2, ',', ' ') }} €</td>
+                    <td>Contingence ({{ order.contingencyPercentage }}%):</td>
+                    <td class="text-right">-{{ totals.contingencyAmount|number_format(2, ',', ' ') }} €</td>
                 </tr>
+                {% endif %}
                 <tr class="total-ttc">
-                    <td><strong>Total TTC:</strong></td>
-                    <td class="text-right"><strong>{{ order.totalTTC|number_format(2, ',', ' ') }} €</strong></td>
+                    <td><strong>Total net HT:</strong></td>
+                    <td class="text-right"><strong>{{ totals.finalAmount|number_format(2, ',', ' ') }} €</strong></td>
                 </tr>
             </table>
         </div>
@@ -270,8 +271,11 @@
 
     <!-- Conditions et mentions légales -->
     <div style="margin-top: 40px; font-size: 9pt; color: #7f8c8d;">
-        <p><strong>Conditions de paiement:</strong> {{ payment_terms|default('30% à la commande, 70% à la livraison') }}</p>
-        <p><strong>Délai de réalisation:</strong> {{ delivery_time|default('À définir selon planning') }}</p>
+        <p><strong>Conditions de paiement:</strong> {{ payment_terms|default('30% a la commande, 70% a la livraison') }}</p>
+        <p><strong>Delai de realisation:</strong> {{ delivery_time|default('A definir selon planning') }}</p>
+        {% if validity_duration is defined %}
+        <p><strong>Duree de validite:</strong> {{ validity_duration }}</p>
+        {% endif %}
         {% if notes %}
         <p><strong>Notes:</strong> {{ notes }}</p>
         {% endif %}
@@ -280,7 +284,7 @@
     <!-- Pied de page -->
     <div class="footer">
         <p>{{ company_legal|default('SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX') }}</p>
-        <p>Document généré le {{ "now"|date('d/m/Y à H:i') }}</p>
+        <p>Document genere le {{ "now"|date('d/m/Y a H:i') }}</p>
     </div>
 </body>
 </html>

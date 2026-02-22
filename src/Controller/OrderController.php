@@ -717,49 +717,58 @@ class OrderController extends AbstractController
     #[Route('/{id}/pdf', name: 'order_pdf', methods: ['GET'])]
     public function pdf(Order $order, \App\Service\PdfGeneratorService $pdfGenerator): Response
     {
-        // Données pour le template PDF
-        $data = [
-            'order'           => $order,
-            'company_name'    => 'HotOnes Agency', // À configurer
-            'company_address' => 'Adresse de l\'entreprise', // À configurer
-            'company_postal'  => 'Code postal', // À configurer
-            'company_city'    => 'Ville', // À configurer
-            'company_phone'   => '01 23 45 67 89', // À configurer
-            'company_email'   => 'contact@hotones.com', // À configurer
-            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX', // À configurer
-            'payment_terms'   => '30% à la commande, 70% à la livraison',
-            'delivery_time'   => 'Selon planning défini',
-            'notes'           => $order->getNotes(),
-        ];
+        $data     = $this->buildPdfData($order);
+        $filename = sprintf('devis_%s_%s.pdf', $order->getOrderNumber(), (new DateTime())->format('Y-m-d'));
 
-        // Générer le nom du fichier
-        $filename = sprintf('devis_%s_%s.pdf', $order->getReference(), new DateTime()->format('Y-m-d'));
-
-        // Générer et retourner le PDF
-        return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: false); // Force le téléchargement
+        return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: false);
     }
 
     #[Route('/{id}/pdf/preview', name: 'order_pdf_preview', methods: ['GET'])]
     public function pdfPreview(Order $order, \App\Service\PdfGeneratorService $pdfGenerator): Response
     {
-        // Données pour le template PDF
-        $data = [
-            'order'           => $order,
-            'company_name'    => 'HotOnes Agency',
-            'company_address' => 'Adresse de l\'entreprise',
-            'company_postal'  => 'Code postal',
-            'company_city'    => 'Ville',
-            'company_phone'   => '01 23 45 67 89',
-            'company_email'   => 'contact@hotones.com',
-            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',
-            'payment_terms'   => '30% à la commande, 70% à la livraison',
-            'delivery_time'   => 'Selon planning défini',
-            'notes'           => $order->getNotes(),
+        if ($order->getSections()->isEmpty()) {
+            return new Response('Le devis ne contient aucune ligne de prestation.', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $hasLines = false;
+        foreach ($order->getSections() as $section) {
+            if (!$section->getLines()->isEmpty()) {
+                $hasLines = true;
+                break;
+            }
+        }
+        if (!$hasLines) {
+            return new Response('Le devis ne contient aucune ligne de prestation.', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            $data     = $this->buildPdfData($order);
+            $filename = sprintf('devis_%s_preview.pdf', $order->getOrderNumber());
+
+            return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: true);
+        } catch (\Throwable $e) {
+            return new Response('Impossible de generer la previsualisation. Veuillez reessayer.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Build the data array for the PDF template.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildPdfData(Order $order): array
+    {
+        $company = $order->getCompany();
+        $totals  = $this->orderCalculationService->calculateOrderTotals($order);
+
+        return [
+            'order'             => $order,
+            'totals'            => $totals,
+            'company_name'      => $company->getName(),
+            'payment_terms'     => '30% a la commande, 70% a la livraison',
+            'delivery_time'     => 'Selon planning defini',
+            'validity_duration' => '30 jours',
+            'notes'             => $order->getNotes(),
         ];
-
-        $filename = sprintf('devis_%s_preview.pdf', $order->getReference());
-
-        // Affiche le PDF dans le navigateur
-        return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: true); // Affichage dans le navigateur
     }
 }

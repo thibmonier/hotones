@@ -1,0 +1,29 @@
+metadata:
+  sprint_id: "sprint-001"
+  name: "Walking Skeleton - CRUD & Filtres"
+  start_date: "2026-03-02"
+  end_date: "2026-03-13"
+  goal: "Livrer un squelette fonctionnel complet avec filtres avancés et prévisualisation PDF sur les entités principales"
+  capacity_points: 25
+  velocity_target: "25-35"
+
+stories:
+  US-001:
+    title: "Filtres avancés liste projets"
+    epic: "EPIC-001"
+    points: 5
+    priority: "Must"
+    status: "done"
+    assignee: "claude"
+    blocked_by: []
+    completed_at: "2026-02-22"
+
+  US-002:
+    title: "Prévisualisation PDF devis"
+    epic: "EPIC-001"
+    points: 5
+    priority: "Must"
+    status: "done"
+    assignee: "claude"
+    blocked_by: []
+    completed_at: "2026-02-22"

@@ -18,7 +18,7 @@
     } %}
 
     <!-- Filtres période -->
-    <div class="row mb-3">
+    <div class="row mb-3" data-controller="project-filter" data-project-filter-reset-url-value="{{ path('project_index', { reset: 1 }) }}">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -43,7 +43,9 @@
                         </h5>
                         <div class="btn-group">
                             <a href="{{ path('project_export_csv', filters_query|merge({ sort: sort, dir: dir })) }}" class="btn btn-sm btn-outline-primary">Exporter CSV</a>
-                            <a href="{{ path('project_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary">Effacer</a>
+                            {% if activeFiltersCount > 0 %}
+                                <a href="{{ path('project_index', { reset: 1 }) }}" class="btn btn-sm btn-outline-secondary" data-project-filter-target="resetButton" data-action="project-filter#reset">Effacer</a>
+                            {% endif %}
                             <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="collapse" data-bs-target="#filters-projects" aria-expanded="true" aria-controls="filters-projects" id="filters-toggle-projects">
                                 <i class="bx bx-chevron-up"></i>
                             </button>
@@ -85,19 +87,12 @@
                                 <span class="badge bg-light text-dark me-1">{{ c }}</span>
                             {% endfor %}
                         </div>
-                        <script>
-                          (function(){
-                            try { window.__ACTIVE_FILTERS = {{ chips|json_encode|raw }}; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}
-                          })();
-                        </script>
-                    {% else %}
-                        <script>try { window.__ACTIVE_FILTERS = []; window.dispatchEvent(new Event('active-filters-changed')); } catch(e) {}</script>
-                        {% endif %}
-                        <form method="get" class="row g-2 align-items-end">
+                    {% endif %}
+                        <form method="get" class="row g-2 align-items-end" data-project-filter-target="form" data-turbo-frame="project-list" data-turbo-action="advance">
                         <div class="col-12 mb-2">
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bx bx-search"></i></span>
-                                <input type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="Rechercher un projet, client ou description...">
+                                <input type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="Rechercher un projet, client ou description..." data-project-filter-target="search" data-action="input->project-filter#searchInput">
                                 {% if filters.search %}
                                     <a href="{{ path('project_index', filters_query|merge({search: null})) }}" class="btn btn-outline-secondary" title="Effacer la recherche">
                                         <i class="bx bx-x"></i>
@@ -107,7 +102,7 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Année</label>
-                            <select name="year" class="form-select">
+                            <select name="year" class="form-select" data-action="change->project-filter#filterChanged">
                                 {% for y in range(2020, date().format('Y') + 1) %}
                                     <option value="{{ y }}" {{ filters.year == y ? 'selected' : '' }}>{{ y }}</option>
                                 {% endfor %}
@@ -115,15 +110,15 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Du</label>
-                            <input type="date" class="form-control" name="start_date" value="{{ filters.start_date|date('Y-m-d') }}">
+                            <input type="date" class="form-control" name="start_date" value="{{ filters.start_date|date('Y-m-d') }}" data-action="change->project-filter#filterChanged">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Au</label>
-                            <input type="date" class="form-control" name="end_date" value="{{ filters.end_date|date('Y-m-d') }}">
+                            <input type="date" class="form-control" name="end_date" value="{{ filters.end_date|date('Y-m-d') }}" data-action="change->project-filter#filterChanged">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Type</label>
-                            <select name="project_type" class="form-select">
+                            <select name="project_type" class="form-select" data-action="change->project-filter#filterChanged">
                                 <option value="">Tous</option>
                                 {% for type in filter_options.project_types %}
                                     <option value="{{ type }}" {{ filters.project_type == type ? 'selected' : '' }}>{{ type|title }}</option>
@@ -132,7 +127,7 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Statut</label>
-                            <select name="status" class="form-select">
+                            <select name="status" class="form-select" data-action="change->project-filter#filterChanged">
                                 <option value="">Tous</option>
                                 {% for s in filter_options.statuses %}
                                     <option value="{{ s }}" {{ filters.status == s ? 'selected' : '' }}>{{ s|title }}</option>
@@ -141,7 +136,7 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Technologie</label>
-                            <select name="technology" class="form-select">
+                            <select name="technology" class="form-select" data-action="change->project-filter#filterChanged">
                                 <option value="">Toutes</option>
                                 {% for t in filter_options.technologies %}
                                     <option value="{{ t.id }}" {{ filters.technology == t.id ? 'selected' : '' }}>{{ t.name }}</option>
@@ -150,7 +145,7 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Catégorie</label>
-                            <select name="service_category" class="form-select">
+                            <select name="service_category" class="form-select" data-action="change->project-filter#filterChanged">
                                 <option value="">Toutes</option>
                                 {% for sc in filter_options.service_categories %}
                                     <option value="{{ sc.id }}" {{ filters.service_category == sc.id ? 'selected' : '' }}>{{ sc.name }}</option>
@@ -191,17 +186,17 @@
                         })();
                     </script>
                 </div>
-                {% set hasFilters = (filters.project_type) or (filters.status) or (filters.technology) or (filters.service_category) or (filters.start_date|date('Y-m-d') != (filters.year ~ '-01-01')) or (filters.end_date|date('Y-m-d') != (filters.year ~ '-12-31')) or (sort != 'name') or (dir != 'ASC') or (pagination.per_page != 10) %}
-                {% if hasFilters %}
-                    <div class="small text-muted mt-2">
-                        Filtres actifs · <a href="{{ path('project_index', { reset: 1 }) }}">Effacer</a>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>
 
+    <turbo-frame id="project-list" data-turbo-action="advance">
     {% if projects_with_metrics|length > 0 %}
+        <div class="row mb-2">
+            <div class="col-12">
+                <span class="text-muted">{{ pagination.total }} résultat{{ pagination.total > 1 ? 's' : '' }}</span>
+            </div>
+        </div>
         <!-- KPIs période (réel sur la période filtrée) -->
         <div class="row mb-4">
             <div class="col-md-2">
@@ -469,11 +464,9 @@
                                 <tr>
                                     <td colspan="12" class="text-center text-muted">
                                         <div class="py-4">
-                                            <i class="bx bx-folder-open font-size-24 mb-2"></i>
-                                            <p>Aucun projet trouvé</p>
-                                            {% if is_granted('ROLE_CHEF_PROJET') %}
-                                                <a href="{{ path('project_new') }}" class="btn btn-primary">Créer le premier projet</a>
-                                            {% endif %}
+                                            <i class="bx bx-search-alt font-size-24 mb-2"></i>
+                                            <p>Aucun projet ne correspond a vos criteres</p>
+                                            <a href="{{ path('project_index', { reset: 1 }) }}" class="btn btn-outline-secondary btn-sm">Reinitialiser les filtres</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -496,6 +489,7 @@
             queryParams: filters_query|default({})
         } %}
     {% endif %}
+    </turbo-frame>
 {% endblock %}
 
 {% block javascripts %}

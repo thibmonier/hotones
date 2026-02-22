@@ -1,0 +1,21 @@
+execution:
+  mode: "sequential"
+  resume_on_failure: true
+  checkpoint_interval: 1
+  started_at: "2026-02-22T10:00:00Z"
+  completed_at: "2026-02-22T16:00:00Z"
+
+queue:
+  US-001:
+    title: "Filtres avances liste projets"
+    points: 5
+    priority: 1
+    status: "completed"
+    depends_on: []
+
+  US-002:
+    title: "Previsualisation PDF devis"
+    points: 5
+    priority: 2
+    status: "completed"
+    depends_on: []
