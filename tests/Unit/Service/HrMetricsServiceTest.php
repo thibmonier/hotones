@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Service;
 
+use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Entity\Contributor;
 use App\Entity\EmploymentPeriod;
 use App\Entity\Profile;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
-use App\Repository\VacationRepository;
 use App\Service\HrMetricsService;
 use DateTime;
 use PHPUnit\Framework\TestCase;
@@ -32,7 +32,7 @@ class HrMetricsServiceTest extends TestCase
         // Create mocks for all dependencies
         $this->contributorRepository      = $this->createMock(ContributorRepository::class);
         $this->employmentPeriodRepository = $this->createMock(EmploymentPeriodRepository::class);
-        $this->vacationRepository         = $this->createMock(VacationRepository::class);
+        $this->vacationRepository         = $this->createMock(VacationRepositoryInterface::class);
 
         // Instantiate service with mocks
         $this->service = new HrMetricsService(
@@ -288,13 +288,15 @@ class HrMetricsServiceTest extends TestCase
             ->willReturn($contributors);
 
         // Mock repository to return employment periods in order
-        $this->employmentPeriodRepository->method('findFirstByContributor')->willReturnOnConsecutiveCalls(
-            $this->createEmploymentPeriodStartedYearsAgo(0.5),
-            $this->createEmploymentPeriodStartedYearsAgo(1.5),
-            $this->createEmploymentPeriodStartedYearsAgo(3.0),
-            $this->createEmploymentPeriodStartedYearsAgo(7.0),
-            $this->createEmploymentPeriodStartedYearsAgo(12.0),
-        );
+        $this->employmentPeriodRepository
+            ->method('findFirstByContributor')
+            ->willReturnOnConsecutiveCalls(
+                $this->createEmploymentPeriodStartedYearsAgo(0.5),
+                $this->createEmploymentPeriodStartedYearsAgo(1.5),
+                $this->createEmploymentPeriodStartedYearsAgo(3.0),
+                $this->createEmploymentPeriodStartedYearsAgo(7.0),
+                $this->createEmploymentPeriodStartedYearsAgo(12.0),
+            );
 
         // When: calculate average seniority
         $result = $this->service->calculateAverageSeniority();
@@ -383,12 +385,12 @@ class HrMetricsServiceTest extends TestCase
     {
         // Given: 6 contributors with different ages and genders
         $contributors = [
-            $this->createContributorWithAge(22, 'male'), // < 25 ans
+            $this->createContributorWithAge(22, 'male'),   // < 25 ans
             $this->createContributorWithAge(28, 'female'), // 25-30 ans
-            $this->createContributorWithAge(35, 'male'), // 30-40 ans
+            $this->createContributorWithAge(35, 'male'),   // 30-40 ans
             $this->createContributorWithAge(45, 'female'), // 40-50 ans
-            $this->createContributorWithAge(55, 'male'), // 50-60 ans
-            $this->createContributorWithAge(65, 'other'), // > 60 ans
+            $this->createContributorWithAge(55, 'male'),   // 50-60 ans
+            $this->createContributorWithAge(65, 'other'),  // > 60 ans
         ];
 
         $this->contributorRepository

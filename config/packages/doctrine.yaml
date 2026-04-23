@@ -7,6 +7,11 @@ doctrine:
         #server_version: '16'
 
         profiling_collect_backtrace: '%kernel.debug%'
+        types:
+            vacation_id: App\Infrastructure\Vacation\Persistence\Doctrine\Type\VacationIdType
+            vacation_status: App\Infrastructure\Vacation\Persistence\Doctrine\Type\VacationStatusType
+            vacation_type: App\Infrastructure\Vacation\Persistence\Doctrine\Type\VacationTypeType
+            daily_hours: App\Infrastructure\Vacation\Persistence\Doctrine\Type\DailyHoursType
     orm:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         identity_generation_preferences:
@@ -19,6 +24,18 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            DomainVacation:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Infrastructure/Vacation/Persistence/Doctrine/Mapping/Entity'
+                prefix: 'App\Domain\Vacation\Entity'
+                alias: DomainVacation
+            DomainVacationValueObject:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Infrastructure/Vacation/Persistence/Doctrine/Mapping/ValueObject'
+                prefix: 'App\Domain\Vacation\ValueObject'
+                alias: DomainVacationValueObject
         dql:
             datetime_functions:
                 YEAR: DoctrineExtensions\Query\Mysql\Year
