@@ -236,7 +236,7 @@ class CronExtension extends AbstractExtension
         ];
 
         return [
-            'days'   => $locale   === 'en' ? $days_en : $days_fr,
+            'days'   => $locale === 'en' ? $days_en : $days_fr,
             'months' => $locale === 'en' ? $months_en : $months_fr,
         ];
     }

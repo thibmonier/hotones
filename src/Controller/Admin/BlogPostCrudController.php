@@ -200,8 +200,7 @@ class BlogPostCrudController extends AbstractCrudController
             ->setIcon('fa fa-refresh')
             ->displayIf(
                 static fn (BlogPost $post): bool => $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
-                    && $post->imagePrompt !== null
-                ,
+                    && $post->imagePrompt !== null,
             )
             ->addCssClass('btn btn-warning');
 
