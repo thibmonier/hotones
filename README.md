@@ -187,6 +187,29 @@ docker compose exec app ./vendor/bin/phpunit
 docker compose exec app composer check-code
 ```
 
+### Coverage local
+
+PCOV est activé dans `Dockerfile.dev`. Configuration coverage dédiée : `phpunit.coverage.xml`.
+
+```bash
+# Clover XML (format CI → var/coverage/clover.xml)
+docker compose exec app composer test-coverage
+
+# Rapport HTML navigable (→ var/coverage/html/index.html)
+docker compose exec app composer test-coverage-html
+
+# Sortie console rapide
+docker compose exec app composer test-coverage-text
+```
+
+### Coverage CI
+
+Le workflow `.github/workflows/sonarqube.yml` exécute automatiquement la couverture
+sur push `main`/`develop` et sur chaque PR, puis upload vers SonarCloud.
+Badge et détails : section [Code Quality (SonarCloud)](#code-quality-sonarcloud).
+
+- Rapport complet : [sonarcloud.io/project/overview?id=thibmonier_hotones](https://sonarcloud.io/project/overview?id=thibmonier_hotones)
+
 - Environnement de test: `.env.test` utilise SQLite (isolation sans DB externe)
 - E2E (Panther): nécessite Chrome/Chromium; variables utiles (si besoin):
 ```bash

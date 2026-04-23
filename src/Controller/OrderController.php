@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Throwable;
 
 #[Route('/orders')]
 #[IsGranted('ROLE_CHEF_PROJET')]
@@ -746,7 +747,7 @@ class OrderController extends AbstractController
             $filename = sprintf('devis_%s_preview.pdf', $order->getOrderNumber());
 
             return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: true);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return new Response('Impossible de generer la previsualisation. Veuillez reessayer.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

@@ -195,6 +195,9 @@
             "@check-architecture"
         ],
         "test": "phpunit -c phpunit.xml.dist",
+        "test-coverage": "phpunit --configuration phpunit.coverage.xml",
+        "test-coverage-html": "phpunit --configuration phpunit.coverage.xml --coverage-html var/coverage/html",
+        "test-coverage-text": "phpunit --configuration phpunit.coverage.xml --coverage-text",
         "test-unit": "phpunit --testsuite unit",
         "test-functional": "phpunit --testsuite functional",
         "test-integration": "phpunit --testsuite integration",
