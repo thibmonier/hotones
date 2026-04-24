@@ -19,7 +19,7 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use App\Entity\User;
 use DateTimeImmutable;
 
-class Vacation implements CompanyOwnedInterface
+final class Vacation implements CompanyOwnedInterface
 {
     /** @var list<object> */
     private array $domainEvents = [];

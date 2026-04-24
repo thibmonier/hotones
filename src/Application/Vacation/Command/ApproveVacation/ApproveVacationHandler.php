@@ -6,7 +6,7 @@ namespace App\Application\Vacation\Command\ApproveVacation;
 
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationId;
-use App\Infrastructure\Vacation\Notification\Message\VacationNotificationMessage;
+use App\Application\Vacation\Notification\Message\VacationNotificationMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;

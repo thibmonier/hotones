@@ -10,7 +10,7 @@ use App\Domain\Vacation\ValueObject\DailyHours;
 use App\Domain\Vacation\ValueObject\DateRange;
 use App\Domain\Vacation\ValueObject\VacationId;
 use App\Domain\Vacation\ValueObject\VacationType;
-use App\Infrastructure\Vacation\Notification\Message\VacationNotificationMessage;
+use App\Application\Vacation\Notification\Message\VacationNotificationMessage;
 use App\Repository\ContributorRepository;
 use InvalidArgumentException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

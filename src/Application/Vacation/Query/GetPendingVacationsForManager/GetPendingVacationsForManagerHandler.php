@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Vacation\Query\GetPendingVacationsForManager;
 
-use App\Domain\Vacation\Entity\Vacation;
+use App\Application\Vacation\DTO\VacationDTO;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Repository\ContributorRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +19,7 @@ final readonly class GetPendingVacationsForManagerHandler
     }
 
     /**
-     * @return Vacation[]
+     * @return VacationDTO[]
      */
     public function __invoke(GetPendingVacationsForManagerQuery $query): array
     {
@@ -31,8 +31,13 @@ final readonly class GetPendingVacationsForManagerHandler
 
         $managedContributors = $managerContributor->getManagedContributors();
 
-        return $this->vacationRepository->findPendingForContributors(
+        $vacations = $this->vacationRepository->findPendingForContributors(
             $managedContributors->toArray(),
+        );
+
+        return array_map(
+            static fn ($vacation): VacationDTO => VacationDTO::fromEntity($vacation),
+            $vacations,
         );
     }
 }

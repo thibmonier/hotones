@@ -6,7 +6,7 @@ namespace App\Infrastructure\Vacation\Notification;
 
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationId;
-use App\Infrastructure\Vacation\Notification\Message\VacationNotificationMessage;
+use App\Application\Vacation\Notification\Message\VacationNotificationMessage;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

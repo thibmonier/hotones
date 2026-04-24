@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Vacation\Notification\Message;
+namespace App\Application\Vacation\Notification\Message;
 
 final readonly class VacationNotificationMessage
 {
