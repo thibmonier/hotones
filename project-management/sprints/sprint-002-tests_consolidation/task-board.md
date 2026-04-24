@@ -1,8 +1,8 @@
 # Task Board — Sprint 002 Tests Consolidation
 
-**Dates :** TBD (2 semaines — démarre après sprint-001-walking-skeleton)
+**Dates :** 2026-04-24 → 2026-05-08 (2 semaines — fériés FR 01/05, 08/05)
 **Vélocité cible :** 34 points
-**Mis à jour :** 2026-04-23
+**Mis à jour :** 2026-04-24
 **Note :** OPS-001 partiellement livrée sur PR #30 depuis origin/main (composer scripts + README coverage). Voir section "Terminé" anticipée.
 
 ## Légende

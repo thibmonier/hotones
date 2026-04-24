@@ -1,6 +1,6 @@
 # Sprint 002 — Tests Consolidation (rattrapage dette critique)
 
-**Dates:** TBD (2 semaines fixe — démarre après clôture sprint-001-walking-skeleton)
+**Dates:** 2026-04-24 → 2026-05-08 (2 semaines fixe — fériés FR 01/05 Fête travail, 08/05 Victoire 1945)
 **Contexte:** Brownfield — HotOnes en production. Sprint 002 = **consolidation** post Walking Skeleton (US-001 filtres + US-002 PDF livrés sprint-001).
 **Dépend de:** sprint-001-walking-skeleton clôturé + PR OPS-001 (#30) mergée.
 **Origine:** Planification initialement dans sprint-001-tests_consolidation local (non pushée), migrée vers sprint-002 après finding que origin/main avait sprint-001-walking-skeleton divergent.
