@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Vacation\Controller;
 
 use App\Application\Vacation\Command\ApproveVacation\ApproveVacationCommand;
-use App\Application\Vacation\Command\ApproveVacation\ApproveVacationHandler;
 use App\Application\Vacation\Command\RejectVacation\RejectVacationCommand;
-use App\Application\Vacation\Command\RejectVacation\RejectVacationHandler;
 use App\Domain\Vacation\Exception\InvalidStatusTransitionException;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationId;
@@ -15,6 +13,7 @@ use App\Repository\ContributorRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -25,8 +24,7 @@ class VacationApprovalController extends AbstractController
     public function __construct(
         private readonly VacationRepositoryInterface $vacationRepository,
         private readonly ContributorRepository $contributorRepository,
-        private readonly ApproveVacationHandler $approveVacationHandler,
-        private readonly RejectVacationHandler $rejectVacationHandler,
+        private readonly MessageBusInterface $commandBus,
     ) {
     }
 
@@ -100,7 +98,7 @@ class VacationApprovalController extends AbstractController
         }
 
         try {
-            ($this->approveVacationHandler)(new ApproveVacationCommand($id, $user->getId()));
+            $this->commandBus->dispatch(new ApproveVacationCommand($id, $user->getId()));
             $this->addFlash('success', 'La demande de conge a ete approuvee.');
         } catch (InvalidStatusTransitionException) {
             $this->addFlash('error', 'Seules les demandes en attente peuvent etre approuvees.');
@@ -127,7 +125,7 @@ class VacationApprovalController extends AbstractController
         }
 
         try {
-            ($this->rejectVacationHandler)(new RejectVacationCommand($id));
+            $this->commandBus->dispatch(new RejectVacationCommand($id));
             $this->addFlash('success', 'La demande de conge a ete rejetee.');
         } catch (InvalidStatusTransitionException) {
             $this->addFlash('error', 'Seules les demandes en attente peuvent etre rejetees.');

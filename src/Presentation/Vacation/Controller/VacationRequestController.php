@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Vacation\Controller;
 
 use App\Application\Vacation\Command\CancelVacation\CancelVacationCommand;
-use App\Application\Vacation\Command\CancelVacation\CancelVacationHandler;
 use App\Application\Vacation\Command\RequestVacation\RequestVacationCommand;
-use App\Application\Vacation\Command\RequestVacation\RequestVacationHandler;
 use App\Domain\Vacation\Exception\InvalidStatusTransitionException;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationId;
@@ -18,6 +16,7 @@ use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -28,8 +27,7 @@ class VacationRequestController extends AbstractController
     public function __construct(
         private readonly VacationRepositoryInterface $vacationRepository,
         private readonly ContributorRepository $contributorRepository,
-        private readonly RequestVacationHandler $requestVacationHandler,
-        private readonly CancelVacationHandler $cancelVacationHandler,
+        private readonly MessageBusInterface $commandBus,
     ) {
     }
 
@@ -83,7 +81,7 @@ class VacationRequestController extends AbstractController
                     reason: $data['reason'],
                 );
 
-                ($this->requestVacationHandler)($command);
+                $this->commandBus->dispatch($command);
 
                 $this->addFlash('success', 'Votre demande de conge a ete enregistree avec succes. Elle est en attente de validation.');
 
@@ -134,7 +132,7 @@ class VacationRequestController extends AbstractController
         }
 
         try {
-            ($this->cancelVacationHandler)(new CancelVacationCommand($id));
+            $this->commandBus->dispatch(new CancelVacationCommand($id));
             $this->addFlash('success', 'Votre demande de conge a ete annulee.');
         } catch (InvalidStatusTransitionException) {
             $this->addFlash('error', 'Seules les demandes en attente peuvent etre annulees.');
