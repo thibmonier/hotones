@@ -14,7 +14,7 @@
 gap-analysis.md identifie :
 - 🔴 11 gaps Critical — prioriser 4 bloquants qualité
 - 🟡 EPIC-009 Vacation UI supprimée → décider et agir
-- Coverage 14% → cible 80% (impossible en 1 sprint, mais démarrer)
+- Coverage baseline mesurée J1 sprint-002 : **9.4% elements** (2922/31077) · methods 11.2% · statements 9.2% — cible long-terme 80%
 
 ## Cérémonies
 
@@ -60,7 +60,6 @@ graph TD
     US066 --> US069
 
     US067["US-067 Validation"] --> US068
-    US067 --> US069
 
     TEST001["TEST-001 Notif tests"]
     TEST003["TEST-003 RunningTimer tests"]
@@ -78,7 +77,7 @@ graph TD
 
 ## Incrément livrable
 
-À la fin du Sprint 001, l'utilisateur pourra :
+À la fin du Sprint 002, l'utilisateur pourra :
 
 **Côté produit**
 - ✅ Soumettre une demande de congés via nouvelle UI (P-001 Intervenant)

@@ -1,4 +1,4 @@
-# Sprint 001 — Dépendances
+# Sprint 002 — Dépendances
 
 ## Graphe inter-US Sprint
 
