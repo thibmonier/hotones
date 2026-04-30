@@ -190,16 +190,23 @@ $tolerance = $settingsRepo->getValue('timesheet_weekly_tolerance', 0.15);
 
 Liste des types de notifications disponibles:
 
-| Type (valeur) | Label | Icône | Couleur | Usage |
-|---------------|-------|-------|---------|-------|
-| `quote_to_sign` | Nouveau devis à signer | fa-file-signature | info | Devis prêt pour signature |
-| `quote_won` | Devis gagné | fa-check-circle | success | Devis signé/gagné |
-| `quote_lost` | Devis perdu | fa-times-circle | danger | Devis refusé/perdu |
-| `project_budget_alert` | Budget projet proche | fa-exclamation-triangle | warning | Dépassement de budget |
-| `timesheet_pending_validation` | Temps en attente de validation | fa-clock | primary | Timesheets à valider |
-| `payment_due_alert` | Échéance de paiement proche | fa-calendar-alt | warning | Paiement à venir |
-| `kpi_threshold_exceeded` | Seuil KPI dépassé | fa-chart-line | danger | Alerte KPI |
-| `timesheet_missing_weekly` | Rappel saisie temps hebdo | fa-hourglass-half | primary | Temps manquants |
+> **10 types officiels** — toute évolution doit être répercutée sur :
+> - `src/Enum/NotificationType.php` (cases + match arms `getLabel/getIcon/getColor`)
+> - `tests/Unit/Enum/NotificationTypeTest.php` (assertion `exposes_exactly_10_notification_types`)
+> - cette table
+
+| Domaine | Type (valeur) | Label | Icône | Couleur | Émetteur (source) | Destinataires | Données contextuelles |
+|---|---|---|---|---|---|---|---|
+| Commercial | `quote_to_sign` | Nouveau devis à signer | fa-file-signature | info | `OrderStatusChangedSubscriber` (statut → `pending_signature`) | Manager du compte client | `orderId`, `clientId` |
+| Commercial | `quote_won` | Devis gagné | fa-check-circle | success | `OrderStatusChangedSubscriber` (statut → `signed`) | Owner + commercial | `orderId`, `amount` |
+| Commercial | `quote_lost` | Devis perdu | fa-times-circle | danger | `OrderStatusChangedSubscriber` (statut → `lost`) | Owner + commercial | `orderId`, `reason?` |
+| Suivi projet | `project_budget_alert` | Budget projet proche | fa-exclamation-triangle | warning | `ProjectBudgetMonitor` (consommation > 80%) | Project manager | `projectId`, `consumptionPct` |
+| Suivi projet | `low_margin_alert` | Marge faible | fa-percentage | danger | `ProfitabilityService` (marge < seuil société) | Owner + commercial | `projectId`, `marginPct` |
+| Suivi projet | `contributor_overload_alert` | Surcharge contributeur | fa-user-clock | warning | `StaffingMetricsCalculationService` (charge > capacité) | Manager RH | `contributorId`, `loadPct`, `weekStart` |
+| Suivi projet | `kpi_threshold_exceeded` | Seuil KPI dépassé | fa-chart-line | danger | Scheduler KPI | Owner + responsable KPI | `kpiCode`, `value`, `threshold` |
+| Timesheets | `timesheet_pending_validation` | Temps en attente de validation | fa-clock | primary | `TimesheetSubmittedSubscriber` | Manager direct | `timesheetId`, `contributorId` |
+| Timesheets | `timesheet_missing_weekly` | Rappel saisie temps hebdo | fa-hourglass-half | primary | `NotificationsScheduleProvider` (cron hebdo) | Contributeur | `weekNumber`, `year` |
+| Facturation | `payment_due_alert` | Échéance de paiement proche | fa-calendar-alt | warning | Scheduler facturation (J-7) | Owner + finance | `invoiceId`, `dueDate` |
 
 **Méthodes de l'enum:**
 ```php
