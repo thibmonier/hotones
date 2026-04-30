@@ -53,6 +53,9 @@ jobs:
                   DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
               run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+            - name: Prepare asset directories required by Liip Imagine kernel boot
+              run: mkdir -p public/assets/images public/assets/css public/assets/js public/assets/fonts assets/images
+
             - name: Setup Mago
               if: matrix.tool.script == 'mago'
               uses: nhedger/setup-mago@v1
