@@ -106,7 +106,7 @@ final class DateRangeTest extends TestCase
     {
         // Smoke test on the full 2025 calendar : neither 0 nor > 366,
         // and within ±5 of the 260 working-day baseline (2025 has 261 working days).
-        $range   = DateRange::fromStrings('2025-01-01', '2025-12-31');
+        $range = DateRange::fromStrings('2025-01-01', '2025-12-31');
         $working = $range->getNumberOfWorkingDays();
 
         self::assertGreaterThan(255, $working);

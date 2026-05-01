@@ -60,6 +60,15 @@ services:
         arguments:
             $projectDir: '%kernel.project_dir%'
 
+    # Backup commands (TEST-006)
+    App\Command\BackupDumpCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Command\BackupRestoreCommand:
+        arguments:
+            $kernelEnvironment: '%kernel.environment%'
+
     # NPS Mailer Service
     App\Service\NpsMailerService:
         arguments:

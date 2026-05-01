@@ -43,10 +43,10 @@ final class CancelNotificationFlowTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client      = static::createClient();
+        $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
 
-        $this->manager  = $this->provisionContributor('cancel-manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
+        $this->manager = $this->provisionContributor('cancel-manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
         $this->employee = $this->provisionContributor('cancel-employee@test.com', 'Adrien', 'Employee', ['ROLE_INTERVENANT'], $this->manager);
     }
 
@@ -72,7 +72,7 @@ final class CancelNotificationFlowTest extends WebTestCase
 
         // Vacation final state
         /** @var VacationRepositoryInterface $repo */
-        $repo  = static::getContainer()->get(VacationRepositoryInterface::class);
+        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
         $found = $repo->findByIdOrNull(VacationId::fromString($vacationId));
         self::assertNotNull($found);
         self::assertSame(VacationStatus::CANCELLED, $found->getStatus());
@@ -107,7 +107,7 @@ final class CancelNotificationFlowTest extends WebTestCase
         $this->loginAs($this->employee->getUser());
 
         /** @var RequestVacationHandler $handler */
-        $handler    = static::getContainer()->get(RequestVacationHandler::class);
+        $handler = static::getContainer()->get(RequestVacationHandler::class);
         $vacationId = ($handler)(new RequestVacationCommand(
             contributorId: $this->employee->getId(),
             startDate: new DateTimeImmutable('+5 days'),
@@ -125,13 +125,13 @@ final class CancelNotificationFlowTest extends WebTestCase
      */
     private function provisionContributor(string $email, string $first, string $last, array $roles, ?Contributor $manager = null): Contributor
     {
-        $em   = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $user = new User();
         $user->setCompany($this->testCompany);
         $user->setEmail($email);
         $user->setPassword('password');
         $user->firstName = $first;
-        $user->lastName  = $last;
+        $user->lastName = $last;
         $user->setRoles($roles);
         $em->persist($user);
 

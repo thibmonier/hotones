@@ -1,0 +1,86 @@
+name: Staging DB Backup
+
+on:
+  schedule:
+    # Tous les jours à 02:17 UTC (~ 04:17 Paris l'été, 03:17 l'hiver). Loin du peloton.
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+    inputs:
+      retention_days:
+        description: 'Combien de jours conserver les artifacts'
+        required: false
+        default: '14'
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+concurrency:
+  group: staging-backup
+  cancel-in-progress: false
+
+jobs:
+  dump:
+    name: Dump staging DB
+    runs-on: ubuntu-latest
+    if: ${{ vars.STAGING_BACKUP_ENABLED == 'true' }}
+
+    env:
+      DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      APP_ENV: prod
+      APP_SECRET: ${{ secrets.STAGING_APP_SECRET }}
+      RUN_ID: ${{ github.run_id }}
+      RETENTION_DAYS: ${{ github.event.inputs.retention_days || '14' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite, zip
+          coverage: none
+
+      - name: Install mysql/pg client tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends mariadb-client postgresql-client
+
+      - name: Install dependencies (no-dev)
+        run: composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
+
+      - name: Run backup dump
+        run: |
+          mkdir -p var/backups
+          php bin/console app:backup:dump \
+            --output="var/backups/staging-${RUN_ID}.sql.gz" \
+            --compress
+
+      - name: Verify dump file
+        run: |
+          file="var/backups/staging-${RUN_ID}.sql.gz"
+          test -s "$file" || { echo "Dump is empty"; exit 1; }
+          ls -lh "$file"
+
+      - name: Upload dump artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-backup-${{ github.run_id }}
+          path: var/backups/staging-${{ github.run_id }}.sql.gz
+          retention-days: ${{ github.event.inputs.retention_days || '14' }}
+          if-no-files-found: error
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DATE: ${{ github.event.repository.updated_at }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create \
+            --title "[staging-backup] dump KO" \
+            --label "ops,backup" \
+            --body "Le job de backup staging a échoué. Voir $RUN_URL." || true
