@@ -1,29 +1,84 @@
 metadata:
-  sprint_id: "sprint-001"
-  name: "Walking Skeleton - CRUD & Filtres"
-  start_date: "2026-03-02"
-  end_date: "2026-03-13"
-  goal: "Livrer un squelette fonctionnel complet avec filtres avancés et prévisualisation PDF sur les entités principales"
-  capacity_points: 25
-  velocity_target: "25-35"
+  sprint_id: "sprint-002"
+  name: "Tests Consolidation (rattrapage dette critique)"
+  start_date: "2026-04-24"
+  end_date: "2026-05-08"
+  goal: "Finaliser bounded context Vacation (DDD) + combler les 4 trous tests Critical (Notifications, Auth/2FA, RunningTimer, Company voter) pour stabiliser le socle avant migration DDD étendue"
+  capacity_points: 34
+  velocity_target: "20-40"
 
 stories:
-  US-001:
-    title: "Filtres avancés liste projets"
-    epic: "EPIC-001"
-    points: 5
+  OPS-001:
+    title: "Coverage CI + baseline"
+    epic: "TECH"
+    points: 2
     priority: "Must"
     status: "done"
     assignee: "claude"
     blocked_by: []
-    completed_at: "2026-02-22"
+    completed_at: "2026-04-23"
+    pr: 30
 
-  US-002:
-    title: "Prévisualisation PDF devis"
-    epic: "EPIC-001"
+  TEST-001:
+    title: "Tests Notifications (NotificationService + Subscriber)"
+    epic: "TECH"
     points: 5
     priority: "Must"
-    status: "done"
-    assignee: "claude"
+    status: "ready-for-dev"
     blocked_by: []
-    completed_at: "2026-02-22"
+
+  TEST-002:
+    title: "Tests Auth/2FA (SecurityController + TwoFactor + LoginSecuritySubscriber)"
+    epic: "TECH"
+    points: 5
+    priority: "Must"
+    status: "ready-for-dev"
+    blocked_by: []
+
+  TEST-003:
+    title: "Tests RunningTimer + Timer start/stop"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "ready-for-dev"
+    blocked_by: []
+
+  TEST-004:
+    title: "Tests Multi-tenant (CompanyVoter + CompanyContext)"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "ready-for-dev"
+    blocked_by: []
+
+  US-066:
+    title: "Demande congés"
+    epic: "EPIC-009"
+    points: 5
+    priority: "Must"
+    status: "ready-for-dev"
+    blocked_by: ["TEST-002", "TEST-004"]
+
+  US-067:
+    title: "Validation manager congés"
+    epic: "EPIC-009"
+    points: 5
+    priority: "Must"
+    status: "ready-for-dev"
+    blocked_by: ["US-066"]
+
+  US-068:
+    title: "Rejet avec motif"
+    epic: "EPIC-009"
+    points: 3
+    priority: "Should"
+    status: "ready-for-dev"
+    blocked_by: ["US-067"]
+
+  US-069:
+    title: "Annulation demande"
+    epic: "EPIC-009"
+    points: 3
+    priority: "Should"
+    status: "ready-for-dev"
+    blocked_by: ["US-066"]

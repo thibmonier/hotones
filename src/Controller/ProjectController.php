@@ -193,7 +193,7 @@ class ProjectController extends AbstractController
             'filter_options' => $filterOptions,
             'period_kpis'    => $periodKpis,
             'pagination'     => $pagination,
-            'filters_query' => [
+            'filters_query'  => [
                 'year'             => $year,
                 'start_date'       => $startDate->format('Y-m-d'),
                 'end_date'         => $endDate->format('Y-m-d'),

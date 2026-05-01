@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\Project;
 use App\Tests\Support\MultiTenantTestTrait;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -21,7 +22,7 @@ class ProjectControllerFilterTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
+        $this->client      = static::createClient();
         $this->testCompany = $this->createTestCompany();
         $this->testUser    = $this->authenticateTestUser($this->testCompany, ['ROLE_INTERVENANT']);
     }
@@ -33,8 +34,8 @@ class ProjectControllerFilterTest extends WebTestCase
         $project->setCompany($this->getTestCompany());
         $project->setStatus($status);
         $project->setProjectType($type);
-        $project->setStartDate(new \DateTime('2026-01-15'));
-        $project->setEndDate(new \DateTime('2026-06-30'));
+        $project->setStartDate(new DateTime('2026-01-15'));
+        $project->setEndDate(new DateTime('2026-06-30'));
 
         $em = $this->getEntityManager();
         $em->persist($project);
