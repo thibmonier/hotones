@@ -31,6 +31,7 @@
         <field name="status" type="vacation_status" column="status" length="20"/>
         <field name="dailyHours" type="daily_hours" column="daily_hours" precision="4" scale="2"/>
         <field name="reason" type="text" column="reason" nullable="true"/>
+        <field name="rejectionReason" type="text" column="rejection_reason" nullable="true"/>
         <field name="createdAt" type="datetime_immutable" column="created_at"/>
         <field name="approvedAt" type="datetime_immutable" column="approved_at" nullable="true"/>
 

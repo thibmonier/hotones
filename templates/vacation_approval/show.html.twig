@@ -59,17 +59,27 @@
                     </dl>
                 </div>
                 {% if status.value == 'pending' %}
-                    <div class="card-footer d-flex justify-content-end gap-2">
+                    <div class="card-footer">
                         <form method="post"
                               action="{{ path('vacation_approval_reject', {'id': vacation.id.value}) }}"
+                              class="mb-3"
                               onsubmit="return confirm('Rejeter cette demande ?');">
                             <input type="hidden" name="_token"
                                    value="{{ csrf_token('reject' ~ vacation.id.value) }}">
+                            <label for="rejection-reason-{{ vacation.id.value }}"
+                                   class="form-label fw-semibold">
+                                Motif du rejet (transmis au collaborateur)
+                            </label>
+                            <textarea id="rejection-reason-{{ vacation.id.value }}"
+                                      name="rejection_reason"
+                                      class="form-control mb-2"
+                                      rows="2"
+                                      placeholder="Optionnel — ex: planning sature sur la periode"></textarea>
                             <button type="submit"
                                     class="btn btn-outline-danger"
                                     aria-label="Rejeter la demande de {{ vacation.contributor.fullName }}">
                                 <i class="bx bx-x me-1" aria-hidden="true"></i>
-                                Rejeter
+                                Rejeter avec ce motif
                             </button>
                         </form>
                         <form method="post"
@@ -84,6 +94,25 @@
                                 Approuver
                             </button>
                         </form>
+                    </div>
+                {% elseif status.value == 'approved' %}
+                    <div class="card-footer text-end">
+                        <form method="post"
+                              action="{{ path('vacation_approval_cancel', {'id': vacation.id.value}) }}"
+                              onsubmit="return confirm('Annuler cette demande deja approuvee ? Le collaborateur sera notifie.');">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('cancel-manager' ~ vacation.id.value) }}">
+                            <button type="submit"
+                                    class="btn btn-outline-warning"
+                                    aria-label="Annuler la demande approuvee de {{ vacation.contributor.fullName }}">
+                                <i class="bx bx-rotate-left me-1" aria-hidden="true"></i>
+                                Annuler cette demande approuvee
+                            </button>
+                        </form>
+                    </div>
+                {% elseif status.value == 'rejected' and vacation.rejectionReason %}
+                    <div class="card-footer">
+                        <strong>Motif du rejet :</strong> {{ vacation.rejectionReason }}
                     </div>
                 {% endif %}
             </div>

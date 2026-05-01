@@ -50,6 +50,11 @@
 
                         <dt class="col-sm-4">Soumise le</dt>
                         <dd class="col-sm-8">{{ vacation.createdAt|date('d/m/Y H:i') }}</dd>
+
+                        {% if status.value == 'rejected' and vacation.rejectionReason %}
+                            <dt class="col-sm-4">Motif du rejet</dt>
+                            <dd class="col-sm-8 text-danger">{{ vacation.rejectionReason }}</dd>
+                        {% endif %}
                     </dl>
                 </div>
                 {% if status.value == 'pending' %}
