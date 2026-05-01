@@ -539,6 +539,59 @@ Les types suivants sont définis mais non implémentés:
 
 ---
 
+## Emails transactionnels Vacation (US-071)
+
+> Origine : sprint-003 US-071, retro sprint-002 + TECH-DEBT-001 amplifié.
+
+Le chemin Vacation déclenche 5 emails transactionnels via `App\Application\Vacation\Notification\Message\VacationNotificationMessage`. Le message est routé sur le transport `async` Symfony Messenger (cf. `config/packages/messenger.yaml`), traité par `App\Infrastructure\Vacation\Notification\VacationNotificationHandler` qui rend le template Twig + envoie via `Symfony\Mailer`.
+
+### Templates et acteurs
+
+| Type message | Trigger | Destinataire | Template |
+|---|---|---|---|
+| `created` | `RequestVacationCommand` | Manager direct | `templates/emails/vacation_created.html.twig` |
+| `approved` | `ApproveVacationCommand` | Intervenant propriétaire | `templates/emails/vacation_approved.html.twig` |
+| `rejected` | `RejectVacationCommand` (motif optionnel) | Intervenant propriétaire | `templates/emails/vacation_rejected.html.twig` |
+| `cancelled` | `CancelVacationCommand` (intervenant self-cancel) | Manager direct | `templates/emails/vacation_cancelled.html.twig` |
+| `cancelled-by-manager` | `CancelVacationCommand` avec `cancelledByUserId !== null` | Intervenant propriétaire | `templates/emails/vacation_cancelled_by_manager.html.twig` |
+
+### Configuration `MAILER_DSN` par environnement
+
+| Env | DSN cible | Origine |
+|---|---|---|
+| `dev` (Docker compose) | `smtp://mailhog:1025` (ou inbox locale) | `compose.override.yaml` |
+| `test` | `null://null` | `phpunit.xml.dist` (auto via Symfony) |
+| `staging` (Render free) | `smtp://USER:PASS@sandbox.smtp.mailtrap.io:587` | `render.staging.yaml` (`sync: false`, set via dashboard) |
+| `prod` | `smtp://...sendgrid.net` ou Mailgun | `render.yaml` (`sync: false`, set via dashboard) |
+
+Si `MAILER_DSN` n'est pas configuré au boot staging, `start-staging.sh` fallback sur `null://null` pour ne pas bloquer le démarrage. Aucun email ne part dans ce cas.
+
+### Worker async — staging vs prod
+
+| Env | Transport | Worker requis | Comportement |
+|---|---|---|---|
+| `staging` (free tier) | `sync://` | Non | Email rendu + envoyé synchrone dans la requête HTTP |
+| `prod` | `redis://...` (cf. `MESSENGER_TRANSPORT_DSN`) | Oui (`messenger:consume async`) | Email queue → worker → SMTP |
+
+En staging, `render.staging.yaml` force `MESSENGER_TRANSPORT_DSN=sync://` parce que Render free tier n'autorise pas un service worker dédié.
+
+### Tests
+
+| Suite | File | Cas |
+|---|---|---|
+| Unit | `tests/Unit/Application/Vacation/CancelVacationHandlerDispatchTest.php` | Dispatch `'cancelled'` vs `'cancelled-by-manager'` selon le flag command |
+| Functional | `tests/Functional/Vacation/CancelNotificationFlowTest.php` | End-to-end via `MailerAssertionsTrait` : manager cancel → email intervenant ; self-cancel → email manager |
+
+### Failure modes connus
+
+| Symptôme | Cause | Action |
+|---|---|---|
+| `TemplateNotFoundException` | Un des 5 templates absent du repo | Vérifier `templates/emails/vacation_*.html.twig` (TECH-DEBT-001 PR #52 les a tous ressuscités) |
+| Aucun email reçu en staging | `MAILER_DSN` toujours sur `null://null` (default fallback) | Configurer le DSN Mailtrap dans le dashboard Render |
+| Email reçu mais pas en prod | Transport prod sur Redis sans worker | Lancer / superviser `messenger:consume async` |
+
+---
+
 ## Interface utilisateur
 
 ### Dropdown header (temps réel)

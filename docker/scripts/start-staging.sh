@@ -16,6 +16,15 @@ echo "========================================="
 echo "Starting HotOnes STAGING (Render free tier)"
 echo "========================================="
 
+# US-071 — fallback MAILER_DSN si pas configure dans le dashboard Render.
+# `null://null` discard les emails proprement (pas d'exception boot).
+# Pour visualiser les emails dans une inbox demo, configurer cote Render :
+#   smtp://USER:PASS@sandbox.smtp.mailtrap.io:587
+if [ -z "${MAILER_DSN:-}" ]; then
+    echo "MAILER_DSN unset, falling back to null://null (US-071 default)"
+    export MAILER_DSN="null://null"
+fi
+
 PORT=${PORT:-8080}
 echo "Configuring Nginx to listen on port $PORT..."
 sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/conf.d/default.conf

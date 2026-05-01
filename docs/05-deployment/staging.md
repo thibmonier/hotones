@@ -11,8 +11,8 @@
 | URL stable | `https://hotones-staging.onrender.com` |
 | Plan | `free` (web service uniquement) |
 | Base de données | SQLite éphémère (rechargée au boot avec fixtures démo) |
-| Redis | absent (transport Messenger `in-memory`) |
-| Mailer | `null://null` (pas d'envoi réel — bascule Mailtrap dev en US-071) |
+| Redis | absent (transport Messenger `sync://` — handler dispatché immédiatement, pas de worker) |
+| Mailer | Mailtrap dev (US-071) — `MAILER_DSN` injecté via dashboard Render, fallback `null://null` au boot si absent |
 | Coût | 0 € |
 | Cold start | ~30 s après 15 min d'inactivité (limite free tier) |
 
@@ -24,8 +24,8 @@ Free tier choisi pour démarrer sans dépendance budget. Trade-offs assumés :
 |---|---|---|
 | Pas de persistent disk | DB SQLite recréée à chaque boot | Fixtures rechargées par `start-staging.sh` ; OK pour démo Sprint Review |
 | Sleep après 15 min idle | Cold start de ~30 s à la première requête | Acceptable en démo, réveille via simple GET avant le créneau review |
-| Pas de Redis free tier | Transport Messenger `in-memory` (perte des messages async sur cold start) | Aucun message critique en démo ; passer à payant si scénario async demande à être démontré |
-| Mailer `null://` | Aucun email réel envoyé | US-071 ajoutera Mailtrap dev pour visualiser dans une inbox |
+| Pas de Redis free tier + pas de worker | Transport Messenger `sync://` — emails Vacation rendus dans la requête HTTP elle-même | Acceptable pour démo (latence ajoutée minime sur l'opération approve/reject/cancel) |
+| Mailer Mailtrap | Tous les emails Vacation atterrissent dans une inbox Mailtrap dev | Configurer `MAILER_DSN` côté Render dashboard, fallback `null://null` automatique si non défini |
 
 ## Comptes démo
 

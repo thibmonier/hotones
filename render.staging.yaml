@@ -36,9 +36,13 @@ services:
       - key: DATABASE_URL
         value: sqlite:///%kernel.project_dir%/var/staging.db
 
-      # Pas de Redis sur free tier -> in-memory transport
+      # Pas de Redis sur free tier + pas de worker async dispo en free :
+      # transport sync:// pour que VacationNotificationMessage (US-071)
+      # soit handle immediatement dans la meme requete, sans queue.
+      # Si bascule plan payant : revenir sur Redis (cf. render.yaml prod)
+      # et lancer un worker Messenger via supervisord.
       - key: MESSENGER_TRANSPORT_DSN
-        value: in-memory://
+        value: sync://
 
       # Cache Symfony : adapter filesystem (sur disque ephemere)
       - key: CACHE_ADAPTER
@@ -52,10 +56,16 @@ services:
       - key: JWT_PASSPHRASE
         generateValue: true
 
-      # Mailer : transport "null" pour eviter d'envoyer de vrais emails
-      # depuis staging. A swapper sur Mailtrap dev (US-071) quand le
-      # provider sera valide.
+      # Mailer (US-071) : Mailtrap dev par defaut pour visualiser les
+      # emails dans une inbox de demo sans risquer un envoi reel.
+      # Le credential complet est fourni via le dashboard Render
+      # (sync: false) sous la forme :
+      #   smtp://USER:PASSWORD@sandbox.smtp.mailtrap.io:587
+      # Tant que la valeur n'est pas configuree, la chaine de fallback
+      # `null://null` evite toute exception au boot.
       - key: MAILER_DSN
+        sync: false
+      - key: MAILER_DSN_FALLBACK
         value: "null://null"
 
       - key: TZ
