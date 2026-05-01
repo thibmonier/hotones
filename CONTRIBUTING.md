@@ -356,6 +356,86 @@ git diff main...HEAD --shortstat -- ':(exclude)composer.lock' ':(exclude)package
 - Origine : retro sprint-002, action 5 (OPS-006).
 - ADR : à venir si l'équipe décide d'un split policy plus formelle.
 
+### PR empilées (stacked PRs) — procédure
+
+Quand un travail dépasse 400 lignes ou se décompose naturellement en
+couches (ADR → infra → feature), on empile plusieurs PRs où chacune cible
+la précédente plutôt que `main`. Cela accélère la review (chaque PR est
+petite) sans bloquer le travail dépendant.
+
+#### Quand empiler
+
+- ✅ Refactor en plusieurs étapes : extraction interface → migration
+  consommateurs → suppression code legacy.
+- ✅ Feature dont la base technique mérite review séparée
+  (ex : nouveau Doctrine type → entity → service → UI).
+- ✅ ADR + son implémentation (ADR mergé d'abord, code ensuite).
+- ❌ Fix simple (< 100 lignes) : reste en PR unique vers `main`.
+- ❌ PRs sans dépendance forte : merger en parallèle, pas en stack.
+
+#### Convention de nommage
+
+```
+feat/<story>-base       (ouvre PR vers main)
+feat/<story>-step1      (ouvre PR vers feat/<story>-base)
+feat/<story>-step2      (ouvre PR vers feat/<story>-step1)
+```
+
+Documentez la chaîne dans chaque description : *« Stack: PR #X → PR #Y → PR #Z »*.
+
+#### Workflow de création
+
+```bash
+# 1. Base
+git checkout main && git pull
+git checkout -b feat/foo-base
+# ... code base ...
+git push -u origin feat/foo-base
+gh pr create --base main --title "feat(foo): base" --body "..."
+
+# 2. Étape 2 (cible la base, pas main)
+git checkout -b feat/foo-step1
+# ... code step 1 ...
+git push -u origin feat/foo-step1
+gh pr create --base feat/foo-base --title "feat(foo): step 1" --body "..."
+```
+
+Le helper `bin/stacked-pr` automatise le scaffolding (voir
+`docs/04-development/stacked-prs.md`).
+
+#### Workflow de merge (ordre strict)
+
+1. Reviewer + merge `feat/foo-base` vers `main` (squash recommandé).
+2. **Rebaser la PR suivante** sur `main` :
+   ```bash
+   git checkout feat/foo-step1
+   git fetch origin
+   git rebase origin/main
+   git push --force-with-lease
+   ```
+3. Mettre à jour la base de la PR sur GitHub :
+   ```bash
+   gh pr edit <pr-step1> --base main
+   ```
+4. Reviewer + merge.
+5. Répéter pour chaque étape suivante.
+
+GitHub fait parfois ce changement de base automatiquement après le merge
+de la PR parent ; vérifiez tout de même via `gh pr view` que la cible est
+bien `main` avant de mergrer.
+
+#### Erreurs fréquentes
+
+| Symptôme | Cause | Fix |
+|---|---|---|
+| PR step1 affiche les commits de la base + ses propres commits | Pas rebasé après merge de la base | `git rebase origin/main` puis `gh pr edit --base main` |
+| Conflits sur composer.lock à chaque rebase | Lock divergé entre étapes | Régénérer le lock une fois sur la base, le partager dans la step |
+| Reviewer dit "je ne vois que la base" | Mauvaise base GitHub | `gh pr edit <num> --base feat/foo-base` |
+| Force-push refusé | Branch protection sur la base | Demander à un mainteneur ou attendre le merge de la base |
+
+**Référence** : sprint-002 stack #32 → #39 → #40 → #43, sprint-003 stack
+#50 → #54, #56 → #57, #66 → #67. Action retro sprint-003 #1.
+
 **Template de PR** :
 
 ```markdown
