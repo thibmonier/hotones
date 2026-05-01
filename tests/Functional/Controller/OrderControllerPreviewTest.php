@@ -9,6 +9,7 @@ use App\Entity\OrderLine;
 use App\Entity\OrderSection;
 use App\Entity\Project;
 use App\Tests\Support\MultiTenantTestTrait;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -39,8 +40,8 @@ class OrderControllerPreviewTest extends WebTestCase
         $project->setCompany($company);
         $project->setStatus('active');
         $project->setProjectType('forfait');
-        $project->setStartDate(new \DateTime('2026-01-01'));
-        $project->setEndDate(new \DateTime('2026-12-31'));
+        $project->setStartDate(new DateTime('2026-01-01'));
+        $project->setEndDate(new DateTime('2026-12-31'));
         $em->persist($project);
         $em->flush();
 
@@ -88,8 +89,8 @@ class OrderControllerPreviewTest extends WebTestCase
         $project->setCompany($company);
         $project->setStatus('active');
         $project->setProjectType('forfait');
-        $project->setStartDate(new \DateTime('2026-01-01'));
-        $project->setEndDate(new \DateTime('2026-12-31'));
+        $project->setStartDate(new DateTime('2026-01-01'));
+        $project->setEndDate(new DateTime('2026-12-31'));
         $em->persist($project);
 
         $order = new Order();
@@ -115,8 +116,8 @@ class OrderControllerPreviewTest extends WebTestCase
         $project->setCompany($company);
         $project->setStatus('active');
         $project->setProjectType('forfait');
-        $project->setStartDate(new \DateTime('2026-01-01'));
-        $project->setEndDate(new \DateTime('2026-12-31'));
+        $project->setStartDate(new DateTime('2026-01-01'));
+        $project->setEndDate(new DateTime('2026-12-31'));
         $em->persist($project);
 
         $order = new Order();

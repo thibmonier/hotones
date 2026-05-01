@@ -4,6 +4,40 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
+/**
+ * Catalog of in-app notification types emitted by the application.
+ *
+ * Each case maps to:
+ *  - a stable string `value` persisted in DB (`notifications.type` column)
+ *  - a French label rendered in the UI (`getLabel()`)
+ *  - a Font Awesome icon class (`getIcon()`)
+ *  - a Bootstrap color (`getColor()`)
+ *
+ * The 10 supported types are grouped by domain:
+ *
+ *  COMMERCIAL (quote lifecycle)
+ *    - QUOTE_TO_SIGN                : a draft quote awaits the client signature
+ *    - QUOTE_WON                    : a signed quote has been won
+ *    - QUOTE_LOST                   : a quote was rejected
+ *
+ *  PROJECT MONITORING
+ *    - PROJECT_BUDGET_ALERT         : a project budget consumption is approaching the cap
+ *    - LOW_MARGIN_ALERT             : the realized margin on a project drops below threshold
+ *    - CONTRIBUTOR_OVERLOAD_ALERT   : a contributor planned load exceeds capacity
+ *    - KPI_THRESHOLD_EXCEEDED       : a configured KPI threshold has been crossed
+ *
+ *  TIMESHEETS
+ *    - TIMESHEET_PENDING_VALIDATION : a manager has timesheets to validate
+ *    - TIMESHEET_MISSING_WEEKLY     : weekly reminder when a contributor hasn't logged time
+ *
+ *  BILLING
+ *    - PAYMENT_DUE_ALERT            : an invoice is approaching its due date
+ *
+ * Adding a case: also add an arm to `getLabel()`, `getIcon()`, `getColor()`,
+ * and update `tests/Unit/Enum/NotificationTypeTest.php` (`exposes_exactly_10_notification_types`).
+ *
+ * Recipients and event-emission rules are documented in `docs/notifications.md`.
+ */
 enum NotificationType: string
 {
     case QUOTE_TO_SIGN                = 'quote_to_sign';

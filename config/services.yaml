@@ -18,11 +18,29 @@ services:
     App\:
         resource: '../src/'
         exclude:
-            - '../src/DataFixtures/'
             - '../src/Entity/'
+            - '../src/Domain/'
             - '../src/Factory/'
             - '../src/Story/'
             - '../src/Kernel.php'
+
+    # DDD Layers - Domain (no services, pure PHP)
+
+    # DDD Layers - Application
+    App\Application\:
+        resource: '../src/Application/'
+
+    # DDD Layers - Infrastructure
+    App\Infrastructure\:
+        resource: '../src/Infrastructure/'
+
+    # DDD Layers - Presentation
+    App\Presentation\:
+        resource: '../src/Presentation/'
+
+    # Vacation Bounded Context - Interface bindings
+    App\Domain\Vacation\Repository\VacationRepositoryInterface:
+        alias: App\Infrastructure\Vacation\Persistence\Doctrine\DoctrineVacationRepository
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
@@ -75,20 +93,6 @@ services:
     App\Service\Analytics\DashboardReadService:
         arguments:
             $analyticsCache: '@cache.analytics'
-
-when@dev:
-    services:
-        # Enable DataFixtures in dev environment
-        App\DataFixtures\:
-            resource: '../src/DataFixtures/'
-            autowire: true
-            autoconfigure: true
-
-        # Enable Foundry factories as services in dev environment
-        App\Factory\:
-            resource: '../src/Factory/'
-            autowire: true
-            autoconfigure: true
 
 when@test:
     services:
