@@ -42,8 +42,3 @@ parameters:
 			count: 1
 			path: src/Controller/ProjectTechnologyController.php
 
-		-
-			message: '#^Property App\\Controller\\VacationRequestController\:\:\$companyContext is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/Controller/VacationRequestController.php

@@ -35,9 +35,9 @@ final class GetContributorVacationsHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->vacationRepo    = $this->createMock(VacationRepositoryInterface::class);
+        $this->vacationRepo = $this->createMock(VacationRepositoryInterface::class);
         $this->contributorRepo = $this->createMock(ContributorRepository::class);
-        $this->handler         = new GetContributorVacationsHandler($this->vacationRepo, $this->contributorRepo);
+        $this->handler = new GetContributorVacationsHandler($this->vacationRepo, $this->contributorRepo);
     }
 
     #[Test]

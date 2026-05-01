@@ -34,12 +34,12 @@ final readonly class VacationNotificationHandler
         $manager = $contributor->getManager();
 
         match ($message->getType()) {
-            'created'              => $this->sendCreatedNotification($vacation, $manager),
-            'approved'             => $this->sendApprovedNotification($vacation, $contributor),
-            'rejected'             => $this->sendRejectedNotification($vacation, $contributor),
-            'cancelled'            => $this->sendCancelledByContributorNotification($vacation, $manager),
+            'created' => $this->sendCreatedNotification($vacation, $manager),
+            'approved' => $this->sendApprovedNotification($vacation, $contributor),
+            'rejected' => $this->sendRejectedNotification($vacation, $contributor),
+            'cancelled' => $this->sendCancelledByContributorNotification($vacation, $manager),
             'cancelled-by-manager' => $this->sendCancelledByManagerNotification($vacation, $contributor),
-            default                => null,
+            default => null,
         };
     }
 
@@ -112,9 +112,9 @@ final readonly class VacationNotificationHandler
             ->subject('Demande de conge annulee par le collaborateur')
             ->htmlTemplate('emails/vacation_cancelled.html.twig')
             ->context([
-                'vacation'    => $vacation,
+                'vacation' => $vacation,
                 'contributor' => $vacation->getContributor(),
-                'manager'     => $manager,
+                'manager' => $manager,
             ]);
 
         $this->mailer->send($email);
@@ -134,7 +134,7 @@ final readonly class VacationNotificationHandler
             ->subject('Votre demande de conge a ete annulee par votre manager')
             ->htmlTemplate('emails/vacation_cancelled_by_manager.html.twig')
             ->context([
-                'vacation'    => $vacation,
+                'vacation' => $vacation,
                 'contributor' => $contributor,
             ]);
 

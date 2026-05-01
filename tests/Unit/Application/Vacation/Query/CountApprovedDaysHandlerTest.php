@@ -26,14 +26,14 @@ final class CountApprovedDaysHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->repository = $this->createMock(VacationRepositoryInterface::class);
-        $this->handler    = new CountApprovedDaysHandler($this->repository);
+        $this->handler = new CountApprovedDaysHandler($this->repository);
     }
 
     #[Test]
     public function delegatesToRepositoryAndReturnsTotal(): void
     {
         $start = new DateTimeImmutable('2026-01-01');
-        $end   = new DateTimeImmutable('2026-12-31');
+        $end = new DateTimeImmutable('2026-12-31');
 
         $this->repository->expects(self::once())
             ->method('countApprovedDaysBetween')

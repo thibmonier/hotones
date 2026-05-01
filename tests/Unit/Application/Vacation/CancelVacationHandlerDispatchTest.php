@@ -42,7 +42,7 @@ final class CancelVacationHandlerDispatchTest extends TestCase
     {
         $this->repository = $this->createMock(VacationRepositoryInterface::class);
         $this->messageBus = $this->createMock(MessageBusInterface::class);
-        $this->handler    = new CancelVacationHandler($this->repository, $this->messageBus);
+        $this->handler = new CancelVacationHandler($this->repository, $this->messageBus);
     }
 
     #[Test]

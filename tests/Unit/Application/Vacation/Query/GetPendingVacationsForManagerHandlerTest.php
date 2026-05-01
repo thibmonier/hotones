@@ -37,9 +37,9 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->vacationRepo    = $this->createMock(VacationRepositoryInterface::class);
+        $this->vacationRepo = $this->createMock(VacationRepositoryInterface::class);
         $this->contributorRepo = $this->createMock(ContributorRepository::class);
-        $this->handler         = new GetPendingVacationsForManagerHandler($this->vacationRepo, $this->contributorRepo);
+        $this->handler = new GetPendingVacationsForManagerHandler($this->vacationRepo, $this->contributorRepo);
     }
 
     #[Test]
@@ -56,7 +56,7 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
     #[Test]
     public function mapsPendingVacationsToDTOs(): void
     {
-        $manager  = $this->createMock(Contributor::class);
+        $manager = $this->createMock(Contributor::class);
         $teamMate = $this->createMock(Contributor::class);
         $teamMate->method('getFullName')->willReturn('Adrien Test');
 
