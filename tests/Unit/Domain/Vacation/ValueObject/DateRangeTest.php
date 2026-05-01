@@ -83,4 +83,62 @@ final class DateRangeTest extends TestCase
         self::assertTrue($range1->equals($range2));
         self::assertFalse($range1->equals($range3));
     }
+
+    public function testWeekendOnlyRangeReportsZeroWorkingDays(): void
+    {
+        // Saturday 2025-01-11 -> Sunday 2025-01-12
+        $range = DateRange::fromStrings('2025-01-11', '2025-01-12');
+
+        self::assertSame(2, $range->getNumberOfDays());
+        self::assertSame(0, $range->getNumberOfWorkingDays());
+    }
+
+    public function testLeapYearFebruary29IsCountedAsWorkingDay(): void
+    {
+        // 2024-02-29 was a Thursday
+        $range = DateRange::fromStrings('2024-02-29', '2024-02-29');
+
+        self::assertSame(1, $range->getNumberOfDays());
+        self::assertSame(1, $range->getNumberOfWorkingDays());
+    }
+
+    public function testFullYearWorkingDaysAround260(): void
+    {
+        // Smoke test on the full 2025 calendar : neither 0 nor > 366,
+        // and within ±5 of the 260 working-day baseline (2025 has 261 working days).
+        $range   = DateRange::fromStrings('2025-01-01', '2025-12-31');
+        $working = $range->getNumberOfWorkingDays();
+
+        self::assertGreaterThan(255, $working);
+        self::assertLessThan(265, $working);
+    }
+
+    public function testOverlapsTouchingBoundariesIsConsideredOverlap(): void
+    {
+        $a = DateRange::fromStrings('2025-06-01', '2025-06-15');
+        $b = DateRange::fromStrings('2025-06-15', '2025-06-30');
+
+        // The current implementation considers a touching boundary as an overlap (same day on both sides).
+        self::assertTrue($a->overlaps($b));
+        self::assertTrue($b->overlaps($a));
+    }
+
+    public function testNonOverlappingDisjointRanges(): void
+    {
+        $a = DateRange::fromStrings('2025-06-01', '2025-06-10');
+        $b = DateRange::fromStrings('2025-06-12', '2025-06-20');
+
+        self::assertFalse($a->overlaps($b));
+        self::assertFalse($b->overlaps($a));
+    }
+
+    public function testContainsDateOnEdges(): void
+    {
+        $range = DateRange::fromStrings('2025-06-01', '2025-06-10');
+
+        self::assertTrue($range->containsDate(new DateTimeImmutable('2025-06-01')));
+        self::assertTrue($range->containsDate(new DateTimeImmutable('2025-06-10')));
+        self::assertFalse($range->containsDate(new DateTimeImmutable('2025-05-31')));
+        self::assertFalse($range->containsDate(new DateTimeImmutable('2025-06-11')));
+    }
 }
