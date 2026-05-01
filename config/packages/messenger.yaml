@@ -10,7 +10,7 @@ framework:
         routing:
             # Route your messages to the transports
             'App\Message\RecalculateMetricsMessage': async
-            'App\Message\VacationNotificationMessage': async
+            'App\Application\Vacation\Notification\Message\VacationNotificationMessage': async
             'App\Message\GenerateForecastsMessage': async
             'App\Message\AnalyzeProjectRisksMessage': async
             'App\Message\CheckAlertsMessage': async

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
-use App\Repository\VacationRepository;
 use DateTime;
 use DateTimeInterface;
 
@@ -15,7 +15,7 @@ class HrMetricsService
     public function __construct(
         public ContributorRepository $contributorRepository,
         private readonly EmploymentPeriodRepository $employmentPeriodRepository,
-        private readonly VacationRepository $vacationRepository,
+        private readonly VacationRepositoryInterface $vacationRepository
     ) {
     }
 
@@ -166,30 +166,9 @@ class HrMetricsService
 
         // Structure pour la pyramide par genre
         $ageRangesByGender = [
-            'male' => [
-                '< 25 ans'  => 0,
-                '25-30 ans' => 0,
-                '30-40 ans' => 0,
-                '40-50 ans' => 0,
-                '50-60 ans' => 0,
-                '> 60 ans'  => 0,
-            ],
-            'female' => [
-                '< 25 ans'  => 0,
-                '25-30 ans' => 0,
-                '30-40 ans' => 0,
-                '40-50 ans' => 0,
-                '50-60 ans' => 0,
-                '> 60 ans'  => 0,
-            ],
-            'other' => [
-                '< 25 ans'  => 0,
-                '25-30 ans' => 0,
-                '30-40 ans' => 0,
-                '40-50 ans' => 0,
-                '50-60 ans' => 0,
-                '> 60 ans'  => 0,
-            ],
+            'male'   => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+            'female' => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+            'other'  => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
         ];
 
         $genderCounts = ['male' => 0, 'female' => 0, 'other' => 0];
@@ -304,8 +283,8 @@ class HrMetricsService
     private function countWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
         $workingDays = 0;
-        $current     = clone $startDate;
-        $end         = clone $endDate;
+        $current     = (clone $startDate);
+        $end         = (clone $endDate);
 
         while ($current <= $end) {
             $dayOfWeek = (int) $current->format('N'); // 1 (lundi) à 7 (dimanche)
