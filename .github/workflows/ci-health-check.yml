@@ -1,0 +1,144 @@
+name: CI Health Check (main)
+
+on:
+  schedule:
+    # Toutes les heures, à hh:07 pour éviter la cohue à hh:00
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  actions: read
+
+jobs:
+  check-main-status:
+    name: Check main CI status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Detect failing main runs older than 24h
+        id: detect
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          # Heure butoir : 24h en arrière (RFC3339 UTC)
+          since="$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-24H +%Y-%m-%dT%H:%M:%SZ)"
+
+          echo "Looking for failed runs on main older than 24h (since $since)" >&2
+
+          # On regarde les workflows critiques uniquement (CI, Quality, SonarQube)
+          payload="$(gh run list \
+            --branch main \
+            --status failure \
+            --limit 50 \
+            --json databaseId,name,workflowName,event,conclusion,createdAt,updatedAt,htmlUrl \
+            | jq --arg since "$since" '
+              [ .[]
+                | select(.event == "push" or .event == "schedule")
+                | select(.workflowName == "CI" or .workflowName == "Quality" or .workflowName == "SonarQube Analysis")
+                | select(.conclusion == "failure")
+                | select(.updatedAt < $since)
+              ]
+            ')"
+
+          count=$(echo "$payload" | jq 'length')
+          echo "stale_count=$count" >> "$GITHUB_OUTPUT"
+          echo "$payload" > /tmp/stale-runs.json
+
+      - name: Open or update incident issue
+        if: steps.detect.outputs.stale_count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          existing="$(gh issue list \
+            --state open \
+            --label ci-incident \
+            --json number,title \
+            | jq -r '.[0].number // empty')"
+
+          first_run="$(jq -r '.[0]' /tmp/stale-runs.json)"
+          run_url="$(echo "$first_run" | jq -r '.htmlUrl')"
+          run_workflow="$(echo "$first_run" | jq -r '.workflowName')"
+          run_updated="$(echo "$first_run" | jq -r '.updatedAt')"
+          stale_count="${{ steps.detect.outputs.stale_count }}"
+
+          {
+            echo "## CI rouge sur \`main\` depuis plus de 24h"
+            echo
+            echo "Détecté par \`.github/workflows/ci-health-check.yml\` à \`$(date -u +%Y-%m-%dT%H:%M:%SZ)\`."
+            echo
+            echo "- Nombre de runs en échec hors fenêtre 24h : **$stale_count**"
+            echo "- Run le plus ancien : [$run_workflow]($run_url)"
+            echo "- Dernier update du run : \`$run_updated\`"
+            echo
+            echo "## Actions attendues"
+            echo
+            echo "1. Investiguer le run lié."
+            echo "2. Pousser un fix sur main ou révoquer le commit fautif."
+            echo "3. Cette issue se ferme automatiquement quand un run \`main\` redevient vert (workflow \`ci-health-check\` job \`auto-close\`)."
+            echo
+            echo "_Ouvert automatiquement par OPS-004 (sprint-003)._"
+          } > /tmp/issue-body.md
+
+          if [ -z "$existing" ]; then
+            gh issue create \
+              --title "CI: main est rouge depuis plus de 24h ($run_workflow)" \
+              --label ci-incident \
+              --body-file /tmp/issue-body.md
+          else
+            gh issue comment "$existing" --body-file /tmp/issue-body.md
+          fi
+
+  auto-close-incidents:
+    name: Auto-close ci-incident issues when main is green
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Look for the latest CI run on main
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          latest_conclusion="$(gh run list \
+            --branch main \
+            --workflow CI \
+            --limit 1 \
+            --json conclusion,status,htmlUrl \
+            | jq -r '.[0].conclusion // empty')"
+
+          latest_url="$(gh run list \
+            --branch main \
+            --workflow CI \
+            --limit 1 \
+            --json conclusion,status,htmlUrl \
+            | jq -r '.[0].htmlUrl // empty')"
+
+          echo "conclusion=$latest_conclusion" >> "$GITHUB_OUTPUT"
+          echo "url=$latest_url" >> "$GITHUB_OUTPUT"
+
+      - name: Close open ci-incident issues if latest run is green
+        if: steps.latest.outputs.conclusion == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LATEST_URL: ${{ steps.latest.outputs.url }}
+        run: |
+          set -euo pipefail
+
+          for issue in $(gh issue list --state open --label ci-incident --json number --jq '.[].number'); do
+            gh issue comment "$issue" --body "Le dernier run CI sur main est vert ($LATEST_URL). Auto-fermeture par OPS-004."
+            gh issue close "$issue" --reason completed
+          done
