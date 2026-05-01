@@ -1,0 +1,72 @@
+# US-070 — Render Blueprint pour l'environnement de staging.
+#
+# Hosting choisi : Render free tier (web service + SQLite ephemere).
+# Limitations free tier connues :
+#   - Service web sleep apres 15 min d'inactivite (cold start ~30s).
+#   - Pas de persistent disk : la base SQLite est recreee a chaque
+#     boot via `app:staging:reset` (charge automatiquement les fixtures
+#     demo). Acceptable pour une demo de Sprint Review.
+#   - Pas de service Redis free tier separe (free a expiré chez Render
+#     en 2024) -> on utilise le transport messenger `in-memory` en
+#     staging et on accepte la perte des messages async.
+#
+# Pour passer en plan payant :
+#   - service web `plan: starter` ($7/mois)
+#   - ajouter `disk:` persistent + DATABASE_URL postgres `fromDatabase:`
+#   - reactiver Redis service (cf. render.yaml prod)
+
+services:
+  - type: web
+    name: hotones-staging
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: frankfurt
+    plan: free
+    branch: develop  # Tout merge sur develop redeploie automatiquement
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_DEBUG
+        value: "0"
+      - key: APP_SECRET
+        generateValue: true
+
+      # SQLite ephemere — wipe + fixtures rechargees a chaque boot
+      - key: DATABASE_URL
+        value: sqlite:///%kernel.project_dir%/var/staging.db
+
+      # Pas de Redis sur free tier -> in-memory transport
+      - key: MESSENGER_TRANSPORT_DSN
+        value: in-memory://
+
+      # Cache Symfony : adapter filesystem (sur disque ephemere)
+      - key: CACHE_ADAPTER
+        value: cache.adapter.filesystem
+
+      # JWT keys — generes au premier boot par start-staging.sh
+      - key: JWT_SECRET_KEY
+        value: "%kernel.project_dir%/config/jwt/private.pem"
+      - key: JWT_PUBLIC_KEY
+        value: "%kernel.project_dir%/config/jwt/public.pem"
+      - key: JWT_PASSPHRASE
+        generateValue: true
+
+      # Mailer : transport "null" pour eviter d'envoyer de vrais emails
+      # depuis staging. A swapper sur Mailtrap dev (US-071) quand le
+      # provider sera valide.
+      - key: MAILER_DSN
+        value: "null://null"
+
+      - key: TZ
+        value: Europe/Paris
+      - key: DEFAULT_URI
+        value: https://hotones-staging.onrender.com
+
+      # Marqueur "staging" exploite par /health et le bandeau UI
+      - key: STAGING_BANNER
+        value: "1"
+
+    # Override du CMD : on utilise le script de boot staging au lieu
+    # du start-render.sh prod (qui n'execute pas le wipe + fixtures)
+    dockerCommand: /usr/local/bin/start-staging.sh

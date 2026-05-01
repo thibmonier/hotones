@@ -1,18 +1,51 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-# Use docker compose if available, else fallback to docker-compose
-function dc() {
+# OPS-005 (sprint-003) — fallback sans Docker daemon
+#
+# Detection order:
+#   1. Docker daemon up + docker compose available → run via container `app`
+#   2. Local PHP + composer available → run binaries directly from vendor/
+#   3. Otherwise: skip with a warning so the commit is not blocked silently
+
+has_docker() {
+  command -v docker >/dev/null 2>&1 \
+    && docker compose version >/dev/null 2>&1 \
+    && docker info >/dev/null 2>&1
+}
+
+has_local_php() {
+  command -v php >/dev/null 2>&1 \
+    && command -v composer >/dev/null 2>&1 \
+    && [ -d vendor ]
+}
+
+run_docker() {
   if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
-    docker compose "$@"
+    docker compose run --rm -T app composer "$@"
   else
-    docker-compose "$@"
+    docker-compose run --rm -T app composer "$@"
   fi
 }
 
-# 1) Auto-fix coding style using PHP-CS-Fixer via Composer inside the app container
+run_local() {
+  composer "$@"
+}
+
+if has_docker; then
+  printf "[pre-commit] Using Docker (app container)\n"
+  RUNNER=run_docker
+elif has_local_php; then
+  printf "[pre-commit] Docker daemon unavailable — falling back to local composer\n"
+  RUNNER=run_local
+else
+  printf "[pre-commit] Neither Docker nor local PHP/composer available — skipping checks (use --no-verify to bypass intentionally)\n" >&2
+  exit 0
+fi
+
+# 1) Auto-fix coding style using PHP-CS-Fixer
 printf "[pre-commit] Running php-cs-fixer...\n"
-dc run --rm -T app composer phpcsfixer-fix
+$RUNNER phpcsfixer-fix
 
 # Re-stage any files modified by the fixer
 git add -A
@@ -21,8 +54,10 @@ git add -A
 changed_files=$(git diff --cached --name-only)
 if echo "$changed_files" | grep -Eq '^(src/Controller/|config/routes|src/Entity/)'; then
   printf "[pre-commit] Endpoint changes detected -> running API tests...\n"
-  # Run the API tests; if they fail, abort the commit
-  dc run --rm -T app composer test-api
+  if ! $RUNNER test-api; then
+    printf "[pre-commit] API tests failed. Aborting commit.\n" >&2
+    exit 1
+  fi
 else
   printf "[pre-commit] No endpoint changes detected; skipping API tests.\n"
 fi

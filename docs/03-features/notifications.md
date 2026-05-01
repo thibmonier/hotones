@@ -190,9 +190,9 @@ $tolerance = $settingsRepo->getValue('timesheet_weekly_tolerance', 0.15);
 
 Liste des types de notifications disponibles:
 
-> **10 types officiels** — toute évolution doit être répercutée sur :
+> **11 types officiels** — toute évolution doit être répercutée sur :
 > - `src/Enum/NotificationType.php` (cases + match arms `getLabel/getIcon/getColor`)
-> - `tests/Unit/Enum/NotificationTypeTest.php` (assertion `exposes_exactly_10_notification_types`)
+> - `tests/Unit/Enum/NotificationTypeTest.php` (assertion `exposes_exactly_11_notification_types`)
 > - cette table
 
 | Domaine | Type (valeur) | Label | Icône | Couleur | Émetteur (source) | Destinataires | Données contextuelles |
@@ -207,6 +207,7 @@ Liste des types de notifications disponibles:
 | Timesheets | `timesheet_pending_validation` | Temps en attente de validation | fa-clock | primary | `TimesheetSubmittedSubscriber` | Manager direct | `timesheetId`, `contributorId` |
 | Timesheets | `timesheet_missing_weekly` | Rappel saisie temps hebdo | fa-hourglass-half | primary | `NotificationsScheduleProvider` (cron hebdo) | Contributeur | `weekNumber`, `year` |
 | Facturation | `payment_due_alert` | Échéance de paiement proche | fa-calendar-alt | warning | Scheduler facturation (J-7) | Owner + finance | `invoiceId`, `dueDate` |
+| RH / Vacation | `vacation_cancelled_by_manager` | Demande de conge annulee par le manager | fa-rotate-left | warning | `CancelVacationHandler` quand `cancelledByUserId !== null` (US-069 + TECH-DEBT-001) | Intervenant proprietaire de la demande | `vacationId`, `startDate`, `endDate` |
 
 **Méthodes de l'enum:**
 ```php

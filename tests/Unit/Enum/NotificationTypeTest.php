@@ -19,9 +19,9 @@ use PHPUnit\Framework\TestCase;
 final class NotificationTypeTest extends TestCase
 {
     #[Test]
-    public function exposesExactly10NotificationTypes(): void
+    public function exposesExactly11NotificationTypes(): void
     {
-        self::assertCount(10, NotificationType::cases(), 'NotificationType enum must expose 10 cases — update tests if a case is added/removed.');
+        self::assertCount(11, NotificationType::cases(), 'NotificationType enum must expose 11 cases — update tests if a case is added/removed.');
     }
 
     /**
@@ -39,6 +39,7 @@ final class NotificationTypeTest extends TestCase
         yield 'payment_due_alert' => [NotificationType::PAYMENT_DUE_ALERT, 'payment_due_alert'];
         yield 'kpi_threshold_exceeded' => [NotificationType::KPI_THRESHOLD_EXCEEDED, 'kpi_threshold_exceeded'];
         yield 'timesheet_missing_weekly' => [NotificationType::TIMESHEET_MISSING_WEEKLY, 'timesheet_missing_weekly'];
+        yield 'vacation_cancelled_by_manager' => [NotificationType::VACATION_CANCELLED_BY_MANAGER, 'vacation_cancelled_by_manager'];
     }
 
     #[Test]
