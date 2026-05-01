@@ -13,6 +13,7 @@ use App\Repository\ContributorRepository;
 use App\Repository\OrderRepository;
 use App\Service\WorkloadPredictionService;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -26,10 +27,11 @@ class WorkloadPredictionServiceTest extends TestCase
     {
         $orderRepository       = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager         = $this->createMock(EntityManagerInterface::class);
 
         $orderRepository->expects($this->once())->method('findBy')->with(['status' => 'a_signer'])->willReturn([]);
 
-        $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result  = $service->analyzePipeline();
 
         // Check structure
@@ -44,10 +46,11 @@ class WorkloadPredictionServiceTest extends TestCase
     {
         $orderRepository       = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager         = $this->createMock(EntityManagerInterface::class);
 
         $orderRepository->expects($this->once())->method('findBy')->willReturn([]);
 
-        $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
 
         // Should accept profile and contributor filters without error
         $result = $service->analyzePipeline([1, 2], [5, 6]);
@@ -60,6 +63,7 @@ class WorkloadPredictionServiceTest extends TestCase
     {
         $orderRepository       = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager         = $this->createMock(EntityManagerInterface::class);
 
         $profile = new Profile();
         $profile->setName('Développeur Frontend');
@@ -89,7 +93,7 @@ class WorkloadPredictionServiceTest extends TestCase
             ->with(['status' => 'a_signer'])
             ->willReturn([$order]);
 
-        $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result  = $service->analyzePipeline();
 
         $this->assertNotEmpty($result['pipeline']);
@@ -102,6 +106,7 @@ class WorkloadPredictionServiceTest extends TestCase
     {
         $orderRepository       = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager         = $this->createMock(EntityManagerInterface::class);
 
         $profile1 = new Profile();
         $profile1->setName('Développeur');
@@ -137,7 +142,7 @@ class WorkloadPredictionServiceTest extends TestCase
 
         $orderRepository->expects($this->once())->method('findBy')->willReturn([$order]);
 
-        $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
 
         // Filter only profile 1
         $result = $service->analyzePipeline([1], []);
@@ -151,6 +156,7 @@ class WorkloadPredictionServiceTest extends TestCase
     {
         $orderRepository       = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager         = $this->createMock(EntityManagerInterface::class);
 
         $profile = new Profile();
         $profile->setName('Développeur');
@@ -172,7 +178,7 @@ class WorkloadPredictionServiceTest extends TestCase
 
         $orderRepository->expects($this->once())->method('findBy')->willReturn([$order]);
 
-        $service = new WorkloadPredictionService($orderRepository, $contributorRepository);
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result  = $service->analyzePipeline();
 
         $this->assertIsArray($result['workloadByMonth']);

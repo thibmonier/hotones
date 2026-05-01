@@ -235,7 +235,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         // Work time: 100%
         // Expected cost: 3 * 400 = 1200 EUR
         $period = $this->createEmploymentPeriod($contributor, '2025-01-01', '2025-01-05');
-        $period->setCjm(400.0);
+        $period->setCjm('400.00');
         $period->setWorkTimePercentage('100.00');
 
         $cost = $this->repository->calculatePeriodCost($period);
@@ -252,7 +252,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         // Work time: 80% (part-time)
         // Expected cost: 3 * 0.8 * 400 = 960 EUR
         $period = $this->createEmploymentPeriod($contributor, '2025-01-01', '2025-01-05');
-        $period->setCjm(400.0);
+        $period->setCjm('400.00');
         $period->setWorkTimePercentage('80.00');
 
         $cost = $this->repository->calculatePeriodCost($period);
@@ -300,11 +300,11 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $contributor2 = ContributorFactory::createOne();
 
         // 2 active periods
-        $this->createEmploymentPeriod($contributor1, '2024-01-01', null)->setCjm(400.0);
-        $this->createEmploymentPeriod($contributor2, '2025-01-01', '2030-12-31')->setCjm(500.0);
+        $this->createEmploymentPeriod($contributor1, '2024-01-01', null)->setCjm('400.00');
+        $this->createEmploymentPeriod($contributor2, '2025-01-01', '2030-12-31')->setCjm('500.00');
 
         // 1 past period
-        $this->createEmploymentPeriod($contributor1, '2020-01-01', '2020-12-31')->setCjm(300.0);
+        $this->createEmploymentPeriod($contributor1, '2020-01-01', '2020-12-31')->setCjm('300.00');
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->flush();
