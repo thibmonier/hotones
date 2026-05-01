@@ -4,18 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use App\Entity\BlogCategory;
-use App\Entity\BlogPost;
-use App\Entity\BlogTag;
-use App\Entity\Company;
-use App\Entity\Profile;
-use App\Entity\SaasProvider;
-use App\Entity\SaasService;
-use App\Entity\SaasSubscription;
-use App\Entity\SchedulerEntry;
-use App\Entity\ServiceCategory;
-use App\Entity\Skill;
-use App\Entity\Technology;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -23,30 +12,18 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Override;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
+#[AdminDashboard(routePath: '/backoffice', routeName: 'backoffice')]
 class BackofficeDashboardController extends AbstractDashboardController
 {
-    #[Route('/backoffice', name: 'backoffice')]
     #[Override]
     public function index(): Response
     {
-        // Option 1. You can make your dashboard redirect to some common page of your backend
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
 
         return $this->redirect($adminUrlGenerator->setController(TechnologyCrudController::class)->generateUrl());
-
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirect('...');
-        // }
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-        // return $this->render('admin/dashboard.html.twig');
     }
 
     #[Override]
@@ -70,24 +47,24 @@ class BackofficeDashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
         yield MenuItem::section('Configuration');
-        yield MenuItem::linkToCrud('Technologies', 'fas fa-code', Technology::class);
-        yield MenuItem::linkToCrud('Catégories de service', 'fas fa-tags', ServiceCategory::class);
-        yield MenuItem::linkToCrud('Profils métier', 'fas fa-user-tie', Profile::class);
-        yield MenuItem::linkToCrud('Compétences', 'fas fa-certificate', Skill::class);
+        yield MenuItem::linkTo(TechnologyCrudController::class, 'Technologies', 'fas fa-code');
+        yield MenuItem::linkTo(ServiceCategoryCrudController::class, 'Catégories de service', 'fas fa-tags');
+        yield MenuItem::linkTo(ProfileCrudController::class, 'Profils métier', 'fas fa-user-tie');
+        yield MenuItem::linkTo(SkillCrudController::class, 'Compétences', 'fas fa-certificate');
 
         yield MenuItem::section('SaaS');
-        yield MenuItem::linkToCrud('Fournisseurs', 'fas fa-building', SaasProvider::class);
-        yield MenuItem::linkToCrud('Services', 'fas fa-cube', SaasService::class);
-        yield MenuItem::linkToCrud('Abonnements', 'fas fa-calendar-check', SaasSubscription::class);
+        yield MenuItem::linkTo(SaasProviderCrudController::class, 'Fournisseurs', 'fas fa-building');
+        yield MenuItem::linkTo(SaasServiceCrudController::class, 'Services', 'fas fa-cube');
+        yield MenuItem::linkTo(SaasSubscriptionCrudController::class, 'Abonnements', 'fas fa-calendar-check');
 
         yield MenuItem::section('Blog');
-        yield MenuItem::linkToCrud('Articles', 'fas fa-newspaper', BlogPost::class);
-        yield MenuItem::linkToCrud('Catégories', 'fas fa-folder', BlogCategory::class);
-        yield MenuItem::linkToCrud('Tags', 'fas fa-tag', BlogTag::class);
+        yield MenuItem::linkTo(BlogPostCrudController::class, 'Articles', 'fas fa-newspaper');
+        yield MenuItem::linkTo(BlogCategoryCrudController::class, 'Catégories', 'fas fa-folder');
+        yield MenuItem::linkTo(BlogTagCrudController::class, 'Tags', 'fas fa-tag');
 
         yield MenuItem::section('Système');
-        yield MenuItem::linkToCrud('Sociétés', 'fas fa-building', Company::class);
-        yield MenuItem::linkToCrud('Scheduler', 'fas fa-clock', SchedulerEntry::class);
+        yield MenuItem::linkTo(CompanyCrudController::class, 'Sociétés', 'fas fa-building');
+        yield MenuItem::linkTo(SchedulerEntryCrudController::class, 'Scheduler', 'fas fa-clock');
         yield MenuItem::linkToRoute('Notifications', 'fas fa-bell', 'admin_notification_settings');
 
         yield MenuItem::section();
