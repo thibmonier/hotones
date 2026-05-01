@@ -87,6 +87,22 @@ docker compose exec app php bin/console app:seed-projects-2025 --count=50
 - **Redis**: `localhost:6379`
 - **API Documentation**: `http://localhost:8080/api/documentation`
 
+### Git hooks (pre-commit / pre-push)
+
+```bash
+git config --local core.hooksPath .githooks
+```
+
+Les hooks `.githooks/pre-commit` et `.githooks/pre-push` détectent automatiquement votre environnement (OPS-005) :
+
+| Détection | Comportement |
+|---|---|
+| Docker daemon up + `docker compose` disponible | Exécute via le conteneur `app` (mode historique, identique à la CI) |
+| Docker indisponible mais PHP + composer + `vendor/` présents | Fallback local : `composer phpcsfixer-fix` / `./vendor/bin/phpunit` |
+| Aucune des deux disponibles | Skip avec un avertissement (le commit n'est pas bloqué silencieusement) |
+
+Si vous voulez bypasser **intentionnellement** un hook : `git commit --no-verify` / `git push --no-verify`. Documentez la raison dans le message de commit.
+
 ## 📏 Standards de code
 
 ### Style de code

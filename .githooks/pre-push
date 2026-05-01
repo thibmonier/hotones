@@ -1,21 +1,37 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-function dc() {
-  if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
-    docker compose "$@"
-  else
-    docker-compose "$@"
-  fi
+# OPS-005 (sprint-003) — fallback sans Docker daemon
+
+has_docker() {
+  command -v docker >/dev/null 2>&1 \
+    && docker compose version >/dev/null 2>&1 \
+    && docker info >/dev/null 2>&1
 }
 
-printf "[pre-push] Cleaning test database...\n"
-# Clean test database to avoid corruption issues
-dc exec -T app rm -f var/test.db* 2>/dev/null || true
+has_local_php() {
+  command -v php >/dev/null 2>&1 \
+    && [ -x vendor/bin/phpunit ]
+}
 
-printf "[pre-push] Running test suite (excluding E2E)...\n"
-# Run PHPUnit suite excluding E2E tests (require geckodriver)
-if ! dc run --rm -T app ./vendor/bin/phpunit tests/Unit tests/Integration tests/Api tests/Functional; then
+if has_docker; then
+  printf "[pre-push] Using Docker (app container)\n"
+  RUN_PHPUNIT=(docker compose run --rm -T app ./vendor/bin/phpunit)
+  RUN_CLEAN=(docker compose exec -T app rm -f var/test.db*)
+elif has_local_php; then
+  printf "[pre-push] Docker daemon unavailable — falling back to local phpunit\n"
+  RUN_PHPUNIT=(./vendor/bin/phpunit)
+  RUN_CLEAN=(rm -f var/test.db*)
+else
+  printf "[pre-push] Neither Docker nor local PHP/phpunit available — skipping checks (use --no-verify to bypass intentionally)\n" >&2
+  exit 0
+fi
+
+printf "[pre-push] Cleaning test database...\n"
+"${RUN_CLEAN[@]}" 2>/dev/null || true
+
+printf "[pre-push] Running test suite (Unit + Integration + Api + Functional)...\n"
+if ! "${RUN_PHPUNIT[@]}" tests/Unit tests/Integration tests/Api tests/Functional; then
   printf "[pre-push] Tests failed. Aborting push.\n" >&2
   exit 1
 fi
