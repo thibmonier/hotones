@@ -19,9 +19,9 @@ use PHPUnit\Framework\TestCase;
 final class NotificationTypeTest extends TestCase
 {
     #[Test]
-    public function exposes_exactly_10_notification_types(): void
+    public function exposesExactly11NotificationTypes(): void
     {
-        self::assertCount(10, NotificationType::cases(), 'NotificationType enum must expose 10 cases — update tests if a case is added/removed.');
+        self::assertCount(11, NotificationType::cases(), 'NotificationType enum must expose 11 cases — update tests if a case is added/removed.');
     }
 
     /**
@@ -29,27 +29,28 @@ final class NotificationTypeTest extends TestCase
      */
     public static function casesWithExpectedValueProvider(): iterable
     {
-        yield 'quote_to_sign'                => [NotificationType::QUOTE_TO_SIGN, 'quote_to_sign'];
-        yield 'quote_won'                    => [NotificationType::QUOTE_WON, 'quote_won'];
-        yield 'quote_lost'                   => [NotificationType::QUOTE_LOST, 'quote_lost'];
-        yield 'project_budget_alert'         => [NotificationType::PROJECT_BUDGET_ALERT, 'project_budget_alert'];
-        yield 'low_margin_alert'             => [NotificationType::LOW_MARGIN_ALERT, 'low_margin_alert'];
-        yield 'contributor_overload_alert'   => [NotificationType::CONTRIBUTOR_OVERLOAD_ALERT, 'contributor_overload_alert'];
+        yield 'quote_to_sign' => [NotificationType::QUOTE_TO_SIGN, 'quote_to_sign'];
+        yield 'quote_won' => [NotificationType::QUOTE_WON, 'quote_won'];
+        yield 'quote_lost' => [NotificationType::QUOTE_LOST, 'quote_lost'];
+        yield 'project_budget_alert' => [NotificationType::PROJECT_BUDGET_ALERT, 'project_budget_alert'];
+        yield 'low_margin_alert' => [NotificationType::LOW_MARGIN_ALERT, 'low_margin_alert'];
+        yield 'contributor_overload_alert' => [NotificationType::CONTRIBUTOR_OVERLOAD_ALERT, 'contributor_overload_alert'];
         yield 'timesheet_pending_validation' => [NotificationType::TIMESHEET_PENDING_VALIDATION, 'timesheet_pending_validation'];
-        yield 'payment_due_alert'            => [NotificationType::PAYMENT_DUE_ALERT, 'payment_due_alert'];
-        yield 'kpi_threshold_exceeded'       => [NotificationType::KPI_THRESHOLD_EXCEEDED, 'kpi_threshold_exceeded'];
-        yield 'timesheet_missing_weekly'     => [NotificationType::TIMESHEET_MISSING_WEEKLY, 'timesheet_missing_weekly'];
+        yield 'payment_due_alert' => [NotificationType::PAYMENT_DUE_ALERT, 'payment_due_alert'];
+        yield 'kpi_threshold_exceeded' => [NotificationType::KPI_THRESHOLD_EXCEEDED, 'kpi_threshold_exceeded'];
+        yield 'timesheet_missing_weekly' => [NotificationType::TIMESHEET_MISSING_WEEKLY, 'timesheet_missing_weekly'];
+        yield 'vacation_cancelled_by_manager' => [NotificationType::VACATION_CANCELLED_BY_MANAGER, 'vacation_cancelled_by_manager'];
     }
 
     #[Test]
     #[DataProvider('casesWithExpectedValueProvider')]
-    public function string_value_matches_expected(NotificationType $case, string $expectedValue): void
+    public function stringValueMatchesExpected(NotificationType $case, string $expectedValue): void
     {
         self::assertSame($expectedValue, $case->value);
     }
 
     #[Test]
-    public function getLabel_returns_non_empty_french_label_for_all_cases(): void
+    public function getLabelReturnsNonEmptyFrenchLabelForAllCases(): void
     {
         foreach (NotificationType::cases() as $case) {
             $label = $case->getLabel();
@@ -60,7 +61,7 @@ final class NotificationTypeTest extends TestCase
     }
 
     #[Test]
-    public function getIcon_returns_fontawesome_class_for_all_cases(): void
+    public function getIconReturnsFontawesomeClassForAllCases(): void
     {
         foreach (NotificationType::cases() as $case) {
             $icon = $case->getIcon();
@@ -69,7 +70,7 @@ final class NotificationTypeTest extends TestCase
     }
 
     #[Test]
-    public function getColor_returns_known_bootstrap_color_for_all_cases(): void
+    public function getColorReturnsKnownBootstrapColorForAllCases(): void
     {
         $allowedColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
 
@@ -79,7 +80,7 @@ final class NotificationTypeTest extends TestCase
     }
 
     #[Test]
-    public function from_round_trips_for_all_string_values(): void
+    public function fromRoundTripsForAllStringValues(): void
     {
         foreach (NotificationType::cases() as $case) {
             self::assertSame($case, NotificationType::from($case->value));
@@ -87,7 +88,7 @@ final class NotificationTypeTest extends TestCase
     }
 
     #[Test]
-    public function tryFrom_returns_null_for_unknown_value(): void
+    public function tryFromReturnsNullForUnknownValue(): void
     {
         self::assertNull(NotificationType::tryFrom('unknown_event_type'));
     }

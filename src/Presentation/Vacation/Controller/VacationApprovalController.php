@@ -161,7 +161,7 @@ class VacationApprovalController extends AbstractController
         }
 
         try {
-            ($this->cancelVacationHandler)(new CancelVacationCommand($id));
+            ($this->cancelVacationHandler)(new CancelVacationCommand($id, $user->getId()));
             $this->addFlash('success', 'La demande de conge a ete annulee.');
         } catch (InvalidStatusTransitionException) {
             $this->addFlash('error', 'Cette demande ne peut plus etre annulee.');

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Demande de conge annulee par le collaborateur</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2>Demande de conge annulee</h2>
+
+    <p>Bonjour {{ manager.firstName ?: manager.email }},</p>
+
+    <p>{{ contributor.fullName }} a annule sa demande de conge en attente.</p>
+
+    <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+        <tr><th align="left">Type</th><td>{{ vacation.typeLabel }}</td></tr>
+        <tr><th align="left">Du</th><td>{{ vacation.startDate|date('d/m/Y') }}</td></tr>
+        <tr><th align="left">Au</th><td>{{ vacation.endDate|date('d/m/Y') }}</td></tr>
+    </table>
+
+    <p>Aucune action n'est requise de votre part.</p>
+
+    <hr>
+    <p style="font-size: 12px; color: #666;">HotOnes — notification automatique.</p>
+</body>
+</html>
