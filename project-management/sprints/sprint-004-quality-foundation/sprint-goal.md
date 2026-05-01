@@ -37,7 +37,9 @@ Sprint-004 absorbe les 2 categories en parallele : un cluster TEST-006..009 sur 
 
 ## User Stories selectionnees
 
-> Total **31 pts** sur capacite ~32. 1 pt de marge, sprint deliberement charge en dette pour ne pas accumuler.
+> **Mise a jour 2026-05-01** : DEPS-001/002/003 livres en avance pendant sprint-003 J1. 8 pts liberes
+> et redeployes sur 1 nouveau cluster (TEST-DEPRECATIONS, DEPS-004) + revue des PRs majors deja
+> ouvertes. Total ajuste : **30 pts** sur capacite ~32.
 
 ### Cluster Tests (gap-analysis residuels)
 
@@ -47,6 +49,7 @@ Sprint-004 absorbe les 2 categories en parallele : un cluster TEST-006..009 sur 
 | TEST-007 | Tests AlertSubscriber + ChartConfigService Twig | 3 | Must | gap-analysis Critical #4 + #6 |
 | TEST-008 | Healthcheck endpoint + Doctrine connectivity test | 2 | Must | gap-analysis Critical #3 |
 | TEST-009 | BoondManagerConnector + HubspotConnector integration tests | 5 | Should | gap-analysis Critical #5 |
+| TEST-DEPRECATIONS-001 | Nettoyer 8 PHPUnit 13 deprecations | 2 | Should | post-PR #64 PHPUnit 13 |
 
 ### Cluster Ops / Release
 
@@ -55,14 +58,16 @@ Sprint-004 absorbe les 2 categories en parallele : un cluster TEST-006..009 sur 
 | OPS-007 | Stacked PR merge procedure (CONTRIBUTING.md + script aide) | 2 | Must | retro sprint-003 action 1 |
 | OPS-008 | Auto-comment CI rouge sur PR (extension OPS-004) | 3 | Should | retro sprint-003 action 2 |
 | OPS-009 | Smoke test staging automatique post-deploy | 3 | Should | retro sprint-003 action 3 |
+| OPS-010 | Review + merge cascade des 4 majors PRs ouverts (#65 #66 #67 #68) | 2 | Must | sprint-003 J1 carry-over |
 
-### Cluster Dependances / Montees de version
+### Cluster Dependances (livre en avance pendant sprint-003 J1)
 
-| ID | Titre | Pts | MoSCoW | Origine |
+| ID | Titre | Pts | MoSCoW | Statut |
 |---|---|---:|---|---|
-| DEPS-001 | Montée endroid/qr-code v5 → v6 (config breaking) | 3 | Must | demande utilisateur |
-| DEPS-002 | Symfony patches + roave/security-advisories audit | 3 | Should | maintenance courante |
-| DEPS-003 | composer audit + npm audit clean | 2 | Should | sécurité courante |
+| ~~DEPS-001~~ | endroid/qr-code v6 (puis v7) config migration | ~~3~~ | ~~Must~~ | ✅ Mergé #59 + hotfix #62 + #64 |
+| ~~DEPS-002~~ | Symfony patches | ~~3~~ | ~~Should~~ | ✅ Mergé #60 |
+| ~~DEPS-003~~ | composer audit + npm audit clean | ~~2~~ | ~~Should~~ | ✅ Mergé #60 |
+| DEPS-004 | Symfony AI bundle alpha bump (debloque reflection-docblock ^6) | 3 | Could | sprint-003 J1 finding |
 
 ### Cluster Refactor
 
@@ -70,7 +75,7 @@ Sprint-004 absorbe les 2 categories en parallele : un cluster TEST-006..009 sur 
 |---|---|---:|---|---|
 | REFACTOR-001 | Mutualiser fixtures fonctionnelles Vacation (tests/Support/VacationFunctionalTrait) | 2 | Could | retro sprint-003 action 4 |
 
-**Total selectionne : 31 points** (Must 23 + Should 11 - 3 surcharge = 31)
+**Total selectionne : 30 points** (Must 19 + Should 8 + Could 5, hors DEPS-001/2/3 livres en sprint-003 J1)
 
 ## Ordre d'execution
 
