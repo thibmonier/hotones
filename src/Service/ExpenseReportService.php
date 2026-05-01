@@ -257,7 +257,7 @@ class ExpenseReportService
         DateTimeInterface $end,
     ): array {
         $company = $this->companyContext->getCurrentCompany();
-        $qb      = $this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
 
         // Total des frais
         $total = $qb
@@ -310,8 +310,8 @@ class ExpenseReportService
             ->getResult();
 
         return [
-            'total'       => $total ? (string) $total : '0.00',
-            'validated'   => $validated ? (string) $validated : '0.00',
+            'total' => $total ? (string) $total : '0.00',
+            'validated' => $validated ? (string) $validated : '0.00',
             'by_category' => $byCategory,
         ];
     }

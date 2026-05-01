@@ -55,13 +55,13 @@ class GenerateEmploymentPeriodsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $startDate      = new DateTime($input->getOption('start-date'));
-        $endDateStr     = $input->getOption('end-date');
-        $endDate        = $endDateStr ? new DateTime($endDateStr) : null;
-        $weeklyHours    = (float) $input->getOption('weekly-hours');
+        $startDate = new DateTime($input->getOption('start-date'));
+        $endDateStr = $input->getOption('end-date');
+        $endDate = $endDateStr ? new DateTime($endDateStr) : null;
+        $weeklyHours = (float) $input->getOption('weekly-hours');
         $workPercentage = (float) $input->getOption('work-percentage');
-        $dryRun         = $input->getOption('dry-run');
-        $force          = $input->getOption('force');
+        $dryRun = $input->getOption('dry-run');
+        $force = $input->getOption('force');
 
         $io->title('Generate Employment Periods');
 
@@ -87,7 +87,7 @@ class GenerateEmploymentPeriodsCommand extends Command
 
         // Filter contributors without active employment period
         $contributorsToProcess = [];
-        $today                 = new DateTime();
+        $today = new DateTime();
 
         foreach ($allContributors as $contributor) {
             $hasActiveContract = $this->hasActiveEmploymentPeriod($contributor, $today);

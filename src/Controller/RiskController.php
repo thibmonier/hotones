@@ -34,19 +34,19 @@ class RiskController extends AbstractController
 
         // Statistiques globales
         $stats = [
-            'total'    => count($projects),
-            'atRisk'   => count($atRiskProjects),
+            'total' => count($projects),
+            'atRisk' => count($atRiskProjects),
             'critical' => count(array_filter(
                 $atRiskProjects,
                 fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
             )),
-            'high'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'high' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
             'medium' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
         return $this->render('risk/projects_dashboard.html.twig', [
             'atRiskProjects' => $atRiskProjects,
-            'stats'          => $stats,
+            'stats' => $stats,
         ]);
     }
 }

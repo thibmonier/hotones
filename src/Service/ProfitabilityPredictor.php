@@ -28,38 +28,38 @@ class ProfitabilityPredictor
         // On peut prédire si >= 30% de réalisation
         if ($progress < 30) {
             return [
-                'canPredict'      => false,
+                'canPredict' => false,
                 'currentProgress' => $progress,
-                'message'         => 'Pas assez de données (progression < 30%)',
-                'currentMargin'   => 0.0,
+                'message' => 'Pas assez de données (progression < 30%)',
+                'currentMargin' => 0.0,
                 'predictedMargin' => [],
-                'budgetDrift'     => [],
+                'budgetDrift' => [],
                 'recommendations' => [],
-                'scenarios'       => [],
+                'scenarios' => [],
             ];
         }
 
         // Données actuelles
         $soldAmount = (float) $project->getTotalSoldAmount();
-        $soldHours  = (float) $project->getTotalTasksSoldHours();
+        $soldHours = (float) $project->getTotalTasksSoldHours();
         $spentHours = (float) $project->getTotalTasksSpentHours();
 
         if ($soldAmount === 0.0 || $soldHours === 0.0) {
             return [
-                'canPredict'      => false,
+                'canPredict' => false,
                 'currentProgress' => $progress,
-                'message'         => 'Données insuffisantes (CA ou budget manquant)',
-                'currentMargin'   => 0.0,
+                'message' => 'Données insuffisantes (CA ou budget manquant)',
+                'currentMargin' => 0.0,
                 'predictedMargin' => [],
-                'budgetDrift'     => [],
+                'budgetDrift' => [],
                 'recommendations' => [],
-                'scenarios'       => [],
+                'scenarios' => [],
             ];
         }
 
         // Coût actuel estimé (simplifié : 400€/jour de coût moyen)
-        $costPerDay    = 400;
-        $currentCost   = ($spentHours / 7)                                              * $costPerDay; // 7h par jour
+        $costPerDay = 400;
+        $currentCost = ($spentHours / 7) * $costPerDay; // 7h par jour
         $currentMargin = $soldAmount > 0 ? (($soldAmount - $currentCost) / $soldAmount) * 100 : 0;
 
         // Prédiction de la marge finale
@@ -82,13 +82,13 @@ class ProfitabilityPredictor
         $scenarios = $this->generateScenarios($project, $soldAmount, $soldHours, $spentHours, $progress, $costPerDay);
 
         return [
-            'canPredict'      => true,
+            'canPredict' => true,
             'currentProgress' => $progress,
-            'currentMargin'   => round($currentMargin, 2),
+            'currentMargin' => round($currentMargin, 2),
             'predictedMargin' => $predictedMargin,
-            'budgetDrift'     => $budgetDrift,
+            'budgetDrift' => $budgetDrift,
             'recommendations' => $recommendations,
-            'scenarios'       => $scenarios,
+            'scenarios' => $scenarios,
         ];
     }
 
@@ -104,22 +104,22 @@ class ProfitabilityPredictor
         float $costPerDay,
     ): array {
         // Estimation linéaire basée sur le rythme actuel
-        $burnRate            = $progress > 0 ? $spentHours / $progress : 0;
+        $burnRate = $progress > 0 ? $spentHours / $progress : 0;
         $projectedTotalHours = $burnRate * 100; // Projection à 100%
 
-        $projectedTotalCost = ($projectedTotalHours / 7)                                            * $costPerDay;
-        $projectedMargin    = $soldAmount > 0 ? (($soldAmount - $projectedTotalCost) / $soldAmount) * 100 : 0;
+        $projectedTotalCost = ($projectedTotalHours / 7) * $costPerDay;
+        $projectedMargin = $soldAmount > 0 ? (($soldAmount - $projectedTotalCost) / $soldAmount) * 100 : 0;
 
         // Marge budgétée initiale (objectif)
-        $budgetedCost   = ($soldHours / 7)                                                * $costPerDay;
+        $budgetedCost = ($soldHours / 7) * $costPerDay;
         $budgetedMargin = $soldAmount > 0 ? (($soldAmount - $budgetedCost) / $soldAmount) * 100 : 0;
 
         return [
-            'projected'           => round($projectedMargin, 2),
-            'budgeted'            => round($budgetedMargin, 2),
-            'difference'          => round($projectedMargin - $budgetedMargin, 2),
+            'projected' => round($projectedMargin, 2),
+            'budgeted' => round($budgetedMargin, 2),
+            'difference' => round($projectedMargin - $budgetedMargin, 2),
             'projectedTotalHours' => round($projectedTotalHours, 1),
-            'projectedTotalCost'  => round($projectedTotalCost, 0),
+            'projectedTotalCost' => round($projectedTotalCost, 0),
         ];
     }
 
@@ -129,8 +129,8 @@ class ProfitabilityPredictor
     private function analyzeBudgetDrift(float $progress, float $soldHours, float $spentHours): array
     {
         $expectedHoursAtProgress = ($soldHours * $progress) / 100;
-        $overrun                 = $spentHours - $expectedHoursAtProgress;
-        $overrunPercentage       = $expectedHoursAtProgress > 0 ? ($overrun / $expectedHoursAtProgress) * 100 : 0;
+        $overrun = $spentHours - $expectedHoursAtProgress;
+        $overrunPercentage = $expectedHoursAtProgress > 0 ? ($overrun / $expectedHoursAtProgress) * 100 : 0;
 
         $severity = 'low';
         if ($overrunPercentage > 30) {
@@ -142,12 +142,12 @@ class ProfitabilityPredictor
         }
 
         return [
-            'hasOverrun'        => $overrun > 0,
-            'overrunHours'      => round($overrun, 1),
+            'hasOverrun' => $overrun > 0,
+            'overrunHours' => round($overrun, 1),
             'overrunPercentage' => round($overrunPercentage, 1),
-            'severity'          => $severity,
-            'expectedHours'     => round($expectedHoursAtProgress, 1),
-            'actualHours'       => round($spentHours, 1),
+            'severity' => $severity,
+            'expectedHours' => round($expectedHoursAtProgress, 1),
+            'actualHours' => round($spentHours, 1),
         ];
     }
 
@@ -162,9 +162,9 @@ class ProfitabilityPredictor
         if ($budgetDrift['severity'] === 'critical') {
             $recommendations[] = [
                 'priority' => 'high',
-                'type'     => 'budget_control',
-                'title'    => 'Action urgente requise',
-                'message'  => sprintf(
+                'type' => 'budget_control',
+                'title' => 'Action urgente requise',
+                'message' => sprintf(
                     'Dérive budgétaire critique de %.1f heures (%.0f%%). Convoquer une réunion d\'urgence pour analyser les causes.',
                     $budgetDrift['overrunHours'],
                     $budgetDrift['overrunPercentage'],
@@ -179,9 +179,9 @@ class ProfitabilityPredictor
         } elseif ($budgetDrift['severity'] === 'high') {
             $recommendations[] = [
                 'priority' => 'medium',
-                'type'     => 'budget_control',
-                'title'    => 'Surveillance nécessaire',
-                'message'  => sprintf(
+                'type' => 'budget_control',
+                'title' => 'Surveillance nécessaire',
+                'message' => sprintf(
                     'Dérive budgétaire de %.1f heures (%.0f%%). Surveiller de près.',
                     $budgetDrift['overrunHours'],
                     $budgetDrift['overrunPercentage'],
@@ -198,9 +198,9 @@ class ProfitabilityPredictor
         if ($predictedMargin['projected'] < 10) {
             $recommendations[] = [
                 'priority' => 'high',
-                'type'     => 'profitability',
-                'title'    => 'Marge finale prédite très faible',
-                'message'  => sprintf(
+                'type' => 'profitability',
+                'title' => 'Marge finale prédite très faible',
+                'message' => sprintf(
                     'Marge finale estimée à %.1f%% (objectif : %.1f%%). Risque de perte.',
                     $predictedMargin['projected'],
                     $predictedMargin['budgeted'],
@@ -215,9 +215,9 @@ class ProfitabilityPredictor
         } elseif ($predictedMargin['projected'] < 20) {
             $recommendations[] = [
                 'priority' => 'medium',
-                'type'     => 'profitability',
-                'title'    => 'Marge finale sous l\'objectif',
-                'message'  => sprintf(
+                'type' => 'profitability',
+                'title' => 'Marge finale sous l\'objectif',
+                'message' => sprintf(
                     'Marge finale estimée à %.1f%% (objectif : 20%%+).',
                     $predictedMargin['projected'],
                 ),
@@ -233,9 +233,9 @@ class ProfitabilityPredictor
         if (count($recommendations) === 0 && $predictedMargin['projected'] > $predictedMargin['budgeted']) {
             $recommendations[] = [
                 'priority' => 'low',
-                'type'     => 'positive',
-                'title'    => 'Performance excellente',
-                'message'  => sprintf(
+                'type' => 'positive',
+                'title' => 'Performance excellente',
+                'message' => sprintf(
                     'Le projet est en avance sur les objectifs de rentabilité (%.1f%% vs %.1f%% budgeté).',
                     $predictedMargin['projected'],
                     $predictedMargin['budgeted'],
@@ -265,41 +265,41 @@ class ProfitabilityPredictor
         $burnRate = $progress > 0 ? $spentHours / $progress : 0;
 
         // Scénario réaliste : tendance actuelle
-        $realisticHours  = $burnRate                                                        * 100;
-        $realisticCost   = ($realisticHours / 7)                                            * $costPerDay;
+        $realisticHours = $burnRate * 100;
+        $realisticCost = ($realisticHours / 7) * $costPerDay;
         $realisticMargin = $soldAmount > 0 ? (($soldAmount - $realisticCost) / $soldAmount) * 100 : 0;
 
         // Scénario optimiste : amélioration de 15%
-        $optimisticHours  = $realisticHours                                                   * 0.85;
-        $optimisticCost   = ($optimisticHours / 7)                                            * $costPerDay;
+        $optimisticHours = $realisticHours * 0.85;
+        $optimisticCost = ($optimisticHours / 7) * $costPerDay;
         $optimisticMargin = $soldAmount > 0 ? (($soldAmount - $optimisticCost) / $soldAmount) * 100 : 0;
 
         // Scénario pessimiste : dérive de 20%
-        $pessimisticHours  = $realisticHours                                                    * 1.20;
-        $pessimisticCost   = ($pessimisticHours / 7)                                            * $costPerDay;
+        $pessimisticHours = $realisticHours * 1.20;
+        $pessimisticCost = ($pessimisticHours / 7) * $costPerDay;
         $pessimisticMargin = $soldAmount > 0 ? (($soldAmount - $pessimisticCost) / $soldAmount) * 100 : 0;
 
         return [
             'optimistic' => [
-                'label'      => 'Optimiste (-15%)',
+                'label' => 'Optimiste (-15%)',
                 'totalHours' => round($optimisticHours, 1),
-                'totalCost'  => round($optimisticCost, 0),
-                'margin'     => round($optimisticMargin, 2),
-                'profit'     => round($soldAmount - $optimisticCost, 0),
+                'totalCost' => round($optimisticCost, 0),
+                'margin' => round($optimisticMargin, 2),
+                'profit' => round($soldAmount - $optimisticCost, 0),
             ],
             'realistic' => [
-                'label'      => 'Réaliste (tendance actuelle)',
+                'label' => 'Réaliste (tendance actuelle)',
                 'totalHours' => round($realisticHours, 1),
-                'totalCost'  => round($realisticCost, 0),
-                'margin'     => round($realisticMargin, 2),
-                'profit'     => round($soldAmount - $realisticCost, 0),
+                'totalCost' => round($realisticCost, 0),
+                'margin' => round($realisticMargin, 2),
+                'profit' => round($soldAmount - $realisticCost, 0),
             ],
             'pessimistic' => [
-                'label'      => 'Pessimiste (+20%)',
+                'label' => 'Pessimiste (+20%)',
                 'totalHours' => round($pessimisticHours, 1),
-                'totalCost'  => round($pessimisticCost, 0),
-                'margin'     => round($pessimisticMargin, 2),
-                'profit'     => round($soldAmount - $pessimisticCost, 0),
+                'totalCost' => round($pessimisticCost, 0),
+                'margin' => round($pessimisticMargin, 2),
+                'profit' => round($soldAmount - $pessimisticCost, 0),
             ],
         ];
     }

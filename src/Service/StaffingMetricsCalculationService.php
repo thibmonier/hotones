@@ -72,17 +72,17 @@ class StaffingMetricsCalculationService
         foreach ($periods as $period) {
             // Récupérer ou créer la dimension temporelle (avec cache local)
             $periodKey = $period->format('Y-m-d');
-            $dimTime   = $this->dimTimeCache[$periodKey]
+            $dimTime = $this->dimTimeCache[$periodKey]
                 ??= $this->getOrCreateDimTime($period);
 
             // Calculer le début et la fin de la période selon la granularité
             $periodStart = clone $period;
-            $periodEnd   = $this->calculatePeriodEnd($period, $granularity);
+            $periodEnd = $this->calculatePeriodEnd($period, $granularity);
 
             foreach ($contributors as $contributor) {
                 // Récupérer la période d'emploi active pour ce contributeur depuis l'index
                 $contributorPeriods = $periodsByContributor[$contributor->getId()] ?? [];
-                $employmentPeriod   = $this->findActivePeriod($contributorPeriods, $period);
+                $employmentPeriod = $this->findActivePeriod($contributorPeriods, $period);
 
                 // Calculer les métriques pour ce contributeur sur cette période
                 $metrics = $this->calculateMetricsForContributor($contributor, $periodStart, $periodEnd, $employmentPeriod);
@@ -177,10 +177,10 @@ class StaffingMetricsCalculationService
 
         return [
             'availableDays' => max(0, $availableDays),
-            'workedDays'    => max(0, $workedDays),
-            'staffedDays'   => max(0, $staffedDays),
-            'vacationDays'  => $vacationDays,
-            'plannedDays'   => $plannedDays,
+            'workedDays' => max(0, $workedDays),
+            'staffedDays' => max(0, $staffedDays),
+            'vacationDays' => $vacationDays,
+            'plannedDays' => $plannedDays,
         ];
     }
 
@@ -189,7 +189,7 @@ class StaffingMetricsCalculationService
      */
     private function calculateWorkingDays(DateTimeInterface $start, DateTimeInterface $end): float
     {
-        $days    = 0;
+        $days = 0;
         $current = clone $start;
 
         while ($current <= $end) {
@@ -229,7 +229,7 @@ class StaffingMetricsCalculationService
         foreach ($vacations as $vacation) {
             // Calculer l'intersection entre la vacation et la période
             $vacStart = max($vacation->getStartDate(), $start);
-            $vacEnd   = min($vacation->getEndDate(), $end);
+            $vacEnd = min($vacation->getEndDate(), $end);
 
             // Compter les jours ouvrés
             $totalVacationDays += $this->calculateWorkingDays($vacStart, $vacEnd);
@@ -287,7 +287,7 @@ class StaffingMetricsCalculationService
             /** @var \App\Entity\Planning $planning */
             // Calculer l'intersection entre la planification et la période
             $planStart = max($planning->getStartDate(), $start);
-            $planEnd   = min($planning->getEndDate(), $end);
+            $planEnd = min($planning->getEndDate(), $end);
 
             // Compter les jours ouvrés dans cette intersection
             $workingDays = $this->calculateWorkingDays($planStart, $planEnd);
@@ -295,7 +295,7 @@ class StaffingMetricsCalculationService
             // Calculer le nombre de jours planifiés selon les heures quotidiennes
             // Si dailyHours = 8, on compte 1 jour par jour ouvré
             // Si dailyHours = 4, on compte 0.5 jour par jour ouvré
-            $dailyHours  = (float) $planning->getDailyHours();
+            $dailyHours = (float) $planning->getDailyHours();
             $plannedDays = $workingDays * ($dailyHours / 8.0);
 
             $totalPlannedDays += $plannedDays;
@@ -409,8 +409,8 @@ class StaffingMetricsCalculationService
         switch ($granularity) {
             case 'monthly':
                 $interval = new DateInterval('P1M');
-                $current  = (new DateTime($startDate->format('Y-m-01')));
-                $end      = (new DateTime($endDate->format('Y-m-01')));
+                $current = (new DateTime($startDate->format('Y-m-01')));
+                $end = (new DateTime($endDate->format('Y-m-01')));
 
                 while ($current <= $end) {
                     $periods[] = clone $current;
@@ -421,11 +421,11 @@ class StaffingMetricsCalculationService
             case 'quarterly':
                 // Générer les trimestres
                 $currentYear = (int) $startDate->format('Y');
-                $endYear     = (int) $endDate->format('Y');
+                $endYear = (int) $endDate->format('Y');
 
                 for ($year = $currentYear; $year <= $endYear; ++$year) {
                     for ($quarter = 1; $quarter <= 4; ++$quarter) {
-                        $month        = ($quarter - 1) * 3 + 1;
+                        $month = ($quarter - 1) * 3 + 1;
                         $quarterStart = new DateTime(sprintf('%d-%02d-01', $year, $month));
 
                         if ($quarterStart >= $startDate && $quarterStart <= $endDate) {
@@ -437,7 +437,7 @@ class StaffingMetricsCalculationService
 
             case 'weekly':
                 $interval = new DateInterval('P1W');
-                $current  = $startDate instanceof DateTime
+                $current = $startDate instanceof DateTime
                     ? clone $startDate
                     : new DateTime($startDate->format('Y-m-d'));
 

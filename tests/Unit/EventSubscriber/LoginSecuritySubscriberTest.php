@@ -44,16 +44,16 @@ final class LoginSecuritySubscriberTest extends TestCase
     {
         $this->loginLimiter = new RateLimiterFactory(
             [
-                'id'       => 'login',
-                'policy'   => 'sliding_window',
-                'limit'    => 5,
+                'id' => 'login',
+                'policy' => 'sliding_window',
+                'limit' => 5,
                 'interval' => '15 minutes',
             ],
             new InMemoryStorage(),
         );
-        $this->logger       = $this->createMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);
-        $this->subscriber   = new LoginSecuritySubscriber(
+        $this->subscriber = new LoginSecuritySubscriber(
             $this->loginLimiter,
             $this->logger,
             $this->requestStack,
@@ -61,7 +61,7 @@ final class LoginSecuritySubscriberTest extends TestCase
     }
 
     #[Test]
-    public function getSubscribedEvents_lists_login_failure_and_success(): void
+    public function getSubscribedEventsListsLoginFailureAndSuccess(): void
     {
         $events = LoginSecuritySubscriber::getSubscribedEvents();
 
@@ -72,7 +72,7 @@ final class LoginSecuritySubscriberTest extends TestCase
     }
 
     #[Test]
-    public function onLoginFailure_returns_silently_when_no_current_request(): void
+    public function onLoginFailureReturnsSilentlyWhenNoCurrentRequest(): void
     {
         $this->requestStack->method('getCurrentRequest')->willReturn(null);
         $this->logger->expects(self::never())->method('warning');
@@ -81,7 +81,7 @@ final class LoginSecuritySubscriberTest extends TestCase
     }
 
     #[Test]
-    public function onLoginFailure_logs_warning_with_remaining_attempts(): void
+    public function onLoginFailureLogsWarningWithRemainingAttempts(): void
     {
         $request = $this->makeRequestWithIp('10.0.0.42', username: 'jean@test.com');
         $this->requestStack->method('getCurrentRequest')->willReturn($request);
@@ -104,13 +104,13 @@ final class LoginSecuritySubscriberTest extends TestCase
     }
 
     #[Test]
-    public function onLoginFailure_throws_too_many_requests_after_5_attempts_from_same_ip(): void
+    public function onLoginFailureThrowsTooManyRequestsAfter5AttemptsFromSameIp(): void
     {
         $request = $this->makeRequestWithIp('10.0.0.66', username: 'attacker');
         $this->requestStack->method('getCurrentRequest')->willReturn($request);
 
         // Burn the first 5 attempts (limit = 5). They should all log warning, no error.
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $this->subscriber->onLoginFailure($this->makeFailureEvent());
         }
 
@@ -121,7 +121,7 @@ final class LoginSecuritySubscriberTest extends TestCase
     }
 
     #[Test]
-    public function onLoginFailure_uses_unknown_for_missing_username_and_ip(): void
+    public function onLoginFailureUsesUnknownForMissingUsernameAndIp(): void
     {
         $request = Request::create('/login', 'POST');
         $request->server->remove('REMOTE_ADDR');
@@ -140,7 +140,7 @@ final class LoginSecuritySubscriberTest extends TestCase
     }
 
     #[Test]
-    public function onLoginSuccess_returns_silently_when_no_current_request(): void
+    public function onLoginSuccessReturnsSilentlyWhenNoCurrentRequest(): void
     {
         $this->requestStack->method('getCurrentRequest')->willReturn(null);
         $this->logger->expects(self::never())->method('info');
@@ -149,7 +149,7 @@ final class LoginSecuritySubscriberTest extends TestCase
     }
 
     #[Test]
-    public function onLoginSuccess_logs_info_with_user_identifier_and_ip(): void
+    public function onLoginSuccessLogsInfoWithUserIdentifierAndIp(): void
     {
         $request = $this->makeRequestWithIp('10.0.0.7');
         $this->requestStack->method('getCurrentRequest')->willReturn($request);
@@ -167,7 +167,7 @@ final class LoginSecuritySubscriberTest extends TestCase
 
     private function makeRequestWithIp(string $ip, string $username = 'jean@test.com'): Request
     {
-        $request          = new Request(
+        $request = new Request(
             request: ['_username' => $username],
             server: ['REMOTE_ADDR' => $ip],
         );

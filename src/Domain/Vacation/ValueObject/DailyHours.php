@@ -9,8 +9,8 @@ use InvalidArgumentException;
 final readonly class DailyHours
 {
     private const string DEFAULT = '8.00';
-    private const float MIN      = 0.0;
-    private const float MAX      = 8.0;
+    private const float MIN = 0.0;
+    private const float MAX = 8.0;
 
     private function __construct(
         private string $value,

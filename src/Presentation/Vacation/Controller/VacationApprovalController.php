@@ -37,7 +37,7 @@ class VacationApprovalController extends AbstractController
     public function index(): Response
     {
         /** @var \App\Entity\User $user */
-        $user               = $this->getUser();
+        $user = $this->getUser();
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$managerContributor) {
@@ -62,8 +62,8 @@ class VacationApprovalController extends AbstractController
 
         return $this->render('vacation_approval/index.html.twig', [
             'pending_vacations' => $pendingVacations,
-            'all_vacations'     => $allVacations,
-            'manager'           => $managerContributor,
+            'all_vacations' => $allVacations,
+            'manager' => $managerContributor,
         ]);
     }
 
@@ -71,7 +71,7 @@ class VacationApprovalController extends AbstractController
     public function show(string $id): Response
     {
         /** @var \App\Entity\User $user */
-        $user               = $this->getUser();
+        $user = $this->getUser();
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         $vacation = $this->vacationRepository->findById(VacationId::fromString($id));
@@ -89,7 +89,7 @@ class VacationApprovalController extends AbstractController
     public function approve(Request $request, string $id): Response
     {
         /** @var \App\Entity\User $user */
-        $user               = $this->getUser();
+        $user = $this->getUser();
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         $vacation = $this->vacationRepository->findById(VacationId::fromString($id));
@@ -116,7 +116,7 @@ class VacationApprovalController extends AbstractController
     public function reject(Request $request, string $id): Response
     {
         /** @var \App\Entity\User $user */
-        $user               = $this->getUser();
+        $user = $this->getUser();
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         $vacation = $this->vacationRepository->findById(VacationId::fromString($id));
@@ -147,7 +147,7 @@ class VacationApprovalController extends AbstractController
     public function cancel(Request $request, string $id): Response
     {
         /** @var \App\Entity\User $user */
-        $user               = $this->getUser();
+        $user = $this->getUser();
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         $vacation = $this->vacationRepository->findById(VacationId::fromString($id));
@@ -174,7 +174,7 @@ class VacationApprovalController extends AbstractController
     public function pendingCount(): Response
     {
         /** @var \App\Entity\User $user */
-        $user               = $this->getUser();
+        $user = $this->getUser();
         $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$managerContributor) {
@@ -182,25 +182,25 @@ class VacationApprovalController extends AbstractController
         }
 
         $managedContributors = $managerContributor->getManagedContributors();
-        $pendingVacations    = $this->vacationRepository->findPendingForContributors(
+        $pendingVacations = $this->vacationRepository->findPendingForContributors(
             $managedContributors->toArray(),
         );
 
         $vacationData = [];
         foreach (array_slice($pendingVacations, 0, 5) as $vacation) {
             $vacationData[] = [
-                'id'           => $vacation->getId()->getValue(),
-                'contributor'  => $vacation->getContributor()->getFullName(),
-                'type'         => $vacation->getTypeLabel(),
-                'start_date'   => $vacation->getStartDate()->format('d/m/Y'),
-                'end_date'     => $vacation->getEndDate()->format('d/m/Y'),
+                'id' => $vacation->getId()->getValue(),
+                'contributor' => $vacation->getContributor()->getFullName(),
+                'type' => $vacation->getTypeLabel(),
+                'start_date' => $vacation->getStartDate()->format('d/m/Y'),
+                'end_date' => $vacation->getEndDate()->format('d/m/Y'),
                 'working_days' => $vacation->getNumberOfWorkingDays(),
-                'url'          => $this->generateUrl('vacation_approval_show', ['id' => $vacation->getId()->getValue()]),
+                'url' => $this->generateUrl('vacation_approval_show', ['id' => $vacation->getId()->getValue()]),
             ];
         }
 
         return $this->json([
-            'count'     => count($pendingVacations),
+            'count' => count($pendingVacations),
             'vacations' => $vacationData,
         ]);
     }

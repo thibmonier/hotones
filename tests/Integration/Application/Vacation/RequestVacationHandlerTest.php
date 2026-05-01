@@ -38,7 +38,7 @@ final class RequestVacationHandlerTest extends KernelTestCase
     {
         self::bootKernel();
         $this->setUpMultiTenant();
-        $this->handler    = static::getContainer()->get(RequestVacationHandler::class);
+        $this->handler = static::getContainer()->get(RequestVacationHandler::class);
         $this->repository = static::getContainer()->get(VacationRepositoryInterface::class);
     }
 
@@ -84,7 +84,7 @@ final class RequestVacationHandlerTest extends KernelTestCase
 
     private function createTestContributor(): Contributor
     {
-        $em          = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $contributor = new Contributor();
         $contributor->setCompany($this->getTestCompany());
         $contributor->setUser($this->testUser);

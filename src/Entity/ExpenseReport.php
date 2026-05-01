@@ -21,43 +21,43 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class ExpenseReport implements CompanyOwnedInterface
 {
-    public const STATUS_DRAFT     = 'draft';
-    public const STATUS_PENDING   = 'pending';
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_PENDING = 'pending';
     public const STATUS_VALIDATED = 'validated';
-    public const STATUS_REJECTED  = 'rejected';
-    public const STATUS_PAID      = 'paid';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_PAID = 'paid';
 
     public const STATUSES = [
-        self::STATUS_DRAFT     => 'Brouillon',
-        self::STATUS_PENDING   => 'En attente',
+        self::STATUS_DRAFT => 'Brouillon',
+        self::STATUS_PENDING => 'En attente',
         self::STATUS_VALIDATED => 'Validé',
-        self::STATUS_REJECTED  => 'Refusé',
-        self::STATUS_PAID      => 'Remboursé',
+        self::STATUS_REJECTED => 'Refusé',
+        self::STATUS_PAID => 'Remboursé',
     ];
 
-    public const CATEGORY_TRANSPORT     = 'transport';
-    public const CATEGORY_MEAL          = 'meal';
+    public const CATEGORY_TRANSPORT = 'transport';
+    public const CATEGORY_MEAL = 'meal';
     public const CATEGORY_ACCOMMODATION = 'accommodation';
-    public const CATEGORY_EQUIPMENT     = 'equipment';
-    public const CATEGORY_TRAINING      = 'training';
-    public const CATEGORY_OTHER         = 'other';
+    public const CATEGORY_EQUIPMENT = 'equipment';
+    public const CATEGORY_TRAINING = 'training';
+    public const CATEGORY_OTHER = 'other';
 
     public const CATEGORIES = [
-        self::CATEGORY_TRANSPORT     => 'Transport',
-        self::CATEGORY_MEAL          => 'Repas',
+        self::CATEGORY_TRANSPORT => 'Transport',
+        self::CATEGORY_MEAL => 'Repas',
         self::CATEGORY_ACCOMMODATION => 'Hébergement',
-        self::CATEGORY_EQUIPMENT     => 'Matériel',
-        self::CATEGORY_TRAINING      => 'Formation',
-        self::CATEGORY_OTHER         => 'Autre',
+        self::CATEGORY_EQUIPMENT => 'Matériel',
+        self::CATEGORY_TRAINING => 'Formation',
+        self::CATEGORY_OTHER => 'Autre',
     ];
 
     public const CATEGORY_ICONS = [
-        self::CATEGORY_TRANSPORT     => 'mdi mdi-car',
-        self::CATEGORY_MEAL          => 'mdi mdi-food',
+        self::CATEGORY_TRANSPORT => 'mdi mdi-car',
+        self::CATEGORY_MEAL => 'mdi mdi-food',
         self::CATEGORY_ACCOMMODATION => 'mdi mdi-bed',
-        self::CATEGORY_EQUIPMENT     => 'mdi mdi-desktop-mac',
-        self::CATEGORY_TRAINING      => 'mdi mdi-school',
-        self::CATEGORY_OTHER         => 'mdi mdi-file-document',
+        self::CATEGORY_EQUIPMENT => 'mdi mdi-desktop-mac',
+        self::CATEGORY_TRAINING => 'mdi mdi-school',
+        self::CATEGORY_OTHER => 'mdi mdi-file-document',
     ];
 
     #[ORM\Id]
@@ -254,7 +254,7 @@ class ExpenseReport implements CompanyOwnedInterface
     private function calculateAmountTTC(): void
     {
         if (isset($this->amountHT) && isset($this->vatRate)) {
-            $vatMultiplier   = bcadd('1', bcdiv($this->vatRate, '100', 4), 4);
+            $vatMultiplier = bcadd('1', bcdiv($this->vatRate, '100', 4), 4);
             $this->amountTTC = bcmul($this->amountHT, $vatMultiplier, 2);
         }
     }
@@ -303,12 +303,12 @@ class ExpenseReport implements CompanyOwnedInterface
     public function getStatusBadgeClass(): string
     {
         return match ($this->status) {
-            self::STATUS_DRAFT     => 'badge-secondary',
-            self::STATUS_PENDING   => 'badge-warning',
+            self::STATUS_DRAFT => 'badge-secondary',
+            self::STATUS_PENDING => 'badge-warning',
             self::STATUS_VALIDATED => 'badge-success',
-            self::STATUS_REJECTED  => 'badge-danger',
-            self::STATUS_PAID      => 'badge-info',
-            default                => 'badge-light',
+            self::STATUS_REJECTED => 'badge-danger',
+            self::STATUS_PAID => 'badge-info',
+            default => 'badge-light',
         };
     }
 
@@ -454,7 +454,7 @@ class ExpenseReport implements CompanyOwnedInterface
             return '0.00';
         }
 
-        $feeRate       = $this->order->getExpenseManagementFeeRate();
+        $feeRate = $this->order->getExpenseManagementFeeRate();
         $feeMultiplier = bcadd('1', bcdiv($feeRate, '100', 4), 4);
 
         return bcmul($this->amountTTC, $feeMultiplier, 2);

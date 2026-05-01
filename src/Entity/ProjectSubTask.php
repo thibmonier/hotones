@@ -16,10 +16,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'idx_projectsubtask_company', columns: ['company_id'])]
 class ProjectSubTask implements CompanyOwnedInterface
 {
-    public const STATUS_TODO        = 'todo';
+    public const STATUS_TODO = 'todo';
     public const STATUS_IN_PROGRESS = 'in_progress';
-    public const STATUS_DONE        = 'done';
-    public const STATUS_BLOCKED     = 'blocked';
+    public const STATUS_DONE = 'done';
+    public const STATUS_BLOCKED = 'blocked';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -68,7 +68,7 @@ class ProjectSubTask implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $now             = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $this->createdAt = $now;
         $this->updatedAt = $now;
     }
@@ -97,7 +97,7 @@ class ProjectSubTask implements CompanyOwnedInterface
 
     public function setTask(ProjectTask $task): self
     {
-        $this->task    = $task;
+        $this->task = $task;
         $this->project = $task->getProject();
 
         return $this;
@@ -224,8 +224,8 @@ class ProjectSubTask implements CompanyOwnedInterface
     public function getProgressPercentage(): int
     {
         $spent = $this->getTimeSpentHours();
-        $raf   = $this->getRemainingHours();
-        $den   = bcadd($spent, $raf, 2);
+        $raf = $this->getRemainingHours();
+        $den = bcadd($spent, $raf, 2);
         if (bccomp($den, '0.00', 2) <= 0) {
             return 0;
         }
@@ -237,10 +237,10 @@ class ProjectSubTask implements CompanyOwnedInterface
     public static function getAvailableStatuses(): array
     {
         return [
-            self::STATUS_TODO        => 'À faire',
+            self::STATUS_TODO => 'À faire',
             self::STATUS_IN_PROGRESS => 'En cours',
-            self::STATUS_DONE        => 'Terminé',
-            self::STATUS_BLOCKED     => 'Bloqué',
+            self::STATUS_DONE => 'Terminé',
+            self::STATUS_BLOCKED => 'Bloqué',
         ];
     }
 

@@ -44,7 +44,7 @@ class ProjectApiTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
         $this->assertJsonContains([
             '@context' => '/api/contexts/Project',
-            '@type'    => 'Collection',
+            '@type' => 'Collection',
         ]);
 
         // Vérifier qu'on a au moins un résultat dans la collection
@@ -59,12 +59,12 @@ class ProjectApiTest extends ApiTestCase
         $response = static::createClient()
             ->request('POST', '/api/projects', [
                 'headers' => ['Authorization' => 'Bearer '.$this->getTokenWithRole('ROLE_CHEF_PROJET')],
-                'json'    => [
-                    'name'        => 'Projet Test API',
+                'json' => [
+                    'name' => 'Projet Test API',
                     'description' => 'Description du projet test',
-                    'status'      => 'active',
+                    'status' => 'active',
                     'projectType' => 'forfait',
-                    'isInternal'  => false,
+                    'isInternal' => false,
                 ],
             ]);
 
@@ -72,9 +72,9 @@ class ProjectApiTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
         $this->assertJsonContains([
             '@context' => '/api/contexts/Project',
-            '@type'    => 'Project',
-            'name'     => 'Projet Test API',
-            'status'   => 'active',
+            '@type' => 'Project',
+            'name' => 'Projet Test API',
+            'status' => 'active',
         ]);
     }
 
@@ -83,7 +83,7 @@ class ProjectApiTest extends ApiTestCase
         $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         // Créer un projet via le client
-        $client  = static::createClient();
+        $client = static::createClient();
         $project = $this->createProject();
 
         // Récupérer le projet
@@ -93,7 +93,7 @@ class ProjectApiTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            '@id'  => '/api/projects/'.$project->getId(),
+            '@id' => '/api/projects/'.$project->getId(),
             'name' => $project->getName(),
         ]);
     }
@@ -107,15 +107,15 @@ class ProjectApiTest extends ApiTestCase
         $client = static::createClient();
         $client->request('PUT', '/api/projects/'.$project->getId(), [
             'headers' => ['Authorization' => 'Bearer '.$this->getTokenWithRole('ROLE_CHEF_PROJET')],
-            'json'    => [
-                'name'   => 'Projet modifié',
+            'json' => [
+                'name' => 'Projet modifié',
                 'status' => 'completed',
             ],
         ]);
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            'name'   => 'Projet modifié',
+            'name' => 'Projet modifié',
             'status' => 'completed',
         ]);
     }
@@ -155,7 +155,7 @@ class ProjectApiTest extends ApiTestCase
         $client = static::createClient();
         $client->request('POST', '/api/projects', [
             'headers' => ['Authorization' => 'Bearer '.$this->getToken()], // ROLE_USER
-            'json'    => [
+            'json' => [
                 'name' => 'Projet non autorisé',
             ],
         ]);
@@ -192,8 +192,8 @@ class ProjectApiTest extends ApiTestCase
         static::createClient();
 
         // Crée un utilisateur aléatoire et génère un JWT sans appeler /api/login
-        $user        = UserFactory::createOne();
-        $jwtManager  = static::getContainer()->get('lexik_jwt_authentication.jwt_manager');
+        $user = UserFactory::createOne();
+        $jwtManager = static::getContainer()->get('lexik_jwt_authentication.jwt_manager');
         $this->token = $jwtManager->create($user);
 
         return $this->token;
@@ -205,7 +205,7 @@ class ProjectApiTest extends ApiTestCase
         static::createClient();
 
         // Crée un utilisateur avec le rôle demandé et génère un JWT
-        $user       = UserFactory::createOne(['roles' => [$role]]);
+        $user = UserFactory::createOne(['roles' => [$role]]);
         $jwtManager = static::getContainer()->get('lexik_jwt_authentication.jwt_manager');
 
         return $jwtManager->create($user);

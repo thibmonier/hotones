@@ -100,7 +100,7 @@ class BusinessUnitRepository extends CompanyAwareRepository
             ->getResult();
 
         // Build tree structure
-        $tree    = [];
+        $tree = [];
         $indexed = [];
 
         // Index by ID
@@ -171,7 +171,7 @@ class BusinessUnitRepository extends CompanyAwareRepository
         $counts = [];
 
         foreach ($allBUs as $bu) {
-            $depth          = $bu->getDepth();
+            $depth = $bu->getDepth();
             $counts[$depth] = ($counts[$depth] ?? 0) + 1;
         }
 

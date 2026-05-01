@@ -80,12 +80,12 @@ class ProjectRepository extends CompanyAwareRepository
         // Reformater et additionner l'achat projet
         $byId = [];
         foreach ($rows as $r) {
-            $pid        = (int) $r['projectId'];
+            $pid = (int) $r['projectId'];
             $byId[$pid] = [
-                'total_revenue'       => (string) $r['totalRevenue'],
-                'total_margin'        => (string) $r['totalMargin'],
-                'total_purchases'     => (string) $r['totalLinePurchases'], // on ajoutera purchasesAmount du projet côté contrôleur
-                'orders_count'        => (int) $r['ordersCount'],
+                'total_revenue' => (string) $r['totalRevenue'],
+                'total_margin' => (string) $r['totalMargin'],
+                'total_purchases' => (string) $r['totalLinePurchases'], // on ajoutera purchasesAmount du projet côté contrôleur
+                'orders_count' => (int) $r['ordersCount'],
                 'signed_orders_count' => (int) $r['signedOrdersCount'],
             ];
         }
@@ -109,7 +109,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->select('COALESCE(SUM(p.purchasesAmount), 0) AS totalProjectPurchases')
             ->andWhere('p.id IN (:ids)')
             ->setParameter('ids', $projectIds);
-        $row1             = $qb1->getQuery()->getSingleResult();
+        $row1 = $qb1->getQuery()->getSingleResult();
         $projectPurchases = (string) ($row1['totalProjectPurchases'] ?? '0');
 
         // Achats attachés aux lignes de service
@@ -123,7 +123,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->leftJoin('s.lines', 'l')
             ->andWhere('p.id IN (:ids)')
             ->setParameter('ids', $projectIds);
-        $row2          = $qb2->getQuery()->getSingleResult();
+        $row2 = $qb2->getQuery()->getSingleResult();
         $linePurchases = (string) ($row2['totalLinePurchases'] ?? '0');
 
         return bcadd($projectPurchases, $linePurchases, 2);
@@ -366,12 +366,12 @@ class ProjectRepository extends CompanyAwareRepository
 
         // Tri sécurisé par liste blanche
         $map = [
-            'name'   => 'p.name',
+            'name' => 'p.name',
             'client' => 'c.name',
             'status' => 'p.status',
-            'type'   => 'p.projectType',
-            'start'  => 'p.startDate',
-            'end'    => 'p.endDate',
+            'type' => 'p.projectType',
+            'start' => 'p.startDate',
+            'end' => 'p.endDate',
         ];
         $col = $map[$sortField] ?? 'p.name';
         $dir = strtoupper((string) $sortDir) === 'DESC' ? 'DESC' : 'ASC';
@@ -490,7 +490,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->getArrayResult();
 
         return array_map(static fn (array $r): array => [
-            'id'   => (int) $r['id'],
+            'id' => (int) $r['id'],
             'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
         ], $rows);
     }
@@ -516,7 +516,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->getArrayResult();
 
         return array_map(static fn (array $r): array => [
-            'id'   => (int) $r['id'],
+            'id' => (int) $r['id'],
             'name' => trim(($r['firstName'] ?? '').' '.($r['lastName'] ?? '')),
         ], $rows);
     }
@@ -541,7 +541,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->getArrayResult();
 
         return array_map(static fn (array $r): array => [
-            'id'   => (int) $r['id'],
+            'id' => (int) $r['id'],
             'name' => (string) ($r['name'] ?? ''),
         ], $rows);
     }
@@ -566,7 +566,7 @@ class ProjectRepository extends CompanyAwareRepository
             ->getArrayResult();
 
         return array_map(static fn (array $r): array => [
-            'id'   => (int) $r['id'],
+            'id' => (int) $r['id'],
             'name' => (string) ($r['name'] ?? ''),
         ], $rows);
     }
@@ -657,9 +657,9 @@ class ProjectRepository extends CompanyAwareRepository
         $projectsAtRisk = [];
         foreach ($activeProjects as $project) {
             $performance = $project->getPerformanceComparison();
-            $marginRate  = (float) $project->getRealMarginPercentage();
+            $marginRate = (float) $project->getRealMarginPercentage();
 
-            $isOverTime  = bccomp((string) $performance['real_hours'], (string) $performance['target_hours'], 2) > 0;
+            $isOverTime = bccomp((string) $performance['real_hours'], (string) $performance['target_hours'], 2) > 0;
             $isLowMargin = $marginRate < 20.0;
 
             if ($isOverTime || $isLowMargin) {

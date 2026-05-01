@@ -183,7 +183,7 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
             return [];
         }
 
-        $contributors  = [];
+        $contributors = [];
         $technologyIds = [];
 
         foreach ($projectTechnologies as $tech) {
@@ -210,7 +210,7 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
             $contributorId = $ct->getContributor()->getId();
             if (!isset($byContributor[$contributorId])) {
                 $byContributor[$contributorId] = [
-                    'contributor'  => $ct->getContributor(),
+                    'contributor' => $ct->getContributor(),
                     'technologies' => [],
                 ];
             }
@@ -222,20 +222,20 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
 
         foreach ($byContributor as $contributorId => $data) {
             $matchingCount = count($data['technologies']);
-            $totalScore    = 0;
+            $totalScore = 0;
 
             foreach ($data['technologies'] as $ct) {
                 $totalScore += $ct->getStaffingScore();
             }
 
-            $averageScore  = $matchingCount > 0 ? $totalScore / $matchingCount : 0;
+            $averageScore = $matchingCount > 0 ? $totalScore / $matchingCount : 0;
             $coverageBonus = ($matchingCount / $totalTechnologies) * 50;
 
             $contributors[] = [
                 'contributor' => $data['contributor'],
-                'score'       => (int) round($averageScore + $coverageBonus),
-                'matching'    => $matchingCount,
-                'total'       => $totalTechnologies,
+                'score' => (int) round($averageScore + $coverageBonus),
+                'matching' => $matchingCount,
+                'total' => $totalTechnologies,
             ];
         }
 

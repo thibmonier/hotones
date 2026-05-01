@@ -27,7 +27,7 @@ final class OrderFactory extends PersistentObjectFactory
     {
         /** @var Generator $faker */
         $faker = self::faker();
-        $date  = DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', 'now'));
+        $date = DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', 'now'));
 
         // Try to get company from context (for multi-tenant tests), fallback to creating new company
         $company = null;
@@ -40,39 +40,39 @@ final class OrderFactory extends PersistentObjectFactory
         $validatedAtTemp = $faker->optional()->dateTimeBetween(DateTime::createFromImmutable($date), '+4 months');
 
         return [
-            'company'     => $company ?? CompanyFactory::new(),
-            'project'     => ProjectFactory::random(),
-            'name'        => $faker->sentence(3),
+            'company' => $company ?? CompanyFactory::new(),
+            'project' => ProjectFactory::random(),
+            'name' => $faker->sentence(3),
             'description' => $faker->optional()->paragraph(2, true),
             // Mostly small contingency (0-5%), sometimes up to 10%
             'contingencyPercentage' => (string) (
                 $faker->boolean(75) ? $faker->randomFloat(2, 0, 5) : $faker->randomFloat(2, 5, 10)
             ),
-            'validUntil'        => $faker->optional()->dateTimeBetween('now', '+3 months'),
-            'orderNumber'       => Order::generateOrderNumber($date),
-            'notes'             => $faker->optional()->sentence(10),
+            'validUntil' => $faker->optional()->dateTimeBetween('now', '+3 months'),
+            'orderNumber' => Order::generateOrderNumber($date),
+            'notes' => $faker->optional()->sentence(10),
             'contingenceAmount' => (string) $faker->randomFloat(2, 0, 2000),
             'contingenceReason' => $faker->optional()->sentence(8),
             // provisional, may be updated by fixtures after creating tasks/sections
             'totalAmount' => (string) $faker->randomFloat(2, 1000, 50000),
-            'createdAt'   => $date,
+            'createdAt' => $date,
             'validatedAt' => $validatedAtTemp,
-            'status'      => $this->pickWeighted([
+            'status' => $this->pickWeighted([
                 'a_signer' => 10,
-                'gagne'    => 20,
-                'signe'    => 40,
-                'perdu'    => 15,
-                'termine'  => 10,
-                'standby'  => 5,
+                'gagne' => 20,
+                'signe' => 40,
+                'perdu' => 15,
+                'termine' => 10,
+                'standby' => 5,
             ]),
         ];
     }
 
     private function pickWeighted(array $weights): string
     {
-        $sum  = array_sum($weights);
+        $sum = array_sum($weights);
         $rand = mt_rand(1, max(1, $sum));
-        $cum  = 0;
+        $cum = 0;
         foreach ($weights as $value => $weight) {
             $cum += $weight;
             if ($rand <= $cum) {

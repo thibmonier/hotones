@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Vacation\Notification;
 
+use App\Application\Vacation\Notification\Message\VacationNotificationMessage;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationId;
-use App\Application\Vacation\Notification\Message\VacationNotificationMessage;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -31,13 +31,13 @@ final readonly class VacationNotificationHandler
         }
 
         $contributor = $vacation->getContributor();
-        $manager     = $contributor->getManager();
+        $manager = $contributor->getManager();
 
         match ($message->getType()) {
-            'created'  => $this->sendCreatedNotification($vacation, $manager),
+            'created' => $this->sendCreatedNotification($vacation, $manager),
             'approved' => $this->sendApprovedNotification($vacation, $contributor),
             'rejected' => $this->sendRejectedNotification($vacation, $contributor),
-            default    => null,
+            default => null,
         };
     }
 
@@ -52,9 +52,9 @@ final readonly class VacationNotificationHandler
             ->subject('Nouvelle demande de conge a valider')
             ->htmlTemplate('emails/vacation_created.html.twig')
             ->context([
-                'vacation'    => $vacation,
+                'vacation' => $vacation,
                 'contributor' => $vacation->getContributor(),
-                'manager'     => $manager,
+                'manager' => $manager,
             ]);
 
         $this->mailer->send($email);
@@ -71,7 +71,7 @@ final readonly class VacationNotificationHandler
             ->subject('Votre demande de conge a ete approuvee')
             ->htmlTemplate('emails/vacation_approved.html.twig')
             ->context([
-                'vacation'    => $vacation,
+                'vacation' => $vacation,
                 'contributor' => $contributor,
             ]);
 
@@ -89,7 +89,7 @@ final readonly class VacationNotificationHandler
             ->subject('Votre demande de conge a ete rejetee')
             ->htmlTemplate('emails/vacation_rejected.html.twig')
             ->context([
-                'vacation'    => $vacation,
+                'vacation' => $vacation,
                 'contributor' => $contributor,
             ]);
 

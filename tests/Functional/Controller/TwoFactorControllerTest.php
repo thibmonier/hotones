@@ -26,7 +26,7 @@ final class TwoFactorControllerTest extends WebTestCase
     }
 
     #[Test]
-    public function form_route_is_not_accessible_to_anonymous_user(): void
+    public function formRouteIsNotAccessibleToAnonymousUser(): void
     {
         $this->client->request('GET', '/2fa');
 
@@ -40,7 +40,7 @@ final class TwoFactorControllerTest extends WebTestCase
     }
 
     #[Test]
-    public function check_route_is_not_accessible_to_anonymous_user(): void
+    public function checkRouteIsNotAccessibleToAnonymousUser(): void
     {
         $this->client->request('POST', '/2fa_check');
 
@@ -50,7 +50,7 @@ final class TwoFactorControllerTest extends WebTestCase
     }
 
     #[Test]
-    public function form_route_does_not_500(): void
+    public function formRouteDoesNot500(): void
     {
         // Sanity check: route is wired and reaches the firewall layer cleanly.
         $this->client->request('GET', '/2fa');

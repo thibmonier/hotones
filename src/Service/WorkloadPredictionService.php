@@ -41,9 +41,9 @@ class WorkloadPredictionService
         array $contributorIds = [],
         bool $includeConfirmed = false,
     ): array {
-        $pipeline           = [];
-        $workloadByMonth    = [];
-        $alerts             = [];
+        $pipeline = [];
+        $workloadByMonth = [];
+        $alerts = [];
         $totalPotentialDays = 0;
 
         // Toujours inclure la charge confirmée depuis les plannings
@@ -92,9 +92,9 @@ class WorkloadPredictionService
         $alerts = $this->detectWorkloadAlerts($workloadByMonth);
 
         return [
-            'pipeline'           => $pipeline,
-            'workloadByMonth'    => $workloadByMonth,
-            'alerts'             => $alerts,
+            'pipeline' => $pipeline,
+            'workloadByMonth' => $workloadByMonth,
+            'alerts' => $alerts,
             'totalPotentialDays' => round($totalPotentialDays, 1),
         ];
     }
@@ -104,8 +104,8 @@ class WorkloadPredictionService
      */
     private function analyzeOrder(Order $order, array $profileIds = [], array $contributorIds = []): array
     {
-        $project     = $order->project;
-        $client      = $project?->client;
+        $project = $order->project;
+        $client = $project?->client;
         $salesPerson = $project?->salesPerson;
 
         // Calcul de la probabilité de gain basée sur plusieurs facteurs
@@ -125,7 +125,7 @@ class WorkloadPredictionService
 
         // Facteur 3 : Âge du devis (pénalité si ancien)
         $createdAt = $order->getCreatedAt();
-        $daysOld   = 0;
+        $daysOld = 0;
         if ($createdAt !== null) {
             $daysOld = new DateTime()->diff($createdAt)->days;
             if ($daysOld > 60) {
@@ -154,13 +154,13 @@ class WorkloadPredictionService
         $totalDays = $this->calculateOrderDays($order, $profileIds, $contributorIds);
 
         return [
-            'order'          => $order,
+            'order' => $order,
             'winProbability' => round($probability, 1),
-            'totalDays'      => $totalDays,
-            'amount'         => $amount,
-            'daysOld'        => $daysOld,
-            'client'         => $client->name  ?? 'N/A',
-            'project'        => $project->name ?? 'N/A',
+            'totalDays' => $totalDays,
+            'amount' => $amount,
+            'daysOld' => $daysOld,
+            'client' => $client->name ?? 'N/A',
+            'project' => $project->name ?? 'N/A',
         ];
     }
 
@@ -270,9 +270,9 @@ class WorkloadPredictionService
         }
 
         $startDate = $project->getStartDate();
-        $duration  = $project->getEndDate() ? $startDate->diff($project->getEndDate())->days : 90; // Par défaut 3 mois
+        $duration = $project->getEndDate() ? $startDate->diff($project->getEndDate())->days : 90; // Par défaut 3 mois
 
-        $totalDays    = $this->calculateOrderDays($order, $profileIds, $contributorIds);
+        $totalDays = $this->calculateOrderDays($order, $profileIds, $contributorIds);
         $daysPerMonth = $duration > 0 ? $totalDays / max(1, $duration / 30) : $totalDays;
 
         // Répartir sur 3 mois max
@@ -284,14 +284,14 @@ class WorkloadPredictionService
                 $workloadByMonth[$month] = [
                     'potential' => 0,
                     'confirmed' => 0,
-                    'orders'    => [],
+                    'orders' => [],
                 ];
             }
 
             $workloadByMonth[$month]['potential'] += ($daysPerMonth / $monthsToSpread) * ($probability / 100);
             $workloadByMonth[$month]['orders'][] = [
                 'orderNumber' => $order->getOrderNumber(),
-                'days'        => $daysPerMonth / $monthsToSpread,
+                'days' => $daysPerMonth / $monthsToSpread,
                 'probability' => $probability,
             ];
         }
@@ -322,13 +322,13 @@ class WorkloadPredictionService
         foreach ($plannings as $planning) {
             /** @var Planning $planning */
             $start = max($planning->getStartDate(), new DateTime('first day of this month'));
-            $end   = $planning->getEndDate();
+            $end = $planning->getEndDate();
 
             $dailyHours = (float) $planning->getDailyHours();
-            $dailyDays  = $dailyHours / 8.0;
+            $dailyDays = $dailyHours / 8.0;
 
             // Distribuer les jours par mois
-            $current   = new DateTime($start->format('Y-m-01'));
+            $current = new DateTime($start->format('Y-m-01'));
             $lastMonth = new DateTime($end->format('Y-m-01'));
 
             while ($current <= $lastMonth) {
@@ -336,7 +336,7 @@ class WorkloadPredictionService
 
                 // Calculer les jours ouvrés de ce planning dans ce mois
                 $monthStart = max($start, new DateTime($current->format('Y-m-01')));
-                $monthEnd   = min($end, new DateTime($current->format('Y-m-t')));
+                $monthEnd = min($end, new DateTime($current->format('Y-m-t')));
 
                 $workingDays = $this->countWorkingDays($monthStart, $monthEnd);
                 $plannedDays = $workingDays * $dailyDays;
@@ -346,7 +346,7 @@ class WorkloadPredictionService
                         $workloadByMonth[$month] = [
                             'potential' => 0,
                             'confirmed' => 0,
-                            'orders'    => [],
+                            'orders' => [],
                         ];
                     }
 
@@ -363,7 +363,7 @@ class WorkloadPredictionService
      */
     private function countWorkingDays(DateTimeInterface $start, DateTimeInterface $end): int
     {
-        $days    = 0;
+        $days = 0;
         $current = clone $start;
 
         while ($current <= $end) {
@@ -384,19 +384,19 @@ class WorkloadPredictionService
         $alerts = [];
 
         // Capacité de l'équipe = nombre de contributeurs actifs × 20 jours/mois
-        $activeContributors   = $this->contributorRepository->findBy(['active' => true]);
+        $activeContributors = $this->contributorRepository->findBy(['active' => true]);
         $teamCapacityPerMonth = max(20, count($activeContributors) * 20);
 
         foreach ($workloadByMonth as $month => $data) {
-            $totalLoad    = $data['potential'] + $data['confirmed'];
+            $totalLoad = $data['potential'] + $data['confirmed'];
             $capacityRate = ($totalLoad / $teamCapacityPerMonth) * 100;
 
             if ($capacityRate > 120) {
                 $alerts[] = [
-                    'month'    => $month,
-                    'type'     => 'overload',
+                    'month' => $month,
+                    'type' => 'overload',
                     'severity' => 'critical',
-                    'message'  => sprintf(
+                    'message' => sprintf(
                         'Surcharge critique en %s : %.0f%% de la capacité (%.1f jours sur %d disponibles)',
                         new DateTimeImmutable($month)->format('F Y'),
                         $capacityRate,
@@ -407,10 +407,10 @@ class WorkloadPredictionService
                 ];
             } elseif ($capacityRate > 100) {
                 $alerts[] = [
-                    'month'    => $month,
-                    'type'     => 'overload',
+                    'month' => $month,
+                    'type' => 'overload',
                     'severity' => 'high',
-                    'message'  => sprintf(
+                    'message' => sprintf(
                         'Surcharge en %s : %.0f%% de la capacité',
                         new DateTimeImmutable($month)->format('F Y'),
                         $capacityRate,
@@ -419,10 +419,10 @@ class WorkloadPredictionService
                 ];
             } elseif ($capacityRate < 50) {
                 $alerts[] = [
-                    'month'    => $month,
-                    'type'     => 'underload',
+                    'month' => $month,
+                    'type' => 'underload',
                     'severity' => 'medium',
-                    'message'  => sprintf(
+                    'message' => sprintf(
                         'Sous-charge en %s : seulement %.0f%% de la capacité utilisée',
                         new DateTimeImmutable($month)->format('F Y'),
                         $capacityRate,
@@ -445,7 +445,7 @@ class WorkloadPredictionService
         }
 
         $contributors = $this->contributorRepository->findBy(['id' => $contributorIds]);
-        $profileIds   = [];
+        $profileIds = [];
 
         foreach ($contributors as $contributor) {
             foreach ($contributor->getProfiles() as $profile) {
@@ -471,14 +471,14 @@ class WorkloadPredictionService
         }
 
         $startDate = $project->startDate;
-        $endDate   = $project->endDate;
+        $endDate = $project->endDate;
 
         if (!$endDate) {
             // Si pas de date de fin, prévoir 3 mois par défaut
             $endDate = (clone $startDate)->modify('+3 months');
         }
 
-        $duration  = $startDate->diff($endDate)->days;
+        $duration = $startDate->diff($endDate)->days;
         $totalDays = $this->calculateOrderDays($order, $profileIds, $contributorIds);
 
         if ($totalDays <= 0) {
@@ -496,7 +496,7 @@ class WorkloadPredictionService
                 $workloadByMonth[$month] = [
                     'potential' => 0,
                     'confirmed' => 0,
-                    'orders'    => [],
+                    'orders' => [],
                 ];
             }
 

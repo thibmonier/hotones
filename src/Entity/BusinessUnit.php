@@ -168,7 +168,7 @@ class BusinessUnit implements CompanyOwnedInterface, Stringable
      */
     public function getFullPath(string $separator = ' / '): string
     {
-        $path    = [$this->name];
+        $path = [$this->name];
         $current = $this->parent;
 
         while ($current !== null) {
@@ -186,7 +186,7 @@ class BusinessUnit implements CompanyOwnedInterface, Stringable
      */
     public function getDepth(): int
     {
-        $depth   = 0;
+        $depth = 0;
         $current = $this->parent;
 
         while ($current !== null) {
@@ -205,11 +205,11 @@ class BusinessUnit implements CompanyOwnedInterface, Stringable
     public function getAncestors(): array
     {
         $ancestors = [];
-        $current   = $this->parent;
+        $current = $this->parent;
 
         while ($current !== null) {
             $ancestors[] = $current;
-            $current     = $current->getParent();
+            $current = $current->getParent();
         }
 
         return $ancestors;
@@ -226,7 +226,7 @@ class BusinessUnit implements CompanyOwnedInterface, Stringable
 
         foreach ($this->children as $child) {
             $descendants[] = $child;
-            $descendants   = array_merge($descendants, $child->getDescendants());
+            $descendants = array_merge($descendants, $child->getDescendants());
         }
 
         return $descendants;

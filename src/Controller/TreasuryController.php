@@ -23,16 +23,16 @@ class TreasuryController extends AbstractController
         $period = $request->query->get('period', 'year');
 
         $startDate = null;
-        $endDate   = new DateTime();
+        $endDate = new DateTime();
 
         switch ($period) {
             case 'month':
                 $startDate = (clone $endDate)->modify('first day of this month');
                 break;
             case 'quarter':
-                $currentMonth      = (int) $endDate->format('n');
+                $currentMonth = (int) $endDate->format('n');
                 $quarterStartMonth = ((int) (($currentMonth - 1) / 3) * 3) + 1;
-                $startDate         = (clone $endDate)->setDate((int) $endDate->format('Y'), $quarterStartMonth, 1);
+                $startDate = (clone $endDate)->setDate((int) $endDate->format('Y'), $quarterStartMonth, 1);
                 break;
             case 'year':
                 $startDate = (clone $endDate)->modify('first day of january this year');
@@ -59,12 +59,12 @@ class TreasuryController extends AbstractController
         $monthlyTrend = $treasuryService->getMonthlyTrend(12);
 
         return $this->render('treasury/dashboard.html.twig', [
-            'kpis'            => $kpis,
-            'forecast'        => $forecast,
+            'kpis' => $kpis,
+            'forecast' => $forecast,
             'overdueInvoices' => $overdueInvoices,
-            'topClients'      => $topClients,
-            'monthlyTrend'    => $monthlyTrend,
-            'period'          => $period,
+            'topClients' => $topClients,
+            'monthlyTrend' => $monthlyTrend,
+            'period' => $period,
         ]);
     }
 }

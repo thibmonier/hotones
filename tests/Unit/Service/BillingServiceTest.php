@@ -23,13 +23,13 @@ class BillingServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->timesheetRepositoryMock = $this->createMock(TimesheetRepository::class);
-        $this->billingService          = new BillingService($this->timesheetRepositoryMock);
+        $this->billingService = new BillingService($this->timesheetRepositoryMock);
     }
 
     public function testBuildProjectBillingRecapWithForfaitOrder(): void
     {
         $project = new Project();
-        $order   = new Order();
+        $order = new Order();
         $order->setContractType('forfait');
         $order->setProject($project);
 
@@ -63,7 +63,7 @@ class BillingServiceTest extends TestCase
     public function testBuildProjectBillingRecapWithRegieOrder(): void
     {
         $project = new Project();
-        $order   = new Order();
+        $order = new Order();
         $order->setContractType('regie');
         $order->setProject($project);
 
@@ -141,7 +141,7 @@ class BillingServiceTest extends TestCase
     public function testBuildProjectBillingRecapSortingByDate(): void
     {
         $project = new Project();
-        $order   = new Order();
+        $order = new Order();
         $order->setContractType('forfait');
         $order->setProject($project);
         $order->setTotalAmount('10000.00');
@@ -175,7 +175,7 @@ class BillingServiceTest extends TestCase
     public function testBuildProjectBillingRecapWithEmptyScheduleLabel(): void
     {
         $project = new Project();
-        $order   = new Order();
+        $order = new Order();
         $order->setContractType('forfait');
         $order->setProject($project);
         $order->setTotalAmount('10000.00');
@@ -195,7 +195,7 @@ class BillingServiceTest extends TestCase
 
     public function testBuildProjectBillingRecapWithNullRevenue(): void
     {
-        $project    = new Project();
+        $project = new Project();
         $regieOrder = new Order();
         $regieOrder->setContractType('regie');
         $regieOrder->setProject($project);
@@ -217,7 +217,7 @@ class BillingServiceTest extends TestCase
 
     public function testBuildProjectBillingRecapWithEmptyTimesheetData(): void
     {
-        $project    = new Project();
+        $project = new Project();
         $regieOrder = new Order();
         $regieOrder->setContractType('regie');
         $regieOrder->setProject($project);
@@ -235,7 +235,7 @@ class BillingServiceTest extends TestCase
     public function testBuildProjectBillingRecapArrayStructure(): void
     {
         $project = new Project();
-        $order   = new Order();
+        $order = new Order();
         $order->setContractType('forfait');
         $order->setProject($project);
         $order->setTotalAmount('5000.00');

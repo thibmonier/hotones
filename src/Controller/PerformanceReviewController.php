@@ -28,7 +28,7 @@ class PerformanceReviewController extends AbstractController
     #[Route('', name: 'performance_review_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $year   = (int) $request->query->get('year', date('Y'));
+        $year = (int) $request->query->get('year', date('Y'));
         $status = $request->query->get('status');
 
         /** @var \App\Entity\User $user */
@@ -41,7 +41,7 @@ class PerformanceReviewController extends AbstractController
         } else {
             // Contributors see only their own reviews
             $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
-            $reviews     = null === $contributor ? [] : $this->reviewRepository->findByContributor($contributor);
+            $reviews = null === $contributor ? [] : $this->reviewRepository->findByContributor($contributor);
         }
 
         // Apply filters
@@ -60,9 +60,9 @@ class PerformanceReviewController extends AbstractController
         }
 
         return $this->render('performance_review/index.html.twig', [
-            'reviews'    => $reviews,
-            'year'       => $year,
-            'status'     => $status,
+            'reviews' => $reviews,
+            'year' => $year,
+            'status' => $status,
             'statistics' => $statistics,
         ]);
     }
@@ -74,7 +74,7 @@ class PerformanceReviewController extends AbstractController
         $user = $this->getUser();
         if (
             $review->getContributor()->getUser() !== $user
-            && $review->getManager()             !== $user
+            && $review->getManager() !== $user
             && !$this->isGranted('ROLE_ADMIN')
         ) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette évaluation.');
@@ -99,7 +99,7 @@ class PerformanceReviewController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $achievements = $request->request->get('achievements');
-            $strengths    = $request->request->get('strengths');
+            $strengths = $request->request->get('strengths');
             $improvements = $request->request->get('improvements');
 
             if (!$this->isCsrfTokenValid('self-evaluation-'.$review->getId(), $request->request->get('_token'))) {
@@ -135,10 +135,10 @@ class PerformanceReviewController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $achievements = $request->request->get('achievements');
-            $strengths    = $request->request->get('strengths');
+            $strengths = $request->request->get('strengths');
             $improvements = $request->request->get('improvements');
-            $feedback     = $request->request->get('feedback');
-            $rating       = $request->request->get('rating') ? (int) $request->request->get('rating') : null;
+            $feedback = $request->request->get('feedback');
+            $rating = $request->request->get('rating') ? (int) $request->request->get('rating') : null;
 
             if (!$this->isCsrfTokenValid('manager-evaluation-'.$review->getId(), $request->request->get('_token'))) {
                 $this->addFlash('error', 'Token CSRF invalide.');
@@ -179,9 +179,9 @@ class PerformanceReviewController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $objectivesData   = $request->request->all('objectives');
+            $objectivesData = $request->request->all('objectives');
             $interviewDateStr = $request->request->get('interview_date');
-            $comments         = $request->request->get('comments');
+            $comments = $request->request->get('comments');
 
             if (!$this->isCsrfTokenValid('validate-review-'.$review->getId(), $request->request->get('_token'))) {
                 $this->addFlash('error', 'Token CSRF invalide.');
@@ -194,9 +194,9 @@ class PerformanceReviewController extends AbstractController
             foreach ($objectivesData as $objective) {
                 if (!empty($objective['title'])) {
                     $objectives[] = [
-                        'title'       => $objective['title'],
+                        'title' => $objective['title'],
                         'description' => $objective['description'] ?? '',
-                        'deadline'    => $objective['deadline']    ?? null,
+                        'deadline' => $objective['deadline'] ?? null,
                     ];
                 }
             }

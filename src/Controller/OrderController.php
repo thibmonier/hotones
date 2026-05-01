@@ -44,64 +44,64 @@ class OrderController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $session = $request->getSession();
-        $reset   = (bool) $request->query->get('reset', false);
+        $reset = (bool) $request->query->get('reset', false);
         if ($reset) {
             $session->remove('order_filters');
 
             return $this->redirectToRoute('order_index');
         }
 
-        $queryAll   = $request->query->all();
+        $queryAll = $request->query->all();
         $filterKeys = ['project', 'status'];
-        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved      = $session->has('order_filters') ? (array) $session->get('order_filters') : [];
+        $hasFilter = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved = $session->has('order_filters') ? (array) $session->get('order_filters') : [];
 
         $projectId = $hasFilter ? $request->query->get('project') ?? null : $saved['project'] ?? null;
-        $status    = $hasFilter ? $request->query->get('status')  ?? null : $saved['status'] ?? null;
+        $status = $hasFilter ? $request->query->get('status') ?? null : $saved['status'] ?? null;
 
         $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
         // Tri
         $sort = $hasFilter
-            ? $request->query->get('sort')              ?? $saved['sort'] ?? 'createdAt'
-            : $saved['sort']                            ?? 'createdAt';
+            ? $request->query->get('sort') ?? $saved['sort'] ?? 'createdAt'
+            : $saved['sort'] ?? 'createdAt';
         $dir = $hasFilter ? $request->query->get('dir') ?? $saved['dir'] ?? 'DESC' : $saved['dir'] ?? 'DESC';
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
-        $perPageParam   = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
-        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
-        $page           = max(1, (int) $request->query->get('page', 1));
-        $offset         = ($page - 1) * $perPage;
+        $perPageParam = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
+        $perPage = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
+        $page = max(1, (int) $request->query->get('page', 1));
+        $offset = ($page - 1) * $perPage;
 
-        $orders   = $em->getRepository(Order::class)->findWithFilters($project, $status, $sort, $dir, $perPage, $offset);
-        $total    = $em->getRepository(Order::class)->countWithFilters($project, $status);
+        $orders = $em->getRepository(Order::class)->findWithFilters($project, $status, $sort, $dir, $perPage, $offset);
+        $total = $em->getRepository(Order::class)->countWithFilters($project, $status);
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
 
         $pagination = Pagination::create($page, $perPage, $total);
 
         $session->set('order_filters', [
-            'project'  => $projectId,
-            'status'   => $status,
-            'sort'     => $sort,
-            'dir'      => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
+            'project' => $projectId,
+            'status' => $status,
+            'sort' => $sort,
+            'dir' => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'per_page' => $perPage,
         ]);
 
         return $this->render('order/index.html.twig', [
-            'orders'          => $orders,
-            'projects'        => $projects,
+            'orders' => $orders,
+            'projects' => $projects,
             'selectedProject' => $projectId,
-            'selectedStatus'  => $status,
-            'statusOptions'   => Order::STATUS_OPTIONS,
-            'filters_query'   => [
-                'project'  => $projectId,
-                'status'   => $status,
-                'sort'     => $sort,
-                'dir'      => $dir,
+            'selectedStatus' => $status,
+            'statusOptions' => Order::STATUS_OPTIONS,
+            'filters_query' => [
+                'project' => $projectId,
+                'status' => $status,
+                'sort' => $sort,
+                'dir' => $dir,
                 'per_page' => $perPage,
             ],
-            'sort'       => $sort,
-            'dir'        => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
+            'sort' => $sort,
+            'dir' => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'pagination' => $pagination->toArray(),
         ]);
     }
@@ -137,7 +137,7 @@ class OrderController extends AbstractController
 
         return $this->render('order/new.html.twig', [
             'order' => $order,
-            'form'  => $form,
+            'form' => $form,
         ]);
     }
 
@@ -153,14 +153,14 @@ class OrderController extends AbstractController
         $totals = $this->orderCalculationService->calculateOrderTotals($order);
 
         return $this->render('order/show.html.twig', [
-            'order'             => $order,
-            'sectionsTotal'     => $totals['sectionsTotal'],
-            'servicesSubtotal'  => $totals['servicesSubtotal'],
+            'order' => $order,
+            'sectionsTotal' => $totals['sectionsTotal'],
+            'servicesSubtotal' => $totals['servicesSubtotal'],
             'purchasesSubtotal' => $totals['purchasesSubtotal'],
             'contingencyAmount' => $totals['contingencyAmount'],
-            'finalAmount'       => $totals['finalAmount'],
-            'scheduledTotal'    => $totals['scheduledTotal'],
-            'statusOptions'     => Order::STATUS_OPTIONS,
+            'finalAmount' => $totals['finalAmount'],
+            'scheduledTotal' => $totals['scheduledTotal'],
+            'statusOptions' => Order::STATUS_OPTIONS,
         ]);
     }
 
@@ -187,7 +187,7 @@ class OrderController extends AbstractController
 
         return $this->render('order/edit.html.twig', [
             'order' => $order,
-            'form'  => $form,
+            'form' => $form,
         ]);
     }
 
@@ -197,7 +197,7 @@ class OrderController extends AbstractController
         $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         return $this->render('order/sections.html.twig', [
-            'order'    => $order,
+            'order' => $order,
             'profiles' => $profiles,
         ]);
     }
@@ -300,7 +300,7 @@ class OrderController extends AbstractController
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function addLine(Request $request, int $orderId, int $sectionId, EntityManagerInterface $em): Response
     {
-        $order   = $em->getRepository(Order::class)->find($orderId);
+        $order = $em->getRepository(Order::class)->find($orderId);
         $section = $em->getRepository(OrderSection::class)->find($sectionId);
 
         if (!$order || !$section || $section->getOrder() !== $order) {
@@ -338,7 +338,7 @@ class OrderController extends AbstractController
         // Ajouter des informations sur la marge dans le message flash
         $marginInfo = '';
         if ($line->getProfile() && $line->getDays()) {
-            $margin     = $line->getGrossMargin();
+            $margin = $line->getGrossMargin();
             $marginRate = $line->getMarginRate();
             $marginInfo = sprintf(
                 ' (Marge: %s€ - %s%%)',
@@ -361,9 +361,9 @@ class OrderController extends AbstractController
         int $lineId,
         EntityManagerInterface $em,
     ): Response {
-        $order   = $em->getRepository(Order::class)->find($orderId);
+        $order = $em->getRepository(Order::class)->find($orderId);
         $section = $em->getRepository(OrderSection::class)->find($sectionId);
-        $line    = $em->getRepository(OrderLine::class)->find($lineId);
+        $line = $em->getRepository(OrderLine::class)->find($lineId);
 
         if (!$order || !$section || !$line || $section->getOrder() !== $order || $line->getSection() !== $section) {
             throw $this->createNotFoundException();
@@ -406,9 +406,9 @@ class OrderController extends AbstractController
         int $lineId,
         EntityManagerInterface $em,
     ): Response {
-        $order   = $em->getRepository(Order::class)->find($orderId);
+        $order = $em->getRepository(Order::class)->find($orderId);
         $section = $em->getRepository(OrderSection::class)->find($sectionId);
-        $line    = $em->getRepository(OrderLine::class)->find($lineId);
+        $line = $em->getRepository(OrderLine::class)->find($lineId);
 
         if (!$order || !$section || !$line || $section->getOrder() !== $order || $line->getSection() !== $section) {
             throw $this->createNotFoundException();
@@ -559,16 +559,16 @@ class OrderController extends AbstractController
     public function getProfileInfo(Profile $profile): Response
     {
         return $this->json([
-            'id'               => $profile->getId(),
-            'name'             => $profile->getName(),
+            'id' => $profile->getId(),
+            'name' => $profile->getName(),
             'defaultDailyRate' => $profile->getDefaultDailyRate(),
-            'color'            => $profile->getColor(),
+            'color' => $profile->getColor(),
         ]);
     }
 
     private function generateOrderNumber(EntityManagerInterface $em): string
     {
-        $year  = date('Y');
+        $year = date('Y');
         $month = date('m');
 
         // Trouver le dernier numéro de devis pour ce mois
@@ -577,7 +577,7 @@ class OrderController extends AbstractController
         $increment = 1;
         if ($lastOrder) {
             $lastNumber = $lastOrder->getOrderNumber();
-            $increment  = (int) substr((string) $lastNumber, -3) + 1;
+            $increment = (int) substr((string) $lastNumber, -3) + 1;
         }
 
         return sprintf('D%s%s%03d', $year, $month, $increment);
@@ -596,11 +596,11 @@ class OrderController extends AbstractController
             ], 422);
         }
 
-        $label       = (string) $request->request->get('label');
+        $label = (string) $request->request->get('label');
         $billingDate = (string) $request->request->get('billing_date');
-        $amountType  = (string) $request->request->get('amount_type', 'percent');
-        $percent     = $request->request->get('percent');
-        $fixed       = $request->request->get('fixed_amount');
+        $amountType = (string) $request->request->get('amount_type', 'percent');
+        $percent = $request->request->get('percent');
+        $fixed = $request->request->get('fixed_amount');
 
         if (!$billingDate) {
             $this->addFlash('danger', 'La date de facturation est requise.');
@@ -643,7 +643,7 @@ class OrderController extends AbstractController
     #[Route('/{orderId}/schedule/{scheduleId}/delete', name: 'order_schedule_delete', methods: ['POST'])]
     public function deleteSchedule(int $orderId, int $scheduleId, EntityManagerInterface $em): Response
     {
-        $order    = $em->getRepository(Order::class)->find($orderId);
+        $order = $em->getRepository(Order::class)->find($orderId);
         $schedule = $em->getRepository(OrderPaymentSchedule::class)->find($scheduleId);
         if (!$order || !$schedule || $schedule->getOrder()->id !== $order->id) {
             throw $this->createNotFoundException();
@@ -670,17 +670,17 @@ class OrderController extends AbstractController
     #[Route('/export.csv', name: 'order_export_csv', methods: ['GET'])]
     public function exportCsv(Request $request, EntityManagerInterface $em): Response
     {
-        $session   = $request->getSession();
-        $saved     = $session->has('order_filters') ? (array) $session->get('order_filters') : [];
+        $session = $request->getSession();
+        $saved = $session->has('order_filters') ? (array) $session->get('order_filters') : [];
         $projectId = $request->query->get('project', $saved['project'] ?? null);
-        $status    = $request->query->get('status', $saved['status'] ?? null);
-        $sort      = $request->query->get('sort', $saved['sort'] ?? 'createdAt');
-        $dir       = $request->query->get('dir', $saved['dir'] ?? 'DESC');
+        $status = $request->query->get('status', $saved['status'] ?? null);
+        $sort = $request->query->get('sort', $saved['sort'] ?? 'createdAt');
+        $dir = $request->query->get('dir', $saved['dir'] ?? 'DESC');
 
         $project = $projectId ? $em->getRepository(Project::class)->find($projectId) : null;
-        $orders  = $em->getRepository(Order::class)->findWithFilters($project, $status, $sort, $dir, null, null);
+        $orders = $em->getRepository(Order::class)->findWithFilters($project, $status, $sort, $dir, null, null);
 
-        $rows   = [];
+        $rows = [];
         $header = ['Numéro', 'Nom', 'Projet', 'Statut', 'Date création', 'Montant total HT'];
         $rows[] = $header;
         foreach ($orders as $o) {
@@ -689,7 +689,7 @@ class OrderController extends AbstractController
                 $total = (float) $o->getTotalAmount();
             }
             $statusLabel = Order::STATUS_OPTIONS[$o->getStatus()] ?? $o->getStatus();
-            $rows[]      = [
+            $rows[] = [
                 $o->getOrderNumber(),
                 $o->getName() ?: '',
                 $o->getProject() ? $o->getProject()->getName() : '',
@@ -718,7 +718,7 @@ class OrderController extends AbstractController
     #[Route('/{id}/pdf', name: 'order_pdf', methods: ['GET'])]
     public function pdf(Order $order, \App\Service\PdfGeneratorService $pdfGenerator): Response
     {
-        $data     = $this->buildPdfData($order);
+        $data = $this->buildPdfData($order);
         $filename = sprintf('devis_%s_%s.pdf', $order->getOrderNumber(), (new DateTime())->format('Y-m-d'));
 
         return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: false);
@@ -743,7 +743,7 @@ class OrderController extends AbstractController
         }
 
         try {
-            $data     = $this->buildPdfData($order);
+            $data = $this->buildPdfData($order);
             $filename = sprintf('devis_%s_preview.pdf', $order->getOrderNumber());
 
             return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: true);
@@ -760,16 +760,16 @@ class OrderController extends AbstractController
     private function buildPdfData(Order $order): array
     {
         $company = $order->getCompany();
-        $totals  = $this->orderCalculationService->calculateOrderTotals($order);
+        $totals = $this->orderCalculationService->calculateOrderTotals($order);
 
         return [
-            'order'             => $order,
-            'totals'            => $totals,
-            'company_name'      => $company->getName(),
-            'payment_terms'     => '30% a la commande, 70% a la livraison',
-            'delivery_time'     => 'Selon planning defini',
+            'order' => $order,
+            'totals' => $totals,
+            'company_name' => $company->getName(),
+            'payment_terms' => '30% a la commande, 70% a la livraison',
+            'delivery_time' => 'Selon planning defini',
             'validity_duration' => '30 jours',
-            'notes'             => $order->getNotes(),
+            'notes' => $order->getNotes(),
         ];
     }
 }

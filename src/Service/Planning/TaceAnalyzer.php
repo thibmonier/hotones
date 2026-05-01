@@ -15,9 +15,9 @@ use DateTime;
 class TaceAnalyzer
 {
     // Seuils de TACE (en pourcentage)
-    private const int TACE_IDEAL_MIN     = 70; // En dessous = sous-utilisation
-    private const int TACE_IDEAL_MAX     = 90; // Au-dessus = surcharge
-    private const int TACE_CRITICAL_LOW  = 50; // Sous-utilisation critique
+    private const int TACE_IDEAL_MIN = 70; // En dessous = sous-utilisation
+    private const int TACE_IDEAL_MAX = 90; // Au-dessus = surcharge
+    private const int TACE_CRITICAL_LOW = 50; // Sous-utilisation critique
     private const int TACE_CRITICAL_HIGH = 110; // Surcharge critique
 
     public function __construct(
@@ -41,11 +41,11 @@ class TaceAnalyzer
         }
 
         $contributors = $this->contributorRepository->findBy(['active' => true]);
-        $results      = [
-            'overloaded'    => [], // TACE > TACE_IDEAL_MAX
+        $results = [
+            'overloaded' => [], // TACE > TACE_IDEAL_MAX
             'underutilized' => [], // TACE < TACE_IDEAL_MIN
-            'optimal'       => [], // TACE entre MIN et MAX
-            'critical'      => [], // TACE < CRITICAL_LOW ou > CRITICAL_HIGH
+            'optimal' => [], // TACE entre MIN et MAX
+            'critical' => [], // TACE < CRITICAL_LOW ou > CRITICAL_HIGH
         ];
 
         foreach ($contributors as $contributor) {
@@ -85,47 +85,47 @@ class TaceAnalyzer
 
         if (empty($metrics)) {
             return [
-                'tace'            => null,
-                'availability'    => 0,
-                'workload'        => 0,
-                'status'          => 'no_data',
-                'severity'        => 0,
-                'deviation'       => 0,
+                'tace' => null,
+                'availability' => 0,
+                'workload' => 0,
+                'status' => 'no_data',
+                'severity' => 0,
+                'deviation' => 0,
                 'recommendations' => [],
             ];
         }
 
         // Calculer le TACE moyen sur la période
-        $totalTace         = 0;
+        $totalTace = 0;
         $totalAvailability = 0;
-        $totalWorkload     = 0;
-        $count             = 0;
+        $totalWorkload = 0;
+        $count = 0;
 
         foreach ($metrics as $metric) {
-            $totalTace         += (float) $metric->getTace();
+            $totalTace += (float) $metric->getTace();
             $totalAvailability += (float) $metric->getAvailableDays();
-            $totalWorkload     += (float) $metric->getWorkedDays();
+            $totalWorkload += (float) $metric->getWorkedDays();
             ++$count;
         }
 
-        $avgTace         = $totalTace         / $count;
+        $avgTace = $totalTace / $count;
         $avgAvailability = $totalAvailability / $count;
-        $avgWorkload     = $totalWorkload     / $count;
+        $avgWorkload = $totalWorkload / $count;
 
         // Déterminer le statut
-        $status    = $this->determineStatus($avgTace);
-        $severity  = $this->calculateSeverity($avgTace);
+        $status = $this->determineStatus($avgTace);
+        $severity = $this->calculateSeverity($avgTace);
         $deviation = $this->calculateDeviation($avgTace);
 
         return [
-            'tace'         => round($avgTace, 2),
+            'tace' => round($avgTace, 2),
             'availability' => round($avgAvailability, 2),
-            'workload'     => round($avgWorkload, 2),
-            'status'       => $status,
-            'severity'     => $severity,
-            'deviation'    => $deviation,
+            'workload' => round($avgWorkload, 2),
+            'status' => $status,
+            'severity' => $severity,
+            'deviation' => $deviation,
             'period_start' => $startDate,
-            'period_end'   => $endDate,
+            'period_end' => $endDate,
         ];
     }
 
@@ -156,7 +156,7 @@ class TaceAnalyzer
     private function calculateSeverity(float $tace): int
     {
         $idealCenter = (self::TACE_IDEAL_MIN + self::TACE_IDEAL_MAX) / 2; // 80%
-        $deviation   = abs($tace - $idealCenter);
+        $deviation = abs($tace - $idealCenter);
 
         // Normaliser sur une échelle de 0-100
         // Plus on s'éloigne de l'idéal, plus c'est sévère
@@ -179,9 +179,9 @@ class TaceAnalyzer
     public function getThresholds(): array
     {
         return [
-            'ideal_min'     => self::TACE_IDEAL_MIN,
-            'ideal_max'     => self::TACE_IDEAL_MAX,
-            'critical_low'  => self::TACE_CRITICAL_LOW,
+            'ideal_min' => self::TACE_IDEAL_MIN,
+            'ideal_max' => self::TACE_IDEAL_MAX,
+            'critical_low' => self::TACE_CRITICAL_LOW,
             'critical_high' => self::TACE_CRITICAL_HIGH,
         ];
     }

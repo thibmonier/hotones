@@ -117,7 +117,7 @@ class SkillRepository extends CompanyAwareRepository
         $formatted = [];
         foreach ($results as $result) {
             $formatted[] = [
-                'skill'            => $result[0],
+                'skill' => $result[0],
                 'contributorCount' => (int) $result['contributorCount'],
             ];
         }

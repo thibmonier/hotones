@@ -164,27 +164,27 @@ class HubSpotSyncService
         if (!$settings->isConfigured()) {
             return [
                 'success' => false,
-                'error'   => 'HubSpot n\'est pas configure',
-                'deals'   => [],
+                'error' => 'HubSpot n\'est pas configure',
+                'deals' => [],
             ];
         }
 
         try {
             $excludedStages = $settings->getExcludedStagesList();
-            $pipelineIds    = $settings->getPipelineIds();
+            $pipelineIds = $settings->getPipelineIds();
 
             $deals = $this->hubSpotClient->getDeals($settings, $excludedStages, $pipelineIds);
 
             // Enrichir les deals avec les infos de pipeline
-            $pipelines   = $this->hubSpotClient->getDealPipelines($settings);
+            $pipelines = $this->hubSpotClient->getDealPipelines($settings);
             $pipelineMap = [];
-            $stageMap    = [];
+            $stageMap = [];
 
             foreach ($pipelines as $pipeline) {
                 $pipelineMap[$pipeline['id']] = $pipeline['label'] ?? $pipeline['id'];
                 foreach ($pipeline['stages'] ?? [] as $stage) {
                     $stageMap[$stage['id']] = [
-                        'label'        => $stage['label']        ?? $stage['id'],
+                        'label' => $stage['label'] ?? $stage['id'],
                         'displayOrder' => $stage['displayOrder'] ?? 0,
                     ];
                 }
@@ -193,22 +193,22 @@ class HubSpotSyncService
             // Formater les deals pour l'affichage
             $formattedDeals = [];
             foreach ($deals as $deal) {
-                $props      = $deal['properties'] ?? [];
-                $pipelineId = $props['pipeline']  ?? '';
-                $stageId    = $props['dealstage'] ?? '';
+                $props = $deal['properties'] ?? [];
+                $pipelineId = $props['pipeline'] ?? '';
+                $stageId = $props['dealstage'] ?? '';
 
                 $formattedDeals[] = [
-                    'id'           => $deal['id'],
-                    'name'         => $props['dealname']        ?? 'Sans nom',
-                    'amount'       => $props['amount']          ?? null,
-                    'pipeline'     => $pipelineMap[$pipelineId] ?? $pipelineId,
-                    'pipelineId'   => $pipelineId,
-                    'stage'        => $stageMap[$stageId]['label'] ?? $stageId,
-                    'stageId'      => $stageId,
-                    'closeDate'    => $props['closedate']           ?? null,
-                    'createDate'   => $props['createdate']          ?? null,
+                    'id' => $deal['id'],
+                    'name' => $props['dealname'] ?? 'Sans nom',
+                    'amount' => $props['amount'] ?? null,
+                    'pipeline' => $pipelineMap[$pipelineId] ?? $pipelineId,
+                    'pipelineId' => $pipelineId,
+                    'stage' => $stageMap[$stageId]['label'] ?? $stageId,
+                    'stageId' => $stageId,
+                    'closeDate' => $props['closedate'] ?? null,
+                    'createDate' => $props['createdate'] ?? null,
                     'lastModified' => $props['hs_lastmodifieddate'] ?? null,
-                    'associations' => $deal['associations']         ?? [],
+                    'associations' => $deal['associations'] ?? [],
                 ];
             }
 
@@ -218,9 +218,9 @@ class HubSpotSyncService
             });
 
             return [
-                'success'   => true,
-                'deals'     => $formattedDeals,
-                'count'     => count($formattedDeals),
+                'success' => true,
+                'deals' => $formattedDeals,
+                'count' => count($formattedDeals),
                 'pipelines' => $pipelines,
             ];
         } catch (Exception $e) {
@@ -230,8 +230,8 @@ class HubSpotSyncService
 
             return [
                 'success' => false,
-                'error'   => $e->getMessage(),
-                'deals'   => [],
+                'error' => $e->getMessage(),
+                'deals' => [],
             ];
         }
     }
@@ -246,7 +246,7 @@ class HubSpotSyncService
         if (!$settings->isConfigured()) {
             return [
                 'success' => false,
-                'error'   => 'HubSpot n\'est pas configure',
+                'error' => 'HubSpot n\'est pas configure',
                 'clients' => [],
             ];
         }
@@ -256,40 +256,40 @@ class HubSpotSyncService
 
             $formattedClients = [];
             foreach ($companies as $company) {
-                $props     = $company['properties'] ?? [];
+                $props = $company['properties'] ?? [];
                 $companyId = $company['id'];
 
                 // Recuperer les contacts associes
                 $associatedContacts = [];
-                $associations       = $company['associations']['contacts']['results'] ?? [];
+                $associations = $company['associations']['contacts']['results'] ?? [];
 
                 foreach ($associations as $contactAssoc) {
                     $contactId = $contactAssoc['id'];
-                    $contact   = $this->hubSpotClient->getContact($settings, $contactId);
+                    $contact = $this->hubSpotClient->getContact($settings, $contactId);
                     if ($contact !== null) {
-                        $contactProps         = $contact['properties'] ?? [];
+                        $contactProps = $contact['properties'] ?? [];
                         $associatedContacts[] = [
-                            'id'          => $contact['id'],
-                            'firstName'   => $contactProps['firstname']   ?? '',
-                            'lastName'    => $contactProps['lastname']    ?? '',
-                            'email'       => $contactProps['email']       ?? '',
-                            'phone'       => $contactProps['phone']       ?? '',
+                            'id' => $contact['id'],
+                            'firstName' => $contactProps['firstname'] ?? '',
+                            'lastName' => $contactProps['lastname'] ?? '',
+                            'email' => $contactProps['email'] ?? '',
+                            'phone' => $contactProps['phone'] ?? '',
                             'mobilePhone' => $contactProps['mobilephone'] ?? '',
-                            'jobTitle'    => $contactProps['jobtitle']    ?? '',
+                            'jobTitle' => $contactProps['jobtitle'] ?? '',
                         ];
                     }
                 }
 
                 $formattedClients[] = [
-                    'id'           => $companyId,
-                    'name'         => $props['name']     ?? 'Sans nom',
-                    'domain'       => $props['domain']   ?? '',
-                    'website'      => $props['website']  ?? '',
-                    'phone'        => $props['phone']    ?? '',
-                    'industry'     => $props['industry'] ?? '',
-                    'city'         => $props['city']     ?? '',
-                    'country'      => $props['country']  ?? '',
-                    'contacts'     => $associatedContacts,
+                    'id' => $companyId,
+                    'name' => $props['name'] ?? 'Sans nom',
+                    'domain' => $props['domain'] ?? '',
+                    'website' => $props['website'] ?? '',
+                    'phone' => $props['phone'] ?? '',
+                    'industry' => $props['industry'] ?? '',
+                    'city' => $props['city'] ?? '',
+                    'country' => $props['country'] ?? '',
+                    'contacts' => $associatedContacts,
                     'contactCount' => count($associatedContacts),
                 ];
             }
@@ -302,7 +302,7 @@ class HubSpotSyncService
             return [
                 'success' => true,
                 'clients' => $formattedClients,
-                'count'   => count($formattedClients),
+                'count' => count($formattedClients),
             ];
         } catch (Exception $e) {
             $this->logger->error('HubSpot: Failed to get clients with contacts', [
@@ -311,7 +311,7 @@ class HubSpotSyncService
 
             return [
                 'success' => false,
-                'error'   => $e->getMessage(),
+                'error' => $e->getMessage(),
                 'clients' => [],
             ];
         }
@@ -330,7 +330,7 @@ class HubSpotSyncService
         }
 
         $props = $hsCompany['properties'] ?? [];
-        $name  = $props['name']           ?? '';
+        $name = $props['name'] ?? '';
 
         if ($name === '') {
             ++$result->skipped;
@@ -340,21 +340,21 @@ class HubSpotSyncService
 
         // Chercher un client existant par nom (simplification, idealement utiliser un champ hubspot_id)
         $existingClient = $this->clientRepository->findOneBy([
-            'name'    => $name,
+            'name' => $name,
             'company' => $settings->getCompany(),
         ]);
 
         if ($existingClient !== null) {
             // Mettre a jour
-            $existingClient->website     = $props['website']     ?? $existingClient->website;
+            $existingClient->website = $props['website'] ?? $existingClient->website;
             $existingClient->description = $props['description'] ?? $existingClient->description;
             ++$result->updated;
         } else {
             // Creer un nouveau client
-            $client              = new Client();
-            $client->company     = $settings->getCompany();
-            $client->name        = $name;
-            $client->website     = $props['website']     ?? null;
+            $client = new Client();
+            $client->company = $settings->getCompany();
+            $client->name = $name;
+            $client->website = $props['website'] ?? null;
             $client->description = $props['description'] ?? null;
             $this->entityManager->persist($client);
             ++$result->created;
@@ -373,10 +373,10 @@ class HubSpotSyncService
             return;
         }
 
-        $props     = $hsContact['properties'] ?? [];
-        $email     = $props['email']          ?? '';
-        $firstName = $props['firstname']      ?? '';
-        $lastName  = $props['lastname']       ?? '';
+        $props = $hsContact['properties'] ?? [];
+        $email = $props['email'] ?? '';
+        $firstName = $props['firstname'] ?? '';
+        $lastName = $props['lastname'] ?? '';
 
         if ($email === '' && $firstName === '' && $lastName === '') {
             ++$result->skipped;
@@ -386,17 +386,17 @@ class HubSpotSyncService
 
         // Trouver le client associe via les associations
         $associations = $hsContact['associations']['companies']['results'] ?? [];
-        $client       = null;
+        $client = null;
 
         if (!empty($associations)) {
             // Recuperer la premiere company associee
             $companyAssoc = $associations[0];
-            $hsCompany    = $this->hubSpotClient->getCompany($settings, $companyAssoc['id']);
+            $hsCompany = $this->hubSpotClient->getCompany($settings, $companyAssoc['id']);
             if ($hsCompany !== null) {
                 $companyName = $hsCompany['properties']['name'] ?? '';
                 if ($companyName !== '') {
                     $client = $this->clientRepository->findOneBy([
-                        'name'    => $companyName,
+                        'name' => $companyName,
                         'company' => $settings->getCompany(),
                     ]);
                 }
@@ -414,30 +414,30 @@ class HubSpotSyncService
         $existingContact = null;
         if ($email !== '') {
             $existingContact = $this->contactRepository->findOneBy([
-                'email'   => $email,
+                'email' => $email,
                 'company' => $settings->getCompany(),
             ]);
         }
 
         if ($existingContact !== null) {
             // Mettre a jour
-            $existingContact->firstName     = $firstName !== '' ? $firstName : $existingContact->firstName;
-            $existingContact->lastName      = $lastName  !== '' ? $lastName : $existingContact->lastName;
-            $existingContact->phone         = $props['phone']       ?? $existingContact->phone;
-            $existingContact->mobilePhone   = $props['mobilephone'] ?? $existingContact->mobilePhone;
-            $existingContact->positionTitle = $props['jobtitle']    ?? $existingContact->positionTitle;
+            $existingContact->firstName = $firstName !== '' ? $firstName : $existingContact->firstName;
+            $existingContact->lastName = $lastName !== '' ? $lastName : $existingContact->lastName;
+            $existingContact->phone = $props['phone'] ?? $existingContact->phone;
+            $existingContact->mobilePhone = $props['mobilephone'] ?? $existingContact->mobilePhone;
+            $existingContact->positionTitle = $props['jobtitle'] ?? $existingContact->positionTitle;
             ++$result->updated;
         } else {
             // Creer un nouveau contact
-            $contact          = new ClientContact();
+            $contact = new ClientContact();
             $contact->company = $settings->getCompany();
             $contact->setClient($client);
-            $contact->firstName     = $firstName;
-            $contact->lastName      = $lastName;
-            $contact->email         = $email !== '' ? $email : null;
-            $contact->phone         = $props['phone']       ?? null;
-            $contact->mobilePhone   = $props['mobilephone'] ?? null;
-            $contact->positionTitle = $props['jobtitle']    ?? null;
+            $contact->firstName = $firstName;
+            $contact->lastName = $lastName;
+            $contact->email = $email !== '' ? $email : null;
+            $contact->phone = $props['phone'] ?? null;
+            $contact->mobilePhone = $props['mobilephone'] ?? null;
+            $contact->positionTitle = $props['jobtitle'] ?? null;
             $this->entityManager->persist($contact);
             ++$result->created;
         }
@@ -448,10 +448,10 @@ class HubSpotSyncService
      */
     private function updateSyncStatus(HubSpotSettings $settings, SyncResult $result): void
     {
-        $settings->lastSyncAt     = new DateTime();
+        $settings->lastSyncAt = new DateTime();
         $settings->lastSyncStatus = $result->success ? 'success' : 'error';
-        $settings->lastSyncError  = $result->error;
-        $settings->lastSyncCount  = $result->getTotal();
+        $settings->lastSyncError = $result->error;
+        $settings->lastSyncCount = $result->getTotal();
 
         $this->entityManager->flush();
     }

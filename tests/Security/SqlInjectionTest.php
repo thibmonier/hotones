@@ -18,7 +18,7 @@ class SqlInjectionTest extends WebTestCase
         $client = static::createClient();
 
         $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
-        $testUser       = $userRepository->findOneBy(['email' => 'test@example.com']);
+        $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
             $this->markTestSkipped('Test user not found');
@@ -56,12 +56,12 @@ class SqlInjectionTest extends WebTestCase
     public static function sqlInjectionPayloadsProvider(): array
     {
         return [
-            'simple quote'    => ["' OR '1'='1"],
-            'union select'    => ["' UNION SELECT NULL--"],
-            'comment'         => ["admin'--"],
+            'simple quote' => ["' OR '1'='1"],
+            'union select' => ["' UNION SELECT NULL--"],
+            'comment' => ["admin'--"],
             'stacked queries' => ["'; DROP TABLE users--"],
-            'boolean based'   => ["1' AND '1'='1"],
-            'time based'      => ["' OR SLEEP(5)--"],
+            'boolean based' => ["1' AND '1'='1"],
+            'time based' => ["' OR SLEEP(5)--"],
         ];
     }
 
@@ -74,7 +74,7 @@ class SqlInjectionTest extends WebTestCase
 
         // Tester avec une entrée malveillante
         $maliciousInput = "' OR '1'='1";
-        $projects       = $projectRepository->findBy(['name' => $maliciousInput]);
+        $projects = $projectRepository->findBy(['name' => $maliciousInput]);
 
         // Devrait retourner un tableau vide (aucun projet avec ce nom exact)
         $this->assertIsArray($projects);
@@ -87,7 +87,7 @@ class SqlInjectionTest extends WebTestCase
         $client = static::createClient();
 
         $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
-        $testUser       = $userRepository->findOneBy(['email' => 'test@example.com']);
+        $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
             $this->markTestSkipped('Test user not found');
@@ -113,8 +113,8 @@ class SqlInjectionTest extends WebTestCase
     public static function xssPayloadsProvider(): array
     {
         return [
-            'basic script'  => ['<script>alert(1)</script>'],
-            'img onerror'   => ['<img src=x onerror=alert(1)>'],
+            'basic script' => ['<script>alert(1)</script>'],
+            'img onerror' => ['<img src=x onerror=alert(1)>'],
             'event handler' => ['<div onload=alert(1)>'],
         ];
     }

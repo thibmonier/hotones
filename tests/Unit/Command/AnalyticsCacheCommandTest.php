@@ -21,8 +21,8 @@ class AnalyticsCacheCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheService  = $this->createMock(AnalyticsCacheService::class);
-        $this->command       = new AnalyticsCacheCommand($this->cacheService);
+        $this->cacheService = $this->createMock(AnalyticsCacheService::class);
+        $this->command = new AnalyticsCacheCommand($this->cacheService);
         $this->commandTester = new CommandTester($this->command);
     }
 
@@ -66,7 +66,7 @@ class AnalyticsCacheCommandTest extends TestCase
         $this->cacheService->expects($this->once())->method('warmup');
 
         $exitCode = $this->commandTester->execute([
-            '--clear'  => true,
+            '--clear' => true,
             '--warmup' => true,
         ]);
 

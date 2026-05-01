@@ -30,11 +30,11 @@ class PerformanceReviewControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $container    = static::getContainer();
+        $container = static::getContainer();
 
-        $this->userRepository        = $container->get(UserRepository::class);
+        $this->userRepository = $container->get(UserRepository::class);
         $this->contributorRepository = $container->get(ContributorRepository::class);
-        $this->reviewRepository      = $container->get(PerformanceReviewRepository::class);
+        $this->reviewRepository = $container->get(PerformanceReviewRepository::class);
 
         $this->setUpMultiTenant();
     }
@@ -73,7 +73,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testIndexDisplaysReviews(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         // Create a review
@@ -120,7 +120,7 @@ class PerformanceReviewControllerTest extends WebTestCase
         $this->client->loginUser($user);
 
         $crawler = $this->client->request('GET', '/performance-reviews/campaign/create');
-        $form    = $crawler
+        $form = $crawler
             ->selectButton('Créer la campagne')
             ->form([
                 'year' => '2025',
@@ -137,9 +137,9 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testShowRequiresAuthentication(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
-        $review      = $this->createPerformanceReview($contributor, $user, 2024);
+        $review = $this->createPerformanceReview($contributor, $user, 2024);
 
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->persist($review);
@@ -152,7 +152,7 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testShowDisplaysReviewDetails(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         $review = $this->createPerformanceReview($contributor, $user, 2024);
@@ -186,8 +186,8 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testValidateRequiresManagerRole(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
-        $manager     = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $manager = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         $review = $this->createPerformanceReview($contributor, $manager, 2024);
@@ -205,21 +205,21 @@ class PerformanceReviewControllerTest extends WebTestCase
 
     public function testValidateChangesStatus(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $contributor = $this->createContributor();
 
         $review = $this->createPerformanceReview($contributor, $user, 2024);
         $review->setStatus('eval_manager_faite');
         $review->setSelfEvaluation([
             'achievements' => 'Did great things',
-            'strengths'    => 'Coding',
+            'strengths' => 'Coding',
             'improvements' => 'Testing',
         ]);
         $review->setManagerEvaluation([
             'achievements' => 'Observed great things',
-            'strengths'    => 'Coding',
+            'strengths' => 'Coding',
             'improvements' => 'Testing',
-            'feedback'     => 'Good job',
+            'feedback' => 'Good job',
         ]);
 
         $em = static::getContainer()->get('doctrine')->getManager();

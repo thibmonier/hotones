@@ -25,14 +25,14 @@ class OrderControllerPreviewTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client      = static::createClient();
+        $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
-        $this->testUser    = $this->authenticateTestUser($this->testCompany, ['ROLE_CHEF_PROJET']);
+        $this->testUser = $this->authenticateTestUser($this->testCompany, ['ROLE_CHEF_PROJET']);
     }
 
     private function createOrderWithLines(): Order
     {
-        $em      = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $company = $this->getTestCompany();
 
         $project = new Project();
@@ -81,7 +81,7 @@ class OrderControllerPreviewTest extends WebTestCase
 
     private function createEmptyOrder(): Order
     {
-        $em      = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $company = $this->getTestCompany();
 
         $project = new Project();
@@ -108,7 +108,7 @@ class OrderControllerPreviewTest extends WebTestCase
 
     private function createOrderWithEmptySections(): Order
     {
-        $em      = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $company = $this->getTestCompany();
 
         $project = new Project();

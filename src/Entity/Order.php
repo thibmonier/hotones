@@ -48,12 +48,12 @@ class Order implements CompanyOwnedInterface
     use Blameable;
 
     public const STATUS_OPTIONS = [
-        'a_signer'  => 'À signer',
-        'gagne'     => 'Gagné',
-        'signe'     => 'Signé',
-        'perdu'     => 'Perdu',
-        'termine'   => 'Terminé',
-        'standby'   => 'Standby',
+        'a_signer' => 'À signer',
+        'gagne' => 'Gagné',
+        'signe' => 'Signé',
+        'perdu' => 'Perdu',
+        'termine' => 'Terminé',
+        'standby' => 'Standby',
         'abandonne' => 'Abandonné',
     ];
 
@@ -183,7 +183,7 @@ class Order implements CompanyOwnedInterface
     public string $status = 'a_signer' { // a_signer, gagne, signe, perdu, termine, standby, abandonne
         get => $this->status;
         set {
-            $oldStatus    = $this->status;
+            $oldStatus = $this->status;
             $this->status = $value;
 
             // Définir automatiquement validated_at lors du passage à un statut validé
@@ -242,10 +242,10 @@ class Order implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->tasks            = new ArrayCollection();
-        $this->sections         = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+        $this->sections = new ArrayCollection();
         $this->paymentSchedules = new ArrayCollection();
-        $this->expenseReports   = new ArrayCollection();
+        $this->expenseReports = new ArrayCollection();
     }
 
     public function getTasks(): Collection
@@ -335,7 +335,7 @@ class Order implements CompanyOwnedInterface
      */
     public function validatePaymentScheduleCoverage(): array
     {
-        $total     = $this->calculateTotalFromSections();
+        $total = $this->calculateTotalFromSections();
         $scheduled = '0.00';
         foreach ($this->paymentSchedules as $s) {
             $scheduled = bcadd($scheduled, (string) $s->computeAmount($total), 2);
@@ -359,7 +359,7 @@ class Order implements CompanyOwnedInterface
      */
     public static function generateOrderNumber(DateTimeInterface $date): string
     {
-        $year  = $date->format('Y');
+        $year = $date->format('Y');
         $month = $date->format('m');
 
         // TODO: Implémenter la logique incrémentale en base
@@ -429,7 +429,7 @@ class Order implements CompanyOwnedInterface
         $total = '0.00';
         foreach ($this->expenseReports as $expense) {
             if (
-                $expense->getStatus()    === ExpenseReport::STATUS_VALIDATED
+                $expense->getStatus() === ExpenseReport::STATUS_VALIDATED
                 || $expense->getStatus() === ExpenseReport::STATUS_PAID
             ) {
                 $total = bcadd($total, (string) $expense->getAmountTTC(), 2);
@@ -448,7 +448,7 @@ class Order implements CompanyOwnedInterface
             return '0.00';
         }
 
-        $total         = $this->getTotalValidatedExpenses();
+        $total = $this->getTotalValidatedExpenses();
         $feeMultiplier = bcadd('1', bcdiv($this->expenseManagementFeeRate, '100', 4), 4);
 
         return bcmul($total, $feeMultiplier, 2);

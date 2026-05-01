@@ -45,7 +45,7 @@ class TreasuryService
 
         // Factures en retard
         $overdueInvoices = $this->invoiceRepository->findOverdueInvoices();
-        $overdueAmount   = '0.00';
+        $overdueAmount = '0.00';
         foreach ($overdueInvoices as $invoice) {
             $overdueAmount = bcadd($overdueAmount, $invoice->getAmountTtc(), 2);
         }
@@ -59,13 +59,13 @@ class TreasuryService
             : 0.0;
 
         return [
-            'total_billed'          => $totalBilled,
-            'total_paid'            => $totalPaid,
-            'pending_payment'       => $pendingPayment,
-            'overdue_amount'        => $overdueAmount,
-            'overdue_count'         => count($overdueInvoices),
+            'total_billed' => $totalBilled,
+            'total_paid' => $totalPaid,
+            'pending_payment' => $pendingPayment,
+            'overdue_amount' => $overdueAmount,
+            'overdue_count' => count($overdueInvoices),
             'average_payment_delay' => $averagePaymentDelay,
-            'collection_rate'       => $collectionRate,
+            'collection_rate' => $collectionRate,
         ];
     }
 
@@ -77,7 +77,7 @@ class TreasuryService
      */
     public function getForecast(int $days = 90): array
     {
-        $today   = new DateTime();
+        $today = new DateTime();
         $endDate = (clone $today)->modify("+{$days} days");
 
         // Récupérer toutes les factures non payées avec échéance dans la période
@@ -95,15 +95,15 @@ class TreasuryService
         // Grouper par semaine
         $forecast = [];
         foreach ($invoices as $invoice) {
-            $dueDate   = $invoice->getDueDate();
+            $dueDate = $invoice->getDueDate();
             $weekStart = (clone $dueDate)->modify('monday this week');
-            $weekKey   = $weekStart->format('Y-m-d');
+            $weekKey = $weekStart->format('Y-m-d');
 
             if (!isset($forecast[$weekKey])) {
                 $forecast[$weekKey] = [
-                    'week_start'      => $weekStart->format('d/m/Y'),
+                    'week_start' => $weekStart->format('d/m/Y'),
                     'expected_amount' => '0.00',
-                    'invoice_count'   => 0,
+                    'invoice_count' => 0,
                 ];
             }
 
@@ -130,11 +130,11 @@ class TreasuryService
     public function getOverdueInvoices(): array
     {
         $overdueInvoices = $this->invoiceRepository->findOverdueInvoices();
-        $today           = new DateTime();
+        $today = new DateTime();
 
         $result = [];
         foreach ($overdueInvoices as $invoice) {
-            $dueDate  = $invoice->getDueDate();
+            $dueDate = $invoice->getDueDate();
             $daysLate = $today->diff($dueDate)->days;
 
             // Priorité selon le retard
@@ -142,19 +142,19 @@ class TreasuryService
                 $daysLate >= 60 => 'critical',
                 $daysLate >= 30 => 'high',
                 $daysLate >= 15 => 'medium',
-                default         => 'low',
+                default => 'low',
             };
 
             $result[] = [
-                'invoice'   => $invoice,
+                'invoice' => $invoice,
                 'days_late' => $daysLate,
-                'priority'  => $priority,
+                'priority' => $priority,
             ];
         }
 
         // Trier par priorité puis par retard
         usort($result, function ($a, $b) {
-            $priorityOrder   = ['critical' => 0, 'high' => 1, 'medium' => 2, 'low' => 3];
+            $priorityOrder = ['critical' => 0, 'high' => 1, 'medium' => 2, 'low' => 3];
             $priorityCompare = $priorityOrder[$a['priority']] <=> $priorityOrder[$b['priority']];
             if ($priorityCompare !== 0) {
                 return $priorityCompare;
@@ -212,7 +212,7 @@ class TreasuryService
                 ->setParameter('statusPaid', Invoice::STATUS_PAID);
 
             $paidResult = $qbPaid->getQuery()->getSingleScalarResult();
-            $totalPaid  = $paidResult ? (string) $paidResult : '0.00';
+            $totalPaid = $paidResult ? (string) $paidResult : '0.00';
 
             // Calculer le délai moyen de paiement pour ce client
             $qbDelay = $this->invoiceRepository->createQueryBuilder('i3');
@@ -224,18 +224,18 @@ class TreasuryService
                 ->setParameter('statusPaid', Invoice::STATUS_PAID);
 
             $delayResult = $qbDelay->getQuery()->getSingleScalarResult();
-            $avgDelay    = $delayResult ? (float) $delayResult : 0.0;
+            $avgDelay = $delayResult ? (float) $delayResult : 0.0;
 
-            $totalBilled   = (string) $row['total_billed'];
+            $totalBilled = (string) $row['total_billed'];
             $pendingAmount = bcsub($totalBilled, $totalPaid, 2);
 
             $clientStats[] = [
-                'client_id'             => $clientId,
-                'client_name'           => (string) $row['client_name'],
-                'total_billed'          => $totalBilled,
-                'total_paid'            => $totalPaid,
-                'pending_amount'        => $pendingAmount,
-                'invoice_count'         => (int) $row['invoice_count'],
+                'client_id' => $clientId,
+                'client_name' => (string) $row['client_name'],
+                'total_billed' => $totalBilled,
+                'total_paid' => $totalPaid,
+                'pending_amount' => $pendingAmount,
+                'invoice_count' => (int) $row['invoice_count'],
                 'average_payment_delay' => $avgDelay,
             ];
         }
@@ -251,21 +251,21 @@ class TreasuryService
     public function getMonthlyTrend(int $months = 12): array
     {
         $result = [];
-        $today  = new DateTime();
+        $today = new DateTime();
 
         for ($i = $months - 1; $i >= 0; --$i) {
-            $date      = (clone $today)->modify("-{$i} months");
+            $date = (clone $today)->modify("-{$i} months");
             $startDate = (clone $date)->modify('first day of this month');
-            $endDate   = (clone $date)->modify('last day of this month');
+            $endDate = (clone $date)->modify('last day of this month');
 
             $billed = $this->invoiceRepository->calculateTotalRevenue($startDate, $endDate);
-            $paid   = $this->invoiceRepository->calculatePaidRevenue($startDate, $endDate);
+            $paid = $this->invoiceRepository->calculatePaidRevenue($startDate, $endDate);
 
-            $monthKey          = $date->format('Y-m');
+            $monthKey = $date->format('Y-m');
             $result[$monthKey] = [
-                'month'  => $date->format('M Y'),
+                'month' => $date->format('M Y'),
                 'billed' => $billed,
-                'paid'   => $paid,
+                'paid' => $paid,
             ];
         }
 

@@ -137,8 +137,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
         foreach ($results as $result) {
             $totals[] = [
                 'category' => $result['category'],
-                'total'    => (string) $result['total'],
-                'count'    => (int) $result['count'],
+                'total' => (string) $result['total'],
+                'count' => (int) $result['count'],
             ];
         }
 
@@ -210,10 +210,10 @@ class ExpenseReportRepository extends CompanyAwareRepository
         $count = $qb->select('COUNT(e.id)')->getQuery()->getSingleScalarResult();
 
         return [
-            'total'     => $total ? (string) $total : '0.00',
+            'total' => $total ? (string) $total : '0.00',
             'validated' => $validated ? (string) $validated : '0.00',
-            'pending'   => $pending ? (string) $pending : '0.00',
-            'count'     => (int) $count,
+            'pending' => $pending ? (string) $pending : '0.00',
+            'count' => (int) $count,
         ];
     }
 
@@ -247,8 +247,8 @@ class ExpenseReportRepository extends CompanyAwareRepository
             if ($contributor instanceof Contributor) {
                 $topContributors[] = [
                     'contributor' => $contributor,
-                    'total'       => (string) $result['total'],
-                    'count'       => (int) $result['count'],
+                    'total' => (string) $result['total'],
+                    'count' => (int) $result['count'],
                 ];
             }
         }

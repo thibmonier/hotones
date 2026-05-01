@@ -60,12 +60,12 @@ final class RunningTimerTest extends TestCase
     #[Test]
     public function settersAreFluent(): void
     {
-        $company     = new Company();
+        $company = new Company();
         $contributor = new Contributor();
-        $project     = new Project();
-        $task        = new ProjectTask();
-        $subTask     = new ProjectSubTask();
-        $startedAt   = new DateTimeImmutable('2026-04-30 09:15:00');
+        $project = new Project();
+        $task = new ProjectTask();
+        $subTask = new ProjectSubTask();
+        $startedAt = new DateTimeImmutable('2026-04-30 09:15:00');
 
         $timer = new RunningTimer();
 
@@ -81,13 +81,13 @@ final class RunningTimerTest extends TestCase
     #[Test]
     public function gettersReturnAssignedValues(): void
     {
-        $company     = new Company();
+        $company = new Company();
         $contributor = new Contributor();
-        $project     = new Project();
-        $task        = new ProjectTask();
-        $subTask     = new ProjectSubTask();
-        $startedAt   = new DateTimeImmutable('2026-04-30 09:15:00');
-        $stoppedAt   = new DateTimeImmutable('2026-04-30 12:00:00');
+        $project = new Project();
+        $task = new ProjectTask();
+        $subTask = new ProjectSubTask();
+        $startedAt = new DateTimeImmutable('2026-04-30 09:15:00');
+        $stoppedAt = new DateTimeImmutable('2026-04-30 12:00:00');
 
         $timer = (new RunningTimer())
             ->setCompany($company)
@@ -123,7 +123,7 @@ final class RunningTimerTest extends TestCase
     public function stoppingARunningTimerPreservesStartedAt(): void
     {
         $startedAt = new DateTime('2026-04-30 10:00:00');
-        $timer     = (new RunningTimer())->setStartedAt($startedAt);
+        $timer = (new RunningTimer())->setStartedAt($startedAt);
 
         $timer->setStoppedAt(new DateTime('2026-04-30 11:00:00'));
 

@@ -33,7 +33,7 @@ class NpsController extends AbstractController
     #[Route('', name: 'nps_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $status    = $request->query->get('status', 'all');
+        $status = $request->query->get('status', 'all');
         $projectId = $request->query->get('project');
 
         $qb = $this->npsSurveyRepository
@@ -53,10 +53,10 @@ class NpsController extends AbstractController
         $surveys = $qb->getQuery()->getResult();
 
         // Statistiques globales
-        $totalSurveys     = count($surveys);
+        $totalSurveys = count($surveys);
         $completedSurveys = array_filter($surveys, fn ($s): bool => $s->getStatus() === NpsSurvey::STATUS_COMPLETED);
-        $completedCount   = count($completedSurveys);
-        $responseRate     = $totalSurveys > 0 ? round(($completedCount / $totalSurveys) * 100, 1) : 0;
+        $completedCount = count($completedSurveys);
+        $responseRate = $totalSurveys > 0 ? round(($completedCount / $totalSurveys) * 100, 1) : 0;
 
         // Calculer le NPS moyen sur toutes les réponses
         $allCompleted = $this->npsSurveyRepository
@@ -67,9 +67,9 @@ class NpsController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        $npsScore   = null;
-        $promoters  = 0;
-        $passives   = 0;
+        $npsScore = null;
+        $promoters = 0;
+        $passives = 0;
         $detractors = 0;
 
         if (!empty($allCompleted)) {
@@ -90,15 +90,15 @@ class NpsController extends AbstractController
         }
 
         return $this->render('nps/index.html.twig', [
-            'surveys'          => $surveys,
-            'status'           => $status,
-            'project_id'       => $projectId,
-            'total_surveys'    => $totalSurveys,
-            'completed_count'  => $completedCount,
-            'response_rate'    => $responseRate,
-            'nps_score'        => $npsScore !== null ? round($npsScore, 1) : null,
-            'promoters_count'  => $promoters,
-            'passives_count'   => $passives,
+            'surveys' => $surveys,
+            'status' => $status,
+            'project_id' => $projectId,
+            'total_surveys' => $totalSurveys,
+            'completed_count' => $completedCount,
+            'response_rate' => $responseRate,
+            'nps_score' => $npsScore !== null ? round($npsScore, 1) : null,
+            'promoters_count' => $promoters,
+            'passives_count' => $passives,
             'detractors_count' => $detractors,
         ]);
     }
@@ -146,9 +146,9 @@ class NpsController extends AbstractController
         $stats = $this->npsSurveyRepository->getStatsByProject($project);
 
         return $this->render('nps/show.html.twig', [
-            'survey'          => $survey,
+            'survey' => $survey,
             'project_surveys' => $projectSurveys,
-            'stats'           => $stats,
+            'stats' => $stats,
         ]);
     }
 
@@ -199,12 +199,12 @@ class NpsController extends AbstractController
     public function project(Project $project): Response
     {
         $surveys = $this->npsSurveyRepository->findByProject($project);
-        $stats   = $this->npsSurveyRepository->getStatsByProject($project);
+        $stats = $this->npsSurveyRepository->getStatsByProject($project);
 
         return $this->render('nps/project.html.twig', [
             'project' => $project,
             'surveys' => $surveys,
-            'stats'   => $stats,
+            'stats' => $stats,
         ]);
     }
 
@@ -226,7 +226,7 @@ class NpsController extends AbstractController
         $surveys = $qb->getQuery()->getResult();
 
         // Créer le contenu CSV
-        $csv   = [];
+        $csv = [];
         $csv[] = [
             'ID',
             'Projet',
@@ -250,9 +250,9 @@ class NpsController extends AbstractController
                 $survey->getSentAt()->format('Y-m-d H:i:s'),
                 $survey->getRespondedAt() ? $survey->getRespondedAt()->format('Y-m-d H:i:s') : '',
                 $survey->getStatus(),
-                $survey->getScore()         ?? '',
+                $survey->getScore() ?? '',
                 $survey->getCategoryLabel() ?? '',
-                $survey->getComment()       ?? '',
+                $survey->getComment() ?? '',
                 $survey->getExpiresAt()->format('Y-m-d'),
             ];
         }

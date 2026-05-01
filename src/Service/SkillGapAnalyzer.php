@@ -29,9 +29,9 @@ class SkillGapAnalyzer
     public function analyzeGlobalGaps(): array
     {
         $allSkills = $this->skillRepository->findActive();
-        $gaps      = [];
-        $surplus   = [];
-        $balanced  = [];
+        $gaps = [];
+        $surplus = [];
+        $balanced = [];
 
         foreach ($allSkills as $skill) {
             // Compter les contributeurs ayant cette compétence au niveau confirmé ou expert
@@ -48,24 +48,24 @@ class SkillGapAnalyzer
 
             if ($gap > 0) {
                 $gaps[] = [
-                    'skill'     => $skill,
+                    'skill' => $skill,
                     'available' => $availableCount,
-                    'demand'    => $demandCount,
-                    'gap'       => $gap,
-                    'severity'  => $this->calculateGapSeverity($gap, $demandCount),
+                    'demand' => $demandCount,
+                    'gap' => $gap,
+                    'severity' => $this->calculateGapSeverity($gap, $demandCount),
                 ];
             } elseif ($gap < 0) {
                 $surplus[] = [
-                    'skill'     => $skill,
+                    'skill' => $skill,
                     'available' => $availableCount,
-                    'demand'    => $demandCount,
-                    'surplus'   => abs($gap),
+                    'demand' => $demandCount,
+                    'surplus' => abs($gap),
                 ];
             } else {
                 $balanced[] = [
-                    'skill'     => $skill,
+                    'skill' => $skill,
                     'available' => $availableCount,
-                    'demand'    => $demandCount,
+                    'demand' => $demandCount,
                 ];
             }
         }
@@ -74,13 +74,13 @@ class SkillGapAnalyzer
         usort($gaps, fn ($a, $b): int => $b['gap'] <=> $a['gap']);
 
         return [
-            'gaps'     => $gaps,
-            'surplus'  => $surplus,
+            'gaps' => $gaps,
+            'surplus' => $surplus,
             'balanced' => $balanced,
-            'summary'  => [
-                'totalGaps'     => count($gaps),
-                'criticalGaps'  => count(array_filter($gaps, fn ($g): bool => $g['severity'] === 'critical')),
-                'totalSurplus'  => count($surplus),
+            'summary' => [
+                'totalGaps' => count($gaps),
+                'criticalGaps' => count(array_filter($gaps, fn ($g): bool => $g['severity'] === 'critical')),
+                'totalSurplus' => count($surplus),
                 'totalBalanced' => count($balanced),
             ],
         ];
@@ -95,8 +95,8 @@ class SkillGapAnalyzer
     {
         // Récupérer les technologies du projet
         $projectTechnologies = $project->getTechnologies();
-        $requiredSkills      = [];
-        $missingSkills       = [];
+        $requiredSkills = [];
+        $missingSkills = [];
 
         foreach ($projectTechnologies as $technology) {
             // Mapper les technologies vers les compétences (simplifié : recherche par nom)
@@ -110,15 +110,15 @@ class SkillGapAnalyzer
                 );
 
                 $requiredSkills[] = [
-                    'skill'          => $skill,
-                    'technology'     => $technology,
+                    'skill' => $skill,
+                    'technology' => $technology,
                     'availableCount' => count($availableContributors),
                 ];
 
                 if (count($availableContributors) === 0) {
                     $missingSkills[] = [
-                        'skill'          => $skill,
-                        'technology'     => $technology,
+                        'skill' => $skill,
+                        'technology' => $technology,
                         'recommendation' => 'Formation urgente ou recrutement nécessaire',
                     ];
                 }
@@ -129,8 +129,8 @@ class SkillGapAnalyzer
         $recommendations = $this->generateProjectRecommendations($project, $missingSkills, $requiredSkills);
 
         return [
-            'requiredSkills'  => $requiredSkills,
-            'missingSkills'   => $missingSkills,
+            'requiredSkills' => $requiredSkills,
+            'missingSkills' => $missingSkills,
             'recommendations' => $recommendations,
         ];
     }
@@ -142,7 +142,7 @@ class SkillGapAnalyzer
      */
     public function identifyTrainingNeeds(): array
     {
-        $gaps          = $this->analyzeGlobalGaps();
+        $gaps = $this->analyzeGlobalGaps();
         $trainingNeeds = [];
 
         foreach ($gaps['gaps'] as $gap) {
@@ -155,26 +155,26 @@ class SkillGapAnalyzer
                     $level = $contributorSkill->getEffectiveLevel();
                     if ($level < ContributorSkill::LEVEL_CONFIRMED) {
                         $contributorsToTrain[] = [
-                            'contributor'  => $contributorSkill->getContributor(),
+                            'contributor' => $contributorSkill->getContributor(),
                             'currentLevel' => $level,
-                            'targetLevel'  => ContributorSkill::LEVEL_CONFIRMED,
+                            'targetLevel' => ContributorSkill::LEVEL_CONFIRMED,
                         ];
                     }
                 }
 
                 $trainingNeeds[] = [
-                    'skill'               => $gap['skill'],
-                    'gap'                 => $gap['gap'],
-                    'severity'            => $gap['severity'],
+                    'skill' => $gap['skill'],
+                    'gap' => $gap['gap'],
+                    'severity' => $gap['severity'],
                     'contributorsToTrain' => $contributorsToTrain,
-                    'priority'            => $gap['severity'],
+                    'priority' => $gap['severity'],
                 ];
             }
         }
 
         return [
             'trainingNeeds' => $trainingNeeds,
-            'totalNeeds'    => count($trainingNeeds),
+            'totalNeeds' => count($trainingNeeds),
         ];
     }
 
@@ -185,18 +185,18 @@ class SkillGapAnalyzer
      */
     public function getRecruitmentRecommendations(): array
     {
-        $gaps             = $this->analyzeGlobalGaps();
+        $gaps = $this->analyzeGlobalGaps();
         $recruitmentNeeds = [];
 
         foreach ($gaps['gaps'] as $gap) {
             // Si le gap est important et qu'on n'a pas assez de contributeurs à former
             if ($gap['gap'] >= 2 && $gap['severity'] !== 'low') {
                 $recruitmentNeeds[] = [
-                    'skill'            => $gap['skill'],
-                    'gap'              => $gap['gap'],
-                    'severity'         => $gap['severity'],
+                    'skill' => $gap['skill'],
+                    'gap' => $gap['gap'],
+                    'severity' => $gap['severity'],
                     'recommendedHires' => (int) ceil($gap['gap'] / 2),
-                    'urgency'          => $gap['severity'] === 'critical' ? 'Immédiat' : 'Court terme',
+                    'urgency' => $gap['severity'] === 'critical' ? 'Immédiat' : 'Court terme',
                 ];
             }
         }
@@ -210,7 +210,7 @@ class SkillGapAnalyzer
 
         return [
             'recruitmentNeeds' => $recruitmentNeeds,
-            'totalPositions'   => array_sum(array_column($recruitmentNeeds, 'recommendedHires')),
+            'totalPositions' => array_sum(array_column($recruitmentNeeds, 'recommendedHires')),
         ];
     }
 
@@ -228,7 +228,7 @@ class SkillGapAnalyzer
             // Rechercher si la compétence correspond à une technologie du projet
             foreach ($project->getTechnologies() as $technology) {
                 if (
-                    stripos((string) $technology->getName(), (string) $skill->getName())    !== false
+                    stripos((string) $technology->getName(), (string) $skill->getName()) !== false
                     || stripos((string) $skill->getName(), (string) $technology->getName()) !== false
                 ) {
                     ++$demandCount;
@@ -278,10 +278,10 @@ class SkillGapAnalyzer
 
         if (count($missingSkills) > 0) {
             $recommendations[] = [
-                'type'     => 'critical',
+                'type' => 'critical',
                 'priority' => 'high',
-                'message'  => sprintf('Le projet manque de %d compétence(s) critique(s)', count($missingSkills)),
-                'actions'  => [
+                'message' => sprintf('Le projet manque de %d compétence(s) critique(s)', count($missingSkills)),
+                'actions' => [
                     'Former des contributeurs sur ces technologies',
                     'Recruter un profil avec ces compétences',
                     'Faire appel à un freelance spécialisé',
@@ -296,9 +296,9 @@ class SkillGapAnalyzer
         );
         if (count($lowAvailability) > 0) {
             $recommendations[] = [
-                'type'     => 'warning',
+                'type' => 'warning',
                 'priority' => 'medium',
-                'message'  => sprintf(
+                'message' => sprintf(
                     '%d compétence(s) avec peu de contributeurs disponibles (risque de goulot d\'étranglement)',
                     count($lowAvailability),
                 ),
@@ -311,10 +311,10 @@ class SkillGapAnalyzer
 
         if (count($recommendations) === 0) {
             $recommendations[] = [
-                'type'     => 'success',
+                'type' => 'success',
                 'priority' => 'low',
-                'message'  => 'Le projet dispose de toutes les compétences nécessaires',
-                'actions'  => [],
+                'message' => 'Le projet dispose de toutes les compétences nécessaires',
+                'actions' => [],
             ];
         }
 

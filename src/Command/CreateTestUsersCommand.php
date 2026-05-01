@@ -23,40 +23,40 @@ class CreateTestUsersCommand extends Command
 
     private const array TEST_USERS = [
         [
-            'email'     => 'intervenant@test.com',
+            'email' => 'intervenant@test.com',
             'firstName' => 'Jean',
-            'lastName'  => 'Intervenant',
-            'roles'     => ['ROLE_INTERVENANT'],
+            'lastName' => 'Intervenant',
+            'roles' => ['ROLE_INTERVENANT'],
         ],
         [
-            'email'     => 'chef-projet@test.com',
+            'email' => 'chef-projet@test.com',
             'firstName' => 'Marie',
-            'lastName'  => 'ChefProjet',
-            'roles'     => ['ROLE_CHEF_PROJET'],
+            'lastName' => 'ChefProjet',
+            'roles' => ['ROLE_CHEF_PROJET'],
         ],
         [
-            'email'     => 'manager@test.com',
+            'email' => 'manager@test.com',
             'firstName' => 'Pierre',
-            'lastName'  => 'Manager',
-            'roles'     => ['ROLE_MANAGER'],
+            'lastName' => 'Manager',
+            'roles' => ['ROLE_MANAGER'],
         ],
         [
-            'email'     => 'compta@test.com',
+            'email' => 'compta@test.com',
             'firstName' => 'Sophie',
-            'lastName'  => 'Comptable',
-            'roles'     => ['ROLE_COMPTA'],
+            'lastName' => 'Comptable',
+            'roles' => ['ROLE_COMPTA'],
         ],
         [
-            'email'     => 'admin@test.com',
+            'email' => 'admin@test.com',
             'firstName' => 'Laurent',
-            'lastName'  => 'Admin',
-            'roles'     => ['ROLE_ADMIN'],
+            'lastName' => 'Admin',
+            'roles' => ['ROLE_ADMIN'],
         ],
         [
-            'email'     => 'superadmin@test.com',
+            'email' => 'superadmin@test.com',
             'firstName' => 'Alice',
-            'lastName'  => 'SuperAdmin',
-            'roles'     => ['ROLE_SUPERADMIN'],
+            'lastName' => 'SuperAdmin',
+            'roles' => ['ROLE_SUPERADMIN'],
         ],
     ];
 
@@ -123,7 +123,7 @@ class CreateTestUsersCommand extends Command
             $user = new User();
             $user->setEmail($userData['email'])->setCompany($company)->setRoles($userData['roles']);
             $user->firstName = $userData['firstName'];
-            $user->lastName  = $userData['lastName'];
+            $user->lastName = $userData['lastName'];
 
             $hashedPassword = $this->hasher->hashPassword($user, self::DEFAULT_PASSWORD);
             $user->setPassword($hashedPassword);
@@ -145,9 +145,9 @@ class CreateTestUsersCommand extends Command
             $this->em->flush();
 
             $createdUsers[] = [
-                'Email'          => $user->getEmail(),
-                'Name'           => $user->getFullName(),
-                'Roles'          => implode(', ', $userData['roles']),
+                'Email' => $user->getEmail(),
+                'Name' => $user->getFullName(),
+                'Roles' => implode(', ', $userData['roles']),
                 'Contributor ID' => $contributor->getId(),
             ];
 

@@ -104,7 +104,7 @@ class Planning implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->createdAt      = new DateTime();
+        $this->createdAt = new DateTime();
         $this->planningSkills = new ArrayCollection();
     }
 
@@ -160,8 +160,8 @@ class Planning implements CompanyOwnedInterface
     public function getNumberOfWorkingDays(): int
     {
         $start = clone $this->startDate;
-        $end   = clone $this->endDate;
-        $days  = 0;
+        $end = clone $this->endDate;
+        $days = 0;
 
         while ($start <= $end) {
             // Exclure les weekends (samedi=6, dimanche=0)
@@ -180,7 +180,7 @@ class Planning implements CompanyOwnedInterface
     public function getProjectedCost(): string
     {
         $totalHours = $this->getTotalPlannedHours();
-        $cjm        = $this->contributor->getCjm();
+        $cjm = $this->contributor->getCjm();
 
         // Convertir heures en jours (8h = 1j) puis multiplier par CJM
         $days = bcdiv($totalHours, '8', 4);
@@ -255,7 +255,7 @@ class Planning implements CompanyOwnedInterface
             return 100;
         }
 
-        $met   = 0;
+        $met = 0;
         $total = 0;
 
         foreach ($this->planningSkills as $planningSkill) {

@@ -35,10 +35,10 @@ final class ClientFactory extends PersistentObjectFactory
         }
 
         return [
-            'company'     => $company ?? CompanyFactory::new(),
-            'name'        => $faker->company(),
-            'logoPath'    => null,
-            'website'     => $faker->optional()->url(),
+            'company' => $company ?? CompanyFactory::new(),
+            'name' => $faker->company(),
+            'logoPath' => null,
+            'website' => $faker->optional()->url(),
             'description' => $faker->optional()->paragraphs(2, true),
         ];
     }

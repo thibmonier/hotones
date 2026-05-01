@@ -24,17 +24,17 @@ final class CompanyFactory extends PersistentObjectFactory
         $slug = strtolower((string) preg_replace('/[^A-Za-z0-9]+/', '-', trim($name)));
 
         return [
-            'name'                       => $name,
-            'slug'                       => $slug,
-            'description'                => $faker->optional()->sentence(),
-            'subscriptionTier'           => Company::TIER_PROFESSIONAL,
-            'currency'                   => 'EUR',
-            'structureCostCoefficient'   => '1.35',
+            'name' => $name,
+            'slug' => $slug,
+            'description' => $faker->optional()->sentence(),
+            'subscriptionTier' => Company::TIER_PROFESSIONAL,
+            'currency' => 'EUR',
+            'structureCostCoefficient' => '1.35',
             'employerChargesCoefficient' => '1.45',
-            'annualPaidLeaveDays'        => 25,
-            'annualRttDays'              => 10,
-            'billingDayOfMonth'          => 1,
-            'billingStartDate'           => new DateTime(),
+            'annualPaidLeaveDays' => 25,
+            'annualRttDays' => 10,
+            'billingDayOfMonth' => 1,
+            'billingStartDate' => new DateTime(),
             // owner will be set in initialize() to avoid circular dependency
         ];
     }

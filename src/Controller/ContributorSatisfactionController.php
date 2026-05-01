@@ -39,7 +39,7 @@ class ContributorSatisfactionController extends AbstractController
     #[Route('', name: 'satisfaction_index', methods: ['GET'])]
     public function index(): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
@@ -52,8 +52,8 @@ class ContributorSatisfactionController extends AbstractController
         $satisfactions = $this->satisfactionRepository->findByContributor($contributor);
 
         // Mois en cours
-        $now          = new DateTime();
-        $currentYear  = (int) $now->format('Y');
+        $now = new DateTime();
+        $currentYear = (int) $now->format('Y');
         $currentMonth = (int) $now->format('n');
 
         // Vérifier si le mois en cours a déjà été saisi
@@ -64,11 +64,11 @@ class ContributorSatisfactionController extends AbstractController
         );
 
         return $this->render('satisfaction/index.html.twig', [
-            'contributor'          => $contributor,
-            'satisfactions'        => $satisfactions,
+            'contributor' => $contributor,
+            'satisfactions' => $satisfactions,
             'current_satisfaction' => $currentSatisfaction,
-            'current_year'         => $currentYear,
-            'current_month'        => $currentMonth,
+            'current_year' => $currentYear,
+            'current_month' => $currentMonth,
         ]);
     }
 
@@ -78,7 +78,7 @@ class ContributorSatisfactionController extends AbstractController
     #[Route('/submit/{year}/{month}', name: 'satisfaction_submit', methods: ['GET', 'POST'])]
     public function submit(int $year, int $month, Request $request): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
@@ -139,11 +139,11 @@ class ContributorSatisfactionController extends AbstractController
         }
 
         return $this->render('satisfaction/submit.html.twig', [
-            'form'         => $form->createView(),
+            'form' => $form->createView(),
             'satisfaction' => $satisfaction,
-            'year'         => $year,
-            'month'        => $month,
-            'is_edit'      => $satisfaction->getId() !== null,
+            'year' => $year,
+            'month' => $month,
+            'is_edit' => $satisfaction->getId() !== null,
         ]);
     }
 
@@ -154,33 +154,33 @@ class ContributorSatisfactionController extends AbstractController
     #[IsGranted('ROLE_MANAGER')]
     public function stats(Request $request): Response
     {
-        $year  = (int) $request->query->get('year', date('Y'));
+        $year = (int) $request->query->get('year', date('Y'));
         $month = $request->query->get('month') ? (int) $request->query->get('month') : null;
 
         if ($month) {
             // Stats pour un mois spécifique
-            $stats         = $this->satisfactionRepository->getStatsByPeriod($year, $month);
+            $stats = $this->satisfactionRepository->getStatsByPeriod($year, $month);
             $satisfactions = $this->satisfactionRepository->findByPeriod($year, $month);
-            $title         = 'Satisfaction collaborateur - '.$this->getMonthLabel($month).' '.$year;
+            $title = 'Satisfaction collaborateur - '.$this->getMonthLabel($month).' '.$year;
         } else {
             // Stats pour une année
-            $stats         = $this->satisfactionRepository->getStatsByYear($year);
+            $stats = $this->satisfactionRepository->getStatsByYear($year);
             $satisfactions = $this->satisfactionRepository->findByYear($year);
-            $title         = 'Satisfaction collaborateur - Année '.$year;
+            $title = 'Satisfaction collaborateur - Année '.$year;
         }
 
         // Nombre total de collaborateurs actifs
         $totalContributors = $this->contributorRepository->count(['active' => true]);
-        $responseRate      = $totalContributors > 0 ? round(($stats['total'] / $totalContributors) * 100, 1) : 0;
+        $responseRate = $totalContributors > 0 ? round(($stats['total'] / $totalContributors) * 100, 1) : 0;
 
         return $this->render('satisfaction/stats.html.twig', [
-            'stats'              => $stats,
-            'satisfactions'      => $satisfactions,
-            'year'               => $year,
-            'month'              => $month,
-            'title'              => $title,
+            'stats' => $stats,
+            'satisfactions' => $satisfactions,
+            'year' => $year,
+            'month' => $month,
+            'title' => $title,
             'total_contributors' => $totalContributors,
-            'response_rate'      => $responseRate,
+            'response_rate' => $responseRate,
         ]);
     }
 
@@ -190,7 +190,7 @@ class ContributorSatisfactionController extends AbstractController
     #[Route('/{id}', name: 'satisfaction_show', methods: ['GET'])]
     public function show(ContributorSatisfaction $satisfaction): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         // Vérifier que l'utilisateur a le droit de voir cette satisfaction
@@ -232,19 +232,19 @@ class ContributorSatisfactionController extends AbstractController
     #[IsGranted('ROLE_MANAGER')]
     public function exportCsv(Request $request): Response
     {
-        $year  = (int) $request->query->get('year', date('Y'));
+        $year = (int) $request->query->get('year', date('Y'));
         $month = $request->query->get('month') ? (int) $request->query->get('month') : null;
 
         if ($month) {
             $satisfactions = $this->satisfactionRepository->findByPeriod($year, $month);
-            $filename      = sprintf('satisfaction_collaborateur_%s_%d.csv', $this->getMonthLabel($month), $year);
+            $filename = sprintf('satisfaction_collaborateur_%s_%d.csv', $this->getMonthLabel($month), $year);
         } else {
             $satisfactions = $this->satisfactionRepository->findByYear($year);
-            $filename      = sprintf('satisfaction_collaborateur_%d.csv', $year);
+            $filename = sprintf('satisfaction_collaborateur_%d.csv', $year);
         }
 
         // Créer le contenu CSV
-        $csv   = [];
+        $csv = [];
         $csv[] = [
             'ID',
             'Collaborateur',
@@ -268,13 +268,13 @@ class ContributorSatisfactionController extends AbstractController
                 $satisfaction->getYear(),
                 $satisfaction->getMonthLabel(),
                 $satisfaction->getOverallScore(),
-                $satisfaction->getProjectsScore()        ?? '',
-                $satisfaction->getTeamScore()            ?? '',
+                $satisfaction->getProjectsScore() ?? '',
+                $satisfaction->getTeamScore() ?? '',
                 $satisfaction->getWorkEnvironmentScore() ?? '',
                 $satisfaction->getWorkLifeBalanceScore() ?? '',
-                $satisfaction->getPositivePoints()       ?? '',
-                $satisfaction->getImprovementPoints()    ?? '',
-                $satisfaction->getComment()              ?? '',
+                $satisfaction->getPositivePoints() ?? '',
+                $satisfaction->getImprovementPoints() ?? '',
+                $satisfaction->getComment() ?? '',
                 $satisfaction->getSubmittedAt()->format('Y-m-d H:i:s'),
             ];
         }
@@ -298,18 +298,18 @@ class ContributorSatisfactionController extends AbstractController
     private function getMonthLabel(int $month): string
     {
         return match ($month) {
-            1       => 'Janvier',
-            2       => 'Février',
-            3       => 'Mars',
-            4       => 'Avril',
-            5       => 'Mai',
-            6       => 'Juin',
-            7       => 'Juillet',
-            8       => 'Août',
-            9       => 'Septembre',
-            10      => 'Octobre',
-            11      => 'Novembre',
-            12      => 'Décembre',
+            1 => 'Janvier',
+            2 => 'Février',
+            3 => 'Mars',
+            4 => 'Avril',
+            5 => 'Mai',
+            6 => 'Juin',
+            7 => 'Juillet',
+            8 => 'Août',
+            9 => 'Septembre',
+            10 => 'Octobre',
+            11 => 'Novembre',
+            12 => 'Décembre',
             default => '',
         };
     }

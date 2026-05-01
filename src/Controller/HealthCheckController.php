@@ -35,24 +35,24 @@ class HealthCheckController extends AbstractController
     #[Route('/health', name: 'health_check', methods: ['GET'])]
     public function check(): JsonResponse
     {
-        $checks        = [];
+        $checks = [];
         $overallStatus = 'healthy';
-        $httpStatus    = Response::HTTP_OK;
+        $httpStatus = Response::HTTP_OK;
 
         // Check 1: Database connectivity
         try {
             $this->connection->executeQuery('SELECT 1')->fetchOne();
             $checks['database'] = [
-                'status'  => 'healthy',
+                'status' => 'healthy',
                 'message' => 'Database connection successful',
             ];
         } catch (Exception $e) {
             $checks['database'] = [
-                'status'  => 'unhealthy',
+                'status' => 'unhealthy',
                 'message' => 'Database connection failed: '.$e->getMessage(),
             ];
             $overallStatus = 'unhealthy';
-            $httpStatus    = Response::HTTP_SERVICE_UNAVAILABLE;
+            $httpStatus = Response::HTTP_SERVICE_UNAVAILABLE;
         }
 
         // Check 2: Redis/Cache connectivity
@@ -65,27 +65,27 @@ class HealthCheckController extends AbstractController
             $retrievedItem = $this->cache->getItem('health_check_test');
             if ($retrievedItem->isHit() && $retrievedItem->get() === 'test_value') {
                 $checks['cache'] = [
-                    'status'  => 'healthy',
+                    'status' => 'healthy',
                     'message' => 'Cache system operational',
                 ];
             } else {
                 $checks['cache'] = [
-                    'status'  => 'unhealthy',
+                    'status' => 'unhealthy',
                     'message' => 'Cache read/write failed',
                 ];
                 $overallStatus = 'unhealthy';
-                $httpStatus    = Response::HTTP_SERVICE_UNAVAILABLE;
+                $httpStatus = Response::HTTP_SERVICE_UNAVAILABLE;
             }
 
             // Clean up test item
             $this->cache->deleteItem('health_check_test');
         } catch (Exception $e) {
             $checks['cache'] = [
-                'status'  => 'unhealthy',
+                'status' => 'unhealthy',
                 'message' => 'Cache system failed: '.$e->getMessage(),
             ];
             $overallStatus = 'unhealthy';
-            $httpStatus    = Response::HTTP_SERVICE_UNAVAILABLE;
+            $httpStatus = Response::HTTP_SERVICE_UNAVAILABLE;
         }
 
         // Check 3: Filesystem writability (var/cache)
@@ -104,35 +104,35 @@ class HealthCheckController extends AbstractController
             unlink($testFile);
 
             $checks['filesystem'] = [
-                'status'  => 'healthy',
+                'status' => 'healthy',
                 'message' => 'Filesystem is writable',
             ];
         } catch (Exception $e) {
             $checks['filesystem'] = [
-                'status'  => 'unhealthy',
+                'status' => 'unhealthy',
                 'message' => 'Filesystem check failed: '.$e->getMessage(),
             ];
             $overallStatus = 'unhealthy';
-            $httpStatus    = Response::HTTP_SERVICE_UNAVAILABLE;
+            $httpStatus = Response::HTTP_SERVICE_UNAVAILABLE;
         }
 
         // Application metadata
         $metadata = [
-            'version'         => $this->getParameter('kernel.project_dir').'/VERSION',
+            'version' => $this->getParameter('kernel.project_dir').'/VERSION',
             'symfony_version' => Kernel::VERSION,
-            'php_version'     => PHP_VERSION,
-            'environment'     => $this->getParameter('kernel.environment'),
+            'php_version' => PHP_VERSION,
+            'environment' => $this->getParameter('kernel.environment'),
         ];
 
         // Try to read version file if it exists
-        $versionFile         = $this->getParameter('kernel.project_dir').'/VERSION';
+        $versionFile = $this->getParameter('kernel.project_dir').'/VERSION';
         $metadata['version'] = file_exists($versionFile) ? trim(file_get_contents($versionFile)) : 'unknown';
 
         return $this->json([
-            'status'    => $overallStatus,
+            'status' => $overallStatus,
             'timestamp' => new DateTime()->format(DateTimeInterface::ATOM),
-            'checks'    => $checks,
-            'metadata'  => $metadata,
+            'checks' => $checks,
+            'metadata' => $metadata,
         ], $httpStatus);
     }
 
@@ -146,7 +146,7 @@ class HealthCheckController extends AbstractController
     public function liveness(): JsonResponse
     {
         return $this->json([
-            'status'    => 'alive',
+            'status' => 'alive',
             'timestamp' => new DateTime()->format(DateTimeInterface::ATOM),
         ]);
     }
@@ -160,9 +160,9 @@ class HealthCheckController extends AbstractController
     #[Route('/health/ready', name: 'health_readiness', methods: ['GET'])]
     public function readiness(): JsonResponse
     {
-        $ready      = true;
+        $ready = true;
         $httpStatus = Response::HTTP_OK;
-        $checks     = [];
+        $checks = [];
 
         // Check database
         try {
@@ -170,8 +170,8 @@ class HealthCheckController extends AbstractController
             $checks['database'] = 'ready';
         } catch (Exception) {
             $checks['database'] = 'not ready';
-            $ready              = false;
-            $httpStatus         = Response::HTTP_SERVICE_UNAVAILABLE;
+            $ready = false;
+            $httpStatus = Response::HTTP_SERVICE_UNAVAILABLE;
         }
 
         // Check cache
@@ -183,14 +183,14 @@ class HealthCheckController extends AbstractController
             $checks['cache'] = 'ready';
         } catch (Exception) {
             $checks['cache'] = 'not ready';
-            $ready           = false;
-            $httpStatus      = Response::HTTP_SERVICE_UNAVAILABLE;
+            $ready = false;
+            $httpStatus = Response::HTTP_SERVICE_UNAVAILABLE;
         }
 
         return $this->json([
-            'status'    => $ready ? 'ready' : 'not ready',
+            'status' => $ready ? 'ready' : 'not ready',
             'timestamp' => new DateTime()->format(DateTimeInterface::ATOM),
-            'checks'    => $checks,
+            'checks' => $checks,
         ], $httpStatus);
     }
 }

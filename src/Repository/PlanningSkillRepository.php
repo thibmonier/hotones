@@ -108,7 +108,7 @@ class PlanningSkillRepository extends CompanyAwareRepository
     public function findUnmetByPlanning(Planning $planning): array
     {
         $planningSkills = $this->findByPlanning($planning);
-        $unmet          = [];
+        $unmet = [];
 
         foreach ($planningSkills as $planningSkill) {
             if (!$planningSkill->isMetByAssignedContributor()) {
@@ -127,7 +127,7 @@ class PlanningSkillRepository extends CompanyAwareRepository
     public function findUnmetMandatoryByPlanning(Planning $planning): array
     {
         $mandatorySkills = $this->findMandatoryByPlanning($planning);
-        $unmet           = [];
+        $unmet = [];
 
         foreach ($mandatorySkills as $planningSkill) {
             if (!$planningSkill->isMetByAssignedContributor()) {
@@ -177,7 +177,7 @@ class PlanningSkillRepository extends CompanyAwareRepository
             return 100;
         }
 
-        $met   = 0;
+        $met = 0;
         $total = 0;
 
         foreach ($planningSkills as $planningSkill) {

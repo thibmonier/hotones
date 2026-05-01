@@ -15,7 +15,7 @@ class MenuBuilder
 
     public function buildMainMenu(): array
     {
-        $menu     = [];
+        $menu = [];
         $fullMenu = $this->getMenuDefinition();
 
         foreach ($fullMenu as $item) {
@@ -56,9 +56,9 @@ class MenuBuilder
             // Commerce
             ['is_title' => true, 'label' => 'Commerce', 'role' => 'ROLE_CHEF_PROJET'],
             [
-                'label'    => 'Commerce',
-                'icon'     => 'bx-store',
-                'role'     => 'ROLE_CHEF_PROJET',
+                'label' => 'Commerce',
+                'icon' => 'bx-store',
+                'role' => 'ROLE_CHEF_PROJET',
                 'children' => [
                     ['label' => 'KPIs commerce', 'route' => 'sales_dashboard_index'],
                     ['label' => 'Clients', 'route' => 'client_index'],
@@ -69,23 +69,23 @@ class MenuBuilder
             // Delivery
             ['is_title' => true, 'label' => 'Delivery', 'role' => 'ROLE_INTERVENANT'],
             [
-                'label'    => 'Delivery',
-                'icon'     => 'bx-package',
-                'role'     => 'ROLE_INTERVENANT',
+                'label' => 'Delivery',
+                'icon' => 'bx-package',
+                'role' => 'ROLE_INTERVENANT',
                 'children' => [
                     ['label' => 'Projets', 'route' => 'project_index', 'role' => 'ROLE_CHEF_PROJET'],
                     ['label' => 'Planning', 'route' => 'planning_index', 'role' => 'ROLE_CHEF_PROJET'],
                     [
                         'label' => 'Optimisation',
                         'route' => 'planning_optimization_index',
-                        'role'  => 'ROLE_MANAGER',
-                        'icon'  => 'bx-bulb',
+                        'role' => 'ROLE_MANAGER',
+                        'icon' => 'bx-bulb',
                     ],
                     [
                         'label' => 'Projets à risque',
                         'route' => 'risk_projects_dashboard',
-                        'role'  => 'ROLE_MANAGER',
-                        'icon'  => 'bx-error-circle',
+                        'role' => 'ROLE_MANAGER',
+                        'icon' => 'bx-error-circle',
                     ],
                     ['label' => 'Mes tâches', 'route' => 'my_tasks_index', 'role' => 'ROLE_INTERVENANT'],
                     ['label' => 'Saisir mes temps', 'route' => 'timesheet_index', 'role' => 'ROLE_INTERVENANT'],
@@ -95,7 +95,7 @@ class MenuBuilder
                     [
                         'label' => 'Validation notes de frais',
                         'route' => 'expense_report_pending',
-                        'role'  => 'ROLE_MANAGER',
+                        'role' => 'ROLE_MANAGER',
                     ],
                     ['label' => 'Tous les temps', 'route' => 'timesheet_all', 'role' => 'ROLE_ADMIN'],
                 ],
@@ -104,9 +104,9 @@ class MenuBuilder
             // Comptabilité
             ['is_title' => true, 'label' => 'Comptabilité', 'role' => 'ROLE_COMPTA'],
             [
-                'label'    => 'Comptabilité',
-                'icon'     => 'bx-receipt',
-                'role'     => 'ROLE_COMPTA',
+                'label' => 'Comptabilité',
+                'icon' => 'bx-receipt',
+                'role' => 'ROLE_COMPTA',
                 'children' => [
                     ['label' => 'Facturation mensuelle', 'route' => 'billing_index'],
                     ['label' => 'Factures', 'route' => 'invoice_index'],
@@ -118,9 +118,9 @@ class MenuBuilder
             // Administration
             ['is_title' => true, 'label' => 'Administration', 'role' => 'ROLE_COMPTA'],
             [
-                'label'    => 'Administration',
-                'icon'     => 'bx-briefcase',
-                'role'     => 'ROLE_COMPTA',
+                'label' => 'Administration',
+                'icon' => 'bx-briefcase',
+                'role' => 'ROLE_COMPTA',
                 'children' => [
                     ['label' => 'Collaborateurs', 'route' => 'contributor_index'],
                     ['label' => 'Utilisateurs et rôles', 'route' => 'admin_users'],
@@ -131,9 +131,9 @@ class MenuBuilder
             // RH & Satisfaction
             ['is_title' => true, 'label' => 'RH & Satisfaction', 'role' => 'ROLE_USER'],
             [
-                'label'    => 'RH & Satisfaction',
-                'icon'     => 'bx-heart',
-                'role'     => 'ROLE_USER',
+                'label' => 'RH & Satisfaction',
+                'icon' => 'bx-heart',
+                'role' => 'ROLE_USER',
                 'children' => [
                     ['label' => 'Ma satisfaction', 'route' => 'satisfaction_index'],
                     ['label' => 'Classement & XP', 'route' => 'leaderboard_index'],
@@ -152,9 +152,9 @@ class MenuBuilder
             // Analytics
             ['is_title' => true, 'label' => 'Analytics', 'role' => 'ROLE_ADMIN'],
             [
-                'label'    => 'Analytics',
-                'icon'     => 'bx-bar-chart-alt-2',
-                'role'     => 'ROLE_ADMIN',
+                'label' => 'Analytics',
+                'icon' => 'bx-bar-chart-alt-2',
+                'role' => 'ROLE_ADMIN',
                 'children' => [
                     ['label' => 'Dashboard KPIs', 'route' => 'analytics_dashboard'],
                     ['label' => 'Prédictions & Alertes', 'route' => 'analytics_predictions', 'role' => 'ROLE_MANAGER'],
@@ -169,9 +169,9 @@ class MenuBuilder
             // CRM HotOnes
             ['is_title' => true, 'label' => 'CRM HotOnes', 'role' => 'ROLE_ADMIN'],
             [
-                'label'    => 'CRM HotOnes',
-                'icon'     => 'bx-user-check',
-                'role'     => 'ROLE_ADMIN',
+                'label' => 'CRM HotOnes',
+                'icon' => 'bx-user-check',
+                'role' => 'ROLE_ADMIN',
                 'children' => [
                     ['label' => 'Statistiques', 'route' => 'admin_crm_statistics', 'icon' => 'bx-bar-chart'],
                     ['label' => 'Tous les leads', 'route' => 'admin_crm_leads_index', 'icon' => 'bx-list-ul'],
@@ -181,9 +181,9 @@ class MenuBuilder
             // Gestion
             ['is_title' => true, 'label' => 'Gestion', 'role' => 'ROLE_ADMIN'],
             [
-                'label'    => 'Abonnements SaaS',
-                'icon'     => 'bx-cloud',
-                'role'     => 'ROLE_ADMIN',
+                'label' => 'Abonnements SaaS',
+                'icon' => 'bx-cloud',
+                'role' => 'ROLE_ADMIN',
                 'children' => [
                     ['label' => 'Dashboard', 'route' => 'saas_dashboard', 'icon' => 'bx-line-chart'],
                 ],

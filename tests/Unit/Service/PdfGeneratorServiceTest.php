@@ -16,7 +16,7 @@ class PdfGeneratorServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->twig    = $this->createMock(Environment::class);
+        $this->twig = $this->createMock(Environment::class);
         $this->service = new PdfGeneratorService($this->twig);
     }
 
@@ -103,7 +103,7 @@ class PdfGeneratorServiceTest extends TestCase
 
         $result = $this->service->generatePdf('template.html.twig', [], [
             'orientation' => 'landscape',
-            'paper'       => 'A4',
+            'paper' => 'A4',
         ]);
 
         $this->assertNotEmpty($result);

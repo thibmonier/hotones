@@ -19,23 +19,23 @@ class AboutController extends AbstractController
     {
         // Get PHP extensions
         $extensions = [
-            'bcmath'    => extension_loaded('bcmath'),
-            'redis'     => extension_loaded('redis'),
-            'intl'      => extension_loaded('intl'),
-            'opcache'   => extension_loaded('Zend OPcache'),
+            'bcmath' => extension_loaded('bcmath'),
+            'redis' => extension_loaded('redis'),
+            'intl' => extension_loaded('intl'),
+            'opcache' => extension_loaded('Zend OPcache'),
             'pdo_mysql' => extension_loaded('pdo_mysql'),
         ];
 
         // Get environment info
         $environment = [
             'symfony_version' => Kernel::VERSION,
-            'php_version'     => PHP_VERSION,
-            'environment'     => $kernel->getEnvironment(),
-            'debug'           => $kernel->isDebug(),
+            'php_version' => PHP_VERSION,
+            'environment' => $kernel->getEnvironment(),
+            'debug' => $kernel->isDebug(),
         ];
 
         return $this->render('about/index.html.twig', [
-            'extensions'  => $extensions,
+            'extensions' => $extensions,
             'environment' => $environment,
         ]);
     }

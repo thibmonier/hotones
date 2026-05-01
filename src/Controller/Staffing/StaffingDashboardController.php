@@ -45,16 +45,16 @@ class StaffingDashboardController extends AbstractController
     private function renderDashboard(Request $request, string $viewMode): Response
     {
         // Filtres depuis la requête
-        $profileId     = $request->query->get('profile');
+        $profileId = $request->query->get('profile');
         $contributorId = $request->query->get('contributor');
-        $granularity   = $request->query->get('granularity', 'monthly');
-        $year          = (int) $request->query->get('year', date('Y'));
+        $granularity = $request->query->get('granularity', 'monthly');
+        $year = (int) $request->query->get('year', date('Y'));
 
         // Période selon le mode de vue
         if ($viewMode === 'annual') {
             // Vue annuelle : toute l'année sélectionnée
             $startDate = new DateTime("$year-01-01");
-            $endDate   = new DateTime("$year-12-31");
+            $endDate = new DateTime("$year-12-31");
             // Forcer la granularité hebdomadaire pour la vue annuelle
             $granularity = 'weekly';
         } else {
@@ -68,7 +68,7 @@ class StaffingDashboardController extends AbstractController
         }
 
         // Charger les entités associées aux filtres (si fournies)
-        $selectedProfile     = null;
+        $selectedProfile = null;
         $selectedContributor = null;
 
         if ($profileId) {
@@ -86,7 +86,7 @@ class StaffingDashboardController extends AbstractController
             $startDate->format('Y-m-d'),
             $endDate->format('Y-m-d'),
             $granularity,
-            $profileId     ?? 'all',
+            $profileId ?? 'all',
             $contributorId ?? 'all',
         );
 
@@ -148,7 +148,7 @@ class StaffingDashboardController extends AbstractController
         });
 
         // Données spécifiques pour la vue annuelle (avec cache)
-        $weeklyOccupancy  = [];
+        $weeklyOccupancy = [];
         $weeklyGlobalTACE = [];
         if ($viewMode === 'annual') {
             $weeklyOccupancy = $this->cache->get($cacheKey.'_weekly_occupancy', function (ItemInterface $item) use (
@@ -172,7 +172,7 @@ class StaffingDashboardController extends AbstractController
 
         // Récupérer les profils et collaborateurs actifs pour les filtres
         $profileRepo = $this->doctrine->getRepository(Profile::class);
-        $profiles    = $profileRepo->findBy(['active' => true], ['name' => 'ASC']);
+        $profiles = $profileRepo->findBy(['active' => true], ['name' => 'ASC']);
 
         if ($selectedProfile) {
             $contributors = $this->contributorRepo->findActiveContributorsByProfile($selectedProfile);
@@ -187,25 +187,25 @@ class StaffingDashboardController extends AbstractController
         $weeklyTaceChartData = $this->prepareWeeklyTaceChartData($weeklyGlobalTACE);
 
         // Années disponibles pour le sélecteur
-        $currentYear    = (int) date('Y');
+        $currentYear = (int) date('Y');
         $availableYears = range($currentYear - 3, $currentYear + 1);
 
         return $this->render('staffing/dashboard.html.twig', [
-            'chart_data'             => $chartData,
-            'metrics_by_profile'     => $metricsByProfile,
+            'chart_data' => $chartData,
+            'metrics_by_profile' => $metricsByProfile,
             'metrics_by_contributor' => $metricsByContributor,
-            'weekly_occupancy'       => $weeklyOccupancy,
+            'weekly_occupancy' => $weeklyOccupancy,
             'weekly_tace_chart_data' => $weeklyTaceChartData,
-            'profiles'               => $profiles,
-            'contributors'           => $contributors,
-            'selected_profile'       => $profileId,
-            'selected_contributor'   => $contributorId,
-            'selected_granularity'   => $granularity,
-            'selected_year'          => $year,
-            'selected_view_mode'     => $viewMode,
-            'available_years'        => $availableYears,
-            'start_date'             => $startDate,
-            'end_date'               => $endDate,
+            'profiles' => $profiles,
+            'contributors' => $contributors,
+            'selected_profile' => $profileId,
+            'selected_contributor' => $contributorId,
+            'selected_granularity' => $granularity,
+            'selected_year' => $year,
+            'selected_view_mode' => $viewMode,
+            'available_years' => $availableYears,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
     }
 
@@ -214,20 +214,20 @@ class StaffingDashboardController extends AbstractController
      */
     private function prepareChartData(array $metrics): array
     {
-        $labels        = [];
+        $labels = [];
         $staffingRates = [];
-        $taceRates     = [];
+        $taceRates = [];
 
         foreach ($metrics as $metric) {
-            $labels[]        = $metric['yearMonth'];
+            $labels[] = $metric['yearMonth'];
             $staffingRates[] = (float) $metric['staffingRate'];
-            $taceRates[]     = (float) $metric['tace'];
+            $taceRates[] = (float) $metric['tace'];
         }
 
         return [
-            'labels'        => $labels,
+            'labels' => $labels,
             'staffingRates' => $staffingRates,
-            'taceRates'     => $taceRates,
+            'taceRates' => $taceRates,
         ];
     }
 
@@ -237,16 +237,16 @@ class StaffingDashboardController extends AbstractController
     private function prepareWeeklyTaceChartData(array $weeklyTace): array
     {
         $labels = [];
-        $tace   = [];
+        $tace = [];
 
         foreach ($weeklyTace as $week) {
             $labels[] = $week['weekNumber'];
-            $tace[]   = (float) $week['tace'];
+            $tace[] = (float) $week['tace'];
         }
 
         return [
             'labels' => $labels,
-            'tace'   => $tace,
+            'tace' => $tace,
         ];
     }
 }

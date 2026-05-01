@@ -35,16 +35,16 @@ final class CompanyContextTest extends KernelTestCase
     {
         self::bootKernel();
         $this->companyContext = static::getContainer()->get(CompanyContext::class);
-        $this->entityManager  = static::getContainer()->get(EntityManagerInterface::class);
+        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
 
         $this->companyAlpha = $this->createCompany('Company Alpha', 'company-alpha');
-        $this->companyBeta  = $this->createCompany('Company Beta', 'company-beta');
+        $this->companyBeta = $this->createCompany('Company Beta', 'company-beta');
 
         $this->entityManager->flush();
     }
 
     #[Test]
-    public function getCurrentCompany_returns_user_primary_company_by_default(): void
+    public function getCurrentCompanyReturnsUserPrimaryCompanyByDefault(): void
     {
         $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER']);
         $this->companyContext->clearCache();
@@ -55,7 +55,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function getCurrentCompanyId_is_consistent_with_getCurrentCompany(): void
+    public function getCurrentCompanyIdIsConsistentWithGetCurrentCompany(): void
     {
         $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER']);
         $this->companyContext->clearCache();
@@ -67,7 +67,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function getCurrentCompany_throws_if_user_not_authenticated(): void
+    public function getCurrentCompanyThrowsIfUserNotAuthenticated(): void
     {
         // No token is stored — simulate an anonymous request.
         $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
@@ -80,7 +80,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function hasAccessToCompany_returns_true_for_user_own_company(): void
+    public function hasAccessToCompanyReturnsTrueForUserOwnCompany(): void
     {
         $user = $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER']);
 
@@ -88,7 +88,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function hasAccessToCompany_returns_false_for_standard_user_on_other_company(): void
+    public function hasAccessToCompanyReturnsFalseForStandardUserOnOtherCompany(): void
     {
         $user = $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER']);
 
@@ -96,7 +96,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function hasAccessToCompany_returns_true_for_superadmin_on_any_company(): void
+    public function hasAccessToCompanyReturnsTrueForSuperadminOnAnyCompany(): void
     {
         $user = $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER', 'ROLE_SUPERADMIN']);
 
@@ -104,7 +104,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function switchCompany_in_cli_bypasses_authentication_checks(): void
+    public function switchCompanyInCliBypassesAuthenticationChecks(): void
     {
         // CompanyContext detects CLI via php_sapi_name() and skips auth.
         // Purposely do NOT authenticate.
@@ -118,7 +118,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function getAccessibleCompanies_returns_only_user_company_for_standard_user(): void
+    public function getAccessibleCompaniesReturnsOnlyUserCompanyForStandardUser(): void
     {
         $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER']);
 
@@ -129,7 +129,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function getAccessibleCompanies_returns_all_active_companies_for_superadmin(): void
+    public function getAccessibleCompaniesReturnsAllActiveCompaniesForSuperadmin(): void
     {
         $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER', 'ROLE_SUPERADMIN']);
 
@@ -141,7 +141,7 @@ final class CompanyContextTest extends KernelTestCase
     }
 
     #[Test]
-    public function clearCache_forces_re_resolution(): void
+    public function clearCacheForcesReResolution(): void
     {
         $this->authenticateUserInCompany($this->companyAlpha, ['ROLE_USER', 'ROLE_SUPERADMIN']);
         $this->companyContext->clearCache();
@@ -189,13 +189,13 @@ final class CompanyContextTest extends KernelTestCase
         $user->setEmail('test-'.uniqid().'@test.com');
         $user->setPassword('password');
         $user->firstName = 'Test';
-        $user->lastName  = 'User';
+        $user->lastName = 'User';
         $user->setRoles($roles);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $token        = new UsernamePasswordToken($user, 'main', $user->getRoles());
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
         $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
         $tokenStorage->setToken($token);
 

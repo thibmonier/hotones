@@ -125,7 +125,7 @@ class SaasService implements CompanyOwnedInterface, Stringable
     public function __construct()
     {
         $this->subscriptions = new ArrayCollection();
-        $this->createdAt     = new DateTime();
+        $this->createdAt = new DateTime();
     }
 
     #[ORM\PreUpdate]

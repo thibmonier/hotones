@@ -118,9 +118,9 @@ class ContributorProgressRepository extends CompanyAwareRepository
         return [
             'total_players' => (int) $stats['total_players'],
             'average_level' => round((float) $stats['average_level'], 1),
-            'average_xp'    => (int) $stats['average_xp'],
-            'max_level'     => (int) $stats['max_level'],
-            'max_xp'        => (int) $stats['max_xp'],
+            'average_xp' => (int) $stats['average_xp'],
+            'max_level' => (int) $stats['max_level'],
+            'max_xp' => (int) $stats['max_xp'],
         ];
     }
 }

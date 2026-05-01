@@ -110,7 +110,7 @@ class DimProfile implements CompanyOwnedInterface
 
     private function updateCompositeKey(): void
     {
-        $profileId          = $this->profile ? $this->profile->getId() : 'null';
+        $profileId = $this->profile ? $this->profile->getId() : 'null';
         $this->compositeKey = sprintf(
             '%s_%s_%s_%s',
             $profileId,
@@ -122,7 +122,7 @@ class DimProfile implements CompanyOwnedInterface
 
     public function getDisplayName(): string
     {
-        $parts   = [];
+        $parts = [];
         $parts[] = $this->name;
         if ($this->isProductive) {
             $parts[] = '(Productif)';

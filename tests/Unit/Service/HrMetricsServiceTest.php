@@ -30,9 +30,9 @@ class HrMetricsServiceTest extends TestCase
     protected function setUp(): void
     {
         // Create mocks for all dependencies
-        $this->contributorRepository      = $this->createMock(ContributorRepository::class);
+        $this->contributorRepository = $this->createMock(ContributorRepository::class);
         $this->employmentPeriodRepository = $this->createMock(EmploymentPeriodRepository::class);
-        $this->vacationRepository         = $this->createMock(VacationRepositoryInterface::class);
+        $this->vacationRepository = $this->createMock(VacationRepositoryInterface::class);
 
         // Instantiate service with mocks
         $this->service = new HrMetricsService(
@@ -52,7 +52,7 @@ class HrMetricsServiceTest extends TestCase
     {
         // Given: no departures, stable headcount of 10
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-12-31');
+        $endDate = new DateTime('2025-12-31');
 
         $this->employmentPeriodRepository
             ->expects($this->once())
@@ -87,7 +87,7 @@ class HrMetricsServiceTest extends TestCase
         // Given: 2 departures, headcount 10→8 (average 9)
         // Expected turnover: (2 / 9) * 100 = 22.22%
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-12-31');
+        $endDate = new DateTime('2025-12-31');
 
         $this->employmentPeriodRepository
             ->expects($this->once())
@@ -121,7 +121,7 @@ class HrMetricsServiceTest extends TestCase
     {
         // Given: no employees at all
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-12-31');
+        $endDate = new DateTime('2025-12-31');
 
         $this->employmentPeriodRepository
             ->expects($this->once())
@@ -152,7 +152,7 @@ class HrMetricsServiceTest extends TestCase
     {
         // Given: no vacations, 10 employees, 20 working days
         $startDate = new DateTime('2025-01-01'); // Wednesday
-        $endDate   = new DateTime('2025-01-31'); // Friday
+        $endDate = new DateTime('2025-01-31'); // Friday
 
         $this->vacationRepository
             ->expects($this->once())
@@ -187,7 +187,7 @@ class HrMetricsServiceTest extends TestCase
         // Theoretical days = 10 * 20 = 200
         // Absenteeism = (50 / 200) * 100 = 25%
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-01-31');
+        $endDate = new DateTime('2025-01-31');
 
         $this->vacationRepository
             ->expects($this->once())
@@ -219,7 +219,7 @@ class HrMetricsServiceTest extends TestCase
     {
         // Given: no employees
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-01-31');
+        $endDate = new DateTime('2025-01-31');
 
         $this->vacationRepository
             ->expects($this->once())
@@ -322,7 +322,7 @@ class HrMetricsServiceTest extends TestCase
         // Given: 3 contributors, but 1 has no employment period
         $contributorWithPeriod1 = $this->createContributorWithSeniority(2.0);
         $contributorWithPeriod2 = $this->createContributorWithSeniority(3.0);
-        $contributorNoPeriod    = $this->createMock(Contributor::class);
+        $contributorNoPeriod = $this->createMock(Contributor::class);
 
         $this->contributorRepository
             ->expects($this->once())
@@ -435,7 +435,7 @@ class HrMetricsServiceTest extends TestCase
         // Given: 3 contributors, but 1 has no birthDate
         $contributorWithAge1 = $this->createContributorWithAge(30, 'male');
         $contributorWithAge2 = $this->createContributorWithAge(40, 'female');
-        $contributorNoAge    = $this->createMock(Contributor::class);
+        $contributorNoAge = $this->createMock(Contributor::class);
         $contributorNoAge->method('getAge')->willReturn(null);
         $contributorNoAge->method('getGender')->willReturn('male');
 
@@ -520,9 +520,9 @@ class HrMetricsServiceTest extends TestCase
         // Contributor 1: Developer
         // Contributor 2: Developer, Designer
         // Contributor 3: Manager
-        $profileDev      = $this->createProfile('Developer');
+        $profileDev = $this->createProfile('Developer');
         $profileDesigner = $this->createProfile('Designer');
-        $profileManager  = $this->createProfile('Manager');
+        $profileManager = $this->createProfile('Manager');
 
         $contributor1 = $this->createContributorWithProfiles([$profileDev]);
         $contributor2 = $this->createContributorWithProfiles([$profileDev, $profileDesigner]);
@@ -558,7 +558,7 @@ class HrMetricsServiceTest extends TestCase
     public function testUgetSkillsPyramidSkipsContributorsWithoutCurrentPeriod(): void
     {
         // Given: 2 contributors, but 1 has no current employment period
-        $profileDev   = $this->createProfile('Developer');
+        $profileDev = $this->createProfile('Developer');
         $contributor1 = $this->createContributorWithProfiles([$profileDev]);
 
         $contributor2 = $this->createMock(Contributor::class);
@@ -588,7 +588,7 @@ class HrMetricsServiceTest extends TestCase
     {
         // Given: mocked repositories returning empty data
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-12-31');
+        $endDate = new DateTime('2025-12-31');
 
         $this->employmentPeriodRepository->method('countDepartures')->willReturn(0);
         $this->employmentPeriodRepository->method('countActiveAt')->willReturn(0);
@@ -623,7 +623,7 @@ class HrMetricsServiceTest extends TestCase
     private function createEmploymentPeriodStartedYearsAgo(float $yearsAgo): EmploymentPeriod
     {
         // Use real EmploymentPeriod object instead of mock to avoid PHPUnit property hooks conflict
-        $period    = new EmploymentPeriod();
+        $period = new EmploymentPeriod();
         $startDate = new DateTime();
         $startDate->modify(sprintf('-%d days', (int) ($yearsAgo * 365)));
         $period->startDate = $startDate;
@@ -634,7 +634,7 @@ class HrMetricsServiceTest extends TestCase
     private function createContributorWithAge(int $age, string $gender): Contributor
     {
         // Use real Contributor object instead of mock to avoid property hooks issues
-        $contributor         = new Contributor();
+        $contributor = new Contributor();
         $contributor->gender = $gender;
 
         // Set birthDate to match the desired age

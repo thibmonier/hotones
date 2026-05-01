@@ -55,7 +55,7 @@ class LoginSecuritySubscriber implements EventSubscriberInterface
 
         // Récupérer l'email/identifiant depuis la requête
         $identifier = $request->request->get('_username', 'unknown');
-        $ip         = $request->getClientIp() ?? 'unknown';
+        $ip = $request->getClientIp() ?? 'unknown';
 
         // Créer une clé unique par IP pour le rate limiting
         $limiter = $this->loginLimiter->create($ip);
@@ -65,11 +65,11 @@ class LoginSecuritySubscriber implements EventSubscriberInterface
 
         // Logger l'échec de connexion
         $this->logger->warning('Login attempt failed', [
-            'username'           => $identifier,
-            'ip'                 => $ip,
-            'user_agent'         => $request->headers->get('User-Agent'),
+            'username' => $identifier,
+            'ip' => $ip,
+            'user_agent' => $request->headers->get('User-Agent'),
             'remaining_attempts' => $limit->getRemainingTokens(),
-            'retry_after'        => $limit->getRetryAfter()->getTimestamp(),
+            'retry_after' => $limit->getRetryAfter()->getTimestamp(),
         ]);
 
         // Si le rate limit est dépassé, bloquer
@@ -77,8 +77,8 @@ class LoginSecuritySubscriber implements EventSubscriberInterface
             $retryAfter = $limit->getRetryAfter();
 
             $this->logger->error('Login rate limit exceeded', [
-                'username'            => $identifier,
-                'ip'                  => $ip,
+                'username' => $identifier,
+                'ip' => $ip,
                 'retry_after_seconds' => $retryAfter->getTimestamp() - time(),
             ]);
 
@@ -101,12 +101,12 @@ class LoginSecuritySubscriber implements EventSubscriberInterface
         }
 
         $user = $event->getUser();
-        $ip   = $request->getClientIp() ?? 'unknown';
+        $ip = $request->getClientIp() ?? 'unknown';
 
         // Logger la connexion réussie
         $this->logger->info('User logged in successfully', [
-            'username'   => $user->getUserIdentifier(),
-            'ip'         => $ip,
+            'username' => $user->getUserIdentifier(),
+            'ip' => $ip,
             'user_agent' => $request->headers->get('User-Agent'),
         ]);
 

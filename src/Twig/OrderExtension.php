@@ -47,7 +47,7 @@ class OrderExtension extends AbstractExtension
         return match ($status) {
             'signe', 'gagne', 'termine' => 'success',
             'a_signer' => 'warning',
-            'perdu'    => 'danger',
+            'perdu' => 'danger',
             'standby', 'abandonne' => 'secondary',
             default => 'secondary',
         };
@@ -58,7 +58,7 @@ class OrderExtension extends AbstractExtension
      */
     public function renderStatusBadge(string $status): string
     {
-        $label      = $this->getStatusLabel($status);
+        $label = $this->getStatusLabel($status);
         $badgeClass = $this->getStatusBadgeClass($status);
 
         return sprintf(

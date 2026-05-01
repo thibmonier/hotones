@@ -54,17 +54,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class Invoice implements CompanyOwnedInterface
 {
-    public const STATUS_DRAFT     = 'brouillon';
-    public const STATUS_SENT      = 'envoyee';
-    public const STATUS_PAID      = 'payee';
-    public const STATUS_OVERDUE   = 'en_retard';
+    public const STATUS_DRAFT = 'brouillon';
+    public const STATUS_SENT = 'envoyee';
+    public const STATUS_PAID = 'payee';
+    public const STATUS_OVERDUE = 'en_retard';
     public const STATUS_CANCELLED = 'annulee';
 
     public const STATUS_OPTIONS = [
-        self::STATUS_DRAFT     => 'Brouillon',
-        self::STATUS_SENT      => 'Envoyée',
-        self::STATUS_PAID      => 'Payée',
-        self::STATUS_OVERDUE   => 'En retard',
+        self::STATUS_DRAFT => 'Brouillon',
+        self::STATUS_SENT => 'Envoyée',
+        self::STATUS_PAID => 'Payée',
+        self::STATUS_OVERDUE => 'En retard',
         self::STATUS_CANCELLED => 'Annulée',
     ];
 
@@ -274,11 +274,11 @@ class Invoice implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->lines     = new ArrayCollection();
+        $this->lines = new ArrayCollection();
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
-        $this->issuedAt  = new DateTime();
-        $this->dueDate   = new DateTime()->modify('+30 days'); // Échéance par défaut : 30 jours
+        $this->issuedAt = new DateTime();
+        $this->dueDate = new DateTime()->modify('+30 days'); // Échéance par défaut : 30 jours
     }
 
     #[ORM\PrePersist]
@@ -301,7 +301,7 @@ class Invoice implements CompanyOwnedInterface
      */
     private function generateInvoiceNumber(): string
     {
-        $year  = $this->issuedAt->format('Y');
+        $year = $this->issuedAt->format('Y');
         $month = $this->issuedAt->format('m');
 
         return sprintf('F%s%s000', $year, $month);

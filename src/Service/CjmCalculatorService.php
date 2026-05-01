@@ -52,11 +52,11 @@ class CjmCalculatorService
     private function countWeekendsInYear(int $year): int
     {
         $weekendDays = 0;
-        $start       = new DateTime("$year-01-01");
-        $end         = new DateTime("$year-12-31");
+        $start = new DateTime("$year-01-01");
+        $end = new DateTime("$year-12-31");
 
         $interval = new DateInterval('P1D');
-        $period   = new DatePeriod($start, $interval, $end->modify('+1 day'));
+        $period = new DatePeriod($start, $interval, $end->modify('+1 day'));
 
         foreach ($period as $date) {
             $dayOfWeek = (int) $date->format('N'); // 1 (lundi) à 7 (dimanche)
@@ -87,7 +87,7 @@ class CjmCalculatorService
     private function countPublicHolidaysInYear(int $year): int
     {
         $holidays = $this->getPublicHolidays($year);
-        $count    = 0;
+        $count = 0;
 
         foreach ($holidays as $holiday) {
             $dayOfWeek = (int) $holiday->format('N');
@@ -130,20 +130,20 @@ class CjmCalculatorService
      */
     private function getEasterDate(int $year): DateTime
     {
-        $a     = $year % 19;
-        $b     = (int) ($year / 100);
-        $c     = $year % 100;
-        $d     = (int) ($b / 4);
-        $e     = $b % 4;
-        $f     = (int) (($b + 8) / 25);
-        $g     = (int) (($b - $f + 1) / 3);
-        $h     = ((19 * $a) + $b - $d - $g + 15) % 30;
-        $i     = (int) ($c / 4);
-        $k     = $c                                   % 4;
-        $l     = (32 + (2 * $e) + (2 * $i) - $h - $k) % 7;
-        $m     = (int) (($a + (11 * $h) + (22 * $l)) / 451);
+        $a = $year % 19;
+        $b = (int) ($year / 100);
+        $c = $year % 100;
+        $d = (int) ($b / 4);
+        $e = $b % 4;
+        $f = (int) (($b + 8) / 25);
+        $g = (int) (($b - $f + 1) / 3);
+        $h = ((19 * $a) + $b - $d - $g + 15) % 30;
+        $i = (int) ($c / 4);
+        $k = $c % 4;
+        $l = (32 + (2 * $e) + (2 * $i) - $h - $k) % 7;
+        $m = (int) (($a + (11 * $h) + (22 * $l)) / 451);
         $month = (int) (($h + $l - (7 * $m) + 114) / 31);
-        $day   = (($h + $l - (7 * $m) + 114) % 31) + 1;
+        $day = (($h + $l - (7 * $m) + 114) % 31) + 1;
 
         return new DateTime(sprintf('%d-%02d-%02d', $year, $month, $day));
     }
@@ -198,22 +198,22 @@ class CjmCalculatorService
      */
     public function getCalculationReport(int $year): array
     {
-        $settings       = $this->companySettingsRepository->getSettings();
-        $totalDays      = new DateTime("$year-12-31")->format('z') + 1;
-        $weekends       = $this->countWeekendsInYear($year);
+        $settings = $this->companySettingsRepository->getSettings();
+        $totalDays = new DateTime("$year-12-31")->format('z') + 1;
+        $weekends = $this->countWeekendsInYear($year);
         $publicHolidays = $this->countPublicHolidaysInYear($year);
 
         return [
-            'year'                         => $year,
-            'total_days'                   => $totalDays,
-            'weekends'                     => $weekends,
-            'public_holidays'              => $publicHolidays,
-            'paid_leave'                   => $settings->getAnnualPaidLeaveDays(),
-            'rtt'                          => $settings->getAnnualRttDays(),
-            'working_days'                 => $this->calculateWorkingDaysInYear($year),
-            'structure_coefficient'        => $settings->getStructureCostCoefficient(),
+            'year' => $year,
+            'total_days' => $totalDays,
+            'weekends' => $weekends,
+            'public_holidays' => $publicHolidays,
+            'paid_leave' => $settings->getAnnualPaidLeaveDays(),
+            'rtt' => $settings->getAnnualRttDays(),
+            'working_days' => $this->calculateWorkingDaysInYear($year),
+            'structure_coefficient' => $settings->getStructureCostCoefficient(),
             'employer_charges_coefficient' => $settings->getEmployerChargesCoefficient(),
-            'global_coefficient'           => $settings->getGlobalChargeCoefficient(),
+            'global_coefficient' => $settings->getGlobalChargeCoefficient(),
         ];
     }
 }

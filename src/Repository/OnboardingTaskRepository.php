@@ -129,17 +129,17 @@ class OnboardingTaskRepository extends CompanyAwareRepository
         // Calculate progress percentage and ensure proper types
         $typedResults = [];
         foreach ($results as $result) {
-            $total     = (int) $result['total'];
+            $total = (int) $result['total'];
             $completed = (int) $result['completed'];
-            $overdue   = (int) $result['overdue'];
+            $overdue = (int) $result['overdue'];
 
             $typedResults[] = [
-                'contributor_id'   => (int) $result['contributor_id'],
+                'contributor_id' => (int) $result['contributor_id'],
                 'contributor_name' => (string) $result['contributor_name'],
-                'total'            => $total,
-                'completed'        => $completed,
-                'overdue'          => $overdue,
-                'progress'         => $total > 0 ? (int) round(($completed / $total) * 100) : 100,
+                'total' => $total,
+                'completed' => $completed,
+                'overdue' => $overdue,
+                'progress' => $total > 0 ? (int) round(($completed / $total) * 100) : 100,
             ];
         }
 

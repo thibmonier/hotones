@@ -61,7 +61,7 @@ class CspReportController extends AbstractController
 
             if (!isset($report['csp-report'])) {
                 return new JsonResponse([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'Invalid CSP report format',
                 ], Response::HTTP_BAD_REQUEST);
             }
@@ -70,20 +70,20 @@ class CspReportController extends AbstractController
 
             // Logger la violation CSP avec toutes les informations
             $this->logger->warning('CSP Violation detected', [
-                'document_uri'       => $cspReport['document-uri']       ?? 'unknown',
+                'document_uri' => $cspReport['document-uri'] ?? 'unknown',
                 'violated_directive' => $cspReport['violated-directive'] ?? 'unknown',
-                'blocked_uri'        => $cspReport['blocked-uri']        ?? 'unknown',
-                'source_file'        => $cspReport['source-file']        ?? null,
-                'line_number'        => $cspReport['line-number']        ?? null,
-                'column_number'      => $cspReport['column-number']      ?? null,
-                'user_agent'         => $request->headers->get('User-Agent'),
-                'ip'                 => $request->getClientIp(),
+                'blocked_uri' => $cspReport['blocked-uri'] ?? 'unknown',
+                'source_file' => $cspReport['source-file'] ?? null,
+                'line_number' => $cspReport['line-number'] ?? null,
+                'column_number' => $cspReport['column-number'] ?? null,
+                'user_agent' => $request->headers->get('User-Agent'),
+                'ip' => $request->getClientIp(),
             ]);
 
             return new JsonResponse(['status' => 'ok'], Response::HTTP_NO_CONTENT);
         } catch (JsonException $e) {
             $this->logger->error('Failed to parse CSP report', [
-                'error'   => $e->getMessage(),
+                'error' => $e->getMessage(),
                 'content' => $content,
             ]);
 
@@ -110,7 +110,7 @@ class CspReportController extends AbstractController
         if (!file_exists($logFile)) {
             return $this->render('security/csp_violations.html.twig', [
                 'violations' => [],
-                'error'      => 'Log file not found',
+                'error' => 'Log file not found',
             ]);
         }
 
@@ -127,14 +127,14 @@ class CspReportController extends AbstractController
                 continue;
             }
             try {
-                $context      = json_decode($matches[2], true, 512, JSON_THROW_ON_ERROR);
+                $context = json_decode($matches[2], true, 512, JSON_THROW_ON_ERROR);
                 $violations[] = [
-                    'timestamp'          => $matches[1],
-                    'document_uri'       => $context['document_uri']       ?? 'unknown',
+                    'timestamp' => $matches[1],
+                    'document_uri' => $context['document_uri'] ?? 'unknown',
                     'violated_directive' => $context['violated_directive'] ?? 'unknown',
-                    'blocked_uri'        => $context['blocked_uri']        ?? 'unknown',
-                    'source_file'        => $context['source_file']        ?? null,
-                    'line_number'        => $context['line_number']        ?? null,
+                    'blocked_uri' => $context['blocked_uri'] ?? 'unknown',
+                    'source_file' => $context['source_file'] ?? null,
+                    'line_number' => $context['line_number'] ?? null,
                 ];
             } catch (JsonException) {
                 // Ignorer les lignes mal formées
@@ -147,7 +147,7 @@ class CspReportController extends AbstractController
 
         return $this->render('security/csp_violations.html.twig', [
             'violations' => $violations,
-            'error'      => null,
+            'error' => null,
         ]);
     }
 
@@ -166,12 +166,12 @@ class CspReportController extends AbstractController
         $buffer = 4096;
         fseek($handle, -1, SEEK_END);
         $output = '';
-        $chunk  = '';
+        $chunk = '';
 
         while (ftell($handle) > 0 && substr_count($output, "\n") < $lines) {
             $seek = min(ftell($handle), $buffer);
             fseek($handle, -$seek, SEEK_CUR);
-            $chunk  = fread($handle, $seek) ?: '';
+            $chunk = fread($handle, $seek) ?: '';
             $output = $chunk.$output;
             fseek($handle, -mb_strlen($chunk, '8bit'), SEEK_CUR);
         }

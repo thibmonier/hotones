@@ -52,13 +52,13 @@ class CreateTestSubTasksCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io       = new SymfonyStyle($input, $output);
-        $perTask  = max(1, (int) $input->getOption('per-task'));
+        $io = new SymfonyStyle($input, $output);
+        $perTask = max(1, (int) $input->getOption('per-task'));
         $attachTs = (bool) $input->getOption('attach-timesheets');
 
         $io->title('Création de sous-tâches de test');
 
-        $projects       = $this->projects->findAllOrderedByName();
+        $projects = $this->projects->findAllOrderedByName();
         $activeContribs = $this->contributors->findActiveContributors();
         if (count($activeContribs) === 0) {
             $io->warning('Aucun contributeur actif — arrêt.');
@@ -81,7 +81,7 @@ class CreateTestSubTasksCommand extends Command
 
                 // Heures de base pour découpage
                 $baseHours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? 24; // fallback 3j
-                $parts     = $this->buildParts($perTask, (int) $baseHours);
+                $parts = $this->buildParts($perTask, (int) $baseHours);
 
                 for ($i = 0; $i < count($parts); ++$i) {
                     $st = new ProjectSubTask();
@@ -126,7 +126,7 @@ class CreateTestSubTasksCommand extends Command
     private function defaultTitleForIndex(ProjectTask $task, int $i): string
     {
         $labels = ['Découverte', 'Implémentation', 'Revue & QA', 'Livraison'];
-        $label  = $labels[$i % count($labels)];
+        $label = $labels[$i % count($labels)];
 
         return sprintf('%s — %s', $task->getName(), $label);
     }
@@ -139,12 +139,12 @@ class CreateTestSubTasksCommand extends Command
     private function buildParts(int $count, int $total): array
     {
         $count = max(1, $count);
-        $min   = 2;
+        $min = 2;
         if ($total < ($count * $min)) {
             return array_fill(0, $count, (int) max(1, floor($total / $count)));
         }
         $remaining = $total - ($count * $min);
-        $parts     = array_fill(0, $count, $min);
+        $parts = array_fill(0, $count, $min);
         for ($i = 0; $i < $remaining; ++$i) {
             ++$parts[$i % $count];
         }
@@ -156,14 +156,14 @@ class CreateTestSubTasksCommand extends Command
     {
         // Affecter ~30% des timesheets existantes à des sous-tâches du même projet
         $tsRepo = $this->em->getRepository(Timesheet::class);
-        $allTs  = $tsRepo->findBy([], ['date' => 'DESC']);
-        $count  = 0;
+        $allTs = $tsRepo->findBy([], ['date' => 'DESC']);
+        $count = 0;
         foreach ($allTs as $ts) {
             if (random_int(1, 100) > 30) {
                 continue;
             }
             /** @var Timesheet $ts */
-            $project  = $ts->getProject();
+            $project = $ts->getProject();
             $subTasks = $this->em->getRepository(ProjectSubTask::class)->findBy(['project' => $project]);
             if (!$subTasks) {
                 continue;

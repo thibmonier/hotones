@@ -51,7 +51,7 @@ class AnalyzeProjectRisksCommand extends Command
 
         // Options
         $criticalOnly = (bool) $input->getOption('critical-only');
-        $minScore     = (int) $input->getOption('min-score');
+        $minScore = (int) $input->getOption('min-score');
         $verboseRisks = (bool) $input->getOption('verbose-risks');
 
         // Récupérer tous les projets actifs ou en cours
@@ -77,13 +77,13 @@ class AnalyzeProjectRisksCommand extends Command
 
         // Statistiques
         $stats = [
-            'total'    => count($projects),
-            'atRisk'   => count($atRiskProjects),
+            'total' => count($projects),
+            'atRisk' => count($atRiskProjects),
             'critical' => count(array_filter(
                 $atRiskProjects,
                 fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
             )),
-            'high'   => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'high' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
             'medium' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
@@ -117,14 +117,14 @@ class AnalyzeProjectRisksCommand extends Command
         $table->setHeaders(['Score', 'Niveau', 'Projet', 'Client', 'CA', 'Progression', 'Risques']);
 
         foreach ($atRiskProjects as $item) {
-            $project  = $item['project'];
+            $project = $item['project'];
             $analysis = $item['analysis'];
 
             $riskLevel = match ($analysis['riskLevel']) {
                 'critical' => '<error>CRITIQUE</error>',
-                'high'     => '<fg=red>ÉLEVÉ</>',
-                'medium'   => '<comment>MOYEN</>',
-                default    => 'FAIBLE',
+                'high' => '<fg=red>ÉLEVÉ</>',
+                'medium' => '<comment>MOYEN</>',
+                default => 'FAIBLE',
             };
 
             $table->addRow([
@@ -146,8 +146,8 @@ class AnalyzeProjectRisksCommand extends Command
                 foreach ($analysis['risks'] as $risk) {
                     $severityColor = match ($risk['severity']) {
                         'critical' => 'red',
-                        'high'     => 'yellow',
-                        default    => 'cyan',
+                        'high' => 'yellow',
+                        default => 'cyan',
                     };
 
                     $table->addRow([

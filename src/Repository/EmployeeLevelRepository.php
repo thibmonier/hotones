@@ -81,11 +81,11 @@ class EmployeeLevelRepository extends ServiceEntityRepository
     public function findByCompanyAndCategory(Company $company, string $category): array
     {
         $levels = match ($category) {
-            EmployeeLevel::CATEGORY_JUNIOR      => [1, 2, 3],
+            EmployeeLevel::CATEGORY_JUNIOR => [1, 2, 3],
             EmployeeLevel::CATEGORY_EXPERIENCED => [4, 5, 6],
-            EmployeeLevel::CATEGORY_SENIOR      => [7, 8, 9],
-            EmployeeLevel::CATEGORY_LEAD        => [10, 11, 12],
-            default                             => [],
+            EmployeeLevel::CATEGORY_SENIOR => [7, 8, 9],
+            EmployeeLevel::CATEGORY_LEAD => [10, 11, 12],
+            default => [],
         };
 
         if (empty($levels)) {
@@ -120,13 +120,13 @@ class EmployeeLevelRepository extends ServiceEntityRepository
 
         // Si aucun niveau ne correspond exactement, trouve le plus proche
         $bestMatch = null;
-        $minDiff   = PHP_FLOAT_MAX;
+        $minDiff = PHP_FLOAT_MAX;
 
         foreach ($levels as $level) {
             if ($level->salaryTarget !== null) {
                 $diff = abs($annualSalary - (float) $level->salaryTarget);
                 if ($diff < $minDiff) {
-                    $minDiff   = $diff;
+                    $minDiff = $diff;
                     $bestMatch = $level;
                 }
             }

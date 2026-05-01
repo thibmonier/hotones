@@ -204,7 +204,7 @@ class EmploymentPeriod implements CompanyOwnedInterface
      */
     public function getEffectiveDailyCost(): string
     {
-        $baseCost     = floatval($this->cjm);
+        $baseCost = floatval($this->cjm);
         $workingRatio = floatval($this->workTimePercentage) / 100;
 
         return number_format($baseCost * $workingRatio, 2, '.', '');
@@ -216,8 +216,8 @@ class EmploymentPeriod implements CompanyOwnedInterface
     public function getWorkingDaysPerWeek(): float
     {
         $standardHourPerDay = 7; // 7h par jour standard
-        $actualHours        = floatval($this->weeklyHours);
-        $workingRatio       = floatval($this->workTimePercentage) / 100;
+        $actualHours = floatval($this->weeklyHours);
+        $workingRatio = floatval($this->workTimePercentage) / 100;
 
         return ($actualHours * $workingRatio) / $standardHourPerDay;
     }
@@ -234,8 +234,8 @@ class EmploymentPeriod implements CompanyOwnedInterface
      */
     public function getHoursPerDay(): float
     {
-        $actualHours    = floatval($this->weeklyHours);
-        $workingRatio   = floatval($this->workTimePercentage) / 100;
+        $actualHours = floatval($this->weeklyHours);
+        $workingRatio = floatval($this->workTimePercentage) / 100;
         $effectiveHours = $actualHours * $workingRatio;
 
         // Par défaut, on divise par 5 jours (lundi-vendredi)
@@ -270,8 +270,8 @@ class EmploymentPeriod implements CompanyOwnedInterface
             return null;
         }
 
-        $salaryFloat        = floatval($this->salary);
-        $weeklyHours        = floatval($this->weeklyHours);
+        $salaryFloat = floatval($this->salary);
+        $weeklyHours = floatval($this->weeklyHours);
         $workTimePercentage = floatval($this->workTimePercentage);
 
         // Charges sociales patronales (par défaut 45%)
@@ -538,7 +538,7 @@ class EmploymentPeriod implements CompanyOwnedInterface
         }
 
         $annualSalary = (float) $this->salary * 12;
-        $target       = $this->employeeLevel->salaryTarget;
+        $target = $this->employeeLevel->salaryTarget;
 
         if ($target === null) {
             return null;

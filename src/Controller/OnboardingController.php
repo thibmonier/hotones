@@ -39,7 +39,7 @@ class OnboardingController extends AbstractController
             if ($summary['total'] > 0) {
                 $onboardingData[] = [
                     'contributor' => $contributor,
-                    'summary'     => $summary,
+                    'summary' => $summary,
                 ];
             }
         }
@@ -61,7 +61,7 @@ class OnboardingController extends AbstractController
     #[Route('/task/{id}/complete', name: 'onboarding_task_complete', methods: ['POST'])]
     public function completeTask(Request $request, OnboardingTask $task): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $task->getContributor();
 
         // Check access
@@ -86,7 +86,7 @@ class OnboardingController extends AbstractController
     #[Route('/task/{id}/update-status', name: 'onboarding_task_update_status', methods: ['POST'])]
     public function updateTaskStatus(Request $request, OnboardingTask $task): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $task->getContributor();
 
         // Check access
@@ -106,8 +106,8 @@ class OnboardingController extends AbstractController
         $this->onboardingService->updateTaskStatus($task, $status);
 
         return $this->json([
-            'success'      => true,
-            'status'       => $status,
+            'success' => true,
+            'status' => $status,
             'status_label' => $task->getStatusLabel(),
         ]);
     }
@@ -122,12 +122,12 @@ class OnboardingController extends AbstractController
         }
 
         $tasksByWeek = $this->onboardingService->getTasksByWeek($contributor);
-        $summary     = $this->onboardingService->getOnboardingSummary($contributor);
+        $summary = $this->onboardingService->getOnboardingSummary($contributor);
 
         return $this->render('onboarding/show.html.twig', [
-            'contributor'   => $contributor,
+            'contributor' => $contributor,
             'tasks_by_week' => $tasksByWeek,
-            'summary'       => $summary,
+            'summary' => $summary,
         ]);
     }
 }

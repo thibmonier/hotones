@@ -37,11 +37,11 @@ class NpsMailerService
             ->subject('Votre avis compte : partagez votre expérience avec nous')
             ->htmlTemplate('emails/nps_survey.html.twig')
             ->context([
-                'survey'        => $survey,
-                'surveyUrl'     => $surveyUrl,
+                'survey' => $survey,
+                'surveyUrl' => $surveyUrl,
                 'recipientName' => $survey->getRecipientName(),
-                'projectName'   => $survey->getProject()->getName(),
-                'expiresAt'     => $survey->getExpiresAt(),
+                'projectName' => $survey->getProject()->getName(),
+                'expiresAt' => $survey->getExpiresAt(),
             ]);
 
         $this->mailer->send($email);
@@ -64,11 +64,11 @@ class NpsMailerService
             ->subject('Rappel : votre avis nous intéresse')
             ->htmlTemplate('emails/nps_reminder.html.twig')
             ->context([
-                'survey'        => $survey,
-                'surveyUrl'     => $surveyUrl,
+                'survey' => $survey,
+                'surveyUrl' => $surveyUrl,
                 'recipientName' => $survey->getRecipientName(),
-                'projectName'   => $survey->getProject()->getName(),
-                'expiresAt'     => $survey->getExpiresAt(),
+                'projectName' => $survey->getProject()->getName(),
+                'expiresAt' => $survey->getExpiresAt(),
             ]);
 
         $this->mailer->send($email);

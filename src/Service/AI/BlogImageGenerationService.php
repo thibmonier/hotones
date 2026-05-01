@@ -25,9 +25,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class BlogImageGenerationService
 {
     private const int RATE_LIMIT_PER_HOUR = 5;
-    private const int MIN_PROMPT_LENGTH   = 10;
-    private const int MAX_PROMPT_LENGTH   = 1000;
-    private const MAX_IMAGE_SIZE          = 5 * 1024 * 1024; // 5 MB
+    private const int MIN_PROMPT_LENGTH = 10;
+    private const int MAX_PROMPT_LENGTH = 1000;
+    private const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     private const array PROHIBITED_KEYWORDS = [
         'nude',
@@ -66,15 +66,15 @@ class BlogImageGenerationService
 
         try {
             // Call DALL-E 3 API
-            $client   = $this->clientFactory->createClient();
+            $client = $this->clientFactory->createClient();
             $response = $client
                 ->images()
                 ->create([
-                    'model'           => 'dall-e-3',
-                    'prompt'          => $sanitizedPrompt,
-                    'n'               => 1,
-                    'size'            => '1024x1024',
-                    'quality'         => 'standard',
+                    'model' => 'dall-e-3',
+                    'prompt' => $sanitizedPrompt,
+                    'n' => 1,
+                    'size' => '1024x1024',
+                    'quality' => 'standard',
                     'response_format' => 'url',
                 ]);
 
@@ -85,34 +85,34 @@ class BlogImageGenerationService
             }
 
             // Download and store image
-            $filename  = $this->generateFilename($blogPost->slug);
+            $filename = $this->generateFilename($blogPost->slug);
             $imagePath = $this->downloadAndStoreImage($imageUrl, $filename);
 
             // Update blog post metadata
-            $blogPost->featuredImage    = $this->uploadService->getBlogImagePublicUrl($filename);
-            $blogPost->imagePrompt      = $prompt;
-            $blogPost->imageSource      = BlogPost::IMAGE_SOURCE_AI_GENERATED;
+            $blogPost->featuredImage = $this->uploadService->getBlogImagePublicUrl($filename);
+            $blogPost->imagePrompt = $prompt;
+            $blogPost->imageSource = BlogPost::IMAGE_SOURCE_AI_GENERATED;
             $blogPost->imageGeneratedAt = new DateTimeImmutable();
-            $blogPost->imageModel       = 'dall-e-3';
+            $blogPost->imageModel = 'dall-e-3';
 
             // Log success
             $this->logger->info('AI image generated successfully', [
-                'company_id'     => $blogPost->company->getId(),
-                'blog_post_id'   => $blogPost->id,
-                'prompt'         => $prompt,
-                'model'          => 'dall-e-3',
-                'size'           => '1024x1024',
-                'cost_usd'       => 0.040,
-                'filename'       => $filename,
+                'company_id' => $blogPost->company->getId(),
+                'blog_post_id' => $blogPost->id,
+                'prompt' => $prompt,
+                'model' => 'dall-e-3',
+                'size' => '1024x1024',
+                'cost_usd' => 0.040,
+                'filename' => $filename,
                 'revised_prompt' => $response->data[0]->revisedPrompt ?? null,
             ]);
 
             return $imagePath;
         } catch (Exception $e) {
             $this->logger->error('AI image generation failed', [
-                'exception'    => $e->getMessage(),
-                'prompt'       => $prompt,
-                'company_id'   => $blogPost->company->getId(),
+                'exception' => $e->getMessage(),
+                'prompt' => $prompt,
+                'company_id' => $blogPost->company->getId(),
                 'blog_post_id' => $blogPost->id,
             ]);
 
@@ -141,7 +141,7 @@ class BlogImageGenerationService
             $this->uploadService->deleteBlogImage($oldFilename);
 
             $this->logger->info('Deleted old AI-generated image', [
-                'filename'     => $oldFilename,
+                'filename' => $oldFilename,
                 'blog_post_id' => $blogPost->id,
             ]);
         }
@@ -178,7 +178,7 @@ class BlogImageGenerationService
 
             // Store via Flysystem
             $storagePath = 'blog-images/'.$filename;
-            $stream      = fopen($tempPath, 'r');
+            $stream = fopen($tempPath, 'r');
 
             if ($stream === false) {
                 throw new BlogImageGenerationException('Failed to open temporary file for upload');
@@ -194,8 +194,8 @@ class BlogImageGenerationService
             unlink($tempPath);
 
             $this->logger->info('Image downloaded and stored', [
-                'filename'  => $filename,
-                'size'      => $fileSize,
+                'filename' => $filename,
+                'size' => $fileSize,
                 'dalle_url' => $dalleUrl,
             ]);
 
@@ -217,7 +217,7 @@ class BlogImageGenerationService
      */
     private function validateDownloadedImage(string $tempPath): void
     {
-        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $tempPath);
 
         if (!in_array($mimeType, ['image/png', 'image/jpeg', 'image/webp'], true)) {
@@ -276,7 +276,7 @@ class BlogImageGenerationService
     private function checkRateLimit(Company $company): bool
     {
         $cacheKey = sprintf('blog_ai_gen-%d-%s', $company->getId(), date('YmdH'));
-        $item     = $this->cache->getItem($cacheKey);
+        $item = $this->cache->getItem($cacheKey);
 
         if (!$item->isHit()) {
             $item->set(1);

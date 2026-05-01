@@ -26,24 +26,24 @@ final readonly class AnalyzeProjectRisksMessageHandler
         try {
             $healthScores = $this->riskAnalyzer->analyzeAllActiveProjects();
 
-            $healthy  = 0;
-            $warning  = 0;
+            $healthy = 0;
+            $warning = 0;
             $critical = 0;
 
             foreach ($healthScores as $healthScore) {
                 match ($healthScore->getHealthLevel()) {
-                    'healthy'  => $healthy++,
-                    'warning'  => $warning++,
+                    'healthy' => $healthy++,
+                    'warning' => $warning++,
                     'critical' => $critical++,
-                    default    => null,
+                    default => null,
                 };
             }
 
             $this->logger->info('[Scheduler] Analyse des risques terminée', [
                 'total_projects' => count($healthScores),
-                'healthy'        => $healthy,
-                'warning'        => $warning,
-                'critical'       => $critical,
+                'healthy' => $healthy,
+                'warning' => $warning,
+                'critical' => $critical,
             ]);
         } catch (Exception $e) {
             $this->logger->error('[Scheduler] Erreur lors de l\'analyse des risques', [

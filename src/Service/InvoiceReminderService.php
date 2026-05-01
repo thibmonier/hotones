@@ -41,9 +41,9 @@ class InvoiceReminderService
     public function processAllReminders(bool $dryRun = false): array
     {
         $stats = [
-            'sent'    => 0,
+            'sent' => 0,
             'skipped' => 0,
-            'errors'  => 0,
+            'errors' => 0,
         ];
 
         $invoices = $this->invoiceRepository->findInvoicesNeedingReminder();
@@ -60,7 +60,7 @@ class InvoiceReminderService
                 ++$stats['errors'];
                 $this->logger->error('Failed to send invoice reminder', [
                     'invoice_id' => $invoice->getId(),
-                    'error'      => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -83,7 +83,7 @@ class InvoiceReminderService
         if ($this->hasReminderBeenSent($invoice, $daysLate)) {
             $this->logger->info('Reminder already sent', [
                 'invoice_id' => $invoice->getId(),
-                'days_late'  => $daysLate,
+                'days_late' => $daysLate,
             ]);
 
             return false;
@@ -91,10 +91,10 @@ class InvoiceReminderService
 
         if ($dryRun) {
             $this->logger->info('[DRY-RUN] Would send reminder', [
-                'invoice_id'     => $invoice->getId(),
+                'invoice_id' => $invoice->getId(),
                 'invoice_number' => $invoice->getInvoiceNumber(),
-                'days_late'      => $daysLate,
-                'client'         => $invoice->getClient()->getName(),
+                'days_late' => $daysLate,
+                'client' => $invoice->getClient()->getName(),
             ]);
 
             return true;
@@ -107,10 +107,10 @@ class InvoiceReminderService
         $this->markReminderAsSent($invoice, $daysLate);
 
         $this->logger->info('Invoice reminder sent', [
-            'invoice_id'     => $invoice->getId(),
+            'invoice_id' => $invoice->getId(),
             'invoice_number' => $invoice->getInvoiceNumber(),
-            'days_late'      => $daysLate,
-            'client'         => $invoice->getClient()->getName(),
+            'days_late' => $daysLate,
+            'client' => $invoice->getClient()->getName(),
         ]);
 
         return true;
@@ -125,9 +125,9 @@ class InvoiceReminderService
 
         // Déterminer le type de relance
         $reminderType = match ($daysLate) {
-            30      => 'first',
-            45      => 'second',
-            60      => 'final',
+            30 => 'first',
+            45 => 'second',
+            60 => 'final',
             default => 'final',
         };
 
@@ -144,9 +144,9 @@ class InvoiceReminderService
             ->subject(sprintf('Relance facture %s - %s', $invoice->getInvoiceNumber(), $client->getName()))
             ->htmlTemplate('emails/invoice_reminder.html.twig')
             ->context([
-                'invoice'       => $invoice,
-                'client'        => $client,
-                'days_late'     => $daysLate,
+                'invoice' => $invoice,
+                'client' => $client,
+                'days_late' => $daysLate,
                 'reminder_type' => $reminderType,
             ]);
 
@@ -158,7 +158,7 @@ class InvoiceReminderService
      */
     private function markReminderAsSent(Invoice $invoice, int $daysLate): void
     {
-        $now         = new DateTime();
+        $now = new DateTime();
         $reminderLog = sprintf('[RELANCE J+%d] Envoyée le %s', $daysLate, $now->format('d/m/Y à H:i'));
 
         $currentNotes = $invoice->getInternalNotes() ?? '';
@@ -192,7 +192,7 @@ class InvoiceReminderService
             return null;
         }
 
-        $today   = new DateTime();
+        $today = new DateTime();
         $dueDate = $invoice->getDueDate();
 
         if ($dueDate >= $today) {
@@ -213,7 +213,7 @@ class InvoiceReminderService
 
         $stats = [
             'total_reminders' => 0,
-            'by_delay'        => [
+            'by_delay' => [
                 30 => 0,
                 45 => 0,
                 60 => 0,

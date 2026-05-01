@@ -26,29 +26,29 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['contributor', 'technology'], message: 'Ce contributeur possède déjà cette technologie')]
 class ContributorTechnology implements CompanyOwnedInterface
 {
-    public const LEVEL_BEGINNER     = 1;
+    public const LEVEL_BEGINNER = 1;
     public const LEVEL_INTERMEDIATE = 2;
-    public const LEVEL_CONFIRMED    = 3;
-    public const LEVEL_EXPERT       = 4;
+    public const LEVEL_CONFIRMED = 3;
+    public const LEVEL_EXPERT = 4;
 
     public const LEVELS = [
-        self::LEVEL_BEGINNER     => 'Débutant',
+        self::LEVEL_BEGINNER => 'Débutant',
         self::LEVEL_INTERMEDIATE => 'Intermédiaire',
-        self::LEVEL_CONFIRMED    => 'Confirmé',
-        self::LEVEL_EXPERT       => 'Expert',
+        self::LEVEL_CONFIRMED => 'Confirmé',
+        self::LEVEL_EXPERT => 'Expert',
     ];
 
     // Contextes d'utilisation
     public const CONTEXT_PROFESSIONAL = 'professional';
-    public const CONTEXT_PERSONAL     = 'personal';
-    public const CONTEXT_TRAINING     = 'training';
-    public const CONTEXT_ACADEMIC     = 'academic';
+    public const CONTEXT_PERSONAL = 'personal';
+    public const CONTEXT_TRAINING = 'training';
+    public const CONTEXT_ACADEMIC = 'academic';
 
     public const CONTEXTS = [
         self::CONTEXT_PROFESSIONAL => 'Professionnel',
-        self::CONTEXT_PERSONAL     => 'Personnel',
-        self::CONTEXT_TRAINING     => 'Formation',
-        self::CONTEXT_ACADEMIC     => 'Académique',
+        self::CONTEXT_PERSONAL => 'Personnel',
+        self::CONTEXT_TRAINING => 'Formation',
+        self::CONTEXT_ACADEMIC => 'Académique',
     ];
 
     #[ORM\Id]
@@ -375,8 +375,8 @@ class ContributorTechnology implements CompanyOwnedInterface
     public function hasAssessmentGap(): bool
     {
         return
-            $this->managerAssessmentLevel    !== null
-            && $this->selfAssessmentLevel    !== null
+            $this->managerAssessmentLevel !== null
+            && $this->selfAssessmentLevel !== null
             && $this->managerAssessmentLevel !== $this->selfAssessmentLevel
         ;
     }
@@ -399,11 +399,11 @@ class ContributorTechnology implements CompanyOwnedInterface
     public function getLevelBadgeClass(): string
     {
         return match ($this->getEffectiveLevel()) {
-            self::LEVEL_EXPERT       => 'success',
-            self::LEVEL_CONFIRMED    => 'primary',
+            self::LEVEL_EXPERT => 'success',
+            self::LEVEL_CONFIRMED => 'primary',
             self::LEVEL_INTERMEDIATE => 'info',
-            self::LEVEL_BEGINNER     => 'secondary',
-            default                  => 'secondary',
+            self::LEVEL_BEGINNER => 'secondary',
+            default => 'secondary',
         };
     }
 

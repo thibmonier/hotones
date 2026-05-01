@@ -21,8 +21,8 @@ class MyTasksController extends AbstractController
     public function index(Request $request, ContributorRepository $contributorRepo): Response
     {
         $currentWeek = $request->query->get('week', date('Y-W'));
-        $year        = (int) substr($currentWeek, 0, 4);
-        $week        = (int) substr($currentWeek, -2);
+        $year = (int) substr($currentWeek, 0, 4);
+        $week = (int) substr($currentWeek, -2);
 
         $startDate = new DateTime();
         $startDate->setISODate($year, $week, 1); // Monday
@@ -43,7 +43,7 @@ class MyTasksController extends AbstractController
         $filtered = [];
         foreach ($projectsWithTasks as $row) {
             $project = $row['project'];
-            $tasks   = $row['tasks'];
+            $tasks = $row['tasks'];
 
             $tasksForWeek = array_values(array_filter($tasks, function ($t) use ($startDate, $endDate) {
                 $ts = $t->getStartDate();
@@ -61,19 +61,19 @@ class MyTasksController extends AbstractController
             if (!empty($tasksForWeek)) {
                 $filtered[] = [
                     'project' => $project,
-                    'tasks'   => $tasksForWeek,
+                    'tasks' => $tasksForWeek,
                 ];
             }
         }
 
         return $this->render('my_tasks/index.html.twig', [
-            'contributor'  => $contributor,
-            'groups'       => $filtered,
-            'startDate'    => $startDate,
-            'endDate'      => $endDate,
-            'currentWeek'  => $currentWeek,
+            'contributor' => $contributor,
+            'groups' => $filtered,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'currentWeek' => $currentWeek,
             'previousWeek' => $year.'-W'.str_pad((string) ($week - 1), 2, '0', STR_PAD_LEFT),
-            'nextWeek'     => $year.'-W'.str_pad((string) ($week + 1), 2, '0', STR_PAD_LEFT),
+            'nextWeek' => $year.'-W'.str_pad((string) ($week + 1), 2, '0', STR_PAD_LEFT),
         ]);
     }
 }

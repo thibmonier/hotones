@@ -151,40 +151,40 @@ class ContributorRepositoryTest extends KernelTestCase
         $contributor1 = ContributorFactory::createOne(['active' => true]);
         $contributor2 = ContributorFactory::createOne(['active' => true]);
         $contributor3 = ContributorFactory::createOne(['active' => false]);
-        $project      = ProjectFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         // Contributor1: 16 hours in period
         TimesheetFactory::createOne([
             'contributor' => $contributor1,
-            'project'     => $project,
-            'date'        => new DateTime('2025-01-10'),
-            'hours'       => '8.00',
+            'project' => $project,
+            'date' => new DateTime('2025-01-10'),
+            'hours' => '8.00',
         ]);
         TimesheetFactory::createOne([
             'contributor' => $contributor1,
-            'project'     => $project,
-            'date'        => new DateTime('2025-01-15'),
-            'hours'       => '8.00',
+            'project' => $project,
+            'date' => new DateTime('2025-01-15'),
+            'hours' => '8.00',
         ]);
 
         // Contributor2: 4 hours in period
         TimesheetFactory::createOne([
             'contributor' => $contributor2,
-            'project'     => $project,
-            'date'        => new DateTime('2025-01-12'),
-            'hours'       => '4.00',
+            'project' => $project,
+            'date' => new DateTime('2025-01-12'),
+            'hours' => '4.00',
         ]);
 
         // Contributor3: inactive (should be excluded)
         TimesheetFactory::createOne([
             'contributor' => $contributor3,
-            'project'     => $project,
-            'date'        => new DateTime('2025-01-12'),
-            'hours'       => '10.00',
+            'project' => $project,
+            'date' => new DateTime('2025-01-12'),
+            'hours' => '10.00',
         ]);
 
-        $start   = new DateTime('2025-01-01');
-        $end     = new DateTime('2025-01-31');
+        $start = new DateTime('2025-01-01');
+        $end = new DateTime('2025-01-31');
         $results = $this->repository->findWithHoursForPeriod($start, $end);
 
         // Should return only active contributors
@@ -201,36 +201,36 @@ class ContributorRepositoryTest extends KernelTestCase
         ProfileFactory::createOne(['name' => 'Developer']);
 
         $contributor = ContributorFactory::createOne();
-        $project1    = ProjectFactory::createOne(['status' => 'active']);
-        $project2    = ProjectFactory::createOne(['status' => 'active']);
-        $project3    = ProjectFactory::createOne(['status' => 'archived']);
+        $project1 = ProjectFactory::createOne(['status' => 'active']);
+        $project2 = ProjectFactory::createOne(['status' => 'active']);
+        $project3 = ProjectFactory::createOne(['status' => 'archived']);
 
         // Task assigned to contributor in active project
         ProjectTaskFactory::createOne([
-            'project'             => $project1,
+            'project' => $project1,
             'assignedContributor' => $contributor,
-            'active'              => true,
+            'active' => true,
         ]);
 
         // Task assigned to contributor in another active project
         ProjectTaskFactory::createOne([
-            'project'             => $project2,
+            'project' => $project2,
             'assignedContributor' => $contributor,
-            'active'              => true,
+            'active' => true,
         ]);
 
         // Task in archived project (should be excluded)
         ProjectTaskFactory::createOne([
-            'project'             => $project3,
+            'project' => $project3,
             'assignedContributor' => $contributor,
-            'active'              => true,
+            'active' => true,
         ]);
 
         // Inactive task (should be excluded)
         ProjectTaskFactory::createOne([
-            'project'             => $project1,
+            'project' => $project1,
             'assignedContributor' => $contributor,
-            'active'              => false,
+            'active' => false,
         ]);
 
         $projects = $this->repository->findProjectsWithAssignedTasks($contributor);
@@ -251,24 +251,24 @@ class ContributorRepositoryTest extends KernelTestCase
 
         // 2 tasks for contributor in project1
         ProjectTaskFactory::createOne([
-            'project'             => $project1,
+            'project' => $project1,
             'assignedContributor' => $contributor,
-            'active'              => true,
-            'position'            => 1,
+            'active' => true,
+            'position' => 1,
         ]);
         ProjectTaskFactory::createOne([
-            'project'             => $project1,
+            'project' => $project1,
             'assignedContributor' => $contributor,
-            'active'              => true,
-            'position'            => 2,
+            'active' => true,
+            'position' => 2,
         ]);
 
         // 1 task for contributor in project2
         ProjectTaskFactory::createOne([
-            'project'             => $project2,
+            'project' => $project2,
             'assignedContributor' => $contributor,
-            'active'              => true,
-            'position'            => 1,
+            'active' => true,
+            'position' => 1,
         ]);
 
         $results = $this->repository->findProjectsWithTasksForContributor($contributor);
@@ -287,16 +287,16 @@ class ContributorRepositoryTest extends KernelTestCase
         $user1 = UserFactory::createOne(['email' => 'john@example.com']);
         ContributorFactory::createOne([
             'firstName' => 'John',
-            'lastName'  => 'Doe',
-            'user'      => $user1,
+            'lastName' => 'Doe',
+            'user' => $user1,
         ]);
         ContributorFactory::createOne([
             'firstName' => 'Jane',
-            'lastName'  => 'Smith',
+            'lastName' => 'Smith',
         ]);
         ContributorFactory::createOne([
             'firstName' => 'Bob',
-            'lastName'  => 'Johnson',
+            'lastName' => 'Johnson',
         ]);
 
         // Search by first name

@@ -23,46 +23,46 @@ class AssignTaskProfilesCommand extends Command
 {
     private array $profileMapping = [
         // Keywords => Profile name
-        'frontend'       => 'développeur frontend',
-        'front-end'      => 'développeur frontend',
-        'react'          => 'développeur frontend',
-        'vue'            => 'développeur frontend',
-        'angular'        => 'développeur frontend',
-        'ui'             => 'développeur frontend',
-        'interface'      => 'développeur frontend',
-        'backend'        => 'développeur backend',
-        'back-end'       => 'développeur backend',
-        'api'            => 'développeur backend',
-        'serveur'        => 'développeur backend',
-        'base de'        => 'développeur backend',
-        'database'       => 'développeur backend',
-        'fullstack'      => 'développeur fullstack',
-        'full-stack'     => 'développeur fullstack',
-        'développement'  => 'développeur fullstack',
-        'dev '           => 'développeur fullstack',
-        'design'         => 'UI designer',
-        'maquette'       => 'UI designer',
-        'graphique'      => 'UI designer',
-        'ux'             => 'UX designer',
-        'ergonomie'      => 'UX designer',
-        'wireframe'      => 'UX designer',
-        'prototype'      => 'UX designer',
-        'test'           => 'développeur fullstack',
-        'recette'        => 'développeur fullstack',
-        'validation'     => 'développeur fullstack',
-        'qa'             => 'développeur fullstack',
-        'deploy'         => 'Lead developer',
-        'déploiement'    => 'Lead developer',
+        'frontend' => 'développeur frontend',
+        'front-end' => 'développeur frontend',
+        'react' => 'développeur frontend',
+        'vue' => 'développeur frontend',
+        'angular' => 'développeur frontend',
+        'ui' => 'développeur frontend',
+        'interface' => 'développeur frontend',
+        'backend' => 'développeur backend',
+        'back-end' => 'développeur backend',
+        'api' => 'développeur backend',
+        'serveur' => 'développeur backend',
+        'base de' => 'développeur backend',
+        'database' => 'développeur backend',
+        'fullstack' => 'développeur fullstack',
+        'full-stack' => 'développeur fullstack',
+        'développement' => 'développeur fullstack',
+        'dev ' => 'développeur fullstack',
+        'design' => 'UI designer',
+        'maquette' => 'UI designer',
+        'graphique' => 'UI designer',
+        'ux' => 'UX designer',
+        'ergonomie' => 'UX designer',
+        'wireframe' => 'UX designer',
+        'prototype' => 'UX designer',
+        'test' => 'développeur fullstack',
+        'recette' => 'développeur fullstack',
+        'validation' => 'développeur fullstack',
+        'qa' => 'développeur fullstack',
+        'deploy' => 'Lead developer',
+        'déploiement' => 'Lead developer',
         'infrastructure' => 'Lead developer',
-        'devops'         => 'Lead developer',
-        'analyse'        => 'product owner',
-        'spécification'  => 'product owner',
-        'cahier'         => 'product owner',
-        'conception'     => 'product owner',
-        'gestion'        => 'chef de projet',
-        'coordination'   => 'chef de projet',
-        'planning'       => 'chef de projet',
-        'suivi'          => 'chef de projet',
+        'devops' => 'Lead developer',
+        'analyse' => 'product owner',
+        'spécification' => 'product owner',
+        'cahier' => 'product owner',
+        'conception' => 'product owner',
+        'gestion' => 'chef de projet',
+        'coordination' => 'chef de projet',
+        'planning' => 'chef de projet',
+        'suivi' => 'chef de projet',
     ];
 
     public function __construct(
@@ -91,8 +91,8 @@ class AssignTaskProfilesCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $projectId = $input->getOption('project-id');
-        $dryRun    = $input->getOption('dry-run');
-        $force     = $input->getOption('force');
+        $dryRun = $input->getOption('dry-run');
+        $force = $input->getOption('force');
 
         $io->title('Assign Profiles to Project Tasks');
 
@@ -125,8 +125,8 @@ class AssignTaskProfilesCommand extends Command
         $io->comment(sprintf('Found %d task(s) to analyze', count($tasks)));
 
         $assigned = 0;
-        $skipped  = 0;
-        $noMatch  = 0;
+        $skipped = 0;
+        $noMatch = 0;
 
         foreach ($tasks as $task) {
             // Skip if task already has a profile and not forcing

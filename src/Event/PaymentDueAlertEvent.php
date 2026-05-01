@@ -16,7 +16,7 @@ class PaymentDueAlertEvent extends NotificationEvent
         private readonly int $daysUntilDue,
         array $recipients,
     ) {
-        $title   = 'Échéance de paiement proche';
+        $title = 'Échéance de paiement proche';
         $message = sprintf(
             'Le paiement pour le devis "%s" (#%s) est prévu dans %d jour(s) (le %s).',
             $order->getTitle(),
@@ -31,10 +31,10 @@ class PaymentDueAlertEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'order_id'        => $order->id,
+                'order_id' => $order->id,
                 'order_reference' => $order->getReference(),
-                'due_date'        => $dueDate->format('Y-m-d'),
-                'days_until_due'  => $daysUntilDue,
+                'due_date' => $dueDate->format('Y-m-d'),
+                'days_until_due' => $daysUntilDue,
             ],
             entityType: 'Order',
             entityId: $order->id,

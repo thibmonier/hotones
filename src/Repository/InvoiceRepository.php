@@ -26,8 +26,8 @@ class InvoiceRepository extends CompanyAwareRepository
      */
     public function generateNextInvoiceNumber(DateTimeInterface $date): string
     {
-        $year   = $date->format('Y');
-        $month  = $date->format('m');
+        $year = $date->format('Y');
+        $month = $date->format('m');
         $prefix = sprintf('F%s%s', $year, $month);
 
         // Récupérer le dernier numéro du mois

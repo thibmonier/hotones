@@ -119,27 +119,27 @@ class ProjectRepositoryTest extends KernelTestCase
     public function testFindActiveBetweenDates(): void
     {
         $start = new DateTime('2025-01-01');
-        $end   = new DateTime('2025-12-31');
+        $end = new DateTime('2025-12-31');
 
         // Project overlapping the period
         ProjectFactory::createOne([
-            'status'    => 'active',
+            'status' => 'active',
             'startDate' => new DateTime('2025-06-01'),
-            'endDate'   => new DateTime('2025-08-31'),
+            'endDate' => new DateTime('2025-08-31'),
         ]);
 
         // Project outside the period
         ProjectFactory::createOne([
-            'status'    => 'active',
+            'status' => 'active',
             'startDate' => new DateTime('2024-01-01'),
-            'endDate'   => new DateTime('2024-12-31'),
+            'endDate' => new DateTime('2024-12-31'),
         ]);
 
         // Completed project in period (should be excluded)
         ProjectFactory::createOne([
-            'status'    => 'completed',
+            'status' => 'completed',
             'startDate' => new DateTime('2025-03-01'),
-            'endDate'   => new DateTime('2025-05-31'),
+            'endDate' => new DateTime('2025-05-31'),
         ]);
 
         $projects = $this->repository->findActiveBetweenDates($start, $end);
@@ -208,15 +208,15 @@ class ProjectRepositoryTest extends KernelTestCase
 
         // Signed order - should be counted
         OrderFactory::createOne([
-            'project'     => $project,
-            'status'      => 'signe',
+            'project' => $project,
+            'status' => 'signe',
             'totalAmount' => '10000.00',
         ]);
 
         // Pending order - should NOT be counted
         OrderFactory::createOne([
-            'project'     => $project,
-            'status'      => 'a_signer',
+            'project' => $project,
+            'status' => 'a_signer',
             'totalAmount' => '5000.00',
         ]);
 
@@ -260,10 +260,10 @@ class ProjectRepositoryTest extends KernelTestCase
     public function testFindOneWithRelationsLoadsRelations(): void
     {
         $client = ClientFactory::createOne();
-        $user   = UserFactory::createOne();
+        $user = UserFactory::createOne();
 
         $project = ProjectFactory::createOne([
-            'client'         => $client,
+            'client' => $client,
             'projectManager' => $user,
         ]);
 

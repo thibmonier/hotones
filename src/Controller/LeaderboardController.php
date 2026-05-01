@@ -31,27 +31,27 @@ class LeaderboardController extends AbstractController
     #[Route('', name: 'leaderboard_index', methods: ['GET'])]
     public function index(): Response
     {
-        $leaderboard        = $this->gamificationService->getLeaderboard(50);
-        $globalStats        = $this->progressRepository->getGlobalStats();
+        $leaderboard = $this->gamificationService->getLeaderboard(50);
+        $globalStats = $this->progressRepository->getGlobalStats();
         $recentAchievements = $this->achievementRepository->findRecentAchievements(10);
 
         // Récupérer la progression de l'utilisateur connecté
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
-        $myProgress  = null;
-        $myRank      = 0;
+        $myProgress = null;
+        $myRank = 0;
 
         if ($contributor) {
             $myProgress = $this->gamificationService->getContributorProgress($contributor);
-            $myRank     = $this->gamificationService->getContributorRank($contributor);
+            $myRank = $this->gamificationService->getContributorRank($contributor);
         }
 
         return $this->render('leaderboard/index.html.twig', [
-            'leaderboard'         => $leaderboard,
-            'global_stats'        => $globalStats,
+            'leaderboard' => $leaderboard,
+            'global_stats' => $globalStats,
             'recent_achievements' => $recentAchievements,
-            'my_progress'         => $myProgress,
-            'my_rank'             => $myRank,
+            'my_progress' => $myProgress,
+            'my_rank' => $myRank,
         ]);
     }
 
@@ -67,17 +67,17 @@ class LeaderboardController extends AbstractController
             throw $this->createNotFoundException('Collaborateur non trouvé');
         }
 
-        $progress     = $this->gamificationService->getContributorProgress($contributor);
+        $progress = $this->gamificationService->getContributorProgress($contributor);
         $achievements = $this->gamificationService->getContributorAchievements($contributor);
-        $xpHistory    = $this->gamificationService->getContributorXpHistory($contributor, 100);
-        $rank         = $this->gamificationService->getContributorRank($contributor);
+        $xpHistory = $this->gamificationService->getContributorXpHistory($contributor, 100);
+        $rank = $this->gamificationService->getContributorRank($contributor);
 
         return $this->render('leaderboard/profile.html.twig', [
-            'contributor'  => $contributor,
-            'progress'     => $progress,
+            'contributor' => $contributor,
+            'progress' => $progress,
             'achievements' => $achievements,
-            'xp_history'   => $xpHistory,
-            'rank'         => $rank,
+            'xp_history' => $xpHistory,
+            'rank' => $rank,
         ]);
     }
 
@@ -87,7 +87,7 @@ class LeaderboardController extends AbstractController
     #[Route('/me', name: 'leaderboard_me', methods: ['GET'])]
     public function me(): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {

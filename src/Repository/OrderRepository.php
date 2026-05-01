@@ -50,12 +50,12 @@ class OrderRepository extends CompanyAwareRepository
 
         // Tri sécurisé par liste blanche
         $map = [
-            'number'    => 'o.orderNumber',
-            'name'      => 'o.name',
-            'project'   => 'p.name',
-            'status'    => 'o.status',
+            'number' => 'o.orderNumber',
+            'name' => 'o.name',
+            'project' => 'p.name',
+            'status' => 'o.status',
             'createdAt' => 'o.createdAt',
-            'total'     => 'o.totalAmount',
+            'total' => 'o.totalAmount',
         ];
         $col = $map[$sortField] ?? 'o.createdAt';
         $dir = strtoupper((string) $sortDir) === 'ASC' ? 'ASC' : 'DESC';
@@ -329,7 +329,7 @@ class OrderRepository extends CompanyAwareRepository
         $conn = $this->getEntityManager()->getConnection();
 
         // Support both MySQL and PostgreSQL
-        $platform   = $conn->getDatabasePlatform();
+        $platform = $conn->getDatabasePlatform();
         $dateFormat = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform
             ? "TO_CHAR(validated_at, 'YYYY-MM')"
             : "DATE_FORMAT(validated_at, '%Y-%m')"; // MySQL/MariaDB
@@ -349,8 +349,8 @@ class OrderRepository extends CompanyAwareRepository
             $sql,
             [
                 'statuses' => ['signe', 'gagne', 'termine'],
-                'start'    => $startDate->format('Y-m-d'),
-                'end'      => $endDate->format('Y-m-d'),
+                'start' => $startDate->format('Y-m-d'),
+                'end' => $endDate->format('Y-m-d'),
             ],
             [
                 'statuses' => \Doctrine\DBAL\ArrayParameterType::STRING,
@@ -373,7 +373,7 @@ class OrderRepository extends CompanyAwareRepository
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        $platform   = $conn->getDatabasePlatform();
+        $platform = $conn->getDatabasePlatform();
         $dateFormat = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform
             ? "TO_CHAR(created_at, 'YYYY-MM')"
             : "DATE_FORMAT(created_at, '%Y-%m')";
@@ -390,7 +390,7 @@ class OrderRepository extends CompanyAwareRepository
 
         $results = $conn->executeQuery($sql, [
             'start' => $startDate->format('Y-m-d'),
-            'end'   => $endDate->format('Y-m-d'),
+            'end' => $endDate->format('Y-m-d'),
         ])->fetchAllAssociative();
 
         $evolution = [];
@@ -482,22 +482,22 @@ class OrderRepository extends CompanyAwareRepository
         ?int $userId = null,
         ?string $userRole = null,
     ): array {
-        $currentStart  = new DateTime("$currentYear-01-01");
-        $currentEnd    = new DateTime("$currentYear-12-31");
+        $currentStart = new DateTime("$currentYear-01-01");
+        $currentEnd = new DateTime("$currentYear-12-31");
         $previousStart = new DateTime("$previousYear-01-01");
-        $previousEnd   = new DateTime("$previousYear-12-31");
+        $previousEnd = new DateTime("$previousYear-12-31");
 
         return [
             'current' => [
-                'year'            => $currentYear,
-                'revenue'         => $this->getSignedRevenueForPeriod($currentStart, $currentEnd, $userId, $userRole),
-                'count'           => $this->countOrdersInPeriod($currentStart, $currentEnd, $userId, $userRole),
+                'year' => $currentYear,
+                'revenue' => $this->getSignedRevenueForPeriod($currentStart, $currentEnd, $userId, $userRole),
+                'count' => $this->countOrdersInPeriod($currentStart, $currentEnd, $userId, $userRole),
                 'conversion_rate' => $this->getConversionRate($currentStart, $currentEnd, $userId, $userRole),
             ],
             'previous' => [
-                'year'            => $previousYear,
-                'revenue'         => $this->getSignedRevenueForPeriod($previousStart, $previousEnd, $userId, $userRole),
-                'count'           => $this->countOrdersInPeriod($previousStart, $previousEnd, $userId, $userRole),
+                'year' => $previousYear,
+                'revenue' => $this->getSignedRevenueForPeriod($previousStart, $previousEnd, $userId, $userRole),
+                'count' => $this->countOrdersInPeriod($previousStart, $previousEnd, $userId, $userRole),
                 'conversion_rate' => $this->getConversionRate($previousStart, $previousEnd, $userId, $userRole),
             ],
         ];

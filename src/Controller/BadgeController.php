@@ -30,11 +30,11 @@ class BadgeController extends AbstractController
     public function index(): Response
     {
         $badges = $this->badgeRepository->findBy([], ['category' => 'ASC', 'xpReward' => 'ASC']);
-        $stats  = $this->badgeRepository->getBadgeStats();
+        $stats = $this->badgeRepository->getBadgeStats();
 
         return $this->render('badge/index.html.twig', [
             'badges' => $badges,
-            'stats'  => $stats,
+            'stats' => $stats,
         ]);
     }
 
@@ -60,7 +60,7 @@ class BadgeController extends AbstractController
                     $this->addFlash('error', 'Format JSON invalide pour les critères');
 
                     return $this->render('badge/new.html.twig', [
-                        'badge'      => $badge,
+                        'badge' => $badge,
                         'categories' => $this->getBadgeCategories(),
                     ]);
                 }
@@ -109,7 +109,7 @@ class BadgeController extends AbstractController
                     $this->addFlash('error', 'Format JSON invalide pour les critères');
 
                     return $this->render('badge/edit.html.twig', [
-                        'badge'      => $badge,
+                        'badge' => $badge,
                         'categories' => $this->getBadgeCategories(),
                     ]);
                 }
@@ -125,7 +125,7 @@ class BadgeController extends AbstractController
         }
 
         return $this->render('badge/edit.html.twig', [
-            'badge'      => $badge,
+            'badge' => $badge,
             'categories' => $this->getBadgeCategories(),
         ]);
     }
@@ -168,12 +168,12 @@ class BadgeController extends AbstractController
     private function getBadgeCategories(): array
     {
         return [
-            'contribution'  => 'Contribution',
-            'engagement'    => 'Engagement',
-            'expertise'     => 'Expertise',
+            'contribution' => 'Contribution',
+            'engagement' => 'Engagement',
+            'expertise' => 'Expertise',
             'collaboration' => 'Collaboration',
-            'performance'   => 'Performance',
-            'anciennete'    => 'Ancienneté',
+            'performance' => 'Performance',
+            'anciennete' => 'Ancienneté',
         ];
     }
 }

@@ -57,7 +57,7 @@ class ProjectTaskTest extends TestCase
 
     public function testProjectRelation(): void
     {
-        $task    = new ProjectTask();
+        $task = new ProjectTask();
         $project = new Project();
         $project->setName('Test Project');
 
@@ -69,7 +69,7 @@ class ProjectTaskTest extends TestCase
 
     public function testOrderLineRelation(): void
     {
-        $task      = new ProjectTask();
+        $task = new ProjectTask();
         $orderLine = new OrderLine();
 
         $task->setOrderLine($orderLine);
@@ -79,7 +79,7 @@ class ProjectTaskTest extends TestCase
 
     public function testAssignedContributorRelation(): void
     {
-        $task        = new ProjectTask();
+        $task = new ProjectTask();
         $contributor = new Contributor();
         $contributor->setFirstName('John');
         $contributor->setLastName('Doe');
@@ -91,7 +91,7 @@ class ProjectTaskTest extends TestCase
 
     public function testRequiredProfileRelation(): void
     {
-        $task    = new ProjectTask();
+        $task = new ProjectTask();
         $profile = new Profile();
         $profile->setName('Developer');
 
@@ -105,7 +105,7 @@ class ProjectTaskTest extends TestCase
         $task = new ProjectTask();
 
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-12-31');
+        $endDate = new DateTime('2025-12-31');
 
         $task->setStartDate($startDate);
         $task->setEndDate($endDate);

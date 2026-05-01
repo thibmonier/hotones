@@ -80,7 +80,7 @@ class SubscriptionRepository extends CompanyAwareRepository
      */
     public function findUpcomingRenewals(int $days = 30): array
     {
-        $today   = new DateTime();
+        $today = new DateTime();
         $endDate = (clone $today)->modify("+{$days} days");
 
         return $this
@@ -105,7 +105,7 @@ class SubscriptionRepository extends CompanyAwareRepository
     public function getTotalMonthlyCost(): float
     {
         $subscriptions = $this->findAllActive();
-        $total         = 0.0;
+        $total = 0.0;
 
         foreach ($subscriptions as $subscription) {
             $total += $subscription->getMonthlyCost();
@@ -120,7 +120,7 @@ class SubscriptionRepository extends CompanyAwareRepository
     public function getTotalYearlyCost(): float
     {
         $subscriptions = $this->findAllActive();
-        $total         = 0.0;
+        $total = 0.0;
 
         foreach ($subscriptions as $subscription) {
             $total += $subscription->getYearlyCost();
@@ -152,10 +152,10 @@ class SubscriptionRepository extends CompanyAwareRepository
     public function getCostByCategory(): array
     {
         $subscriptions = $this->findAllActive();
-        $costs         = [];
+        $costs = [];
 
         foreach ($subscriptions as $subscription) {
-            $category         = $subscription->getCategory() ?? 'Non catégorisé';
+            $category = $subscription->getCategory() ?? 'Non catégorisé';
             $costs[$category] = ($costs[$category] ?? 0.0) + $subscription->getMonthlyCost();
         }
 
@@ -170,10 +170,10 @@ class SubscriptionRepository extends CompanyAwareRepository
     public function getCostByVendor(): array
     {
         $subscriptions = $this->findAllActive();
-        $costs         = [];
+        $costs = [];
 
         foreach ($subscriptions as $subscription) {
-            $vendorName         = $subscription->getVendor()?->getName() ?? 'Inconnu';
+            $vendorName = $subscription->getVendor()?->getName() ?? 'Inconnu';
             $costs[$vendorName] = ($costs[$vendorName] ?? 0.0) + $subscription->getMonthlyCost();
         }
 

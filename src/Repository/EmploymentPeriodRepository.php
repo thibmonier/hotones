@@ -156,8 +156,8 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
             return null;
         }
 
-        $endDate             = $period->endDate ?? new DateTime();
-        $workingDays         = $this->calculateWorkingDays($period->startDate, $endDate);
+        $endDate = $period->endDate ?? new DateTime();
+        $workingDays = $this->calculateWorkingDays($period->startDate, $endDate);
         $adjustedWorkingDays = $workingDays * (floatval($period->workTimePercentage) / 100);
 
         return $adjustedWorkingDays * floatval($period->cjm);
@@ -169,7 +169,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
     public function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
         $workingDays = 0;
-        $current     = new DateTime($startDate->format('Y-m-d'));
+        $current = new DateTime($startDate->format('Y-m-d'));
 
         while ($current <= $endDate) {
             // Exclure les weekends (samedi = 6, dimanche = 0)
@@ -194,7 +194,7 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
         $totalPeriods = $qb->select('COUNT(ep.id)')->getQuery()->getSingleScalarResult();
 
         // Périodes actives
-        $now           = new DateTime();
+        $now = new DateTime();
         $activePeriods = $this
             ->createCompanyQueryBuilder('ep')
             ->select('COUNT(ep.id)')
@@ -212,9 +212,9 @@ class EmploymentPeriodRepository extends CompanyAwareRepository
             ->getSingleScalarResult();
 
         return [
-            'total_periods'  => $totalPeriods,
+            'total_periods' => $totalPeriods,
             'active_periods' => $activePeriods,
-            'average_cjm'    => $avgCjm ? round($avgCjm, 2) : null,
+            'average_cjm' => $avgCjm ? round($avgCjm, 2) : null,
         ];
     }
 

@@ -37,8 +37,8 @@ class TimesheetController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em, ProjectSubTaskRepository $subTaskRepo): Response
     {
         $currentWeek = $request->query->get('week', date('Y-W'));
-        $year        = (int) substr($currentWeek, 0, 4);
-        $week        = (int) substr($currentWeek, -2);
+        $year = (int) substr($currentWeek, 0, 4);
+        $week = (int) substr($currentWeek, -2);
 
         // Calculer les dates de début et fin de semaine
         $startDate = new DateTime();
@@ -47,11 +47,11 @@ class TimesheetController extends AbstractController
         $endDate->modify('+6 days');
 
         $contributorRepo = $em->getRepository(Contributor::class);
-        $timesheetRepo   = $em->getRepository(Timesheet::class);
+        $timesheetRepo = $em->getRepository(Timesheet::class);
 
         // Récupérer les temps de la semaine pour l'utilisateur connecté via repository
-        $contributor       = $contributorRepo->findByUser($this->getUser());
-        $timesheets        = [];
+        $contributor = $contributorRepo->findByUser($this->getUser());
+        $timesheets = [];
         $projectsWithTasks = [];
 
         if ($contributor) {
@@ -62,9 +62,9 @@ class TimesheetController extends AbstractController
             foreach ($projectsWithTasks as &$row) {
                 $taskList = [];
                 foreach ($row['tasks'] as $task) {
-                    $subTasks   = $subTaskRepo->findByTaskAndAssignee($task, $contributor);
+                    $subTasks = $subTaskRepo->findByTaskAndAssignee($task, $contributor);
                     $taskList[] = [
-                        'task'     => $task,
+                        'task' => $task,
                         'subTasks' => $subTasks,
                     ];
                 }
@@ -78,13 +78,13 @@ class TimesheetController extends AbstractController
         // Organiser les temps par projet, tâche et date
         $timesheetGrid = [];
         foreach ($timesheets as $timesheet) {
-            $projectId                                 = $timesheet->getProject()->getId();
-            $taskId                                    = $timesheet->getTask() ? $timesheet->getTask()->getId() : 'no_task';
-            $date                                      = $timesheet->getDate()->format('Y-m-d');
+            $projectId = $timesheet->getProject()->getId();
+            $taskId = $timesheet->getTask() ? $timesheet->getTask()->getId() : 'no_task';
+            $date = $timesheet->getDate()->format('Y-m-d');
             $timesheetGrid[$projectId][$taskId][$date] = $timesheet;
             // Carte séparée pour sous-tâches (si présentes)
             if ($timesheet->getSubTask()) {
-                $subId                                           = $timesheet->getSubTask()->getId();
+                $subId = $timesheet->getSubTask()->getId();
                 $timesheetGrid['sub'][$projectId][$subId][$date] = $timesheet;
             }
         }
@@ -97,15 +97,15 @@ class TimesheetController extends AbstractController
 
         return $this->render('timesheet/index.html.twig', [
             'projectsWithTasks' => $projectsWithTasks,
-            'contributor'       => $contributor,
-            'timesheetGrid'     => $timesheetGrid,
-            'startDate'         => $startDate,
-            'endDate'           => $endDate,
-            'currentWeek'       => $currentWeek,
-            'previousWeek'      => $year.'-W'.str_pad((string) ($week - 1), 2, '0', STR_PAD_LEFT),
-            'nextWeek'          => $year.'-W'.str_pad((string) ($week + 1), 2, '0', STR_PAD_LEFT),
-            'activeTimer'       => $activeTimer,
-            'hoursPerDay'       => $contributor ? $contributor->getHoursPerDay() : 7.0,
+            'contributor' => $contributor,
+            'timesheetGrid' => $timesheetGrid,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'currentWeek' => $currentWeek,
+            'previousWeek' => $year.'-W'.str_pad((string) ($week - 1), 2, '0', STR_PAD_LEFT),
+            'nextWeek' => $year.'-W'.str_pad((string) ($week + 1), 2, '0', STR_PAD_LEFT),
+            'activeTimer' => $activeTimer,
+            'hoursPerDay' => $contributor ? $contributor->getHoursPerDay() : 7.0,
         ]);
     }
 
@@ -113,7 +113,7 @@ class TimesheetController extends AbstractController
     public function save(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $contributorRepo = $em->getRepository(Contributor::class);
-        $timesheetRepo   = $em->getRepository(Timesheet::class);
+        $timesheetRepo = $em->getRepository(Timesheet::class);
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
@@ -121,10 +121,10 @@ class TimesheetController extends AbstractController
         }
 
         $projectId = $request->request->get('project_id');
-        $taskId    = $request->request->get('task_id');
-        $date      = new DateTime($request->request->get('date'));
-        $hours     = (float) $request->request->get('hours');
-        $notes     = $request->request->get('notes', '');
+        $taskId = $request->request->get('task_id');
+        $date = new DateTime($request->request->get('date'));
+        $hours = (float) $request->request->get('hours');
+        $notes = $request->request->get('notes', '');
 
         // Validation : minimum 1h (0.125j = 1h/8)
         if ($hours > 0 && $hours < 1.0) {
@@ -200,8 +200,8 @@ class TimesheetController extends AbstractController
     public function calendar(Request $request, EntityManagerInterface $em): Response
     {
         $contributorRepo = $em->getRepository(Contributor::class);
-        $timesheetRepo   = $em->getRepository(Timesheet::class);
-        $projectRepo     = $em->getRepository(Project::class);
+        $timesheetRepo = $em->getRepository(Timesheet::class);
+        $projectRepo = $em->getRepository(Project::class);
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
@@ -210,9 +210,9 @@ class TimesheetController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $month     = $request->query->get('month', date('Y-m'));
+        $month = $request->query->get('month', date('Y-m'));
         $startDate = new DateTime($month.'-01');
-        $endDate   = clone $startDate;
+        $endDate = clone $startDate;
         $endDate->modify('last day of this month');
 
         // Récupérer les temps du mois
@@ -222,20 +222,20 @@ class TimesheetController extends AbstractController
         $events = [];
         foreach ($timesheets as $ts) {
             $events[] = [
-                'id'              => $ts->getId(),
-                'title'           => sprintf('%s - %.2fh', $ts->getProject()->getName(), (float) $ts->getHours()),
-                'start'           => $ts->getDate()->format('Y-m-d'),
-                'allDay'          => true,
+                'id' => $ts->getId(),
+                'title' => sprintf('%s - %.2fh', $ts->getProject()->getName(), (float) $ts->getHours()),
+                'start' => $ts->getDate()->format('Y-m-d'),
+                'allDay' => true,
                 'backgroundColor' => '#3788d8',
-                'borderColor'     => '#3788d8',
-                'extendedProps'   => [
+                'borderColor' => '#3788d8',
+                'extendedProps' => [
                     'timesheetId' => $ts->getId(),
-                    'projectId'   => $ts->getProject()->getId(),
+                    'projectId' => $ts->getProject()->getId(),
                     'projectName' => $ts->getProject()->getName(),
-                    'taskId'      => $ts->getTask()?->getId(),
-                    'taskName'    => $ts->getTask()?->getName(),
-                    'hours'       => (float) $ts->getHours(),
-                    'notes'       => $ts->getNotes(),
+                    'taskId' => $ts->getTask()?->getId(),
+                    'taskName' => $ts->getTask()?->getName(),
+                    'hours' => (float) $ts->getHours(),
+                    'notes' => $ts->getNotes(),
                 ],
             ];
         }
@@ -244,11 +244,11 @@ class TimesheetController extends AbstractController
         $projectsWithTasks = $contributorRepo->findProjectsWithTasksForContributor($contributor);
 
         return $this->render('timesheet/calendar.html.twig', [
-            'events'            => $events,
-            'month'             => $month,
-            'startDate'         => $startDate,
-            'endDate'           => $endDate,
-            'contributor'       => $contributor,
+            'events' => $events,
+            'month' => $month,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'contributor' => $contributor,
             'projectsWithTasks' => $projectsWithTasks,
         ]);
     }
@@ -257,7 +257,7 @@ class TimesheetController extends AbstractController
     public function myTime(Request $request, EntityManagerInterface $em): Response
     {
         $contributorRepo = $em->getRepository(Contributor::class);
-        $timesheetRepo   = $em->getRepository(Timesheet::class);
+        $timesheetRepo = $em->getRepository(Timesheet::class);
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
@@ -266,9 +266,9 @@ class TimesheetController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $month     = $request->query->get('month', date('Y-m'));
+        $month = $request->query->get('month', date('Y-m'));
         $startDate = new DateTime($month.'-01');
-        $endDate   = clone $startDate;
+        $endDate = clone $startDate;
         $endDate->modify('last day of this month');
 
         // Utiliser le repository pour récupérer les temps
@@ -276,15 +276,15 @@ class TimesheetController extends AbstractController
 
         // Calculer les totaux via repository
         $projectTotals = $timesheetRepo->getHoursGroupedByProjectForContributor($contributor, $startDate, $endDate);
-        $totalHours    = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
+        $totalHours = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
 
         return $this->render('timesheet/my_time.html.twig', [
-            'timesheets'    => $timesheets,
-            'totalHours'    => $totalHours,
+            'timesheets' => $timesheets,
+            'totalHours' => $totalHours,
             'projectTotals' => $projectTotals,
-            'month'         => $month,
-            'startDate'     => $startDate,
-            'endDate'       => $endDate,
+            'month' => $month,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
         ]);
     }
 
@@ -293,7 +293,7 @@ class TimesheetController extends AbstractController
     public function all(Request $request, EntityManagerInterface $em): Response
     {
         $session = $request->getSession();
-        $reset   = (bool) $request->query->get('reset', false);
+        $reset = (bool) $request->query->get('reset', false);
         if ($reset) {
             $session->remove('timesheet_all_filters');
 
@@ -301,27 +301,27 @@ class TimesheetController extends AbstractController
         }
 
         $queryAll = $request->query->all();
-        $keys     = ['month', 'project'];
-        $has      = count(array_intersect(array_keys($queryAll), $keys)) > 0;
-        $saved    = $session->has('timesheet_all_filters') ? (array) $session->get('timesheet_all_filters') : [];
+        $keys = ['month', 'project'];
+        $has = count(array_intersect(array_keys($queryAll), $keys)) > 0;
+        $saved = $session->has('timesheet_all_filters') ? (array) $session->get('timesheet_all_filters') : [];
 
-        $month     = $has ? $request->query->get('month', date('Y-m')) : $saved['month'] ?? date('Y-m');
-        $projectId = $has ? $request->query->get('project') : $saved['project']          ?? null;
+        $month = $has ? $request->query->get('month', date('Y-m')) : $saved['month'] ?? date('Y-m');
+        $projectId = $has ? $request->query->get('project') : $saved['project'] ?? null;
 
         $startDate = new DateTime($month.'-01');
-        $endDate   = clone $startDate;
+        $endDate = clone $startDate;
         $endDate->modify('last day of this month');
 
-        $projectRepo   = $em->getRepository(Project::class);
+        $projectRepo = $em->getRepository(Project::class);
         $timesheetRepo = $em->getRepository(Timesheet::class);
 
         // Utiliser le repository avec filtrage optionnel par projet
         $selectedProject = $projectId ? $projectRepo->find($projectId) : null;
-        $timesheets      = $timesheetRepo->findForPeriodWithProject($startDate, $endDate, $selectedProject);
-        $projects        = $projectRepo->findActiveOrderedByName();
+        $timesheets = $timesheetRepo->findForPeriodWithProject($startDate, $endDate, $selectedProject);
+        $projects = $projectRepo->findActiveOrderedByName();
 
         $session->set('timesheet_all_filters', [
-            'month'   => $month,
+            'month' => $month,
             'project' => $projectId,
         ]);
 
@@ -335,12 +335,12 @@ class TimesheetController extends AbstractController
         }
 
         return $this->render('timesheet/all.html.twig', [
-            'timesheets'         => $timesheets,
-            'projects'           => $projects,
-            'month'              => $month,
-            'selectedProject'    => $projectId,
-            'startDate'          => $startDate,
-            'endDate'            => $endDate,
+            'timesheets' => $timesheets,
+            'projects' => $projects,
+            'month' => $month,
+            'selectedProject' => $projectId,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
             'activeFiltersCount' => $activeFiltersCount,
         ]);
     }
@@ -349,7 +349,7 @@ class TimesheetController extends AbstractController
     public function duplicateWeek(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $contributorRepo = $em->getRepository(Contributor::class);
-        $timesheetRepo   = $em->getRepository(Timesheet::class);
+        $timesheetRepo = $em->getRepository(Timesheet::class);
 
         $contributor = $contributorRepo->findByUser($this->getUser());
         if (!$contributor) {
@@ -388,7 +388,7 @@ class TimesheetController extends AbstractController
         $duplicatedCount = 0;
         foreach ($sourceTimesheets as $source) {
             // Calculer le décalage de jours entre source et cible
-            $dayOffset  = $source->getDate()->diff($sourceStart)->days;
+            $dayOffset = $source->getDate()->diff($sourceStart)->days;
             $targetDate = clone $targetStart;
             $targetDate->modify("+{$dayOffset} days");
             // Normaliser à minuit pour éviter les problèmes de comparaison
@@ -422,8 +422,8 @@ class TimesheetController extends AbstractController
         $em->flush();
 
         return new JsonResponse([
-            'success'          => true,
-            'message'          => sprintf('%d entrée(s) dupliquée(s)', $duplicatedCount),
+            'success' => true,
+            'message' => sprintf('%d entrée(s) dupliquée(s)', $duplicatedCount),
             'duplicated_count' => $duplicatedCount,
         ]);
     }
@@ -441,7 +441,7 @@ class TimesheetController extends AbstractController
         }
 
         $projectId = (int) $request->request->get('project_id');
-        $taskId    = $request->request->get('task_id');
+        $taskId = $request->request->get('task_id');
         $subTaskId = $request->request->get('sub_task_id');
 
         try {
@@ -476,14 +476,14 @@ class TimesheetController extends AbstractController
             }
             if (
                 $task && $subTask->getTask()->getId() !== $task->getId()
-                || $subTask->getProject()->getId()    !== $project->getId()
+                || $subTask->getProject()->getId() !== $project->getId()
             ) {
                 return new JsonResponse(['error' => 'La sous-tâche ne correspond pas au projet/tâche'], 400);
             }
         }
 
         $timerRepo = $em->getRepository(RunningTimer::class);
-        $active    = $timerRepo->findActiveByContributor($contributor);
+        $active = $timerRepo->findActiveByContributor($contributor);
 
         // Si un timer est actif, l'arrêter et l'imputer
         if ($active) {
@@ -505,11 +505,11 @@ class TimesheetController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'timer'   => [
-                'id'         => $timer->getId(),
-                'project'    => ['id' => $project->getId(), 'name' => $project->getName()],
-                'task'       => $task ? ['id' => $task->getId(), 'name' => $task->getName()] : null,
-                'subTask'    => $subTask ? ['id' => $subTask->getId(), 'title' => $subTask->getTitle()] : null,
+            'timer' => [
+                'id' => $timer->getId(),
+                'project' => ['id' => $project->getId(), 'name' => $project->getName()],
+                'task' => $task ? ['id' => $task->getId(), 'name' => $task->getName()] : null,
+                'subTask' => $subTask ? ['id' => $subTask->getId(), 'title' => $subTask->getTitle()] : null,
                 'started_at' => $timer->getStartedAt()->format(DateTimeInterface::ATOM),
             ],
         ]);
@@ -548,22 +548,22 @@ class TimesheetController extends AbstractController
         $projects = [];
         foreach ($rows as $row) {
             /** @var Project $p */
-            $p         = $row['project'];
+            $p = $row['project'];
             $taskItems = [];
             foreach ($row['tasks'] as $task) {
-                $subTasks    = $subTaskRepo->findByTaskAndAssignee($task, $contributor);
+                $subTasks = $subTaskRepo->findByTaskAndAssignee($task, $contributor);
                 $taskItems[] = [
-                    'id'       => $task->getId(),
-                    'name'     => $task->getName(),
+                    'id' => $task->getId(),
+                    'name' => $task->getName(),
                     'subTasks' => array_map(fn ($st): array => [
-                        'id'    => $st->getId(),
+                        'id' => $st->getId(),
                         'title' => $st->getTitle(),
                     ], $subTasks),
                 ];
             }
             $projects[] = [
-                'id'    => $p->getId(),
-                'name'  => $p->getName(),
+                'id' => $p->getId(),
+                'name' => $p->getName(),
                 'tasks' => $taskItems,
             ];
         }
@@ -587,9 +587,9 @@ class TimesheetController extends AbstractController
 
         return new JsonResponse([
             'timer' => [
-                'id'      => $timer->getId(),
+                'id' => $timer->getId(),
                 'project' => ['id' => $timer->getProject()->getId(), 'name' => $timer->getProject()->getName()],
-                'task'    => $timer->getTask()
+                'task' => $timer->getTask()
                     ? ['id' => $timer->getTask()->getId(), 'name' => $timer->getTask()->getName()]
                     : null,
                 'subTask' => $timer->getSubTask()
@@ -610,7 +610,7 @@ class TimesheetController extends AbstractController
         $timer->setStoppedAt($now);
 
         $startedAt = $timer->getStartedAt();
-        $elapsed   = $now->getTimestamp() - $startedAt->getTimestamp(); // en secondes
+        $elapsed = $now->getTimestamp() - $startedAt->getTimestamp(); // en secondes
         if ($elapsed < 0) {
             $elapsed = 0;
         }
@@ -625,7 +625,7 @@ class TimesheetController extends AbstractController
         $date = new DateTime($now->format('Y-m-d'));
 
         $timesheetRepo = $em->getRepository(Timesheet::class);
-        $existing      = $timesheetRepo->findExistingTimesheetWithTaskAndSubTask(
+        $existing = $timesheetRepo->findExistingTimesheetWithTaskAndSubTask(
             $timer->getContributor(),
             $timer->getProject(),
             $date,
@@ -668,7 +668,7 @@ class TimesheetController extends AbstractController
         }
 
         [$start, $end] = $this->resolveExportDateRange($request);
-        $projectId     = $request->query->get('project_id');
+        $projectId = $request->query->get('project_id');
 
         return $this->exportService->exportToExcel($contributor, $start, $end, $projectId ? (int) $projectId : null);
     }
@@ -684,7 +684,7 @@ class TimesheetController extends AbstractController
         }
 
         [$start, $end] = $this->resolveExportDateRange($request);
-        $projectId     = $request->query->get('project_id');
+        $projectId = $request->query->get('project_id');
 
         return $this->exportService->exportToPdf($contributor, $start, $end, $projectId ? (int) $projectId : null);
     }
@@ -695,7 +695,7 @@ class TimesheetController extends AbstractController
     private function resolveExportDateRange(Request $request): array
     {
         $startDate = $request->query->get('start_date');
-        $endDate   = $request->query->get('end_date');
+        $endDate = $request->query->get('end_date');
 
         if (!$startDate) {
             $startDate = new DateTime('first day of this month')->format('Y-m-d');

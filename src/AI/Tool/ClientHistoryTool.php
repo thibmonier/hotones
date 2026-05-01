@@ -39,12 +39,12 @@ final readonly class ClientHistoryTool
 
         if (empty($clients)) {
             return [
-                'client_name'     => $clientName,
-                'client_found'    => false,
-                'total_projects'  => 0,
+                'client_name' => $clientName,
+                'client_found' => false,
+                'total_projects' => 0,
                 'recent_projects' => [],
-                'service_level'   => null,
-                'error'           => 'Client non trouvé',
+                'service_level' => null,
+                'error' => 'Client non trouvé',
             ];
         }
 
@@ -55,17 +55,17 @@ final readonly class ClientHistoryTool
 
         // Formater les 5 derniers projets
         $recentProjects = array_slice(array_map(fn ($project): array => [
-            'name'   => $project->getName(),
+            'name' => $project->getName(),
             'status' => $project->getStatus(),
-            'type'   => $project->getProjectType(),
+            'type' => $project->getProjectType(),
         ], $projects), 0, 5);
 
         return [
-            'client_name'     => $client->getName(),
-            'client_found'    => true,
-            'total_projects'  => count($projects),
+            'client_name' => $client->getName(),
+            'client_found' => true,
+            'total_projects' => count($projects),
             'recent_projects' => $recentProjects,
-            'service_level'   => $client->getServiceLevel(),
+            'service_level' => $client->getServiceLevel(),
         ];
     }
 }

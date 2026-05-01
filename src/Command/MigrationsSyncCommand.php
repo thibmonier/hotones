@@ -58,8 +58,8 @@ class MigrationsSyncCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io      = new SymfonyStyle($input, $output);
-        $dryRun  = $input->getOption('dry-run');
+        $io = new SymfonyStyle($input, $output);
+        $dryRun = $input->getOption('dry-run');
         $markAll = $input->getOption('mark-all');
 
         $io->title('Migration Synchronization Tool');
@@ -69,7 +69,7 @@ class MigrationsSyncCommand extends Command
         $availableMigrations = $migrationRepository->getMigrations();
 
         // Get executed migrations from metadata storage
-        $metadataStorage  = $this->dependencyFactory->getMetadataStorage();
+        $metadataStorage = $this->dependencyFactory->getMetadataStorage();
         $executedVersions = $metadataStorage->getExecutedMigrations();
 
         // Calculate pending migrations
@@ -102,7 +102,7 @@ class MigrationsSyncCommand extends Command
             }
 
             $metadataStorage = $this->dependencyFactory->getMetadataStorage();
-            $marked          = 0;
+            $marked = 0;
 
             foreach ($pendingMigrations as $versionString) {
                 $version = new Version($versionString);
@@ -134,7 +134,7 @@ class MigrationsSyncCommand extends Command
         $io->section('Checking Database State');
 
         $schemaManager = $this->connection->createSchemaManager();
-        $tables        = $schemaManager->listTableNames();
+        $tables = $schemaManager->listTableNames();
 
         $io->writeln('Found '.count($tables).' tables in database');
         $io->newLine();
@@ -146,14 +146,14 @@ class MigrationsSyncCommand extends Command
 
             // Try to detect if migration is already applied by reading the migration file
             $migrationClass = 'DoctrineMigrations\\'.basename($versionString);
-            $migrationPath  = $this->getMigrationPath($versionString);
+            $migrationPath = $this->getMigrationPath($versionString);
 
             if (!file_exists($migrationPath)) {
                 $io->warning("Migration file not found: {$migrationPath}");
                 continue;
             }
 
-            $content     = file_get_contents($migrationPath);
+            $content = file_get_contents($migrationPath);
             $description = $this->extractDescription($content);
 
             if ($description) {
@@ -199,7 +199,7 @@ class MigrationsSyncCommand extends Command
         $metadataStorage = $this->dependencyFactory->getMetadataStorage();
 
         foreach ($toMark as $versionString) {
-            $version         = new Version($versionString);
+            $version = new Version($versionString);
             $executionResult = new ExecutionResult(
                 version: $version,
                 direction: Direction::UP,

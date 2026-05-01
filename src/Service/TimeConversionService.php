@@ -34,11 +34,11 @@ class TimeConversionService
         $hoursFloat = floatval($hours);
 
         if ($hoursFloat >= self::HOURS_PER_DAY) {
-            $days           = self::hoursToDays($hours);
+            $days = self::hoursToDays($hours);
             $remainingHours = bcmod($hours, (string) self::HOURS_PER_DAY, 2);
 
             // Truncate days to 1 decimal instead of rounding (tests expect 10h => 1,2j 2,0h)
-            $daysFloat     = floatval($days);
+            $daysFloat = floatval($days);
             $daysTruncated = floor($daysFloat * 10) / 10;
 
             if ($remainingHours === '0.00') {
@@ -75,7 +75,7 @@ class TimeConversionService
             $days = rtrim($input, 'j');
 
             return [
-                'days'  => $days,
+                'days' => $days,
                 'hours' => self::daysToHours($days),
             ];
         }
@@ -85,14 +85,14 @@ class TimeConversionService
 
             return [
                 'hours' => $hours,
-                'days'  => self::hoursToDays($hours),
+                'days' => self::hoursToDays($hours),
             ];
         }
 
         // Par défaut, considérer comme des heures
         return [
             'hours' => $input,
-            'days'  => self::hoursToDays($input),
+            'days' => self::hoursToDays($input),
         ];
     }
 
@@ -102,8 +102,8 @@ class TimeConversionService
     public static function getWorkingDaysBetween(DateTimeInterface $start, DateTimeInterface $end): int
     {
         $start = clone $start;
-        $end   = clone $end;
-        $days  = 0;
+        $end = clone $end;
+        $days = 0;
 
         while ($start <= $end) {
             // Exclure les weekends (samedi=6, dimanche=0)

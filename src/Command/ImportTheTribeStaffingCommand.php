@@ -33,15 +33,15 @@ class ImportTheTribeStaffingCommand extends Command
      * Source: feuille "TJM CF 3 tribus".
      */
     private const array ANNUAL_SALARIES = [
-        1  => 15000,
-        2  => 34000,
-        3  => 36000,
-        4  => 38000,
-        5  => 40000,
-        6  => 42000,
-        7  => 45000,
-        8  => 47500,
-        9  => 50000,
+        1 => 15000,
+        2 => 34000,
+        3 => 36000,
+        4 => 38000,
+        5 => 40000,
+        6 => 42000,
+        7 => 45000,
+        8 => 47500,
+        9 => 50000,
         10 => 55000,
         11 => 60000,
         12 => 65000,
@@ -52,43 +52,43 @@ class ImportTheTribeStaffingCommand extends Command
      */
     private const array TJM_MAP = [
         'dev' => [
-            1  => 300,
-            2  => 550,
-            3  => 550,
-            4  => 550,
-            5  => 550,
-            6  => 680,
-            7  => 680,
-            8  => 680,
-            9  => 680,
+            1 => 300,
+            2 => 550,
+            3 => 550,
+            4 => 550,
+            5 => 550,
+            6 => 680,
+            7 => 680,
+            8 => 680,
+            9 => 680,
             10 => 800,
             11 => 800,
             12 => 800,
         ],
         'pm' => [
-            1  => 300,
-            2  => 650,
-            3  => 650,
-            4  => 750,
-            5  => 750,
-            6  => 750,
-            7  => 750,
-            8  => 800,
-            9  => 800,
+            1 => 300,
+            2 => 650,
+            3 => 650,
+            4 => 750,
+            5 => 750,
+            6 => 750,
+            7 => 750,
+            8 => 800,
+            9 => 800,
             10 => 800,
             11 => 850,
             12 => 850,
         ],
         'design' => [
-            1  => 300,
-            2  => 650,
-            3  => 650,
-            4  => 750,
-            5  => 750,
-            6  => 750,
-            7  => 750,
-            8  => 800,
-            9  => 800,
+            1 => 300,
+            2 => 650,
+            3 => 650,
+            4 => 750,
+            5 => 750,
+            6 => 750,
+            7 => 750,
+            8 => 800,
+            9 => 800,
             10 => 800,
             11 => 850,
             12 => 850,
@@ -99,49 +99,49 @@ class ImportTheTribeStaffingCommand extends Command
      * Mapping des noms de technos du fichier Excel vers les noms normalisés en base.
      */
     private const array TECH_NAME_ALIASES = [
-        'vue'               => 'Vue.js',
-        'nextjs'            => 'Next.js',
-        'nuxt'              => 'Nuxt.js',
-        'node'              => 'Node.js',
+        'vue' => 'Vue.js',
+        'nextjs' => 'Next.js',
+        'nuxt' => 'Nuxt.js',
+        'node' => 'Node.js',
         'node.js (fastify)' => 'Node.js',
-        'nestjs'            => 'NestJS',
-        'express'           => 'Express.js',
-        'typescript'        => 'TypeScript',
-        'rails'             => 'Ruby on Rails',
-        'k8s'               => 'Kubernetes',
-        'postgresql'        => 'PostgreSQL',
+        'nestjs' => 'NestJS',
+        'express' => 'Express.js',
+        'typescript' => 'TypeScript',
+        'rails' => 'Ruby on Rails',
+        'k8s' => 'Kubernetes',
+        'postgresql' => 'PostgreSQL',
     ];
 
     /**
      * Technologies à créer si elles n'existent pas, avec leur catégorie.
      */
     private const array NEW_TECHNOLOGIES = [
-        'Bubble'         => 'no-code',
-        'Framer'         => 'no-code',
-        'Weweb'          => 'no-code',
-        'Xano'           => 'no-code',
-        'Ksaar'          => 'no-code',
-        'Flutterflow'    => 'no-code',
-        'Supabase'       => 'database',
-        'Firebase'       => 'hosting',
-        'Codemagic'      => 'tool',
-        'Bitrise'        => 'tool',
-        'Serverless'     => 'tool',
-        'Helm'           => 'tool',
-        'AdonisJS'       => 'framework',
-        'Ionic'          => 'framework',
-        'Android natif'  => 'framework',
-        'IA'             => 'tool',
+        'Bubble' => 'no-code',
+        'Framer' => 'no-code',
+        'Weweb' => 'no-code',
+        'Xano' => 'no-code',
+        'Ksaar' => 'no-code',
+        'Flutterflow' => 'no-code',
+        'Supabase' => 'database',
+        'Firebase' => 'hosting',
+        'Codemagic' => 'tool',
+        'Bitrise' => 'tool',
+        'Serverless' => 'tool',
+        'Helm' => 'tool',
+        'AdonisJS' => 'framework',
+        'Ionic' => 'framework',
+        'Android natif' => 'framework',
+        'IA' => 'tool',
         'Éco-conception' => 'tool',
-        'Cybersécurité'  => 'tool',
+        'Cybersécurité' => 'tool',
     ];
 
     /**
      * Mapping CF type → profile name en base.
      */
     private const array CF_PROFILE_MAP = [
-        'dev'    => 'Développeur',
-        'pm'     => 'Chef de projet',
+        'dev' => 'Développeur',
+        'pm' => 'Chef de projet',
         'design' => 'Product Designer',
     ];
 
@@ -184,7 +184,7 @@ class ImportTheTribeStaffingCommand extends Command
         $io->title('Import des collaborateurs theTribe');
 
         $filePath = $input->getArgument('file');
-        $dryRun   = $input->getOption('dry-run');
+        $dryRun = $input->getOption('dry-run');
 
         if (!file_exists($filePath)) {
             $io->error(sprintf('Fichier introuvable: %s', $filePath));
@@ -255,19 +255,19 @@ class ImportTheTribeStaffingCommand extends Command
     {
         $io->section('Création des niveaux d\'employés');
 
-        $repo    = $this->entityManager->getRepository(EmployeeLevel::class);
+        $repo = $this->entityManager->getRepository(EmployeeLevel::class);
         $created = 0;
 
         $levelNames = [
-            1  => 'Junior 1',
-            2  => 'Junior 2',
-            3  => 'Junior 3',
-            4  => 'Confirmé 1',
-            5  => 'Confirmé 2',
-            6  => 'Confirmé 3',
-            7  => 'Senior 1',
-            8  => 'Senior 2',
-            9  => 'Senior 3',
+            1 => 'Junior 1',
+            2 => 'Junior 2',
+            3 => 'Junior 3',
+            4 => 'Confirmé 1',
+            5 => 'Confirmé 2',
+            6 => 'Confirmé 3',
+            7 => 'Senior 1',
+            8 => 'Senior 2',
+            9 => 'Senior 3',
             10 => 'Lead 1',
             11 => 'Lead 2',
             12 => 'Lead 3',
@@ -282,7 +282,7 @@ class ImportTheTribeStaffingCommand extends Command
                 continue;
             }
 
-            $annualSalary  = self::ANNUAL_SALARIES[$level];
+            $annualSalary = self::ANNUAL_SALARIES[$level];
             $monthlySalary = $annualSalary / 12;
 
             $employeeLevel = new EmployeeLevel();
@@ -379,20 +379,20 @@ class ImportTheTribeStaffingCommand extends Command
     {
         $io->section('Lecture du fichier Excel');
 
-        $reader      = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
         $spreadsheet = $reader->load($filePath);
-        $sheet       = $spreadsheet->getSheetByName('Staffing');
+        $sheet = $spreadsheet->getSheetByName('Staffing');
 
         if (!$sheet) {
             throw new RuntimeException('Feuille "Staffing" introuvable dans le fichier Excel');
         }
 
-        $rows           = [];
+        $rows = [];
         $sectionHeaders = ['DEVS', 'PM', 'DESIGN', 'UX', 'DATA', 'QA'];
 
         for ($row = 3; $row <= $sheet->getHighestRow(); ++$row) {
             $name = trim((string) $sheet->getCell('A'.$row)->getValue());
-            $cf   = trim((string) $sheet->getCell('C'.$row)->getValue());
+            $cf = trim((string) $sheet->getCell('C'.$row)->getValue());
 
             if ($name === '' || $cf === '') {
                 continue;
@@ -403,24 +403,24 @@ class ImportTheTribeStaffingCommand extends Command
             }
 
             $tjmRaw = $sheet->getCell('D'.$row)->getCalculatedValue();
-            $jours  = $sheet->getCell('F'.$row)->getValue();
+            $jours = $sheet->getCell('F'.$row)->getValue();
 
             // Skip les TJM invalides (string comme "PM 11" pour Timothée)
             $tjm = is_numeric($tjmRaw) ? (int) $tjmRaw : null;
 
             $rows[] = [
-                'row'           => $row,
-                'name'          => $name,
-                'tribu'         => trim((string) $sheet->getCell('B'.$row)->getValue()),
-                'cf'            => $cf,
-                'tjm'           => $tjm,
-                'jours'         => is_numeric($jours) ? (float) $jours : null,
-                'tech_front'    => $this->parseTechList((string) $sheet->getCell('G'.$row)->getValue()),
-                'tech_back'     => $this->parseTechList((string) $sheet->getCell('H'.$row)->getValue()),
-                'tech_mobile'   => $this->parseTechList((string) $sheet->getCell('I'.$row)->getValue()),
+                'row' => $row,
+                'name' => $name,
+                'tribu' => trim((string) $sheet->getCell('B'.$row)->getValue()),
+                'cf' => $cf,
+                'tjm' => $tjm,
+                'jours' => is_numeric($jours) ? (float) $jours : null,
+                'tech_front' => $this->parseTechList((string) $sheet->getCell('G'.$row)->getValue()),
+                'tech_back' => $this->parseTechList((string) $sheet->getCell('H'.$row)->getValue()),
+                'tech_mobile' => $this->parseTechList((string) $sheet->getCell('I'.$row)->getValue()),
                 'tech_nc_front' => $this->parseTechList((string) $sheet->getCell('J'.$row)->getValue()),
-                'tech_nc_back'  => $this->parseTechList((string) $sheet->getCell('K'.$row)->getValue()),
-                'tech_devops'   => $this->parseTechList((string) $sheet->getCell('L'.$row)->getValue()),
+                'tech_nc_back' => $this->parseTechList((string) $sheet->getCell('K'.$row)->getValue()),
+                'tech_devops' => $this->parseTechList((string) $sheet->getCell('L'.$row)->getValue()),
             ];
         }
 
@@ -441,7 +441,7 @@ class ImportTheTribeStaffingCommand extends Command
 
         foreach ($rows as $data) {
             $parsedName = $this->parseName($data['name']);
-            $parsedCf   = $this->parseCf($data['cf']);
+            $parsedCf = $this->parseCf($data['cf']);
 
             if (!$parsedCf) {
                 $io->warning(sprintf(
@@ -459,9 +459,9 @@ class ImportTheTribeStaffingCommand extends Command
             $existing = $this->entityManager
                 ->getRepository(Contributor::class)
                 ->findOneBy([
-                    'company'   => $company,
+                    'company' => $company,
                     'firstName' => $parsedName['firstName'],
-                    'lastName'  => $parsedName['lastName'],
+                    'lastName' => $parsedName['lastName'],
                 ]);
 
             if ($existing) {
@@ -539,13 +539,13 @@ class ImportTheTribeStaffingCommand extends Command
         ?Profile $profile,
     ): void {
         $level = $parsedCf['level'];
-        $type  = $parsedCf['type'];
+        $type = $parsedCf['type'];
 
         // Calculer TJM
         $tjm = $data['tjm'] ?? self::TJM_MAP[$type][$level] ?? null;
 
         // Salaire mensuel = annuel / 12
-        $annualSalary  = self::ANNUAL_SALARIES[$level] ?? null;
+        $annualSalary = self::ANNUAL_SALARIES[$level] ?? null;
         $monthlySalary = $annualSalary !== null ? round($annualSalary / 12, 2) : null;
 
         // CJM = (salaire annuel * charges) / jours travaillés par an
@@ -554,7 +554,7 @@ class ImportTheTribeStaffingCommand extends Command
             : null;
 
         // Temps de travail
-        $jours              = $data['jours'] ?? 5.0;
+        $jours = $data['jours'] ?? 5.0;
         $workTimePercentage = round(($jours / 5) * 100, 2);
 
         $period = new EmploymentPeriod();
@@ -623,7 +623,7 @@ class ImportTheTribeStaffingCommand extends Command
     private function resolveTechnology(string $rawName, Company $company, SymfonyStyle $io): Technology
     {
         $normalized = trim($rawName);
-        $key        = mb_strtolower($normalized);
+        $key = mb_strtolower($normalized);
 
         // Appliquer les alias
         if (isset(self::TECH_NAME_ALIASES[$key])) {
@@ -680,12 +680,12 @@ class ImportTheTribeStaffingCommand extends Command
         }
 
         $firstName = array_shift($parts);
-        $lastName  = implode(' ', $parts);
+        $lastName = implode(' ', $parts);
 
         // Retirer le point final si c'est une initiale (ex: "C." → "C.")
         return [
             'firstName' => $firstName,
-            'lastName'  => $lastName,
+            'lastName' => $lastName,
         ];
     }
 

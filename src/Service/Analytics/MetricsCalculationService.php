@@ -40,7 +40,7 @@ readonly class MetricsCalculationService
     public function calculateMetricsForPeriod(DateTimeInterface $date, string $granularity = 'monthly'): void
     {
         $this->logger->info('Début du calcul des métriques', [
-            'date'        => $date->format('Y-m-d'),
+            'date' => $date->format('Y-m-d'),
             'granularity' => $granularity,
         ]);
 
@@ -89,9 +89,9 @@ readonly class MetricsCalculationService
             ->getResult();
 
         // Obtenir ou créer les dimensions
-        $dimProjectType     = $this->getOrCreateDimProjectType($project);
-        $dimProjectManager  = $this->getOrCreateDimContributor($project->getProjectManager(), 'project_manager');
-        $dimSalesPerson     = $this->getOrCreateDimContributor($project->getSalesPerson(), 'sales_person');
+        $dimProjectType = $this->getOrCreateDimProjectType($project);
+        $dimProjectManager = $this->getOrCreateDimContributor($project->getProjectManager(), 'project_manager');
+        $dimSalesPerson = $this->getOrCreateDimContributor($project->getSalesPerson(), 'sales_person');
         $dimProjectDirector = $this->getOrCreateDimContributor($project->getProjectDirector(), 'project_director');
 
         // Calculer les métriques pour chaque devis du projet
@@ -216,8 +216,8 @@ readonly class MetricsCalculationService
         foreach ($timesheets as $timesheet) {
             $contributor = $timesheet->getContributor();
             if ($contributor && $contributor->getCjm()) {
-                $dailyCost  = bcdiv((string) $contributor->getCjm(), '8', 4); // Coût horaire
-                $timeCost   = bcmul($dailyCost, (string) $timesheet->getHours(), 2);
+                $dailyCost = bcdiv((string) $contributor->getCjm(), '8', 4); // Coût horaire
+                $timeCost = bcmul($dailyCost, (string) $timesheet->getHours(), 2);
                 $totalCosts = bcadd($totalCosts, $timeCost, 2);
             }
         }
@@ -282,7 +282,7 @@ readonly class MetricsCalculationService
      */
     private function getOrCreateDimTime(DateTimeInterface $date): DimTime
     {
-        $repo    = $this->entityManager->getRepository(DimTime::class);
+        $repo = $this->entityManager->getRepository(DimTime::class);
         $dimTime = $repo->findOneBy(['date' => $date]);
 
         if (!$dimTime) {
@@ -312,7 +312,7 @@ readonly class MetricsCalculationService
             $project->getIsInternal() ? 'internal' : 'external',
         );
 
-        $repo           = $this->entityManager->getRepository(DimProjectType::class);
+        $repo = $this->entityManager->getRepository(DimProjectType::class);
         $dimProjectType = $repo->findOneBy(['compositeKey' => $compositeKey]);
 
         if (!$dimProjectType) {
@@ -339,7 +339,7 @@ readonly class MetricsCalculationService
             return null;
         }
 
-        $repo           = $this->entityManager->getRepository(DimContributor::class);
+        $repo = $this->entityManager->getRepository(DimContributor::class);
         $dimContributor = $repo->findOneBy(['user' => $user, 'role' => $role, 'isActive' => true]);
 
         if (!$dimContributor) {
@@ -424,7 +424,7 @@ readonly class MetricsCalculationService
     private function getProjectsForPeriod(DateTimeInterface $date, string $granularity): array
     {
         $repo = $this->entityManager->getRepository(Project::class);
-        $qb   = $repo->createQueryBuilder('p');
+        $qb = $repo->createQueryBuilder('p');
 
         [$startDate, $endDate] = $this->getPeriodBounds($date, $granularity);
 
@@ -467,7 +467,7 @@ readonly class MetricsCalculationService
         // Recalculer par trimestre
         for ($quarter = 1; $quarter <= 4; ++$quarter) {
             $month = (($quarter - 1) * 3) + 1;
-            $date  = new DateTime("$year-$month-01");
+            $date = new DateTime("$year-$month-01");
             $this->calculateMetricsForPeriod($date, 'quarterly');
         }
 
@@ -484,21 +484,21 @@ readonly class MetricsCalculationService
         switch ($granularity) {
             case 'monthly':
                 $startDate = (clone $date)->modify('first day of this month')->setTime(0, 0, 0);
-                $endDate   = (clone $date)->modify('last day of this month')->setTime(23, 59, 59);
+                $endDate = (clone $date)->modify('last day of this month')->setTime(23, 59, 59);
                 break;
             case 'quarterly':
-                $quarter    = (int) ceil((int) $date->format('n') / 3);
+                $quarter = (int) ceil((int) $date->format('n') / 3);
                 $startMonth = (($quarter - 1) * 3) + 1;
-                $startDate  = new DateTime($date->format('Y').'-'.$startMonth.'-01');
-                $startDate  = $startDate->setTime(0, 0, 0);
-                $endDate    = (clone $startDate)
+                $startDate = new DateTime($date->format('Y').'-'.$startMonth.'-01');
+                $startDate = $startDate->setTime(0, 0, 0);
+                $endDate = (clone $startDate)
                     ->modify('+2 months')
                     ->modify('last day of this month')
                     ->setTime(23, 59, 59);
                 break;
             case 'yearly':
                 $startDate = new DateTime($date->format('Y').'-01-01')->setTime(0, 0, 0);
-                $endDate   = new DateTime($date->format('Y').'-12-31')->setTime(23, 59, 59);
+                $endDate = new DateTime($date->format('Y').'-12-31')->setTime(23, 59, 59);
                 break;
             default:
                 throw new InvalidArgumentException("Granularité non supportée: {$granularity}");

@@ -38,8 +38,8 @@ final class NotificationEventChainTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        $container                    = static::getContainer();
-        $this->eventDispatcher        = $container->get(EventDispatcherInterface::class);
+        $container = static::getContainer();
+        $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
         $this->notificationRepository = $container->get(NotificationRepository::class);
     }
 
@@ -47,8 +47,8 @@ final class NotificationEventChainTest extends KernelTestCase
     {
         // Given: a company + 2 users authenticated in that company
         $company = CompanyFactory::createOne()->_real();
-        $alice   = UserFactory::createOne(['company' => $company, 'email' => 'alice@example.com'])->_real();
-        $bob     = UserFactory::createOne(['company' => $company, 'email' => 'bob@example.com'])->_real();
+        $alice = UserFactory::createOne(['company' => $company, 'email' => 'alice@example.com'])->_real();
+        $bob = UserFactory::createOne(['company' => $company, 'email' => 'bob@example.com'])->_real();
 
         $this->authenticate($alice);
 
@@ -67,7 +67,7 @@ final class NotificationEventChainTest extends KernelTestCase
 
         // Then: 2 notifications persisted (one per recipient), both bound to the same company
         $aliceUnread = $this->notificationRepository->findUnreadByUser($alice);
-        $bobUnread   = $this->notificationRepository->findUnreadByUser($bob);
+        $bobUnread = $this->notificationRepository->findUnreadByUser($bob);
 
         self::assertCount(1, $aliceUnread);
         self::assertCount(1, $bobUnread);
@@ -80,7 +80,7 @@ final class NotificationEventChainTest extends KernelTestCase
     {
         // Given: an event with a recipient whose company is misaligned -> service may raise
         $company = CompanyFactory::createOne()->_real();
-        $alice   = UserFactory::createOne(['company' => $company])->_real();
+        $alice = UserFactory::createOne(['company' => $company])->_real();
 
         $this->authenticate($alice);
 

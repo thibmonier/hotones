@@ -29,9 +29,9 @@ class SecureFileUploadServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->slugger    = $this->createMock(SluggerInterface::class);
+        $this->slugger = $this->createMock(SluggerInterface::class);
         $this->filesystem = $this->createMock(FilesystemOperator::class);
-        $this->logger     = $this->createMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         // Default service instance (dev environment)
         $this->service = new SecureFileUploadService(
@@ -414,10 +414,10 @@ class SecureFileUploadServiceTest extends TestCase
 
         // Generate minimal valid file content based on MIME type
         $content = match (true) {
-            str_starts_with($mimeType, 'image/jpeg')      => $this->createMinimalJpeg(),
-            str_starts_with($mimeType, 'image/png')       => $this->createMinimalPng(),
+            str_starts_with($mimeType, 'image/jpeg') => $this->createMinimalJpeg(),
+            str_starts_with($mimeType, 'image/png') => $this->createMinimalPng(),
             str_starts_with($mimeType, 'application/pdf') => '%PDF-1.4',
-            default                                       => 'test content',
+            default => 'test content',
         };
 
         file_put_contents($tempFile, $content);

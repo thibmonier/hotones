@@ -25,8 +25,8 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->messageBus    = $this->createMock(MessageBusInterface::class);
-        $this->command       = new DispatchMetricsRecalculationCommand($this->messageBus);
+        $this->messageBus = $this->createMock(MessageBusInterface::class);
+        $this->command = new DispatchMetricsRecalculationCommand($this->messageBus);
         $this->commandTester = new CommandTester($this->command);
     }
 
@@ -52,7 +52,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithYearDispatchesMonthlyMessages(): void
     {
-        $year            = 2023;
+        $year = 2023;
         $dispatchedDates = [];
 
         $this->messageBus
@@ -60,7 +60,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
             ->willReturnCallback(function ($message) use (&$dispatchedDates) {
                 if ($message instanceof RecalculateMetricsMessage) {
                     $dispatchedDates[] = [
-                        'date'        => $message->date,
+                        'date' => $message->date,
                         'granularity' => $message->granularity,
                     ];
                 }
@@ -89,7 +89,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithYearDispatchesQuarterlyMessages(): void
     {
-        $year            = 2023;
+        $year = 2023;
         $dispatchedDates = [];
 
         $this->messageBus
@@ -97,7 +97,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
             ->willReturnCallback(function ($message) use (&$dispatchedDates) {
                 if ($message instanceof RecalculateMetricsMessage) {
                     $dispatchedDates[] = [
-                        'date'        => $message->date,
+                        'date' => $message->date,
                         'granularity' => $message->granularity,
                     ];
                 }
@@ -113,7 +113,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
         // Verify dates: Q1=01-01, Q2=04-01, Q3=07-01, Q4=10-01
         $expectedQuarterlyDates = ['2023-01-01', '2023-04-01', '2023-07-01', '2023-10-01'];
-        $actualQuarterlyDates   = array_column(array_values($quarterlyMessages), 'date');
+        $actualQuarterlyDates = array_column(array_values($quarterlyMessages), 'date');
         sort($actualQuarterlyDates);
 
         $this->assertEquals($expectedQuarterlyDates, $actualQuarterlyDates);
@@ -121,7 +121,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithYearDispatchesYearlyMessage(): void
     {
-        $year            = 2023;
+        $year = 2023;
         $dispatchedDates = [];
 
         $this->messageBus
@@ -129,7 +129,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
             ->willReturnCallback(function ($message) use (&$dispatchedDates) {
                 if ($message instanceof RecalculateMetricsMessage) {
                     $dispatchedDates[] = [
-                        'date'        => $message->date,
+                        'date' => $message->date,
                         'granularity' => $message->granularity,
                     ];
                 }
@@ -174,7 +174,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
     public function testExecuteWithDateAndCustomGranularity(): void
     {
-        $date        = '2024-01-01';
+        $date = '2024-01-01';
         $granularity = 'quarterly';
 
         $capturedMessage = null;
@@ -187,7 +187,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
             });
 
         $exitCode = $this->commandTester->execute([
-            '--date'        => $date,
+            '--date' => $date,
             '--granularity' => $granularity,
         ]);
 

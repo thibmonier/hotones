@@ -42,7 +42,7 @@ final class RunningTimerRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->repository = static::getContainer()->get(RunningTimerRepository::class);
-        $this->em         = $this->getEntityManager();
+        $this->em = $this->getEntityManager();
         $this->setUpMultiTenant();
     }
 
@@ -56,7 +56,7 @@ final class RunningTimerRepositoryTest extends KernelTestCase
     public function testFindActiveByContributorReturnsRunningTimer(): void
     {
         $contributor = ContributorFactory::createOne()->_real();
-        $project     = ProjectFactory::createOne()->_real();
+        $project = ProjectFactory::createOne()->_real();
 
         $timer = $this->createTimer($contributor, $project, startedAt: new DateTime('2026-04-30 09:00:00'));
 
@@ -70,7 +70,7 @@ final class RunningTimerRepositoryTest extends KernelTestCase
     public function testFindActiveByContributorIgnoresStoppedTimer(): void
     {
         $contributor = ContributorFactory::createOne()->_real();
-        $project     = ProjectFactory::createOne()->_real();
+        $project = ProjectFactory::createOne()->_real();
 
         $stopped = $this->createTimer(
             $contributor,
@@ -86,7 +86,7 @@ final class RunningTimerRepositoryTest extends KernelTestCase
     public function testFindActiveByContributorReturnsActiveAmongMixedHistory(): void
     {
         $contributor = ContributorFactory::createOne()->_real();
-        $project     = ProjectFactory::createOne()->_real();
+        $project = ProjectFactory::createOne()->_real();
 
         $this->createTimer(
             $contributor,
@@ -114,8 +114,8 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
     public function testFindActiveByContributorIsolatesPerContributor(): void
     {
-        $alice   = ContributorFactory::createOne()->_real();
-        $bob     = ContributorFactory::createOne()->_real();
+        $alice = ContributorFactory::createOne()->_real();
+        $bob = ContributorFactory::createOne()->_real();
         $project = ProjectFactory::createOne()->_real();
 
         $this->createTimer($alice, $project, startedAt: new DateTime('2026-04-30 09:00:00'));

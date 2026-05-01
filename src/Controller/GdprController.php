@@ -61,8 +61,8 @@ class GdprController extends AbstractController
         // Log pour debugging
         $this->container->get('logger')->info('Cookie consent saved', [
             'consent_id' => $consent->getId(),
-            'user_id'    => $user?->getId(),
-            'ip'         => $consent->getIpAddress(),
+            'user_id' => $user?->getId(),
+            'ip' => $consent->getIpAddress(),
         ]);
 
         return new JsonResponse([
@@ -167,7 +167,7 @@ class GdprController extends AbstractController
         if ($existingRequest) {
             return new JsonResponse([
                 'success' => false,
-                'error'   => 'Une demande de suppression est déjà en cours pour votre compte.',
+                'error' => 'Une demande de suppression est déjà en cours pour votre compte.',
             ], 400);
         }
 
@@ -185,9 +185,9 @@ class GdprController extends AbstractController
             $message = 'Demande enregistrée. Consultez votre email pour confirmer (lien valide 48h).';
         } catch (Exception $e) {
             $this->container->get('logger')->error('Failed to send deletion request email', [
-                'user_id'    => $user->getId(),
+                'user_id' => $user->getId(),
                 'request_id' => $deletionRequest->getId(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
             $message = 'Demande enregistrée mais l\'email de confirmation n\'a pas pu être envoyé. Contactez le support.';
         }
@@ -237,9 +237,9 @@ class GdprController extends AbstractController
             $emailService->sendDeletionConfirmed($deletionRequest);
         } catch (Exception $e) {
             $this->container->get('logger')->error('Failed to send deletion confirmed email', [
-                'user_id'    => $deletionRequest->getUser()->getId(),
+                'user_id' => $deletionRequest->getUser()->getId(),
                 'request_id' => $deletionRequest->getId(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -270,14 +270,14 @@ class GdprController extends AbstractController
         if (!$deletionRequest) {
             return new JsonResponse([
                 'success' => false,
-                'error'   => 'Aucune demande de suppression active trouvée.',
+                'error' => 'Aucune demande de suppression active trouvée.',
             ], 404);
         }
 
         if (!$deletionRequest->isInGracePeriod()) {
             return new JsonResponse([
                 'success' => false,
-                'error'   => 'Cette demande ne peut plus être annulée.',
+                'error' => 'Cette demande ne peut plus être annulée.',
             ], 400);
         }
 
@@ -290,9 +290,9 @@ class GdprController extends AbstractController
             $emailService->sendDeletionCancelled($deletionRequest);
         } catch (Exception $e) {
             $this->container->get('logger')->error('Failed to send deletion cancelled email', [
-                'user_id'    => $user->getId(),
+                'user_id' => $user->getId(),
                 'request_id' => $deletionRequest->getId(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
 

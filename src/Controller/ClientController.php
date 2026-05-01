@@ -31,7 +31,7 @@ class ClientController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
         $session = $request->getSession();
-        $reset   = (bool) $request->query->get('reset', false);
+        $reset = (bool) $request->query->get('reset', false);
         if ($reset) {
             $session->remove('client_filters');
 
@@ -39,31 +39,31 @@ class ClientController extends AbstractController
         }
 
         // Charger filtres depuis la session si aucun filtre explicite n'est fourni
-        $queryAll   = $request->query->all();
+        $queryAll = $request->query->all();
         $filterKeys = ['search', 'service_level', 'per_page', 'sort', 'dir'];
-        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved      = $session->has('client_filters') ? (array) $session->get('client_filters') : [];
+        $hasFilter = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved = $session->has('client_filters') ? (array) $session->get('client_filters') : [];
 
         // Filtres
-        $search       = $hasFilter ? ($request->query->get('search') ?: '') : $saved['search']               ?? '';
+        $search = $hasFilter ? ($request->query->get('search') ?: '') : $saved['search'] ?? '';
         $serviceLevel = $hasFilter ? ($request->query->get('service_level') ?: '') : $saved['service_level'] ?? '';
 
         // Tri
         $sort = $hasFilter ? ($request->query->get('sort') ?: $saved['sort'] ?? 'name') : $saved['sort'] ?? 'name';
-        $dir  = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'ASC') : $saved['dir']     ?? 'ASC';
+        $dir = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'ASC') : $saved['dir'] ?? 'ASC';
 
         // Pagination
         $allowedPerPage = [10, 25, 50, 100];
-        $perPageParam   = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
-        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
+        $perPageParam = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
+        $perPage = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
 
         // Sauvegarder en session
         $session->set('client_filters', [
-            'search'        => $search,
+            'search' => $search,
             'service_level' => $serviceLevel,
-            'per_page'      => $perPage,
-            'sort'          => $sort,
-            'dir'           => $dir,
+            'per_page' => $perPage,
+            'sort' => $sort,
+            'dir' => $dir,
         ]);
 
         // Query builder avec filtres et tri
@@ -82,8 +82,8 @@ class ClientController extends AbstractController
 
         // Tri
         $validSortFields = ['name' => 'c.name', 'serviceLevel' => 'c.serviceLevel'];
-        $sortField       = $validSortFields[$sort] ?? 'c.name';
-        $sortDir         = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
+        $sortField = $validSortFields[$sort] ?? 'c.name';
+        $sortDir = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($sortField, $sortDir);
 
         // Pagination
@@ -92,11 +92,11 @@ class ClientController extends AbstractController
         return $this->render('client/index.html.twig', [
             'clients' => $pagination,
             'filters' => [
-                'search'        => $search,
+                'search' => $search,
                 'service_level' => $serviceLevel,
             ],
             'sort' => $sort,
-            'dir'  => $dir,
+            'dir' => $dir,
         ]);
     }
 
@@ -104,7 +104,7 @@ class ClientController extends AbstractController
     public function exportCsv(Request $request, EntityManagerInterface $em): Response
     {
         // Mêmes filtres que l'index
-        $search       = $request->query->get('search', '');
+        $search = $request->query->get('search', '');
         $serviceLevel = $request->query->get('service_level', '');
 
         $qb = $em->getRepository(Client::class)->createQueryBuilder('c')->orderBy('c.name', 'ASC');
@@ -128,7 +128,7 @@ class ClientController extends AbstractController
             $csv .= sprintf(
                 "%s;%s;%s;%d\n",
                 $client->getName(),
-                $client->getWebsite()      ?? '',
+                $client->getWebsite() ?? '',
                 $client->getServiceLevel() ?? '',
                 $client->getContacts()->count(),
             );
@@ -171,7 +171,7 @@ class ClientController extends AbstractController
             $logo = $request->files->get('logo');
             if ($logo instanceof UploadedFile && $logo->isValid()) {
                 $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads/clients';
-                $fs        = new Filesystem();
+                $fs = new Filesystem();
                 if (!$fs->exists($uploadDir)) {
                     $fs->mkdir($uploadDir, 0775);
                 }
@@ -232,7 +232,7 @@ class ClientController extends AbstractController
             $logo = $request->files->get('logo');
             if ($logo instanceof UploadedFile && $logo->isValid()) {
                 $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads/clients';
-                $fs        = new Filesystem();
+                $fs = new Filesystem();
                 if (!$fs->exists($uploadDir)) {
                     $fs->mkdir($uploadDir, 0775);
                 }
@@ -291,7 +291,7 @@ class ClientController extends AbstractController
         }
 
         return $this->render('client_contact/new.html.twig', [
-            'client'  => $client,
+            'client' => $client,
             'contact' => $contact,
         ]);
     }

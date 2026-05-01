@@ -39,7 +39,7 @@ class ChatbotController extends AbstractController
     #[Route('/message', name: 'chatbot_message', methods: ['POST'])]
     public function message(Request $request): JsonResponse
     {
-        $data        = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
         $userMessage = $data['message'] ?? '';
 
         if (empty($userMessage)) {
@@ -56,7 +56,7 @@ class ChatbotController extends AbstractController
             ]);
         } catch (Exception $e) {
             return new JsonResponse([
-                'error'   => 'Erreur lors de la communication avec l\'IA',
+                'error' => 'Erreur lors de la communication avec l\'IA',
                 'details' => $e->getMessage(),
             ], 500);
         }
@@ -108,13 +108,13 @@ class ChatbotController extends AbstractController
         $response = $client
             ->chat()
             ->create([
-                'model'    => 'gpt-4o-mini',
+                'model' => 'gpt-4o-mini',
                 'messages' => [
                     ['role' => 'system', 'content' => $this->getUnit404SystemPrompt()],
                     ['role' => 'user', 'content' => $userMessage],
                 ],
                 'temperature' => 0.9,
-                'max_tokens'  => 1024,
+                'max_tokens' => 1024,
             ]);
 
         return $response->choices[0]->message->content;
@@ -127,17 +127,17 @@ class ChatbotController extends AbstractController
     {
         $response = $this->httpClient->request('POST', 'https://api.anthropic.com/v1/messages', [
             'headers' => [
-                'x-api-key'         => $this->anthropicApiKey,
+                'x-api-key' => $this->anthropicApiKey,
                 'anthropic-version' => '2023-06-01',
-                'content-type'      => 'application/json',
+                'content-type' => 'application/json',
             ],
             'json' => [
-                'model'      => 'claude-3-haiku-20240307',
+                'model' => 'claude-3-haiku-20240307',
                 'max_tokens' => 1024,
-                'system'     => $this->getUnit404SystemPrompt(),
-                'messages'   => [
+                'system' => $this->getUnit404SystemPrompt(),
+                'messages' => [
                     [
-                        'role'    => 'user',
+                        'role' => 'user',
                         'content' => $userMessage,
                     ],
                 ],
@@ -170,7 +170,7 @@ class ChatbotController extends AbstractController
                         ],
                     ],
                     'generationConfig' => [
-                        'temperature'     => 0.9,
+                        'temperature' => 0.9,
                         'maxOutputTokens' => 1024,
                     ],
                 ],

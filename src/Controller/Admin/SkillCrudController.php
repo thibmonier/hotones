@@ -55,11 +55,11 @@ class SkillCrudController extends AbstractCrudController
         yield TextField::new('name', 'Nom')->setRequired(true);
 
         yield ChoiceField::new('category', 'Catégorie')->setChoices([
-            'Langage'      => 'language',
-            'Framework'    => 'framework',
-            'Outil'        => 'tool',
+            'Langage' => 'language',
+            'Framework' => 'framework',
+            'Outil' => 'tool',
             'Méthodologie' => 'methodology',
-            'Autre'        => 'other',
+            'Autre' => 'other',
         ])->setRequired(true);
 
         yield TextareaField::new('description', 'Description')->hideOnIndex();
@@ -73,11 +73,11 @@ class SkillCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters->add(ChoiceFilter::new('category', 'Catégorie')->setChoices([
-            'Langage'      => 'language',
-            'Framework'    => 'framework',
-            'Outil'        => 'tool',
+            'Langage' => 'language',
+            'Framework' => 'framework',
+            'Outil' => 'tool',
             'Méthodologie' => 'methodology',
-            'Autre'        => 'other',
+            'Autre' => 'other',
         ]))->add(BooleanFilter::new('active', 'Actif'));
     }
 

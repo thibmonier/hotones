@@ -33,7 +33,7 @@ final readonly class SendLeadNurturingEmailMessageHandler
 
         if (!$lead) {
             $this->logger->warning('Lead not found for nurturing email', [
-                'lead_id'    => $message->getLeadId(),
+                'lead_id' => $message->getLeadId(),
                 'day_number' => $message->getDayNumber(),
             ]);
 
@@ -44,7 +44,7 @@ final readonly class SendLeadNurturingEmailMessageHandler
         if (!$lead->hasMarketingConsent()) {
             $this->logger->info('Lead has no marketing consent, skipping nurturing email', [
                 'lead_id' => $lead->getId(),
-                'email'   => $lead->getEmail(),
+                'email' => $lead->getEmail(),
             ]);
 
             return;
@@ -52,23 +52,23 @@ final readonly class SendLeadNurturingEmailMessageHandler
 
         try {
             match ($message->getDayNumber()) {
-                1       => $this->sendDay1Email($lead),
-                3       => $this->sendDay3Email($lead),
-                7       => $this->sendDay7Email($lead),
+                1 => $this->sendDay1Email($lead),
+                3 => $this->sendDay3Email($lead),
+                7 => $this->sendDay7Email($lead),
                 default => throw new InvalidArgumentException('Invalid day number: '.$message->getDayNumber()),
             };
 
             $this->logger->info('Nurturing email sent successfully', [
-                'lead_id'    => $lead->getId(),
-                'email'      => $lead->getEmail(),
+                'lead_id' => $lead->getId(),
+                'email' => $lead->getEmail(),
                 'day_number' => $message->getDayNumber(),
             ]);
         } catch (Exception $e) {
             $this->logger->error('Failed to send nurturing email', [
-                'lead_id'    => $lead->getId(),
-                'email'      => $lead->getEmail(),
+                'lead_id' => $lead->getId(),
+                'email' => $lead->getEmail(),
                 'day_number' => $message->getDayNumber(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             throw $e;

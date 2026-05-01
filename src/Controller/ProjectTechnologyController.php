@@ -53,7 +53,7 @@ class ProjectTechnologyController extends AbstractController
 
         return $this->render('project/tech/index.html.twig', [
             'project' => $project,
-            'form'    => $form->createView(),
+            'form' => $form->createView(),
         ]);
     }
 
@@ -73,7 +73,7 @@ class ProjectTechnologyController extends AbstractController
         }
 
         return $this->render('project/tech/edit.html.twig', [
-            'pt'   => $pt,
+            'pt' => $pt,
             'form' => $form->createView(),
         ]);
     }

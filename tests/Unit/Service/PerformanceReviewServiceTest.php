@@ -27,12 +27,12 @@ class PerformanceReviewServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->em                    = $this->createMock(EntityManagerInterface::class);
-        $this->reviewRepository      = $this->createMock(PerformanceReviewRepository::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->reviewRepository = $this->createMock(PerformanceReviewRepository::class);
         $this->contributorRepository = $this->createMock(ContributorRepository::class);
-        $this->companyContext        = $this->createMock(CompanyContext::class);
-        $this->mailer                = $this->createMock(MailerInterface::class);
-        $this->service               = new PerformanceReviewService(
+        $this->companyContext = $this->createMock(CompanyContext::class);
+        $this->mailer = $this->createMock(MailerInterface::class);
+        $this->service = new PerformanceReviewService(
             $this->em,
             $this->reviewRepository,
             $this->contributorRepository,
@@ -106,7 +106,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setYear(2024);
 
         $contributor = $this->createContributor(1, 'John', 'Doe');
-        $manager     = $this->createMockUser('manager@example.com');
+        $manager = $this->createMockUser('manager@example.com');
         $review->setContributor($contributor);
         $review->setManager($manager);
 
@@ -132,7 +132,7 @@ class PerformanceReviewServiceTest extends TestCase
     public function testCompleteManagerEvaluation(): void
     {
         $manager = $this->createMockUser('manager@example.com');
-        $user    = $this->createMockUser('john@example.com');
+        $user = $this->createMockUser('john@example.com');
 
         $review = new PerformanceReview();
         $review->setStatus('auto_eval_faite');
@@ -169,7 +169,7 @@ class PerformanceReviewServiceTest extends TestCase
     public function testValidateReview(): void
     {
         $manager = $this->createMockUser('manager@example.com');
-        $user    = $this->createMockUser('john@example.com');
+        $user = $this->createMockUser('john@example.com');
 
         $review = new PerformanceReview();
         $review->setStatus('eval_manager_faite');
@@ -181,9 +181,9 @@ class PerformanceReviewServiceTest extends TestCase
 
         $objectives = [
             [
-                'title'       => 'Improve technical skills',
+                'title' => 'Improve technical skills',
                 'description' => 'Complete certification',
-                'deadline'    => '2025-06-30',
+                'deadline' => '2025-06-30',
             ],
         ];
 
@@ -203,8 +203,8 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCanEditSelfEvaluation(): void
     {
-        $manager     = $this->createMockUser('manager@example.com');
-        $user        = $this->createMockUser('john@example.com');
+        $manager = $this->createMockUser('manager@example.com');
+        $user = $this->createMockUser('john@example.com');
         $contributor = $this->createContributor(1, 'John', 'Doe', $user);
 
         $review = new PerformanceReview();
@@ -218,8 +218,8 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCanEditSelfEvaluationWhenAlreadyCompleted(): void
     {
-        $manager     = $this->createMockUser('manager@example.com');
-        $user        = $this->createMockUser('john@example.com');
+        $manager = $this->createMockUser('manager@example.com');
+        $user = $this->createMockUser('john@example.com');
         $contributor = $this->createContributor(1, 'John', 'Doe', $user);
 
         $review = new PerformanceReview();
@@ -233,7 +233,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCannotEditSelfEvaluationWhenManagerEvaluationCompleted(): void
     {
-        $user        = $this->createMockUser('john@example.com');
+        $user = $this->createMockUser('john@example.com');
         $contributor = $this->createContributor(1, 'John', 'Doe');
         $contributor->setUser($user);
 
@@ -246,7 +246,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCanEditManagerEvaluation(): void
     {
-        $manager     = $this->createMockUser('manager@example.com');
+        $manager = $this->createMockUser('manager@example.com');
         $contributor = $this->createContributor(1, 'John', 'Doe');
 
         $review = new PerformanceReview();
@@ -259,7 +259,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCannotEditManagerEvaluationWhenSelfEvaluationNotCompleted(): void
     {
-        $manager     = $this->createMockUser('manager@example.com');
+        $manager = $this->createMockUser('manager@example.com');
         $contributor = $this->createContributor(1, 'John', 'Doe');
 
         $review = new PerformanceReview();
@@ -272,7 +272,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCanValidateReview(): void
     {
-        $manager     = $this->createMockUser('manager@example.com');
+        $manager = $this->createMockUser('manager@example.com');
         $contributor = $this->createContributor(1, 'John', 'Doe');
 
         $review = new PerformanceReview();
@@ -285,7 +285,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     public function testCannotValidateReviewWhenManagerEvaluationNotCompleted(): void
     {
-        $manager     = $this->createMockUser('manager@example.com');
+        $manager = $this->createMockUser('manager@example.com');
         $contributor = $this->createContributor(1, 'John', 'Doe');
 
         $review = new PerformanceReview();
@@ -299,7 +299,7 @@ class PerformanceReviewServiceTest extends TestCase
     public function testGetContributorHistory(): void
     {
         $contributor = $this->createContributor(1, 'John', 'Doe');
-        $reviews     = [
+        $reviews = [
             new PerformanceReview(),
             new PerformanceReview(),
         ];

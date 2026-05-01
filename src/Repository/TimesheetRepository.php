@@ -188,8 +188,8 @@ class TimesheetRepository extends CompanyAwareRepository
         foreach ($results as $r) {
             $formatted[] = [
                 'project' => [
-                    'id'     => $r['projectId']         ?? null,
-                    'name'   => $r['projectName']       ?? null,
+                    'id' => $r['projectId'] ?? null,
+                    'name' => $r['projectName'] ?? null,
                     'client' => $r['projectClientName'] ?? null,
                 ],
                 'totalHours' => (float) ($r['totalHours'] ?? 0),
@@ -209,8 +209,8 @@ class TimesheetRepository extends CompanyAwareRepository
     ): ?Timesheet {
         return $this->findOneBy([
             'contributor' => $contributor,
-            'project'     => $project,
-            'date'        => $date,
+            'project' => $project,
+            'date' => $date,
         ]);
     }
 
@@ -410,9 +410,9 @@ class TimesheetRepository extends CompanyAwareRepository
     ): array {
         if (empty($projectIds)) {
             return [
-                'totalHours'     => 0.0,
+                'totalHours' => 0.0,
                 'totalHumanCost' => '0',
-                'totalRevenue'   => '0',
+                'totalRevenue' => '0',
             ];
         }
 
@@ -441,9 +441,9 @@ class TimesheetRepository extends CompanyAwareRepository
 
         // Retourner sous formes attendues (strings pour montants comme ailleurs)
         return [
-            'totalHours'     => (float) ($row['totalHours'] ?? 0),
+            'totalHours' => (float) ($row['totalHours'] ?? 0),
             'totalHumanCost' => (string) ($row['totalHumanCost'] ?? '0'),
-            'totalRevenue'   => (string) ($row['totalRevenue'] ?? '0'),
+            'totalRevenue' => (string) ($row['totalRevenue'] ?? '0'),
         ];
     }
 

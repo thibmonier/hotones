@@ -37,10 +37,10 @@ class AlertDetectionService
     public function checkAllAlerts(): array
     {
         return [
-            'budget_alerts'   => $this->checkBudgetAlerts(),
-            'margin_alerts'   => $this->checkMarginAlerts(),
+            'budget_alerts' => $this->checkBudgetAlerts(),
+            'margin_alerts' => $this->checkMarginAlerts(),
             'overload_alerts' => $this->checkWorkloadAlerts(),
-            'payment_alerts'  => $this->checkPaymentAlerts(),
+            'payment_alerts' => $this->checkPaymentAlerts(),
         ];
     }
 
@@ -62,10 +62,10 @@ class AlertDetectionService
                 continue;
             }
 
-            $spentHours     = (float) $project->getTotalTasksSpentHours();
-            $consumedPct    = ($spentHours / $soldHours) * 100;
+            $spentHours = (float) $project->getTotalTasksSpentHours();
+            $consumedPct = ($spentHours / $soldHours) * 100;
             $globalProgress = (float) $project->getGlobalProgress();
-            $timeRemaining  = 100 - $globalProgress;
+            $timeRemaining = 100 - $globalProgress;
 
             // Alert threshold: >80% budget consumed AND <20% time remaining
             if ($consumedPct >= 80 && $timeRemaining < 20) {
@@ -134,7 +134,7 @@ class AlertDetectionService
     private function checkWorkloadAlerts(): int
     {
         $alertCount = 0;
-        $now        = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         // Check next 3 months
         for ($i = 0; $i < 3; ++$i) {
@@ -174,7 +174,7 @@ class AlertDetectionService
      */
     private function checkPaymentAlerts(): int
     {
-        $alertCount       = 0;
+        $alertCount = 0;
         $sevenDaysFromNow = new DateTimeImmutable()->modify('+7 days');
 
         // Find all active orders
@@ -185,7 +185,7 @@ class AlertDetectionService
                 // Check if due within 7 days
                 // Note: Actual billing status tracking may be elsewhere in the system
                 if ($schedule->getBillingDate() <= $sevenDaysFromNow) {
-                    $recipients   = $this->getPaymentAlertRecipients($order);
+                    $recipients = $this->getPaymentAlertRecipients($order);
                     $daysUntilDue = new DateTime()->diff($schedule->getBillingDate())->days;
 
                     $this->eventDispatcher->dispatch(
@@ -222,19 +222,19 @@ class AlertDetectionService
         $metrics = $qb->getQuery()->getOneOrNullResult();
 
         if ($metrics) {
-            $plannedDays   = (float) $metrics->getPlannedDays();
+            $plannedDays = (float) $metrics->getPlannedDays();
             $availableDays = (float) $metrics->getAvailableDays();
-            $capacityRate  = $availableDays > 0 ? ($plannedDays / $availableDays) * 100 : 0;
+            $capacityRate = $availableDays > 0 ? ($plannedDays / $availableDays) * 100 : 0;
 
             return [
-                'totalDays'    => $plannedDays,
+                'totalDays' => $plannedDays,
                 'capacityRate' => $capacityRate,
             ];
         }
 
         // Fallback: no metrics available
         return [
-            'totalDays'    => 0,
+            'totalDays' => 0,
             'capacityRate' => 0,
         ];
     }
@@ -289,7 +289,7 @@ class AlertDetectionService
     private function getPaymentAlertRecipients($order): array
     {
         $recipients = [];
-        $project    = $order->getProject();
+        $project = $order->getProject();
 
         // Add project manager
         if ($project && $project->getProjectManager()) {
@@ -320,12 +320,12 @@ class AlertDetectionService
     private function uniqueUsers(array $users): array
     {
         $uniqueIds = [];
-        $result    = [];
+        $result = [];
 
         foreach ($users as $user) {
             if (!in_array($user->getId(), $uniqueIds, true)) {
                 $uniqueIds[] = $user->getId();
-                $result[]    = $user;
+                $result[] = $user;
             }
         }
 

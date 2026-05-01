@@ -38,14 +38,14 @@ class DashboardController extends AbstractController
         // Si pas de période dans l'URL, utiliser la session ou 'month' par défaut
         if ($period === null) {
             $session = $request->getSession();
-            $period  = $session->get('dashboard_period', 'month');
+            $period = $session->get('dashboard_period', 'month');
         } else {
             // Si période fournie dans l'URL, la sauvegarder en session
             $request->getSession()->set('dashboard_period', $period);
         }
 
         $customStart = $request->query->get('start_date');
-        $customEnd   = $request->query->get('end_date');
+        $customEnd = $request->query->get('end_date');
 
         // Calculer les dates selon la période sélectionnée
         [$startDate, $endDate] = $this->calculatePeriodDates($period, $customStart, $customEnd);
@@ -53,7 +53,7 @@ class DashboardController extends AbstractController
         // Filtres (Lot 3.2)
         $filters = [
             'project_type' => $request->query->get('project_type') ?: null, // 'forfait' | 'regie'
-            'is_internal'  => $request->query->get('client_type') === 'internal'
+            'is_internal' => $request->query->get('client_type') === 'internal'
                 ? true
                 : ($request->query->get('client_type') === 'client' ? false : null),
             'project_manager_id' => $request->query->get('project_manager_id')
@@ -76,11 +76,11 @@ class DashboardController extends AbstractController
         // Adapter le nombre de mois pour l'évolution selon la période
         $monthsToShow = match ($period) {
             'today', 'week' => 3, // 3 mois de contexte pour les courtes périodes
-            'month'   => 12, // 12 mois glissants
+            'month' => 12, // 12 mois glissants
             'quarter' => 12, // 12 mois pour voir les tendances
-            'year'    => 12, // 12 derniers mois
-            'custom'  => max(3, min(12, (int) ceil($startDate->diff($endDate)->days / 30))), // Entre 3 et 12 mois
-            default   => 12,
+            'year' => 12, // 12 derniers mois
+            'custom' => max(3, min(12, (int) ceil($startDate->diff($endDate)->days / 30))), // Entre 3 et 12 mois
+            default => 12,
         };
 
         // Récupérer l'évolution mensuelle depuis le modèle en étoile
@@ -92,8 +92,8 @@ class DashboardController extends AbstractController
                 $startDate,
                 $endDate,
             ),
-            'sales_persons'      => $this->projectRepository->getDistinctSalesPersonsBetweenDates($startDate, $endDate),
-            'technologies'       => $this->projectRepository->getDistinctTechnologiesBetweenDates($startDate, $endDate),
+            'sales_persons' => $this->projectRepository->getDistinctSalesPersonsBetweenDates($startDate, $endDate),
+            'technologies' => $this->projectRepository->getDistinctTechnologiesBetweenDates($startDate, $endDate),
             'service_categories' => $this->projectRepository->getDistinctServiceCategoriesBetweenDates(
                 $startDate,
                 $endDate,
@@ -101,13 +101,13 @@ class DashboardController extends AbstractController
         ];
 
         return $this->render('analytics/dashboard.html.twig', [
-            'kpis'              => $kpis,
+            'kpis' => $kpis,
             'monthly_evolution' => $monthlyEvolution,
-            'selected_period'   => $period,
-            'start_date'        => $startDate,
-            'end_date'          => $endDate,
-            'filters'           => $filters,
-            'filter_options'    => $filterOptions,
+            'selected_period' => $period,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'filters' => $filters,
+            'filter_options' => $filterOptions,
         ]);
     }
 
@@ -155,7 +155,7 @@ class DashboardController extends AbstractController
      */
     private function getQuarterStart(DateTime $date): DateTime
     {
-        $month             = (int) $date->format('n');
+        $month = (int) $date->format('n');
         $quarterStartMonth = (int) (floor(($month - 1) / 3) * 3) + 1;
 
         return (clone $date)->setDate((int) $date->format('Y'), $quarterStartMonth, 1)->setTime(0, 0);
@@ -176,16 +176,16 @@ class DashboardController extends AbstractController
     public function exportExcel(Request $request): Response
     {
         // Récupérer les mêmes paramètres que pour le dashboard
-        $period      = $request->query->get('period', 'month');
+        $period = $request->query->get('period', 'month');
         $customStart = $request->query->get('start_date');
-        $customEnd   = $request->query->get('end_date');
+        $customEnd = $request->query->get('end_date');
 
         [$startDate, $endDate] = $this->calculatePeriodDates($period, $customStart, $customEnd);
 
         // Filtres
         $filters = [
             'project_type' => $request->query->get('project_type') ?: null,
-            'is_internal'  => $request->query->get('client_type') === 'internal'
+            'is_internal' => $request->query->get('client_type') === 'internal'
                 ? true
                 : ($request->query->get('client_type') === 'client' ? false : null),
             'project_manager_id' => $request->query->get('project_manager_id')
@@ -203,7 +203,7 @@ class DashboardController extends AbstractController
         ];
 
         // Récupérer les données
-        $kpis             = $this->dashboardReadService->getKPIs($startDate, $endDate, $filters);
+        $kpis = $this->dashboardReadService->getKPIs($startDate, $endDate, $filters);
         $monthlyEvolution = $this->dashboardReadService->getMonthlyEvolution(12, $filters);
 
         // Générer et télécharger le fichier Excel
@@ -214,7 +214,7 @@ class DashboardController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function recalculate(Request $request): JsonResponse
     {
-        $period      = $request->request->get('period', date('Y'));
+        $period = $request->request->get('period', date('Y'));
         $granularity = $request->request->get('granularity', 'monthly');
 
         try {

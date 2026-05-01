@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 trait MultiTenantTestTrait
 {
     private ?Company $testCompany = null;
-    private ?User $testUser       = null;
+    private ?User $testUser = null;
 
     /**
      * Setup multi-tenant : crée une Company et authentifie un User.
@@ -32,7 +32,7 @@ trait MultiTenantTestTrait
     protected function setUpMultiTenant(): void
     {
         $this->testCompany = $this->createTestCompany();
-        $this->testUser    = $this->authenticateTestUser($this->testCompany);
+        $this->testUser = $this->authenticateTestUser($this->testCompany);
     }
 
     /**
@@ -69,14 +69,14 @@ trait MultiTenantTestTrait
         $user->setEmail('test@test.com');
         $user->setPassword('password');
         $user->firstName = 'Test';
-        $user->lastName  = 'User';
+        $user->lastName = 'User';
         $user->setRoles($roles);
 
         $em = $this->getEntityManager();
         $em->persist($user);
         $em->flush();
 
-        $token        = new UsernamePasswordToken($user, 'main', $user->getRoles());
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
         $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
 

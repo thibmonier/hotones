@@ -25,19 +25,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 class LeadCapture implements CompanyOwnedInterface
 {
     // Sources possibles
-    public const SOURCE_HOMEPAGE  = 'homepage';
-    public const SOURCE_PRICING   = 'pricing';
+    public const SOURCE_HOMEPAGE = 'homepage';
+    public const SOURCE_PRICING = 'pricing';
     public const SOURCE_ANALYTICS = 'analytics';
-    public const SOURCE_FEATURES  = 'features';
-    public const SOURCE_CONTACT   = 'contact';
-    public const SOURCE_OTHER     = 'other';
+    public const SOURCE_FEATURES = 'features';
+    public const SOURCE_CONTACT = 'contact';
+    public const SOURCE_OTHER = 'other';
 
     // Statuts du lead
-    public const STATUS_NEW       = 'new';
+    public const STATUS_NEW = 'new';
     public const STATUS_NURTURING = 'nurturing';
     public const STATUS_QUALIFIED = 'qualified';
     public const STATUS_CONVERTED = 'converted';
-    public const STATUS_LOST      = 'lost';
+    public const STATUS_LOST = 'lost';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -416,7 +416,7 @@ class LeadCapture implements CompanyOwnedInterface
      */
     public function getDaysSinceCreation(): int
     {
-        $now      = new DateTime();
+        $now = new DateTime();
         $interval = $this->createdAt->diff($now);
 
         return (int) $interval->days;

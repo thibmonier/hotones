@@ -40,7 +40,7 @@ class PlanningController extends AbstractController
         ContributorRepository $contributorRepo,
         TaceAnalyzer $taceAnalyzer,
     ): Response {
-        $weeks      = max(1, (int) $request->query->get('weeks', 8));
+        $weeks = max(1, (int) $request->query->get('weeks', 8));
         $startParam = $request->query->get('start');
 
         // Filters (arrays)
@@ -52,7 +52,7 @@ class PlanningController extends AbstractController
             $request->query->all('project_managers'),
             fn ($v): bool => $v !== null && $v !== '',
         );
-        $selectedProjects     = array_filter($request->query->all('projects'), fn ($v): bool => $v !== null && $v !== '');
+        $selectedProjects = array_filter($request->query->all('projects'), fn ($v): bool => $v !== null && $v !== '');
         $selectedProjectTypes = array_filter(
             $request->query->all('project_types'),
             fn ($v): bool => $v !== null && $v !== '',
@@ -61,10 +61,10 @@ class PlanningController extends AbstractController
         $today = new DateTime('today');
         // Start at Monday of the current week by default
         $start = $startParam ? new DateTime($startParam) : (clone $today)->modify('monday this week');
-        $end   = (clone $start)->modify('+'.(($weeks * 7) - 1).' days');
+        $end = (clone $start)->modify('+'.(($weeks * 7) - 1).' days');
 
         // Build timeline dates (inclusive)
-        $period        = new DatePeriod($start, new DateInterval('P1D'), (clone $end)->modify('+1 day'));
+        $period = new DatePeriod($start, new DateInterval('P1D'), (clone $end)->modify('+1 day'));
         $timelineDates = iterator_to_array($period);
 
         // Base contributors list (optionally filtered)
@@ -118,11 +118,11 @@ class PlanningController extends AbstractController
         $planningsByContributor = [];
         foreach ($plannings as $planning) {
             /** @var Planning $planning */
-            $cid                                  = $planning->getContributor()->id;
-            $project                              = $planning->getProject();
-            $pid                                  = $project->id;
+            $cid = $planning->getContributor()->id;
+            $project = $planning->getProject();
+            $pid = $project->id;
             $planningsByContributor[$cid][$pid][] = $planning;
-            $availableProjects[$pid]              = $project; // deduplicate by id
+            $availableProjects[$pid] = $project; // deduplicate by id
             if ($project->projectManager) {
                 $availableManagers[$project->projectManager->getId()] = $project->projectManager;
             }
@@ -135,15 +135,15 @@ class PlanningController extends AbstractController
             if ($planning->getStatus() === 'cancelled') {
                 continue;
             }
-            $cid    = $planning->getContributor()->id;
-            $ps     = $planning->getStartDate() < $start ? clone $start : clone $planning->getStartDate();
-            $pe     = $planning->getEndDate() > $end ? clone $end : clone $planning->getEndDate();
+            $cid = $planning->getContributor()->id;
+            $ps = $planning->getStartDate() < $start ? clone $start : clone $planning->getStartDate();
+            $pe = $planning->getEndDate() > $end ? clone $end : clone $planning->getEndDate();
             $cursor = $ps;
             while ($cursor <= $pe) {
                 // weekdays only (Mon-Fri); 'w' Sunday=0, Saturday=6
                 $w = (int) $cursor->format('w');
                 if ($w !== 0 && $w !== 6) {
-                    $key                              = $cursor->format('Y-m-d');
+                    $key = $cursor->format('Y-m-d');
                     $plannedByContributor[$cid][$key] = ($plannedByContributor[$cid][$key] ?? 0) + (float) $planning->getDailyHours();
                 }
                 $cursor = (clone $cursor)->modify('+1 day');
@@ -175,11 +175,11 @@ class PlanningController extends AbstractController
                 ->andWhere('tpm.id IN (:mids)')
                 ->setParameter('mids', $selectedManagers);
         }
-        $tsRows              = $tsQb->getQuery()->getResult();
+        $tsRows = $tsQb->getQuery()->getResult();
         $totalsByContributor = [];
         foreach ($tsRows as $r) {
-            $cid                                 = (int) $r['cid'];
-            $dateKey                             = $r['d']->format('Y-m-d');
+            $cid = (int) $r['cid'];
+            $dateKey = $r['d']->format('Y-m-d');
             $totalsByContributor[$cid][$dateKey] = (float) $r['hours'];
         }
 
@@ -213,14 +213,14 @@ class PlanningController extends AbstractController
         $vacationDaysByContributor = [];
         foreach ($vacations as $vacation) {
             /** @var Vacation $vacation */
-            $cid    = $vacation->getContributor()->getId();
-            $vs     = $vacation->getStartDate() < $start ? clone $start : clone $vacation->getStartDate();
-            $ve     = $vacation->getEndDate() > $end ? clone $end : clone $vacation->getEndDate();
+            $cid = $vacation->getContributor()->getId();
+            $vs = $vacation->getStartDate() < $start ? clone $start : clone $vacation->getStartDate();
+            $ve = $vacation->getEndDate() > $end ? clone $end : clone $vacation->getEndDate();
             $cursor = $vs;
             while ($cursor <= $ve) {
                 $w = (int) $cursor->format('w');
                 if ($w !== 0 && $w !== 6) {
-                    $key                                   = $cursor->format('Y-m-d');
+                    $key = $cursor->format('Y-m-d');
                     $vacationDaysByContributor[$cid][$key] = true;
                 }
                 $cursor = (clone $cursor)->modify('+1 day');
@@ -244,9 +244,9 @@ class PlanningController extends AbstractController
         $contributorDailyHours = [];
         foreach ($employmentPeriods as $employmentPeriod) {
             /** @var EmploymentPeriod $employmentPeriod */
-            $cid         = $employmentPeriod->contributor->id;
+            $cid = $employmentPeriod->contributor->id;
             $weeklyHours = (float) $employmentPeriod->weeklyHours;
-            $workPct     = (float) $employmentPeriod->workTimePercentage;
+            $workPct = (float) $employmentPeriod->workTimePercentage;
             // Daily hours = (weekly hours * work% / 100) / 5 days
             $dailyHours = (($weeklyHours * $workPct) / 100) / 5;
             $contributorDailyHours[$cid] ??= [];
@@ -268,8 +268,8 @@ class PlanningController extends AbstractController
 
         $weeklyStaffing = [];
         foreach ($contributors as $contributor) {
-            $cid            = $contributor->id;
-            $dailyHours     = $contributorDailyHours[$cid] ?? 7.0;
+            $cid = $contributor->id;
+            $dailyHours = $contributorDailyHours[$cid] ?? 7.0;
             $weeklyMaxHours = $dailyHours * 5; // 5 working days
             foreach ($weekGroups as $weekKey => $dates) {
                 $plannedHours = 0;
@@ -282,8 +282,8 @@ class PlanningController extends AbstractController
                     }
                 }
                 // Calculate percentage
-                $staffingPct                         = $weeklyMaxHours > 0 ? ($plannedHours / $weeklyMaxHours) * 100 : 0;
-                $weeklyStaffing[$cid][$weekKey]      = $staffingPct;
+                $staffingPct = $weeklyMaxHours > 0 ? ($plannedHours / $weeklyMaxHours) * 100 : 0;
+                $weeklyStaffing[$cid][$weekKey] = $staffingPct;
                 $weeklyStaffing[$cid][$weekKey.'_h'] = $plannedHours;
             }
         }
@@ -291,20 +291,20 @@ class PlanningController extends AbstractController
         // Build grouped structure: one summary row per contributor + project rows
         $groups = [];
         foreach ($contributors as $contributor) {
-            $cid         = $contributor->id;
+            $cid = $contributor->id;
             $projectRows = [];
             if (isset($planningsByContributor[$cid])) {
                 foreach ($planningsByContributor[$cid] as $items) {
                     $projectRows[] = [
                         'project' => $items[0]->getProject(),
-                        'items'   => $items,
+                        'items' => $items,
                     ];
                 }
             }
             // Always include all active contributors to allow creating new plannings
             $groups[] = [
                 'contributor' => $contributor,
-                'totals'      => $totalsByContributor[$cid] ?? [],
+                'totals' => $totalsByContributor[$cid] ?? [],
                 'projectRows' => $projectRows,
             ];
         }
@@ -319,8 +319,8 @@ class PlanningController extends AbstractController
         if ($this->isGranted('ROLE_MANAGER')) {
             try {
                 $analysisStart = new DateTime('first day of this month');
-                $analysisEnd   = new DateTime('last day of next month');
-                $taceAnalysis  = $taceAnalyzer->analyzeAllContributors($analysisStart, $analysisEnd);
+                $analysisEnd = new DateTime('last day of next month');
+                $taceAnalysis = $taceAnalyzer->analyzeAllContributors($analysisStart, $analysisEnd);
             } catch (Exception) {
                 // Silently fail if analysis fails (missing metrics data)
                 $taceAnalysis = ['critical' => [], 'overloaded' => [], 'underutilized' => [], 'optimal' => []];
@@ -328,35 +328,35 @@ class PlanningController extends AbstractController
         }
 
         return $this->render('planning/index.html.twig', [
-            'contributors'                  => $contributors,
-            'timeline_start'                => $start,
-            'timeline_end'                  => $end,
-            'timeline_dates'                => $timelineDates,
-            'groups'                        => $groups,
+            'contributors' => $contributors,
+            'timeline_start' => $start,
+            'timeline_end' => $end,
+            'timeline_dates' => $timelineDates,
+            'groups' => $groups,
             'planned_totals_by_contributor' => $plannedByContributor,
-            'vacations_by_contributor'      => $vacationsByContributor,
-            'vacation_days_by_contributor'  => $vacationDaysByContributor,
-            'contributor_daily_hours'       => $contributorDailyHours,
-            'week_groups'                   => $weekGroups,
-            'weekly_staffing'               => $weeklyStaffing,
+            'vacations_by_contributor' => $vacationsByContributor,
+            'vacation_days_by_contributor' => $vacationDaysByContributor,
+            'contributor_daily_hours' => $contributorDailyHours,
+            'week_groups' => $weekGroups,
+            'weekly_staffing' => $weeklyStaffing,
             // filter UI data
-            'all_contributors'          => $contributorRepo->findActiveContributors(),
-            'all_projects'              => $allProjects,
-            'all_project_managers'      => array_values($availableManagers),
-            'project_types'             => ['forfait' => 'Forfait', 'regie' => 'Régie'],
-            'selected_contributors'     => $selectedContributors,
+            'all_contributors' => $contributorRepo->findActiveContributors(),
+            'all_projects' => $allProjects,
+            'all_project_managers' => array_values($availableManagers),
+            'project_types' => ['forfait' => 'Forfait', 'regie' => 'Régie'],
+            'selected_contributors' => $selectedContributors,
             'selected_project_managers' => $selectedManagers,
-            'selected_projects'         => $selectedProjects,
-            'selected_project_types'    => $selectedProjectTypes,
-            'tace_analysis'             => $taceAnalysis,
+            'selected_projects' => $selectedProjects,
+            'selected_project_types' => $selectedProjectTypes,
+            'tace_analysis' => $taceAnalysis,
         ]);
     }
 
     #[Route('/create', name: 'planning_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $data  = json_decode($request->getContent(), true) ?? [];
-        $token = $data['_token']                           ?? null;
+        $data = json_decode($request->getContent(), true) ?? [];
+        $token = $data['_token'] ?? null;
         if (!$this->isCsrfTokenValid('create_planning', $token)) {
             return new JsonResponse(['error' => 'Invalid CSRF token'], 400);
         }
@@ -373,7 +373,7 @@ class PlanningController extends AbstractController
 
         // Get contributor and project
         $contributor = $em->getRepository(Contributor::class)->find($data['contributorId']);
-        $project     = $em->getRepository(\App\Entity\Project::class)->find($data['projectId']);
+        $project = $em->getRepository(\App\Entity\Project::class)->find($data['projectId']);
 
         if (!$contributor || !$project) {
             return new JsonResponse(['error' => 'Contributor or Project not found'], 400);
@@ -400,18 +400,18 @@ class PlanningController extends AbstractController
         $em->flush();
 
         return new JsonResponse([
-            'ok'        => true,
-            'id'        => $planning->getId(),
+            'ok' => true,
+            'id' => $planning->getId(),
             'startDate' => $planning->getStartDate()->format('Y-m-d'),
-            'endDate'   => $planning->getEndDate()->format('Y-m-d'),
+            'endDate' => $planning->getEndDate()->format('Y-m-d'),
         ]);
     }
 
     #[Route('/{id}/move', name: 'planning_move', methods: ['POST'])]
     public function move(Request $request, Planning $planning, EntityManagerInterface $em): JsonResponse
     {
-        $data  = json_decode($request->getContent(), true) ?? [];
-        $token = $data['_token']                           ?? null;
+        $data = json_decode($request->getContent(), true) ?? [];
+        $token = $data['_token'] ?? null;
         if (!$this->isCsrfTokenValid('move_planning_'.$planning->getId(), $token)) {
             return new JsonResponse(['error' => 'Invalid CSRF token'], 400);
         }
@@ -422,8 +422,8 @@ class PlanningController extends AbstractController
         }
         $targetDate = new DateTime($targetDateStr);
 
-        $oldStart     = clone $planning->getStartDate();
-        $oldEnd       = clone $planning->getEndDate();
+        $oldStart = clone $planning->getStartDate();
+        $oldEnd = clone $planning->getEndDate();
         $durationDays = (int) $oldStart->diff($oldEnd)->format('%a');
 
         $planning->setStartDate($targetDate);
@@ -433,17 +433,17 @@ class PlanningController extends AbstractController
         $em->flush();
 
         return new JsonResponse([
-            'ok'        => true,
+            'ok' => true,
             'startDate' => $planning->getStartDate()->format('Y-m-d'),
-            'endDate'   => $planning->getEndDate()->format('Y-m-d'),
+            'endDate' => $planning->getEndDate()->format('Y-m-d'),
         ]);
     }
 
     #[Route('/{id}/update', name: 'planning_update', methods: ['POST'])]
     public function update(Request $request, Planning $planning, EntityManagerInterface $em): JsonResponse
     {
-        $data  = json_decode($request->getContent(), true) ?? [];
-        $token = $data['_token']                           ?? null;
+        $data = json_decode($request->getContent(), true) ?? [];
+        $token = $data['_token'] ?? null;
         if (!$this->isCsrfTokenValid('edit_planning_'.$planning->getId(), $token)) {
             return new JsonResponse(['error' => 'Invalid CSRF token'], 400);
         }
@@ -482,7 +482,7 @@ class PlanningController extends AbstractController
     private function validatePlanningCapacity(Planning $planning, EntityManagerInterface $em): array
     {
         $contributor = $planning->getContributor();
-        $dailyHours  = (float) $planning->getDailyHours();
+        $dailyHours = (float) $planning->getDailyHours();
 
         // Get active employment period for this contributor
         $period = $em
@@ -501,14 +501,14 @@ class PlanningController extends AbstractController
             // No active period found, use default 7h
             $maxDailyHours = 7.0;
         } else {
-            $weeklyHours   = (float) $period->getWeeklyHours();
-            $workPct       = (float) $period->getWorkTimePercentage();
+            $weeklyHours = (float) $period->getWeeklyHours();
+            $workPct = (float) $period->getWorkTimePercentage();
             $maxDailyHours = (($weeklyHours * $workPct) / 100) / 5;
         }
 
         if ($dailyHours > $maxDailyHours) {
             return [
-                'valid'   => false,
+                'valid' => false,
                 'message' => sprintf(
                     'La durée quotidienne (%.2fh) dépasse la capacité du collaborateur (%.2fh/jour)',
                     $dailyHours,
@@ -523,8 +523,8 @@ class PlanningController extends AbstractController
     #[Route('/{id}/split', name: 'planning_split', methods: ['POST'])]
     public function split(Request $request, Planning $planning, EntityManagerInterface $em): JsonResponse
     {
-        $data  = json_decode($request->getContent(), true) ?? [];
-        $token = $data['_token']                           ?? null;
+        $data = json_decode($request->getContent(), true) ?? [];
+        $token = $data['_token'] ?? null;
         if (!$this->isCsrfTokenValid('split_planning_'.$planning->getId(), $token)) {
             return new JsonResponse(['error' => 'Invalid CSRF token'], 400);
         }
@@ -536,7 +536,7 @@ class PlanningController extends AbstractController
 
         $splitDate = new DateTime($splitDateStr);
         $startDate = $planning->getStartDate();
-        $endDate   = $planning->getEndDate();
+        $endDate = $planning->getEndDate();
 
         // Validate split date is within the planning range
         if ($splitDate <= $startDate || $splitDate > $endDate) {
@@ -566,12 +566,12 @@ class PlanningController extends AbstractController
         $em->flush();
 
         return new JsonResponse([
-            'ok'           => true,
-            'original_id'  => $planning->getId(),
-            'new_id'       => $planning2->getId(),
+            'ok' => true,
+            'original_id' => $planning->getId(),
+            'new_id' => $planning2->getId(),
             'original_end' => $planning->getEndDate()->format('Y-m-d'),
-            'new_start'    => $planning2->getStartDate()->format('Y-m-d'),
-            'new_end'      => $planning2->getEndDate()->format('Y-m-d'),
+            'new_start' => $planning2->getStartDate()->format('Y-m-d'),
+            'new_end' => $planning2->getEndDate()->format('Y-m-d'),
         ]);
     }
 }

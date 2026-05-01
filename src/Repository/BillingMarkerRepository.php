@@ -44,13 +44,13 @@ class BillingMarkerRepository extends CompanyAwareRepository
         $rows = $qb->getQuery()->getResult();
 
         $bySchedule = [];
-        $byRegie    = [];
+        $byRegie = [];
         /** @var BillingMarker $bm */
         foreach ($rows as $bm) {
             if ($bm->getSchedule()) {
                 $bySchedule[$bm->getSchedule()->getId()] = $bm;
             } elseif ($bm->getOrder() && $bm->getYear() && $bm->getMonth()) {
-                $key           = sprintf('%d-%04d-%02d', $bm->getOrder()->id, $bm->getYear(), $bm->getMonth());
+                $key = sprintf('%d-%04d-%02d', $bm->getOrder()->id, $bm->getYear(), $bm->getMonth());
                 $byRegie[$key] = $bm;
             }
         }

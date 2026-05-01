@@ -15,9 +15,9 @@ final readonly class Pagination
         public int $perPage,
         public int $total,
     ) {
-        $this->totalPages = $total       > 0 ? (int) ceil($total / $perPage) : 1;
-        $this->hasPrev    = $currentPage > 1;
-        $this->hasNext    = ($currentPage * $perPage) < $total;
+        $this->totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
+        $this->hasPrev = $currentPage > 1;
+        $this->hasNext = ($currentPage * $perPage) < $total;
     }
 
     public static function create(int $page, int $perPage, int $total): self
@@ -32,11 +32,11 @@ final readonly class Pagination
     {
         return [
             'current_page' => $this->currentPage,
-            'per_page'     => $this->perPage,
-            'total'        => $this->total,
-            'total_pages'  => $this->totalPages,
-            'has_prev'     => $this->hasPrev,
-            'has_next'     => $this->hasNext,
+            'per_page' => $this->perPage,
+            'total' => $this->total,
+            'total_pages' => $this->totalPages,
+            'has_prev' => $this->hasPrev,
+            'has_next' => $this->hasNext,
         ];
     }
 }

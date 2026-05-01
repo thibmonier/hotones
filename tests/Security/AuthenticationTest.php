@@ -34,7 +34,7 @@ class AuthenticationTest extends WebTestCase
 
         // Se connecter avec un utilisateur non-admin
         $userRepository = static::getContainer()->get('doctrine')->getRepository(\App\Entity\User::class);
-        $regularUser    = $userRepository->findOneBy(['email' => 'test@example.com']);
+        $regularUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$regularUser) {
             $this->markTestSkipped('Regular user not found');
@@ -69,7 +69,7 @@ class AuthenticationTest extends WebTestCase
         $client = static::createClient();
 
         $userRepository = static::getContainer()->get('doctrine')->getRepository(\App\Entity\User::class);
-        $user2fa        = $userRepository->findOneBy(['totpSecret' => ['$ne' => null]]);
+        $user2fa = $userRepository->findOneBy(['totpSecret' => ['$ne' => null]]);
 
         if (!$user2fa) {
             $this->markTestSkipped('No user with 2FA enabled found');
@@ -95,7 +95,7 @@ class AuthenticationTest extends WebTestCase
         $client = static::createClient();
 
         $userRepository = static::getContainer()->get('doctrine')->getRepository(\App\Entity\User::class);
-        $testUser       = $userRepository->findOneBy(['email' => 'test@example.com']);
+        $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
             $this->markTestSkipped('Test user not found');

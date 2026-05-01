@@ -27,15 +27,15 @@ class ProfileController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $contributor       = $em->getRepository(Contributor::class)->findOneBy(['user' => $user]);
+        $contributor = $em->getRepository(Contributor::class)->findOneBy(['user' => $user]);
         $employmentPeriods = [];
         if ($contributor) {
             $employmentPeriods = $em->getRepository(EmploymentPeriod::class)->findByContributor($contributor);
         }
 
         return $this->render('profile/profile.html.twig', [
-            'user'              => $user,
-            'contributor'       => $contributor,
+            'user' => $user,
+            'contributor' => $contributor,
             'employmentPeriods' => $employmentPeriods,
         ]);
     }
@@ -54,7 +54,7 @@ class ProfileController extends AbstractController
             $user->firstName = $request->request->get('first_name');
             $user->setLastName($request->request->get('last_name'));
             $user->setEmail($request->request->get('email'));
-            $user->phoneWork     = $request->request->get('phone_work');
+            $user->phoneWork = $request->request->get('phone_work');
             $user->phonePersonal = $request->request->get('phone_personal');
             $user->setAddress($request->request->get('address'));
 
@@ -105,7 +105,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/2fa_setup.html.twig', [
             'otpauth_uri' => $totp->getProvisioningUri(),
-            'secret'      => $user->getTotpSecret(),
+            'secret' => $user->getTotpSecret(),
         ]);
     }
 
@@ -121,7 +121,7 @@ class ProfileController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $current = (string) $request->request->get('current_password');
-            $new     = (string) $request->request->get('new_password');
+            $new = (string) $request->request->get('new_password');
             $confirm = (string) $request->request->get('confirm_password');
 
             if (!$hasher->isPasswordValid($user, $current)) {
@@ -167,8 +167,8 @@ class ProfileController extends AbstractController
 
         if ($request->isMethod('POST')) {
             // Uniquement la préférence pour le rappel hebdo de temps pour commencer
-            $inApp   = (bool) $request->request->get('timesheet_missing_weekly_inapp', false);
-            $email   = (bool) $request->request->get('timesheet_missing_weekly_email', false);
+            $inApp = (bool) $request->request->get('timesheet_missing_weekly_inapp', false);
+            $email = (bool) $request->request->get('timesheet_missing_weekly_email', false);
             $webhook = false; // non exposé pour l'instant
 
             $prefs->upsert($user, \App\Enum\NotificationType::TIMESHEET_MISSING_WEEKLY, $inApp, $email, $webhook);
@@ -178,7 +178,7 @@ class ProfileController extends AbstractController
         }
 
         return $this->render('profile/notifications.html.twig', [
-            'user'    => $user,
+            'user' => $user,
             'current' => $current,
         ]);
     }

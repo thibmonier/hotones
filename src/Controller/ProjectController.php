@@ -45,30 +45,30 @@ class ProjectController extends AbstractController
         }
 
         // All filters from URL query parameters (single source of truth)
-        $year       = $request->query->getInt('year') ?: (int) date('Y');
+        $year = $request->query->getInt('year') ?: (int) date('Y');
         $startParam = $request->query->get('start_date') ?: null;
-        $endParam   = $request->query->get('end_date') ?: null;
+        $endParam = $request->query->get('end_date') ?: null;
 
         $startDate = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
-        $endDate   = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
+        $endDate = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
 
         // Filtres additionnels
-        $filterProjectType     = $request->query->get('project_type') ?: null;
-        $filterStatus          = $request->query->get('status') ?: null;
-        $filterTechnology      = $request->query->getInt('technology') ?: null;
+        $filterProjectType = $request->query->get('project_type') ?: null;
+        $filterStatus = $request->query->get('status') ?: null;
+        $filterTechnology = $request->query->getInt('technology') ?: null;
         $filterServiceCategory = $request->query->getInt('service_category') ?: null;
-        $filterSearch          = $request->query->get('search') ?: null;
+        $filterSearch = $request->query->get('search') ?: null;
 
         // Tri
         $sort = $request->query->get('sort') ?: 'name';
-        $dir  = $request->query->get('dir') ?: 'ASC';
+        $dir = $request->query->get('dir') ?: 'ASC';
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
-        $perPageParam   = $request->query->getInt('per_page') ?: 10;
-        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 10;
-        $page           = max(1, $request->query->getInt('page', 1));
-        $offset         = ($page - 1) * $perPage;
+        $perPageParam = $request->query->getInt('per_page') ?: 10;
+        $perPage = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 10;
+        $page = max(1, $request->query->getInt('page', 1));
+        $offset = ($page - 1) * $perPage;
 
         // Total
         $total = $projectRepo->countBetweenDatesFiltered(
@@ -108,16 +108,16 @@ class ProjectController extends AbstractController
         foreach ($projects as $project) {
             $pid = $project->id;
             $agg = $aggregates[$pid] ?? [
-                'total_revenue'       => '0',
-                'total_margin'        => '0',
-                'total_purchases'     => '0',
-                'orders_count'        => 0,
+                'total_revenue' => '0',
+                'total_margin' => '0',
+                'total_purchases' => '0',
+                'orders_count' => 0,
                 'signed_orders_count' => 0,
             ];
 
             // Ajouter l'achat projet (purchasesAmount)
             $projectPurchases = $project->purchasesAmount ?? '0';
-            $totalPurchases   = bcadd((string) $agg['total_purchases'], $projectPurchases, 2);
+            $totalPurchases = bcadd((string) $agg['total_purchases'], $projectPurchases, 2);
 
             // Taux de marge
             $marginRate = '0';
@@ -128,11 +128,11 @@ class ProjectController extends AbstractController
             $projectsWithMetrics[] = [
                 'project' => $project,
                 'metrics' => [
-                    'total_revenue'       => $agg['total_revenue'],
-                    'total_margin'        => $agg['total_margin'],
-                    'margin_rate'         => $marginRate,
-                    'total_purchases'     => $totalPurchases,
-                    'orders_count'        => $agg['orders_count'],
+                    'total_revenue' => $agg['total_revenue'],
+                    'total_margin' => $agg['total_margin'],
+                    'margin_rate' => $marginRate,
+                    'total_purchases' => $totalPurchases,
+                    'orders_count' => $agg['orders_count'],
                     'signed_orders_count' => $agg['signed_orders_count'],
                 ],
             ];
@@ -163,51 +163,51 @@ class ProjectController extends AbstractController
 
         $pagination = [
             'current_page' => $page,
-            'per_page'     => $perPage,
-            'total'        => $total,
-            'total_pages'  => (int) ceil($total / $perPage),
-            'has_prev'     => $page > 1,
-            'has_next'     => ($page * $perPage) < $total,
+            'per_page' => $perPage,
+            'total' => $total,
+            'total_pages' => (int) ceil($total / $perPage),
+            'has_prev' => $page > 1,
+            'has_next' => ($page * $perPage) < $total,
         ];
 
         // Options de filtres
         $filterOptions = [
-            'project_types'      => $projectRepo->getDistinctProjectTypes(),
-            'statuses'           => $projectRepo->getDistinctStatuses(),
-            'technologies'       => $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
+            'project_types' => $projectRepo->getDistinctProjectTypes(),
+            'statuses' => $projectRepo->getDistinctStatuses(),
+            'technologies' => $em->getRepository(Technology::class)->findBy(['active' => true], ['name' => 'ASC']),
             'service_categories' => $projectRepo->getDistinctServiceCategoriesBetweenDates($startDate, $endDate),
         ];
 
         return $this->render('project/index.html.twig', [
             'projects_with_metrics' => $projectsWithMetrics,
-            'filters'               => [
-                'year'             => $year,
-                'start_date'       => $startDate,
-                'end_date'         => $endDate,
-                'project_type'     => $filterProjectType,
-                'status'           => $filterStatus,
-                'technology'       => $filterTechnology,
+            'filters' => [
+                'year' => $year,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'project_type' => $filterProjectType,
+                'status' => $filterStatus,
+                'technology' => $filterTechnology,
                 'service_category' => $filterServiceCategory,
-                'search'           => $filterSearch,
+                'search' => $filterSearch,
             ],
             'filter_options' => $filterOptions,
-            'period_kpis'    => $periodKpis,
-            'pagination'     => $pagination,
-            'filters_query'  => [
-                'year'             => $year,
-                'start_date'       => $startDate->format('Y-m-d'),
-                'end_date'         => $endDate->format('Y-m-d'),
-                'project_type'     => $filterProjectType,
-                'status'           => $filterStatus,
-                'technology'       => $filterTechnology,
+            'period_kpis' => $periodKpis,
+            'pagination' => $pagination,
+            'filters_query' => [
+                'year' => $year,
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+                'project_type' => $filterProjectType,
+                'status' => $filterStatus,
+                'technology' => $filterTechnology,
                 'service_category' => $filterServiceCategory,
-                'search'           => $filterSearch,
-                'per_page'         => $perPage,
-                'sort'             => $sort,
-                'dir'              => $dir,
+                'search' => $filterSearch,
+                'per_page' => $perPage,
+                'sort' => $sort,
+                'dir' => $dir,
             ],
             'sort' => $sort,
-            'dir'  => strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC',
+            'dir' => strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC',
         ]);
     }
 
@@ -239,7 +239,7 @@ class ProjectController extends AbstractController
 
         return $this->render('project/new.html.twig', [
             'project' => $project,
-            'form'    => $form,
+            'form' => $form,
         ]);
     }
 
@@ -275,42 +275,42 @@ class ProjectController extends AbstractController
         $satisfactionData = $satisfactionRepo->getProjectSatisfactionEvolution($id, 12);
 
         // Devis du projet: tri + pagination
-        $orderRepo      = $em->getRepository(\App\Entity\Order::class);
+        $orderRepo = $em->getRepository(\App\Entity\Order::class);
         $allowedPerPage = [5, 10, 20, 50];
-        $oSort          = (string) $request->query->get('o_sort', 'createdAt');
-        $oDir           = (string) $request->query->get('o_dir', 'DESC');
-        $oPerPage       = (int) $request->query->get('o_per_page', 10);
-        $oPerPage       = in_array($oPerPage, $allowedPerPage, true) ? $oPerPage : 10;
-        $oPage          = max(1, (int) $request->query->get('o_page', 1));
-        $oOffset        = ($oPage - 1) * $oPerPage;
+        $oSort = (string) $request->query->get('o_sort', 'createdAt');
+        $oDir = (string) $request->query->get('o_dir', 'DESC');
+        $oPerPage = (int) $request->query->get('o_per_page', 10);
+        $oPerPage = in_array($oPerPage, $allowedPerPage, true) ? $oPerPage : 10;
+        $oPage = max(1, (int) $request->query->get('o_page', 1));
+        $oOffset = ($oPage - 1) * $oPerPage;
 
-        $orders      = $orderRepo->findWithFilters($project, null, $oSort, $oDir, $oPerPage, $oOffset);
-        $oTotal      = $orderRepo->countWithFilters($project, null);
+        $orders = $orderRepo->findWithFilters($project, null, $oSort, $oDir, $oPerPage, $oOffset);
+        $oTotal = $orderRepo->countWithFilters($project, null);
         $oPagination = [
             'current_page' => $oPage,
-            'per_page'     => $oPerPage,
-            'total'        => $oTotal,
-            'total_pages'  => (int) ceil($oTotal / $oPerPage),
-            'has_prev'     => $oPage > 1,
-            'has_next'     => ($oPage * $oPerPage) < $oTotal,
+            'per_page' => $oPerPage,
+            'total' => $oTotal,
+            'total_pages' => (int) ceil($oTotal / $oPerPage),
+            'has_prev' => $oPage > 1,
+            'has_next' => ($oPage * $oPerPage) < $oTotal,
         ];
 
         // Charger les événements du projet pour la timeline
         $events = $em->getRepository(\App\Entity\ProjectEvent::class)->findByProject($id, 50);
 
         return $this->render('project/show.html.twig', [
-            'project'                 => $project,
-            'metrics'                 => $projectMetrics,
-            'riskAnalysis'            => $riskAnalysis,
-            'healthScore'             => $healthScore,
+            'project' => $project,
+            'metrics' => $projectMetrics,
+            'riskAnalysis' => $riskAnalysis,
+            'healthScore' => $healthScore,
             'profitabilityPrediction' => $profitabilityPrediction,
-            'orders'                  => $orders,
-            'orders_pagination'       => $oPagination,
-            'orders_sort'             => $oSort,
-            'orders_dir'              => strtoupper($oDir) === 'ASC' ? 'ASC' : 'DESC',
-            'orders_per_page'         => $oPerPage,
-            'events'                  => $events,
-            'satisfactionData'        => $satisfactionData,
+            'orders' => $orders,
+            'orders_pagination' => $oPagination,
+            'orders_sort' => $oSort,
+            'orders_dir' => strtoupper($oDir) === 'ASC' ? 'ASC' : 'DESC',
+            'orders_per_page' => $oPerPage,
+            'events' => $events,
+            'satisfactionData' => $satisfactionData,
         ]);
     }
 
@@ -331,7 +331,7 @@ class ProjectController extends AbstractController
 
         return $this->render('project/edit.html.twig', [
             'project' => $project,
-            'form'    => $form,
+            'form' => $form,
         ]);
     }
 
@@ -361,13 +361,13 @@ class ProjectController extends AbstractController
      */
     private function calculateProjectMetrics(Project $project): array
     {
-        $totalRevenue   = '0';
-        $totalDays      = '0';
-        $totalMargin    = '0';
-        $totalCost      = '0';
+        $totalRevenue = '0';
+        $totalDays = '0';
+        $totalMargin = '0';
+        $totalCost = '0';
         $totalPurchases = $project->purchasesAmount ?? '0';
         $ordersByStatus = [];
-        $ordersCount    = 0;
+        $ordersCount = 0;
 
         foreach ($project->getOrders() as $order) {
             ++$ordersCount;
@@ -382,7 +382,7 @@ class ProjectController extends AbstractController
             // Ne compter dans les totaux que les devis signés/gagnés/terminés
             if (in_array($status, ['signed', 'won', 'completed', 'signe', 'gagne', 'termine'], true)) {
                 // CA du devis (calculé depuis les sections)
-                $orderTotal   = $order->calculateTotalFromSections();
+                $orderTotal = $order->calculateTotalFromSections();
                 $totalRevenue = bcadd($totalRevenue, (string) $orderTotal, 2);
 
                 // Compter les jours et calculer les marges par section
@@ -394,7 +394,7 @@ class ProjectController extends AbstractController
 
                             // Marge et coût estimé
                             $totalMargin = bcadd($totalMargin, (string) $line->getGrossMargin(), 2);
-                            $totalCost   = bcadd($totalCost, (string) $line->getEstimatedCost(), 2);
+                            $totalCost = bcadd($totalCost, (string) $line->getEstimatedCost(), 2);
                         }
 
                         // Achats de la ligne
@@ -413,14 +413,14 @@ class ProjectController extends AbstractController
         }
 
         return [
-            'total_revenue'       => $totalRevenue,
-            'total_days'          => $totalDays,
-            'total_margin'        => $totalMargin,
-            'total_cost'          => $totalCost,
-            'total_purchases'     => $totalPurchases,
-            'margin_rate'         => $marginRate,
-            'orders_count'        => $ordersCount,
-            'orders_by_status'    => $ordersByStatus,
+            'total_revenue' => $totalRevenue,
+            'total_days' => $totalDays,
+            'total_margin' => $totalMargin,
+            'total_cost' => $totalCost,
+            'total_purchases' => $totalPurchases,
+            'margin_rate' => $marginRate,
+            'orders_count' => $ordersCount,
+            'orders_by_status' => $ordersByStatus,
             'signed_orders_count' => array_sum(array_intersect_key($ordersByStatus, array_flip([
                 'signed',
                 'won',
@@ -441,18 +441,18 @@ class ProjectController extends AbstractController
         $projectRepo = $em->getRepository(Project::class);
 
         // All filters from URL query parameters
-        $year       = $request->query->getInt('year') ?: (int) date('Y');
+        $year = $request->query->getInt('year') ?: (int) date('Y');
         $startParam = $request->query->get('start_date') ?: null;
-        $endParam   = $request->query->get('end_date') ?: null;
-        $startDate  = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
-        $endDate    = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
+        $endParam = $request->query->get('end_date') ?: null;
+        $startDate = $startParam ? new DateTime($startParam) : new DateTime($year.'-01-01');
+        $endDate = $endParam ? new DateTime($endParam) : new DateTime($year.'-12-31');
 
-        $filterProjectType     = $request->query->get('project_type') ?: null;
-        $filterStatus          = $request->query->get('status') ?: null;
-        $filterTechnology      = $request->query->getInt('technology') ?: null;
+        $filterProjectType = $request->query->get('project_type') ?: null;
+        $filterStatus = $request->query->get('status') ?: null;
+        $filterTechnology = $request->query->getInt('technology') ?: null;
         $filterServiceCategory = $request->query->getInt('service_category') ?: null;
-        $sort                  = (string) ($request->query->get('sort') ?: 'name');
-        $dir                   = (string) ($request->query->get('dir') ?: 'ASC');
+        $sort = (string) ($request->query->get('sort') ?: 'name');
+        $dir = (string) ($request->query->get('dir') ?: 'ASC');
 
         $projects = $projectRepo->findBetweenDatesFiltered(
             $startDate,
@@ -471,7 +471,7 @@ class ProjectController extends AbstractController
         );
 
         // CSV headers
-        $rows   = [];
+        $rows = [];
         $header = ['Nom', 'Client', 'Type', 'Statut', 'Catégorie', 'Technologies'];
         $rows[] = $header;
 
@@ -524,7 +524,7 @@ class ProjectController extends AbstractController
 
         try {
             $projectRepo = $em->getRepository(Project::class);
-            $deleted     = 0;
+            $deleted = 0;
 
             foreach ($ids as $id) {
                 $project = $projectRepo->find((int) $id);
@@ -570,7 +570,7 @@ class ProjectController extends AbstractController
 
         try {
             $projectRepo = $em->getRepository(Project::class);
-            $archived    = 0;
+            $archived = 0;
 
             foreach ($ids as $id) {
                 $project = $projectRepo->find((int) $id);
@@ -608,17 +608,17 @@ class ProjectController extends AbstractController
     ): Response {
         // Date de début préférée (par défaut: date de début du projet ou lundi prochain)
         $startParam = $request->query->get('start_date');
-        $startDate  = $startParam ? new DateTime($startParam) : null;
+        $startDate = $startParam ? new DateTime($startParam) : null;
 
         // Générer les suggestions
         $result = $assistant->generateSuggestions($project, $startDate);
 
         return $this->render('project/planning_suggestions.html.twig', [
-            'project'     => $project,
+            'project' => $project,
             'suggestions' => $result['suggestions'],
-            'unassigned'  => $result['unassigned'],
-            'statistics'  => $result['statistics'],
-            'startDate'   => $startDate,
+            'unassigned' => $result['unassigned'],
+            'statistics' => $result['statistics'],
+            'startDate' => $startDate,
         ]);
     }
 
@@ -644,7 +644,7 @@ class ProjectController extends AbstractController
         try {
             // Regénérer les suggestions
             $startDate = isset($data['start_date']) ? new DateTime($data['start_date']) : null;
-            $result    = $assistant->generateSuggestions($project, $startDate);
+            $result = $assistant->generateSuggestions($project, $startDate);
 
             $created = 0;
             foreach ($result['suggestions'] as $suggestion) {

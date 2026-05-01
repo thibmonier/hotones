@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class AccountDeletionRequest implements CompanyOwnedInterface
 {
-    public const STATUS_PENDING   = 'pending'; // En attente de confirmation email
+    public const STATUS_PENDING = 'pending'; // En attente de confirmation email
     public const STATUS_CONFIRMED = 'confirmed'; // Confirmé, période de grâce en cours
     public const STATUS_CANCELLED = 'cancelled'; // Annulé par l'utilisateur
     public const STATUS_COMPLETED = 'completed'; // Suppression effectuée
@@ -239,8 +239,8 @@ class AccountDeletionRequest implements CompanyOwnedInterface
      */
     public function confirm(): void
     {
-        $this->status              = self::STATUS_CONFIRMED;
-        $this->confirmedAt         = new DateTimeImmutable();
+        $this->status = self::STATUS_CONFIRMED;
+        $this->confirmedAt = new DateTimeImmutable();
         $this->scheduledDeletionAt = new DateTimeImmutable('+30 days');
     }
 
@@ -249,7 +249,7 @@ class AccountDeletionRequest implements CompanyOwnedInterface
      */
     public function cancel(): void
     {
-        $this->status      = self::STATUS_CANCELLED;
+        $this->status = self::STATUS_CANCELLED;
         $this->cancelledAt = new DateTimeImmutable();
     }
 
@@ -258,7 +258,7 @@ class AccountDeletionRequest implements CompanyOwnedInterface
      */
     public function complete(): void
     {
-        $this->status      = self::STATUS_COMPLETED;
+        $this->status = self::STATUS_COMPLETED;
         $this->completedAt = new DateTimeImmutable();
     }
 

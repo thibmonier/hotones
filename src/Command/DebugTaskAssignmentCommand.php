@@ -29,7 +29,7 @@ class DebugTaskAssignmentCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io            = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $contributorId = $input->getArgument('contributor_id');
 
         if ($contributorId) {

@@ -37,19 +37,19 @@ final class PlanningFactory extends PersistentObjectFactory
 
         // Generate random date range within the next 6 months
         $startDate = $faker->dateTimeBetween('-1 month', '+3 months');
-        $endDate   = (clone $startDate)->modify('+'.$faker->numberBetween(5, 30).' days');
+        $endDate = (clone $startDate)->modify('+'.$faker->numberBetween(5, 30).' days');
 
         return [
-            'company'     => $company ?? CompanyFactory::new(),
+            'company' => $company ?? CompanyFactory::new(),
             'contributor' => ContributorFactory::new(),
-            'project'     => ProjectFactory::new(),
-            'startDate'   => $startDate,
-            'endDate'     => $endDate,
-            'dailyHours'  => $faker->randomElement(['4.00', '7.00', '8.00', '8.00', '8.00']), // Bias toward full-time
-            'profile'     => null,
-            'status'      => $faker->randomElement(['planned', 'planned', 'confirmed', 'confirmed', 'cancelled']),
-            'notes'       => $faker->optional(0.3)->sentence(),
-            'createdAt'   => new DateTime(),
+            'project' => ProjectFactory::new(),
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'dailyHours' => $faker->randomElement(['4.00', '7.00', '8.00', '8.00', '8.00']), // Bias toward full-time
+            'profile' => null,
+            'status' => $faker->randomElement(['planned', 'planned', 'confirmed', 'confirmed', 'cancelled']),
+            'notes' => $faker->optional(0.3)->sentence(),
+            'createdAt' => new DateTime(),
         ];
     }
 

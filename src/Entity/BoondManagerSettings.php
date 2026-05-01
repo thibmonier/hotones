@@ -211,7 +211,7 @@ class BoondManagerSettings implements CompanyOwnedInterface
 
         if ($this->authType === 'basic') {
             return
-                $this->apiUsername    !== null
+                $this->apiUsername !== null
                 && $this->apiUsername !== ''
                 && $this->apiPassword !== null
                 && $this->apiPassword !== ''
@@ -220,12 +220,12 @@ class BoondManagerSettings implements CompanyOwnedInterface
 
         // JWT auth
         return
-            $this->userToken      !== null
-            && $this->userToken   !== ''
+            $this->userToken !== null
+            && $this->userToken !== ''
             && $this->clientToken !== null
             && $this->clientToken !== ''
-            && $this->clientKey   !== null
-            && $this->clientKey   !== ''
+            && $this->clientKey !== null
+            && $this->clientKey !== ''
         ;
     }
 

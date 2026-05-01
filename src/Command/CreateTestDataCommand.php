@@ -39,15 +39,15 @@ class CreateTestDataCommand extends Command
     // Répartition des contributeurs selon les profils
     private const array CONTRIBUTORS_DISTRIBUTION = [
         'développeur fullstack' => 6,
-        'développeur frontend'  => 5,
-        'développeur backend'   => 4,
-        'chef de projet'        => 4,
-        'product owner'         => 2,
-        'scrumm master'         => 1,
-        'consultant'            => 1,
-        'Directeur artistique'  => 1,
-        'UX designer'           => 1,
-        'UI designer'           => 1,
+        'développeur frontend' => 5,
+        'développeur backend' => 4,
+        'chef de projet' => 4,
+        'product owner' => 2,
+        'scrumm master' => 1,
+        'consultant' => 1,
+        'Directeur artistique' => 1,
+        'UX designer' => 1,
+        'UI designer' => 1,
     ];
 
     // Prénoms et noms français
@@ -149,7 +149,7 @@ Répartition des contributeurs :
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io           = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $withTestData = $input->getOption('with-test-data');
 
         $io->title('Création des données'.($withTestData ? ' de test' : ''));
@@ -223,7 +223,7 @@ Répartition des contributeurs :
         $io->section('Vérification des données de référence');
 
         $profileCount = $this->entityManager->getRepository(Profile::class)->count([]);
-        $techCount    = $this->entityManager->getRepository(Technology::class)->count([]);
+        $techCount = $this->entityManager->getRepository(Technology::class)->count([]);
 
         if ($profileCount === 0 || $techCount === 0) {
             $io->warning('Les données de référence (profils/technologies) sont manquantes.');
@@ -240,28 +240,28 @@ Répartition des contributeurs :
 
         $usersData = [
             [
-                'email'     => 'chef.projet@test.com',
+                'email' => 'chef.projet@test.com',
                 'firstName' => 'Alice',
-                'lastName'  => 'Martin',
-                'roles'     => ['ROLE_CHEF_PROJET'],
+                'lastName' => 'Martin',
+                'roles' => ['ROLE_CHEF_PROJET'],
             ],
             [
-                'email'     => 'commercial@test.com',
+                'email' => 'commercial@test.com',
                 'firstName' => 'Bob',
-                'lastName'  => 'Durand',
-                'roles'     => ['ROLE_COMMERCIAL'],
+                'lastName' => 'Durand',
+                'roles' => ['ROLE_COMMERCIAL'],
             ],
             [
-                'email'     => 'manager@test.com',
+                'email' => 'manager@test.com',
                 'firstName' => 'Claire',
-                'lastName'  => 'Moreau',
-                'roles'     => ['ROLE_MANAGER'],
+                'lastName' => 'Moreau',
+                'roles' => ['ROLE_MANAGER'],
             ],
             ['email' => 'admin@test.com', 'firstName' => 'David', 'lastName' => 'Admin', 'roles' => ['ROLE_ADMIN']],
         ];
 
         $users = [];
-        $repo  = $this->entityManager->getRepository(User::class);
+        $repo = $this->entityManager->getRepository(User::class);
         foreach ($usersData as $data) {
             $user = $repo->findOneBy(['email' => $data['email']]);
             if (!$user) {
@@ -287,11 +287,11 @@ Répartition des contributeurs :
     {
         $io->section('Création des contributeurs selon la répartition');
 
-        $profileRepo     = $this->entityManager->getRepository(Profile::class);
+        $profileRepo = $this->entityManager->getRepository(Profile::class);
         $contributorRepo = $this->entityManager->getRepository(Contributor::class);
 
         $contributors = [];
-        $usedNames    = [];
+        $usedNames = [];
 
         foreach (self::CONTRIBUTORS_DISTRIBUTION as $profileName => $count) {
             $profile = $profileRepo->findOneBy(['name' => $profileName]);
@@ -304,8 +304,8 @@ Répartition des contributeurs :
                 // Générer un nom unique
                 do {
                     $firstName = self::FIRST_NAMES[array_rand(self::FIRST_NAMES)];
-                    $lastName  = self::LAST_NAMES[array_rand(self::LAST_NAMES)];
-                    $fullName  = "$firstName $lastName";
+                    $lastName = self::LAST_NAMES[array_rand(self::LAST_NAMES)];
+                    $fullName = "$firstName $lastName";
                 } while (in_array($fullName, $usedNames, true));
 
                 $usedNames[] = $fullName;
@@ -313,7 +313,7 @@ Répartition des contributeurs :
                 // Vérifier si le contributeur existe déjà
                 $contributor = $contributorRepo->findOneBy([
                     'firstName' => $firstName,
-                    'lastName'  => $lastName,
+                    'lastName' => $lastName,
                 ]);
 
                 if (!$contributor) {
@@ -328,12 +328,12 @@ Répartition des contributeurs :
 
                 // CJM selon le profil
                 $cjm = match (true) {
-                    str_contains(strtolower($profileName), 'lead')      => '600.00',
+                    str_contains(strtolower($profileName), 'lead') => '600.00',
                     str_contains(strtolower($profileName), 'directeur') => '700.00',
-                    str_contains(strtolower($profileName), 'senior')    => '550.00',
-                    str_contains(strtolower($profileName), 'chef')      => '500.00',
-                    str_contains(strtolower($profileName), 'designer')  => '450.00',
-                    default                                             => '400.00',
+                    str_contains(strtolower($profileName), 'senior') => '550.00',
+                    str_contains(strtolower($profileName), 'chef') => '500.00',
+                    str_contains(strtolower($profileName), 'designer') => '450.00',
+                    default => '400.00',
                 };
 
                 $contributor->setCjm($cjm);
@@ -368,7 +368,7 @@ Répartition des contributeurs :
         ];
 
         $categories = [];
-        $repo       = $this->entityManager->getRepository(ServiceCategory::class);
+        $repo = $this->entityManager->getRepository(ServiceCategory::class);
         foreach ($categoriesData as $data) {
             $category = $repo->findOneBy(['name' => $data['name']]);
             if (!$category) {
@@ -399,7 +399,7 @@ Répartition des contributeurs :
         ];
 
         $clients = [];
-        $repo    = $this->entityManager->getRepository(Client::class);
+        $repo = $this->entityManager->getRepository(Client::class);
         foreach ($clientsData as $name) {
             $client = $repo->findOneBy(['name' => $name]);
             if (!$client) {
@@ -429,58 +429,58 @@ Répartition des contributeurs :
     ): array {
         $io->section('Création des projets');
 
-        $techRepo     = $this->entityManager->getRepository(Technology::class);
+        $techRepo = $this->entityManager->getRepository(Technology::class);
         $technologies = $techRepo->findAll();
 
         $projectsData = [
             [
-                'name'          => 'E-shop Mode Parisienne',
-                'client'        => 0,
-                'description'   => 'Refonte complète de la boutique en ligne avec système de recommandation',
-                'type'          => 'forfait',
-                'status'        => 'active',
+                'name' => 'E-shop Mode Parisienne',
+                'client' => 0,
+                'description' => 'Refonte complète de la boutique en ligne avec système de recommandation',
+                'type' => 'forfait',
+                'status' => 'active',
                 'categoryIndex' => 0,
-                'techNames'     => ['Symfony', 'React', 'MariaDB'],
-                'startDate'     => '2024-09-01',
-                'endDate'       => '2024-12-15',
+                'techNames' => ['Symfony', 'React', 'MariaDB'],
+                'startDate' => '2024-09-01',
+                'endDate' => '2024-12-15',
             ],
             [
-                'name'          => 'App Mobile Banking',
-                'client'        => 1,
-                'description'   => 'Application mobile pour la gestion des comptes bancaires',
-                'type'          => 'regie',
-                'status'        => 'active',
+                'name' => 'App Mobile Banking',
+                'client' => 1,
+                'description' => 'Application mobile pour la gestion des comptes bancaires',
+                'type' => 'regie',
+                'status' => 'active',
                 'categoryIndex' => 3,
-                'techNames'     => ['React', 'MongoDB'],
-                'startDate'     => '2024-10-01',
-                'endDate'       => '2025-03-30',
+                'techNames' => ['React', 'MongoDB'],
+                'startDate' => '2024-10-01',
+                'endDate' => '2025-03-30',
             ],
             [
-                'name'          => 'Site Vitrine Avocat',
-                'client'        => 2,
-                'description'   => 'Site vitrine moderne avec système de prise de rendez-vous',
-                'type'          => 'forfait',
-                'status'        => 'active',
+                'name' => 'Site Vitrine Avocat',
+                'client' => 2,
+                'description' => 'Site vitrine moderne avec système de prise de rendez-vous',
+                'type' => 'forfait',
+                'status' => 'active',
                 'categoryIndex' => 1,
-                'techNames'     => ['Laravel', 'VueJS'],
-                'startDate'     => '2024-08-15',
-                'endDate'       => '2024-11-30',
+                'techNames' => ['Laravel', 'VueJS'],
+                'startDate' => '2024-08-15',
+                'endDate' => '2024-11-30',
             ],
             [
-                'name'          => 'Plateforme SaaS RH',
-                'client'        => 3,
-                'description'   => 'Plateforme de gestion des ressources humaines en mode SaaS',
-                'type'          => 'forfait',
-                'status'        => 'completed',
+                'name' => 'Plateforme SaaS RH',
+                'client' => 3,
+                'description' => 'Plateforme de gestion des ressources humaines en mode SaaS',
+                'type' => 'forfait',
+                'status' => 'completed',
                 'categoryIndex' => 2,
-                'techNames'     => ['Symfony', 'Angular', 'MariaDB'],
-                'startDate'     => '2024-06-01',
-                'endDate'       => '2024-09-30',
+                'techNames' => ['Symfony', 'Angular', 'MariaDB'],
+                'startDate' => '2024-06-01',
+                'endDate' => '2024-09-30',
             ],
         ];
 
         $projects = [];
-        $repo     = $this->entityManager->getRepository(Project::class);
+        $repo = $this->entityManager->getRepository(Project::class);
         foreach ($projectsData as $data) {
             $project = $repo->findOneBy(['name' => $data['name']]);
             if (!$project) {
@@ -532,54 +532,54 @@ Répartition des contributeurs :
 
         $taskTemplates = [
             [
-                'name'          => 'Analyse et spécifications',
-                'type'          => 'regular',
-                'hours_sold'    => 40,
+                'name' => 'Analyse et spécifications',
+                'type' => 'regular',
+                'hours_sold' => 40,
                 'hours_revised' => 35,
-                'progress'      => 100,
+                'progress' => 100,
             ],
             [
-                'name'          => 'Maquettage et design',
-                'type'          => 'regular',
-                'hours_sold'    => 80,
+                'name' => 'Maquettage et design',
+                'type' => 'regular',
+                'hours_sold' => 80,
                 'hours_revised' => 75,
-                'progress'      => 90,
+                'progress' => 90,
             ],
             [
-                'name'          => 'Développement Frontend',
-                'type'          => 'regular',
-                'hours_sold'    => 120,
+                'name' => 'Développement Frontend',
+                'type' => 'regular',
+                'hours_sold' => 120,
                 'hours_revised' => 140,
-                'progress'      => 60,
+                'progress' => 60,
             ],
             [
-                'name'          => 'Développement Backend',
-                'type'          => 'regular',
-                'hours_sold'    => 100,
+                'name' => 'Développement Backend',
+                'type' => 'regular',
+                'hours_sold' => 100,
                 'hours_revised' => 110,
-                'progress'      => 70,
+                'progress' => 70,
             ],
             [
-                'name'          => 'Tests et validation',
-                'type'          => 'regular',
-                'hours_sold'    => 40,
+                'name' => 'Tests et validation',
+                'type' => 'regular',
+                'hours_sold' => 40,
                 'hours_revised' => 45,
-                'progress'      => 30,
+                'progress' => 30,
             ],
             ['name' => 'Déploiement', 'type' => 'regular', 'hours_sold' => 20, 'hours_revised' => 25, 'progress' => 0],
             [
-                'name'          => 'AVV - Avant-vente',
-                'type'          => 'avv',
-                'hours_sold'    => 0,
+                'name' => 'AVV - Avant-vente',
+                'type' => 'avv',
+                'hours_sold' => 0,
                 'hours_revised' => 16,
-                'progress'      => 100,
+                'progress' => 100,
             ],
             [
-                'name'          => 'Non-vendu - Formation',
-                'type'          => 'non_vendu',
-                'hours_sold'    => 0,
+                'name' => 'Non-vendu - Formation',
+                'type' => 'non_vendu',
+                'hours_sold' => 0,
                 'hours_revised' => 8,
-                'progress'      => 50,
+                'progress' => 50,
             ],
         ];
 
@@ -594,7 +594,7 @@ Répartition des contributeurs :
             $position = 1;
 
             // Prendre un sous-ensemble de tâches selon le projet
-            $numTasks      = min(6, count($taskTemplates));
+            $numTasks = min(6, count($taskTemplates));
             $selectedTasks = array_slice($taskTemplates, 0, $numTasks);
 
             $taskRepo = $this->entityManager->getRepository(ProjectTask::class);
@@ -676,10 +676,10 @@ Répartition des contributeurs :
         $io->section('Création des feuilles de temps');
 
         $startDate = new DateTime('2024-09-01');
-        $endDate   = new DateTime('2024-10-31');
+        $endDate = new DateTime('2024-10-31');
 
         $interval = new DateInterval('P1D');
-        $period   = new DatePeriod($startDate, $interval, $endDate);
+        $period = new DatePeriod($startDate, $interval, $endDate);
 
         $timesheetsCreated = 0;
 
@@ -720,13 +720,13 @@ Répartition des contributeurs :
         $io->section('Création des plannings prévisionnels');
 
         $startWindow = new DateTime('monday this week');
-        $endWindow   = (clone $startWindow)->modify('+8 weeks');
+        $endWindow = (clone $startWindow)->modify('+8 weeks');
 
         $planningCreated = 0;
 
         foreach ($contributors as $contributor) {
             // Chaque contributeur: 1 à 3 projets planifiés
-            $num              = random_int(1, 3);
+            $num = random_int(1, 3);
             $selectedProjects = array_rand($projects, min($num, count($projects)));
             if (!is_array($selectedProjects)) {
                 $selectedProjects = [$selectedProjects];
@@ -739,9 +739,9 @@ Répartition des contributeurs :
                 $blocks = random_int(1, 2);
                 $cursor = (clone $startWindow)->modify('+'.random_int(0, 14).' days');
                 for ($b = 0; $b < $blocks; ++$b) {
-                    $days  = random_int(3, 10);
+                    $days = random_int(3, 10);
                     $start = clone $cursor;
-                    $end   = (clone $start)->modify('+'.max(0, $days - 1).' days');
+                    $end = (clone $start)->modify('+'.max(0, $days - 1).' days');
 
                     $planning = new Planning();
                     $planning->setCompany($project->getCompany());

@@ -32,7 +32,7 @@ class OrderRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $this->repository    = $this->entityManager->getRepository(Order::class);
+        $this->repository = $this->entityManager->getRepository(Order::class);
         $this->setUpMultiTenant();
     }
 
@@ -47,7 +47,7 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order1  = $this->createOrder($project, 'Order 1', 'draft');
+        $order1 = $this->createOrder($project, 'Order 1', 'draft');
         sleep(1); // Ensure different timestamps
         $order2 = $this->createOrder($project, 'Order 2', 'signe');
 
@@ -67,8 +67,8 @@ class OrderRepositoryTest extends KernelTestCase
         // Arrange
         $project1 = $this->createProject('Project 1');
         $project2 = $this->createProject('Project 2');
-        $order1   = $this->createOrder($project1, 'Order 1');
-        $order2   = $this->createOrder($project2, 'Order 2');
+        $order1 = $this->createOrder($project1, 'Order 1');
+        $order2 = $this->createOrder($project2, 'Order 2');
 
         // Act
         $results = $this->repository->findWithFilters(project: $project1);
@@ -82,8 +82,8 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order1  = $this->createOrder($project, 'Order 1', 'draft');
-        $order2  = $this->createOrder($project, 'Order 2', 'signe');
+        $order1 = $this->createOrder($project, 'Order 1', 'draft');
+        $order2 = $this->createOrder($project, 'Order 2', 'signe');
 
         // Act
         $results = $this->repository->findWithFilters(status: 'signe');
@@ -97,8 +97,8 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order1  = $this->createOrder($project, 'Alpha', 'draft', 1000.0);
-        $order2  = $this->createOrder($project, 'Beta', 'draft', 2000.0);
+        $order1 = $this->createOrder($project, 'Alpha', 'draft', 1000.0);
+        $order2 = $this->createOrder($project, 'Beta', 'draft', 2000.0);
 
         // Act - Sort by name
         $results = $this->repository->findWithFilters(sortField: 'name', sortDir: 'ASC');
@@ -139,9 +139,9 @@ class OrderRepositoryTest extends KernelTestCase
         $this->createOrder($project, 'Order 3', 'signe');
 
         // Act
-        $total        = $this->repository->countWithFilters();
+        $total = $this->repository->countWithFilters();
         $totalProject = $this->repository->countWithFilters(project: $project);
-        $totalStatus  = $this->repository->countWithFilters(status: 'signe');
+        $totalStatus = $this->repository->countWithFilters(status: 'signe');
 
         // Assert
         $this->assertEquals(3, $total);
@@ -153,7 +153,7 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order1  = $this->createOrder($project, 'Order 1');
+        $order1 = $this->createOrder($project, 'Order 1');
         $order1->setOrderNumber('D202401-001');
         $order2 = $this->createOrder($project, 'Order 2');
         $order2->setOrderNumber('D202401-002');
@@ -183,9 +183,9 @@ class OrderRepositoryTest extends KernelTestCase
         // Arrange
         $project1 = $this->createProject('Project 1');
         $project2 = $this->createProject('Project 2');
-        $order1   = $this->createOrder($project1, 'Order 1');
-        $order2   = $this->createOrder($project1, 'Order 2');
-        $order3   = $this->createOrder($project2, 'Order 3');
+        $order1 = $this->createOrder($project1, 'Order 1');
+        $order2 = $this->createOrder($project1, 'Order 2');
+        $order3 = $this->createOrder($project2, 'Order 3');
 
         // Act
         $results = $this->repository->findByProject($project1);
@@ -213,7 +213,7 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order   = $this->createOrder($project, 'Order 1');
+        $order = $this->createOrder($project, 'Order 1');
 
         $section = new OrderSection();
         $section->setCompany($this->getTestCompany());
@@ -251,8 +251,8 @@ class OrderRepositoryTest extends KernelTestCase
         // Arrange
         $project1 = $this->createProject('Project 1');
         $project2 = $this->createProject('Project 2');
-        $order1   = $this->createOrder($project1, 'Order 1');
-        $order2   = $this->createOrder($project2, 'Order 2');
+        $order1 = $this->createOrder($project1, 'Order 1');
+        $order2 = $this->createOrder($project2, 'Order 2');
 
         // Act (should not throw exception)
         $this->repository->preloadForProjects([$project1, $project2]);
@@ -279,8 +279,8 @@ class OrderRepositoryTest extends KernelTestCase
         $this->createOrder($project, 'Order 3', 'signe');
 
         // Act
-        $draftCount  = $this->repository->countByStatus('draft');
-        $signeCount  = $this->repository->countByStatus('signe');
+        $draftCount = $this->repository->countByStatus('draft');
+        $signeCount = $this->repository->countByStatus('signe');
         $perdueCount = $this->repository->countByStatus('perdue');
 
         // Assert
@@ -328,8 +328,8 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order1  = $this->createOrder($project, 'Order 1', 'signe', 1000.0);
-        $order2  = $this->createOrder($project, 'Order 2', 'signe', 2000.0);
+        $order1 = $this->createOrder($project, 'Order 1', 'signe', 1000.0);
+        $order2 = $this->createOrder($project, 'Order 2', 'signe', 2000.0);
 
         // Modify creation dates
         $order1->setCreatedAt(new DateTimeImmutable('2024-01-15'));
@@ -348,9 +348,9 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order1  = $this->createOrder($project, 'Order 1', 'signe', 1000.0);
-        $order2  = $this->createOrder($project, 'Order 2', 'gagne', 2000.0);
-        $order3  = $this->createOrder($project, 'Order 3', 'draft', 500.0);
+        $order1 = $this->createOrder($project, 'Order 1', 'signe', 1000.0);
+        $order2 = $this->createOrder($project, 'Order 2', 'gagne', 2000.0);
+        $order3 = $this->createOrder($project, 'Order 3', 'draft', 500.0);
 
         $order1->validatedAt = new DateTime('2024-01-15');
         $order2->validatedAt = new DateTime('2024-01-20');
@@ -443,9 +443,9 @@ class OrderRepositoryTest extends KernelTestCase
     {
         // Arrange
         $project = $this->createProject('Test Project');
-        $order1  = $this->createOrder($project, 'Order 1');
-        $order2  = $this->createOrder($project, 'Order 2');
-        $order3  = $this->createOrder($project, 'Order 3');
+        $order1 = $this->createOrder($project, 'Order 1');
+        $order2 = $this->createOrder($project, 'Order 2');
+        $order3 = $this->createOrder($project, 'Order 3');
 
         $order1->setCreatedAt(new DateTimeImmutable('2024-01-15'));
         $order2->setCreatedAt(new DateTimeImmutable('2024-02-15'));
@@ -462,9 +462,9 @@ class OrderRepositoryTest extends KernelTestCase
     public function testSearch(): void
     {
         // Arrange
-        $client  = $this->createClient('ACME Corp');
+        $client = $this->createClient('ACME Corp');
         $project = $this->createProjectWithClient('Test Project', $client);
-        $order1  = $this->createOrder($project, 'Website Redesign');
+        $order1 = $this->createOrder($project, 'Website Redesign');
         $order1->setOrderNumber('D202401-001');
         $order2 = $this->createOrder($project, 'Mobile App');
         $order2->setOrderNumber('D202401-002');

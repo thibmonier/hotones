@@ -22,8 +22,8 @@ class NpsMarkExpiredCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->npsSurveyRepository = $this->createMock(NpsSurveyRepository::class);
-        $this->command             = new NpsMarkExpiredCommand($this->npsSurveyRepository);
-        $this->commandTester       = new CommandTester($this->command);
+        $this->command = new NpsMarkExpiredCommand($this->npsSurveyRepository);
+        $this->commandTester = new CommandTester($this->command);
     }
 
     public function testExecuteWithExpiredSurveys(): void
@@ -88,7 +88,7 @@ class NpsMarkExpiredCommandTest extends TestCase
             $repository->method('markExpiredSurveysAsExpired')->willReturn($count);
 
             $command = new NpsMarkExpiredCommand($repository);
-            $tester  = new CommandTester($command);
+            $tester = new CommandTester($command);
 
             $tester->execute([]);
             $output = $tester->getDisplay();

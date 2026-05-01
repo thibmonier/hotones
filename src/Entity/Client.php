@@ -125,22 +125,22 @@ class Client implements Stringable, CompanyOwnedInterface
     public function getServiceLevelLabel(): string
     {
         return match ($this->serviceLevel) {
-            'vip'      => 'VIP',
+            'vip' => 'VIP',
             'priority' => 'Prioritaire',
             'standard' => 'Standard',
-            'low'      => 'Basse priorité',
-            default    => 'Non défini',
+            'low' => 'Basse priorité',
+            default => 'Non défini',
         };
     }
 
     public function getServiceLevelBadgeClass(): string
     {
         return match ($this->serviceLevel) {
-            'vip'      => 'bg-danger',
+            'vip' => 'bg-danger',
             'priority' => 'bg-warning',
             'standard' => 'bg-info',
-            'low'      => 'bg-secondary',
-            default    => 'bg-light text-dark',
+            'low' => 'bg-secondary',
+            default => 'bg-light text-dark',
         };
     }
 

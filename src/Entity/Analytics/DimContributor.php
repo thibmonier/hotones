@@ -110,8 +110,8 @@ class DimContributor implements CompanyOwnedInterface
 
     private function updateCompositeKey(): void
     {
-        $userId             = $this->user ? $this->user->getId() : 'null';
-        $name               = $this->name ?? 'unknown';
+        $userId = $this->user ? $this->user->getId() : 'null';
+        $name = $this->name ?? 'unknown';
         $this->compositeKey = sprintf(
             '%s_%s_%s_%s',
             $userId,
@@ -125,10 +125,10 @@ class DimContributor implements CompanyOwnedInterface
     {
         return match ($this->role) {
             'key_account_manager' => 'Key Account Manager',
-            'project_manager'     => 'Chef de Projet',
-            'project_director'    => 'Directeur de Projet',
-            'sales_person'        => 'Commercial',
-            default               => ucfirst(str_replace('_', ' ', $this->role)),
+            'project_manager' => 'Chef de Projet',
+            'project_director' => 'Directeur de Projet',
+            'sales_person' => 'Commercial',
+            default => ucfirst(str_replace('_', ' ', $this->role)),
         };
     }
 

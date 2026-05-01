@@ -60,7 +60,7 @@ class CookieConsentRepository extends CompanyAwareRepository
     public function deleteOldExpiredConsents(): int
     {
         $threshold = new DateTimeImmutable('-30 days');
-        $company   = $this->companyContext->getCurrentCompany();
+        $company = $this->companyContext->getCurrentCompany();
 
         return $this
             ->createQueryBuilder('c')

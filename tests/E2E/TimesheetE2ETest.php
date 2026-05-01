@@ -26,28 +26,28 @@ class TimesheetE2ETest extends PantherTestCase
 
         // Créer les données de test
         $user = UserFactory::createOne([
-            'roles'    => ['ROLE_USER', 'ROLE_INTERVENANT'],
+            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
         $contributor = ContributorFactory::createOne([
-            'user'      => $user,
+            'user' => $user,
             'firstName' => 'Jean',
-            'lastName'  => 'Dupont',
+            'lastName' => 'Dupont',
         ]);
 
         $project1 = ProjectFactory::createOne([
-            'name'   => 'Projet Test E2E',
+            'name' => 'Projet Test E2E',
             'status' => 'in_progress',
         ]);
 
         $task1 = ProjectTaskFactory::createOne([
             'project' => $project1,
-            'name'    => 'Développement',
+            'name' => 'Développement',
         ]);
 
         $project2 = ProjectFactory::createOne([
-            'name'   => 'Projet Test 2',
+            'name' => 'Projet Test 2',
             'status' => 'in_progress',
         ]);
 
@@ -123,12 +123,12 @@ class TimesheetE2ETest extends PantherTestCase
 
         // Créer les données de test
         $user = UserFactory::createOne([
-            'roles'    => ['ROLE_USER', 'ROLE_INTERVENANT'],
+            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne(['name' => 'Projet Calendrier']);
+        $project = ProjectFactory::createOne(['name' => 'Projet Calendrier']);
 
         // Login
         $crawler = $client->request('GET', '/login');
@@ -166,7 +166,7 @@ class TimesheetE2ETest extends PantherTestCase
 
         // Créer les données de test
         $user = UserFactory::createOne([
-            'roles'    => ['ROLE_USER', 'ROLE_INTERVENANT'],
+            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
@@ -226,7 +226,7 @@ class TimesheetE2ETest extends PantherTestCase
 
         // Créer les données de test
         $user = UserFactory::createOne([
-            'roles'    => ['ROLE_USER', 'ROLE_INTERVENANT'],
+            'roles' => ['ROLE_USER', 'ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 

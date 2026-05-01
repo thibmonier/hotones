@@ -50,7 +50,7 @@ final readonly class DateRange
     public function getNumberOfWorkingDays(): int
     {
         $current = $this->startDate;
-        $days    = 0;
+        $days = 0;
 
         while ($current <= $this->endDate) {
             $dayOfWeek = (int) $current->format('w');
@@ -76,6 +76,6 @@ final readonly class DateRange
     public function equals(self $other): bool
     {
         return $this->startDate == $other->startDate
-            && $this->endDate   == $other->endDate;
+            && $this->endDate == $other->endDate;
     }
 }

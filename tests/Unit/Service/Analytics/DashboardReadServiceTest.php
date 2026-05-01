@@ -30,11 +30,11 @@ class DashboardReadServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager   = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->realTimeService = $this->createMock(RealTimeService::class);
-        $this->companyContext  = $this->createMock(CompanyContext::class);
-        $this->logger          = $this->createMock(LoggerInterface::class);
-        $this->cache           = $this->createMock(CacheInterface::class);
+        $this->companyContext = $this->createMock(CompanyContext::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->cache = $this->createMock(CacheInterface::class);
 
         $this->service = new DashboardReadService(
             $this->entityManager,
@@ -48,7 +48,7 @@ class DashboardReadServiceTest extends TestCase
     public function testGetKPIsReturnsDataFromStarSchema(): void
     {
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-01-31');
+        $endDate = new DateTime('2025-01-31');
 
         // Mock QueryBuilder et Query
         $query = $this->createMock(Query::class);
@@ -56,20 +56,20 @@ class DashboardReadServiceTest extends TestCase
             ->expects($this->once())
             ->method('getSingleResult')
             ->willReturn([
-                'totalRevenue'        => '10000.00',
-                'totalCosts'          => '7000.00',
-                'grossMargin'         => '3000.00',
+                'totalRevenue' => '10000.00',
+                'totalCosts' => '7000.00',
+                'grossMargin' => '3000.00',
                 'avgMarginPercentage' => '30.00',
-                'totalProjects'       => '5',
-                'activeProjects'      => '3',
-                'completedProjects'   => '2',
-                'totalOrders'         => '10',
-                'pendingOrders'       => '3',
-                'wonOrders'           => '7',
-                'pendingRevenue'      => '5000.00',
-                'totalWorkedDays'     => '100.00',
-                'totalSoldDays'       => '120.00',
-                'avgUtilization'      => '83.33',
+                'totalProjects' => '5',
+                'activeProjects' => '3',
+                'completedProjects' => '2',
+                'totalOrders' => '10',
+                'pendingOrders' => '3',
+                'wonOrders' => '7',
+                'pendingRevenue' => '5000.00',
+                'totalWorkedDays' => '100.00',
+                'totalSoldDays' => '120.00',
+                'avgUtilization' => '83.33',
             ]);
         $query->method('getResult')->willReturn([]);
 
@@ -109,7 +109,7 @@ class DashboardReadServiceTest extends TestCase
     public function testGetKPIsFallbackToRealTimeWhenNoData(): void
     {
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-01-31');
+        $endDate = new DateTime('2025-01-31');
 
         // Mock QueryBuilder qui retourne des données vides
         $query = $this->createMock(Query::class);
@@ -118,8 +118,8 @@ class DashboardReadServiceTest extends TestCase
             ->method('getSingleResult')
             ->willReturn([
                 'totalRevenue' => '0',
-                'totalCosts'   => '0',
-                'grossMargin'  => '0',
+                'totalCosts' => '0',
+                'grossMargin' => '0',
             ]);
         $query->method('getResult')->willReturn([]);
 
@@ -138,12 +138,12 @@ class DashboardReadServiceTest extends TestCase
 
         // Vérifier que le service temps réel est appelé en fallback
         $realTimeData = [
-            'period'  => ['start' => $startDate, 'end' => $endDate],
+            'period' => ['start' => $startDate, 'end' => $endDate],
             'revenue' => [
                 'total_revenue' => 15000.00,
-                'total_cost'    => 10000.00,
-                'total_margin'  => 5000.00,
-                'margin_rate'   => 33.33,
+                'total_cost' => 10000.00,
+                'total_margin' => 5000.00,
+                'margin_rate' => 33.33,
             ],
             'projects' => ['total' => 10, 'active' => 5, 'completed' => 5],
         ];
@@ -182,20 +182,20 @@ class DashboardReadServiceTest extends TestCase
             ->method('getResult')
             ->willReturn([
                 [
-                    'year'         => 2025,
-                    'month'        => 1,
-                    'monthName'    => 'Janvier 2025',
+                    'year' => 2025,
+                    'month' => 1,
+                    'monthName' => 'Janvier 2025',
                     'totalRevenue' => '10000.00',
-                    'totalCosts'   => '7000.00',
-                    'grossMargin'  => '3000.00',
+                    'totalCosts' => '7000.00',
+                    'grossMargin' => '3000.00',
                 ],
                 [
-                    'year'         => 2025,
-                    'month'        => 2,
-                    'monthName'    => 'Février 2025',
+                    'year' => 2025,
+                    'month' => 2,
+                    'monthName' => 'Février 2025',
                     'totalRevenue' => '12000.00',
-                    'totalCosts'   => '8000.00',
-                    'grossMargin'  => '4000.00',
+                    'totalCosts' => '8000.00',
+                    'grossMargin' => '4000.00',
                 ],
             ]);
 

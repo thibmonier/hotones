@@ -38,7 +38,7 @@ class VacationRepositoryTest extends KernelTestCase
     public function testSaveAndFindById(): void
     {
         $contributor = ContributorFactory::createOne();
-        $vacation    = $this->createVacation($contributor, '2025-01-10', '2025-01-14');
+        $vacation = $this->createVacation($contributor, '2025-01-10', '2025-01-14');
 
         $this->repository->save($vacation);
 
@@ -151,7 +151,7 @@ class VacationRepositoryTest extends KernelTestCase
         $vacation = $this->createVacation($contributor, $startDate, $endDate);
 
         if ($status === 'approved') {
-            $em   = static::getContainer()->get('doctrine')->getManager();
+            $em = static::getContainer()->get('doctrine')->getManager();
             $user = $em->getRepository(User::class)->findOneBy([]) ?? $this->createTestUser();
             $vacation->approve($user);
         } elseif ($status === 'rejected') {
@@ -167,7 +167,7 @@ class VacationRepositoryTest extends KernelTestCase
 
     private function createTestUser(): User
     {
-        $em   = static::getContainer()->get('doctrine')->getManager();
+        $em = static::getContainer()->get('doctrine')->getManager();
         $user = new User();
         $user->setEmail('test-vacation@example.com');
         $user->setPassword('test');

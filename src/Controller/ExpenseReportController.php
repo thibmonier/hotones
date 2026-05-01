@@ -40,8 +40,8 @@ class ExpenseReportController extends AbstractController
     public function index(Request $request): Response
     {
         $filters = [
-            'status'     => $request->query->get('status'),
-            'category'   => $request->query->get('category'),
+            'status' => $request->query->get('status'),
+            'category' => $request->query->get('category'),
             'rebillable' => $request->query->get('rebillable'),
         ];
 
@@ -56,7 +56,7 @@ class ExpenseReportController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function mine(): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepo->findOneBy(['user' => $user]);
         if (!$contributor instanceof Contributor) {
             throw $this->createAccessDeniedException('Aucun contributor lié à cet utilisateur.');
@@ -73,7 +73,7 @@ class ExpenseReportController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function new(Request $request): Response
     {
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepo->findOneBy(['user' => $user]);
         if (!$contributor instanceof Contributor) {
             throw $this->createAccessDeniedException('Aucun contributor lié à cet utilisateur.');
@@ -127,7 +127,7 @@ class ExpenseReportController extends AbstractController
     public function show(ExpenseReport $expense): Response
     {
         // Vérifier que l'utilisateur peut voir cette note de frais
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepo->findOneBy(['user' => $user]);
 
         // Le propriétaire ou un comptable peut voir
@@ -145,7 +145,7 @@ class ExpenseReportController extends AbstractController
     public function edit(ExpenseReport $expense, Request $request): Response
     {
         // Seul le propriétaire peut modifier et seulement si le statut est "draft"
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepo->findOneBy(['user' => $user]);
 
         if ($expense->getContributor() !== $contributor) {
@@ -182,7 +182,7 @@ class ExpenseReportController extends AbstractController
 
         return $this->render('expense_report/edit.html.twig', [
             'expense' => $expense,
-            'form'    => $form,
+            'form' => $form,
         ]);
     }
 

@@ -31,7 +31,7 @@ class ContributorType extends AbstractType
     {
         $builder
             ->add('firstName', TextType::class, [
-                'label'       => 'Prénom',
+                'label' => 'Prénom',
                 'constraints' => [
                     new NotBlank(message: 'Le prénom est obligatoire'),
                     new Length(max: 100),
@@ -39,7 +39,7 @@ class ContributorType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('lastName', TextType::class, [
-                'label'       => 'Nom',
+                'label' => 'Nom',
                 'constraints' => [
                     new NotBlank(message: 'Le nom est obligatoire'),
                     new Length(max: 100),
@@ -47,35 +47,35 @@ class ContributorType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('email', EmailType::class, [
-                'label'       => 'Email',
-                'required'    => false,
+                'label' => 'Email',
+                'required' => false,
                 'constraints' => [
                     new Email(message: 'Email invalide'),
                 ],
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('phoneProfessional', TelType::class, [
-                'label'    => 'Téléphone professionnel',
+                'label' => 'Téléphone professionnel',
                 'required' => false,
-                'attr'     => ['class' => 'form-control'],
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('phonePersonal', TelType::class, [
-                'label'    => 'Téléphone personnel',
+                'label' => 'Téléphone personnel',
                 'required' => false,
-                'attr'     => ['class' => 'form-control'],
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('birthDate', BirthdayType::class, [
-                'label'    => 'Date de naissance',
+                'label' => 'Date de naissance',
                 'required' => false,
-                'widget'   => 'single_text',
-                'attr'     => ['class' => 'form-control'],
-                'help'     => 'Permet de calculer l\'âge et la pyramide des âges dans le dashboard RH',
+                'widget' => 'single_text',
+                'attr' => ['class' => 'form-control'],
+                'help' => 'Permet de calculer l\'âge et la pyramide des âges dans le dashboard RH',
             ])
             ->add('gender', ChoiceType::class, [
-                'label'       => 'Genre',
-                'required'    => false,
+                'label' => 'Genre',
+                'required' => false,
                 'placeholder' => '-- Non renseigné --',
-                'choices'     => [
+                'choices' => [
                     'Homme' => 'male',
                     'Femme' => 'female',
                     'Autre' => 'other',
@@ -84,61 +84,61 @@ class ContributorType extends AbstractType
                 'help' => 'Permet d\'analyser la parité homme/femme dans le dashboard RH',
             ])
             ->add('address', TextareaType::class, [
-                'label'    => 'Adresse',
+                'label' => 'Adresse',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-control',
-                    'rows'  => 3,
+                    'rows' => 3,
                 ],
             ])
             ->add('cjm', MoneyType::class, [
-                'label'    => 'CJM (Coût Journalier Moyen)',
+                'label' => 'CJM (Coût Journalier Moyen)',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr'     => ['class' => 'form-control'],
-                'help'     => 'Coût réel pour l\'entreprise',
+                'attr' => ['class' => 'form-control'],
+                'help' => 'Coût réel pour l\'entreprise',
             ])
             ->add('tjm', MoneyType::class, [
-                'label'    => 'TJM (Tarif Journalier Moyen)',
+                'label' => 'TJM (Tarif Journalier Moyen)',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr'     => ['class' => 'form-control'],
-                'help'     => 'Prix de vente facturé au client',
+                'attr' => ['class' => 'form-control'],
+                'help' => 'Prix de vente facturé au client',
             ])
             ->add('active', CheckboxType::class, [
-                'label'    => 'Actif',
+                'label' => 'Actif',
                 'required' => false,
-                'attr'     => ['class' => 'form-check-input'],
+                'attr' => ['class' => 'form-check-input'],
             ])
             ->add('notes', TextareaType::class, [
-                'label'    => 'Notes',
+                'label' => 'Notes',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-control',
-                    'rows'  => 5,
+                    'rows' => 5,
                 ],
             ])
             ->add('user', EntityType::class, [
-                'label'        => 'Compte utilisateur associé',
-                'class'        => User::class,
+                'label' => 'Compte utilisateur associé',
+                'class' => User::class,
                 'choice_label' => fn (User $user): string => $user->getFirstName()
                     .' '
                     .$user->getLastName()
                     .' ('
                     .$user->getEmail()
                     .')',
-                'required'    => false,
+                'required' => false,
                 'placeholder' => '-- Aucun compte --',
-                'attr'        => ['class' => 'form-select'],
+                'attr' => ['class' => 'form-select'],
             ])
             ->add('manager', EntityType::class, [
-                'label'         => 'Manager responsable',
-                'class'         => Contributor::class,
-                'choice_label'  => fn (Contributor $contributor): string => $contributor->getFullName(),
-                'required'      => false,
-                'placeholder'   => '-- Aucun manager --',
-                'attr'          => ['class' => 'form-select'],
-                'help'          => 'Sélectionnez le manager qui validera les demandes de congés de ce collaborateur',
+                'label' => 'Manager responsable',
+                'class' => Contributor::class,
+                'choice_label' => fn (Contributor $contributor): string => $contributor->getFullName(),
+                'required' => false,
+                'placeholder' => '-- Aucun manager --',
+                'attr' => ['class' => 'form-select'],
+                'help' => 'Sélectionnez le manager qui validera les demandes de congés de ce collaborateur',
                 'query_builder' => fn ($er) => $er
                     ->createQueryBuilder('c')
                     ->where('c.active = :active')
@@ -147,14 +147,14 @@ class ContributorType extends AbstractType
                     ->addOrderBy('c.firstName', 'ASC'),
             ])
             ->add('profiles', EntityType::class, [
-                'label'        => 'Profils métier',
-                'class'        => Profile::class,
+                'label' => 'Profils métier',
+                'class' => Profile::class,
                 'choice_label' => 'name',
-                'multiple'     => true,
-                'expanded'     => false,
-                'required'     => false,
-                'attr'         => [
-                    'class'            => 'form-select select2-multiple',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-select select2-multiple',
                     'data-placeholder' => 'Sélectionnez un ou plusieurs profils',
                 ],
                 'query_builder' => fn ($er) => $er
@@ -164,9 +164,9 @@ class ContributorType extends AbstractType
                     ->orderBy('p.name', 'ASC'),
             ])
             ->add('avatarFile', FileType::class, [
-                'label'       => 'Avatar',
-                'mapped'      => false,
-                'required'    => false,
+                'label' => 'Avatar',
+                'mapped' => false,
+                'required' => false,
                 'constraints' => [
                     new File(
                         maxSize: '2M',

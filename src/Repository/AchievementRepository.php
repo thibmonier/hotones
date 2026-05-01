@@ -44,7 +44,7 @@ class AchievementRepository extends CompanyAwareRepository
     {
         return $this->countForCurrentCompany([
             'contributor' => $contributor,
-            'badge'       => $badge,
+            'badge' => $badge,
         ]) > 0;
     }
 

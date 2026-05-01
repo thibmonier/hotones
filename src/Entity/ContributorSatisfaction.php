@@ -123,8 +123,8 @@ class ContributorSatisfaction implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->createdAt   = new DateTime();
-        $this->updatedAt   = new DateTime();
+        $this->createdAt = new DateTime();
+        $this->updatedAt = new DateTime();
         $this->submittedAt = new DateTime();
     }
 
@@ -198,18 +198,18 @@ class ContributorSatisfaction implements CompanyOwnedInterface
     public function getMonthLabel(): string
     {
         return match ($this->month) {
-            1       => 'Janvier',
-            2       => 'Février',
-            3       => 'Mars',
-            4       => 'Avril',
-            5       => 'Mai',
-            6       => 'Juin',
-            7       => 'Juillet',
-            8       => 'Août',
-            9       => 'Septembre',
-            10      => 'Octobre',
-            11      => 'Novembre',
-            12      => 'Décembre',
+            1 => 'Janvier',
+            2 => 'Février',
+            3 => 'Mars',
+            4 => 'Avril',
+            5 => 'Mai',
+            6 => 'Juin',
+            7 => 'Juillet',
+            8 => 'Août',
+            9 => 'Septembre',
+            10 => 'Octobre',
+            11 => 'Novembre',
+            12 => 'Décembre',
             default => '',
         };
     }
@@ -366,11 +366,11 @@ class ContributorSatisfaction implements CompanyOwnedInterface
     public function getScoreLabel(int $score): string
     {
         return match ($score) {
-            1       => 'Très insatisfait',
-            2       => 'Insatisfait',
-            3       => 'Neutre',
-            4       => 'Satisfait',
-            5       => 'Très satisfait',
+            1 => 'Très insatisfait',
+            2 => 'Insatisfait',
+            3 => 'Neutre',
+            4 => 'Satisfait',
+            5 => 'Très satisfait',
             default => 'Non évalué',
         };
     }
