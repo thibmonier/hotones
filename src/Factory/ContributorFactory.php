@@ -64,9 +64,9 @@ final class ContributorFactory extends PersistentObjectFactory
                 ->setCompany($contributor->getCompany())
                 ->setContributor($contributor)
                 ->setStartDate(new DateTime('-6 months'))
-                ->setCjm((float) $faker->numberBetween(300, 700))
-                ->setTjm((float) $faker->numberBetween(450, 1000))
-                ->setWeeklyHours(35.0); // Multi-tenant: inherit company from contributor
+                ->setCjm((string) $faker->numberBetween(300, 700))
+                ->setTjm((string) $faker->numberBetween(450, 1000))
+                ->setWeeklyHours('35.0'); // Multi-tenant: inherit company from contributor
             $contributor->addEmploymentPeriod($employmentPeriod);
         });
     }

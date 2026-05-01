@@ -163,13 +163,19 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "importmap:install": "symfony-cmd"
         },
+        "prepare-asset-dirs": "mkdir -p public/assets/images public/assets/css public/assets/js public/assets/fonts assets/images",
         "post-install-cmd": [
+            "@prepare-asset-dirs",
             "@auto-scripts"
         ],
         "post-update-cmd": [
+            "@prepare-asset-dirs",
             "@auto-scripts"
         ],
-        "phpstan": "phpstan analyse --configuration=phpstan.neon --memory-limit=512M",
+        "phpstan": [
+            "@prepare-asset-dirs",
+            "phpstan analyse --configuration=phpstan.neon --memory-limit=512M"
+        ],
         "phpstan-clear": "phpstan clear-result-cache",
         "phpcsfixer": "php-cs-fixer fix --dry-run --diff --ansi",
         "phpcsfixer-fix": "php-cs-fixer fix --ansi",
@@ -195,6 +201,9 @@
             "@check-architecture"
         ],
         "test": "phpunit -c phpunit.xml.dist",
+        "test-coverage": "phpunit --configuration phpunit.coverage.xml",
+        "test-coverage-html": "phpunit --configuration phpunit.coverage.xml --coverage-html var/coverage/html",
+        "test-coverage-text": "phpunit --configuration phpunit.coverage.xml --coverage-text",
         "test-unit": "phpunit --testsuite unit",
         "test-functional": "phpunit --testsuite functional",
         "test-integration": "phpunit --testsuite integration",

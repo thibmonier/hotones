@@ -158,7 +158,7 @@ class ExpenseReportService
      */
     public function calculateRebillableAmount(Order $order): string
     {
-        if (!$order->isExpensesRebillable()) {
+        if (!$order->expensesRebillable) {
             return '0.00';
         }
 

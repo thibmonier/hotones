@@ -60,9 +60,9 @@ class HrMetricsService
         // Jours travaillés théoriques = effectif moyen * jours ouvrés dans la période
         $workingDays      = $this->countWorkingDays($startDate, $endDate);
         $averageHeadcount = (
-                $this->employmentPeriodRepository->countActiveAt($startDate)
-                + $this->employmentPeriodRepository->countActiveAt($endDate)
-            )
+            $this->employmentPeriodRepository->countActiveAt($startDate)
+            + $this->employmentPeriodRepository->countActiveAt($endDate)
+        )
             / 2;
 
         $theoreticalDays = $averageHeadcount                                         * $workingDays;
