@@ -24,7 +24,7 @@
         "doctrine/orm": "^3.6.2",
         "dompdf/dompdf": "^3.1.4",
         "dragonmantank/cron-expression": "^3.6",
-        "easycorp/easyadmin-bundle": "^4.28.1",
+        "easycorp/easyadmin-bundle": "^5",
         "endroid/qr-code-bundle": "^7.0",
         "gedmo/doctrine-extensions": "dev-main || >=3.21",
         "knplabs/knp-paginator-bundle": "^6.10.0",
