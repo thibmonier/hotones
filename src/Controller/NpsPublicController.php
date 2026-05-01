@@ -71,7 +71,7 @@ class NpsPublicController extends AbstractController
 
         return $this->render('nps/public/respond.html.twig', [
             'survey' => $survey,
-            'form'   => $form->createView(),
+            'form' => $form->createView(),
         ]);
     }
 }

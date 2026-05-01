@@ -46,7 +46,7 @@ class DebugPlanningOptimizationCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $startDate = new DateTime($input->getOption('start'));
-        $endDate   = new DateTime($input->getOption('end'));
+        $endDate = new DateTime($input->getOption('end'));
 
         $io->title(sprintf(
             'Planning Optimization Debug - Period: %s to %s',

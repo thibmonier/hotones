@@ -25,14 +25,14 @@ class WorkloadPredictionServiceTest extends TestCase
 {
     public function testAnalyzePipelineReturnsCorrectStructure(): void
     {
-        $orderRepository       = $this->createMock(OrderRepository::class);
+        $orderRepository = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $entityManager         = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $orderRepository->expects($this->once())->method('findBy')->with(['status' => 'a_signer'])->willReturn([]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
-        $result  = $service->analyzePipeline();
+        $result = $service->analyzePipeline();
 
         // Check structure
         $this->assertIsArray($result);
@@ -44,9 +44,9 @@ class WorkloadPredictionServiceTest extends TestCase
 
     public function testAnalyzePipelineAcceptsFilters(): void
     {
-        $orderRepository       = $this->createMock(OrderRepository::class);
+        $orderRepository = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $entityManager         = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $orderRepository->expects($this->once())->method('findBy')->willReturn([]);
 
@@ -61,9 +61,9 @@ class WorkloadPredictionServiceTest extends TestCase
 
     public function testAnalyzePipelineWithOrdersContainingLines(): void
     {
-        $orderRepository       = $this->createMock(OrderRepository::class);
+        $orderRepository = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $entityManager         = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $profile = new Profile();
         $profile->setName('Développeur Frontend');
@@ -94,7 +94,7 @@ class WorkloadPredictionServiceTest extends TestCase
             ->willReturn([$order]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
-        $result  = $service->analyzePipeline();
+        $result = $service->analyzePipeline();
 
         $this->assertNotEmpty($result['pipeline']);
         $this->assertGreaterThan(0, $result['totalPotentialDays']);
@@ -104,20 +104,20 @@ class WorkloadPredictionServiceTest extends TestCase
 
     public function testAnalyzePipelineFiltersOrdersByProfile(): void
     {
-        $orderRepository       = $this->createMock(OrderRepository::class);
+        $orderRepository = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $entityManager         = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $profile1 = new Profile();
         $profile1->setName('Développeur');
         $reflectionProfile1 = new ReflectionClass($profile1);
-        $idProperty         = $reflectionProfile1->getProperty('id');
+        $idProperty = $reflectionProfile1->getProperty('id');
         $idProperty->setValue($profile1, 1);
 
         $profile2 = new Profile();
         $profile2->setName('Designer');
         $reflectionProfile2 = new ReflectionClass($profile2);
-        $idProperty         = $reflectionProfile2->getProperty('id');
+        $idProperty = $reflectionProfile2->getProperty('id');
         $idProperty->setValue($profile2, 2);
 
         $line1 = new OrderLine();
@@ -154,9 +154,9 @@ class WorkloadPredictionServiceTest extends TestCase
 
     public function testAnalyzePipelineGroupsWorkloadByMonth(): void
     {
-        $orderRepository       = $this->createMock(OrderRepository::class);
+        $orderRepository = $this->createMock(OrderRepository::class);
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $entityManager         = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $profile = new Profile();
         $profile->setName('Développeur');
@@ -179,7 +179,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $orderRepository->expects($this->once())->method('findBy')->willReturn([$order]);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
-        $result  = $service->analyzePipeline();
+        $result = $service->analyzePipeline();
 
         $this->assertIsArray($result['workloadByMonth']);
     }

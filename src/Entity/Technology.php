@@ -77,8 +77,8 @@ class Technology implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->projects                = new ArrayCollection();
-        $this->skills                  = new ArrayCollection();
+        $this->projects = new ArrayCollection();
+        $this->skills = new ArrayCollection();
         $this->contributorTechnologies = new ArrayCollection();
     }
 

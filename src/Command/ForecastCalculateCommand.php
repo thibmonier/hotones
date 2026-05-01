@@ -74,7 +74,7 @@ class ForecastCalculateCommand extends Command
 
             // Display summary table
             $io->section('Résumé des prévisions (Scénario réaliste)');
-            $tableData          = [];
+            $tableData = [];
             $realisticForecasts = array_filter($forecasts, fn ($f): bool => $f->getScenario() === 'realistic');
 
             foreach ($realisticForecasts as $forecast) {

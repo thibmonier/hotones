@@ -41,15 +41,15 @@ class CrmLeadController extends AbstractController
     #[Route('/leads', name: 'admin_crm_leads_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $page    = max(1, $request->query->getInt('page', 1));
+        $page = max(1, $request->query->getInt('page', 1));
         $perPage = 50;
 
         // Filtres
-        $status           = $request->query->get('status');
-        $source           = $request->query->get('source');
+        $status = $request->query->get('status');
+        $source = $request->query->get('source');
         $marketingConsent = $request->query->get('marketing_consent');
-        $hasDownloaded    = $request->query->get('has_downloaded');
-        $search           = $request->query->get('search');
+        $hasDownloaded = $request->query->get('has_downloaded');
+        $search = $request->query->get('search');
 
         // QueryBuilder avec filtres
         $qb = $this->leadCaptureRepository->createQueryBuilder('l')->orderBy('l.createdAt', 'DESC');
@@ -91,16 +91,16 @@ class CrmLeadController extends AbstractController
         $totalPages = (int) ceil($total / $perPage);
 
         return $this->render('admin/crm/leads/index.html.twig', [
-            'leads'      => $leads,
-            'page'       => $page,
+            'leads' => $leads,
+            'page' => $page,
             'totalPages' => $totalPages,
-            'total'      => $total,
-            'filters'    => [
-                'status'            => $status,
-                'source'            => $source,
+            'total' => $total,
+            'filters' => [
+                'status' => $status,
+                'source' => $source,
                 'marketing_consent' => $marketingConsent,
-                'has_downloaded'    => $hasDownloaded,
-                'search'            => $search,
+                'has_downloaded' => $hasDownloaded,
+                'search' => $search,
             ],
         ]);
     }
@@ -121,7 +121,7 @@ class CrmLeadController extends AbstractController
         $timeline = $this->buildTimeline($lead);
 
         return $this->render('admin/crm/leads/show.html.twig', [
-            'lead'     => $lead,
+            'lead' => $lead,
             'timeline' => $timeline,
         ]);
     }
@@ -208,7 +208,7 @@ class CrmLeadController extends AbstractController
         $leads = $qb->getQuery()->getResult();
 
         // Créer le CSV
-        $csv   = [];
+        $csv = [];
         $csv[] = [
             'ID',
             'Prénom',
@@ -236,7 +236,7 @@ class CrmLeadController extends AbstractController
                 $lead->getLastName(),
                 $lead->getEmail(),
                 $lead->getCompany() ?? '',
-                $lead->getPhone()   ?? '',
+                $lead->getPhone() ?? '',
                 $lead->getSource(),
                 $lead->getStatus(),
                 $lead->hasMarketingConsent() ? 'Oui' : 'Non',
@@ -291,7 +291,7 @@ class CrmLeadController extends AbstractController
         foreach ($statsBySourceRaw as $source => $count) {
             $statsBySource[] = [
                 'source' => $source,
-                'count'  => $count,
+                'count' => $count,
             ];
         }
 
@@ -319,17 +319,17 @@ class CrmLeadController extends AbstractController
             $converted = (int) $convertedQb->getQuery()->getSingleScalarResult();
 
             $conversionBySource[$source] = [
-                'total'     => $totalBySource,
+                'total' => $totalBySource,
                 'converted' => $converted,
-                'rate'      => $totalBySource > 0 ? round(($converted / $totalBySource) * 100, 2) : 0,
+                'rate' => $totalBySource > 0 ? round(($converted / $totalBySource) * 100, 2) : 0,
             ];
         }
 
         return $this->render('admin/crm/statistics.html.twig', [
-            'stats'                => $stats,
-            'stats_by_source'      => $statsBySource,
-            'stats_by_status'      => $statsByStatus,
-            'recent_leads'         => $recentLeads,
+            'stats' => $stats,
+            'stats_by_source' => $statsBySource,
+            'stats_by_status' => $statsByStatus,
+            'recent_leads' => $recentLeads,
             'conversion_by_source' => $conversionBySource,
         ]);
     }
@@ -343,22 +343,22 @@ class CrmLeadController extends AbstractController
 
         // Création du lead
         $timeline[] = [
-            'date'        => $lead->getCreatedAt(),
-            'type'        => 'created',
-            'icon'        => 'bx-user-plus',
-            'color'       => 'info',
-            'title'       => 'Lead capturé',
+            'date' => $lead->getCreatedAt(),
+            'type' => 'created',
+            'icon' => 'bx-user-plus',
+            'color' => 'info',
+            'title' => 'Lead capturé',
             'description' => sprintf('Via %s', $lead->getSource()),
         ];
 
         // Téléchargement
         if ($lead->getDownloadedAt()) {
             $timeline[] = [
-                'date'        => $lead->getDownloadedAt(),
-                'type'        => 'downloaded',
-                'icon'        => 'bx-download',
-                'color'       => 'success',
-                'title'       => 'Guide téléchargé',
+                'date' => $lead->getDownloadedAt(),
+                'type' => 'downloaded',
+                'icon' => 'bx-download',
+                'color' => 'success',
+                'title' => 'Guide téléchargé',
                 'description' => sprintf('%d téléchargement(s)', $lead->getDownloadCount()),
             ];
         }
@@ -366,33 +366,33 @@ class CrmLeadController extends AbstractController
         // Emails de nurturing
         if ($lead->getNurturingDay1SentAt()) {
             $timeline[] = [
-                'date'        => $lead->getNurturingDay1SentAt(),
-                'type'        => 'nurturing_day1',
-                'icon'        => 'bx-envelope',
-                'color'       => 'primary',
-                'title'       => 'Email J+1 envoyé',
+                'date' => $lead->getNurturingDay1SentAt(),
+                'type' => 'nurturing_day1',
+                'icon' => 'bx-envelope',
+                'color' => 'primary',
+                'title' => 'Email J+1 envoyé',
                 'description' => 'Premier email de nurturing',
             ];
         }
 
         if ($lead->getNurturingDay3SentAt()) {
             $timeline[] = [
-                'date'        => $lead->getNurturingDay3SentAt(),
-                'type'        => 'nurturing_day3',
-                'icon'        => 'bx-envelope',
-                'color'       => 'primary',
-                'title'       => 'Email J+3 envoyé',
+                'date' => $lead->getNurturingDay3SentAt(),
+                'type' => 'nurturing_day3',
+                'icon' => 'bx-envelope',
+                'color' => 'primary',
+                'title' => 'Email J+3 envoyé',
                 'description' => 'Cas pratique envoyé',
             ];
         }
 
         if ($lead->getNurturingDay7SentAt()) {
             $timeline[] = [
-                'date'        => $lead->getNurturingDay7SentAt(),
-                'type'        => 'nurturing_day7',
-                'icon'        => 'bx-envelope',
-                'color'       => 'primary',
-                'title'       => 'Email J+7 envoyé',
+                'date' => $lead->getNurturingDay7SentAt(),
+                'type' => 'nurturing_day7',
+                'icon' => 'bx-envelope',
+                'color' => 'primary',
+                'title' => 'Email J+7 envoyé',
                 'description' => 'Proposition d\'essai HotOnes',
             ];
         }

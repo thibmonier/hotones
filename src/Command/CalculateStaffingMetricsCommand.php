@@ -73,10 +73,10 @@ Exemples :
     {
         $io = new SymfonyStyle($input, $output);
 
-        $period           = $input->getArgument('period');
-        $granularity      = $input->getOption('granularity');
+        $period = $input->getArgument('period');
+        $granularity = $input->getOption('granularity');
         $forceRecalculate = $input->getOption('force-recalculate');
-        $range            = (int) $input->getOption('range');
+        $range = (int) $input->getOption('range');
 
         // Validation de la granularité
         if (!in_array($granularity, ['monthly', 'quarterly', 'weekly'], true)) {
@@ -87,19 +87,19 @@ Exemples :
 
         try {
             $startDate = null;
-            $endDate   = null;
+            $endDate = null;
 
             // Parse la période
             if (preg_match('/^(\d{4})$/', (string) $period, $matches)) {
                 // Année complète
-                $year      = (int) $matches[1];
+                $year = (int) $matches[1];
                 $startDate = new DateTime("$year-01-01");
-                $endDate   = new DateTime("$year-12-31");
+                $endDate = new DateTime("$year-12-31");
 
                 $io->info("Calcul des métriques de staffing pour l'année $year ($granularity)...");
             } elseif (preg_match('/^(\d{4})-(\d{1,2})$/', (string) $period, $matches)) {
                 // Mois spécifique
-                $year  = (int) $matches[1];
+                $year = (int) $matches[1];
                 $month = (int) $matches[2];
 
                 if ($month < 1 || $month > 12) {
@@ -109,7 +109,7 @@ Exemples :
                 }
 
                 $startDate = new DateTime("$year-$month-01");
-                $endDate   = clone $startDate;
+                $endDate = clone $startDate;
                 $endDate->modify('last day of this month');
 
                 $io->info('Calcul des métriques de staffing pour '.$startDate->format('F Y').'...');

@@ -140,8 +140,8 @@ class TechnologyFixtures extends Fixture implements FixtureGroupInterface
         }
 
         $techRepository = $manager->getRepository(Technology::class);
-        $created        = 0;
-        $skipped        = 0;
+        $created = 0;
+        $skipped = 0;
 
         foreach ($companies as $company) {
             [$companyCreated, $companySkipped] = $this->createTechnologiesForCompany(
@@ -175,7 +175,7 @@ class TechnologyFixtures extends Fixture implements FixtureGroupInterface
             // Check if technology already exists for this company
             $existing = $techRepository->findOneBy([
                 'company' => $company,
-                'name'    => $techData['name'],
+                'name' => $techData['name'],
             ]);
 
             if ($existing !== null) {
@@ -184,12 +184,12 @@ class TechnologyFixtures extends Fixture implements FixtureGroupInterface
                 continue;
             }
 
-            $technology           = new Technology();
-            $technology->company  = $company;
-            $technology->name     = $techData['name'];
+            $technology = new Technology();
+            $technology->company = $company;
+            $technology->name = $techData['name'];
             $technology->category = $techData['category'];
-            $technology->color    = $techData['color'];
-            $technology->active   = true;
+            $technology->color = $techData['color'];
+            $technology->active = true;
 
             $manager->persist($technology);
             ++$created;

@@ -19,9 +19,9 @@ use Throwable;
  */
 class TenantIsolationException extends RuntimeException
 {
-    private ?int $userId             = null;
+    private ?int $userId = null;
     private ?int $attemptedCompanyId = null;
-    private ?int $currentCompanyId   = null;
+    private ?int $currentCompanyId = null;
 
     public function __construct(
         string $message = 'Tenant isolation violation detected',
@@ -75,12 +75,12 @@ class TenantIsolationException extends RuntimeException
     public function getSecurityContext(): array
     {
         return [
-            'user_id'              => $this->userId,
+            'user_id' => $this->userId,
             'attempted_company_id' => $this->attemptedCompanyId,
-            'current_company_id'   => $this->currentCompanyId,
-            'message'              => $this->getMessage(),
-            'file'                 => $this->getFile(),
-            'line'                 => $this->getLine(),
+            'current_company_id' => $this->currentCompanyId,
+            'message' => $this->getMessage(),
+            'file' => $this->getFile(),
+            'line' => $this->getLine(),
         ];
     }
 }

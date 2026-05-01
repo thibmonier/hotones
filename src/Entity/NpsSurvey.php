@@ -29,9 +29,9 @@ class NpsSurvey implements CompanyOwnedInterface
     use Blameable;
 
     // Statuts possibles
-    public const STATUS_PENDING   = 'pending'; // En attente de réponse
+    public const STATUS_PENDING = 'pending'; // En attente de réponse
     public const STATUS_COMPLETED = 'completed'; // Répondu
-    public const STATUS_EXPIRED   = 'expired'; // Expiré
+    public const STATUS_EXPIRED = 'expired'; // Expiré
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -164,7 +164,7 @@ class NpsSurvey implements CompanyOwnedInterface
     public function __construct()
     {
         $this->sentAt = new DateTime();
-        $this->token  = bin2hex(random_bytes(32));
+        $this->token = bin2hex(random_bytes(32));
         // Par défaut, expire après 30 jours
         $this->expiresAt = new DateTime()->modify('+30 days');
     }
@@ -224,9 +224,9 @@ class NpsSurvey implements CompanyOwnedInterface
     {
         return match ($this->getCategory()) {
             'detractor' => 'Détracteur',
-            'passive'   => 'Passif',
-            'promoter'  => 'Promoteur',
-            default     => null,
+            'passive' => 'Passif',
+            'promoter' => 'Promoteur',
+            default => null,
         };
     }
 
@@ -235,7 +235,7 @@ class NpsSurvey implements CompanyOwnedInterface
      */
     public function markAsCompleted(): self
     {
-        $this->status      = self::STATUS_COMPLETED;
+        $this->status = self::STATUS_COMPLETED;
         $this->respondedAt = new DateTime();
 
         return $this;

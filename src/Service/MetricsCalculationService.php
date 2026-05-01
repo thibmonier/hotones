@@ -45,18 +45,18 @@ class MetricsCalculationService
         array $filters = [],
     ): array {
         $startDate ??= new DateTime('first day of this month');
-        $endDate   ??= new DateTime('last day of this month');
+        $endDate ??= new DateTime('last day of this month');
 
         return [
             'period' => [
                 'start' => $startDate,
-                'end'   => $endDate,
+                'end' => $endDate,
             ],
-            'revenue'      => $this->calculateRevenue($startDate, $endDate, $filters),
-            'projects'     => $this->calculateProjectMetrics($startDate, $endDate, $filters),
-            'orders'       => $this->calculateOrderMetrics($startDate, $endDate, $filters),
+            'revenue' => $this->calculateRevenue($startDate, $endDate, $filters),
+            'projects' => $this->calculateProjectMetrics($startDate, $endDate, $filters),
+            'orders' => $this->calculateOrderMetrics($startDate, $endDate, $filters),
             'contributors' => $this->calculateContributorMetrics($startDate, $endDate, $filters),
-            'time'         => $this->calculateTimeMetrics($startDate, $endDate, $filters),
+            'time' => $this->calculateTimeMetrics($startDate, $endDate, $filters),
         ];
     }
 
@@ -72,27 +72,27 @@ class MetricsCalculationService
         $projects = $this->getFilteredProjects($startDate, $endDate, $filters, 'active');
 
         $totalRevenue = '0';
-        $totalCost    = '0';
-        $totalMargin  = '0';
+        $totalCost = '0';
+        $totalMargin = '0';
 
         foreach ($projects as $project) {
             $revenue = $project->getTotalSoldAmount();
-            $cost    = $project->getTotalRealCost();
+            $cost = $project->getTotalRealCost();
 
             $totalRevenue = bcadd($totalRevenue, (string) $revenue, 2);
-            $totalCost    = bcadd($totalCost, (string) $cost, 2);
+            $totalCost = bcadd($totalCost, (string) $cost, 2);
         }
 
         $totalMargin = bcsub($totalRevenue, $totalCost, 2);
-        $marginRate  = bccomp($totalRevenue, '0', 2) > 0
+        $marginRate = bccomp($totalRevenue, '0', 2) > 0
             ? bcmul(bcdiv($totalMargin, $totalRevenue, 4), '100', 2)
             : '0.00';
 
         return [
             'total_revenue' => (float) $totalRevenue,
-            'total_cost'    => (float) $totalCost,
-            'total_margin'  => (float) $totalMargin,
-            'margin_rate'   => (float) $marginRate,
+            'total_cost' => (float) $totalCost,
+            'total_margin' => (float) $totalMargin,
+            'margin_rate' => (float) $marginRate,
         ];
     }
 
@@ -108,14 +108,14 @@ class MetricsCalculationService
         $projectsInPeriod = $this->getFilteredProjects($startDate, $endDate, $filters, null);
 
         // Compter les statuts
-        $activeCount    = 0;
+        $activeCount = 0;
         $completedCount = 0;
 
         // Répartition par type
-        $forfaitCount          = 0;
-        $regieCount            = 0;
-        $internalCount         = 0;
-        $clientCount           = 0;
+        $forfaitCount = 0;
+        $regieCount = 0;
+        $internalCount = 0;
+        $clientCount = 0;
         $serviceCategoryCounts = [];
 
         foreach ($projectsInPeriod as $project) {
@@ -142,7 +142,7 @@ class MetricsCalculationService
             // Catégorie de service
             $sc = $project->serviceCategory;
             if ($sc) {
-                $name                         = $sc->getName();
+                $name = $sc->getName();
                 $serviceCategoryCounts[$name] = ($serviceCategoryCounts[$name] ?? 0) + 1;
             }
         }
@@ -151,17 +151,17 @@ class MetricsCalculationService
         ksort($serviceCategoryCounts);
 
         return [
-            'total'     => count($projectsInPeriod),
-            'active'    => $activeCount,
+            'total' => count($projectsInPeriod),
+            'active' => $activeCount,
             'completed' => $completedCount,
             'in_period' => count($projectsInPeriod),
-            'by_type'   => [
+            'by_type' => [
                 'forfait' => $forfaitCount,
-                'regie'   => $regieCount,
+                'regie' => $regieCount,
             ],
             'by_client_type' => [
                 'internal' => $internalCount,
-                'client'   => $clientCount,
+                'client' => $clientCount,
             ],
             'by_service_category' => $serviceCategoryCounts,
         ];
@@ -176,7 +176,7 @@ class MetricsCalculationService
         array $filters = [],
     ): array {
         // Restreindre aux projets filtrés si des filtres sont fournis
-        $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
+        $projects = $this->getFilteredProjects($startDate, $endDate, $filters, null);
         $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
         $qb = $this->orderRepo
@@ -192,9 +192,9 @@ class MetricsCalculationService
         $ordersInPeriod = $qb->getQuery()->getResult();
 
         $pending = 0;
-        $won     = 0;
-        $lost    = 0;
-        $signed  = 0;
+        $won = 0;
+        $lost = 0;
+        $signed = 0;
 
         foreach ($ordersInPeriod as $order) {
             switch ($order->getStatus()) {
@@ -215,15 +215,15 @@ class MetricsCalculationService
         }
 
         // Taux de conversion
-        $totalDecided   = $won + $signed + $lost;
+        $totalDecided = $won + $signed + $lost;
         $conversionRate = $totalDecided > 0 ? round((($won + $signed) / $totalDecided) * 100, 2) : 0;
 
         return [
-            'total'           => count($ordersInPeriod),
-            'pending'         => $pending,
-            'won'             => $won,
-            'signed'          => $signed,
-            'lost'            => $lost,
+            'total' => count($ordersInPeriod),
+            'pending' => $pending,
+            'won' => $won,
+            'signed' => $signed,
+            'lost' => $lost,
             'conversion_rate' => $conversionRate,
         ];
     }
@@ -239,7 +239,7 @@ class MetricsCalculationService
         $activeContributors = $this->contributorRepo->findBy(['active' => true]);
 
         // Restreindre aux projets filtrés si applicable
-        $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
+        $projects = $this->getFilteredProjects($startDate, $endDate, $filters, null);
         $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
         if (!empty($projectIds)) {
@@ -256,7 +256,7 @@ class MetricsCalculationService
         $topContributors = array_slice($topContributors, 0, 10);
 
         return [
-            'total_active'     => count($activeContributors),
+            'total_active' => count($activeContributors),
             'top_contributors' => $topContributors,
         ];
     }
@@ -270,7 +270,7 @@ class MetricsCalculationService
         array $filters = [],
     ): array {
         // Restreindre les heures aux projets filtrés si applicable
-        $projects   = $this->getFilteredProjects($startDate, $endDate, $filters, null);
+        $projects = $this->getFilteredProjects($startDate, $endDate, $filters, null);
         $projectIds = array_map(static fn ($p) => $p->id, $projects);
 
         if (!empty($projectIds)) {
@@ -284,7 +284,7 @@ class MetricsCalculationService
 
         // Contributeurs actifs
         $activeContributors = $this->contributorRepo->findBy(['active' => true]);
-        $contributorCount   = count($activeContributors);
+        $contributorCount = count($activeContributors);
 
         // Capacité théorique (nb contributeurs × nb jours × 8h)
         $theoreticalCapacity = $contributorCount * $workingDays * 8;
@@ -293,11 +293,11 @@ class MetricsCalculationService
         $occupationRate = $theoreticalCapacity > 0 ? round(($totalHours / $theoreticalCapacity) * 100, 2) : 0;
 
         return [
-            'total_hours'            => $totalHours,
-            'total_days'             => round($totalHours / 8, 2),
+            'total_hours' => $totalHours,
+            'total_days' => round($totalHours / 8, 2),
             'working_days_in_period' => $workingDays,
-            'theoretical_capacity'   => $theoreticalCapacity,
-            'occupation_rate'        => $occupationRate,
+            'theoretical_capacity' => $theoreticalCapacity,
+            'occupation_rate' => $occupationRate,
         ];
     }
 
@@ -323,21 +323,21 @@ class MetricsCalculationService
      */
     public function calculateMonthlyEvolution(int $months = 12, array $filters = []): array
     {
-        $data    = [];
+        $data = [];
         $endDate = new DateTime('last day of this month');
 
         for ($i = $months - 1; $i >= 0; --$i) {
             $monthStart = (clone $endDate)->modify("-{$i} months")->modify('first day of this month');
-            $monthEnd   = (clone $monthStart)->modify('last day of this month');
+            $monthEnd = (clone $monthStart)->modify('last day of this month');
 
             $metrics = $this->calculateKPIs($monthStart, $monthEnd, $filters);
 
             $data[] = [
-                'month'       => $monthStart->format('Y-m'),
+                'month' => $monthStart->format('Y-m'),
                 'month_label' => $monthStart->format('M Y'),
-                'revenue'     => $metrics['revenue']['total_revenue'],
-                'cost'        => $metrics['revenue']['total_cost'],
-                'margin'      => $metrics['revenue']['total_margin'],
+                'revenue' => $metrics['revenue']['total_revenue'],
+                'cost' => $metrics['revenue']['total_cost'],
+                'margin' => $metrics['revenue']['total_margin'],
                 'margin_rate' => $metrics['revenue']['margin_rate'],
             ];
         }
@@ -354,12 +354,12 @@ class MetricsCalculationService
         array $filters = [],
         ?string $statusOverride = null,
     ): array {
-        $status            = $statusOverride                 ?? $filters['status'] ?? null;
-        $projectType       = $filters['project_type']        ?? null;
-        $technologyId      = $filters['technology_id']       ?? null;
-        $isInternal        = $filters['is_internal']         ?? null;
-        $projectManager    = $filters['project_manager_id']  ?? null;
-        $salesPerson       = $filters['sales_person_id']     ?? null;
+        $status = $statusOverride ?? $filters['status'] ?? null;
+        $projectType = $filters['project_type'] ?? null;
+        $technologyId = $filters['technology_id'] ?? null;
+        $isInternal = $filters['is_internal'] ?? null;
+        $projectManager = $filters['project_manager_id'] ?? null;
+        $salesPerson = $filters['sales_person_id'] ?? null;
         $serviceCategoryId = $filters['service_category_id'] ?? null;
 
         return $this->projectRepo->findBetweenDatesFiltered(

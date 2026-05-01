@@ -31,7 +31,7 @@ class TimesheetExportService
         $timesheets = $this->getTimesheets($contributor, $start, $end, $projectId);
 
         $spreadsheet = new Spreadsheet();
-        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Temps saisis');
 
         $sheet->setCellValue('A1', 'Date');
@@ -46,18 +46,18 @@ class TimesheetExportService
         $sheet->getStyle('A1:H1')->applyFromArray([
             'font' => ['bold' => true, 'size' => 12],
             'fill' => [
-                'fillType'   => Fill::FILL_SOLID,
+                'fillType' => Fill::FILL_SOLID,
                 'startColor' => ['rgb' => 'E2E8F0'],
             ],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
-        $row         = 2;
-        $totalHours  = 0;
+        $row = 2;
+        $totalHours = 0;
         $hoursPerDay = $contributor->getHoursPerDay();
         foreach ($timesheets as $ts) {
             $hours = (float) $ts->getHours();
-            $days  = round($hours / $hoursPerDay, 3);
+            $days = round($hours / $hoursPerDay, 3);
 
             $sheet->setCellValue('A'.$row, $ts->getDate()->format('d/m/Y'));
             $sheet->setCellValue('B'.$row, $ts->getProject()->getName());
@@ -83,7 +83,7 @@ class TimesheetExportService
             ->applyFromArray([
                 'font' => ['bold' => true],
                 'fill' => [
-                    'fillType'   => Fill::FILL_SOLID,
+                    'fillType' => Fill::FILL_SOLID,
                     'startColor' => ['rgb' => 'FEF3C7'],
                 ],
             ]);
@@ -93,7 +93,7 @@ class TimesheetExportService
         }
         $sheet->setAutoFilter('A1:H'.($row - 1));
 
-        $writer   = new Xlsx($spreadsheet);
+        $writer = new Xlsx($spreadsheet);
         $filename = sprintf(
             'temps_%s_%s_%s.xlsx',
             $contributor->getFirstName().'_'.$contributor->getLastName(),
@@ -120,7 +120,7 @@ class TimesheetExportService
         DateTime $end,
         ?int $projectId = null,
     ): Response {
-        $timesheets  = $this->getTimesheets($contributor, $start, $end, $projectId);
+        $timesheets = $this->getTimesheets($contributor, $start, $end, $projectId);
         $hoursPerDay = $contributor->getHoursPerDay();
 
         $totalHours = 0;
@@ -152,16 +152,16 @@ class TimesheetExportService
         return $this->pdfGenerator->createPdfResponse(
             'timesheet/export_pdf.html.twig',
             [
-                'contributor'    => $contributor,
-                'timesheets'     => $timesheets,
-                'startDate'      => $start,
-                'endDate'        => $end,
-                'project'        => $project,
-                'totalHours'     => $totalHours,
-                'totalDays'      => round($totalHours / $hoursPerDay, 3),
-                'hoursPerDay'    => $hoursPerDay,
+                'contributor' => $contributor,
+                'timesheets' => $timesheets,
+                'startDate' => $start,
+                'endDate' => $end,
+                'project' => $project,
+                'totalHours' => $totalHours,
+                'totalDays' => round($totalHours / $hoursPerDay, 3),
+                'hoursPerDay' => $hoursPerDay,
                 'projectSummary' => $projectSummary,
-                'generatedAt'    => new DateTime(),
+                'generatedAt' => new DateTime(),
             ],
             $filename,
         );
@@ -177,7 +177,7 @@ class TimesheetExportService
         ?int $projectId,
     ): array {
         $timesheetRepo = $this->em->getRepository(\App\Entity\Timesheet::class);
-        $timesheets    = $timesheetRepo->findByContributorAndDateRange($contributor, $start, $end);
+        $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $start, $end);
 
         if ($projectId) {
             $timesheets = array_filter(

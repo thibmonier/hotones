@@ -8,9 +8,9 @@ use App\Domain\Vacation\Exception\InvalidStatusTransitionException;
 
 enum VacationStatus: string
 {
-    case PENDING   = 'pending';
-    case APPROVED  = 'approved';
-    case REJECTED  = 'rejected';
+    case PENDING = 'pending';
+    case APPROVED = 'approved';
+    case REJECTED = 'rejected';
     case CANCELLED = 'cancelled';
 
     /**
@@ -23,8 +23,8 @@ enum VacationStatus: string
             // APPROVED -> CANCELLED is allowed for manager-initiated cancellations
             // (US-069). The contributor's own cancel is restricted to PENDING by
             // VacationRequestController so the rule is purely additive.
-            self::APPROVED  => [self::CANCELLED],
-            self::REJECTED  => [],
+            self::APPROVED => [self::CANCELLED],
+            self::REJECTED => [],
             self::CANCELLED => [],
         };
     }
@@ -46,9 +46,9 @@ enum VacationStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::PENDING   => 'En attente',
-            self::APPROVED  => 'Approuve',
-            self::REJECTED  => 'Rejete',
+            self::PENDING => 'En attente',
+            self::APPROVED => 'Approuve',
+            self::REJECTED => 'Rejete',
             self::CANCELLED => 'Annule',
         };
     }

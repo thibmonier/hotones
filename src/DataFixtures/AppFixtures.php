@@ -25,29 +25,29 @@ class AppFixtures extends Fixture
     {
         // Volume configuration
         $V = [
-            'users'             => 15,
-            'clients'           => 30,
-            'profiles_extra'    => 8,
-            'contributors'      => 40,
-            'projects'          => 30,
-            'order_tasks_min'   => 4,
-            'order_tasks_max'   => 10,
+            'users' => 15,
+            'clients' => 30,
+            'profiles_extra' => 8,
+            'contributors' => 40,
+            'projects' => 30,
+            'order_tasks_min' => 4,
+            'order_tasks_max' => 10,
             'project_tasks_min' => 8,
             'project_tasks_max' => 16,
-            'subtasks_min'      => 2,
-            'subtasks_max'      => 8,
-            'timesheets_min'    => 150,
-            'timesheets_max'    => 300,
-            'plannings_min'     => 2,
-            'plannings_max'     => 5,
+            'subtasks_min' => 2,
+            'subtasks_max' => 8,
+            'timesheets_min' => 150,
+            'timesheets_max' => 300,
+            'plannings_min' => 2,
+            'plannings_max' => 5,
         ];
 
         // Users
         UserFactory::createOne([
-            'email'     => 'admin@hotones.com',
-            'roles'     => ['ROLE_ADMIN', User::ROLE_SUPERADMIN],
+            'email' => 'admin@hotones.com',
+            'roles' => ['ROLE_ADMIN', User::ROLE_SUPERADMIN],
             'firstName' => 'Admin',
-            'lastName'  => 'Hotones',
+            'lastName' => 'Hotones',
         ]);
         UserFactory::createMany($V['users']);
 
@@ -75,11 +75,11 @@ class AppFixtures extends Fixture
 
         // Projects
         $projects = ProjectFactory::createMany($V['projects'], fn (): array => [
-            'client'            => ClientFactory::random(),
+            'client' => ClientFactory::random(),
             'keyAccountManager' => UserFactory::random(),
-            'projectManager'    => UserFactory::random(),
-            'projectDirector'   => UserFactory::random(),
-            'salesPerson'       => UserFactory::random(),
+            'projectManager' => UserFactory::random(),
+            'projectDirector' => UserFactory::random(),
+            'salesPerson' => UserFactory::random(),
         ]);
 
         // For each project, create order, tasks, subtasks and timesheets
@@ -91,7 +91,7 @@ class AppFixtures extends Fixture
             $orderTasks = OrderTaskFactory::createMany(
                 random_int($V['order_tasks_min'], $V['order_tasks_max']),
                 fn (): array => [
-                    'order'   => $order,
+                    'order' => $order,
                     'profile' => ProfileFactory::random(),
                 ],
             );
@@ -106,9 +106,9 @@ class AppFixtures extends Fixture
             $tasks = ProjectTaskFactory::createMany(
                 random_int($V['project_tasks_min'], $V['project_tasks_max']),
                 fn (): array => [
-                    'project'             => $project,
+                    'project' => $project,
                     'assignedContributor' => random_int(0, 1) ? ContributorFactory::random() : null,
-                    'requiredProfile'     => random_int(0, 1) ? ProfileFactory::random() : null,
+                    'requiredProfile' => random_int(0, 1) ? ProfileFactory::random() : null,
                 ],
             );
 
@@ -119,7 +119,7 @@ class AppFixtures extends Fixture
             );
             foreach ($regularTasks as $task) {
                 ProjectSubTaskFactory::createMany(random_int($V['subtasks_min'], $V['subtasks_max']), fn (): array => [
-                    'task'     => $task,
+                    'task' => $task,
                     'assignee' => random_int(0, 1) ? ContributorFactory::random() : null,
                 ]);
             }
@@ -128,7 +128,7 @@ class AppFixtures extends Fixture
             $allProjectTasks = $tasks; // array of ProjectTask objects
             foreach (range(1, random_int($V['timesheets_min'], $V['timesheets_max'])) as $i) {
                 $withTask = (bool) random_int(0, 1);
-                $task     = $withTask ? $allProjectTasks[array_rand($allProjectTasks)] : null;
+                $task = $withTask ? $allProjectTasks[array_rand($allProjectTasks)] : null;
 
                 // If task chosen, try to pick a subtask for it
                 $subTask = null;
@@ -145,10 +145,10 @@ class AppFixtures extends Fixture
                         : ContributorFactory::random();
 
                 TimesheetFactory::createOne([
-                    'project'     => $project,
+                    'project' => $project,
                     'contributor' => $contrib,
-                    'task'        => $task,
-                    'subTask'     => $subTask,
+                    'task' => $task,
+                    'subTask' => $subTask,
                     // hours/date/notes from defaults
                 ]);
             }
@@ -157,9 +157,9 @@ class AppFixtures extends Fixture
             $planningCount = random_int($V['plannings_min'], $V['plannings_max']);
             for ($p = 0; $p < $planningCount; ++$p) {
                 PlanningFactory::createOne([
-                    'project'     => $project,
+                    'project' => $project,
                     'contributor' => ContributorFactory::random(),
-                    'profile'     => random_int(0, 1) ? ProfileFactory::random() : null,
+                    'profile' => random_int(0, 1) ? ProfileFactory::random() : null,
                 ]);
             }
         }

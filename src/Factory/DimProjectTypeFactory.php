@@ -31,11 +31,11 @@ final class DimProjectTypeFactory extends PersistentObjectFactory
         }
 
         return [
-            'company'         => $company,
-            'projectType'     => self::faker()->randomElement(['forfait', 'regie']),
+            'company' => $company,
+            'projectType' => self::faker()->randomElement(['forfait', 'regie']),
             'serviceCategory' => self::faker()->optional(0.7)->randomElement(['Brand', 'E-commerce', 'Autre']),
-            'status'          => self::faker()->randomElement(['active', 'completed', 'cancelled']),
-            'isInternal'      => self::faker()->boolean(20), // 20% chance d'être interne
+            'status' => self::faker()->randomElement(['active', 'completed', 'cancelled']),
+            'isInternal' => self::faker()->boolean(20), // 20% chance d'être interne
         ];
     }
 

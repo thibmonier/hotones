@@ -51,14 +51,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     // Rôles métier
     public const string ROLE_INTERVENANT = 'ROLE_INTERVENANT';
     public const string ROLE_CHEF_PROJET = 'ROLE_CHEF_PROJET';
-    public const string ROLE_MANAGER     = 'ROLE_MANAGER';
-    public const string ROLE_SUPERADMIN  = 'ROLE_SUPERADMIN';
+    public const string ROLE_MANAGER = 'ROLE_MANAGER';
+    public const string ROLE_SUPERADMIN = 'ROLE_SUPERADMIN';
 
     final public const array ROLE_HIERARCHY = [
         self::ROLE_INTERVENANT => ['ROLE_USER'],
         self::ROLE_CHEF_PROJET => [self::ROLE_INTERVENANT],
-        self::ROLE_MANAGER     => [self::ROLE_CHEF_PROJET],
-        self::ROLE_SUPERADMIN  => [self::ROLE_MANAGER],
+        self::ROLE_MANAGER => [self::ROLE_CHEF_PROJET],
+        self::ROLE_SUPERADMIN => [self::ROLE_MANAGER],
     ];
 
     #[ORM\Id]
@@ -195,7 +195,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
 
     public function getRoles(): array
     {
-        $roles   = $this->roles;
+        $roles = $this->roles;
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);

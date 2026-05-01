@@ -31,11 +31,11 @@ class OnboardingControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $container    = static::getContainer();
+        $container = static::getContainer();
 
-        $this->userRepository        = $container->get(UserRepository::class);
+        $this->userRepository = $container->get(UserRepository::class);
         $this->contributorRepository = $container->get(ContributorRepository::class);
-        $this->taskRepository        = $container->get(OnboardingTaskRepository::class);
+        $this->taskRepository = $container->get(OnboardingTaskRepository::class);
 
         $this->setUpMultiTenant();
     }
@@ -80,7 +80,7 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testShowRequiresAuthentication(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = $this->createContributor($user);
 
         $this->client->request('GET', '/onboarding/contributor/'.$contributor->getId());
@@ -90,7 +90,7 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testShowDisplaysOnboardingDetails(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = $this->createContributor($user);
         $this->createTask($contributor, 'Setup workstation');
 
@@ -103,8 +103,8 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testShowDeniesAccessToOtherContributors(): void
     {
-        $user1        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
-        $user2        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user1 = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user2 = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor1 = $this->createContributor($user1);
 
         $this->client->loginUser($user2);
@@ -115,9 +115,9 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testCompleteTaskRequiresAuthentication(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = $this->createContributor($user);
-        $task        = $this->createTask($contributor);
+        $task = $this->createTask($contributor);
 
         $this->client->request('POST', '/onboarding/task/'.$task->getId().'/complete');
 
@@ -126,9 +126,9 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testCompleteTaskChangesStatus(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = $this->createContributor($user);
-        $task        = $this->createTask($contributor);
+        $task = $this->createTask($contributor);
 
         $this->client->loginUser($user);
 
@@ -139,7 +139,7 @@ class OnboardingControllerTest extends WebTestCase
         $token = $crawler->filter('a[onclick*="completeTask('.$task->getId().'"]')->attr('data-token');
 
         $this->client->request('POST', '/onboarding/task/'.$task->getId().'/complete', [
-            '_token'   => $token,
+            '_token' => $token,
             'comments' => 'Task completed successfully',
         ]);
 
@@ -164,8 +164,8 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testTeamViewDisplaysTeamOnboardings(): void
     {
-        $manager     = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $manager = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = $this->createContributor($user);
         $this->createTask($contributor);
 
@@ -178,9 +178,9 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testUpdateTaskStatusRequiresAuthentication(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = $this->createContributor($user);
-        $task        = $this->createTask($contributor);
+        $task = $this->createTask($contributor);
 
         $this->client->request('POST', '/onboarding/task/'.$task->getId().'/update-status');
 
@@ -189,9 +189,9 @@ class OnboardingControllerTest extends WebTestCase
 
     public function testUpdateTaskStatusChangesStatus(): void
     {
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = $this->createContributor($user);
-        $task        = $this->createTask($contributor);
+        $task = $this->createTask($contributor);
 
         $this->client->loginUser($user);
 

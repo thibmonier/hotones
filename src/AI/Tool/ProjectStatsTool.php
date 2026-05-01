@@ -39,9 +39,9 @@ final readonly class ProjectStatsTool
         $validTypes = ['forfait', 'regie', 'maintenance'];
         if (!in_array($projectType, $validTypes, true)) {
             return [
-                'project_type'   => $projectType,
+                'project_type' => $projectType,
                 'total_projects' => 0,
-                'error'          => 'Type de projet invalide. Valeurs acceptées: '.implode(', ', $validTypes),
+                'error' => 'Type de projet invalide. Valeurs acceptées: '.implode(', ', $validTypes),
             ];
         }
 
@@ -50,20 +50,20 @@ final readonly class ProjectStatsTool
 
         if (empty($projects)) {
             return [
-                'project_type'   => $projectType,
+                'project_type' => $projectType,
                 'total_projects' => 0,
-                'stats'          => [
+                'stats' => [
                     'avg_duration_days' => 0.0,
-                    'avg_budget'        => 0.0,
-                    'common_statuses'   => [],
+                    'avg_budget' => 0.0,
+                    'common_statuses' => [],
                 ],
             ];
         }
 
         // Calculer les statistiques
-        $totalDuration     = 0;
-        $totalBudget       = 0.0;
-        $statusCount       = [];
+        $totalDuration = 0;
+        $totalBudget = 0.0;
+        $statusCount = [];
         $projectsWithDates = 0;
 
         foreach ($projects as $project) {
@@ -78,24 +78,24 @@ final readonly class ProjectStatsTool
             $totalBudget += (float) $project->getTotalSoldAmount();
 
             // Statuts les plus fréquents
-            $status               = $project->getStatus();
+            $status = $project->getStatus();
             $statusCount[$status] = ($statusCount[$status] ?? 0) + 1;
         }
 
         $totalProjects = count($projects);
-        $avgDuration   = $projectsWithDates > 0 ? $totalDuration / $projectsWithDates : 0;
-        $avgBudget     = $totalProjects     > 0 ? $totalBudget   / $totalProjects : 0;
+        $avgDuration = $projectsWithDates > 0 ? $totalDuration / $projectsWithDates : 0;
+        $avgBudget = $totalProjects > 0 ? $totalBudget / $totalProjects : 0;
 
         // Trier les statuts par fréquence
         arsort($statusCount);
 
         return [
-            'project_type'   => $projectType,
+            'project_type' => $projectType,
             'total_projects' => $totalProjects,
-            'stats'          => [
+            'stats' => [
                 'avg_duration_days' => round($avgDuration, 1),
-                'avg_budget'        => round($avgBudget, 2),
-                'common_statuses'   => $statusCount,
+                'avg_budget' => round($avgBudget, 2),
+                'common_statuses' => $statusCount,
             ],
         ];
     }

@@ -65,7 +65,7 @@ class ProcessAccountDeletionsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io     = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $dryRun = $input->getOption('dry-run');
 
         $io->title('GDPR Account Deletion Processor');
@@ -86,7 +86,7 @@ class ProcessAccountDeletionsCommand extends Command
         $io->section(sprintf('Found %d account(s) ready for deletion', count($dueDeletions)));
 
         $deletedCount = 0;
-        $errorCount   = 0;
+        $errorCount = 0;
 
         foreach ($dueDeletions as $deletionRequest) {
             $user = $deletionRequest->getUser();
@@ -112,8 +112,8 @@ class ProcessAccountDeletionsCommand extends Command
                     $this->em->flush();
 
                     $this->logger->warning('Account deletion completed (PLACEHOLDER - actual deletion not implemented)', [
-                        'user_id'    => $user->getId(),
-                        'email'      => $user->getEmail(),
+                        'user_id' => $user->getId(),
+                        'email' => $user->getEmail(),
                         'request_id' => $deletionRequest->getId(),
                     ]);
 
@@ -128,9 +128,9 @@ class ProcessAccountDeletionsCommand extends Command
                 $io->error(sprintf('Failed to process deletion for user #%d: %s', $user->getId(), $e->getMessage()));
 
                 $this->logger->error('Account deletion failed', [
-                    'user_id'    => $user->getId(),
+                    'user_id' => $user->getId(),
                     'request_id' => $deletionRequest->getId(),
-                    'error'      => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

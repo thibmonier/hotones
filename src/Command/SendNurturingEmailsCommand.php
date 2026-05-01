@@ -53,8 +53,8 @@ class SendNurturingEmailsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io          = new SymfonyStyle($input, $output);
-        $dryRun      = (bool) $input->getOption('dry-run');
+        $io = new SymfonyStyle($input, $output);
+        $dryRun = (bool) $input->getOption('dry-run');
         $specificDay = $input->getOption('day') ? (int) $input->getOption('day') : null;
 
         if ($specificDay !== null && !in_array($specificDay, [1, 3, 7], true)) {

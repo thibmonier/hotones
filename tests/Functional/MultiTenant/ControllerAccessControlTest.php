@@ -44,15 +44,15 @@ class ControllerAccessControlTest extends WebTestCase
     {
         // Créer 2 Companies avec utilisateurs
         ['company' => $company1, 'user' => $user1] = $this->createCompanyWithUser('Company Alpha', 'user1@alpha.com');
-        ['company' => $company2]                   = $this->createCompanyWithUser('Company Beta', 'user2@beta.com');
+        ['company' => $company2] = $this->createCompanyWithUser('Company Beta', 'user2@beta.com');
 
         // Créer des projets pour chaque Company
         $project1 = ProjectFactory::createOne([
-            'name'    => 'Project Alpha',
+            'name' => 'Project Alpha',
             'company' => $company1,
         ]);
         $project2 = ProjectFactory::createOne([
-            'name'    => 'Project Beta',
+            'name' => 'Project Beta',
             'company' => $company2,
         ]);
 
@@ -75,15 +75,15 @@ class ControllerAccessControlTest extends WebTestCase
     {
         // Créer 2 Companies avec utilisateurs
         ['company' => $company1, 'user' => $user1] = $this->createCompanyWithUser('Company Alpha', 'user1@alpha.com');
-        ['company' => $company2]                   = $this->createCompanyWithUser('Company Beta', 'user2@beta.com');
+        ['company' => $company2] = $this->createCompanyWithUser('Company Beta', 'user2@beta.com');
 
         // Créer des clients pour chaque Company
         $client1 = ClientFactory::createOne([
-            'name'    => 'Client Alpha',
+            'name' => 'Client Alpha',
             'company' => $company1,
         ]);
         $client2 = ClientFactory::createOne([
-            'name'    => 'Client Beta',
+            'name' => 'Client Beta',
             'company' => $company2,
         ]);
 
@@ -106,18 +106,18 @@ class ControllerAccessControlTest extends WebTestCase
     {
         // Créer 2 Companies avec utilisateurs
         ['company' => $company1, 'user' => $user1] = $this->createCompanyWithUser('Company Alpha', 'user1@alpha.com');
-        ['company' => $company2]                   = $this->createCompanyWithUser('Company Beta', 'user2@beta.com');
+        ['company' => $company2] = $this->createCompanyWithUser('Company Beta', 'user2@beta.com');
 
         // Créer des projets pour chaque Company
         ProjectFactory::createMany(3, [
             'company' => $company1,
-            'name'    => 'Project Alpha',
-            'status'  => 'active',
+            'name' => 'Project Alpha',
+            'status' => 'active',
         ]);
         ProjectFactory::createMany(2, [
             'company' => $company2,
-            'name'    => 'Project Beta',
-            'status'  => 'active',
+            'name' => 'Project Beta',
+            'status' => 'active',
         ]);
 
         // Login en tant qu'utilisateur de Company 1
@@ -155,9 +155,9 @@ class ControllerAccessControlTest extends WebTestCase
         $form = $crawler
             ->selectButton('Créer')
             ->form([
-                'project[name]'        => 'New Project',
+                'project[name]' => 'New Project',
                 'project[projectType]' => 'forfait',
-                'project[status]'      => 'active',
+                'project[status]' => 'active',
             ]);
 
         $this->client->submit($form);
@@ -243,7 +243,7 @@ class ControllerAccessControlTest extends WebTestCase
         $user->setEmail($email);
         $user->setPassword($hasher->hashPassword($user, 'password'));
         $user->firstName = 'Test';
-        $user->lastName  = 'User';
+        $user->lastName = 'User';
         $user->setRoles($roles);
         $em->persist($user);
 

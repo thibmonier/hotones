@@ -33,14 +33,14 @@ class AdminUserController extends AbstractController
     #[Route('', name: 'admin_users')]
     public function index(EntityManagerInterface $em): Response
     {
-        $users        = $em->getRepository(User::class)->findAll();
+        $users = $em->getRepository(User::class)->findAll();
         $contributors = [];
         foreach ($users as $u) {
             $contributors[$u->getId()] = $em->getRepository(Contributor::class)->findOneBy(['user' => $u]);
         }
 
         return $this->render('admin/user/index.html.twig', [
-            'users'        => $users,
+            'users' => $users,
             'contributors' => $contributors,
         ]);
     }
@@ -66,7 +66,7 @@ class AdminUserController extends AbstractController
             $user->firstName = (string) $request->request->get('first_name');
             $user->setLastName((string) $request->request->get('last_name'));
             $user->setEmail((string) $request->request->get('email'));
-            $user->phoneWork     = $request->request->get('phone_work');
+            $user->phoneWork = $request->request->get('phone_work');
             $user->phonePersonal = $request->request->get('phone_personal');
             $user->setAddress($request->request->get('address'));
 
@@ -110,10 +110,10 @@ class AdminUserController extends AbstractController
         SecureFileUploadService $uploadService,
     ): Response {
         if ($request->isMethod('POST')) {
-            $email     = (string) $request->request->get('email');
-            $password  = (string) $request->request->get('password');
+            $email = (string) $request->request->get('email');
+            $password = (string) $request->request->get('password');
             $firstName = (string) $request->request->get('first_name');
-            $lastName  = (string) $request->request->get('last_name');
+            $lastName = (string) $request->request->get('last_name');
 
             $user = new User();
             $user->setEmail($email)->setLastName($lastName)->setRoles(['ROLE_USER']);

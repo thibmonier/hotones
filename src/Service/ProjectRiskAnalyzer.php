@@ -12,10 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectRiskAnalyzer
 {
-    private const float WEIGHT_BUDGET   = 0.40; // 40%
+    private const float WEIGHT_BUDGET = 0.40; // 40%
     private const float WEIGHT_TIMELINE = 0.30; // 30%
     private const float WEIGHT_VELOCITY = 0.20; // 20%
-    private const float WEIGHT_QUALITY  = 0.10; // 10%
+    private const float WEIGHT_QUALITY = 0.10; // 10%
 
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -68,15 +68,15 @@ class ProjectRiskAnalyzer
 
         // Calcul du score de santé (100 - somme des pénalités)
         $totalPenalty = array_sum(array_column($risks, 'score'));
-        $healthScore  = max(0, 100 - $totalPenalty);
+        $healthScore = max(0, 100 - $totalPenalty);
 
         // Détermination du niveau de risque
         $riskLevel = $this->determineRiskLevel($healthScore);
 
         return [
             'healthScore' => $healthScore,
-            'riskLevel'   => $riskLevel,
-            'risks'       => $risks,
+            'riskLevel' => $riskLevel,
+            'risks' => $risks,
         ];
     }
 
@@ -85,7 +85,7 @@ class ProjectRiskAnalyzer
      */
     private function analyzeBudgetOverrun(Project $project): ?array
     {
-        $soldHours  = (float) $project->getTotalTasksSoldHours();
+        $soldHours = (float) $project->getTotalTasksSoldHours();
         $spentHours = (float) $project->getTotalTasksSpentHours();
 
         if ($soldHours === 0.0) {
@@ -96,9 +96,9 @@ class ProjectRiskAnalyzer
 
         if ($overrunPercentage > 20) {
             return [
-                'type'     => 'budget_overrun',
+                'type' => 'budget_overrun',
                 'severity' => 'critical',
-                'message'  => sprintf(
+                'message' => sprintf(
                     'Dépassement budgétaire critique : %.1f%% (%.1fh / %.1fh vendues)',
                     $overrunPercentage,
                     $spentHours,
@@ -110,9 +110,9 @@ class ProjectRiskAnalyzer
 
         if ($overrunPercentage > 10) {
             return [
-                'type'     => 'budget_overrun',
+                'type' => 'budget_overrun',
                 'severity' => 'high',
-                'message'  => sprintf(
+                'message' => sprintf(
                     'Dépassement budgétaire élevé : %.1f%% (%.1fh / %.1fh vendues)',
                     $overrunPercentage,
                     $spentHours,
@@ -124,9 +124,9 @@ class ProjectRiskAnalyzer
 
         if ($overrunPercentage > 0) {
             return [
-                'type'     => 'budget_warning',
+                'type' => 'budget_warning',
                 'severity' => 'medium',
-                'message'  => sprintf(
+                'message' => sprintf(
                     'Budget dépassé : %.1f%% (%.1fh / %.1fh vendues)',
                     $overrunPercentage,
                     $spentHours,
@@ -149,7 +149,7 @@ class ProjectRiskAnalyzer
             return null; // Pas de date de fin définie
         }
 
-        $now      = new DateTime();
+        $now = new DateTime();
         $progress = (float) $project->getGlobalProgress();
 
         // Projet terminé
@@ -162,10 +162,10 @@ class ProjectRiskAnalyzer
             $daysLate = $now->diff($endDate)->days;
 
             return [
-                'type'     => 'schedule_delay',
+                'type' => 'schedule_delay',
                 'severity' => 'critical',
-                'message'  => sprintf('Projet en retard de %d jours (progression : %.0f%%)', $daysLate, $progress),
-                'score'    => 25,
+                'message' => sprintf('Projet en retard de %d jours (progression : %.0f%%)', $daysLate, $progress),
+                'score' => 25,
             ];
         }
 
@@ -173,17 +173,17 @@ class ProjectRiskAnalyzer
         $startDate = $project->getStartDate();
         if ($startDate && $startDate <= $now) {
             $totalDuration = $startDate->diff($endDate)->days;
-            $elapsed       = $startDate->diff($now)->days;
+            $elapsed = $startDate->diff($now)->days;
 
             if ($totalDuration > 0) {
                 $expectedProgress = ($elapsed / $totalDuration) * 100;
-                $progressGap      = $expectedProgress - $progress;
+                $progressGap = $expectedProgress - $progress;
 
                 if ($progressGap > 20) {
                     return [
-                        'type'     => 'schedule_risk',
+                        'type' => 'schedule_risk',
                         'severity' => 'high',
-                        'message'  => sprintf(
+                        'message' => sprintf(
                             'Risque de retard : progression attendue %.0f%%, réelle %.0f%%',
                             $expectedProgress,
                             $progress,
@@ -208,16 +208,16 @@ class ProjectRiskAnalyzer
         }
 
         // Calculer le coût estimé (simplifié : basé sur les heures passées)
-        $spentHours    = (float) $project->getTotalTasksSpentHours();
+        $spentHours = (float) $project->getTotalTasksSpentHours();
         $estimatedCost = $spentHours * 400; // Coût moyen par jour (estimé)
 
         $margin = (($soldAmount - $estimatedCost) / $soldAmount) * 100;
 
         if ($margin < 0) {
             return [
-                'type'     => 'negative_margin',
+                'type' => 'negative_margin',
                 'severity' => 'critical',
-                'message'  => sprintf(
+                'message' => sprintf(
                     'Marge négative : %.1f%% (CA: %.0f€, Coût estimé: %.0f€)',
                     $margin,
                     $soldAmount,
@@ -229,9 +229,9 @@ class ProjectRiskAnalyzer
 
         if ($margin < 10) {
             return [
-                'type'     => 'low_margin',
+                'type' => 'low_margin',
                 'severity' => 'high',
-                'message'  => sprintf(
+                'message' => sprintf(
                     'Marge faible : %.1f%% (CA: %.0f€, Coût estimé: %.0f€)',
                     $margin,
                     $soldAmount,
@@ -243,10 +243,10 @@ class ProjectRiskAnalyzer
 
         if ($margin < 20) {
             return [
-                'type'     => 'margin_warning',
+                'type' => 'margin_warning',
                 'severity' => 'medium',
-                'message'  => sprintf('Marge sous le seuil optimal : %.1f%% (objectif 20%%+)', $margin),
-                'score'    => 10,
+                'message' => sprintf('Marge sous le seuil optimal : %.1f%% (objectif 20%%+)', $margin),
+                'score' => 10,
             ];
         }
 
@@ -265,25 +265,25 @@ class ProjectRiskAnalyzer
         $timesheets = $project->getTimesheets();
         if ($timesheets->count() === 0) {
             return [
-                'type'     => 'no_timesheets',
+                'type' => 'no_timesheets',
                 'severity' => 'high',
-                'message'  => 'Aucun temps saisi sur ce projet en cours',
-                'score'    => 15,
+                'message' => 'Aucun temps saisi sur ce projet en cours',
+                'score' => 15,
             ];
         }
 
         // Vérifier s'il y a eu des saisies récentes (dernières 2 semaines)
-        $now         = new DateTime();
+        $now = new DateTime();
         $twoWeeksAgo = (clone $now)->modify('-14 days');
 
         $recentTimesheets = $timesheets->filter(fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
 
         if ($recentTimesheets->count() === 0) {
             return [
-                'type'     => 'missing_timesheets',
+                'type' => 'missing_timesheets',
                 'severity' => 'medium',
-                'message'  => 'Aucune saisie de temps depuis plus de 2 semaines',
-                'score'    => 10,
+                'message' => 'Aucune saisie de temps depuis plus de 2 semaines',
+                'score' => 10,
             ];
         }
 
@@ -305,19 +305,19 @@ class ProjectRiskAnalyzer
         // Vérifier si le projet est bloqué (0% ou 100% sans changement de statut)
         if ($progress === 0.0 && $project->getStartDate() < new DateTime()->modify('-1 month')) {
             return [
-                'type'     => 'not_started',
+                'type' => 'not_started',
                 'severity' => 'high',
-                'message'  => 'Projet démarré il y a plus d\'un mois mais aucune progression',
-                'score'    => 20,
+                'message' => 'Projet démarré il y a plus d\'un mois mais aucune progression',
+                'score' => 20,
             ];
         }
 
         if ($progress >= 100) {
             return [
-                'type'     => 'completion_pending',
+                'type' => 'completion_pending',
                 'severity' => 'low',
-                'message'  => 'Projet à 100% mais non marqué comme terminé',
-                'score'    => 5,
+                'message' => 'Projet à 100% mais non marqué comme terminé',
+                'score' => 5,
             ];
         }
 
@@ -359,7 +359,7 @@ class ProjectRiskAnalyzer
             // Ne retenir que les projets avec un score < 80 (risque moyen ou élevé)
             if ($analysis['healthScore'] < 80) {
                 $atRiskProjects[] = [
-                    'project'  => $project,
+                    'project' => $project,
                     'analysis' => $analysis,
                 ];
             }
@@ -377,10 +377,10 @@ class ProjectRiskAnalyzer
     public function calculateHealthScore(Project $project): ProjectHealthScore
     {
         // Calculate individual component scores (0-100)
-        $budgetScore   = $this->calculateBudgetScore($project);
+        $budgetScore = $this->calculateBudgetScore($project);
         $timelineScore = $this->calculateTimelineScore($project);
         $velocityScore = $this->calculateVelocityScore($project);
-        $qualityScore  = $this->calculateQualityScore($project);
+        $qualityScore = $this->calculateQualityScore($project);
 
         // Calculate weighted overall score
         $overallScore = (int) round(($budgetScore * self::WEIGHT_BUDGET)
@@ -393,10 +393,10 @@ class ProjectRiskAnalyzer
 
         // Generate recommendations
         $recommendations = $this->generateRecommendations($project, [
-            'budget'   => $budgetScore,
+            'budget' => $budgetScore,
             'timeline' => $timelineScore,
             'velocity' => $velocityScore,
-            'quality'  => $qualityScore,
+            'quality' => $qualityScore,
         ]);
 
         // Create and persist health score
@@ -411,8 +411,8 @@ class ProjectRiskAnalyzer
         $healthScore->setQualityScore($qualityScore);
         $healthScore->setRecommendations($recommendations);
         $healthScore->setDetails([
-            'analysis_date'    => date('Y-m-d H:i:s'),
-            'project_status'   => $project->getStatus(),
+            'analysis_date' => date('Y-m-d H:i:s'),
+            'project_status' => $project->getStatus(),
             'project_progress' => $project->getGlobalProgress(),
         ]);
 
@@ -427,7 +427,7 @@ class ProjectRiskAnalyzer
      */
     private function calculateBudgetScore(Project $project): int
     {
-        $soldHours  = (float) $project->getTotalTasksSoldHours();
+        $soldHours = (float) $project->getTotalTasksSoldHours();
         $spentHours = (float) $project->getTotalTasksSpentHours();
 
         if ($soldHours === 0.0) {
@@ -463,7 +463,7 @@ class ProjectRiskAnalyzer
             return 100; // No deadline, neutral score
         }
 
-        $now      = new DateTime();
+        $now = new DateTime();
         $progress = (float) $project->getGlobalProgress();
 
         // Project completed
@@ -488,11 +488,11 @@ class ProjectRiskAnalyzer
         $startDate = $project->getStartDate();
         if ($startDate && $startDate <= $now) {
             $totalDuration = $startDate->diff($endDate)->days;
-            $elapsed       = $startDate->diff($now)->days;
+            $elapsed = $startDate->diff($now)->days;
 
             if ($totalDuration > 0) {
                 $expectedProgress = ($elapsed / $totalDuration) * 100;
-                $progressGap      = $expectedProgress - $progress;
+                $progressGap = $expectedProgress - $progress;
 
                 if ($progressGap <= 5) {
                     return 100; // On track
@@ -525,7 +525,7 @@ class ProjectRiskAnalyzer
             return 30; // No activity on active project
         }
 
-        $now         = new DateTime();
+        $now = new DateTime();
         $twoWeeksAgo = (clone $now)->modify('-14 days');
 
         $recentTimesheets = $timesheets->filter(fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
@@ -558,9 +558,9 @@ class ProjectRiskAnalyzer
         // Check margin
         $soldAmount = (float) $project->getTotalSoldAmount();
         if ($soldAmount > 0) {
-            $spentHours    = (float) $project->getTotalTasksSpentHours();
-            $estimatedCost = $spentHours                                    * 400;
-            $margin        = (($soldAmount - $estimatedCost) / $soldAmount) * 100;
+            $spentHours = (float) $project->getTotalTasksSpentHours();
+            $estimatedCost = $spentHours * 400;
+            $margin = (($soldAmount - $estimatedCost) / $soldAmount) * 100;
 
             if ($margin < 0) {
                 $score -= 30;
@@ -602,8 +602,8 @@ class ProjectRiskAnalyzer
 
         // Budget recommendations
         if ($componentScores['budget'] < 70) {
-            $soldHours         = (float) $project->getTotalTasksSoldHours();
-            $spentHours        = (float) $project->getTotalTasksSpentHours();
+            $soldHours = (float) $project->getTotalTasksSoldHours();
+            $spentHours = (float) $project->getTotalTasksSpentHours();
             $recommendations[] = sprintf(
                 'Budget dépassé (%.1fh / %.1fh) : revoyez le périmètre ou négociez un avenant',
                 $spentHours,

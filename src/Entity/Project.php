@@ -282,12 +282,12 @@ class Project implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->orders              = new ArrayCollection();
-        $this->technologies        = new ArrayCollection();
+        $this->orders = new ArrayCollection();
+        $this->technologies = new ArrayCollection();
         $this->projectTechnologies = new ArrayCollection();
-        $this->tasks               = new ArrayCollection();
-        $this->timesheets          = new ArrayCollection();
-        $this->projectSkills       = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+        $this->timesheets = new ArrayCollection();
+        $this->projectSkills = new ArrayCollection();
     }
 
     /**
@@ -406,7 +406,7 @@ class Project implements CompanyOwnedInterface
      */
     public function getTotalSoldAmount(): string
     {
-        $total         = '0';
+        $total = '0';
         $validStatuses = ['signe', 'gagne', 'termine'];
 
         foreach ($this->orders as $order) {
@@ -548,7 +548,7 @@ class Project implements CompanyOwnedInterface
      */
     public function getTargetGrossMargin(): string
     {
-        $soldAmount    = $this->getTotalTasksSoldAmount();
+        $soldAmount = $this->getTotalTasksSoldAmount();
         $estimatedCost = $this->getTotalTasksEstimatedCost();
 
         return bcsub($soldAmount, $estimatedCost, 2);
@@ -582,16 +582,16 @@ class Project implements CompanyOwnedInterface
                 && $task->getCountsForProfitability()
                 && $task->getType() === ProjectTask::TYPE_REGULAR
             ) {
-                $contributor   = $task->getAssignedContributor();
+                $contributor = $task->getAssignedContributor();
                 $contributorId = $contributor->id;
 
                 if (!isset($contributors[$contributorId])) {
                     $contributors[$contributorId] = [
-                        'contributor'     => $contributor,
-                        'spent_hours'     => '0',
+                        'contributor' => $contributor,
+                        'spent_hours' => '0',
                         'remaining_hours' => '0',
                         'estimated_hours' => '0',
-                        'tasks'           => [],
+                        'tasks' => [],
                     ];
                 }
 
@@ -607,7 +607,7 @@ class Project implements CompanyOwnedInterface
                     2,
                 );
 
-                $estimatedHours                                  = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
+                $estimatedHours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
                 $contributors[$contributorId]['estimated_hours'] = bcadd(
                     $contributors[$contributorId]['estimated_hours'],
                     $estimatedHours,
@@ -630,16 +630,16 @@ class Project implements CompanyOwnedInterface
             return '0.00';
         }
 
-        $totalWeight      = '0';
+        $totalWeight = '0';
         $weightedProgress = '0';
 
         foreach ($this->tasks as $task) {
             if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $hours    = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '1';
-                $weight   = $hours;
+                $hours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '1';
+                $weight = $hours;
                 $progress = $task->getProgressPercentage();
 
-                $totalWeight      = bcadd($totalWeight, $weight, 2);
+                $totalWeight = bcadd($totalWeight, $weight, 2);
                 $weightedProgress = bcadd($weightedProgress, bcmul($weight, $progress, 4), 2);
             }
         }
@@ -687,7 +687,7 @@ class Project implements CompanyOwnedInterface
     public function getTotalRealMargin(): string
     {
         $soldAmount = $this->getTotalTasksSoldAmount();
-        $realCost   = $this->getTotalRealCost();
+        $realCost = $this->getTotalRealCost();
 
         return bcsub($soldAmount, $realCost, 2);
     }
@@ -713,16 +713,16 @@ class Project implements CompanyOwnedInterface
      */
     public function getPerformanceComparison(): array
     {
-        $targetHours  = $this->getTotalTasksRevisedHours();
-        $realHours    = $this->getTotalRealHours();
-        $targetCost   = $this->getTotalTasksEstimatedCost();
-        $realCost     = $this->getTotalRealCost();
+        $targetHours = $this->getTotalTasksRevisedHours();
+        $realHours = $this->getTotalRealHours();
+        $targetCost = $this->getTotalTasksEstimatedCost();
+        $realCost = $this->getTotalRealCost();
         $targetMargin = $this->getTargetGrossMargin();
-        $realMargin   = $this->getTotalRealMargin();
+        $realMargin = $this->getTotalRealMargin();
 
         // Calcul des écarts
-        $hoursVariance  = bcsub($realHours, $targetHours, 2);
-        $costVariance   = bcsub($realCost, $targetCost, 2);
+        $hoursVariance = bcsub($realHours, $targetHours, 2);
+        $costVariance = bcsub($realCost, $targetCost, 2);
         $marginVariance = bcsub($realMargin, $targetMargin, 2);
 
         // Calcul des pourcentages d'écart
@@ -737,19 +737,19 @@ class Project implements CompanyOwnedInterface
             : '0.00';
 
         return [
-            'target_hours'           => $targetHours,
-            'real_hours'             => $realHours,
-            'hours_variance'         => $hoursVariance,
+            'target_hours' => $targetHours,
+            'real_hours' => $realHours,
+            'hours_variance' => $hoursVariance,
             'hours_variance_percent' => $hoursVariancePercent,
 
-            'target_cost'           => $targetCost,
-            'real_cost'             => $realCost,
-            'cost_variance'         => $costVariance,
+            'target_cost' => $targetCost,
+            'real_cost' => $realCost,
+            'cost_variance' => $costVariance,
             'cost_variance_percent' => $costVariancePercent,
 
-            'target_margin'           => $targetMargin,
-            'real_margin'             => $realMargin,
-            'margin_variance'         => $marginVariance,
+            'target_margin' => $targetMargin,
+            'real_margin' => $realMargin,
+            'margin_variance' => $marginVariance,
             'margin_variance_percent' => $marginVariancePercent,
         ];
     }

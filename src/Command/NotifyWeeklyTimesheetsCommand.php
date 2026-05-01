@@ -35,13 +35,13 @@ final class NotifyWeeklyTimesheetsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $now        = new DateTimeImmutable('now');
-        $monday     = $this->getStartOfWeek($now);
+        $now = new DateTimeImmutable('now');
+        $monday = $this->getStartOfWeek($now);
         $fridayNoon = $this->getFridayNoon($now);
 
-        $contribRepo   = $this->em->getRepository(Contributor::class);
+        $contribRepo = $this->em->getRepository(Contributor::class);
         $timesheetRepo = $this->em->getRepository(Timesheet::class);
-        $contributors  = $contribRepo->findBy(['active' => true]);
+        $contributors = $contribRepo->findBy(['active' => true]);
 
         $notified = 0;
         foreach ($contributors as $contrib) {
@@ -82,18 +82,18 @@ final class NotifyWeeklyTimesheetsCommand extends Command
                         $expected,
                     ))
                     ->setData([
-                        'start'          => $monday->format('Y-m-d'),
-                        'end'            => $fridayNoon->format('Y-m-d'),
+                        'start' => $monday->format('Y-m-d'),
+                        'end' => $fridayNoon->format('Y-m-d'),
                         'expected_hours' => round($expected, 2),
-                        'logged_hours'   => round($logged, 2),
-                        'url'            => '/timesheet',
+                        'logged_hours' => round($logged, 2),
+                        'url' => '/timesheet',
                     ]);
 
                 $this->em->persist($notif);
                 ++$notified;
 
                 // Email si autorisé par préférences (par défaut true si aucune préférence)
-                $pref      = $this->prefs->findByUserAndEventType($user, NotificationType::TIMESHEET_MISSING_WEEKLY);
+                $pref = $this->prefs->findByUserAndEventType($user, NotificationType::TIMESHEET_MISSING_WEEKLY);
                 $sendEmail = $pref ? $pref->isEmail() : true;
                 if ($sendEmail && $user->getEmail()) {
                     $email = new \Symfony\Component\Mime\Email()
@@ -125,7 +125,7 @@ final class NotifyWeeklyTimesheetsCommand extends Command
     private function getStartOfWeek(DateTimeImmutable $date): DateTimeImmutable
     {
         // Lundi 00:00
-        $dow   = (int) $date->format('N'); // 1 (Mon) - 7 (Sun)
+        $dow = (int) $date->format('N'); // 1 (Mon) - 7 (Sun)
         $delta = $dow - 1;
 
         return $date->setTime(0, 0)->sub(new DateInterval('P'.$delta.'D'));
@@ -134,7 +134,7 @@ final class NotifyWeeklyTimesheetsCommand extends Command
     private function getFridayNoon(DateTimeImmutable $date): DateTimeImmutable
     {
         // Vendredi 12:00:00 de la semaine courante
-        $dow           = (int) $date->format('N'); // 1..7
+        $dow = (int) $date->format('N'); // 1..7
         $deltaToFriday = 5 - $dow;
         // Si on est déjà après vendredi midi, rester sur vendredi de cette semaine
         if ($deltaToFriday < 0) {
@@ -158,7 +158,7 @@ final class NotifyWeeklyTimesheetsCommand extends Command
     private function getExpectedWeeklyHours(EmploymentPeriod $p): float
     {
         $weekly = (float) $p->getWeeklyHours();
-        $ratio  = (float) $p->getWorkTimePercentage() / 100.0;
+        $ratio = (float) $p->getWorkTimePercentage() / 100.0;
 
         return $weekly * $ratio;
     }

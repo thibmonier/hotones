@@ -36,14 +36,14 @@ final class TimesheetFactory extends PersistentObjectFactory
         }
 
         return [
-            'company'     => $company ?? CompanyFactory::new(),
+            'company' => $company ?? CompanyFactory::new(),
             'contributor' => ContributorFactory::random(),
-            'project'     => ProjectFactory::random(),
-            'task'        => null,
-            'subTask'     => null,
-            'date'        => $date,
-            'hours'       => $this->pickWeightedHours($faker),
-            'notes'       => $faker->optional()->sentence(10),
+            'project' => ProjectFactory::random(),
+            'task' => null,
+            'subTask' => null,
+            'date' => $date,
+            'hours' => $this->pickWeightedHours($faker),
+            'notes' => $faker->optional()->sentence(10),
         ];
     }
 

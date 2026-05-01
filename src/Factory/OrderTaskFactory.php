@@ -39,12 +39,12 @@ final class OrderTaskFactory extends PersistentObjectFactory
         }
 
         return [
-            'company'       => $company ?? CompanyFactory::new(),
-            'order'         => OrderFactory::random(),
-            'name'          => $faker->sentence(3),
-            'description'   => $faker->optional()->sentence(12),
-            'profile'       => ProfileFactory::random(),
-            'soldDays'      => $days,
+            'company' => $company ?? CompanyFactory::new(),
+            'order' => OrderFactory::random(),
+            'name' => $faker->sentence(3),
+            'description' => $faker->optional()->sentence(12),
+            'profile' => ProfileFactory::random(),
+            'soldDays' => $days,
             'soldDailyRate' => $rate,
             // totalAmount computed in initialize via setters
         ];

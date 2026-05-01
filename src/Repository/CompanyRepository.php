@@ -84,7 +84,7 @@ class CompanyRepository extends ServiceEntityRepository
      */
     public function findExpiringTrials(int $days = 7): array
     {
-        $now    = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $future = $now->modify("+{$days} days");
 
         return $this

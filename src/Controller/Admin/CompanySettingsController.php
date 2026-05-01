@@ -59,18 +59,18 @@ class CompanySettingsController extends AbstractController
         }
 
         // Obtenir le rapport de calcul pour l'année en cours
-        $currentYear       = (int) date('Y');
+        $currentYear = (int) date('Y');
         $calculationReport = $cjmCalculatorService->getCalculationReport($currentYear);
 
         // Exemple de calcul CJM avec un salaire de 3500€
         $exampleSalary = '3500';
-        $exampleCjm    = $cjmCalculatorService->calculateCjmFromMonthlySalary($exampleSalary, $currentYear);
+        $exampleCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($exampleSalary, $currentYear);
 
         return $this->render('admin/company_settings/index.html.twig', [
-            'settings'          => $settings,
+            'settings' => $settings,
             'calculationReport' => $calculationReport,
-            'exampleSalary'     => $exampleSalary,
-            'exampleCjm'        => $exampleCjm,
+            'exampleSalary' => $exampleSalary,
+            'exampleCjm' => $exampleCjm,
         ]);
     }
 }

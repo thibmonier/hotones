@@ -35,7 +35,7 @@ final class NotificationSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->notificationService = $this->createMock(NotificationService::class);
-        $this->logger              = $this->createMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->subscriber = new NotificationSubscriber(
             $this->notificationService,
@@ -56,7 +56,7 @@ final class NotificationSubscriberTest extends TestCase
     public function onNotificationEventDelegatesToServiceAndLogsSuccess(): void
     {
         $alice = (new User())->setEmail('alice@example.com');
-        $bob   = (new User())->setEmail('bob@example.com');
+        $bob = (new User())->setEmail('bob@example.com');
         $event = $this->makeEvent([$alice, $bob]);
 
         $created = [new Notification(), new Notification()];
@@ -69,8 +69,8 @@ final class NotificationSubscriberTest extends TestCase
         $this->logger->expects(self::once())
             ->method('info')
             ->with('Notifications created from event', [
-                'event_type'            => 'quote_won',
-                'recipients_count'      => 2,
+                'event_type' => 'quote_won',
+                'recipients_count' => 2,
                 'notifications_created' => 2,
             ]);
 
@@ -88,8 +88,8 @@ final class NotificationSubscriberTest extends TestCase
         $this->logger->expects(self::once())
             ->method('info')
             ->with('Notifications created from event', [
-                'event_type'            => 'quote_won',
-                'recipients_count'      => 1,
+                'event_type' => 'quote_won',
+                'recipients_count' => 1,
                 'notifications_created' => 0,
             ]);
 
@@ -109,7 +109,7 @@ final class NotificationSubscriberTest extends TestCase
             ->method('error')
             ->with('Error creating notifications from event', [
                 'event_type' => 'quote_won',
-                'error'      => 'DB unreachable',
+                'error' => 'DB unreachable',
             ]);
 
         // Must not propagate — event dispatch chain must keep going.

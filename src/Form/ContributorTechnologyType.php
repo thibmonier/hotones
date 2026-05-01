@@ -23,12 +23,12 @@ class ContributorTechnologyType extends AbstractType
     {
         $builder
             ->add('technology', EntityType::class, [
-                'label'         => 'Technologie',
-                'class'         => Technology::class,
-                'choice_label'  => 'name',
-                'attr'          => ['class' => 'form-select'],
-                'placeholder'   => 'Sélectionnez une technologie',
-                'required'      => true,
+                'label' => 'Technologie',
+                'class' => Technology::class,
+                'choice_label' => 'name',
+                'attr' => ['class' => 'form-select'],
+                'placeholder' => 'Sélectionnez une technologie',
+                'required' => true,
                 'query_builder' => fn ($repository) => $repository
                     ->createQueryBuilder('t')
                     ->where('t.active = :active')
@@ -38,86 +38,86 @@ class ContributorTechnologyType extends AbstractType
                 'group_by' => fn (Technology $technology): string => ucfirst($technology->getCategory()),
             ])
             ->add('selfAssessmentLevel', ChoiceType::class, [
-                'label'   => 'Niveau auto-évalué',
+                'label' => 'Niveau auto-évalué',
                 'choices' => [
-                    'Débutant'      => ContributorTechnology::LEVEL_BEGINNER,
+                    'Débutant' => ContributorTechnology::LEVEL_BEGINNER,
                     'Intermédiaire' => ContributorTechnology::LEVEL_INTERMEDIATE,
-                    'Confirmé'      => ContributorTechnology::LEVEL_CONFIRMED,
-                    'Expert'        => ContributorTechnology::LEVEL_EXPERT,
+                    'Confirmé' => ContributorTechnology::LEVEL_CONFIRMED,
+                    'Expert' => ContributorTechnology::LEVEL_EXPERT,
                 ],
-                'attr'        => ['class' => 'form-select'],
+                'attr' => ['class' => 'form-select'],
                 'placeholder' => 'Sélectionnez un niveau',
-                'required'    => true,
-                'help'        => 'Votre propre évaluation de votre niveau sur cette technologie',
+                'required' => true,
+                'help' => 'Votre propre évaluation de votre niveau sur cette technologie',
             ])
             ->add('managerAssessmentLevel', ChoiceType::class, [
-                'label'   => 'Niveau évalué par le manager',
+                'label' => 'Niveau évalué par le manager',
                 'choices' => [
-                    'Débutant'      => ContributorTechnology::LEVEL_BEGINNER,
+                    'Débutant' => ContributorTechnology::LEVEL_BEGINNER,
                     'Intermédiaire' => ContributorTechnology::LEVEL_INTERMEDIATE,
-                    'Confirmé'      => ContributorTechnology::LEVEL_CONFIRMED,
-                    'Expert'        => ContributorTechnology::LEVEL_EXPERT,
+                    'Confirmé' => ContributorTechnology::LEVEL_CONFIRMED,
+                    'Expert' => ContributorTechnology::LEVEL_EXPERT,
                 ],
-                'attr'        => ['class' => 'form-select'],
+                'attr' => ['class' => 'form-select'],
                 'placeholder' => 'Non évalué',
-                'required'    => false,
-                'help'        => 'Évaluation du manager (optionnel)',
+                'required' => false,
+                'help' => 'Évaluation du manager (optionnel)',
             ])
             ->add('yearsOfExperience', NumberType::class, [
-                'label'    => 'Années d\'expérience',
-                'attr'     => ['class' => 'form-control', 'step' => '0.5', 'min' => '0', 'max' => '50'],
+                'label' => 'Années d\'expérience',
+                'attr' => ['class' => 'form-control', 'step' => '0.5', 'min' => '0', 'max' => '50'],
                 'required' => false,
-                'help'     => 'Nombre d\'années d\'expérience avec cette technologie',
-                'scale'    => 1,
+                'help' => 'Nombre d\'années d\'expérience avec cette technologie',
+                'scale' => 1,
             ])
             ->add('firstUsedDate', DateType::class, [
-                'label'    => 'Première utilisation',
-                'widget'   => 'single_text',
-                'attr'     => ['class' => 'form-control'],
+                'label' => 'Première utilisation',
+                'widget' => 'single_text',
+                'attr' => ['class' => 'form-control'],
                 'required' => false,
-                'help'     => 'Date de première utilisation de cette technologie',
+                'help' => 'Date de première utilisation de cette technologie',
             ])
             ->add('lastUsedDate', DateType::class, [
-                'label'    => 'Dernière utilisation',
-                'widget'   => 'single_text',
-                'attr'     => ['class' => 'form-control'],
+                'label' => 'Dernière utilisation',
+                'widget' => 'single_text',
+                'attr' => ['class' => 'form-control'],
                 'required' => false,
-                'help'     => 'Date de dernière utilisation de cette technologie',
+                'help' => 'Date de dernière utilisation de cette technologie',
             ])
             ->add('primaryContext', ChoiceType::class, [
-                'label'   => 'Contexte principal',
+                'label' => 'Contexte principal',
                 'choices' => [
                     'Professionnel' => ContributorTechnology::CONTEXT_PROFESSIONAL,
-                    'Personnel'     => ContributorTechnology::CONTEXT_PERSONAL,
-                    'Formation'     => ContributorTechnology::CONTEXT_TRAINING,
-                    'Académique'    => ContributorTechnology::CONTEXT_ACADEMIC,
+                    'Personnel' => ContributorTechnology::CONTEXT_PERSONAL,
+                    'Formation' => ContributorTechnology::CONTEXT_TRAINING,
+                    'Académique' => ContributorTechnology::CONTEXT_ACADEMIC,
                 ],
-                'attr'     => ['class' => 'form-select'],
+                'attr' => ['class' => 'form-select'],
                 'required' => true,
-                'help'     => 'Contexte principal d\'utilisation de cette technologie',
+                'help' => 'Contexte principal d\'utilisation de cette technologie',
             ])
             ->add('versionUsed', TextType::class, [
-                'label'    => 'Version utilisée',
-                'attr'     => ['class' => 'form-control', 'placeholder' => 'Ex: PHP 8.3, React 18, etc.'],
+                'label' => 'Version utilisée',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Ex: PHP 8.3, React 18, etc.'],
                 'required' => false,
-                'help'     => 'Version spécifique que vous maîtrisez',
+                'help' => 'Version spécifique que vous maîtrisez',
             ])
             ->add('wantsToUse', CheckboxType::class, [
-                'label'    => 'Souhaite continuer à utiliser cette technologie',
+                'label' => 'Souhaite continuer à utiliser cette technologie',
                 'required' => false,
-                'attr'     => ['class' => 'form-check-input'],
+                'attr' => ['class' => 'form-check-input'],
             ])
             ->add('wantsToImprove', CheckboxType::class, [
-                'label'    => 'Souhaite monter en compétence',
+                'label' => 'Souhaite monter en compétence',
                 'required' => false,
-                'attr'     => ['class' => 'form-check-input'],
-                'help'     => 'Cochez si vous souhaitez progresser sur cette technologie',
+                'attr' => ['class' => 'form-check-input'],
+                'help' => 'Cochez si vous souhaitez progresser sur cette technologie',
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes',
-                'attr'  => [
-                    'rows'        => 3,
-                    'class'       => 'form-control',
+                'attr' => [
+                    'rows' => 3,
+                    'class' => 'form-control',
                     'placeholder' => 'Notes sur cette technologie (projets, certifications, remarques, etc.)',
                 ],
                 'required' => false,

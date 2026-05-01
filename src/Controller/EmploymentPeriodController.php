@@ -38,7 +38,7 @@ class EmploymentPeriodController extends AbstractController
         ContributorRepository $contributorRepository,
     ): Response {
         $session = $request->getSession();
-        $reset   = (bool) $request->query->get('reset', false);
+        $reset = (bool) $request->query->get('reset', false);
         if ($reset) {
             $session->remove('employment_period_filters');
 
@@ -46,33 +46,33 @@ class EmploymentPeriodController extends AbstractController
         }
 
         // Charger filtres depuis la session si aucun filtre explicite n'est fourni
-        $queryAll   = $request->query->all();
+        $queryAll = $request->query->all();
         $filterKeys = ['contributor', 'status', 'per_page', 'sort', 'dir'];
-        $hasFilter  = (bool) count(array_intersect(array_keys($queryAll), $filterKeys));
-        $saved      = $session->has('employment_period_filters') ? (array) $session->get('employment_period_filters') : [];
+        $hasFilter = (bool) count(array_intersect(array_keys($queryAll), $filterKeys));
+        $saved = $session->has('employment_period_filters') ? (array) $session->get('employment_period_filters') : [];
 
         // Filtres
         $contributorId = $hasFilter ? ($request->query->get('contributor') ?: '') : $saved['contributor'] ?? '';
-        $status        = $hasFilter ? ($request->query->get('status') ?: '') : $saved['status']           ?? '';
+        $status = $hasFilter ? ($request->query->get('status') ?: '') : $saved['status'] ?? '';
 
         // Tri
         $sort = $hasFilter
             ? ($request->query->get('sort') ?: $saved['sort'] ?? 'startDate')
-            : $saved['sort']                                                                         ?? 'startDate';
+            : $saved['sort'] ?? 'startDate';
         $dir = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'DESC') : $saved['dir'] ?? 'DESC';
 
         // Pagination
         $allowedPerPage = [10, 25, 50, 100];
-        $perPageParam   = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
-        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
+        $perPageParam = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
+        $perPage = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
 
         // Sauvegarder en session
         $session->set('employment_period_filters', [
             'contributor' => $contributorId,
-            'status'      => $status,
-            'per_page'    => $perPage,
-            'sort'        => $sort,
-            'dir'         => $dir,
+            'status' => $status,
+            'per_page' => $perPage,
+            'sort' => $sort,
+            'dir' => $dir,
         ]);
 
         // Query builder avec filtres
@@ -95,13 +95,13 @@ class EmploymentPeriodController extends AbstractController
         // Tri
         $validSortFields = [
             'contributor' => 'c.lastName',
-            'startDate'   => 'ep.startDate',
-            'salary'      => 'ep.salary',
-            'cjm'         => 'ep.cjm',
-            'tjm'         => 'ep.tjm',
+            'startDate' => 'ep.startDate',
+            'salary' => 'ep.salary',
+            'cjm' => 'ep.cjm',
+            'tjm' => 'ep.tjm',
         ];
         $sortField = $validSortFields[$sort] ?? 'ep.startDate';
-        $sortDir   = strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC';
+        $sortDir = strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC';
         $qb->orderBy($sortField, $sortDir);
 
         // Pagination
@@ -110,14 +110,14 @@ class EmploymentPeriodController extends AbstractController
         $contributors = $contributorRepository->findActiveContributors();
 
         return $this->render('employment_period/index.html.twig', [
-            'periods'      => $pagination,
+            'periods' => $pagination,
             'contributors' => $contributors,
-            'filters'      => [
+            'filters' => [
                 'contributor' => $contributorId,
-                'status'      => $status,
+                'status' => $status,
             ],
             'sort' => $sort,
-            'dir'  => $dir,
+            'dir' => $dir,
         ]);
     }
 
@@ -126,7 +126,7 @@ class EmploymentPeriodController extends AbstractController
     {
         // Mêmes filtres que l'index
         $contributorId = $request->query->get('contributor', '');
-        $status        = $request->query->get('status', '');
+        $status = $request->query->get('status', '');
 
         $qb = $em
             ->getRepository(EmploymentPeriod::class)
@@ -189,7 +189,7 @@ class EmploymentPeriodController extends AbstractController
         CjmCalculatorService $cjmCalculatorService,
     ): Response {
         $company = $this->companyContext->getCurrentCompany();
-        $period  = new EmploymentPeriod();
+        $period = new EmploymentPeriod();
         $period->setCompany($company);
 
         // Pré-sélectionner le collaborateur si fourni dans l'URL
@@ -223,7 +223,7 @@ class EmploymentPeriodController extends AbstractController
 
             // Calculer automatiquement le CJM si un salaire est fourni
             if ($period->getSalary()) {
-                $year          = (int) $period->getStartDate()->format('Y');
+                $year = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
                 $period->setCjm((string) $calculatedCjm);
             } else {
@@ -259,18 +259,18 @@ class EmploymentPeriodController extends AbstractController
                 $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce collaborateur.');
 
                 $contributors = $contributorRepository->findActiveContributors();
-                $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+                $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
                 // Obtenir les informations de calcul CJM
-                $year              = (int) $period->getStartDate()->format('Y');
+                $year = (int) $period->getStartDate()->format('Y');
                 $calculationReport = $cjmCalculatorService->getCalculationReport($year);
 
                 return $this->render('employment_period/new.html.twig', [
-                    'period'                => $period,
-                    'contributors'          => $contributors,
-                    'profiles'              => $profiles,
+                    'period' => $period,
+                    'contributors' => $contributors,
+                    'profiles' => $profiles,
                     'selectedContributorId' => $period->contributor ? $period->contributor->getId() : null,
-                    'calculationReport'     => $calculationReport,
+                    'calculationReport' => $calculationReport,
                 ]);
             }
 
@@ -283,18 +283,18 @@ class EmploymentPeriodController extends AbstractController
         }
 
         $contributors = $contributorRepository->findActiveContributors();
-        $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+        $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         // Obtenir les informations de calcul CJM pour l'année en cours
-        $year              = (int) date('Y');
+        $year = (int) date('Y');
         $calculationReport = $cjmCalculatorService->getCalculationReport($year);
 
         return $this->render('employment_period/new.html.twig', [
-            'period'                => $period,
-            'contributors'          => $contributors,
-            'profiles'              => $profiles,
+            'period' => $period,
+            'contributors' => $contributors,
+            'profiles' => $profiles,
             'selectedContributorId' => $period->contributor ? $period->contributor->getId() : null,
-            'calculationReport'     => $calculationReport,
+            'calculationReport' => $calculationReport,
         ]);
     }
 
@@ -302,15 +302,15 @@ class EmploymentPeriodController extends AbstractController
     public function show(EmploymentPeriod $period, EmploymentPeriodRepository $employmentPeriodRepository): Response
     {
         // Calculer la durée en jours
-        $endDate  = $period->endDate ?? new DateTime();
+        $endDate = $period->endDate ?? new DateTime();
         $duration = $period->startDate->diff($endDate)->days + 1;
 
         // Calculer le coût total sur la période
         $totalCost = $employmentPeriodRepository->calculatePeriodCost($period);
 
         return $this->render('employment_period/show.html.twig', [
-            'period'    => $period,
-            'duration'  => $duration,
+            'period' => $period,
+            'duration' => $duration,
             'totalCost' => $totalCost,
         ]);
     }
@@ -347,7 +347,7 @@ class EmploymentPeriodController extends AbstractController
 
             // Calculer automatiquement le CJM si un salaire est fourni
             if ($period->getSalary()) {
-                $year          = (int) $period->getStartDate()->format('Y');
+                $year = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
                 $period->setCjm((string) $calculatedCjm);
             } else {
@@ -384,16 +384,16 @@ class EmploymentPeriodController extends AbstractController
                 $this->addFlash('error', 'Cette période chevauche avec une période existante pour ce collaborateur.');
 
                 $contributors = $contributorRepository->findActiveContributors();
-                $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+                $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
                 // Obtenir les informations de calcul CJM
-                $year              = (int) $period->getStartDate()->format('Y');
+                $year = (int) $period->getStartDate()->format('Y');
                 $calculationReport = $cjmCalculatorService->getCalculationReport($year);
 
                 return $this->render('employment_period/edit.html.twig', [
-                    'period'            => $period,
-                    'contributors'      => $contributors,
-                    'profiles'          => $profiles,
+                    'period' => $period,
+                    'contributors' => $contributors,
+                    'profiles' => $profiles,
                     'calculationReport' => $calculationReport,
                 ]);
             }
@@ -406,16 +406,16 @@ class EmploymentPeriodController extends AbstractController
         }
 
         $contributors = $contributorRepository->findActiveContributors();
-        $profiles     = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
+        $profiles = $em->getRepository(Profile::class)->findBy(['active' => true], ['name' => 'ASC']);
 
         // Obtenir les informations de calcul CJM pour l'année de la période
-        $year              = (int) $period->getStartDate()->format('Y');
+        $year = (int) $period->getStartDate()->format('Y');
         $calculationReport = $cjmCalculatorService->getCalculationReport($year);
 
         return $this->render('employment_period/edit.html.twig', [
-            'period'            => $period,
-            'contributors'      => $contributors,
-            'profiles'          => $profiles,
+            'period' => $period,
+            'contributors' => $contributors,
+            'profiles' => $profiles,
             'calculationReport' => $calculationReport,
         ]);
     }

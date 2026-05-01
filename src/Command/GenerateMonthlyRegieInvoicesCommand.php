@@ -98,8 +98,8 @@ class GenerateMonthlyRegieInvoicesCommand extends Command
         // Afficher le résumé
         $io->success(sprintf('%d facture(s) générée(s) avec succès', count($invoices)));
 
-        $rows     = [];
-        $totalHt  = '0.00';
+        $rows = [];
+        $totalHt = '0.00';
         $totalTtc = '0.00';
 
         foreach ($invoices as $invoice) {
@@ -112,7 +112,7 @@ class GenerateMonthlyRegieInvoicesCommand extends Command
                 $invoice->getStatus(),
             ];
 
-            $totalHt  = bcadd($totalHt, $invoice->getAmountHt(), 2);
+            $totalHt = bcadd($totalHt, $invoice->getAmountHt(), 2);
             $totalTtc = bcadd($totalTtc, $invoice->getAmountTtc(), 2);
         }
 

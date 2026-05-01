@@ -45,10 +45,10 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client      = static::createClient();
+        $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
 
-        $this->manager  = $this->provisionContributor('manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
+        $this->manager = $this->provisionContributor('manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
         $this->employee = $this->provisionContributor('employee@test.com', 'Adrien', 'Test', ['ROLE_INTERVENANT'], $this->manager);
 
         // Authenticate as the manager so the controller resolves $this->getUser() to a managing contributor.
@@ -68,9 +68,9 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testShowIsForbiddenWhenManagerDoesNotManageContributor(): void
     {
-        $unrelatedManager  = $this->provisionContributor('other@test.com', 'Other', 'Manager', ['ROLE_MANAGER']);
+        $unrelatedManager = $this->provisionContributor('other@test.com', 'Other', 'Manager', ['ROLE_MANAGER']);
         $unrelatedEmployee = $this->provisionContributor('other-emp@test.com', 'Lone', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
-        $foreignVacation   = $this->createPendingVacation($unrelatedEmployee);
+        $foreignVacation = $this->createPendingVacation($unrelatedEmployee);
 
         $this->loginAs($this->manager->getUser());
 
@@ -114,14 +114,14 @@ final class VacationApprovalControllerTest extends WebTestCase
         $vacation = $this->createPendingVacation($this->employee);
 
         $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
-            '_token'           => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
+            '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
             'rejection_reason' => 'Planning sature sur la periode',
         ]);
 
         self::assertResponseRedirects('/manager/conges');
 
         /** @var VacationRepositoryInterface $repo */
-        $repo     = static::getContainer()->get(VacationRepositoryInterface::class);
+        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
         $rejected = $repo->findById($vacation->getId());
         self::assertSame(VacationStatus::REJECTED, $rejected->getStatus());
         self::assertSame('Planning sature sur la periode', $rejected->getRejectionReason());
@@ -164,9 +164,9 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testManagerCancelIsForbiddenForUnmanagedContributor(): void
     {
-        $unrelatedManager  = $this->provisionContributor('rogue@test.com', 'Rogue', 'Manager', ['ROLE_MANAGER']);
+        $unrelatedManager = $this->provisionContributor('rogue@test.com', 'Rogue', 'Manager', ['ROLE_MANAGER']);
         $unrelatedEmployee = $this->provisionContributor('rogue-emp@test.com', 'Stranger', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
-        $foreignVacation   = $this->createPendingVacation($unrelatedEmployee);
+        $foreignVacation = $this->createPendingVacation($unrelatedEmployee);
 
         $this->loginAs($this->manager->getUser());
 
@@ -208,7 +208,7 @@ final class VacationApprovalControllerTest extends WebTestCase
         $user->setEmail($email);
         $user->setPassword('password');
         $user->firstName = $firstName;
-        $user->lastName  = $lastName;
+        $user->lastName = $lastName;
         $user->setRoles($roles);
         $em->persist($user);
 
@@ -242,7 +242,7 @@ final class VacationApprovalControllerTest extends WebTestCase
         ));
 
         /** @var VacationRepositoryInterface $repo */
-        $repo      = static::getContainer()->get(VacationRepositoryInterface::class);
+        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
         $vacations = $repo->findByContributor($contributor);
 
         return end($vacations);

@@ -26,16 +26,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Provider implements CompanyOwnedInterface, Stringable
 {
     // Types de providers
-    public const TYPE_APP_STORE         = 'app_store';
+    public const TYPE_APP_STORE = 'app_store';
     public const TYPE_PAYMENT_PROCESSOR = 'payment_processor';
-    public const TYPE_DIRECT            = 'direct';
-    public const TYPE_OTHER             = 'other';
+    public const TYPE_DIRECT = 'direct';
+    public const TYPE_OTHER = 'other';
 
     public const TYPES = [
-        self::TYPE_APP_STORE         => 'App Store (Apple, Google, etc.)',
+        self::TYPE_APP_STORE => 'App Store (Apple, Google, etc.)',
         self::TYPE_PAYMENT_PROCESSOR => 'Processeur de paiement (Stripe, PayPal, etc.)',
-        self::TYPE_DIRECT            => 'Direct (site du fournisseur)',
-        self::TYPE_OTHER             => 'Autre',
+        self::TYPE_DIRECT => 'Direct (site du fournisseur)',
+        self::TYPE_OTHER => 'Autre',
     ];
 
     #[ORM\Id]
@@ -95,7 +95,7 @@ class Provider implements CompanyOwnedInterface, Stringable
     public function __construct()
     {
         $this->subscriptions = new ArrayCollection();
-        $this->createdAt     = new DateTime();
+        $this->createdAt = new DateTime();
     }
 
     #[ORM\PreUpdate]

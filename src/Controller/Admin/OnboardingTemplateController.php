@@ -48,10 +48,10 @@ class OnboardingTemplateController extends AbstractController
                 return $this->redirectToRoute('admin_onboarding_template_create');
             }
 
-            $name        = $request->request->get('name');
+            $name = $request->request->get('name');
             $description = $request->request->get('description');
-            $profileId   = $request->request->get('profile_id');
-            $tasksData   = $request->request->all('tasks');
+            $profileId = $request->request->get('profile_id');
+            $tasksData = $request->request->all('tasks');
 
             // Validation
             if (empty($name)) {
@@ -67,12 +67,12 @@ class OnboardingTemplateController extends AbstractController
                 foreach ($tasksData as $taskData) {
                     if (!empty($taskData['title'])) {
                         $tasks[] = [
-                            'title'            => $taskData['title'],
-                            'description'      => $taskData['description'] ?? '',
-                            'assigned_to'      => $taskData['assigned_to'] ?? 'contributor',
-                            'type'             => $taskData['type']        ?? 'action',
+                            'title' => $taskData['title'],
+                            'description' => $taskData['description'] ?? '',
+                            'assigned_to' => $taskData['assigned_to'] ?? 'contributor',
+                            'type' => $taskData['type'] ?? 'action',
                             'days_after_start' => (int) ($taskData['days_after_start'] ?? 0),
-                            'order'            => $order++,
+                            'order' => $order++,
                         ];
                     }
                 }
@@ -121,11 +121,11 @@ class OnboardingTemplateController extends AbstractController
                 return $this->redirectToRoute('admin_onboarding_template_edit', ['id' => $template->getId()]);
             }
 
-            $name        = $request->request->get('name');
+            $name = $request->request->get('name');
             $description = $request->request->get('description');
-            $profileId   = $request->request->get('profile_id');
-            $active      = (bool) $request->request->get('active', false);
-            $tasksData   = $request->request->all('tasks');
+            $profileId = $request->request->get('profile_id');
+            $active = (bool) $request->request->get('active', false);
+            $tasksData = $request->request->all('tasks');
 
             // Validation
             if (empty($name)) {
@@ -141,12 +141,12 @@ class OnboardingTemplateController extends AbstractController
                 foreach ($tasksData as $taskData) {
                     if (!empty($taskData['title'])) {
                         $tasks[] = [
-                            'title'            => $taskData['title'],
-                            'description'      => $taskData['description'] ?? '',
-                            'assigned_to'      => $taskData['assigned_to'] ?? 'contributor',
-                            'type'             => $taskData['type']        ?? 'action',
+                            'title' => $taskData['title'],
+                            'description' => $taskData['description'] ?? '',
+                            'assigned_to' => $taskData['assigned_to'] ?? 'contributor',
+                            'type' => $taskData['type'] ?? 'action',
                             'days_after_start' => (int) ($taskData['days_after_start'] ?? 0),
-                            'order'            => $order++,
+                            'order' => $order++,
                         ];
                     }
                 }

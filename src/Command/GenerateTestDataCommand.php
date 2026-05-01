@@ -47,8 +47,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io    = new SymfonyStyle($input, $output);
-        $year  = (int) $input->getOption('year');
+        $io = new SymfonyStyle($input, $output);
+        $year = (int) $input->getOption('year');
         $force = $input->getOption('force');
 
         $io->title('Génération de données de test pour Analytics');
@@ -191,15 +191,15 @@ Attention : Cette commande est uniquement pour les tests et le développement.
 
     private function generateMetrics(array $dimTimes, array $projectTypes, array $contributors): array
     {
-        $metrics         = [];
+        $metrics = [];
         $projectManagers = array_filter($contributors, fn ($c): bool => $c->getRole() === 'project_manager');
-        $salesPersons    = array_filter($contributors, fn ($c): bool => $c->getRole() === 'sales_person');
+        $salesPersons = array_filter($contributors, fn ($c): bool => $c->getRole() === 'sales_person');
 
         foreach ($dimTimes as $dimTime) {
             foreach ($projectTypes as $projectType) {
                 // Sélectionner aléatoirement un chef de projet et un commercial
                 $projectManager = $projectManagers[array_rand($projectManagers)];
-                $salesPerson    = $salesPersons[array_rand($salesPersons)];
+                $salesPerson = $salesPersons[array_rand($salesPersons)];
 
                 $metric = new FactProjectMetrics();
                 $metric
@@ -230,7 +230,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         };
 
         $baseRevenue = random_int(10000, 50000) * $seasonalFactor;
-        $baseCosts   = $baseRevenue             * (0.6 + (random_int(0, 20) / 100)); // 60-80% du CA
+        $baseCosts = $baseRevenue * (0.6 + (random_int(0, 20) / 100)); // 60-80% du CA
 
         $metric
             ->setProjectCount(random_int(1, 5))

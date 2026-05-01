@@ -56,8 +56,8 @@ class ContributorProgress implements CompanyOwnedInterface
     public function __construct()
     {
         $this->lastXpGainedAt = new DateTimeImmutable();
-        $this->createdAt      = new DateTimeImmutable();
-        $this->updatedAt      = new DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -91,10 +91,10 @@ class ContributorProgress implements CompanyOwnedInterface
 
     public function addXp(int $xp): static
     {
-        $this->totalXp        += $xp;
+        $this->totalXp += $xp;
         $this->currentLevelXp += $xp;
         $this->lastXpGainedAt = new DateTimeImmutable();
-        $this->updatedAt      = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
 
         return $this;
     }
@@ -191,7 +191,7 @@ class ContributorProgress implements CompanyOwnedInterface
             ++$this->level;
             $this->currentLevelXp -= $this->nextLevelXp;
             $this->nextLevelXp = $this->calculateNextLevelXp();
-            $this->updatedAt   = new DateTimeImmutable();
+            $this->updatedAt = new DateTimeImmutable();
 
             return true;
         }

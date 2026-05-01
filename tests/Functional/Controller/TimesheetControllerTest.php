@@ -35,15 +35,15 @@ class TimesheetControllerTest extends WebTestCase
         // Create required Profile for ProjectTaskFactory
         ProfileFactory::createOne(['name' => 'Developer']);
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne(['status' => 'active']);
+        $project = ProjectFactory::createOne(['status' => 'active']);
 
         // Create a task assigned to contributor
         ProjectTaskFactory::createOne([
-            'project'             => $project,
+            'project' => $project,
             'assignedContributor' => $contributor,
-            'active'              => true,
+            'active' => true,
         ]);
 
         $client->loginUser($user);
@@ -56,16 +56,16 @@ class TimesheetControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         $client->loginUser($user);
         $client->request('POST', '/timesheet/save', [
             'project_id' => $project->getId(),
-            'date'       => '2025-01-15',
-            'hours'      => '8.0',
-            'notes'      => 'Test timesheet entry',
+            'date' => '2025-01-15',
+            'hours' => '8.0',
+            'notes' => 'Test timesheet entry',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -77,16 +77,16 @@ class TimesheetControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         $client->loginUser($user);
         $client->request('POST', '/timesheet/save', [
             'project_id' => $project->getId(),
-            'date'       => '2025-01-15',
-            'hours'      => '0.5', // Less than minimum 1h (0.125j)
-            'notes'      => '',
+            'date' => '2025-01-15',
+            'hours' => '0.5', // Less than minimum 1h (0.125j)
+            'notes' => '',
         ]);
 
         $this->assertResponseStatusCodeSame(400);
@@ -105,8 +105,8 @@ class TimesheetControllerTest extends WebTestCase
         $client->loginUser($user);
         $client->request('POST', '/timesheet/save', [
             'project_id' => 99999,
-            'date'       => '2025-01-15',
-            'hours'      => '8.0',
+            'date' => '2025-01-15',
+            'hours' => '8.0',
         ]);
 
         $this->assertResponseStatusCodeSame(400);
@@ -119,16 +119,16 @@ class TimesheetControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         // Create timesheet for calendar
         TimesheetFactory::createOne([
             'contributor' => $contributor,
-            'project'     => $project,
-            'date'        => new DateTime('2025-01-15'),
-            'hours'       => '8.0',
+            'project' => $project,
+            'date' => new DateTime('2025-01-15'),
+            'hours' => '8.0',
         ]);
 
         $client->loginUser($user);
@@ -141,15 +141,15 @@ class TimesheetControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         TimesheetFactory::createOne([
             'contributor' => $contributor,
-            'project'     => $project,
-            'date'        => new DateTime('2025-01-15'),
-            'hours'       => '8.0',
+            'project' => $project,
+            'date' => new DateTime('2025-01-15'),
+            'hours' => '8.0',
         ]);
 
         $client->loginUser($user);
@@ -212,15 +212,15 @@ class TimesheetControllerTest extends WebTestCase
         // Create required Profile
         ProfileFactory::createOne(['name' => 'Developer']);
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
-        $task        = ProjectTaskFactory::createOne(['project' => $project]);
+        $project = ProjectFactory::createOne();
+        $task = ProjectTaskFactory::createOne(['project' => $project]);
 
         $client->loginUser($user);
         $client->request('POST', '/timesheet/timer/start', [
             'project_id' => $project->getId(),
-            'task_id'    => $task->getId(),
+            'task_id' => $task->getId(),
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -237,17 +237,17 @@ class TimesheetControllerTest extends WebTestCase
         // Create required Profile
         ProfileFactory::createOne(['name' => 'Developer']);
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         $contributor = ContributorFactory::createOne(['user' => $user]);
-        $project     = ProjectFactory::createOne();
-        $task        = ProjectTaskFactory::createOne(['project' => $project]);
+        $project = ProjectFactory::createOne();
+        $task = ProjectTaskFactory::createOne(['project' => $project]);
 
         $client->loginUser($user);
 
         // Start timer first
         $client->request('POST', '/timesheet/timer/start', [
             'project_id' => $project->getId(),
-            'task_id'    => $task->getId(),
+            'task_id' => $task->getId(),
         ]);
 
         // Stop timer
@@ -284,15 +284,15 @@ class TimesheetControllerTest extends WebTestCase
         // Create a single company and ensure all entities use it
         $company = \App\Factory\CompanyFactory::createOne();
 
-        $user        = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT'], 'company' => $company]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT'], 'company' => $company]);
         $contributor = ContributorFactory::createOne(['user' => $user, 'company' => $company]);
-        $project     = ProjectFactory::createOne(['status' => 'active', 'company' => $company]);
+        $project = ProjectFactory::createOne(['status' => 'active', 'company' => $company]);
 
         ProjectTaskFactory::createOne([
-            'project'             => $project,
-            'company'             => $company,
+            'project' => $project,
+            'company' => $company,
             'assignedContributor' => $contributor,
-            'active'              => true,
+            'active' => true,
         ]);
 
         $client->loginUser($user);

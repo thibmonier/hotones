@@ -55,14 +55,14 @@ class TechnologyCrudController extends AbstractCrudController
         yield TextField::new('name', 'Nom')->setRequired(true);
 
         yield ChoiceField::new('category', 'Catégorie')->setChoices([
-            'Framework'       => 'framework',
-            'CMS'             => 'cms',
-            'Bibliothèque'    => 'library',
-            'Outil'           => 'tool',
-            'Hébergement'     => 'hosting',
+            'Framework' => 'framework',
+            'CMS' => 'cms',
+            'Bibliothèque' => 'library',
+            'Outil' => 'tool',
+            'Hébergement' => 'hosting',
             'Base de données' => 'database',
-            'Langage'         => 'language',
-            'Autre'           => 'other',
+            'Langage' => 'language',
+            'Autre' => 'other',
         ])->setRequired(true);
 
         yield ColorField::new('color', 'Couleur');
@@ -78,14 +78,14 @@ class TechnologyCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters->add(ChoiceFilter::new('category', 'Catégorie')->setChoices([
-            'Framework'       => 'framework',
-            'CMS'             => 'cms',
-            'Bibliothèque'    => 'library',
-            'Outil'           => 'tool',
-            'Hébergement'     => 'hosting',
+            'Framework' => 'framework',
+            'CMS' => 'cms',
+            'Bibliothèque' => 'library',
+            'Outil' => 'tool',
+            'Hébergement' => 'hosting',
             'Base de données' => 'database',
-            'Langage'         => 'language',
-            'Autre'           => 'other',
+            'Langage' => 'language',
+            'Autre' => 'other',
         ]))->add(BooleanFilter::new('active', 'Actif'));
     }
 

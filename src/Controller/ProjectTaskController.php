@@ -41,7 +41,7 @@ class ProjectTaskController extends AbstractController
 
         return $this->render('project_task/index.html.twig', [
             'project' => $project,
-            'tasks'   => $tasks,
+            'tasks' => $tasks,
         ]);
     }
 
@@ -76,8 +76,8 @@ class ProjectTaskController extends AbstractController
 
         return $this->render('project_task/new.html.twig', [
             'project' => $project,
-            'task'    => $task,
-            'form'    => $form,
+            'task' => $task,
+            'form' => $form,
         ]);
     }
 
@@ -102,8 +102,8 @@ class ProjectTaskController extends AbstractController
 
         return $this->render('project_task/edit.html.twig', [
             'project' => $task->getProject(),
-            'task'    => $task,
-            'form'    => $form,
+            'task' => $task,
+            'form' => $form,
         ]);
     }
 
@@ -116,7 +116,7 @@ class ProjectTaskController extends AbstractController
 
         return $this->render('project_task/show.html.twig', [
             'project' => $task->getProject(),
-            'task'    => $task,
+            'task' => $task,
         ]);
     }
 
@@ -175,15 +175,15 @@ class ProjectTaskController extends AbstractController
 
             return $this->redirectToRoute('project_task_show', [
                 'projectId' => $projectId,
-                'id'        => $task->getId(),
+                'id' => $task->getId(),
             ]);
         }
 
         return $this->render('project_task/subtask_new.html.twig', [
             'project' => $task->getProject(),
-            'task'    => $task,
+            'task' => $task,
             'subTask' => $subTask,
-            'form'    => $form,
+            'form' => $form,
         ]);
     }
 }

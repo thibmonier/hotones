@@ -28,21 +28,21 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ImportTheTribePlanningCommand extends Command
 {
     private const array NAME_ALIASES = [
-        'AKIVI'                => 'Akivi',
-        'HE RC-Lot-2'          => 'HE RC Lot-2',
-        'HE RC-Lot2'           => 'HE RC Lot-2',
-        'Homeopath'            => 'Homéopath',
-        'Qonti AUDIT'          => 'Qonti Audit',
-        'Quonti AUDIT'         => 'Qonti Audit',
-        '88jobs'               => '88 Jobs',
-        '88 jobs'              => '88 Jobs',
+        'AKIVI' => 'Akivi',
+        'HE RC-Lot-2' => 'HE RC Lot-2',
+        'HE RC-Lot2' => 'HE RC Lot-2',
+        'Homeopath' => 'Homéopath',
+        'Qonti AUDIT' => 'Qonti Audit',
+        'Quonti AUDIT' => 'Qonti Audit',
+        '88jobs' => '88 Jobs',
+        '88 jobs' => '88 Jobs',
         '88 jobs / Job Public' => '88 Jobs',
-        'La Presse libre'      => 'La Presse Libre',
-        'UnivNantes'           => 'Univ Nantes',
-        'Paper.Club'           => 'Paper.club',
-        'Paper Club'           => 'Paper.club',
-        'Paper'                => 'Paper.club',
-        'AI Mother'            => 'MotherAI',
+        'La Presse libre' => 'La Presse Libre',
+        'UnivNantes' => 'Univ Nantes',
+        'Paper.Club' => 'Paper.club',
+        'Paper Club' => 'Paper.club',
+        'Paper' => 'Paper.club',
+        'AI Mother' => 'MotherAI',
     ];
 
     private const array SKIP_TYPES = ['B', 'F', 'G', 'N'];
@@ -88,7 +88,7 @@ class ImportTheTribePlanningCommand extends Command
         $io->title('Import des plannings theTribe');
 
         $filePath = $input->getArgument('file');
-        $dryRun   = $input->getOption('dry-run');
+        $dryRun = $input->getOption('dry-run');
 
         if (!file_exists($filePath)) {
             $io->error(sprintf('Fichier introuvable: %s', $filePath));
@@ -112,9 +112,9 @@ class ImportTheTribePlanningCommand extends Command
         $this->loadCaches($company, $io);
 
         // 2. Lire le fichier Excel
-        $reader      = new Xlsx();
+        $reader = new Xlsx();
         $spreadsheet = $reader->load($filePath);
-        $sheet       = $spreadsheet->getSheetByName('Staffing');
+        $sheet = $spreadsheet->getSheetByName('Staffing');
 
         if (!$sheet) {
             $io->error('Feuille "Staffing" introuvable dans le fichier Excel');
@@ -168,25 +168,25 @@ class ImportTheTribePlanningCommand extends Command
     private function parseWeekDates(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet, SymfonyStyle $io): array
     {
         $highestColIdx = Coordinate::columnIndexFromString($sheet->getHighestDataColumn());
-        $weekDates     = [];
+        $weekDates = [];
 
         for ($col = self::STAFFING_START_COLUMN; $col <= $highestColIdx; ++$col) {
             $coordinate = Coordinate::stringFromColumnIndex($col);
-            $cellValue  = $sheet->getCell($coordinate.'2')->getCalculatedValue();
+            $cellValue = $sheet->getCell($coordinate.'2')->getCalculatedValue();
 
             if ($cellValue === null) {
                 continue;
             }
 
             if (is_numeric($cellValue) && (float) $cellValue > 40000) {
-                $date            = ExcelDate::excelToDateTimeObject((int) $cellValue);
+                $date = ExcelDate::excelToDateTimeObject((int) $cellValue);
                 $weekDates[$col] = DateTime::createFromInterface($date);
             }
         }
 
         if ($weekDates !== []) {
             $firstDate = reset($weekDates);
-            $lastDate  = end($weekDates);
+            $lastDate = end($weekDates);
             $io->writeln(sprintf(
                 '  %d colonnes semaines (%s → %s)',
                 count($weekDates),
@@ -207,7 +207,7 @@ class ImportTheTribePlanningCommand extends Command
 
         $contributors = $this->entityManager->getRepository(Contributor::class)->findBy(['company' => $company]);
         foreach ($contributors as $contributor) {
-            $key                          = mb_strtolower($contributor->firstName.' '.$contributor->lastName);
+            $key = mb_strtolower($contributor->firstName.' '.$contributor->lastName);
             $this->contributorCache[$key] = $contributor;
         }
 
@@ -221,7 +221,7 @@ class ImportTheTribePlanningCommand extends Command
     private function purgeExistingPlannings(Company $company, bool $dryRun): int
     {
         $plannings = $this->entityManager->getRepository(Planning::class)->findBy(['company' => $company]);
-        $count     = count($plannings);
+        $count = count($plannings);
 
         if (!$dryRun) {
             foreach ($plannings as $planning) {
@@ -296,7 +296,7 @@ class ImportTheTribePlanningCommand extends Command
 
         foreach ($weekDates as $colIdx => $weekStart) {
             $coordinate = Coordinate::stringFromColumnIndex($colIdx);
-            $cellValue  = $sheet->getCell($coordinate.$row)->getValue();
+            $cellValue = $sheet->getCell($coordinate.$row)->getValue();
 
             if ($cellValue === null || trim((string) $cellValue) === '') {
                 continue;
@@ -316,9 +316,9 @@ class ImportTheTribePlanningCommand extends Command
                 $weekEnd->modify('+4 days');
 
                 $assignments[] = [
-                    'project'    => $project,
-                    'weekStart'  => clone $weekStart,
-                    'weekEnd'    => $weekEnd,
+                    'project' => $project,
+                    'weekStart' => clone $weekStart,
+                    'weekEnd' => $weekEnd,
                     'dailyHours' => number_format($dailyHours, 2, '.', ''),
                 ];
             }
@@ -335,7 +335,7 @@ class ImportTheTribePlanningCommand extends Command
         // Grouper par projet
         $byProject = [];
         foreach ($assignments as $assignment) {
-            $projectId               = $assignment['project']->getId() ?? spl_object_id($assignment['project']);
+            $projectId = $assignment['project']->getId() ?? spl_object_id($assignment['project']);
             $byProject[$projectId][] = $assignment;
         }
 
@@ -390,10 +390,10 @@ class ImportTheTribePlanningCommand extends Command
         $planning->setCompany($company);
         $planning->setContributor($contributor);
         $planning->setProject($data['project']);
-        $planning->startDate  = $data['weekStart'];
-        $planning->endDate    = $data['weekEnd'];
+        $planning->startDate = $data['weekStart'];
+        $planning->endDate = $data['weekEnd'];
         $planning->dailyHours = $data['dailyHours'];
-        $planning->status     = 'confirmed';
+        $planning->status = 'confirmed';
 
         $this->entityManager->persist($planning);
     }
@@ -462,7 +462,7 @@ class ImportTheTribePlanningCommand extends Command
     private function resolveContributor(string $rawName): ?Contributor
     {
         $parsed = $this->parseName($rawName);
-        $key    = mb_strtolower($parsed['firstName'].' '.$parsed['lastName']);
+        $key = mb_strtolower($parsed['firstName'].' '.$parsed['lastName']);
 
         return $this->contributorCache[$key] ?? null;
     }
@@ -494,11 +494,11 @@ class ImportTheTribePlanningCommand extends Command
         }
 
         $firstName = array_shift($parts);
-        $lastName  = implode(' ', $parts);
+        $lastName = implode(' ', $parts);
 
         return [
             'firstName' => $firstName,
-            'lastName'  => $lastName,
+            'lastName' => $lastName,
         ];
     }
 

@@ -28,10 +28,10 @@ class OnboardingTemplateControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $container    = static::getContainer();
+        $container = static::getContainer();
 
         $this->templateRepository = $container->get(OnboardingTemplateRepository::class);
-        $this->profileRepository  = $container->get(ProfileRepository::class);
+        $this->profileRepository = $container->get(ProfileRepository::class);
         $this->setUpMultiTenant();
     }
 
@@ -44,12 +44,12 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $template->setActive(true);
         $template->setTasks([
             [
-                'title'            => 'Task 1',
-                'description'      => 'Description 1',
-                'type'             => 'action',
-                'assigned_to'      => 'contributor',
+                'title' => 'Task 1',
+                'description' => 'Description 1',
+                'type' => 'action',
+                'assigned_to' => 'contributor',
                 'days_after_start' => 0,
-                'order'            => 0,
+                'order' => 0,
             ],
         ]);
 
@@ -72,7 +72,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testIndexDisplaysTemplates(): void
     {
-        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Developer Onboarding');
 
         $this->client->loginUser($user);
@@ -126,18 +126,18 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $this->client->loginUser($user);
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates/create');
-        $token   = $crawler->filter('input[name="_token"]')->attr('value');
+        $token = $crawler->filter('input[name="_token"]')->attr('value');
 
         $this->client->request('POST', '/admin/onboarding-templates/create', [
-            '_token'      => $token,
-            'name'        => 'New Template',
+            '_token' => $token,
+            'name' => 'New Template',
             'description' => 'A new onboarding template',
-            'tasks'       => [
+            'tasks' => [
                 [
-                    'title'            => 'Welcome',
-                    'description'      => 'Welcome to the team',
-                    'type'             => 'action',
-                    'assigned_to'      => 'contributor',
+                    'title' => 'Welcome',
+                    'description' => 'Welcome to the team',
+                    'type' => 'action',
+                    'assigned_to' => 'contributor',
                     'days_after_start' => 0,
                 ],
             ],
@@ -159,11 +159,11 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $this->client->loginUser($user);
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates/create');
-        $token   = $crawler->filter('input[name="_token"]')->attr('value');
+        $token = $crawler->filter('input[name="_token"]')->attr('value');
 
         $this->client->request('POST', '/admin/onboarding-templates/create', [
-            '_token'      => $token,
-            'name'        => '', // Empty name
+            '_token' => $token,
+            'name' => '', // Empty name
             'description' => 'Description',
         ]);
 
@@ -176,7 +176,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testShowDisplaysTemplateDetails(): void
     {
-        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('QA Template');
 
         $this->client->loginUser($user);
@@ -190,7 +190,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testEditRequiresAdminRole(): void
     {
-        $user     = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_MANAGER']]);
         $template = $this->createTemplate();
 
         $this->client->loginUser($user);
@@ -201,7 +201,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testEditDisplaysFormWithExistingData(): void
     {
-        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Edit Me');
 
         $this->client->loginUser($user);
@@ -214,25 +214,25 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testEditSubmitUpdatesTemplate(): void
     {
-        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Original Name');
 
         $this->client->loginUser($user);
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates/'.$template->getId().'/edit');
-        $token   = $crawler->filter('input[name="_token"]')->attr('value');
+        $token = $crawler->filter('input[name="_token"]')->attr('value');
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$template->getId().'/edit', [
-            '_token'      => $token,
-            'name'        => 'Updated Name',
+            '_token' => $token,
+            'name' => 'Updated Name',
             'description' => 'Updated description',
-            'active'      => '1',
-            'tasks'       => [
+            'active' => '1',
+            'tasks' => [
                 [
-                    'title'            => 'Updated Task',
-                    'description'      => 'Updated task description',
-                    'type'             => 'lecture',
-                    'assigned_to'      => 'manager',
+                    'title' => 'Updated Task',
+                    'description' => 'Updated task description',
+                    'type' => 'lecture',
+                    'assigned_to' => 'manager',
                     'days_after_start' => 5,
                 ],
             ],
@@ -252,16 +252,16 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testDuplicateCreatesNewTemplate(): void
     {
-        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate('Original Template');
 
         $this->client->loginUser($user);
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates/'.$template->getId());
-        $token   = $crawler->filter('input[name="_token"]')->first()->attr('value');
+        $token = $crawler->filter('input[name="_token"]')->first()->attr('value');
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$template->getId().'/duplicate', [
-            '_token'   => $token,
+            '_token' => $token,
             'new_name' => 'Duplicated Template',
         ]);
 
@@ -277,7 +277,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testToggleChangesActiveStatus(): void
     {
-        $user     = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
         $template = $this->createTemplate();
         $template->setActive(true);
 
@@ -305,8 +305,8 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
     public function testDeleteRemovesTemplate(): void
     {
-        $user       = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
-        $template   = $this->createTemplate('Delete Me');
+        $user = UserFactory::createOne(['roles' => ['ROLE_ADMIN']]);
+        $template = $this->createTemplate('Delete Me');
         $templateId = $template->getId();
 
         $this->client->loginUser($user);
@@ -344,14 +344,14 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $this->client->loginUser($user);
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates/create');
-        $token   = $crawler->filter('input[name="_token"]')->attr('value');
+        $token = $crawler->filter('input[name="_token"]')->attr('value');
 
         $this->client->request('POST', '/admin/onboarding-templates/create', [
-            '_token'      => $token,
-            'name'        => 'Developer Template',
+            '_token' => $token,
+            'name' => 'Developer Template',
             'description' => 'For developers',
-            'profile_id'  => (string) $profile->getId(),
-            'tasks'       => [],
+            'profile_id' => (string) $profile->getId(),
+            'tasks' => [],
         ]);
 
         $this->assertResponseRedirects();

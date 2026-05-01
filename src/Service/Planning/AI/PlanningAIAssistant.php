@@ -22,9 +22,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class PlanningAIAssistant
 {
-    private bool $enabled     = false;
+    private bool $enabled = false;
     private ?string $provider = null;
-    private ?string $apiKey   = null;
+    private ?string $apiKey = null;
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -34,17 +34,17 @@ class PlanningAIAssistant
     ) {
         // Déterminer quel provider est disponible (ordre de priorité)
         if ($anthropicApiKey !== null && $anthropicApiKey !== '') {
-            $this->enabled  = true;
+            $this->enabled = true;
             $this->provider = 'anthropic';
-            $this->apiKey   = $anthropicApiKey;
+            $this->apiKey = $anthropicApiKey;
         } elseif ($openaiApiKey !== null && $openaiApiKey !== '') {
-            $this->enabled  = true;
+            $this->enabled = true;
             $this->provider = 'openai';
-            $this->apiKey   = $openaiApiKey;
+            $this->apiKey = $openaiApiKey;
         } elseif ($geminiApiKey !== null && $geminiApiKey !== '') {
-            $this->enabled  = true;
+            $this->enabled = true;
             $this->provider = 'gemini';
-            $this->apiKey   = $geminiApiKey;
+            $this->apiKey = $geminiApiKey;
         }
     }
 
@@ -68,7 +68,7 @@ class PlanningAIAssistant
         if (!$this->enabled) {
             return [
                 'enhanced' => false,
-                'message'  => 'AI assistance is not enabled. Set OPENAI_API_KEY, ANTHROPIC_API_KEY or GEMINI_API_KEY in .env to enable.',
+                'message' => 'AI assistance is not enabled. Set OPENAI_API_KEY, ANTHROPIC_API_KEY or GEMINI_API_KEY in .env to enable.',
             ];
         }
 
@@ -80,16 +80,16 @@ class PlanningAIAssistant
             $aiResponse = $this->callAI($prompt);
 
             return [
-                'enhanced'        => true,
-                'provider'        => $this->provider,
+                'enhanced' => true,
+                'provider' => $this->provider,
                 'recommendations' => $aiResponse['recommendations'] ?? [],
-                'insights'        => $aiResponse['insights']        ?? [],
-                'confidence'      => $aiResponse['confidence']      ?? 0,
+                'insights' => $aiResponse['insights'] ?? [],
+                'confidence' => $aiResponse['confidence'] ?? 0,
             ];
         } catch (Exception $e) {
             return [
                 'enhanced' => false,
-                'error'    => $e->getMessage(),
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -116,9 +116,9 @@ class PlanningAIAssistant
         if (!empty($projects)) {
             $prompt .= "\n## Projets actifs:\n";
             foreach ($projects as $project) {
-                $type   = $project->isInternal ? 'Interne' : 'Client';
-                $client = $project->getClient()?->getName()         ?? 'N/A';
-                $level  = $project->getClient()?->getServiceLevel() ?? 'standard';
+                $type = $project->isInternal ? 'Interne' : 'Client';
+                $client = $project->getClient()?->getName() ?? 'N/A';
+                $level = $project->getClient()?->getServiceLevel() ?? 'standard';
                 $prompt .= sprintf(
                     "- %s (%s%s)\n",
                     $project->getName(),
@@ -203,16 +203,16 @@ class PlanningAIAssistant
         $response = $client
             ->chat()
             ->create([
-                'model'    => 'gpt-4o-mini', // Modèle plus rapide et moins cher que gpt-4
+                'model' => 'gpt-4o-mini', // Modèle plus rapide et moins cher que gpt-4
                 'messages' => [
                     [
-                        'role'    => 'system',
+                        'role' => 'system',
                         'content' => 'You are an expert in project management and resource planning. You provide actionable recommendations to optimize team workload and project staffing. Always respond in valid JSON format.',
                     ],
                     ['role' => 'user', 'content' => $prompt],
                 ],
                 'temperature' => 0.7,
-                'max_tokens'  => 2000,
+                'max_tokens' => 2000,
             ]);
 
         $content = $response->choices[0]->message->content;
@@ -282,7 +282,7 @@ class PlanningAIAssistant
                         ],
                     ],
                     'generationConfig' => [
-                        'temperature'     => 0.7,
+                        'temperature' => 0.7,
                         'maxOutputTokens' => 2000,
                     ],
                 ],

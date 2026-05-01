@@ -59,7 +59,7 @@ class BadgeRepository extends CompanyAwareRepository
     public function getBadgeStats(): array
     {
         return [
-            'total'       => $this->countForCurrentCompany(['active' => true]),
+            'total' => $this->countForCurrentCompany(['active' => true]),
             'by_category' => $this->countByCategory(),
         ];
     }

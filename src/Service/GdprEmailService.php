@@ -19,9 +19,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class GdprEmailService
 {
-    private const string DPO_EMAIL  = 'dpo@hotones.example';
+    private const string DPO_EMAIL = 'dpo@hotones.example';
     private const string FROM_EMAIL = 'noreply@hotones.example';
-    private const string FROM_NAME  = 'HotOnes - RGPD';
+    private const string FROM_NAME = 'HotOnes - RGPD';
 
     public function __construct(
         private readonly MailerInterface $mailer,
@@ -53,26 +53,26 @@ class GdprEmailService
             ->htmlTemplate('emails/gdpr/deletion_request_confirmation.html.twig')
             ->textTemplate('emails/gdpr/deletion_request_confirmation.txt.twig')
             ->context([
-                'user'            => $user,
+                'user' => $user,
                 'confirmationUrl' => $confirmationUrl,
-                'expiryDate'      => $expiryDate,
-                'dpoEmail'        => self::DPO_EMAIL,
+                'expiryDate' => $expiryDate,
+                'dpoEmail' => self::DPO_EMAIL,
             ]);
 
         try {
             $this->mailer->send($email);
 
             $this->logger->info('GDPR deletion request confirmation email sent', [
-                'user_id'     => $user->getId(),
-                'email'       => $user->getEmail(),
-                'request_id'  => $deletionRequest->getId(),
+                'user_id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'request_id' => $deletionRequest->getId(),
                 'expiry_date' => $expiryDate->format('c'),
             ]);
         } catch (Exception $e) {
             $this->logger->error('Failed to send GDPR deletion request confirmation email', [
-                'user_id'    => $user->getId(),
+                'user_id' => $user->getId(),
                 'request_id' => $deletionRequest->getId(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             throw $e;
@@ -90,7 +90,7 @@ class GdprEmailService
 
         $confirmedDate = $deletionRequest->getConfirmedAt();
         $scheduledDate = $deletionRequest->getScheduledDeletionAt();
-        $reminderDate  = $scheduledDate->modify('-7 days');
+        $reminderDate = $scheduledDate->modify('-7 days');
 
         $daysRemaining = new DateTimeImmutable()->diff($scheduledDate)->days;
 
@@ -101,29 +101,29 @@ class GdprEmailService
             ->htmlTemplate('emails/gdpr/deletion_confirmed.html.twig')
             ->textTemplate('emails/gdpr/deletion_confirmed.txt.twig')
             ->context([
-                'user'                  => $user,
-                'cancelUrl'             => $cancelUrl,
-                'confirmedDate'         => $confirmedDate,
+                'user' => $user,
+                'cancelUrl' => $cancelUrl,
+                'confirmedDate' => $confirmedDate,
                 'scheduledDeletionDate' => $scheduledDate,
-                'reminderDate'          => $reminderDate,
-                'daysRemaining'         => $daysRemaining,
-                'dpoEmail'              => self::DPO_EMAIL,
+                'reminderDate' => $reminderDate,
+                'daysRemaining' => $daysRemaining,
+                'dpoEmail' => self::DPO_EMAIL,
             ]);
 
         try {
             $this->mailer->send($email);
 
             $this->logger->info('GDPR deletion confirmed email sent', [
-                'user_id'       => $user->getId(),
-                'email'         => $user->getEmail(),
-                'request_id'    => $deletionRequest->getId(),
+                'user_id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'request_id' => $deletionRequest->getId(),
                 'scheduled_for' => $scheduledDate->format('c'),
             ]);
         } catch (Exception $e) {
             $this->logger->error('Failed to send GDPR deletion confirmed email', [
-                'user_id'    => $user->getId(),
+                'user_id' => $user->getId(),
                 'request_id' => $deletionRequest->getId(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             throw $e;
@@ -149,27 +149,27 @@ class GdprEmailService
             ->htmlTemplate('emails/gdpr/deletion_reminder.html.twig')
             ->textTemplate('emails/gdpr/deletion_reminder.txt.twig')
             ->context([
-                'user'                  => $user,
-                'cancelUrl'             => $cancelUrl,
+                'user' => $user,
+                'cancelUrl' => $cancelUrl,
                 'scheduledDeletionDate' => $scheduledDate,
-                'daysRemaining'         => $daysRemaining,
-                'dpoEmail'              => self::DPO_EMAIL,
+                'daysRemaining' => $daysRemaining,
+                'dpoEmail' => self::DPO_EMAIL,
             ]);
 
         try {
             $this->mailer->send($email);
 
             $this->logger->info('GDPR deletion reminder email sent', [
-                'user_id'    => $user->getId(),
-                'email'      => $user->getEmail(),
+                'user_id' => $user->getId(),
+                'email' => $user->getEmail(),
                 'request_id' => $deletionRequest->getId(),
-                'days_left'  => $daysRemaining,
+                'days_left' => $daysRemaining,
             ]);
         } catch (Exception $e) {
             $this->logger->error('Failed to send GDPR deletion reminder email', [
-                'user_id'    => $user->getId(),
+                'user_id' => $user->getId(),
                 'request_id' => $deletionRequest->getId(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             throw $e;
@@ -194,25 +194,25 @@ class GdprEmailService
             ->htmlTemplate('emails/gdpr/deletion_cancelled.html.twig')
             ->textTemplate('emails/gdpr/deletion_cancelled.txt.twig')
             ->context([
-                'user'          => $user,
-                'loginUrl'      => $loginUrl,
+                'user' => $user,
+                'loginUrl' => $loginUrl,
                 'cancelledDate' => $cancelledDate,
-                'dpoEmail'      => self::DPO_EMAIL,
+                'dpoEmail' => self::DPO_EMAIL,
             ]);
 
         try {
             $this->mailer->send($email);
 
             $this->logger->info('GDPR deletion cancelled email sent', [
-                'user_id'    => $user->getId(),
-                'email'      => $user->getEmail(),
+                'user_id' => $user->getId(),
+                'email' => $user->getEmail(),
                 'request_id' => $deletionRequest->getId(),
             ]);
         } catch (Exception $e) {
             $this->logger->error('Failed to send GDPR deletion cancelled email', [
-                'user_id'    => $user->getId(),
+                'user_id' => $user->getId(),
                 'request_id' => $deletionRequest->getId(),
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             throw $e;

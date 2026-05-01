@@ -70,9 +70,9 @@ final readonly class ProcessNurturingEmailsMessageHandler
         $total = $stats['day1'] + $stats['day3'] + $stats['day7'];
 
         $this->logger->info('Nurturing emails dispatched', [
-            'day1'  => $stats['day1'],
-            'day3'  => $stats['day3'],
-            'day7'  => $stats['day7'],
+            'day1' => $stats['day1'],
+            'day3' => $stats['day3'],
+            'day7' => $stats['day7'],
             'total' => $total,
         ]);
     }

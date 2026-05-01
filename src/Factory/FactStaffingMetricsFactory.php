@@ -37,17 +37,17 @@ final class FactStaffingMetricsFactory extends PersistentObjectFactory
         }
 
         return [
-            'company'          => $company,
-            'dimTime'          => DimTimeFactory::new(),
-            'dimProfile'       => null, // Should be set explicitly to avoid unique constraint issues
-            'contributor'      => null, // Can be set explicitly
-            'availableDays'    => (string) $faker->numberBetween(15, 22),
-            'workedDays'       => (string) $faker->numberBetween(15, 22),
-            'staffedDays'      => (string) $faker->numberBetween(10, 20),
-            'vacationDays'     => (string) $faker->numberBetween(0, 5),
-            'plannedDays'      => (string) $faker->numberBetween(0, 10),
-            'calculatedAt'     => new DateTime(),
-            'granularity'      => $faker->randomElement(['weekly', 'monthly', 'quarterly']),
+            'company' => $company,
+            'dimTime' => DimTimeFactory::new(),
+            'dimProfile' => null, // Should be set explicitly to avoid unique constraint issues
+            'contributor' => null, // Can be set explicitly
+            'availableDays' => (string) $faker->numberBetween(15, 22),
+            'workedDays' => (string) $faker->numberBetween(15, 22),
+            'staffedDays' => (string) $faker->numberBetween(10, 20),
+            'vacationDays' => (string) $faker->numberBetween(0, 5),
+            'plannedDays' => (string) $faker->numberBetween(0, 10),
+            'calculatedAt' => new DateTime(),
+            'granularity' => $faker->randomElement(['weekly', 'monthly', 'quarterly']),
             'contributorCount' => $faker->numberBetween(1, 10),
         ];
     }

@@ -33,26 +33,26 @@ class EmploymentPeriodCreatedListener
 
             if ($tasksCreated > 0) {
                 $this->logger->info('Onboarding tasks created automatically', [
-                    'contributor_id'       => $contributor->getId(),
-                    'contributor_name'     => $contributor->getFullName(),
+                    'contributor_id' => $contributor->getId(),
+                    'contributor_name' => $contributor->getFullName(),
                     'employment_period_id' => $employmentPeriod->getId(),
-                    'tasks_created'        => $tasksCreated,
+                    'tasks_created' => $tasksCreated,
                 ]);
             } else {
-                $profiles     = $contributor->getProfiles();
+                $profiles = $contributor->getProfiles();
                 $profileNames = $profiles->isEmpty() ? 'none' : $profiles->first()->getName();
 
                 $this->logger->warning('No onboarding template found for contributor', [
-                    'contributor_id'   => $contributor->getId(),
+                    'contributor_id' => $contributor->getId(),
                     'contributor_name' => $contributor->getFullName(),
-                    'profile'          => $profileNames,
+                    'profile' => $profileNames,
                 ]);
             }
         } catch (Exception $e) {
             $this->logger->error('Failed to create onboarding tasks automatically', [
-                'contributor_id'       => $contributor->getId(),
+                'contributor_id' => $contributor->getId(),
                 'employment_period_id' => $employmentPeriod->id, // PHP 8.4 property hook
-                'error'                => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }

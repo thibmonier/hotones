@@ -22,7 +22,7 @@ class TaceAnalyzerTest extends TestCase
         ?ContributorRepository $contributorRepository = null,
         ?StaffingMetricsRepository $staffingMetricsRepository = null,
     ): TaceAnalyzer {
-        $contributorRepository     ??= $this->createMock(ContributorRepository::class);
+        $contributorRepository ??= $this->createMock(ContributorRepository::class);
         $staffingMetricsRepository ??= $this->createMock(StaffingMetricsRepository::class);
 
         return new TaceAnalyzer($contributorRepository, $staffingMetricsRepository);
@@ -41,7 +41,7 @@ class TaceAnalyzerTest extends TestCase
     public function testGetThresholds(): void
     {
         $service = $this->createService();
-        $result  = $service->getThresholds();
+        $result = $service->getThresholds();
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('ideal_min', $result);
@@ -62,9 +62,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn([]);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -89,9 +89,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn($metrics);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -115,9 +115,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn($metrics);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -139,9 +139,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn($metrics);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -163,9 +163,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn($metrics);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -187,9 +187,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn($metrics);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -213,9 +213,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn($metrics);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -239,9 +239,9 @@ class TaceAnalyzerTest extends TestCase
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn($metrics);
 
-        $service   = $this->createService(null, $staffingMetricsRepository);
+        $service = $this->createService(null, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeContributor($contributor, $startDate, $endDate);
 
@@ -257,7 +257,7 @@ class TaceAnalyzerTest extends TestCase
         $contributorRepository->method('findBy')->with(['active' => true])->willReturn([]);
 
         $service = $this->createService($contributorRepository);
-        $result  = $service->analyzeAllContributors();
+        $result = $service->analyzeAllContributors();
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('overloaded', $result);
@@ -307,11 +307,11 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeAllContributorsCategorizesCorrectly(): void
     {
-        $optimalContributor       = $this->createMock(Contributor::class);
-        $overloadedContributor    = $this->createMock(Contributor::class);
+        $optimalContributor = $this->createMock(Contributor::class);
+        $overloadedContributor = $this->createMock(Contributor::class);
         $underutilizedContributor = $this->createMock(Contributor::class);
-        $criticalHighContributor  = $this->createMock(Contributor::class);
-        $criticalLowContributor   = $this->createMock(Contributor::class);
+        $criticalHighContributor = $this->createMock(Contributor::class);
+        $criticalLowContributor = $this->createMock(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
         $contributorRepository
@@ -353,9 +353,9 @@ class TaceAnalyzerTest extends TestCase
                 return [];
             });
 
-        $service   = $this->createService($contributorRepository, $staffingMetricsRepository);
+        $service = $this->createService($contributorRepository, $staffingMetricsRepository);
         $startDate = new DateTime('2024-01-01');
-        $endDate   = new DateTime('2024-01-31');
+        $endDate = new DateTime('2024-01-31');
 
         $result = $service->analyzeAllContributors($startDate, $endDate);
 
@@ -400,7 +400,7 @@ class TaceAnalyzerTest extends TestCase
             });
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
-        $result  = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
+        $result = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
 
         $this->assertCount(3, $result['overloaded']);
         // Should be sorted by TACE descending: 98, 95, 92
@@ -440,7 +440,7 @@ class TaceAnalyzerTest extends TestCase
             });
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
-        $result  = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
+        $result = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
 
         $this->assertCount(3, $result['underutilized']);
         // Should be sorted by TACE ascending: 55, 60, 65
@@ -480,7 +480,7 @@ class TaceAnalyzerTest extends TestCase
             });
 
         $service = $this->createService($contributorRepository, $staffingMetricsRepository);
-        $result  = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
+        $result = $service->analyzeAllContributors(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
 
         $this->assertCount(3, $result['critical']);
         // Should be sorted by abs(tace - 80) descending: 120 (abs=40), 115 (abs=35), 45 (abs=35)
@@ -492,9 +492,9 @@ class TaceAnalyzerTest extends TestCase
 
     public function testCalculateSeverityPrivateMethod(): void
     {
-        $service    = $this->createService();
+        $service = $this->createService();
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('calculateSeverity');
+        $method = $reflection->getMethod('calculateSeverity');
 
         // Test various TACE values
         $this->assertEquals(0, $method->invoke($service, 80.0)); // Ideal center
@@ -507,9 +507,9 @@ class TaceAnalyzerTest extends TestCase
 
     public function testCalculateDeviationPrivateMethod(): void
     {
-        $service    = $this->createService();
+        $service = $this->createService();
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('calculateDeviation');
+        $method = $reflection->getMethod('calculateDeviation');
 
         $this->assertEquals(0.0, $method->invoke($service, 80.0));
         $this->assertEquals(10.0, $method->invoke($service, 90.0));
@@ -520,9 +520,9 @@ class TaceAnalyzerTest extends TestCase
 
     public function testDetermineStatusPrivateMethod(): void
     {
-        $service    = $this->createService();
+        $service = $this->createService();
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('determineStatus');
+        $method = $reflection->getMethod('determineStatus');
 
         // Optimal range (70-90)
         $this->assertEquals('optimal', $method->invoke($service, 70.0));

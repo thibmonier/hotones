@@ -33,7 +33,7 @@ class ProjectHealthController extends AbstractController
 
         return $this->render('project_health/at_risk.html.twig', [
             'at_risk_projects' => $atRiskProjects,
-            'counts'           => $counts,
+            'counts' => $counts,
         ]);
     }
 
@@ -45,7 +45,7 @@ class ProjectHealthController extends AbstractController
 
         // Get critical projects (most urgent)
         $criticalProjects = [];
-        $allAtRisk        = $this->healthScoreRepository->findProjectsAtRisk();
+        $allAtRisk = $this->healthScoreRepository->findProjectsAtRisk();
 
         foreach ($allAtRisk as $healthScore) {
             if ($healthScore->getHealthLevel() === 'critical') {
@@ -54,7 +54,7 @@ class ProjectHealthController extends AbstractController
         }
 
         return $this->render('project_health/overview.html.twig', [
-            'counts'            => $counts,
+            'counts' => $counts,
             'critical_projects' => $criticalProjects,
         ]);
     }

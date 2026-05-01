@@ -32,7 +32,7 @@ class SubscriptionController extends AbstractController
         PaginatorInterface $paginator,
     ): Response {
         $session = $request->getSession();
-        $reset   = (bool) $request->query->get('reset', false);
+        $reset = (bool) $request->query->get('reset', false);
 
         if ($reset) {
             $session->remove('subscription_filters');
@@ -40,7 +40,7 @@ class SubscriptionController extends AbstractController
             return $this->redirectToRoute('subscription_index');
         }
 
-        $queryAll   = $request->query->all();
+        $queryAll = $request->query->all();
         $filterKeys = [
             'search',
             'status',
@@ -53,34 +53,34 @@ class SubscriptionController extends AbstractController
             'dir',
         ];
         $hasFilter = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved     = $session->has('subscription_filters') ? (array) $session->get('subscription_filters') : [];
+        $saved = $session->has('subscription_filters') ? (array) $session->get('subscription_filters') : [];
 
-        $search        = $hasFilter ? ($request->query->get('search') ?: '') : $saved['search']                 ?? '';
-        $status        = $hasFilter ? ($request->query->get('status') ?: '') : $saved['status']                 ?? '';
+        $search = $hasFilter ? ($request->query->get('search') ?: '') : $saved['search'] ?? '';
+        $status = $hasFilter ? ($request->query->get('status') ?: '') : $saved['status'] ?? '';
         $billingPeriod = $hasFilter ? ($request->query->get('billing_period') ?: '') : $saved['billing_period'] ?? '';
-        $category      = $hasFilter ? ($request->query->get('category') ?: '') : $saved['category']             ?? '';
-        $vendorId      = $hasFilter ? ($request->query->get('vendor') ?: '') : $saved['vendor']                 ?? '';
-        $providerId    = $hasFilter ? ($request->query->get('provider') ?: '') : $saved['provider']             ?? '';
+        $category = $hasFilter ? ($request->query->get('category') ?: '') : $saved['category'] ?? '';
+        $vendorId = $hasFilter ? ($request->query->get('vendor') ?: '') : $saved['vendor'] ?? '';
+        $providerId = $hasFilter ? ($request->query->get('provider') ?: '') : $saved['provider'] ?? '';
 
         $sort = $hasFilter
             ? ($request->query->get('sort') ?: $saved['sort'] ?? 'nextRenewalDate')
-            : $saved['sort']                                                                        ?? 'nextRenewalDate';
+            : $saved['sort'] ?? 'nextRenewalDate';
         $dir = $hasFilter ? ($request->query->get('dir') ?: $saved['dir'] ?? 'ASC') : $saved['dir'] ?? 'ASC';
 
         $allowedPerPage = [10, 25, 50, 100];
-        $perPageParam   = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
-        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
+        $perPageParam = (int) ($hasFilter ? $request->query->get('per_page', 25) : $saved['per_page'] ?? 25);
+        $perPage = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 25;
 
         $session->set('subscription_filters', [
-            'search'         => $search,
-            'status'         => $status,
+            'search' => $search,
+            'status' => $status,
             'billing_period' => $billingPeriod,
-            'category'       => $category,
-            'vendor'         => $vendorId,
-            'provider'       => $providerId,
-            'per_page'       => $perPage,
-            'sort'           => $sort,
-            'dir'            => $dir,
+            'category' => $category,
+            'vendor' => $vendorId,
+            'provider' => $providerId,
+            'per_page' => $perPage,
+            'sort' => $sort,
+            'dir' => $dir,
         ]);
 
         $qb = $subscriptionRepository
@@ -122,30 +122,30 @@ class SubscriptionController extends AbstractController
 
         $validSortFields = [
             'nextRenewalDate' => 's.nextRenewalDate',
-            'status'          => 's.status',
-            'price'           => 's.price',
-            'name'            => 'srv.name',
-            'vendor'          => 'srv.name',
-            'category'        => 'srv.category',
+            'status' => 's.status',
+            'price' => 's.price',
+            'name' => 'srv.name',
+            'vendor' => 'srv.name',
+            'category' => 'srv.category',
         ];
         $sortField = $validSortFields[$sort] ?? 's.nextRenewalDate';
-        $sortDir   = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
+        $sortDir = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($sortField, $sortDir);
 
         $pagination = $paginator->paginate($qb->getQuery(), $request->query->getInt('page', 1), $perPage);
 
         return $this->render('saas/subscription/index.html.twig', [
             'subscriptions' => $pagination,
-            'filters'       => [
-                'search'         => $search,
-                'status'         => $status,
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
                 'billing_period' => $billingPeriod,
-                'category'       => $category,
-                'vendor'         => $vendorId,
-                'provider'       => $providerId,
+                'category' => $category,
+                'vendor' => $vendorId,
+                'provider' => $providerId,
             ],
             'sort' => $sort,
-            'dir'  => $dir,
+            'dir' => $dir,
         ]);
     }
 
@@ -168,7 +168,7 @@ class SubscriptionController extends AbstractController
 
         return $this->render('saas/subscription/new.html.twig', [
             'subscription' => $subscription,
-            'form'         => $form,
+            'form' => $form,
         ]);
     }
 
@@ -196,7 +196,7 @@ class SubscriptionController extends AbstractController
 
         return $this->render('saas/subscription/edit.html.twig', [
             'subscription' => $subscription,
-            'form'         => $form,
+            'form' => $form,
         ]);
     }
 

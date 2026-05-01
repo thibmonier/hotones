@@ -59,7 +59,7 @@ class TestS3ConnectionCommand extends Command
         $io->section('Test 1 : Liste des fichiers dans /avatars');
         try {
             $listing = $this->filesystem->listContents('avatars', false);
-            $count   = 0;
+            $count = 0;
             foreach ($listing as $item) {
                 ++$count;
                 if ($count <= 5) {
@@ -77,7 +77,7 @@ class TestS3ConnectionCommand extends Command
         // Test 2 : Écrire un fichier de test
         $io->section('Test 2 : Écriture d\'un fichier de test');
         $testContent = 'Test file created at '.date('Y-m-d H:i:s');
-        $testPath    = 'avatars/test-'.time().'.txt';
+        $testPath = 'avatars/test-'.time().'.txt';
 
         try {
             $this->filesystem->write($testPath, $testContent);
@@ -119,7 +119,7 @@ class TestS3ConnectionCommand extends Command
         $io->section('Test 5 : URL publique');
         if ($this->environment === 'prod' && $this->publicUrl !== '') {
             $examplePath = 'avatars/example.jpg';
-            $publicUrl   = sprintf('%s/%s', rtrim($this->publicUrl, '/'), $examplePath);
+            $publicUrl = sprintf('%s/%s', rtrim($this->publicUrl, '/'), $examplePath);
             $io->info('URL publique générée : '.$publicUrl);
             $io->note('Vérifiez que cette URL est accessible publiquement depuis votre navigateur');
         } else {

@@ -39,38 +39,38 @@ class ContributorController extends AbstractController
     public function index(Request $request): Response
     {
         $session = $request->getSession();
-        $reset   = (bool) $request->query->get('reset', false);
+        $reset = (bool) $request->query->get('reset', false);
         if ($reset) {
             $session->remove('contributor_filters');
 
             return $this->redirectToRoute('contributor_index');
         }
 
-        $queryAll  = $request->query->all();
-        $keys      = ['search', 'active', 'employment_status'];
+        $queryAll = $request->query->all();
+        $keys = ['search', 'active', 'employment_status'];
         $hasFilter = count(array_intersect(array_keys($queryAll), $keys)) > 0;
-        $saved     = $session->has('contributor_filters') ? (array) $session->get('contributor_filters') : [];
+        $saved = $session->has('contributor_filters') ? (array) $session->get('contributor_filters') : [];
 
-        $search           = $hasFilter ? $request->query->get('search', '') : $saved['search']    ?? '';
-        $active           = $hasFilter ? $request->query->get('active', 'all') : $saved['active'] ?? 'all';
+        $search = $hasFilter ? $request->query->get('search', '') : $saved['search'] ?? '';
+        $active = $hasFilter ? $request->query->get('active', 'all') : $saved['active'] ?? 'all';
         $employmentStatus = $hasFilter
             ? $request->query->get('employment_status', 'all')
-            : $saved['employment_status']                                          ?? 'all';
+            : $saved['employment_status'] ?? 'all';
         $sort = $hasFilter ? $request->query->get('sort', 'name') : $saved['sort'] ?? 'name';
-        $dir  = $hasFilter ? $request->query->get('dir', 'ASC') : $saved['dir']    ?? 'ASC';
+        $dir = $hasFilter ? $request->query->get('dir', 'ASC') : $saved['dir'] ?? 'ASC';
 
-        $qb        = $this->contributorRepository->buildFilteredQuery($search, $active, $employmentStatus, $sort, $dir);
+        $qb = $this->contributorRepository->buildFilteredQuery($search, $active, $employmentStatus, $sort, $dir);
         $direction = strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC';
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
-        $perPageParam   = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
-        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
-        $page           = max(1, (int) $request->query->get('page', 1));
-        $offset         = ($page - 1) * $perPage;
+        $perPageParam = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
+        $perPage = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
+        $page = max(1, (int) $request->query->get('page', 1));
+        $offset = ($page - 1) * $perPage;
 
         $countQb = clone $qb;
-        $total   = (int) $countQb
+        $total = (int) $countQb
             ->select('COUNT(DISTINCT c.id)')
             ->resetDQLPart('orderBy')
             ->getQuery()
@@ -78,7 +78,7 @@ class ContributorController extends AbstractController
 
         // Stats globales (sur l'ensemble filtré)
         $withUserQb = clone $qb;
-        $withUser   = (int) $withUserQb
+        $withUser = (int) $withUserQb
             ->select('COUNT(DISTINCT c.id)')
             ->resetDQLPart('orderBy')
             ->andWhere('c.user IS NOT NULL')
@@ -106,30 +106,30 @@ class ContributorController extends AbstractController
             }
         }
 
-        $avgCjm     = !empty($cjmValues) ? array_sum($cjmValues) / count($cjmValues) : null;
-        $avgTjm     = !empty($tjmValues) ? array_sum($tjmValues) / count($tjmValues) : null;
+        $avgCjm = !empty($cjmValues) ? array_sum($cjmValues) / count($cjmValues) : null;
+        $avgTjm = !empty($tjmValues) ? array_sum($tjmValues) / count($tjmValues) : null;
         $pagination = Pagination::create($page, $perPage, $total);
 
         $session->set('contributor_filters', [
-            'search'            => $search,
-            'active'            => $active,
+            'search' => $search,
+            'active' => $active,
             'employment_status' => $employmentStatus,
-            'sort'              => $sort,
-            'dir'               => $direction,
-            'per_page'          => $perPage,
+            'sort' => $sort,
+            'dir' => $direction,
+            'per_page' => $perPage,
         ]);
 
         return $this->render('contributor/index.html.twig', [
-            'contributors'       => $contributors,
-            'search'             => $search,
-            'active'             => $active,
-            'employment_status'  => $employmentStatus,
-            'sort'               => $sort,
-            'dir'                => $direction,
-            'pagination'         => $pagination->toArray(),
+            'contributors' => $contributors,
+            'search' => $search,
+            'active' => $active,
+            'employment_status' => $employmentStatus,
+            'sort' => $sort,
+            'dir' => $direction,
+            'pagination' => $pagination->toArray(),
             'stats_linked_users' => $withUser,
-            'stats_avg_cjm'      => $avgCjm,
-            'stats_avg_tjm'      => $avgTjm,
+            'stats_avg_cjm' => $avgCjm,
+            'stats_avg_tjm' => $avgTjm,
         ]);
     }
 
@@ -164,7 +164,7 @@ class ContributorController extends AbstractController
 
         return $this->render('contributor/new.html.twig', [
             'contributor' => $contributor,
-            'form'        => $form,
+            'form' => $form,
         ]);
     }
 
@@ -192,7 +192,7 @@ class ContributorController extends AbstractController
             $skillName = $row['name'];
             if (!isset($skillsByName[$skillName])) {
                 $skillsByName[$skillName] = [
-                    'name'   => $skillName,
+                    'name' => $skillName,
                     'levels' => [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0],
                 ];
             }
@@ -200,7 +200,7 @@ class ContributorController extends AbstractController
         }
 
         return $this->render('contributor/show.html.twig', [
-            'contributor'     => $contributor,
+            'contributor' => $contributor,
             'skillsResources' => array_values($skillsByName),
         ]);
     }
@@ -216,14 +216,14 @@ class ContributorController extends AbstractController
             try {
                 $this->logger->info('Début édition collaborateur', [
                     'contributor_id' => $contributor->id,
-                    'has_avatar'     => $form->get('avatarFile')->getData() !== null,
+                    'has_avatar' => $form->get('avatarFile')->getData() !== null,
                 ]);
 
                 // Handle avatar upload
                 /** @var UploadedFile $avatarFile */
                 $avatarFile = $form->get('avatarFile')->getData();
                 if ($avatarFile) {
-                    $filename                    = $this->handleAvatarUpload($avatarFile);
+                    $filename = $this->handleAvatarUpload($avatarFile);
                     $contributor->avatarFilename = $filename;
                     $this->logger->info('Avatar uploadé', ['filename' => $filename]);
                 }
@@ -237,13 +237,13 @@ class ContributorController extends AbstractController
             } catch (RuntimeException $e) {
                 $this->logger->error('Erreur modification collaborateur', [
                     'message' => $e->getMessage(),
-                    'trace'   => $e->getTraceAsString(),
+                    'trace' => $e->getTraceAsString(),
                 ]);
                 $this->addFlash('error', $e->getMessage());
             } catch (Exception $e) {
                 $this->logger->error('Erreur inattendue modification collaborateur', [
                     'message' => $e->getMessage(),
-                    'trace'   => $e->getTraceAsString(),
+                    'trace' => $e->getTraceAsString(),
                 ]);
                 $this->addFlash('error', 'Une erreur inattendue s\'est produite. Veuillez réessayer.');
             }
@@ -251,7 +251,7 @@ class ContributorController extends AbstractController
 
         return $this->render('contributor/edit.html.twig', [
             'contributor' => $contributor,
-            'form'        => $form,
+            'form' => $form,
         ]);
     }
 
@@ -265,31 +265,31 @@ class ContributorController extends AbstractController
 
         return $this->render('contributor/employment_periods.html.twig', [
             'contributor' => $contributor,
-            'periods'     => $periods,
+            'periods' => $periods,
         ]);
     }
 
     #[Route('/{id}/timesheets', name: 'contributor_timesheets', methods: ['GET'])]
     public function timesheets(Request $request, Contributor $contributor): Response
     {
-        $month     = $request->query->get('month', date('Y-m'));
+        $month = $request->query->get('month', date('Y-m'));
         $startDate = new DateTime($month.'-01');
-        $endDate   = clone $startDate;
+        $endDate = clone $startDate;
         $endDate->modify('last day of this month');
 
         $timesheetRepo = $this->entityManager->getRepository(\App\Entity\Timesheet::class);
-        $timesheets    = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
+        $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
         $projectTotals = $timesheetRepo->getHoursGroupedByProjectForContributor($contributor, $startDate, $endDate);
-        $totalHours    = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
+        $totalHours = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
 
         return $this->render('contributor/timesheets.html.twig', [
-            'contributor'   => $contributor,
-            'timesheets'    => $timesheets,
-            'totalHours'    => $totalHours,
+            'contributor' => $contributor,
+            'timesheets' => $timesheets,
+            'totalHours' => $totalHours,
             'projectTotals' => $projectTotals,
-            'month'         => $month,
-            'startDate'     => $startDate,
-            'endDate'       => $endDate,
+            'month' => $month,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
         ]);
     }
 
@@ -312,8 +312,8 @@ class ContributorController extends AbstractController
         try {
             $this->logger->info('handleAvatarUpload appelé', [
                 'filename' => $file->getClientOriginalName(),
-                'size'     => $file->getSize(),
-                'mime'     => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
             ]);
 
             $result = $this->uploadService->uploadImage($file, 'avatars');
@@ -323,9 +323,9 @@ class ContributorController extends AbstractController
             return $result;
         } catch (Exception $e) {
             $this->logger->error('handleAvatarUpload échoué', [
-                'message'  => $e->getMessage(),
+                'message' => $e->getMessage(),
                 'previous' => $e->getPrevious()?->getMessage(),
-                'trace'    => $e->getTraceAsString(),
+                'trace' => $e->getTraceAsString(),
             ]);
             throw new RuntimeException(sprintf('Erreur lors de l\'upload de l\'avatar: %s', $e->getMessage()), 0, $e);
         }
@@ -334,18 +334,18 @@ class ContributorController extends AbstractController
     #[Route('/export.csv', name: 'contributor_export_csv', methods: ['GET'])]
     public function exportCsv(Request $request): Response
     {
-        $session          = $request->getSession();
-        $saved            = $session->has('contributor_filters') ? (array) $session->get('contributor_filters') : [];
-        $search           = $request->query->get('search', $saved['search'] ?? '');
-        $active           = $request->query->get('active', $saved['active'] ?? 'all');
+        $session = $request->getSession();
+        $saved = $session->has('contributor_filters') ? (array) $session->get('contributor_filters') : [];
+        $search = $request->query->get('search', $saved['search'] ?? '');
+        $active = $request->query->get('active', $saved['active'] ?? 'all');
         $employmentStatus = $request->query->get('employment_status', $saved['employment_status'] ?? 'all');
-        $sort             = $request->query->get('sort', $saved['sort'] ?? 'name');
-        $dir              = $request->query->get('dir', $saved['dir'] ?? 'ASC');
+        $sort = $request->query->get('sort', $saved['sort'] ?? 'name');
+        $dir = $request->query->get('dir', $saved['dir'] ?? 'ASC');
 
-        $qb           = $this->contributorRepository->buildFilteredQuery($search, $active, $employmentStatus, $sort, $dir);
+        $qb = $this->contributorRepository->buildFilteredQuery($search, $active, $employmentStatus, $sort, $dir);
         $contributors = $qb->getQuery()->getResult();
 
-        $rows   = [];
+        $rows = [];
         $header = ['Nom', 'Email', 'Téléphone pro', 'Téléphone perso', 'Actif', 'Profils', 'CJM', 'TJM'];
         $rows[] = $header;
         foreach ($contributors as $c) {

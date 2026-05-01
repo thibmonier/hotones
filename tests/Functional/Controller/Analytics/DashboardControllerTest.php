@@ -55,12 +55,12 @@ class DashboardControllerTest extends WebTestCase
     public static function periodProvider(): array
     {
         return [
-            'today'   => ['today', 200],
-            'week'    => ['week', 200],
-            'month'   => ['month', 200],
+            'today' => ['today', 200],
+            'week' => ['week', 200],
+            'month' => ['month', 200],
             'quarter' => ['quarter', 200],
-            'year'    => ['year', 200],
-            'custom'  => ['custom', 200],
+            'year' => ['year', 200],
+            'custom' => ['custom', 200],
         ];
     }
 
@@ -72,9 +72,9 @@ class DashboardControllerTest extends WebTestCase
         $client->loginUser($user);
 
         $client->request('GET', '/analytics/dashboard', [
-            'period'     => 'custom',
+            'period' => 'custom',
             'start_date' => '2025-01-01',
-            'end_date'   => '2025-01-31',
+            'end_date' => '2025-01-31',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -102,10 +102,10 @@ class DashboardControllerTest extends WebTestCase
         $client->loginUser($user);
 
         $client->request('GET', '/analytics/dashboard', [
-            'period'             => 'month',
-            'project_type'       => 'regie',
+            'period' => 'month',
+            'project_type' => 'regie',
             'project_manager_id' => '1',
-            'sales_person_id'    => '2',
+            'sales_person_id' => '2',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -147,7 +147,7 @@ class DashboardControllerTest extends WebTestCase
         $client->loginUser($user);
 
         $client->request('GET', '/analytics/export-excel', [
-            'period'       => 'month',
+            'period' => 'month',
             'project_type' => 'forfait',
         ]);
 

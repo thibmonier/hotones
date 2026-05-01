@@ -43,13 +43,13 @@ final class ApproveVacationHandlerTest extends KernelTestCase
         $this->setUpMultiTenant();
         $this->requestHandler = static::getContainer()->get(RequestVacationHandler::class);
         $this->approveHandler = static::getContainer()->get(ApproveVacationHandler::class);
-        $this->repository     = static::getContainer()->get(VacationRepositoryInterface::class);
+        $this->repository = static::getContainer()->get(VacationRepositoryInterface::class);
     }
 
     public function testHandlerApprovesPendingVacation(): void
     {
         [$contributor, $manager] = $this->provisionTeam();
-        $vacationId              = $this->submitVacation($contributor);
+        $vacationId = $this->submitVacation($contributor);
 
         ($this->approveHandler)(new ApproveVacationCommand($vacationId->getValue(), $manager->getId()));
 
@@ -60,7 +60,7 @@ final class ApproveVacationHandlerTest extends KernelTestCase
     public function testHandlerRejectsApprovalOfAlreadyApprovedVacation(): void
     {
         [$contributor, $manager] = $this->provisionTeam();
-        $vacationId              = $this->submitVacation($contributor);
+        $vacationId = $this->submitVacation($contributor);
 
         ($this->approveHandler)(new ApproveVacationCommand($vacationId->getValue(), $manager->getId()));
 
@@ -81,7 +81,7 @@ final class ApproveVacationHandlerTest extends KernelTestCase
         $managerUser->setEmail('manager-handler@test.com');
         $managerUser->setPassword('password');
         $managerUser->firstName = 'Manon';
-        $managerUser->lastName  = 'Boss';
+        $managerUser->lastName = 'Boss';
         $managerUser->setRoles(['ROLE_MANAGER']);
         $em->persist($managerUser);
 

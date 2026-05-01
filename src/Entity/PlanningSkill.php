@@ -27,16 +27,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['planning', 'skill'], message: 'Cette compétence est déjà requise pour cette affectation')]
 class PlanningSkill implements CompanyOwnedInterface
 {
-    public const LEVEL_BEGINNER     = 1;
+    public const LEVEL_BEGINNER = 1;
     public const LEVEL_INTERMEDIATE = 2;
-    public const LEVEL_CONFIRMED    = 3;
-    public const LEVEL_EXPERT       = 4;
+    public const LEVEL_CONFIRMED = 3;
+    public const LEVEL_EXPERT = 4;
 
     public const LEVELS = [
-        self::LEVEL_BEGINNER     => 'Débutant',
+        self::LEVEL_BEGINNER => 'Débutant',
         self::LEVEL_INTERMEDIATE => 'Intermédiaire',
-        self::LEVEL_CONFIRMED    => 'Confirmé',
-        self::LEVEL_EXPERT       => 'Expert',
+        self::LEVEL_CONFIRMED => 'Confirmé',
+        self::LEVEL_EXPERT => 'Expert',
     ];
 
     #[ORM\Id]
@@ -254,11 +254,11 @@ class PlanningSkill implements CompanyOwnedInterface
     public function getLevelBadgeClass(): string
     {
         return match ($this->requiredLevel) {
-            self::LEVEL_EXPERT       => 'danger',
-            self::LEVEL_CONFIRMED    => 'warning',
+            self::LEVEL_EXPERT => 'danger',
+            self::LEVEL_CONFIRMED => 'warning',
             self::LEVEL_INTERMEDIATE => 'info',
-            self::LEVEL_BEGINNER     => 'secondary',
-            default                  => 'secondary',
+            self::LEVEL_BEGINNER => 'secondary',
+            default => 'secondary',
         };
     }
 

@@ -98,7 +98,7 @@ class SaasProvider implements CompanyOwnedInterface, Stringable
 
     public function __construct()
     {
-        $this->services  = new ArrayCollection();
+        $this->services = new ArrayCollection();
         $this->createdAt = new DateTime();
     }
 

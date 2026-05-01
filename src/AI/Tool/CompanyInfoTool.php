@@ -36,12 +36,12 @@ final readonly class CompanyInfoTool
         $settings = $this->settingsRepository->getSettings();
 
         return [
-            'structure_cost_coefficient'   => (float) $settings->getStructureCostCoefficient(),
+            'structure_cost_coefficient' => (float) $settings->getStructureCostCoefficient(),
             'employer_charges_coefficient' => (float) $settings->getEmployerChargesCoefficient(),
-            'global_charge_coefficient'    => (float) $settings->getGlobalChargeCoefficient(),
-            'annual_paid_leave_days'       => $settings->getAnnualPaidLeaveDays(),
-            'annual_rtt_days'              => $settings->getAnnualRttDays(),
-            'total_leave_days'             => $settings->getAnnualPaidLeaveDays() + $settings->getAnnualRttDays(),
+            'global_charge_coefficient' => (float) $settings->getGlobalChargeCoefficient(),
+            'annual_paid_leave_days' => $settings->getAnnualPaidLeaveDays(),
+            'annual_rtt_days' => $settings->getAnnualRttDays(),
+            'total_leave_days' => $settings->getAnnualPaidLeaveDays() + $settings->getAnnualRttDays(),
         ];
     }
 }

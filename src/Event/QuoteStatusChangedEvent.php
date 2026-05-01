@@ -17,17 +17,17 @@ class QuoteStatusChangedEvent extends NotificationEvent
         array $recipients,
     ) {
         $type = match ($newStatus) {
-            OrderStatus::WON     => NotificationType::QUOTE_WON,
-            OrderStatus::LOST    => NotificationType::QUOTE_LOST,
+            OrderStatus::WON => NotificationType::QUOTE_WON,
+            OrderStatus::LOST => NotificationType::QUOTE_LOST,
             OrderStatus::PENDING => NotificationType::QUOTE_TO_SIGN,
-            default              => throw new InvalidArgumentException('Invalid status for notification: '.$newStatus->value),
+            default => throw new InvalidArgumentException('Invalid status for notification: '.$newStatus->value),
         };
 
         $title = match ($newStatus) {
-            OrderStatus::WON     => 'Devis gagné !',
-            OrderStatus::LOST    => 'Devis perdu',
+            OrderStatus::WON => 'Devis gagné !',
+            OrderStatus::LOST => 'Devis perdu',
             OrderStatus::PENDING => 'Nouveau devis à signer',
-            default              => '',
+            default => '',
         };
 
         $message = match ($newStatus) {
@@ -57,10 +57,10 @@ class QuoteStatusChangedEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'order_id'        => $order->id,
+                'order_id' => $order->id,
                 'order_reference' => $order->getReference(),
-                'status'          => $newStatus->value,
-                'amount'          => $order->calculateTotal(),
+                'status' => $newStatus->value,
+                'amount' => $order->calculateTotal(),
             ],
             entityType: 'Order',
             entityId: $order->id,

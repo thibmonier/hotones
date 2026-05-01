@@ -55,8 +55,8 @@ Exemples :
     {
         $io = new SymfonyStyle($input, $output);
 
-        $period           = $input->getArgument('period');
-        $granularity      = $input->getOption('granularity');
+        $period = $input->getArgument('period');
+        $granularity = $input->getOption('granularity');
         $forceRecalculate = $input->getOption('force-recalculate');
 
         // Validation de la granularité
@@ -90,7 +90,7 @@ Exemples :
                         case 'quarterly':
                             for ($quarter = 1; $quarter <= 4; ++$quarter) {
                                 $month = (($quarter - 1) * 3) + 1;
-                                $date  = new DateTime("$year-$month-01");
+                                $date = new DateTime("$year-$month-01");
                                 $this->metricsService->calculateMetricsForPeriod($date, 'quarterly');
                                 $io->writeln("  ✓ Q$quarter $year");
                             }
@@ -105,7 +105,7 @@ Exemples :
                 }
             } elseif (preg_match('/^(\d{4})-(\d{1,2})$/', (string) $period, $matches)) {
                 // Mois spécifique
-                $year  = (int) $matches[1];
+                $year = (int) $matches[1];
                 $month = (int) $matches[2];
 
                 if ($month < 1 || $month > 12) {

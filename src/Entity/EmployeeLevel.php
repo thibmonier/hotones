@@ -24,16 +24,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'unique_level_per_company', columns: ['company_id', 'level'])]
 class EmployeeLevel implements CompanyOwnedInterface
 {
-    public const CATEGORY_JUNIOR      = 'junior';
+    public const CATEGORY_JUNIOR = 'junior';
     public const CATEGORY_EXPERIENCED = 'experienced';
-    public const CATEGORY_SENIOR      = 'senior';
-    public const CATEGORY_LEAD        = 'lead';
+    public const CATEGORY_SENIOR = 'senior';
+    public const CATEGORY_LEAD = 'lead';
 
     public const CATEGORIES = [
-        self::CATEGORY_JUNIOR      => 'Junior',
+        self::CATEGORY_JUNIOR => 'Junior',
         self::CATEGORY_EXPERIENCED => 'Expérimenté',
-        self::CATEGORY_SENIOR      => 'Senior',
-        self::CATEGORY_LEAD        => 'Lead / Expert',
+        self::CATEGORY_SENIOR => 'Senior',
+        self::CATEGORY_LEAD => 'Lead / Expert',
     ];
 
     #[ORM\Id]
@@ -159,7 +159,7 @@ class EmployeeLevel implements CompanyOwnedInterface
             $this->level <= 3 => self::CATEGORY_JUNIOR,
             $this->level <= 6 => self::CATEGORY_EXPERIENCED,
             $this->level <= 9 => self::CATEGORY_SENIOR,
-            default           => self::CATEGORY_LEAD,
+            default => self::CATEGORY_LEAD,
         };
     }
 

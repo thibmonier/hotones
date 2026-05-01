@@ -29,7 +29,7 @@ class LoginRedirectSubscriber implements EventSubscriberInterface
 
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
-        $request  = $event->getRequest();
+        $request = $event->getRequest();
         $response = $event->getResponse();
 
         // Si la réponse est déjà une redirection

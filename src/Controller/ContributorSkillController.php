@@ -36,12 +36,12 @@ class ContributorSkillController extends AbstractController
         }
 
         $skillsByCategory = $this->contributorSkillRepository->findByContributorGroupedByCategory($contributor);
-        $countByLevel     = $this->contributorSkillRepository->countByLevelForContributor($contributor);
+        $countByLevel = $this->contributorSkillRepository->countByLevelForContributor($contributor);
 
         return $this->render('contributor_skill/index.html.twig', [
-            'contributor'      => $contributor,
+            'contributor' => $contributor,
             'skillsByCategory' => $skillsByCategory,
-            'countByLevel'     => $countByLevel,
+            'countByLevel' => $countByLevel,
         ]);
     }
 
@@ -70,9 +70,9 @@ class ContributorSkillController extends AbstractController
         }
 
         return $this->render('contributor_skill/new.html.twig', [
-            'contributor'      => $contributor,
+            'contributor' => $contributor,
             'contributorSkill' => $contributorSkill,
-            'form'             => $form,
+            'form' => $form,
         ]);
     }
 
@@ -96,9 +96,9 @@ class ContributorSkillController extends AbstractController
         }
 
         return $this->render('contributor_skill/edit.html.twig', [
-            'contributor'      => $contributorSkill->getContributor(),
+            'contributor' => $contributorSkill->getContributor(),
             'contributorSkill' => $contributorSkill,
-            'form'             => $form,
+            'form' => $form,
         ]);
     }
 
@@ -131,7 +131,7 @@ class ContributorSkillController extends AbstractController
 
         if ($this->isCsrfTokenValid('assess'.$contributorSkill->getId(), $request->request->get('_token'))) {
             $managerLevel = (int) $request->request->get('manager_level');
-            $notes        = $request->request->get('notes');
+            $notes = $request->request->get('notes');
 
             if ($managerLevel >= ContributorSkill::LEVEL_BEGINNER && $managerLevel <= ContributorSkill::LEVEL_EXPERT) {
                 $contributorSkill->setManagerAssessmentLevel($managerLevel);

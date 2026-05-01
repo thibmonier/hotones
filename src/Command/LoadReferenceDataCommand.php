@@ -132,24 +132,24 @@ class LoadReferenceDataCommand extends Command
 
         $profilesDescriptions = [
             'développeur fullstack' => 'Développeur maîtrisant frontend et backend',
-            'développeur frontend'  => 'Spécialisé en interfaces utilisateur (React, Vue, Angular)',
-            'développeur backend'   => 'Spécialisé en API et bases de données',
-            'Lead developer'        => 'Développeur senior avec responsabilités techniques',
-            'chef de projet'        => 'Gestion de projet et coordination équipe',
-            'product owner'         => 'Responsable produit et priorisation backlog',
-            'scrumm master'         => 'Animation cérémonies agiles et facilitation',
-            'directeur de projet'   => 'Direction stratégique des projets',
-            'consultant'            => 'Conseil et expertise métier',
-            'CTO'                   => 'Direction technique',
-            'expert technique'      => 'Expertise technique pointue',
-            'Key account manager'   => 'Gestion grands comptes',
-            'UX designer'           => 'Conception expérience utilisateur',
-            'UI designer'           => 'Conception interface utilisateur',
-            'Directeur artistique'  => 'Direction artistique et créative',
+            'développeur frontend' => 'Spécialisé en interfaces utilisateur (React, Vue, Angular)',
+            'développeur backend' => 'Spécialisé en API et bases de données',
+            'Lead developer' => 'Développeur senior avec responsabilités techniques',
+            'chef de projet' => 'Gestion de projet et coordination équipe',
+            'product owner' => 'Responsable produit et priorisation backlog',
+            'scrumm master' => 'Animation cérémonies agiles et facilitation',
+            'directeur de projet' => 'Direction stratégique des projets',
+            'consultant' => 'Conseil et expertise métier',
+            'CTO' => 'Direction technique',
+            'expert technique' => 'Expertise technique pointue',
+            'Key account manager' => 'Gestion grands comptes',
+            'UX designer' => 'Conception expérience utilisateur',
+            'UI designer' => 'Conception interface utilisateur',
+            'Directeur artistique' => 'Direction artistique et créative',
         ];
 
         $profiles = [];
-        $repo     = $this->entityManager->getRepository(Profile::class);
+        $repo = $this->entityManager->getRepository(Profile::class);
 
         foreach (self::PROFILES as $profileName) {
             $profile = $repo->findOneBy(['name' => $profileName, 'company' => $company]);
@@ -178,30 +178,30 @@ class LoadReferenceDataCommand extends Command
 
         // Mapping des couleurs par technologie
         $colorsMap = [
-            'Php'           => '#777bb4',
-            'Symfony'       => '#000000',
-            'Laravel'       => '#ff2d20',
-            'Java'          => '#007396',
-            'React'         => '#61dafb',
-            'VueJS'         => '#42b883',
-            'Angular'       => '#dd0031',
-            'NextJS'        => '#000000',
-            'NuxtJS'        => '#00dc82',
-            'MariaDB'       => '#003545',
-            'MongoDB'       => '#47a248',
+            'Php' => '#777bb4',
+            'Symfony' => '#000000',
+            'Laravel' => '#ff2d20',
+            'Java' => '#007396',
+            'React' => '#61dafb',
+            'VueJS' => '#42b883',
+            'Angular' => '#dd0031',
+            'NextJS' => '#000000',
+            'NuxtJS' => '#00dc82',
+            'MariaDB' => '#003545',
+            'MongoDB' => '#47a248',
             'ElasticSearch' => '#005571',
-            'Algolia'       => '#5468ff',
-            'Javascript'    => '#f7df1e',
-            'Drupal'        => '#0678be',
-            'Wordpress'     => '#21759b',
-            'Ibexa'         => '#f15a22',
-            'APIPlatform'   => '#38a9e4',
-            'Bootstrap'     => '#7952b3',
-            'Tailwind'      => '#06b6d4',
+            'Algolia' => '#5468ff',
+            'Javascript' => '#f7df1e',
+            'Drupal' => '#0678be',
+            'Wordpress' => '#21759b',
+            'Ibexa' => '#f15a22',
+            'APIPlatform' => '#38a9e4',
+            'Bootstrap' => '#7952b3',
+            'Tailwind' => '#06b6d4',
         ];
 
         $technologies = [];
-        $repo         = $this->entityManager->getRepository(Technology::class);
+        $repo = $this->entityManager->getRepository(Technology::class);
 
         foreach (self::TECHNOLOGIES as $techData) {
             $techName = $techData['name'];
@@ -219,12 +219,12 @@ class LoadReferenceDataCommand extends Command
 
             // Mapper le type vers la catégorie
             $category = match (strtolower($techType)) {
-                'langage'   => 'language',
+                'langage' => 'language',
                 'framework' => 'framework',
                 'base de données relationnelle', 'base de données nosql' => 'database',
                 'moteur de recherche' => 'search',
-                'cms'                 => 'cms',
-                default               => 'tool',
+                'cms' => 'cms',
+                default => 'tool',
             };
 
             $technology->setCategory($category);

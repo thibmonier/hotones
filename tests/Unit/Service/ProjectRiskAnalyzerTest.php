@@ -18,7 +18,7 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     protected function setUp(): void
     {
-        $em             = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $companyContext = $this->createMock(CompanyContext::class);
 
         $this->service = new ProjectRiskAnalyzer($em, $companyContext);
@@ -167,13 +167,13 @@ class ProjectRiskAnalyzerTest extends TestCase
 
         // Project with minimal issues should have high score
         $project = $this->createHealthyProject(90);
-        $result  = $this->service->analyzeProject($project);
+        $result = $this->service->analyzeProject($project);
         $this->assertGreaterThanOrEqual(70, $result['healthScore']); // Allow for some penalties
         $this->assertContains($result['riskLevel'], ['low', 'medium']);
 
         // Project with multiple issues should have low score
         $project = $this->createHealthyProject(30);
-        $result  = $this->service->analyzeProject($project);
+        $result = $this->service->analyzeProject($project);
         $this->assertLessThan(60, $result['healthScore']);
         $this->assertContains($result['riskLevel'], ['high', 'critical']);
     }

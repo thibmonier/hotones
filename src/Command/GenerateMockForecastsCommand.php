@@ -47,24 +47,24 @@ class GenerateMockForecastsCommand extends Command
         // Clear existing forecasts
         $this->em->createQuery('DELETE FROM App\Entity\FactForecast')->execute();
 
-        $forecasts   = [];
+        $forecasts = [];
         $baseRevenue = 50000; // Base revenue of 50k€
-        $now         = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         for ($i = 1; $i <= $months; ++$i) {
             $periodStart = $now->modify("+{$i} months")->modify('first day of this month');
-            $periodEnd   = $periodStart->modify('last day of this month');
+            $periodEnd = $periodStart->modify('last day of this month');
 
             // Add some growth trend (2% per month) and seasonality
-            $monthNum          = (int) $periodStart->format('n');
+            $monthNum = (int) $periodStart->format('n');
             $seasonalityFactor = $this->getSeasonalityFactor($monthNum);
-            $trendGrowth       = 1 + ($i * 0.02); // 2% growth per month
-            $predictedRevenue  = $baseRevenue * $trendGrowth * $seasonalityFactor;
+            $trendGrowth = 1 + ($i * 0.02); // 2% growth per month
+            $predictedRevenue = $baseRevenue * $trendGrowth * $seasonalityFactor;
 
             // Create 3 scenarios
             $scenarios = [
-                'realistic'   => 1.00,
-                'optimistic'  => 1.10,
+                'realistic' => 1.00,
+                'optimistic' => 1.10,
                 'pessimistic' => 0.85,
             ];
 
@@ -83,9 +83,9 @@ class GenerateMockForecastsCommand extends Command
                 $forecast->setConfidenceMax(number_format($revenue * (1 + $confidenceRange), 2, '.', ''));
 
                 $forecast->setMetadata([
-                    'method'             => 'mock_data',
+                    'method' => 'mock_data',
                     'seasonality_factor' => $seasonalityFactor,
-                    'trend_growth'       => $trendGrowth,
+                    'trend_growth' => $trendGrowth,
                 ]);
 
                 $this->em->persist($forecast);
@@ -99,7 +99,7 @@ class GenerateMockForecastsCommand extends Command
 
         // Display summary
         $io->section('Aperçu des prévisions (Scénario réaliste)');
-        $tableData          = [];
+        $tableData = [];
         $realisticForecasts = array_filter($forecasts, fn ($f): bool => $f->getScenario() === 'realistic');
 
         foreach ($realisticForecasts as $forecast) {
@@ -124,15 +124,15 @@ class GenerateMockForecastsCommand extends Command
     private function getSeasonalityFactor(int $month): float
     {
         $seasonality = [
-            1  => 0.95, // January
-            2  => 0.95, // February
-            3  => 1.05, // March
-            4  => 1.10, // April
-            5  => 1.10, // May
-            6  => 1.05, // June
-            7  => 0.85, // July (summer slowdown)
-            8  => 0.85, // August (summer slowdown)
-            9  => 1.10, // September
+            1 => 0.95, // January
+            2 => 0.95, // February
+            3 => 1.05, // March
+            4 => 1.10, // April
+            5 => 1.10, // May
+            6 => 1.05, // June
+            7 => 0.85, // July (summer slowdown)
+            8 => 0.85, // August (summer slowdown)
+            9 => 1.10, // September
             10 => 1.15, // October
             11 => 1.20, // November
             12 => 1.15, // December

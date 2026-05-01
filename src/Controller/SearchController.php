@@ -27,7 +27,7 @@ class SearchController extends AbstractController
 
         if (strlen($query) < 2) {
             return $this->render('search/index.html.twig', [
-                'query'   => $query,
+                'query' => $query,
                 'results' => [],
             ]);
         }
@@ -35,7 +35,7 @@ class SearchController extends AbstractController
         $results = $this->searchService->search($query);
 
         return $this->render('search/index.html.twig', [
-            'query'   => $query,
+            'query' => $query,
             'results' => $results,
         ]);
     }
@@ -58,9 +58,9 @@ class SearchController extends AbstractController
             $formatted[$type] = [];
             foreach ($items as $item) {
                 $formatted[$type][] = [
-                    'id'   => $item->getId(),
+                    'id' => $item->getId(),
                     'name' => $this->getItemName($item),
-                    'url'  => $this->getItemUrl($type, $item->getId()),
+                    'url' => $this->getItemUrl($type, $item->getId()),
                 ];
             }
         }
@@ -71,21 +71,21 @@ class SearchController extends AbstractController
     private function getItemName(object $item): string
     {
         return match (true) {
-            method_exists($item, 'getName')      => $item->getName(),
-            method_exists($item, 'getFullName')  => $item->getFullName(),
+            method_exists($item, 'getName') => $item->getName(),
+            method_exists($item, 'getFullName') => $item->getFullName(),
             method_exists($item, 'getReference') => $item->getReference(),
-            default                              => (string) $item,
+            default => (string) $item,
         };
     }
 
     private function getItemUrl(string $type, int $id): string
     {
         return match ($type) {
-            'projects'     => $this->generateUrl('project_show', ['id' => $id]),
+            'projects' => $this->generateUrl('project_show', ['id' => $id]),
             'contributors' => $this->generateUrl('contributor_show', ['id' => $id]),
-            'orders'       => $this->generateUrl('order_show', ['id' => $id]),
-            'clients'      => $this->generateUrl('client_show', ['id' => $id]),
-            default        => '#',
+            'orders' => $this->generateUrl('order_show', ['id' => $id]),
+            'clients' => $this->generateUrl('client_show', ['id' => $id]),
+            default => '#',
         };
     }
 }

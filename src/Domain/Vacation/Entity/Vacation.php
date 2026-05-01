@@ -46,17 +46,17 @@ final class Vacation implements CompanyOwnedInterface
         DailyHours $dailyHours,
         ?string $reason,
     ) {
-        $this->id          = $id;
-        $this->company     = $company;
+        $this->id = $id;
+        $this->company = $company;
         $this->contributor = $contributor;
-        $this->dateRange   = $dateRange;
-        $this->type        = $type;
-        $this->dailyHours  = $dailyHours;
-        $this->reason      = $reason;
-        $this->status      = VacationStatus::PENDING;
-        $this->createdAt   = new DateTimeImmutable();
-        $this->approvedAt  = null;
-        $this->approvedBy  = null;
+        $this->dateRange = $dateRange;
+        $this->type = $type;
+        $this->dailyHours = $dailyHours;
+        $this->reason = $reason;
+        $this->status = VacationStatus::PENDING;
+        $this->createdAt = new DateTimeImmutable();
+        $this->approvedAt = null;
+        $this->approvedBy = null;
     }
 
     public static function request(
@@ -77,7 +77,7 @@ final class Vacation implements CompanyOwnedInterface
 
     public function approve(User $approvedBy): void
     {
-        $this->status     = $this->status->transitionTo(VacationStatus::APPROVED);
+        $this->status = $this->status->transitionTo(VacationStatus::APPROVED);
         $this->approvedAt = new DateTimeImmutable();
         $this->approvedBy = $approvedBy;
 
@@ -86,7 +86,7 @@ final class Vacation implements CompanyOwnedInterface
 
     public function reject(?string $rejectionReason = null): void
     {
-        $this->status          = $this->status->transitionTo(VacationStatus::REJECTED);
+        $this->status = $this->status->transitionTo(VacationStatus::REJECTED);
         $this->rejectionReason = $rejectionReason;
 
         $this->recordEvent(new VacationRejected($this->id));
@@ -207,7 +207,7 @@ final class Vacation implements CompanyOwnedInterface
      */
     public function pullDomainEvents(): array
     {
-        $events             = $this->domainEvents;
+        $events = $this->domainEvents;
         $this->domainEvents = [];
 
         return $events;

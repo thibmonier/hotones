@@ -39,10 +39,10 @@ class KpiThresholdExceededEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'kpi_name'        => $kpiName,
-                'current_value'   => $currentValue,
+                'kpi_name' => $kpiName,
+                'current_value' => $currentValue,
                 'threshold_value' => $thresholdValue,
-                'condition'       => $condition,
+                'condition' => $condition,
             ],
             entityType: null,
             entityId: null,

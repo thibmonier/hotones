@@ -18,19 +18,19 @@ class ProjectTechnologyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('technology', EntityType::class, [
-            'class'        => Technology::class,
+            'class' => Technology::class,
             'choice_label' => 'name',
-            'label'        => 'Technologie',
-            'placeholder'  => '-- Sélectionner --',
-            'attr'         => ['class' => 'form-control'],
+            'label' => 'Technologie',
+            'placeholder' => '-- Sélectionner --',
+            'attr' => ['class' => 'form-control'],
         ])->add('version', TextType::class, [
-            'label'    => 'Version',
+            'label' => 'Version',
             'required' => false,
-            'attr'     => ['class' => 'form-control', 'placeholder' => 'ex: 8.3.0'],
+            'attr' => ['class' => 'form-control', 'placeholder' => 'ex: 8.3.0'],
         ])->add('notes', TextareaType::class, [
-            'label'    => 'Notes',
+            'label' => 'Notes',
             'required' => false,
-            'attr'     => ['class' => 'form-control', 'rows' => 2],
+            'attr' => ['class' => 'form-control', 'rows' => 2],
         ]);
     }
 

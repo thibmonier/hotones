@@ -36,9 +36,9 @@ class ProjectTest extends TestCase
     public function testProjectPropertiesSettersAndGetters(): void
     {
         $project = new Project();
-        $client  = new Client();
-        $kam     = new User();
-        $pm      = new User();
+        $client = new Client();
+        $kam = new User();
+        $pm = new User();
 
         $project->setName('Test Project');
         $project->setClient($client);
@@ -93,9 +93,9 @@ class ProjectTest extends TestCase
 
     public function testProjectDateManagement(): void
     {
-        $project   = new Project();
+        $project = new Project();
         $startDate = new DateTime('2023-01-15');
-        $endDate   = new DateTime('2023-06-15');
+        $endDate = new DateTime('2023-06-15');
 
         $project->setStartDate($startDate);
         $project->setEndDate($endDate);
@@ -122,7 +122,7 @@ class ProjectTest extends TestCase
     public function testProjectClientAssociation(): void
     {
         $project = new Project();
-        $client  = new Client();
+        $client = new Client();
 
         $project->setClient($client);
         $this->assertSame($client, $project->getClient());

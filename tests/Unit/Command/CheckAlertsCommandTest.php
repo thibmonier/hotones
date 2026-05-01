@@ -22,17 +22,17 @@ class CheckAlertsCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->alertDetectionService = $this->createMock(AlertDetectionService::class);
-        $this->command               = new CheckAlertsCommand($this->alertDetectionService);
-        $this->commandTester         = new CommandTester($this->command);
+        $this->command = new CheckAlertsCommand($this->alertDetectionService);
+        $this->commandTester = new CommandTester($this->command);
     }
 
     public function testExecuteWithNoAlerts(): void
     {
         $stats = [
-            'budget_alerts'   => 0,
-            'margin_alerts'   => 0,
+            'budget_alerts' => 0,
+            'margin_alerts' => 0,
             'overload_alerts' => 0,
-            'payment_alerts'  => 0,
+            'payment_alerts' => 0,
         ];
 
         $this->alertDetectionService
@@ -53,10 +53,10 @@ class CheckAlertsCommandTest extends TestCase
     public function testExecuteWithSingleAlert(): void
     {
         $stats = [
-            'budget_alerts'   => 1,
-            'margin_alerts'   => 0,
+            'budget_alerts' => 1,
+            'margin_alerts' => 0,
             'overload_alerts' => 0,
-            'payment_alerts'  => 0,
+            'payment_alerts' => 0,
         ];
 
         $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
@@ -72,10 +72,10 @@ class CheckAlertsCommandTest extends TestCase
     public function testExecuteWithMultipleAlerts(): void
     {
         $stats = [
-            'budget_alerts'   => 5,
-            'margin_alerts'   => 3,
+            'budget_alerts' => 5,
+            'margin_alerts' => 3,
             'overload_alerts' => 2,
-            'payment_alerts'  => 4,
+            'payment_alerts' => 4,
         ];
 
         $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
@@ -91,10 +91,10 @@ class CheckAlertsCommandTest extends TestCase
     public function testExecuteDisplaysTableWithAllAlertTypes(): void
     {
         $stats = [
-            'budget_alerts'   => 2,
-            'margin_alerts'   => 1,
+            'budget_alerts' => 2,
+            'margin_alerts' => 1,
             'overload_alerts' => 3,
-            'payment_alerts'  => 0,
+            'payment_alerts' => 0,
         ];
 
         $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
@@ -132,10 +132,10 @@ class CheckAlertsCommandTest extends TestCase
             ],
             [
                 'stats' => [
-                    'budget_alerts'   => 10,
-                    'margin_alerts'   => 5,
+                    'budget_alerts' => 10,
+                    'margin_alerts' => 5,
                     'overload_alerts' => 0,
-                    'payment_alerts'  => 15,
+                    'payment_alerts' => 15,
                 ],
                 'total' => 30,
             ],
@@ -146,7 +146,7 @@ class CheckAlertsCommandTest extends TestCase
             $service->method('checkAllAlerts')->willReturn($testCase['stats']);
 
             $command = new CheckAlertsCommand($service);
-            $tester  = new CommandTester($command);
+            $tester = new CommandTester($command);
 
             $tester->execute([]);
             $output = $tester->getDisplay();
@@ -160,10 +160,10 @@ class CheckAlertsCommandTest extends TestCase
         $this->alertDetectionService
             ->method('checkAllAlerts')
             ->willReturn([
-                'budget_alerts'   => 0,
-                'margin_alerts'   => 0,
+                'budget_alerts' => 0,
+                'margin_alerts' => 0,
                 'overload_alerts' => 0,
-                'payment_alerts'  => 0,
+                'payment_alerts' => 0,
             ]);
 
         $exitCode = $this->commandTester->execute([]);
@@ -178,10 +178,10 @@ class CheckAlertsCommandTest extends TestCase
             ->expects($this->once())
             ->method('checkAllAlerts')
             ->willReturn([
-                'budget_alerts'   => 0,
-                'margin_alerts'   => 0,
+                'budget_alerts' => 0,
+                'margin_alerts' => 0,
                 'overload_alerts' => 0,
-                'payment_alerts'  => 0,
+                'payment_alerts' => 0,
             ]);
 
         $this->commandTester->execute([]);
@@ -190,10 +190,10 @@ class CheckAlertsCommandTest extends TestCase
     public function testExecuteHandlesAllStatKeys(): void
     {
         $stats = [
-            'budget_alerts'   => 1,
-            'margin_alerts'   => 2,
+            'budget_alerts' => 1,
+            'margin_alerts' => 2,
             'overload_alerts' => 3,
-            'payment_alerts'  => 4,
+            'payment_alerts' => 4,
         ];
 
         $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);
@@ -207,10 +207,10 @@ class CheckAlertsCommandTest extends TestCase
     public function testExecuteUsesCorrectPluralFormsForTwoAlerts(): void
     {
         $stats = [
-            'budget_alerts'   => 2,
-            'margin_alerts'   => 0,
+            'budget_alerts' => 2,
+            'margin_alerts' => 0,
             'overload_alerts' => 0,
-            'payment_alerts'  => 0,
+            'payment_alerts' => 0,
         ];
 
         $this->alertDetectionService->method('checkAllAlerts')->willReturn($stats);

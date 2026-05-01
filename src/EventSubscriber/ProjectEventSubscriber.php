@@ -75,8 +75,8 @@ class ProjectEventSubscriber
 
         // Tracer les changements de chef de projet
         if (isset($changeSet['projectManager']) && is_array($changeSet['projectManager'])) {
-            $oldPm   = $changeSet['projectManager'][0];
-            $newPm   = $changeSet['projectManager'][1];
+            $oldPm = $changeSet['projectManager'][0];
+            $newPm = $changeSet['projectManager'][1];
             $oldName = $oldPm ? $oldPm->getFullName() : 'Aucun';
             $newName = $newPm ? $newPm->getFullName() : 'Aucun';
             $this->createEvent(

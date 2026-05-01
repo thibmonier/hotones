@@ -19,7 +19,7 @@ class CsrfProtectionTest extends WebTestCase
 
         // Se connecter en tant qu'utilisateur
         $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
-        $testUser       = $userRepository->findOneBy(['email' => 'test@example.com']);
+        $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
             $this->markTestSkipped('Test user not found. Run fixtures first.');
@@ -32,7 +32,7 @@ class CsrfProtectionTest extends WebTestCase
         // Essayer de soumettre un formulaire sans token CSRF
         $client->request('POST', '/projects/new', [
             'project' => [
-                'name'   => 'Test Project',
+                'name' => 'Test Project',
                 'client' => 1,
             ],
         ]);
@@ -51,7 +51,7 @@ class CsrfProtectionTest extends WebTestCase
 
         // Se connecter en tant qu'utilisateur avec droits de suppression
         $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
-        $testUser       = $userRepository->findOneBy(['email' => 'admin@example.com']);
+        $testUser = $userRepository->findOneBy(['email' => 'admin@example.com']);
 
         if (!$testUser) {
             $this->markTestSkipped('Admin user not found. Run fixtures first.');
@@ -80,7 +80,7 @@ class CsrfProtectionTest extends WebTestCase
 
         // Se connecter
         $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
-        $testUser       = $userRepository->findOneBy(['email' => 'test@example.com']);
+        $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
             $this->markTestSkipped('Test user not found. Run fixtures first.');

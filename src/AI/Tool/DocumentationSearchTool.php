@@ -69,8 +69,8 @@ final readonly class DocumentationSearchTool
                 $preview = $this->extractRelevantPreview($content, $query);
 
                 $results[] = [
-                    'file'      => $docFile,
-                    'preview'   => $preview,
+                    'file' => $docFile,
+                    'preview' => $preview,
                     'relevance' => $this->calculateRelevance($content, $query),
                 ];
             }
@@ -87,9 +87,9 @@ final readonly class DocumentationSearchTool
         $results = array_slice($results, 0, $limit);
 
         return [
-            'query'         => $query,
+            'query' => $query,
             'total_results' => count($results),
-            'results'       => $results,
+            'results' => $results,
         ];
     }
 
@@ -104,7 +104,7 @@ final readonly class DocumentationSearchTool
         }
 
         // Extraire 150 caractères avant et après
-        $start  = max(0, $pos - 150);
+        $start = max(0, $pos - 150);
         $length = 300;
 
         $preview = substr($content, $start, $length);
@@ -122,7 +122,7 @@ final readonly class DocumentationSearchTool
     private function calculateRelevance(string $content, string $query): string
     {
         $occurrences = substr_count(strtolower($content), strtolower($query));
-        $firstPos    = stripos($content, $query);
+        $firstPos = stripos($content, $query);
 
         // High: 3+ occurrences OU présent dans les 500 premiers caractères
         if ($occurrences >= 3 || $firstPos !== false && $firstPos < 500) {

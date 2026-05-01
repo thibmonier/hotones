@@ -28,9 +28,9 @@ class MetricsCalculationServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager  = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->companyContext = $this->createMock(CompanyContext::class);
-        $this->logger         = $this->createMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->service = new MetricsCalculationService($this->entityManager, $this->companyContext, $this->logger);
     }
@@ -41,15 +41,15 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock DimTime repository
         $dimTimeRepo = $this->createMock(EntityRepository::class);
-        $dimTime     = $this->createMock(DimTime::class);
+        $dimTime = $this->createMock(DimTime::class);
         $dimTime->method('getDate')->willReturn($date);
 
         $dimTimeRepo->expects($this->once())->method('findOneBy')->with(['date' => $date])->willReturn($dimTime);
 
         // Mock Project repository
-        $projectRepo  = $this->createMock(ProjectRepository::class);
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $projectRepo->expects($this->once())->method('createQueryBuilder')->with('p')->willReturn($queryBuilder);
 
@@ -91,15 +91,15 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock DimTime repository
         $dimTimeRepo = $this->createMock(EntityRepository::class);
-        $dimTime     = new DimTime();
+        $dimTime = new DimTime();
         $dimTime->setDate($date);
 
         $dimTimeRepo->expects($this->once())->method('findOneBy')->willReturn($dimTime);
 
         // Mock Project repository
-        $projectRepo  = $this->createMock(ProjectRepository::class);
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
         $queryBuilder->method('where')->willReturnSelf();
@@ -134,13 +134,13 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock repositories
         $dimTimeRepo = $this->createMock(EntityRepository::class);
-        $dimTime     = new DimTime();
+        $dimTime = new DimTime();
         $dimTime->setDate($date);
         $dimTimeRepo->method('findOneBy')->willReturn($dimTime);
 
-        $projectRepo  = $this->createMock(ProjectRepository::class);
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
         $queryBuilder->method('where')->willReturnSelf();
@@ -177,9 +177,9 @@ class MetricsCalculationServiceTest extends TestCase
         $dimTimeRepo->expects($this->once())->method('findOneBy')->with(['date' => $date])->willReturn(null);
 
         // Mock Project repository
-        $projectRepo  = $this->createMock(ProjectRepository::class);
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
         $queryBuilder->method('where')->willReturnSelf();
@@ -215,7 +215,7 @@ class MetricsCalculationServiceTest extends TestCase
 
     public function testCalculateMetricsForPeriodLogsErrorOnException(): void
     {
-        $date         = new DateTime('2025-01-15');
+        $date = new DateTime('2025-01-15');
         $errorMessage = 'Database connection failed';
 
         // Mock repository to throw exception
@@ -258,10 +258,10 @@ class MetricsCalculationServiceTest extends TestCase
             ->willReturn($deleteQuery);
 
         // Mock repositories for metric calculations
-        $dimTimeRepo  = $this->createMock(EntityRepository::class);
-        $projectRepo  = $this->createMock(ProjectRepository::class);
+        $dimTimeRepo = $this->createMock(EntityRepository::class);
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $dimTimeRepo->method('findOneBy')->willReturn(new DimTime());
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
@@ -303,9 +303,9 @@ class MetricsCalculationServiceTest extends TestCase
         $dimTimeRepo = $this->createMock(EntityRepository::class);
         $dimTimeRepo->method('findOneBy')->willReturn(new DimTime());
 
-        $projectRepo  = $this->createMock(ProjectRepository::class);
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
         $queryBuilder->method('where')->willReturnSelf();

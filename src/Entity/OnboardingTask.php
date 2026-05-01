@@ -274,7 +274,7 @@ class OnboardingTask implements CompanyOwnedInterface
      */
     public function complete(?string $comments = null): self
     {
-        $this->status      = 'termine';
+        $this->status = 'termine';
         $this->completedAt = new DateTimeImmutable();
 
         if (null !== $comments) {
@@ -290,10 +290,10 @@ class OnboardingTask implements CompanyOwnedInterface
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'a_faire'  => 'À faire',
+            'a_faire' => 'À faire',
             'en_cours' => 'En cours',
-            'termine'  => 'Terminé',
-            default    => 'Inconnu',
+            'termine' => 'Terminé',
+            default => 'Inconnu',
         };
     }
 
@@ -303,11 +303,11 @@ class OnboardingTask implements CompanyOwnedInterface
     public function getTypeLabel(): string
     {
         return match ($this->type) {
-            'action'    => 'Action',
-            'lecture'   => 'Lecture',
+            'action' => 'Action',
+            'lecture' => 'Lecture',
             'formation' => 'Formation',
-            'meeting'   => 'Réunion',
-            default     => 'Autre',
+            'meeting' => 'Réunion',
+            default => 'Autre',
         };
     }
 
@@ -317,11 +317,11 @@ class OnboardingTask implements CompanyOwnedInterface
     public function getTypeIcon(): string
     {
         return match ($this->type) {
-            'action'    => 'bx-task',
-            'lecture'   => 'bx-book',
+            'action' => 'bx-task',
+            'lecture' => 'bx-book',
             'formation' => 'bx-graduation',
-            'meeting'   => 'bx-calendar',
-            default     => 'bx-circle',
+            'meeting' => 'bx-calendar',
+            default => 'bx-circle',
         };
     }
 

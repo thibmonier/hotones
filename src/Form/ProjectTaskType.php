@@ -27,17 +27,17 @@ class ProjectTaskType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var ProjectTask|null $task */
-        $task                = $builder->getData();
+        $task = $builder->getData();
         $isLinkedToOrderLine = $task && $task->getOrderLine() !== null;
 
         $builder
             // Ligne budgétaire source (lecture seule)
             ->add('orderLine', EntityType::class, [
-                'class'    => OrderLine::class,
-                'label'    => 'Ligne budgétaire source',
+                'class' => OrderLine::class,
+                'label' => 'Ligne budgétaire source',
                 'required' => false,
                 'disabled' => true, // Toujours en lecture seule
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-select',
                 ],
                 'choice_label' => function (?OrderLine $line) {
@@ -59,8 +59,8 @@ class ProjectTaskType extends AbstractType
             ])
             ->add('name', TextType::class, [
                 'label' => 'Nom de la tâche',
-                'attr'  => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Ex: Développement interface utilisateur',
                 ],
                 'constraints' => [
@@ -69,67 +69,67 @@ class ProjectTaskType extends AbstractType
                 ],
             ])
             ->add('description', TextareaType::class, [
-                'label'    => 'Description',
+                'label' => 'Description',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
-                    'rows'        => 4,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 4,
                     'placeholder' => 'Description détaillée de la tâche (optionnel)',
                 ],
             ])
             ->add('type', ChoiceType::class, [
-                'label'   => 'Type de tâche',
+                'label' => 'Type de tâche',
                 'choices' => ProjectTask::getAvailableTypes(),
-                'attr'    => [
+                'attr' => [
                     'class' => 'form-select',
                 ],
                 'help' => 'Les tâches AVV et Non-vendu ne comptent pas dans la rentabilité',
             ])
             ->add('countsForProfitability', CheckboxType::class, [
-                'label'    => 'Compte dans la rentabilité',
+                'label' => 'Compte dans la rentabilité',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-check-input',
                 ],
                 'help' => 'Décochez si cette tâche ne doit pas être prise en compte dans les calculs de rentabilité',
             ])
             ->add('status', ChoiceType::class, [
-                'label'   => 'Statut',
+                'label' => 'Statut',
                 'choices' => ProjectTask::getAvailableStatuses(),
-                'attr'    => [
+                'attr' => [
                     'class' => 'form-select',
                 ],
             ])
             ->add('estimatedHoursSold', IntegerType::class, [
-                'label'    => 'Heures vendues (estimées)',
+                'label' => 'Heures vendues (estimées)',
                 'required' => false,
                 'disabled' => $isLinkedToOrderLine, // Verrouillé si lié à une ligne de devis
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Ex: 40',
-                    'min'         => 0,
+                    'min' => 0,
                 ],
                 'help' => $isLinkedToOrderLine
                     ? 'Heures vendues (définies par la ligne budgétaire - non modifiable)'
                     : 'Nombre d\'heures vendues au client pour cette tâche',
             ])
             ->add('estimatedHoursRevised', IntegerType::class, [
-                'label'    => 'Heures révisées (estimées)',
+                'label' => 'Heures révisées (estimées)',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Ex: 45',
-                    'min'         => 0,
+                    'min' => 0,
                 ],
                 'help' => 'Estimation révisée du nombre d\'heures nécessaires',
             ])
             ->add('progressPercentage', IntegerType::class, [
                 'label' => 'Avancement (%)',
-                'attr'  => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => '0',
-                    'min'         => 0,
-                    'max'         => 100,
+                    'min' => 0,
+                    'max' => 100,
                 ],
                 'constraints' => [
                     new Assert\Range(
@@ -141,11 +141,11 @@ class ProjectTaskType extends AbstractType
                 'help' => 'Pourcentage d\'avancement de la tâche (0 à 100)',
             ])
             ->add('assignedContributor', EntityType::class, [
-                'class'       => Contributor::class,
-                'label'       => 'Collaborateur assigné',
-                'required'    => false,
+                'class' => Contributor::class,
+                'label' => 'Collaborateur assigné',
+                'required' => false,
                 'placeholder' => 'Sélectionner un collaborateur',
-                'attr'        => [
+                'attr' => [
                     'class' => 'form-select',
                 ],
                 'query_builder' => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er
@@ -160,56 +160,56 @@ class ProjectTaskType extends AbstractType
                 'help' => 'Collaborateur responsable de cette tâche',
             ])
             ->add('requiredProfile', EntityType::class, [
-                'class'       => Profile::class,
-                'label'       => 'Profil requis',
-                'required'    => false,
+                'class' => Profile::class,
+                'label' => 'Profil requis',
+                'required' => false,
                 'placeholder' => 'Sélectionner un profil',
-                'attr'        => [
+                'attr' => [
                     'class' => 'form-select',
                 ],
                 'choice_label' => 'name',
-                'help'         => 'Type de profil nécessaire pour cette tâche',
+                'help' => 'Type de profil nécessaire pour cette tâche',
             ])
             ->add('dailyRate', MoneyType::class, [
-                'label'    => 'Tarif journalier (€)',
+                'label' => 'Tarif journalier (€)',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => '500.00',
                 ],
                 'help' => 'Tarif journalier spécifique à cette tâche (optionnel)',
             ])
             ->add('startDate', DateType::class, [
-                'label'    => 'Date de début',
+                'label' => 'Date de début',
                 'required' => false,
-                'widget'   => 'single_text',
-                'attr'     => [
+                'widget' => 'single_text',
+                'attr' => [
                     'class' => 'form-control',
                 ],
                 'help' => 'Date prévue de début de la tâche',
             ])
             ->add('endDate', DateType::class, [
-                'label'    => 'Date de fin',
+                'label' => 'Date de fin',
                 'required' => false,
-                'widget'   => 'single_text',
-                'attr'     => [
+                'widget' => 'single_text',
+                'attr' => [
                     'class' => 'form-control',
                 ],
                 'help' => 'Date prévue de fin de la tâche',
             ])
             ->add('position', IntegerType::class, [
                 'label' => 'Position',
-                'attr'  => [
+                'attr' => [
                     'class' => 'form-control',
-                    'min'   => 1,
+                    'min' => 1,
                 ],
                 'help' => 'Ordre d\'affichage de la tâche dans la liste',
             ])
             ->add('active', CheckboxType::class, [
-                'label'    => 'Tâche active',
+                'label' => 'Tâche active',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-check-input',
                 ],
                 'help' => 'Décochez pour désactiver cette tâche',

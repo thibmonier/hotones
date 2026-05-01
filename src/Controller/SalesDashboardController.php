@@ -27,24 +27,24 @@ class SalesDashboardController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em, CacheInterface $cache): Response
     {
         $orderRepository = $em->getRepository(Order::class);
-        $userRepository  = $em->getRepository(User::class);
+        $userRepository = $em->getRepository(User::class);
 
         // Période de filtrage (par défaut: année en cours)
-        $year      = $request->query->get('year', date('Y'));
+        $year = $request->query->get('year', date('Y'));
         $startDate = new DateTime("$year-01-01");
-        $endDate   = new DateTime("$year-12-31");
+        $endDate = new DateTime("$year-12-31");
 
         // Filtres utilisateur - gestion robuste des paramètres
-        $userIdParam    = $request->query->get('user_id');
-        $filterUserId   = $userIdParam !== null && $userIdParam !== '' ? (int) $userIdParam : null;
-        $userRoleParam  = $request->query->get('user_role');
+        $userIdParam = $request->query->get('user_id');
+        $filterUserId = $userIdParam !== null && $userIdParam !== '' ? (int) $userIdParam : null;
+        $userRoleParam = $request->query->get('user_role');
         $filterUserRole = $userRoleParam !== null && $userRoleParam !== '' ? $userRoleParam : null;
 
         // Créer une clé de cache basée sur les filtres
         $cacheKey = sprintf(
             'sales_dashboard_%s_%s_%s_%s',
             $year,
-            $filterUserId   ?? 'all',
+            $filterUserId ?? 'all',
             $filterUserRole ?? 'all',
             $startDate->format('Y-m-d'),
         );
@@ -124,12 +124,12 @@ class SalesDashboardController extends AbstractController
         // Complément: Enrichir avec les labels et les devis manquants
         $statsWithLabels = [];
         foreach (OrderStatus::cases() as $status) {
-            $statusValue       = $status->value;
+            $statusValue = $status->value;
             $statsWithLabels[] = [
                 'status' => $statusValue,
-                'label'  => $status->getLabel(),
-                'count'  => $statsByStatus[$statusValue]['count'] ?? 0,
-                'total'  => $statsByStatus[$statusValue]['total'] ?? 0.0,
+                'label' => $status->getLabel(),
+                'count' => $statsByStatus[$statusValue]['count'] ?? 0,
+                'total' => $statsByStatus[$statusValue]['total'] ?? 0.0,
             ];
         }
 
@@ -145,7 +145,7 @@ class SalesDashboardController extends AbstractController
         // Comparaison avec l'année précédente
         $yearComparison = null;
         if ($year > min($availableYears)) {
-            $previousYear   = (int) $year - 1;
+            $previousYear = (int) $year - 1;
             $yearComparison = $orderRepository->getYearComparison(
                 (int) $year,
                 $previousYear,
@@ -158,19 +158,19 @@ class SalesDashboardController extends AbstractController
         $users = $userRepository->findAll();
 
         return $this->render('sales_dashboard/index.html.twig', [
-            'pendingCount'     => $pendingCount,
-            'signedRevenue'    => $signedRevenue,
-            'conversionRate'   => $conversionRate,
+            'pendingCount' => $pendingCount,
+            'signedRevenue' => $signedRevenue,
+            'conversionRate' => $conversionRate,
             'revenueEvolution' => $revenueEvolution,
-            'statsByStatus'    => $statsWithLabels,
-            'recentOrders'     => $recentOrders,
-            'evolutionData'    => $evolutionData,
-            'selectedYear'     => $year,
-            'availableYears'   => $availableYears,
-            'yearComparison'   => $yearComparison,
-            'users'            => $users,
-            'filterUserId'     => $filterUserId,
-            'filterUserRole'   => $filterUserRole,
+            'statsByStatus' => $statsWithLabels,
+            'recentOrders' => $recentOrders,
+            'evolutionData' => $evolutionData,
+            'selectedYear' => $year,
+            'availableYears' => $availableYears,
+            'yearComparison' => $yearComparison,
+            'users' => $users,
+            'filterUserId' => $filterUserId,
+            'filterUserRole' => $filterUserRole,
         ]);
     }
 
@@ -183,9 +183,9 @@ class SalesDashboardController extends AbstractController
         DateTime $startDate,
         DateTime $endDate,
     ): array {
-        $labels      = [];
+        $labels = [];
         $revenueData = [];
-        $volumeData  = [];
+        $volumeData = [];
 
         $currentMonth = clone $startDate;
         while ($currentMonth <= $endDate) {
@@ -193,15 +193,15 @@ class SalesDashboardController extends AbstractController
             $labels[] = $currentMonth->format('M Y');
 
             $revenueData[] = $revenueEvolution[$monthKey] ?? 0.0;
-            $volumeData[]  = $volumeEvolution[$monthKey]  ?? 0;
+            $volumeData[] = $volumeEvolution[$monthKey] ?? 0;
 
             $currentMonth->modify('+1 month');
         }
 
         return [
-            'labels'       => $labels,
+            'labels' => $labels,
             'revenue_data' => $revenueData,
-            'volume_data'  => $volumeData,
+            'volume_data' => $volumeData,
         ];
     }
 
@@ -213,12 +213,12 @@ class SalesDashboardController extends AbstractController
         $conn = $em->getConnection();
 
         // Support both MySQL and PostgreSQL
-        $platform    = $conn->getDatabasePlatform();
+        $platform = $conn->getDatabasePlatform();
         $yearExtract = $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform
             ? 'EXTRACT(YEAR FROM created_at)'
             : 'YEAR(created_at)'; // MySQL/MariaDB
 
-        $sql    = "SELECT DISTINCT {$yearExtract} as year FROM orders ORDER BY year DESC";
+        $sql = "SELECT DISTINCT {$yearExtract} as year FROM orders ORDER BY year DESC";
         $result = $conn->executeQuery($sql)->fetchAllAssociative();
 
         $years = array_map(fn ($row): int => (int) $row['year'], $result);
@@ -239,17 +239,17 @@ class SalesDashboardController extends AbstractController
         $orderRepository = $em->getRepository(Order::class);
 
         // Récupération des mêmes paramètres que le dashboard
-        $year      = $request->query->get('year', date('Y'));
+        $year = $request->query->get('year', date('Y'));
         $startDate = new DateTime("$year-01-01");
-        $endDate   = new DateTime("$year-12-31");
+        $endDate = new DateTime("$year-12-31");
 
-        $userIdParam    = $request->query->get('user_id');
-        $filterUserId   = $userIdParam !== null && $userIdParam !== '' ? (int) $userIdParam : null;
-        $userRoleParam  = $request->query->get('user_role');
+        $userIdParam = $request->query->get('user_id');
+        $filterUserId = $userIdParam !== null && $userIdParam !== '' ? (int) $userIdParam : null;
+        $userRoleParam = $request->query->get('user_role');
         $filterUserRole = $userRoleParam !== null && $userRoleParam !== '' ? $userRoleParam : null;
 
         // Récupération des données
-        $pendingCount  = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
+        $pendingCount = $orderRepository->countByStatus(OrderStatus::PENDING->value, $filterUserId, $filterUserRole);
         $signedRevenue = $orderRepository->getSignedRevenueForPeriod(
             $startDate,
             $endDate,
@@ -257,17 +257,17 @@ class SalesDashboardController extends AbstractController
             $filterUserRole,
         );
         $conversionRate = $orderRepository->getConversionRate($startDate, $endDate, $filterUserId, $filterUserRole);
-        $statsByStatus  = $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
+        $statsByStatus = $orderRepository->getStatsByStatus($startDate, $endDate, $filterUserId, $filterUserRole);
 
         // Enrichir avec les labels
         $statsWithLabels = [];
         foreach (OrderStatus::cases() as $status) {
-            $statusValue       = $status->value;
+            $statusValue = $status->value;
             $statsWithLabels[] = [
                 'status' => $statusValue,
-                'label'  => $status->getLabel(),
-                'count'  => $statsByStatus[$statusValue]['count'] ?? 0,
-                'total'  => $statsByStatus[$statusValue]['total'] ?? 0.0,
+                'label' => $status->getLabel(),
+                'count' => $statsByStatus[$statusValue]['count'] ?? 0,
+                'total' => $statsByStatus[$statusValue]['total'] ?? 0.0,
             ];
         }
 
@@ -275,7 +275,7 @@ class SalesDashboardController extends AbstractController
         $availableYears = $this->getAvailableYears($em);
         $yearComparison = null;
         if ($year > min($availableYears)) {
-            $previousYear   = (int) $year - 1;
+            $previousYear = (int) $year - 1;
             $yearComparison = $orderRepository->getYearComparison(
                 (int) $year,
                 $previousYear,
@@ -286,13 +286,13 @@ class SalesDashboardController extends AbstractController
 
         // Générer le HTML
         $html = $this->renderView('sales_dashboard/pdf.html.twig', [
-            'pendingCount'   => $pendingCount,
-            'signedRevenue'  => $signedRevenue,
+            'pendingCount' => $pendingCount,
+            'signedRevenue' => $signedRevenue,
             'conversionRate' => $conversionRate,
-            'statsByStatus'  => $statsWithLabels,
-            'selectedYear'   => $year,
+            'statsByStatus' => $statsWithLabels,
+            'selectedYear' => $year,
             'yearComparison' => $yearComparison,
-            'generatedAt'    => new DateTime(),
+            'generatedAt' => new DateTime(),
         ]);
 
         // Configuration de Dompdf
@@ -307,7 +307,7 @@ class SalesDashboardController extends AbstractController
 
         // Retourner le PDF
         return new Response($dompdf->output(), 200, [
-            'Content-Type'        => 'application/pdf',
+            'Content-Type' => 'application/pdf',
             'Content-Disposition' => sprintf('attachment; filename="dashboard-commercial-%s.pdf"', $year),
         ]);
     }

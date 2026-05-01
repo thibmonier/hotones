@@ -30,8 +30,8 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
     ): ?ContributorSatisfaction {
         return $this->findOneBy([
             'contributor' => $contributor,
-            'year'        => $year,
-            'month'       => $month,
+            'year' => $year,
+            'month' => $month,
         ]);
     }
 
@@ -122,27 +122,27 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
 
         if (empty($satisfactions)) {
             return [
-                'total'                     => 0,
-                'average_overall'           => null,
-                'average_projects'          => null,
-                'average_team'              => null,
-                'average_work_environment'  => null,
+                'total' => 0,
+                'average_overall' => null,
+                'average_projects' => null,
+                'average_team' => null,
+                'average_work_environment' => null,
                 'average_work_life_balance' => null,
-                'distribution'              => [],
+                'distribution' => [],
             ];
         }
 
-        $total        = count($satisfactions);
+        $total = count($satisfactions);
         $distribution = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
 
-        $sumOverall           = 0;
-        $sumProjects          = 0;
-        $countProjects        = 0;
-        $sumTeam              = 0;
-        $countTeam            = 0;
-        $sumWorkEnvironment   = 0;
+        $sumOverall = 0;
+        $sumProjects = 0;
+        $countProjects = 0;
+        $sumTeam = 0;
+        $countTeam = 0;
+        $sumWorkEnvironment = 0;
         $countWorkEnvironment = 0;
-        $sumWorkLifeBalance   = 0;
+        $sumWorkLifeBalance = 0;
         $countWorkLifeBalance = 0;
 
         foreach ($satisfactions as $satisfaction) {
@@ -172,10 +172,10 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
         }
 
         return [
-            'total'                    => $total,
-            'average_overall'          => round($sumOverall / $total, 2),
-            'average_projects'         => $countProjects        > 0 ? round($sumProjects / $countProjects, 2) : null,
-            'average_team'             => $countTeam            > 0 ? round($sumTeam / $countTeam, 2) : null,
+            'total' => $total,
+            'average_overall' => round($sumOverall / $total, 2),
+            'average_projects' => $countProjects > 0 ? round($sumProjects / $countProjects, 2) : null,
+            'average_team' => $countTeam > 0 ? round($sumTeam / $countTeam, 2) : null,
             'average_work_environment' => $countWorkEnvironment > 0
                 ? round($sumWorkEnvironment / $countWorkEnvironment, 2)
                 : null,
@@ -195,27 +195,27 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
 
         if (empty($satisfactions)) {
             return [
-                'total'                     => 0,
-                'average_overall'           => null,
-                'average_projects'          => null,
-                'average_team'              => null,
-                'average_work_environment'  => null,
+                'total' => 0,
+                'average_overall' => null,
+                'average_projects' => null,
+                'average_team' => null,
+                'average_work_environment' => null,
                 'average_work_life_balance' => null,
-                'monthly_averages'          => [],
+                'monthly_averages' => [],
             ];
         }
 
-        $total       = count($satisfactions);
+        $total = count($satisfactions);
         $monthlyData = [];
 
-        $sumOverall           = 0;
-        $sumProjects          = 0;
-        $countProjects        = 0;
-        $sumTeam              = 0;
-        $countTeam            = 0;
-        $sumWorkEnvironment   = 0;
+        $sumOverall = 0;
+        $sumProjects = 0;
+        $countProjects = 0;
+        $sumTeam = 0;
+        $countTeam = 0;
+        $sumWorkEnvironment = 0;
         $countWorkEnvironment = 0;
-        $sumWorkLifeBalance   = 0;
+        $sumWorkLifeBalance = 0;
         $countWorkLifeBalance = 0;
 
         foreach ($satisfactions as $satisfaction) {
@@ -224,7 +224,7 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
             if (!isset($monthlyData[$month])) {
                 $monthlyData[$month] = [
                     'count' => 0,
-                    'sum'   => 0,
+                    'sum' => 0,
                 ];
             }
 
@@ -265,10 +265,10 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
         }
 
         return [
-            'total'                    => $total,
-            'average_overall'          => round($sumOverall / $total, 2),
-            'average_projects'         => $countProjects        > 0 ? round($sumProjects / $countProjects, 2) : null,
-            'average_team'             => $countTeam            > 0 ? round($sumTeam / $countTeam, 2) : null,
+            'total' => $total,
+            'average_overall' => round($sumOverall / $total, 2),
+            'average_projects' => $countProjects > 0 ? round($sumProjects / $countProjects, 2) : null,
+            'average_team' => $countTeam > 0 ? round($sumTeam / $countTeam, 2) : null,
             'average_work_environment' => $countWorkEnvironment > 0
                 ? round($sumWorkEnvironment / $countWorkEnvironment, 2)
                 : null,
@@ -323,11 +323,11 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
      */
     public function getProjectSatisfactionEvolution(int $projectId, int $months = 12): array
     {
-        $endDate   = new DateTime();
+        $endDate = new DateTime();
         $startDate = (clone $endDate)->modify("-{$months} months");
 
         // Récupérer les contributeurs ayant travaillé sur le projet
-        $company        = $this->companyContext->getCurrentCompany();
+        $company = $this->companyContext->getCurrentCompany();
         $contributorIds = $this
             ->getEntityManager()
             ->createQueryBuilder()
@@ -373,16 +373,16 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
 
             if (!isset($grouped[$period])) {
                 $grouped[$period] = [
-                    'period'               => $period,
-                    'responseCount'        => 0,
-                    'sumOverall'           => 0,
-                    'sumProjects'          => 0,
-                    'countProjects'        => 0,
-                    'sumTeam'              => 0,
-                    'countTeam'            => 0,
-                    'sumWorkEnvironment'   => 0,
+                    'period' => $period,
+                    'responseCount' => 0,
+                    'sumOverall' => 0,
+                    'sumProjects' => 0,
+                    'countProjects' => 0,
+                    'sumTeam' => 0,
+                    'countTeam' => 0,
+                    'sumWorkEnvironment' => 0,
                     'countWorkEnvironment' => 0,
-                    'sumWorkLifeBalance'   => 0,
+                    'sumWorkLifeBalance' => 0,
                     'countWorkLifeBalance' => 0,
                 ];
             }
@@ -414,15 +414,15 @@ class ContributorSatisfactionRepository extends CompanyAwareRepository
         // Calculer les moyennes
         $result = [];
         foreach ($grouped as $period => $data) {
-            $count    = $data['responseCount'];
+            $count = $data['responseCount'];
             $result[] = [
-                'period'        => $period,
+                'period' => $period,
                 'responseCount' => $count,
-                'avgOverall'    => round($data['sumOverall'] / $count, 2),
-                'avgProjects'   => $data['countProjects'] > 0
+                'avgOverall' => round($data['sumOverall'] / $count, 2),
+                'avgProjects' => $data['countProjects'] > 0
                     ? round($data['sumProjects'] / $data['countProjects'], 2)
                     : null,
-                'avgTeam'            => $data['countTeam']            > 0 ? round($data['sumTeam'] / $data['countTeam'], 2) : null,
+                'avgTeam' => $data['countTeam'] > 0 ? round($data['sumTeam'] / $data['countTeam'], 2) : null,
                 'avgWorkEnvironment' => $data['countWorkEnvironment'] > 0
                     ? round($data['sumWorkEnvironment'] / $data['countWorkEnvironment'], 2)
                     : null,

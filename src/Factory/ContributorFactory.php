@@ -38,17 +38,17 @@ final class ContributorFactory extends PersistentObjectFactory
         }
 
         return [
-            'company'           => $company ?? CompanyFactory::new(),
-            'firstName'         => $faker->firstName(),
-            'lastName'          => $faker->lastName(),
-            'email'             => $faker->optional()->safeEmail(),
-            'phonePersonal'     => $faker->optional()->phoneNumber(),
+            'company' => $company ?? CompanyFactory::new(),
+            'firstName' => $faker->firstName(),
+            'lastName' => $faker->lastName(),
+            'email' => $faker->optional()->safeEmail(),
+            'phonePersonal' => $faker->optional()->phoneNumber(),
             'phoneProfessional' => $faker->optional()->phoneNumber(),
-            'address'           => $faker->optional()->address(),
-            'notes'             => $faker->optional()->sentence(12),
-            'active'            => true,
-            'user'              => null,
-            'avatarFilename'    => null,
+            'address' => $faker->optional()->address(),
+            'notes' => $faker->optional()->sentence(12),
+            'active' => true,
+            'user' => null,
+            'avatarFilename' => null,
             // profiles set in fixtures as it's ManyToMany with domain rules
         ];
     }
@@ -58,7 +58,7 @@ final class ContributorFactory extends PersistentObjectFactory
     {
         return $this->afterInstantiate(function (Contributor $contributor): void {
             // Create an active employment period with CJM/TJM
-            $faker            = self::faker();
+            $faker = self::faker();
             $employmentPeriod = new EmploymentPeriod();
             $employmentPeriod
                 ->setCompany($contributor->getCompany())

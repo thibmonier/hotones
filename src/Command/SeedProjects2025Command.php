@@ -60,8 +60,8 @@ class SeedProjects2025Command extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io    = new SymfonyStyle($input, $output);
-        $year  = (int) $input->getOption('year');
+        $io = new SymfonyStyle($input, $output);
+        $year = (int) $input->getOption('year');
         $count = (int) $input->getOption('count');
 
         $io->title("Génération de $count projets de test pour $year");
@@ -95,9 +95,9 @@ class SeedProjects2025Command extends Command
             }
 
             // Pré-requis (profils, contributeurs, technos)
-            $profiles     = $this->ensureProfiles($io, $company);
+            $profiles = $this->ensureProfiles($io, $company);
             $contributors = $this->ensureContributors($io, $profiles, $company);
-            $technos      = $this->ensureTechnologies($io);
+            $technos = $this->ensureTechnologies($io);
 
             // Génération des projets
             $projects = $this->createProjects($io, $year, $count, $technos, $company);
@@ -140,8 +140,8 @@ class SeedProjects2025Command extends Command
 
     private function ensureProfiles(SymfonyStyle $io, Company $company): array
     {
-        $repo     = $this->em->getRepository(Profile::class);
-        $names    = ['Développeur Frontend', 'Développeur Backend', 'Chef de projet', 'Designer UX/UI', 'DevOps'];
+        $repo = $this->em->getRepository(Profile::class);
+        $names = ['Développeur Frontend', 'Développeur Backend', 'Chef de projet', 'Designer UX/UI', 'DevOps'];
         $profiles = [];
         foreach ($names as $name) {
             $p = $repo->findOneBy(['name' => $name, 'company' => $company]);
@@ -159,7 +159,7 @@ class SeedProjects2025Command extends Command
 
     private function ensureContributors(SymfonyStyle $io, array $profiles, Company $company): array
     {
-        $repo     = $this->em->getRepository(Contributor::class);
+        $repo = $this->em->getRepository(Contributor::class);
         $existing = $repo->findBy(['active' => true]);
         if (count($existing) >= 5) {
             return $existing;
@@ -199,20 +199,20 @@ class SeedProjects2025Command extends Command
 
     private function ensureTechnologies(SymfonyStyle $io): array
     {
-        $repo     = $this->em->getRepository(Technology::class);
+        $repo = $this->em->getRepository(Technology::class);
         $existing = $repo->findBy(['active' => true]);
         if (count($existing) > 0) {
             return $existing;
         }
-        $techs   = ['Symfony', 'React', 'Vue.js', 'Angular', 'Node.js', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis'];
+        $techs = ['Symfony', 'React', 'Vue.js', 'Angular', 'Node.js', 'Docker', 'AWS', 'MySQL', 'PostgreSQL', 'Redis'];
         $created = [];
         foreach ($techs as $t) {
             $tech = $repo->findOneBy([
-                'name'    => $t,
+                'name' => $t,
                 'company' => $this->em->getRepository(Company::class)->findOneBy([]),
             ]);
             if (!$tech) {
-                $tech    = new Technology();
+                $tech = new Technology();
                 $company = $this->em->getRepository(Company::class)->findOneBy([]);
                 $tech->setName($t)->setCategory('tool')->setActive(true)->setCompany($company);
                 $this->em->persist($tech);
@@ -236,7 +236,7 @@ class SeedProjects2025Command extends Command
             $project->setStatus(random_int(0, 10) > 7 ? 'completed' : 'active');
 
             $start = new DateTime(sprintf('%d-%02d-%02d', $year, random_int(1, 11), random_int(1, 28)));
-            $end   = (clone $start)->modify('+'.random_int(30, 180).' days');
+            $end = (clone $start)->modify('+'.random_int(30, 180).' days');
             if ((int) $end->format('Y') > $year) {
                 $end = new DateTime(sprintf('%d-12-15', $year));
             }
@@ -284,7 +284,7 @@ class SeedProjects2025Command extends Command
         $this->setBlameable($order, $user);
 
         // validatedAt is type 'date' which requires DateTime, not DateTimeImmutable
-        $validatedDate      = $createdAt->modify('+'.random_int(1, 30).' days');
+        $validatedDate = $createdAt->modify('+'.random_int(1, 30).' days');
         $order->validatedAt = DateTime::createFromImmutable($validatedDate);
 
         // Section prestations
@@ -346,7 +346,7 @@ class SeedProjects2025Command extends Command
     private function createTasksForProject(Project $project, array $profiles, array $contributors): void
     {
         $positions = 1;
-        $numTasks  = random_int(3, 6);
+        $numTasks = random_int(3, 6);
         for ($i = 0; $i < $numTasks; ++$i) {
             $task = new ProjectTask();
             $task->setCompany($project->getCompany());
@@ -374,7 +374,7 @@ class SeedProjects2025Command extends Command
             return;
         }
         $start = $project->getStartDate() ?: new DateTime("$year-01-01");
-        $end   = $project->getEndDate() ?: new DateTime("$year-12-20");
+        $end = $project->getEndDate() ?: new DateTime("$year-12-20");
         if ((int) $start->format('Y') < $year) {
             $start = new DateTime("$year-01-01");
         }
@@ -407,16 +407,16 @@ class SeedProjects2025Command extends Command
 
     private function generateOrderNumberForDate(DateTimeInterface $date): string
     {
-        $year  = $date->format('Y');
+        $year = $date->format('Y');
         $month = $date->format('m');
-        $key   = $year.$month;
+        $key = $year.$month;
 
         if (!isset($this->orderCounters[$key])) {
             $last = $this->em->getRepository(Order::class)->findLastOrderNumberForMonth($year, $month);
 
             $lastIncrement = 0;
             if ($last) {
-                $lastNumber    = $last->getOrderNumber();
+                $lastNumber = $last->getOrderNumber();
                 $lastIncrement = (int) substr((string) $lastNumber, -3);
             }
             $this->orderCounters[$key] = $lastIncrement;

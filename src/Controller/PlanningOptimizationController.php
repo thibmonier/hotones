@@ -55,7 +55,7 @@ class PlanningOptimizationController extends AbstractController
         $cacheItem = $this->cachePool->getItem($cacheKey);
         if ($cacheItem->isHit()) {
             $fromCache = true;
-            $result    = $cacheItem->get();
+            $result = $cacheItem->get();
         } else {
             $result = $this->optimizer->generateRecommendations($startDate, $endDate);
             $cacheItem->set($result);
@@ -72,21 +72,21 @@ class PlanningOptimizationController extends AbstractController
                 $item->expiresAfter(7200);
 
                 return $this->aiAssistant->enhanceRecommendations([
-                    'analysis'        => $result['analysis'],
+                    'analysis' => $result['analysis'],
                     'recommendations' => $result['recommendations'],
-                    'projects'        => $this->projectRepository->findActiveOrderedByName(),
+                    'projects' => $this->projectRepository->findActiveOrderedByName(),
                 ]);
             });
         }
 
         return $this->render('planning_optimization/index.html.twig', [
             'recommendations' => $result['recommendations'],
-            'analysis'        => $result['analysis'],
-            'summary'         => $result['summary'],
-            'period'          => $result['period'],
-            'thresholds'      => $this->taceAnalyzer->getThresholds(),
-            'ai_enhanced'     => $aiEnhanced,
-            'from_cache'      => $fromCache,
+            'analysis' => $result['analysis'],
+            'summary' => $result['summary'],
+            'period' => $result['period'],
+            'thresholds' => $this->taceAnalyzer->getThresholds(),
+            'ai_enhanced' => $aiEnhanced,
+            'from_cache' => $fromCache,
         ]);
     }
 
@@ -94,19 +94,19 @@ class PlanningOptimizationController extends AbstractController
     public function dashboard(): Response
     {
         $startDate = new DateTime('first day of this month');
-        $endDate   = new DateTime('last day of next month');
+        $endDate = new DateTime('last day of next month');
 
         // Analyse rapide pour le dashboard
         $analysis = $this->taceAnalyzer->analyzeAllContributors($startDate, $endDate);
-        $result   = $this->optimizer->generateRecommendations($startDate, $endDate);
+        $result = $this->optimizer->generateRecommendations($startDate, $endDate);
 
         return $this->render('planning_optimization/dashboard.html.twig', [
-            'critical_count'      => count($analysis['critical']),
-            'overloaded_count'    => count($analysis['overloaded']),
+            'critical_count' => count($analysis['critical']),
+            'overloaded_count' => count($analysis['overloaded']),
             'underutilized_count' => count($analysis['underutilized']),
-            'optimal_count'       => count($analysis['optimal']),
+            'optimal_count' => count($analysis['optimal']),
             'top_recommendations' => array_slice($result['recommendations'], 0, 5),
-            'summary'             => $result['summary'],
+            'summary' => $result['summary'],
         ]);
     }
 
@@ -124,17 +124,17 @@ class PlanningOptimizationController extends AbstractController
         $result = $this->optimizer->generateRecommendations($startDate, $endDate);
 
         return $this->json([
-            'success'         => true,
+            'success' => true,
             'recommendations' => array_map(fn ($rec): array => [
-                'type'           => $rec['type'],
-                'title'          => $rec['title'],
-                'description'    => $rec['description'],
+                'type' => $rec['type'],
+                'title' => $rec['title'],
+                'description' => $rec['description'],
                 'priority_score' => $rec['priority_score'],
-                'severity'       => $rec['severity_level'],
-                'impact'         => $rec['expected_impact'] ?? null,
-                'contributor'    => $rec['contributor']->getFullName(),
-                'target'         => $rec['target']?->getFullName() ?? null,
-                'project'        => $rec['project']?->getName()    ?? null,
+                'severity' => $rec['severity_level'],
+                'impact' => $rec['expected_impact'] ?? null,
+                'contributor' => $rec['contributor']->getFullName(),
+                'target' => $rec['target']?->getFullName() ?? null,
+                'project' => $rec['project']?->getName() ?? null,
             ], $result['recommendations']),
             'summary' => $result['summary'],
         ]);
@@ -208,7 +208,7 @@ class PlanningOptimizationController extends AbstractController
         // Rediriger vers la page d\'optimisation
         return $this->redirectToRoute('planning_optimization_index', [
             'start_date' => $startDate->format('Y-m-d'),
-            'end_date'   => $endDate->format('Y-m-d'),
+            'end_date' => $endDate->format('Y-m-d'),
         ]);
     }
 }

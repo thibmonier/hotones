@@ -28,11 +28,11 @@ class WorkloadPredictionController extends AbstractController
     public function prediction(Request $request): Response
     {
         // Récupérer les filtres depuis la requête
-        $profileIds     = $request->query->all('profiles');
+        $profileIds = $request->query->all('profiles');
         $contributorIds = $request->query->all('contributors');
 
         // Convertir en entiers
-        $profileIds     = array_map(intval(...), array_filter($profileIds, fn ($v): bool => $v !== null && $v !== ''));
+        $profileIds = array_map(intval(...), array_filter($profileIds, fn ($v): bool => $v !== null && $v !== ''));
         $contributorIds = array_map(
             intval(...),
             array_filter($contributorIds, fn ($v): bool => $v !== null && $v !== ''),
@@ -52,13 +52,13 @@ class WorkloadPredictionController extends AbstractController
         ]);
 
         return $this->render('staffing/prediction.html.twig', [
-            'pipeline'             => $analysis['pipeline'],
-            'workloadByMonth'      => $analysis['workloadByMonth'],
-            'alerts'               => $analysis['alerts'],
-            'totalPotentialDays'   => $analysis['totalPotentialDays'],
-            'allProfiles'          => $allProfiles,
-            'allContributors'      => $allContributors,
-            'selectedProfiles'     => $profileIds,
+            'pipeline' => $analysis['pipeline'],
+            'workloadByMonth' => $analysis['workloadByMonth'],
+            'alerts' => $analysis['alerts'],
+            'totalPotentialDays' => $analysis['totalPotentialDays'],
+            'allProfiles' => $allProfiles,
+            'allContributors' => $allContributors,
+            'selectedProfiles' => $profileIds,
             'selectedContributors' => $contributorIds,
         ]);
     }

@@ -30,7 +30,7 @@ class CreateUserCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager  = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
 
         // Mock repositories
@@ -40,7 +40,7 @@ class CreateUserCommandTest extends TestCase
         $companyRepository = $this->createMock(CompanyRepository::class);
 
         // Create a mock Company
-        $company    = new Company();
+        $company = new Company();
         $reflection = new ReflectionClass($company);
         $idProperty = $reflection->getProperty('id');
         $idProperty->setValue($company, 1);
@@ -56,21 +56,21 @@ class CreateUserCommandTest extends TestCase
         $this->entityManager
             ->method('getRepository')
             ->willReturnCallback(fn ($entityClass): \PHPUnit\Framework\MockObject\MockObject => match ($entityClass) {
-                User::class    => $userRepository,
+                User::class => $userRepository,
                 Company::class => $companyRepository,
-                default        => throw new Exception('Unexpected repository requested: '.$entityClass),
+                default => throw new Exception('Unexpected repository requested: '.$entityClass),
             });
 
-        $this->command       = new CreateUserCommand($this->entityManager, $this->passwordHasher);
+        $this->command = new CreateUserCommand($this->entityManager, $this->passwordHasher);
         $this->commandTester = new CommandTester($this->command);
     }
 
     public function testExecuteCreatesUserSuccessfully(): void
     {
-        $email     = 'test@example.com';
-        $password  = 'secure123';
+        $email = 'test@example.com';
+        $password = 'secure123';
         $firstName = 'John';
-        $lastName  = 'Doe';
+        $lastName = 'Doe';
 
         // Mock password hashing
         $hashedPassword = '$2y$13$hashedpassword';
@@ -92,10 +92,10 @@ class CreateUserCommandTest extends TestCase
 
         // Execute command
         $exitCode = $this->commandTester->execute([
-            'email'     => $email,
-            'password'  => $password,
+            'email' => $email,
+            'password' => $password,
             'firstName' => $firstName,
-            'lastName'  => $lastName,
+            'lastName' => $lastName,
         ]);
 
         // Verify command succeeded
@@ -136,17 +136,17 @@ class CreateUserCommandTest extends TestCase
                 if ($entity instanceof Contributor) {
                     // Simulate database assigning an ID after flush
                     $reflection = new ReflectionClass($entity);
-                    $property   = $reflection->getProperty('id');
+                    $property = $reflection->getProperty('id');
                     $property->setValue($entity, $contributorId);
                 }
             });
 
         // Execute command
         $this->commandTester->execute([
-            'email'     => $email,
-            'password'  => 'pass',
+            'email' => $email,
+            'password' => 'pass',
             'firstName' => 'Test',
-            'lastName'  => 'User',
+            'lastName' => 'User',
         ]);
 
         // Verify output contains email and contributor ID
@@ -158,7 +158,7 @@ class CreateUserCommandTest extends TestCase
 
     public function testExecuteHashesPassword(): void
     {
-        $plainPassword  = 'my-secret-password';
+        $plainPassword = 'my-secret-password';
         $hashedPassword = '$2y$13$very.long.hashed.password.string';
 
         // Verify hashPassword is called with correct arguments
@@ -172,10 +172,10 @@ class CreateUserCommandTest extends TestCase
             ->willReturn($hashedPassword);
 
         $this->commandTester->execute([
-            'email'     => 'hash@test.com',
-            'password'  => $plainPassword,
+            'email' => 'hash@test.com',
+            'password' => $plainPassword,
             'firstName' => 'Hash',
-            'lastName'  => 'Test',
+            'lastName' => 'Test',
         ]);
 
         // Success indicates password was hashed
@@ -194,10 +194,10 @@ class CreateUserCommandTest extends TestCase
             });
 
         $this->commandTester->execute([
-            'email'     => 'order@test.com',
-            'password'  => 'pass',
+            'email' => 'order@test.com',
+            'password' => 'pass',
             'firstName' => 'Order',
-            'lastName'  => 'Test',
+            'lastName' => 'Test',
         ]);
 
         // Verify User is persisted before Contributor
@@ -217,10 +217,10 @@ class CreateUserCommandTest extends TestCase
             });
 
         $this->commandTester->execute([
-            'email'     => 'flush@test.com',
-            'password'  => 'pass',
+            'email' => 'flush@test.com',
+            'password' => 'pass',
             'firstName' => 'Flush',
-            'lastName'  => 'Test',
+            'lastName' => 'Test',
         ]);
 
         // Verify flush was called twice (after user, after contributor)
@@ -241,10 +241,10 @@ class CreateUserCommandTest extends TestCase
             });
 
         $this->commandTester->execute([
-            'email'     => 'role@test.com',
-            'password'  => 'pass',
+            'email' => 'role@test.com',
+            'password' => 'pass',
             'firstName' => 'Role',
-            'lastName'  => 'Test',
+            'lastName' => 'Test',
         ]);
 
         $this->assertNotNull($capturedUser);
@@ -255,7 +255,7 @@ class CreateUserCommandTest extends TestCase
     {
         $this->passwordHasher->method('hashPassword')->willReturn('hashed');
 
-        $capturedUser        = null;
+        $capturedUser = null;
         $capturedContributor = null;
 
         $this->entityManager
@@ -270,10 +270,10 @@ class CreateUserCommandTest extends TestCase
             });
 
         $this->commandTester->execute([
-            'email'     => 'link@test.com',
-            'password'  => 'pass',
+            'email' => 'link@test.com',
+            'password' => 'pass',
             'firstName' => 'Link',
-            'lastName'  => 'Test',
+            'lastName' => 'Test',
         ]);
 
         $this->assertNotNull($capturedUser);
@@ -295,10 +295,10 @@ class CreateUserCommandTest extends TestCase
             });
 
         $this->commandTester->execute([
-            'email'     => 'active@test.com',
-            'password'  => 'pass',
+            'email' => 'active@test.com',
+            'password' => 'pass',
             'firstName' => 'Active',
-            'lastName'  => 'Test',
+            'lastName' => 'Test',
         ]);
 
         $this->assertNotNull($capturedContributor);

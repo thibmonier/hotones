@@ -60,7 +60,7 @@ class ProjectPlanningAssistant
         }
 
         $suggestions = [];
-        $unassigned  = [];
+        $unassigned = [];
 
         // Récupérer toutes les tâches actives du projet qui nécessitent une affectation
         $tasks = $this->getUnassignedTasks($project);
@@ -80,8 +80,8 @@ class ProjectPlanningAssistant
 
         return [
             'suggestions' => $suggestions,
-            'unassigned'  => $unassigned,
-            'statistics'  => $this->calculateStatistics($suggestions, $unassigned, $tasks),
+            'unassigned' => $unassigned,
+            'statistics' => $this->calculateStatistics($suggestions, $unassigned, $tasks),
         ];
     }
 
@@ -117,14 +117,14 @@ class ProjectPlanningAssistant
         }
 
         return [
-            'task'        => $task,
+            'task' => $task,
             'contributor' => $bestCandidate['contributor'],
-            'startDate'   => $bestCandidate['startDate'],
-            'endDate'     => $bestCandidate['endDate'],
-            'dailyHours'  => $bestCandidate['dailyHours'],
-            'confidence'  => $bestCandidate['confidence'],
-            'reasoning'   => $bestCandidate['reasoning'],
-            'warnings'    => $bestCandidate['warnings'],
+            'startDate' => $bestCandidate['startDate'],
+            'endDate' => $bestCandidate['endDate'],
+            'dailyHours' => $bestCandidate['dailyHours'],
+            'confidence' => $bestCandidate['confidence'],
+            'reasoning' => $bestCandidate['reasoning'],
+            'warnings' => $bestCandidate['warnings'],
         ];
     }
 
@@ -180,7 +180,7 @@ class ProjectPlanningAssistant
 
         // Calculer la disponibilité (0-1)
         $maxDailyHours = $dailyHours;
-        $availability  = $maxDailyHours > 0 ? max(0, 1 - ($currentLoad / $maxDailyHours)) : 0;
+        $availability = $maxDailyHours > 0 ? max(0, 1 - ($currentLoad / $maxDailyHours)) : 0;
 
         // Vérifier les congés
         $hasVacations = $this->hasVacations($contributor, $startDate, $endDate);
@@ -193,12 +193,12 @@ class ProjectPlanningAssistant
         }
 
         return [
-            'contributor'  => $contributor,
+            'contributor' => $contributor,
             'availability' => $availability,
-            'startDate'    => $startDate,
-            'endDate'      => $endDate,
-            'dailyHours'   => min($dailyHours, $dailyHours * $availability),
-            'currentLoad'  => $currentLoad,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'dailyHours' => min($dailyHours, $dailyHours * $availability),
+            'currentLoad' => $currentLoad,
         ];
     }
 
@@ -218,12 +218,12 @@ class ProjectPlanningAssistant
         // Scorer chaque candidat
         $scoredCandidates = [];
         foreach ($candidates as $candidate) {
-            $score              = $this->scoreCandidate($candidate, $task);
+            $score = $this->scoreCandidate($candidate, $task);
             $scoredCandidates[] = array_merge($candidate, [
-                'score'      => $score['total'],
+                'score' => $score['total'],
                 'confidence' => $score['confidence'],
-                'reasoning'  => $score['reasoning'],
-                'warnings'   => $score['warnings'],
+                'reasoning' => $score['reasoning'],
+                'warnings' => $score['warnings'],
             ]);
         }
 
@@ -238,9 +238,9 @@ class ProjectPlanningAssistant
      */
     private function scoreCandidate(array $candidate, ProjectTask $task): array
     {
-        $score     = 0;
+        $score = 0;
         $reasoning = [];
-        $warnings  = [];
+        $warnings = [];
 
         // Disponibilité (40 points max)
         $availabilityScore = $candidate['availability'] * 40;
@@ -271,10 +271,10 @@ class ProjectPlanningAssistant
         $confidence = min(1, $score / 100);
 
         return [
-            'total'      => $score,
+            'total' => $score,
             'confidence' => $confidence,
-            'reasoning'  => implode(', ', $reasoning),
-            'warnings'   => $warnings,
+            'reasoning' => implode(', ', $reasoning),
+            'warnings' => $warnings,
         ];
     }
 
@@ -316,8 +316,8 @@ class ProjectPlanningAssistant
      */
     private function calculateEndDate(DateTime $startDate, float $days): DateTime
     {
-        $endDate    = clone $startDate;
-        $daysAdded  = 0;
+        $endDate = clone $startDate;
+        $daysAdded = 0;
         $targetDays = ceil($days);
 
         while ($daysAdded < $targetDays) {
@@ -363,7 +363,7 @@ class ProjectPlanningAssistant
     private function calculateDailyHours(EmploymentPeriod $period): float
     {
         $weeklyHours = (float) $period->getWeeklyHours();
-        $workPct     = (float) $period->getWorkTimePercentage();
+        $workPct = (float) $period->getWorkTimePercentage();
 
         return ($weeklyHours * $workPct / 100) / 5; // 5 jours ouvrés
     }
@@ -386,7 +386,7 @@ class ProjectPlanningAssistant
             ->getResult();
 
         $totalHours = 0;
-        $workDays   = 0;
+        $workDays = 0;
 
         $period = new DatePeriod($startDate, new DateInterval('P1D'), (clone $endDate)->modify('+1 day'));
         foreach ($period as $date) {
@@ -449,20 +449,20 @@ class ProjectPlanningAssistant
      */
     private function calculateStatistics(array $suggestions, array $unassigned, array $allTasks): array
     {
-        $totalTasks      = count($allTasks);
-        $assignedTasks   = count($suggestions);
+        $totalTasks = count($allTasks);
+        $assignedTasks = count($suggestions);
         $unassignedTasks = count($unassigned);
 
         $avgConfidence = 0;
         if ($assignedTasks > 0) {
             $totalConfidence = array_sum(array_column($suggestions, 'confidence'));
-            $avgConfidence   = $totalConfidence / $assignedTasks;
+            $avgConfidence = $totalConfidence / $assignedTasks;
         }
 
         return [
-            'totalTasks'        => $totalTasks,
-            'assignedTasks'     => $assignedTasks,
-            'unassignedTasks'   => $unassignedTasks,
+            'totalTasks' => $totalTasks,
+            'assignedTasks' => $assignedTasks,
+            'unassignedTasks' => $unassignedTasks,
             'averageConfidence' => round($avgConfidence, 2),
         ];
     }

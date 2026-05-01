@@ -138,16 +138,16 @@ class PerformanceReviewRepository extends CompanyAwareRepository
             ->getResult();
 
         $stats = [
-            'total'              => 0,
-            'en_attente'         => 0,
-            'auto_eval_faite'    => 0,
+            'total' => 0,
+            'en_attente' => 0,
+            'auto_eval_faite' => 0,
             'eval_manager_faite' => 0,
-            'validee'            => 0,
+            'validee' => 0,
         ];
 
         foreach ($results as $result) {
-            $status         = $result['status'];
-            $count          = (int) $result['count'];
+            $status = $result['status'];
+            $count = (int) $result['count'];
             $stats[$status] = $count;
             $stats['total'] += $count;
         }

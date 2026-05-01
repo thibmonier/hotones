@@ -34,7 +34,7 @@ class ApiRateLimiterSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        $path    = $request->getPathInfo();
+        $path = $request->getPathInfo();
 
         // Appliquer le rate limiter uniquement sur les routes API
         if (!$this->isApiRoute($path)) {
@@ -46,30 +46,30 @@ class ApiRateLimiterSubscriber implements EventSubscriberInterface
 
         // Vérifier la limite
         $limiter = $this->apiLimiter->create($limiterKey);
-        $limit   = $limiter->consume(1);
+        $limit = $limiter->consume(1);
 
         // Ajouter les headers de rate limiting
         $event
             ->getResponse()
             ?->headers->add([
-                'X-RateLimit-Limit'     => (string) $limit->getLimit(),
+                'X-RateLimit-Limit' => (string) $limit->getLimit(),
                 'X-RateLimit-Remaining' => (string) $limit->getRemainingTokens(),
-                'X-RateLimit-Reset'     => (string) $limit->getRetryAfter()->getTimestamp(),
+                'X-RateLimit-Reset' => (string) $limit->getRetryAfter()->getTimestamp(),
             ]);
 
         // Si la limite est atteinte, retourner une erreur 429
         if (!$limit->isAccepted()) {
             $response = new JsonResponse([
-                'error'       => 'Too Many Requests',
-                'message'     => 'Rate limit exceeded. Please try again later.',
+                'error' => 'Too Many Requests',
+                'message' => 'Rate limit exceeded. Please try again later.',
                 'retry_after' => $limit->getRetryAfter()->getTimestamp(),
             ], Response::HTTP_TOO_MANY_REQUESTS);
 
             $response->headers->add([
-                'X-RateLimit-Limit'     => (string) $limit->getLimit(),
+                'X-RateLimit-Limit' => (string) $limit->getLimit(),
                 'X-RateLimit-Remaining' => '0',
-                'X-RateLimit-Reset'     => (string) $limit->getRetryAfter()->getTimestamp(),
-                'Retry-After'           => (string) $limit->getRetryAfter()->getTimestamp(),
+                'X-RateLimit-Reset' => (string) $limit->getRetryAfter()->getTimestamp(),
+                'Retry-After' => (string) $limit->getRetryAfter()->getTimestamp(),
             ]);
 
             $event->setResponse($response);

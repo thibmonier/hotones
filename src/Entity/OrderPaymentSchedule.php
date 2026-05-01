@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class OrderPaymentSchedule implements CompanyOwnedInterface
 {
     public const TYPE_PERCENT = 'percent';
-    public const TYPE_FIXED   = 'fixed';
+    public const TYPE_FIXED = 'fixed';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

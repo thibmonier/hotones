@@ -27,11 +27,11 @@ class OnboardingServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->em                 = $this->createMock(EntityManagerInterface::class);
-        $this->companyContext     = $this->createMock(CompanyContext::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->companyContext = $this->createMock(CompanyContext::class);
         $this->templateRepository = $this->createMock(OnboardingTemplateRepository::class);
-        $this->taskRepository     = $this->createMock(OnboardingTaskRepository::class);
-        $this->service            = new OnboardingService(
+        $this->taskRepository = $this->createMock(OnboardingTaskRepository::class);
+        $this->service = new OnboardingService(
             $this->em,
             $this->companyContext,
             $this->templateRepository,
@@ -41,9 +41,9 @@ class OnboardingServiceTest extends TestCase
 
     public function testCreateOnboardingFromTemplateWithProfileMatch(): void
     {
-        $contributor      = new Contributor();
+        $contributor = new Contributor();
         $employmentPeriod = new EmploymentPeriod();
-        $profile          = new Profile();
+        $profile = new Profile();
 
         // Setup contributor with profile
         $contributor->addProfile($profile);
@@ -53,20 +53,20 @@ class OnboardingServiceTest extends TestCase
         $template->setName('Developer Onboarding');
         $template->setTasks([
             [
-                'title'            => 'Setup workstation',
-                'description'      => 'Install necessary software',
-                'type'             => 'action',
-                'assigned_to'      => 'contributor',
+                'title' => 'Setup workstation',
+                'description' => 'Install necessary software',
+                'type' => 'action',
+                'assigned_to' => 'contributor',
                 'days_after_start' => 0,
-                'order'            => 0,
+                'order' => 0,
             ],
             [
-                'title'            => 'Meet the team',
-                'description'      => 'Introduction meeting',
-                'type'             => 'meeting',
-                'assigned_to'      => 'manager',
+                'title' => 'Meet the team',
+                'description' => 'Introduction meeting',
+                'type' => 'meeting',
+                'assigned_to' => 'manager',
                 'days_after_start' => 1,
-                'order'            => 1,
+                'order' => 1,
             ],
         ]);
 
@@ -90,7 +90,7 @@ class OnboardingServiceTest extends TestCase
 
     public function testCreateOnboardingFromTemplateWithDefaultTemplate(): void
     {
-        $contributor      = new Contributor();
+        $contributor = new Contributor();
         $employmentPeriod = new EmploymentPeriod();
 
         // Default template
@@ -98,12 +98,12 @@ class OnboardingServiceTest extends TestCase
         $template->setName('Default Onboarding');
         $template->setTasks([
             [
-                'title'            => 'Welcome task',
-                'description'      => 'General welcome',
-                'type'             => 'action',
-                'assigned_to'      => 'contributor',
+                'title' => 'Welcome task',
+                'description' => 'General welcome',
+                'type' => 'action',
+                'assigned_to' => 'contributor',
                 'days_after_start' => 0,
-                'order'            => 0,
+                'order' => 0,
             ],
         ]);
 
@@ -126,7 +126,7 @@ class OnboardingServiceTest extends TestCase
 
     public function testCreateOnboardingFromTemplateNoTemplateFound(): void
     {
-        $contributor      = new Contributor();
+        $contributor = new Contributor();
         $employmentPeriod = new EmploymentPeriod();
 
         $this->templateRepository
@@ -160,7 +160,7 @@ class OnboardingServiceTest extends TestCase
 
     public function testCompleteTaskIdempotent(): void
     {
-        $task        = new OnboardingTask();
+        $task = new OnboardingTask();
         $completedAt = new DateTimeImmutable('2024-12-01 10:00:00');
         $task->setStatus('termine');
         $task->setCompletedAt($completedAt);
@@ -191,17 +191,17 @@ class OnboardingServiceTest extends TestCase
 
     public function testCreateTemplate(): void
     {
-        $name        = 'Developer Template';
+        $name = 'Developer Template';
         $description = 'For new developers';
-        $profileId   = 42;
-        $tasks       = [
+        $profileId = 42;
+        $tasks = [
             [
-                'title'            => 'Task 1',
-                'description'      => 'Description 1',
-                'type'             => 'action',
-                'assigned_to'      => 'contributor',
+                'title' => 'Task 1',
+                'description' => 'Description 1',
+                'type' => 'action',
+                'assigned_to' => 'contributor',
                 'days_after_start' => 0,
-                'order'            => 0,
+                'order' => 0,
             ],
         ];
 
@@ -210,9 +210,9 @@ class OnboardingServiceTest extends TestCase
             ->method('persist')
             ->with($this->callback(
                 fn (OnboardingTemplate $template): bool => $template->getName() === $name
-                    && $template->getDescription()                              === $description
-                    && $template->isActive()                                    === true
-                    && count($template->getTasks())                             === 1,
+                    && $template->getDescription() === $description
+                    && $template->isActive() === true
+                    && count($template->getTasks()) === 1,
             ));
 
         $this->em->expects($this->once())->method('flush');
@@ -228,9 +228,9 @@ class OnboardingServiceTest extends TestCase
 
     public function testCreateTemplateWithoutProfile(): void
     {
-        $name        = 'Default Template';
+        $name = 'Default Template';
         $description = 'Default onboarding';
-        $tasks       = [];
+        $tasks = [];
 
         $this->em
             ->expects($this->once())
@@ -252,12 +252,12 @@ class OnboardingServiceTest extends TestCase
         $original->setActive(true);
         $original->setTasks([
             [
-                'title'            => 'Original Task',
-                'description'      => 'Task description',
-                'type'             => 'action',
-                'assigned_to'      => 'contributor',
+                'title' => 'Original Task',
+                'description' => 'Task description',
+                'type' => 'action',
+                'assigned_to' => 'contributor',
                 'days_after_start' => 0,
-                'order'            => 0,
+                'order' => 0,
             ],
         ]);
 
@@ -266,8 +266,8 @@ class OnboardingServiceTest extends TestCase
             ->method('persist')
             ->with($this->callback(
                 fn (OnboardingTemplate $duplicate): bool => str_contains($duplicate->getName(), 'Copie')
-                    && $duplicate->getDescription()  === 'Original description'
-                    && $duplicate->isActive()        === true
+                    && $duplicate->getDescription() === 'Original description'
+                    && $duplicate->isActive() === true
                     && count($duplicate->getTasks()) === 1,
             ));
 
@@ -304,7 +304,7 @@ class OnboardingServiceTest extends TestCase
     public function testGetTeamStatistics(): void
     {
         $contributorIds = [1, 2, 3];
-        $stats          = [
+        $stats = [
             ['contributor_id' => 1, 'total' => 10, 'completed' => 5, 'progress' => 50, 'overdue' => 1],
             ['contributor_id' => 2, 'total' => 8, 'completed' => 8, 'progress' => 100, 'overdue' => 0],
         ];

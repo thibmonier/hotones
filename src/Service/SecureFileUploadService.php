@@ -68,9 +68,9 @@ class SecureFileUploadService
 
         // Génération du nom de fichier sécurisé
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename     = $this->slugger->slug($originalFilename);
-        $extension        = $convertToWebP ? 'webp' : $file->guessExtension();
-        $newFilename      = sprintf('%s-%s.%s', $safeFilename, uniqid(), $extension);
+        $safeFilename = $this->slugger->slug($originalFilename);
+        $extension = $convertToWebP ? 'webp' : $file->guessExtension();
+        $newFilename = sprintf('%s-%s.%s', $safeFilename, uniqid(), $extension);
 
         // Chemin complet dans le filesystem
         $filePath = sprintf('%s/%s', $subdirectory, $newFilename);
@@ -78,9 +78,9 @@ class SecureFileUploadService
         try {
             $this->logger->info('Début upload image', [
                 'subdirectory' => $subdirectory,
-                'filename'     => $newFilename,
-                'environment'  => $this->environment,
-                'public_url'   => $this->publicUrl,
+                'filename' => $newFilename,
+                'environment' => $this->environment,
+                'public_url' => $this->publicUrl,
             ]);
 
             // Lecture du contenu du fichier uploadé
@@ -107,9 +107,9 @@ class SecureFileUploadService
         } catch (Exception $e) {
             $this->logger->error('Erreur upload image', [
                 'message' => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
-                'trace'   => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
             ]);
             throw new FileException(sprintf('Impossible d\'uploader le fichier: %s', $e->getMessage()));
         }
@@ -125,15 +125,15 @@ class SecureFileUploadService
         $this->validateFile($file, self::ALLOWED_DOCUMENT_MIMES);
 
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename     = $this->slugger->slug($originalFilename);
-        $newFilename      = sprintf('%s-%s.%s', $safeFilename, uniqid(), $file->guessExtension());
+        $safeFilename = $this->slugger->slug($originalFilename);
+        $newFilename = sprintf('%s-%s.%s', $safeFilename, uniqid(), $file->guessExtension());
 
         $filePath = sprintf('%s/%s', $subdirectory, $newFilename);
 
         try {
             $this->logger->info('Début upload document', [
                 'subdirectory' => $subdirectory,
-                'filename'     => $newFilename,
+                'filename' => $newFilename,
             ]);
 
             $stream = fopen($file->getPathname(), 'r');
@@ -153,7 +153,7 @@ class SecureFileUploadService
         } catch (Exception $e) {
             $this->logger->error('Erreur upload document', [
                 'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
+                'trace' => $e->getTraceAsString(),
             ]);
             throw new FileException(sprintf('Impossible d\'uploader le document: %s', $e->getMessage()));
         }
@@ -172,7 +172,7 @@ class SecureFileUploadService
         }
 
         // Vérification du type MIME réel (pas juste l'extension)
-        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file->getPathname());
 
         if (!in_array($mimeType, $allowedMimes, true)) {
@@ -191,7 +191,7 @@ class SecureFileUploadService
 
         try {
             // Lire le fichier depuis Flysystem
-            $content  = $this->filesystem->read($filePath);
+            $content = $this->filesystem->read($filePath);
             $tempFile = tempnam(sys_get_temp_dir(), 'webp_');
             file_put_contents($tempFile, $content);
 
@@ -204,9 +204,9 @@ class SecureFileUploadService
 
             $image = match ($info[2]) {
                 IMAGETYPE_JPEG => imagecreatefromjpeg($tempFile),
-                IMAGETYPE_PNG  => imagecreatefrompng($tempFile),
-                IMAGETYPE_GIF  => imagecreatefromgif($tempFile),
-                default        => null,
+                IMAGETYPE_PNG => imagecreatefrompng($tempFile),
+                IMAGETYPE_GIF => imagecreatefromgif($tempFile),
+                default => null,
             };
 
             if ($image === null) {
@@ -221,7 +221,7 @@ class SecureFileUploadService
 
             // Upload du fichier WebP
             $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $filePath);
-            $stream   = fopen($webpTempFile, 'r');
+            $stream = fopen($webpTempFile, 'r');
             if ($stream !== false) {
                 $this->filesystem->writeStream($webpPath, $stream);
                 fclose($stream);

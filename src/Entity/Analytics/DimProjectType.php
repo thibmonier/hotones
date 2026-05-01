@@ -107,16 +107,16 @@ class DimProjectType implements CompanyOwnedInterface
     {
         $this->compositeKey = sprintf(
             '%s_%s_%s_%s',
-            $this->projectType     ?? 'null',
+            $this->projectType ?? 'null',
             $this->serviceCategory ?? 'null',
-            $this->status          ?? 'null',
+            $this->status ?? 'null',
             $this->isInternal ? 'internal' : 'external',
         );
     }
 
     public function getDisplayName(): string
     {
-        $parts   = [];
+        $parts = [];
         $parts[] = ucfirst($this->projectType);
         if ($this->serviceCategory) {
             $parts[] = $this->serviceCategory;

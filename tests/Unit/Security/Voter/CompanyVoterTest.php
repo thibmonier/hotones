@@ -13,6 +13,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ReflectionMethod;
+use stdClass;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -39,11 +41,11 @@ final class CompanyVoterTest extends TestCase
     {
         $this->companyContext = $this->createMock(CompanyContext::class);
         $this->securityLogger = $this->createMock(LoggerInterface::class);
-        $this->voter          = new CompanyVoter($this->companyContext, $this->securityLogger);
+        $this->voter = new CompanyVoter($this->companyContext, $this->securityLogger);
     }
 
     #[Test]
-    public function supports_returns_true_for_view_on_company_owned_subject(): void
+    public function supportsReturnsTrueForViewOnCompanyOwnedSubject(): void
     {
         $subject = $this->createMock(CompanyOwnedInterface::class);
 
@@ -53,39 +55,39 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function supports_returns_true_for_edit_on_company_owned_subject(): void
+    public function supportsReturnsTrueForEditOnCompanyOwnedSubject(): void
     {
         $subject = $this->createMock(CompanyOwnedInterface::class);
         self::assertTrue($this->invokeSupports(CompanyVoter::EDIT, $subject));
     }
 
     #[Test]
-    public function supports_returns_true_for_delete_on_company_owned_subject(): void
+    public function supportsReturnsTrueForDeleteOnCompanyOwnedSubject(): void
     {
         $subject = $this->createMock(CompanyOwnedInterface::class);
         self::assertTrue($this->invokeSupports(CompanyVoter::DELETE, $subject));
     }
 
     #[Test]
-    public function supports_returns_false_for_unsupported_attribute(): void
+    public function supportsReturnsFalseForUnsupportedAttribute(): void
     {
         $subject = $this->createMock(CompanyOwnedInterface::class);
         self::assertFalse($this->invokeSupports('UNKNOWN', $subject));
     }
 
     #[Test]
-    public function supports_returns_false_for_non_company_owned_subject(): void
+    public function supportsReturnsFalseForNonCompanyOwnedSubject(): void
     {
-        self::assertFalse($this->invokeSupports(CompanyVoter::VIEW, new \stdClass()));
+        self::assertFalse($this->invokeSupports(CompanyVoter::VIEW, new stdClass()));
     }
 
     #[Test]
-    public function vote_denies_access_when_subject_belongs_to_different_company(): void
+    public function voteDeniesAccessWhenSubjectBelongsToDifferentCompany(): void
     {
-        $userCompany    = $this->makeCompany(1);
+        $userCompany = $this->makeCompany(1);
         $subjectCompany = $this->makeCompany(2);
-        $user           = $this->makeUser(42, $userCompany, ['ROLE_USER']);
-        $subject        = $this->makeSubject($subjectCompany);
+        $user = $this->makeUser(42, $userCompany, ['ROLE_USER']);
+        $subject = $this->makeSubject($subjectCompany);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($userCompany);
 
@@ -101,12 +103,12 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_allows_superadmin_cross_tenant_access_with_warning_log(): void
+    public function voteAllowsSuperadminCrossTenantAccessWithWarningLog(): void
     {
-        $userCompany    = $this->makeCompany(1);
+        $userCompany = $this->makeCompany(1);
         $subjectCompany = $this->makeCompany(2);
-        $user           = $this->makeUser(1, $userCompany, ['ROLE_SUPERADMIN'], isSuperAdmin: true);
-        $subject        = $this->makeSubject($subjectCompany);
+        $user = $this->makeUser(1, $userCompany, ['ROLE_SUPERADMIN'], isSuperAdmin: true);
+        $subject = $this->makeSubject($subjectCompany);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($userCompany);
 
@@ -124,10 +126,10 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_allows_view_for_any_authenticated_user_in_same_company(): void
+    public function voteAllowsViewForAnyAuthenticatedUserInSameCompany(): void
     {
         $company = $this->makeCompany(1);
-        $user    = $this->makeUser(42, $company, ['ROLE_USER']);
+        $user = $this->makeUser(42, $company, ['ROLE_USER']);
         $subject = $this->makeSubject($company);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
@@ -139,10 +141,10 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_denies_edit_for_intervenant_on_project(): void
+    public function voteDeniesEditForIntervenantOnProject(): void
     {
         $company = $this->makeCompany(1);
-        $user    = $this->makeUser(42, $company, ['ROLE_INTERVENANT'], isChefProjet: false, isManager: false);
+        $user = $this->makeUser(42, $company, ['ROLE_INTERVENANT'], isChefProjet: false, isManager: false);
         $subject = $this->makeSubject($company, className: 'App\\Entity\\Project');
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
@@ -153,10 +155,10 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_allows_edit_for_manager_on_project(): void
+    public function voteAllowsEditForManagerOnProject(): void
     {
         $company = $this->makeCompany(1);
-        $user    = $this->makeUser(42, $company, ['ROLE_MANAGER'], isChefProjet: true, isManager: true);
+        $user = $this->makeUser(42, $company, ['ROLE_MANAGER'], isChefProjet: true, isManager: true);
         $subject = $this->makeSubject($company, className: 'App\\Entity\\Project');
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
@@ -167,10 +169,10 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_allows_edit_for_chef_projet_on_order(): void
+    public function voteAllowsEditForChefProjetOnOrder(): void
     {
         $company = $this->makeCompany(1);
-        $user    = $this->makeUser(42, $company, ['ROLE_CHEF_PROJET'], isChefProjet: true, isManager: false);
+        $user = $this->makeUser(42, $company, ['ROLE_CHEF_PROJET'], isChefProjet: true, isManager: false);
         $subject = $this->makeSubject($company, className: 'App\\Entity\\Order');
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
@@ -181,10 +183,10 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_denies_delete_for_chef_projet(): void
+    public function voteDeniesDeleteForChefProjet(): void
     {
         $company = $this->makeCompany(1);
-        $user    = $this->makeUser(42, $company, ['ROLE_CHEF_PROJET'], isChefProjet: true, isManager: false);
+        $user = $this->makeUser(42, $company, ['ROLE_CHEF_PROJET'], isChefProjet: true, isManager: false);
         $subject = $this->makeSubject($company);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
@@ -195,10 +197,10 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_allows_delete_for_manager(): void
+    public function voteAllowsDeleteForManager(): void
     {
         $company = $this->makeCompany(1);
-        $user    = $this->makeUser(42, $company, ['ROLE_MANAGER'], isManager: true);
+        $user = $this->makeUser(42, $company, ['ROLE_MANAGER'], isManager: true);
         $subject = $this->makeSubject($company);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
@@ -209,7 +211,7 @@ final class CompanyVoterTest extends TestCase
     }
 
     #[Test]
-    public function vote_abstains_if_token_user_is_not_app_user(): void
+    public function voteAbstainsIfTokenUserIsNotAppUser(): void
     {
         $subject = $this->createMock(CompanyOwnedInterface::class);
 
@@ -226,7 +228,7 @@ final class CompanyVoterTest extends TestCase
      */
     private function invokeSupports(string $attribute, mixed $subject): bool
     {
-        $reflection = new \ReflectionMethod($this->voter, 'supports');
+        $reflection = new ReflectionMethod($this->voter, 'supports');
 
         return (bool) $reflection->invoke($this->voter, $attribute, $subject);
     }
@@ -273,7 +275,7 @@ final class CompanyVoterTest extends TestCase
             // generating a mock whose class name contains the target token, and we
             // add a unique suffix to avoid class-name collisions across tests.
             $mockName = str_replace('\\', '_', $className).'Mock_'.uniqid();
-            $builder  = $builder->setMockClassName($mockName);
+            $builder = $builder->setMockClassName($mockName);
         }
         $subject = $builder->getMock();
         $subject->method('getCompany')->willReturn($company);

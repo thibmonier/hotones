@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Application\Vacation\Command\RequestVacation;
 
+use App\Application\Vacation\Notification\Message\VacationNotificationMessage;
 use App\Domain\Vacation\Entity\Vacation;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\DailyHours;
 use App\Domain\Vacation\ValueObject\DateRange;
 use App\Domain\Vacation\ValueObject\VacationId;
 use App\Domain\Vacation\ValueObject\VacationType;
-use App\Application\Vacation\Notification\Message\VacationNotificationMessage;
 use App\Repository\ContributorRepository;
 use InvalidArgumentException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

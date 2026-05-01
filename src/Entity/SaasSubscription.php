@@ -27,24 +27,24 @@ class SaasSubscription implements CompanyOwnedInterface, Stringable
 {
     // Périodicités de facturation
     public const BILLING_MONTHLY = 'monthly';
-    public const BILLING_YEARLY  = 'yearly';
+    public const BILLING_YEARLY = 'yearly';
 
     public const BILLING_PERIODS = [
         self::BILLING_MONTHLY => 'Mensuel',
-        self::BILLING_YEARLY  => 'Annuel',
+        self::BILLING_YEARLY => 'Annuel',
     ];
 
     // Statuts d'abonnement
-    public const STATUS_ACTIVE    = 'active';
+    public const STATUS_ACTIVE = 'active';
     public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_SUSPENDED = 'suspended';
-    public const STATUS_EXPIRED   = 'expired';
+    public const STATUS_EXPIRED = 'expired';
 
     public const STATUSES = [
-        self::STATUS_ACTIVE    => 'Actif',
+        self::STATUS_ACTIVE => 'Actif',
         self::STATUS_CANCELLED => 'Annulé',
         self::STATUS_SUSPENDED => 'Suspendu',
-        self::STATUS_EXPIRED   => 'Expiré',
+        self::STATUS_EXPIRED => 'Expiré',
     ];
 
     #[ORM\Id]
@@ -395,7 +395,7 @@ class SaasSubscription implements CompanyOwnedInterface, Stringable
      */
     public function calculateNextRenewalDate(?DateTimeInterface $fromDate = null): DateTimeInterface
     {
-        $date     = $fromDate ?? $this->nextRenewalDate ?? $this->startDate ?? new DateTime();
+        $date = $fromDate ?? $this->nextRenewalDate ?? $this->startDate ?? new DateTime();
         $nextDate = clone $date;
 
         if ($this->billingPeriod === self::BILLING_MONTHLY) {
@@ -446,8 +446,8 @@ class SaasSubscription implements CompanyOwnedInterface, Stringable
      */
     public function cancel(?DateTimeInterface $endDate = null): self
     {
-        $this->status      = self::STATUS_CANCELLED;
-        $this->endDate     = $endDate ?? new DateTime();
+        $this->status = self::STATUS_CANCELLED;
+        $this->endDate = $endDate ?? new DateTime();
         $this->autoRenewal = false;
 
         return $this;
@@ -458,7 +458,7 @@ class SaasSubscription implements CompanyOwnedInterface, Stringable
      */
     public function suspend(): self
     {
-        $this->status      = self::STATUS_SUSPENDED;
+        $this->status = self::STATUS_SUSPENDED;
         $this->autoRenewal = false;
 
         return $this;
@@ -469,7 +469,7 @@ class SaasSubscription implements CompanyOwnedInterface, Stringable
      */
     public function reactivate(): self
     {
-        $this->status  = self::STATUS_ACTIVE;
+        $this->status = self::STATUS_ACTIVE;
         $this->endDate = null;
 
         return $this;

@@ -36,7 +36,7 @@ class HomeController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $contributorRepo = $em->getRepository(Contributor::class);
-        $contributor     = $contributorRepo->findByUser($this->getUser());
+        $contributor = $contributorRepo->findByUser($this->getUser());
 
         // Récupérer tous les rôles disponibles pour l'utilisateur
         $availableRoles = $this->getAvailableRoles();
@@ -60,17 +60,17 @@ class HomeController extends AbstractController
 
         // Préparer les données selon le rôle sélectionné
         $data = match ($selectedRole) {
-            'admin'       => $this->getAdminData($em, $contributor),
-            'compta'      => $this->getComptaData($em, $contributor),
-            'manager'     => $this->getManagerData($em, $contributor),
+            'admin' => $this->getAdminData($em, $contributor),
+            'compta' => $this->getComptaData($em, $contributor),
+            'manager' => $this->getManagerData($em, $contributor),
             'chef_projet' => $this->getChefProjetData($em, $contributor),
             'intervenant' => $this->getIntervenantData($em, $contributor),
-            default       => $this->getDefaultData($em, $contributor),
+            default => $this->getDefaultData($em, $contributor),
         };
 
-        $data['userRole']       = $selectedRole;
+        $data['userRole'] = $selectedRole;
         $data['availableRoles'] = $availableRoles;
-        $data['contributor']    = $contributor;
+        $data['contributor'] = $contributor;
 
         return $this->render('home/index.html.twig', $data);
     }
@@ -137,11 +137,11 @@ class HomeController extends AbstractController
     private function getAdminData(EntityManagerInterface $em, ?Contributor $contributor): array
     {
         $currentMonth = new DateTime('first day of this month');
-        $endMonth     = new DateTime('last day of this month');
+        $endMonth = new DateTime('last day of this month');
 
-        $projectRepo  = $em->getRepository(Project::class);
-        $orderRepo    = $em->getRepository(Order::class);
-        $invoiceRepo  = $em->getRepository(Invoice::class);
+        $projectRepo = $em->getRepository(Project::class);
+        $orderRepo = $em->getRepository(Order::class);
+        $invoiceRepo = $em->getRepository(Invoice::class);
         $vacationRepo = $em->getRepository(Vacation::class);
 
         // KPIs globaux (CA produit = temps valorisés)
@@ -154,13 +154,13 @@ class HomeController extends AbstractController
         $activeProjects = $projectRepo->findBy(['status' => 'active'], ['name' => 'ASC'], 5);
 
         // Calculer le début et fin du trimestre en cours
-        $now                = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $currentMonthNumber = (int) $now->format('n'); // 1-12
-        $quarterStartMonth  = (int) (floor(($currentMonthNumber - 1) / 3) * 3) + 1; // 1, 4, 7, ou 10
-        $quarterStart       = new DateTimeImmutable(
+        $quarterStartMonth = (int) (floor(($currentMonthNumber - 1) / 3) * 3) + 1; // 1, 4, 7, ou 10
+        $quarterStart = new DateTimeImmutable(
             $now->format('Y').'-'.str_pad((string) $quarterStartMonth, 2, '0', STR_PAD_LEFT).'-01 00:00:00',
         );
-        $quarterEnd     = $quarterStart->modify('+3 months')->modify('-1 second');
+        $quarterEnd = $quarterStart->modify('+3 months')->modify('-1 second');
         $currentQuarter = (int) ceil($currentMonthNumber / 3); // 1, 2, 3, ou 4
 
         // Devis en attente du trimestre en cours
@@ -173,19 +173,19 @@ class HomeController extends AbstractController
         $pendingVacations = [];
         if ($contributor) {
             $managedContributors = $contributor->getManagedContributors();
-            $pendingVacations    = $vacationRepo->findPendingForContributors($managedContributors->toArray());
+            $pendingVacations = $vacationRepo->findPendingForContributors($managedContributors->toArray());
         }
 
         return [
-            'kpis'                 => $kpis,
+            'kpis' => $kpis,
             'monthlySignedRevenue' => $monthlySignedRevenue,
-            'activeProjects'       => $activeProjects,
-            'pendingOrders'        => $pendingOrders,
-            'pendingInvoices'      => $pendingInvoices,
-            'pendingVacations'     => $pendingVacations,
-            'quarterStart'         => $quarterStart,
-            'quarterEnd'           => $quarterEnd,
-            'currentQuarter'       => $currentQuarter,
+            'activeProjects' => $activeProjects,
+            'pendingOrders' => $pendingOrders,
+            'pendingInvoices' => $pendingInvoices,
+            'pendingVacations' => $pendingVacations,
+            'quarterStart' => $quarterStart,
+            'quarterEnd' => $quarterEnd,
+            'currentQuarter' => $currentQuarter,
         ];
     }
 
@@ -195,10 +195,10 @@ class HomeController extends AbstractController
     private function getComptaData(EntityManagerInterface $em, ?Contributor $contributor): array
     {
         $currentMonth = new DateTime('first day of this month');
-        $endMonth     = new DateTime('last day of this month');
+        $endMonth = new DateTime('last day of this month');
 
         $invoiceRepo = $em->getRepository(Invoice::class);
-        $orderRepo   = $em->getRepository(Order::class);
+        $orderRepo = $em->getRepository(Order::class);
 
         // Factures en attente
         $pendingInvoices = $invoiceRepo->findBy(['status' => 'pending'], ['dueDate' => 'ASC'], 10);
@@ -213,8 +213,8 @@ class HomeController extends AbstractController
         $monthlySignedOrders = $orderRepo->getSignedRevenueForPeriod($currentMonth, $endMonth);
 
         return [
-            'pendingInvoices'     => $pendingInvoices,
-            'monthlyRevenue'      => $monthlyRevenue,
+            'pendingInvoices' => $pendingInvoices,
+            'monthlyRevenue' => $monthlyRevenue,
             'monthlySignedOrders' => $monthlySignedOrders,
         ];
     }
@@ -224,17 +224,17 @@ class HomeController extends AbstractController
      */
     private function getManagerData(EntityManagerInterface $em, ?Contributor $contributor): array
     {
-        $currentMonth    = new DateTime('first day of this month');
-        $endMonth        = new DateTime('last day of this month');
+        $currentMonth = new DateTime('first day of this month');
+        $endMonth = new DateTime('last day of this month');
         $contributorRepo = $em->getRepository(Contributor::class);
-        $vacationRepo    = $em->getRepository(Vacation::class);
-        $projectRepo     = $em->getRepository(Project::class);
+        $vacationRepo = $em->getRepository(Vacation::class);
+        $projectRepo = $em->getRepository(Project::class);
 
         // Demandes de congés en attente
         $pendingVacations = [];
         if ($contributor) {
             $managedContributors = $contributor->getManagedContributors();
-            $pendingVacations    = $vacationRepo->findPendingForContributors($managedContributors->toArray());
+            $pendingVacations = $vacationRepo->findPendingForContributors($managedContributors->toArray());
         }
 
         // Effectif actuel
@@ -250,10 +250,10 @@ class HomeController extends AbstractController
         }
 
         return [
-            'pendingVacations'   => $pendingVacations,
+            'pendingVacations' => $pendingVacations,
             'activeContributors' => $activeContributors,
-            'activeProjects'     => $activeProjects,
-            'hrMetrics'          => $hrMetrics,
+            'activeProjects' => $activeProjects,
+            'hrMetrics' => $hrMetrics,
         ];
     }
 
@@ -263,10 +263,10 @@ class HomeController extends AbstractController
     private function getChefProjetData(EntityManagerInterface $em, ?Contributor $contributor): array
     {
         $currentMonth = new DateTime('first day of this month');
-        $endMonth     = new DateTime('last day of this month');
+        $endMonth = new DateTime('last day of this month');
 
         $projectRepo = $em->getRepository(Project::class);
-        $orderRepo   = $em->getRepository(Order::class);
+        $orderRepo = $em->getRepository(Order::class);
 
         // Devis en attente de signature
         $pendingOrders = $orderRepo->findBy(['status' => OrderStatus::PENDING->value], ['createdAt' => 'DESC'], 5);
@@ -281,10 +281,10 @@ class HomeController extends AbstractController
         $recentOrders = $orderRepo->getRecentOrders(5);
 
         return [
-            'pendingOrders'        => $pendingOrders,
+            'pendingOrders' => $pendingOrders,
             'monthlySignedRevenue' => $monthlySignedRevenue,
-            'myProjects'           => $myProjects,
-            'recentOrders'         => $recentOrders,
+            'myProjects' => $myProjects,
+            'recentOrders' => $recentOrders,
         ];
     }
 
@@ -297,12 +297,12 @@ class HomeController extends AbstractController
             return [];
         }
 
-        $timesheetRepo   = $em->getRepository(Timesheet::class);
+        $timesheetRepo = $em->getRepository(Timesheet::class);
         $contributorRepo = $em->getRepository(Contributor::class);
-        $taskRepo        = $em->getRepository(ProjectTask::class);
+        $taskRepo = $em->getRepository(ProjectTask::class);
 
         $startOfWeek = new DateTime('monday this week');
-        $endOfWeek   = new DateTime('sunday this week');
+        $endOfWeek = new DateTime('sunday this week');
 
         // Mes temps cette semaine
         $weeklyTimesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startOfWeek, $endOfWeek);
@@ -320,11 +320,11 @@ class HomeController extends AbstractController
         $overdueTasks = $taskRepo->findOverdueTasksByContributor($contributor);
 
         return [
-            'weeklyTimesheets'  => $weeklyTimesheets,
-            'weeklyHours'       => $weeklyHours,
-            'recentTimesheets'  => $recentTimesheets,
+            'weeklyTimesheets' => $weeklyTimesheets,
+            'weeklyHours' => $weeklyHours,
+            'recentTimesheets' => $recentTimesheets,
             'projectsWithTasks' => $projectsWithTasks,
-            'overdueTasks'      => $overdueTasks,
+            'overdueTasks' => $overdueTasks,
         ];
     }
 
@@ -334,18 +334,18 @@ class HomeController extends AbstractController
     private function getDefaultData(EntityManagerInterface $em, ?Contributor $contributor): array
     {
         $currentMonth = new DateTime('first day of this month');
-        $endMonth     = new DateTime('last day of this month');
+        $endMonth = new DateTime('last day of this month');
 
-        $projectRepo     = $em->getRepository(Project::class);
+        $projectRepo = $em->getRepository(Project::class);
         $contributorRepo = $em->getRepository(Contributor::class);
-        $timesheetRepo   = $em->getRepository(Timesheet::class);
+        $timesheetRepo = $em->getRepository(Timesheet::class);
 
         // KPIs globaux
-        $totalProjects     = $projectRepo->count([]);
-        $activeProjects    = $projectRepo->countActiveProjects();
+        $totalProjects = $projectRepo->count([]);
+        $activeProjects = $projectRepo->countActiveProjects();
         $totalContributors = $contributorRepo->countActiveContributors();
-        $totalRevenue      = $projectRepo->getTotalRevenue();
-        $monthlyHours      = $timesheetRepo->getTotalHoursForMonth($currentMonth, $endMonth);
+        $totalRevenue = $projectRepo->getTotalRevenue();
+        $monthlyHours = $timesheetRepo->getTotalHoursForMonth($currentMonth, $endMonth);
 
         // Projets récents
         $recentProjects = $projectRepo->findRecentProjects(5);
@@ -357,12 +357,12 @@ class HomeController extends AbstractController
         }
 
         return [
-            'totalProjects'      => $totalProjects,
-            'activeProjects'     => $activeProjects,
-            'totalContributors'  => $totalContributors,
-            'totalRevenue'       => $totalRevenue,
-            'monthlyHours'       => $monthlyHours,
-            'recentProjects'     => $recentProjects,
+            'totalProjects' => $totalProjects,
+            'activeProjects' => $activeProjects,
+            'totalContributors' => $totalContributors,
+            'totalRevenue' => $totalRevenue,
+            'monthlyHours' => $monthlyHours,
+            'recentProjects' => $recentProjects,
             'myRecentTimesheets' => $myRecentTimesheets,
         ];
     }

@@ -23,31 +23,31 @@ class OrderType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label'    => 'Nom du devis',
+                'label' => 'Nom du devis',
                 'required' => false,
-                'attr'     => ['class' => 'form-control'],
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('project', EntityType::class, [
-                'class'        => Project::class,
+                'class' => Project::class,
                 'choice_label' => 'name',
-                'label'        => 'Projet associé',
-                'required'     => false,
-                'placeholder'  => '-- Aucun projet --',
-                'attr'         => ['class' => 'form-control'],
-                'help'         => 'Le projet peut être associé ultérieurement',
+                'label' => 'Projet associé',
+                'required' => false,
+                'placeholder' => '-- Aucun projet --',
+                'attr' => ['class' => 'form-control'],
+                'help' => 'Le projet peut être associé ultérieurement',
             ])
             ->add('description', TextareaType::class, [
-                'label'    => 'Description',
+                'label' => 'Description',
                 'required' => false,
-                'attr'     => ['class' => 'form-control', 'rows' => 4],
+                'attr' => ['class' => 'form-control', 'rows' => 4],
             ])
             ->add('status', ChoiceType::class, [
-                'label'   => 'Statut',
+                'label' => 'Statut',
                 'choices' => Order::STATUS_OPTIONS,
-                'attr'    => ['class' => 'form-control'],
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('contractType', ChoiceType::class, [
-                'label'   => 'Type de contrat',
+                'label' => 'Type de contrat',
                 'choices' => [
                     'Forfait (prix fixe)' => 'forfait',
                     'Régie (temps passé)' => 'regie',
@@ -55,36 +55,36 @@ class OrderType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('validUntil', DateType::class, [
-                'label'    => 'Valable jusqu\'au',
-                'widget'   => 'single_text',
+                'label' => 'Valable jusqu\'au',
+                'widget' => 'single_text',
                 'required' => false,
-                'attr'     => ['class' => 'form-control'],
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('contingencyPercentage', NumberType::class, [
-                'label'    => 'Pourcentage de contingence (%)',
+                'label' => 'Pourcentage de contingence (%)',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-control',
-                    'min'   => 0,
-                    'max'   => 100,
-                    'step'  => 0.01,
+                    'min' => 0,
+                    'max' => 100,
+                    'step' => 0.01,
                 ],
             ])
             ->add('contingenceAmount', MoneyType::class, [
-                'label'    => 'Montant de contingence',
+                'label' => 'Montant de contingence',
                 'currency' => 'EUR',
                 'required' => false,
-                'attr'     => ['class' => 'form-control'],
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('contingenceReason', TextareaType::class, [
-                'label'    => 'Raison de la contingence',
+                'label' => 'Raison de la contingence',
                 'required' => false,
-                'attr'     => ['class' => 'form-control', 'rows' => 3],
+                'attr' => ['class' => 'form-control', 'rows' => 3],
             ])
             ->add('notes', TextareaType::class, [
-                'label'    => 'Notes internes',
+                'label' => 'Notes internes',
                 'required' => false,
-                'attr'     => ['class' => 'form-control', 'rows' => 4],
+                'attr' => ['class' => 'form-control', 'rows' => 4],
             ]);
     }
 

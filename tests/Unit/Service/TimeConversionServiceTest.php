@@ -52,13 +52,13 @@ class TimeConversionServiceTest extends TestCase
     public function testWorkingDaysBetweenAndTheoreticalHours(): void
     {
         $start = new DateTime('2024-04-01'); // Monday
-        $end   = new DateTime('2024-04-05'); // Friday
+        $end = new DateTime('2024-04-05'); // Friday
         $this->assertSame(5, TimeConversionService::getWorkingDaysBetween($start, $end));
         $this->assertSame('40.00', TimeConversionService::getTheoreticalHours($start, $end));
 
         // Span with weekend inside
         $start = new DateTime('2024-04-04'); // Thu
-        $end   = new DateTime('2024-04-10'); // Wed
+        $end = new DateTime('2024-04-10'); // Wed
         $this->assertSame(5, TimeConversionService::getWorkingDaysBetween($start, $end));
     }
 }

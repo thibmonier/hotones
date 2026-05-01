@@ -27,7 +27,7 @@ class OpenAIClientFactory
             ->withApiKey($this->openaiApiKey)
             ->withBaseUri($this->baseUri)
             ->withHttpClient(new GuzzleClient([
-                'timeout'         => 60,
+                'timeout' => 60,
                 'connect_timeout' => 10,
             ]))
             ->make();

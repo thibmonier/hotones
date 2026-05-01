@@ -82,9 +82,9 @@ class BlogPostCrudController extends AbstractCrudController
             ->setChoices(BlogPost::STATUS_OPTIONS)
             ->setRequired(true)
             ->renderAsBadges([
-                BlogPost::STATUS_DRAFT     => 'warning',
+                BlogPost::STATUS_DRAFT => 'warning',
                 BlogPost::STATUS_PUBLISHED => 'success',
-                BlogPost::STATUS_ARCHIVED  => 'secondary',
+                BlogPost::STATUS_ARCHIVED => 'secondary',
             ]);
 
         yield TextEditorField::new('content', 'Contenu')->setHelp(
@@ -173,8 +173,8 @@ class BlogPostCrudController extends AbstractCrudController
         return $filters
             ->add(ChoiceFilter::new('status', 'Statut')->setChoices([
                 'Brouillon' => BlogPost::STATUS_DRAFT,
-                'Publié'    => BlogPost::STATUS_PUBLISHED,
-                'Archivé'   => BlogPost::STATUS_ARCHIVED,
+                'Publié' => BlogPost::STATUS_PUBLISHED,
+                'Archivé' => BlogPost::STATUS_ARCHIVED,
             ]))
             ->add(EntityFilter::new('category', 'Catégorie'))
             ->add(EntityFilter::new('tags', 'Tags'))
@@ -323,7 +323,7 @@ class BlogPostCrudController extends AbstractCrudController
                 $this->addFlash('error', sprintf('Erreur lors de la génération de l\'image: %s', $e->getMessage()));
 
                 // Don't throw - allow the blog post to be saved without image
-                $blogPost->imageSource   = BlogPost::IMAGE_SOURCE_EXTERNAL;
+                $blogPost->imageSource = BlogPost::IMAGE_SOURCE_EXTERNAL;
                 $blogPost->featuredImage = null;
             }
 
@@ -334,7 +334,7 @@ class BlogPostCrudController extends AbstractCrudController
         if ($blogPost->imageSource === BlogPost::IMAGE_SOURCE_EXTERNAL) {
             // Validate URL format if provided
             if (
-                $blogPost->featuredImage    !== null
+                $blogPost->featuredImage !== null
                 && $blogPost->featuredImage !== ''
                 && !filter_var($blogPost->featuredImage, FILTER_VALIDATE_URL)
             ) {
