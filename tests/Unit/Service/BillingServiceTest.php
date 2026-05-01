@@ -47,7 +47,7 @@ class BillingServiceTest extends TestCase
         $project->addOrder($order);
 
         // Mock the calculateTotalFromSections method
-        $order->setTotalAmount(10000.00);
+        $order->setTotalAmount('10000.00');
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
@@ -98,7 +98,7 @@ class BillingServiceTest extends TestCase
         $forfaitOrder = new Order();
         $forfaitOrder->setContractType('forfait');
         $forfaitOrder->setProject($project);
-        $forfaitOrder->setTotalAmount(12000.00);
+        $forfaitOrder->setTotalAmount('12000.00');
 
         $schedule = new OrderPaymentSchedule();
         $schedule->setBillingDate(new DateTime('2023-01-15'));
@@ -144,7 +144,7 @@ class BillingServiceTest extends TestCase
         $order   = new Order();
         $order->setContractType('forfait');
         $order->setProject($project);
-        $order->setTotalAmount(10000.00);
+        $order->setTotalAmount('10000.00');
 
         $schedule1 = new OrderPaymentSchedule();
         $schedule1->setBillingDate(new DateTime('2023-03-15'));
@@ -178,7 +178,7 @@ class BillingServiceTest extends TestCase
         $order   = new Order();
         $order->setContractType('forfait');
         $order->setProject($project);
-        $order->setTotalAmount(10000.00);
+        $order->setTotalAmount('10000.00');
 
         $schedule = new OrderPaymentSchedule();
         $schedule->setBillingDate(new DateTime('2023-01-15'));
@@ -238,7 +238,7 @@ class BillingServiceTest extends TestCase
         $order   = new Order();
         $order->setContractType('forfait');
         $order->setProject($project);
-        $order->setTotalAmount(5000.00);
+        $order->setTotalAmount('5000.00');
 
         $schedule = new OrderPaymentSchedule();
         $schedule->setBillingDate(new DateTime('2023-01-15'));
