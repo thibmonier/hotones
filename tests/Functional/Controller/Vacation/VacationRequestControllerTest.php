@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller\Vacation;
 
-use App\Domain\Vacation\Entity\Vacation;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationStatus;
 use App\Entity\Contributor;
 use App\Tests\Support\MultiTenantTestTrait;
+use App\Tests\Support\VacationFunctionalTrait;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -33,6 +33,7 @@ final class VacationRequestControllerTest extends WebTestCase
     use Factories;
     use ResetDatabase;
     use MultiTenantTestTrait;
+    use VacationFunctionalTrait;
 
     private KernelBrowser $client;
 
@@ -52,6 +53,10 @@ final class VacationRequestControllerTest extends WebTestCase
         $contributor->setActive(true);
         $em->persist($contributor);
         $em->flush();
+
+        // authenticateTestUser() only sets TokenStorage; the session firewall
+        // needs a session cookie too, so re-login through the KernelBrowser.
+        $this->client->loginUser($this->testUser);
     }
 
     public function testIndexRendersEmptyStateWhenContributorHasNoVacation(): void
@@ -105,7 +110,7 @@ final class VacationRequestControllerTest extends WebTestCase
 
     public function testCancelOnPendingVacationFlashesSuccess(): void
     {
-        $vacation = $this->createPendingVacation();
+        $vacation = $this->createPendingVacationFor($this->loadContributor());
 
         $this->client->request('POST', '/mes-conges/'.$vacation->getId()->getValue().'/annuler', [
             '_token' => $this->generateCsrfToken('cancel'.$vacation->getId()->getValue()),
@@ -130,7 +135,7 @@ final class VacationRequestControllerTest extends WebTestCase
         $em->persist($otherContributor);
         $em->flush();
 
-        $foreignVacation = $this->createPendingVacation($otherContributor);
+        $foreignVacation = $this->createPendingVacationFor($otherContributor);
 
         // Re-authenticate as the original Adrien (ROLE_INTERVENANT in testCompany)
         $this->testUser = $this->authenticateTestUser($this->testCompany, ['ROLE_INTERVENANT']);
@@ -149,30 +154,4 @@ final class VacationRequestControllerTest extends WebTestCase
         return $contributor;
     }
 
-    private function createPendingVacation(?Contributor $contributor = null): Vacation
-    {
-        $contributor ??= $this->loadContributor();
-
-        /** @var \App\Application\Vacation\Command\RequestVacation\RequestVacationHandler $handler */
-        $handler = static::getContainer()->get(\App\Application\Vacation\Command\RequestVacation\RequestVacationHandler::class);
-
-        ($handler)(new \App\Application\Vacation\Command\RequestVacation\RequestVacationCommand(
-            contributorId: $contributor->getId(),
-            startDate: new DateTimeImmutable('+1 day'),
-            endDate: new DateTimeImmutable('+2 days'),
-            type: 'conges_payes',
-            dailyHours: '8',
-            reason: 'Test pending',
-        ));
-
-        /** @var VacationRepositoryInterface $repo */
-        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
-
-        return $repo->findByContributor($contributor)[0];
-    }
-
-    private function generateCsrfToken(string $id): string
-    {
-        return static::getContainer()->get('security.csrf.token_manager')->getToken($id)->getValue();
-    }
 }
