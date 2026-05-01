@@ -1,0 +1,123 @@
+name: Staging Smoke Test
+
+# OPS-009 (sprint-004) — smoke test staging post-deploy.
+#
+# Déclenché quand la CI sur main est verte, attend que Render finisse
+# son auto-deploy (free tier ~60s cold-start), puis exécute
+# `docker/scripts/smoke-test-staging.sh` sur l'URL staging.
+#
+# Une issue est ouverte automatiquement en cas d'échec, label `staging-smoke`.
+# Idempotent : si une issue est déjà ouverte avec ce label, on commente
+# au lieu d'en créer une nouvelle.
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL du staging (override)'
+        required: false
+        default: 'https://hotones-staging.onrender.com'
+      wait_seconds:
+        description: 'Secondes à attendre avant le smoke test'
+        required: false
+        default: '90'
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+concurrency:
+  group: staging-smoke-test
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Smoke test staging
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'push') }}
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BASE_URL: ${{ github.event.inputs.base_url || vars.STAGING_BASE_URL || 'https://hotones-staging.onrender.com' }}
+      WAIT_SECONDS: ${{ github.event.inputs.wait_seconds || '90' }}
+      TRIGGER_RUN_URL: ${{ github.event.workflow_run.html_url || '' }}
+      SMOKE_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Wait for Render deploy to settle
+        run: |
+          echo "Sleeping ${WAIT_SECONDS}s to let Render finish auto-deploy..."
+          sleep "${WAIT_SECONDS}"
+
+      - name: Run smoke test
+        id: smoke
+        run: |
+          set -euo pipefail
+          chmod +x docker/scripts/smoke-test-staging.sh
+          docker/scripts/smoke-test-staging.sh "${BASE_URL}" 2>&1 | tee /tmp/smoke.log
+
+      - name: Compose failure issue body
+        if: failure()
+        run: |
+          {
+            echo "## Smoke test staging KO"
+            echo
+            echo "Le smoke test post-deploy a échoué sur \`${BASE_URL}\`."
+            echo
+            echo "- Run smoke : ${SMOKE_RUN_URL}"
+            echo "- Run CI déclencheur : ${TRIGGER_RUN_URL}"
+            echo
+            echo "## Sortie du script"
+            echo
+            echo '```'
+            tail -n 80 /tmp/smoke.log 2>/dev/null || echo '(log non disponible)'
+            echo '```'
+            echo
+            echo "## Pistes"
+            echo
+            echo "- Render free tier endormi (cold start > 90s) : relancer manuellement le workflow."
+            echo "- Mauvais déploiement : vérifier l'écran Render \`Logs\` du dernier deploy."
+            echo "- Migration Doctrine en attente : se connecter au shell Render et lancer \`bin/console doctrine:migrations:migrate -n\`."
+            echo
+            echo "_Auto-ouvert par OPS-009. Cette issue se ferme automatiquement quand le prochain smoke test passe._"
+          } > /tmp/issue-body.md
+
+      - name: Open or update incident issue
+        if: failure()
+        run: |
+          set -euo pipefail
+          existing="$(
+            gh issue list \
+              --state open \
+              --label staging-smoke \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+
+          if [[ -z "${existing:-}" ]]; then
+            gh issue create \
+              --title "OPS-009: smoke staging KO" \
+              --label staging-smoke,ops \
+              --body-file /tmp/issue-body.md
+          else
+            gh issue comment "${existing}" --body-file /tmp/issue-body.md
+          fi
+
+      - name: Auto-close staging-smoke incidents on success
+        if: success()
+        run: |
+          set -euo pipefail
+          for issue in $(gh issue list --state open --label staging-smoke --json number --jq '.[].number'); do
+            gh issue comment "${issue}" --body "✅ Smoke test staging OK sur \`${BASE_URL}\` (run ${SMOKE_RUN_URL}). Auto-fermeture par OPS-009."
+            gh issue close "${issue}" --reason completed
+          done
