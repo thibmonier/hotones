@@ -1,9 +1,19 @@
+# DEPS-001 (sprint-004) — schema v6.1.0 du bundle.
+#
+# Migration depuis v5 :
+#   - Le bloc racine `default:` a ete remplace par une map `builders:`.
+#   - `route_prefix` et `route_enabled` sont desormais top-level.
+#   - Le bundle auto-injecte ses routes via `RouteLoaderCompilerPass`,
+#     plus besoin du fichier config/routes/endroid_qr_code.yaml.
 endroid_qr_code:
-    default:
-        writer: Endroid\QrCode\Writer\PngWriter
-        size: 300
-        margin: 10
-        encoding: 'UTF-8'
-        error_correction_level: 'low'
-        round_block_size_mode: 'margin'
-        validate_result: false
+    route_enabled: true
+    route_prefix: /qr-code
+    builders:
+        default:
+            writer: Endroid\QrCode\Writer\PngWriter
+            size: 300
+            margin: 10
+            encoding: 'UTF-8'
+            error_correction_level: 'low'
+            round_block_size_mode: 'margin'
+            validate_result: false
