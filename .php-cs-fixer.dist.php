@@ -14,7 +14,9 @@ return (new PhpCsFixer\Config())
         '@PSR12' => true,
         '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
-        'binary_operator_spaces' => ['default' => 'align_single_space_minimal'],
+        // ADR-0002: alignement vertical désactivé pour éviter les conflits avec Mago.
+        // La migration repo-wide est portée par TECH-DEBT-002 (sprint-003) — pas dans cette PR.
+        'binary_operator_spaces' => ['default' => 'single_space'],
         'blank_line_before_statement' => ['statements' => ['return']],
         'declare_strict_types' => true,
         'global_namespace_import' => [
