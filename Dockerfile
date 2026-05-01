@@ -129,9 +129,10 @@ RUN mkdir -p var/cache var/log var/sessions \
 RUN APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console cache:clear --no-warmup || true \
     && APP_ENV=prod APP_DEBUG=0 DATABASE_URL="sqlite:////var/www/html/var/data.db" php bin/console cache:warmup || true
 
-# Copy startup script
+# Copy startup scripts (production + staging US-070)
 COPY ./docker/scripts/start-render.sh /usr/local/bin/start-render.sh
-RUN chmod +x /usr/local/bin/start-render.sh
+COPY ./docker/scripts/start-staging.sh /usr/local/bin/start-staging.sh
+RUN chmod +x /usr/local/bin/start-render.sh /usr/local/bin/start-staging.sh
 
 # Create simple health check endpoint
 RUN echo '<?php http_response_code(200); echo "OK";' > /var/www/html/public/health
