@@ -109,6 +109,74 @@ final class VacationApprovalControllerTest extends WebTestCase
         self::assertSame(VacationStatus::REJECTED, $repo->findById($vacation->getId())->getStatus());
     }
 
+    public function testRejectPersistsRejectionReasonWhenSupplied(): void
+    {
+        $vacation = $this->createPendingVacation($this->employee);
+
+        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
+            '_token'           => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
+            'rejection_reason' => 'Planning sature sur la periode',
+        ]);
+
+        self::assertResponseRedirects('/manager/conges');
+
+        /** @var VacationRepositoryInterface $repo */
+        $repo     = static::getContainer()->get(VacationRepositoryInterface::class);
+        $rejected = $repo->findById($vacation->getId());
+        self::assertSame(VacationStatus::REJECTED, $rejected->getStatus());
+        self::assertSame('Planning sature sur la periode', $rejected->getRejectionReason());
+    }
+
+    public function testRejectKeepsNullReasonWhenFieldOmitted(): void
+    {
+        $vacation = $this->createPendingVacation($this->employee);
+
+        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
+            '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
+        ]);
+
+        /** @var VacationRepositoryInterface $repo */
+        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
+        self::assertNull($repo->findById($vacation->getId())->getRejectionReason());
+    }
+
+    public function testManagerCancelTransitionsApprovedVacationToCancelled(): void
+    {
+        // US-069: an approved vacation can be cancelled by the manager.
+        $vacation = $this->createPendingVacation($this->employee);
+
+        // Approve first
+        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/approuver', [
+            '_token' => $this->generateCsrfToken('approve'.$vacation->getId()->getValue()),
+        ]);
+
+        // Manager-cancel the approved vacation
+        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/annuler', [
+            '_token' => $this->generateCsrfToken('cancel-manager'.$vacation->getId()->getValue()),
+        ]);
+
+        self::assertResponseRedirects('/manager/conges');
+
+        /** @var VacationRepositoryInterface $repo */
+        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
+        self::assertSame(VacationStatus::CANCELLED, $repo->findById($vacation->getId())->getStatus());
+    }
+
+    public function testManagerCancelIsForbiddenForUnmanagedContributor(): void
+    {
+        $unrelatedManager  = $this->provisionContributor('rogue@test.com', 'Rogue', 'Manager', ['ROLE_MANAGER']);
+        $unrelatedEmployee = $this->provisionContributor('rogue-emp@test.com', 'Stranger', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
+        $foreignVacation   = $this->createPendingVacation($unrelatedEmployee);
+
+        $this->loginAs($this->manager->getUser());
+
+        $this->client->request('POST', '/manager/conges/'.$foreignVacation->getId()->getValue().'/annuler', [
+            '_token' => $this->generateCsrfToken('cancel-manager'.$foreignVacation->getId()->getValue()),
+        ]);
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testPendingCountApiReturnsJsonForManagedContributors(): void
     {
         $this->createPendingVacation($this->employee);

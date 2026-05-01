@@ -6,6 +6,8 @@ namespace App\Presentation\Vacation\Controller;
 
 use App\Application\Vacation\Command\ApproveVacation\ApproveVacationCommand;
 use App\Application\Vacation\Command\ApproveVacation\ApproveVacationHandler;
+use App\Application\Vacation\Command\CancelVacation\CancelVacationCommand;
+use App\Application\Vacation\Command\CancelVacation\CancelVacationHandler;
 use App\Application\Vacation\Command\RejectVacation\RejectVacationCommand;
 use App\Application\Vacation\Command\RejectVacation\RejectVacationHandler;
 use App\Domain\Vacation\Exception\InvalidStatusTransitionException;
@@ -27,6 +29,7 @@ class VacationApprovalController extends AbstractController
         private readonly ContributorRepository $contributorRepository,
         private readonly ApproveVacationHandler $approveVacationHandler,
         private readonly RejectVacationHandler $rejectVacationHandler,
+        private readonly CancelVacationHandler $cancelVacationHandler,
     ) {
     }
 
@@ -126,11 +129,42 @@ class VacationApprovalController extends AbstractController
             throw $this->createAccessDeniedException('Token CSRF invalide.');
         }
 
+        $rejectionReason = $request->request->get('rejection_reason');
+        $rejectionReason = is_string($rejectionReason) ? trim($rejectionReason) : null;
+        $rejectionReason = $rejectionReason === '' ? null : $rejectionReason;
+
         try {
-            ($this->rejectVacationHandler)(new RejectVacationCommand($id));
+            ($this->rejectVacationHandler)(new RejectVacationCommand($id, $rejectionReason));
             $this->addFlash('success', 'La demande de conge a ete rejetee.');
         } catch (InvalidStatusTransitionException) {
             $this->addFlash('error', 'Seules les demandes en attente peuvent etre rejetees.');
+        }
+
+        return $this->redirectToRoute('vacation_approval_index');
+    }
+
+    #[Route('/{id}/annuler', name: 'vacation_approval_cancel', methods: ['POST'])]
+    public function cancel(Request $request, string $id): Response
+    {
+        /** @var \App\Entity\User $user */
+        $user               = $this->getUser();
+        $managerContributor = $this->contributorRepository->findOneBy(['user' => $user]);
+
+        $vacation = $this->vacationRepository->findById(VacationId::fromString($id));
+
+        if (!$managerContributor || $vacation->getContributor()->getManager() !== $managerContributor) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas acces a cette demande.');
+        }
+
+        if (!$this->isCsrfTokenValid('cancel-manager'.$id, $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
+        try {
+            ($this->cancelVacationHandler)(new CancelVacationCommand($id));
+            $this->addFlash('success', 'La demande de conge a ete annulee.');
+        } catch (InvalidStatusTransitionException) {
+            $this->addFlash('error', 'Cette demande ne peut plus etre annulee.');
         }
 
         return $this->redirectToRoute('vacation_approval_index');

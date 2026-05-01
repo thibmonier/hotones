@@ -19,8 +19,11 @@ enum VacationStatus: string
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::PENDING   => [self::APPROVED, self::REJECTED, self::CANCELLED],
-            self::APPROVED  => [],
+            self::PENDING => [self::APPROVED, self::REJECTED, self::CANCELLED],
+            // APPROVED -> CANCELLED is allowed for manager-initiated cancellations
+            // (US-069). The contributor's own cancel is restricted to PENDING by
+            // VacationRequestController so the rule is purely additive.
+            self::APPROVED  => [self::CANCELLED],
             self::REJECTED  => [],
             self::CANCELLED => [],
         };

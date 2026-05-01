@@ -79,19 +79,12 @@
                                                         Approuver
                                                     </button>
                                                 </form>
-                                                <form method="post"
-                                                      action="{{ path('vacation_approval_reject', {'id': vacation.id.value}) }}"
-                                                      class="d-inline-block ms-1"
-                                                      onsubmit="return confirm('Rejeter cette demande ?');">
-                                                    <input type="hidden" name="_token"
-                                                           value="{{ csrf_token('reject' ~ vacation.id.value) }}">
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            aria-label="Rejeter la demande de {{ vacation.contributor.fullName }}">
-                                                        <i class="bx bx-x" aria-hidden="true"></i>
-                                                        Rejeter
-                                                    </button>
-                                                </form>
+                                                <a href="{{ path('vacation_approval_show', {'id': vacation.id.value}) }}#rejection-reason-{{ vacation.id.value }}"
+                                                   class="btn btn-sm btn-outline-danger ms-1"
+                                                   aria-label="Rejeter la demande de {{ vacation.contributor.fullName }} avec un motif">
+                                                    <i class="bx bx-x" aria-hidden="true"></i>
+                                                    Rejeter avec motif
+                                                </a>
                                             </td>
                                         </tr>
                                     {% endfor %}
