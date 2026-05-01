@@ -10,12 +10,14 @@ use App\Repository\ContributorRepository;
 use App\Repository\StaffingMetricsRepository;
 use App\Service\Planning\TaceAnalyzer;
 use DateTime;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
  * Comprehensive unit tests for TaceAnalyzer.
  */
+#[AllowMockObjectsWithoutExpectations]
 class TaceAnalyzerTest extends TestCase
 {
     private function createService(
@@ -254,7 +256,7 @@ class TaceAnalyzerTest extends TestCase
     public function testAnalyzeAllContributorsWithNoActiveContributors(): void
     {
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $contributorRepository->method('findBy')->with(['active' => true])->willReturn([]);
+        $contributorRepository->expects(self::once())->method('findBy')->with(['active' => true])->willReturn([]);
 
         $service = $this->createService($contributorRepository);
         $result = $service->analyzeAllContributors();
@@ -276,7 +278,7 @@ class TaceAnalyzerTest extends TestCase
         $contributor = $this->createMock(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $contributorRepository->method('findBy')->with(['active' => true])->willReturn([$contributor]);
+        $contributorRepository->expects(self::once())->method('findBy')->with(['active' => true])->willReturn([$contributor]);
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
 

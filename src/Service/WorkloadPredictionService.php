@@ -317,7 +317,7 @@ class WorkloadPredictionService
             $qb->andWhere('p.contributor IN (:contributorIds)')->setParameter('contributorIds', $contributorIds);
         }
 
-        $plannings = $qb->getQuery()->getResult();
+        $plannings = $qb->getQuery()->getResult() ?? [];
 
         foreach ($plannings as $planning) {
             /** @var Planning $planning */

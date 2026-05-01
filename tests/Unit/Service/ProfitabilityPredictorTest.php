@@ -6,8 +6,10 @@ namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
 use App\Service\ProfitabilityPredictor;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ProfitabilityPredictorTest extends TestCase
 {
     private ProfitabilityPredictor $service;
