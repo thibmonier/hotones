@@ -1,15 +1,16 @@
-# DEPS-001 (sprint-004) — config v6.1.0 selon le README officiel.
+# DEPS-001 (sprint-004) — schema endroid/qr-code-bundle v7.x.
 #
-# Note : la v6.1.0 documente un schema `endroid_qr_code.<builderName>:`
-# directement (sans wrapper `builders:`). L'auto-routing du bundle
-# enregistre la route GET /qr-code/{builder}/{data} via
-# RouteLoaderCompilerPass — plus besoin de config/routes/endroid_qr_code.yaml.
+# La v7 reintroduit la cle racine `builders:` comme map des configurations.
+# `route_enabled` et `route_prefix` sont top-level (pas dans builders).
 endroid_qr_code:
-    default:
-        writer: Endroid\QrCode\Writer\PngWriter
-        size: 300
-        margin: 10
-        encoding: 'UTF-8'
-        error_correction_level: 'low'
-        round_block_size_mode: 'margin'
-        validate_result: false
+    route_enabled: true
+    route_prefix: /qr-code
+    builders:
+        default:
+            writer: Endroid\QrCode\Writer\PngWriter
+            size: 300
+            margin: 10
+            encoding: 'UTF-8'
+            error_correction_level: 'low'
+            round_block_size_mode: 'margin'
+            validate_result: false
