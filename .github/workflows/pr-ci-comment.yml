@@ -1,0 +1,157 @@
+name: PR CI Failure Comment
+
+# OPS-008 (sprint-004) — extension d'OPS-004.
+# Quand un workflow critique (CI / Quality / SonarQube Analysis) est rouge
+# sur la HEAD d'une PR, poster un commentaire automatique avec le lien vers
+# le run et le résumé des jobs en échec. Idempotent : met à jour un commentaire
+# existant identifié par marqueur HTML plutôt que d'en empiler.
+
+on:
+  workflow_run:
+    workflows:
+      - 'CI'
+      - 'Quality'
+      - 'SonarQube Analysis'
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: pr-ci-comment-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  comment:
+    name: Comment on PR if CI failed
+    if: ${{ github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.event == 'pull_request' }}
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+      WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+      WORKFLOW_RUN_URL: ${{ github.event.workflow_run.html_url }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+      MARKER: '<!-- ops-008-pr-ci-comment -->'
+
+    steps:
+      - name: Find associated pull request
+        id: pr
+        run: |
+          set -euo pipefail
+          # workflow_run payload doesn't include the PR number; resolve it via
+          # the "list PRs for a commit" endpoint on the head SHA.
+          pr_number="$(
+            gh api "repos/${GITHUB_REPOSITORY}/commits/${HEAD_SHA}/pulls" \
+              --jq '.[] | select(.state == "open") | .number' \
+              | head -n1 || true
+          )"
+
+          if [[ -z "${pr_number:-}" ]]; then
+            echo "No open PR found for commit ${HEAD_SHA}; nothing to comment on."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "number=${pr_number}" >> "$GITHUB_OUTPUT"
+
+      - name: Collect failed jobs summary
+        id: jobs
+        if: steps.pr.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          jobs_json="$(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${WORKFLOW_RUN_ID}/jobs" \
+              --jq '[.jobs[] | select(.conclusion == "failure") | {name, html_url}]'
+          )"
+
+          # 5-job hard cap to keep the comment readable on long matrices.
+          summary="$(
+            echo "$jobs_json" \
+              | jq -r '.[:5] | map("- [" + .name + "](" + .html_url + ")") | join("\n")'
+          )"
+
+          total="$(echo "$jobs_json" | jq 'length')"
+
+          {
+            echo "summary<<EOF_JOBS"
+            if [[ -n "$summary" ]]; then
+              echo "$summary"
+              if [[ "$total" -gt 5 ]]; then
+                echo
+                echo "_… +$((total - 5)) autre(s) job(s) en échec, voir le run complet._"
+              fi
+            else
+              echo "_Aucun détail de job exposé par l'API. Voir le run pour les logs complets._"
+            fi
+            echo "EOF_JOBS"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Find existing OPS-008 comment
+        id: existing
+        if: steps.pr.outputs.found == 'true'
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          set -euo pipefail
+          comment_id="$(
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --paginate \
+              --jq ".[] | select(.body | contains(\"${MARKER}\")) | .id" \
+              | head -n1 || true
+          )"
+
+          if [[ -n "${comment_id:-}" ]]; then
+            echo "id=${comment_id}" >> "$GITHUB_OUTPUT"
+          else
+            echo "id=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build comment body
+        id: body
+        if: steps.pr.outputs.found == 'true'
+        env:
+          FAILED_JOBS: ${{ steps.jobs.outputs.summary }}
+        run: |
+          set -euo pipefail
+          short_sha="${HEAD_SHA:0:7}"
+
+          {
+            echo "${MARKER}"
+            echo "## ❌ CI rouge : \`${WORKFLOW_NAME}\`"
+            echo
+            echo "Le workflow \`${WORKFLOW_NAME}\` a échoué sur \`${HEAD_BRANCH}\` (\`${short_sha}\`)."
+            echo
+            echo "**Jobs en échec :**"
+            echo
+            printf '%s\n' "$FAILED_JOBS"
+            echo
+            echo "🔗 [Voir le run complet](${WORKFLOW_RUN_URL})"
+            echo
+            echo "_Auto-comment OPS-008. Ce commentaire est mis à jour à chaque nouvel échec; il n'est pas re-créé._"
+          } > /tmp/comment.md
+
+          echo "path=/tmp/comment.md" >> "$GITHUB_OUTPUT"
+
+      - name: Post or update PR comment
+        if: steps.pr.outputs.found == 'true'
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          EXISTING_ID: ${{ steps.existing.outputs.id }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${EXISTING_ID:-}" ]]; then
+            gh api --method PATCH \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${EXISTING_ID}" \
+              -F body=@/tmp/comment.md > /dev/null
+            echo "Updated existing comment ${EXISTING_ID} on PR #${PR_NUMBER}"
+          else
+            gh pr comment "${PR_NUMBER}" --body-file /tmp/comment.md
+            echo "Posted new comment on PR #${PR_NUMBER}"
+          fi
