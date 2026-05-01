@@ -1,0 +1,92 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Demande de {{ vacation.contributor.fullName }} - Validation{% endblock %}
+
+{% block content %}
+    {% set status = vacation.status %}
+    {% set badgeClass = {
+        'pending':   'bg-warning text-dark',
+        'approved':  'bg-success',
+        'rejected':  'bg-danger',
+        'cancelled': 'bg-secondary',
+    }[status.value] | default('bg-light text-dark') %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">
+                    Demande de {{ vacation.contributor.fullName }}
+                    <span class="badge {{ badgeClass }} align-middle ms-2">{{ status.label }}</span>
+                </h4>
+                <div class="page-title-right">
+                    <a href="{{ path('vacation_approval_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1" aria-hidden="true"></i>
+                        Retour aux validations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Collaborateur</dt>
+                        <dd class="col-sm-8">{{ vacation.contributor.fullName }}</dd>
+
+                        <dt class="col-sm-4">Type de conge</dt>
+                        <dd class="col-sm-8">{{ vacation.typeLabel }}</dd>
+
+                        <dt class="col-sm-4">Date de debut</dt>
+                        <dd class="col-sm-8">{{ vacation.startDate|date('l d F Y') }}</dd>
+
+                        <dt class="col-sm-4">Date de fin</dt>
+                        <dd class="col-sm-8">{{ vacation.endDate|date('l d F Y') }}</dd>
+
+                        <dt class="col-sm-4">Jours ouvres</dt>
+                        <dd class="col-sm-8">{{ vacation.numberOfWorkingDays }}</dd>
+
+                        <dt class="col-sm-4">Heures par jour</dt>
+                        <dd class="col-sm-8">{{ vacation.dailyHours.value }}h</dd>
+
+                        <dt class="col-sm-4">Motif</dt>
+                        <dd class="col-sm-8">{{ vacation.reason ?: '—' }}</dd>
+
+                        <dt class="col-sm-4">Soumise le</dt>
+                        <dd class="col-sm-8">{{ vacation.createdAt|date('d/m/Y H:i') }}</dd>
+                    </dl>
+                </div>
+                {% if status.value == 'pending' %}
+                    <div class="card-footer d-flex justify-content-end gap-2">
+                        <form method="post"
+                              action="{{ path('vacation_approval_reject', {'id': vacation.id.value}) }}"
+                              onsubmit="return confirm('Rejeter cette demande ?');">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('reject' ~ vacation.id.value) }}">
+                            <button type="submit"
+                                    class="btn btn-outline-danger"
+                                    aria-label="Rejeter la demande de {{ vacation.contributor.fullName }}">
+                                <i class="bx bx-x me-1" aria-hidden="true"></i>
+                                Rejeter
+                            </button>
+                        </form>
+                        <form method="post"
+                              action="{{ path('vacation_approval_approve', {'id': vacation.id.value}) }}"
+                              onsubmit="return confirm('Approuver cette demande ?');">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('approve' ~ vacation.id.value) }}">
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    aria-label="Approuver la demande de {{ vacation.contributor.fullName }}">
+                                <i class="bx bx-check me-1" aria-hidden="true"></i>
+                                Approuver
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
