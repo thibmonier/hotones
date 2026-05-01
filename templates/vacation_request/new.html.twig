@@ -1,0 +1,88 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Nouvelle demande de conge{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Nouvelle demande de conge</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('vacation_request_index') }}" class="btn btn-outline-secondary">
+                        <i class="bx bx-arrow-back me-1" aria-hidden="true"></i>
+                        Retour a mes demandes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card"
+                 data-controller="vacation-picker"
+                 data-vacation-picker-start-input-value="{{ form.startDate.vars.id }}"
+                 data-vacation-picker-end-input-value="{{ form.endDate.vars.id }}">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'aria-label': 'Formulaire de demande de conge'}}) }}
+
+                        {% if not form.vars.valid %}
+                            <div class="alert alert-danger" role="alert">
+                                Le formulaire contient des erreurs. Merci de corriger les champs marques.
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                {{ form_label(form.type, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                {{ form_widget(form.type) }}
+                                {{ form_errors(form.type) }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form_label(form.startDate, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                {{ form_widget(form.startDate, {'attr': {'data-vacation-picker-target': 'startInput'}}) }}
+                                {{ form_errors(form.startDate) }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form_label(form.endDate, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                {{ form_widget(form.endDate, {'attr': {'data-vacation-picker-target': 'endInput'}}) }}
+                                {{ form_errors(form.endDate) }}
+                            </div>
+
+                            <div class="col-md-12" data-vacation-picker-target="summary" aria-live="polite">
+                                <div class="alert alert-info mb-0 d-none" role="status">
+                                    <strong>Duree estimee :</strong>
+                                    <span data-vacation-picker-target="businessDays">0</span> jour(s) ouvre(s).
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form_label(form.dailyHours, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                {{ form_widget(form.dailyHours) }}
+                                {{ form_help(form.dailyHours) }}
+                                {{ form_errors(form.dailyHours) }}
+                            </div>
+
+                            <div class="col-md-12">
+                                {{ form_label(form.reason, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                {{ form_widget(form.reason) }}
+                                {{ form_errors(form.reason) }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{{ path('vacation_request_index') }}" class="btn btn-light">Annuler</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-check me-1" aria-hidden="true"></i>
+                                Soumettre la demande
+                            </button>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
