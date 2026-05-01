@@ -1,0 +1,147 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Validation des demandes de conges{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">
+                    Validation des demandes de conges
+                    {% if pending_vacations is not empty %}
+                        <span class="badge bg-warning text-dark align-middle ms-2"
+                              aria-label="{{ pending_vacations|length }} demande(s) en attente">
+                            {{ pending_vacations|length }} en attente
+                        </span>
+                    {% endif %}
+                </h4>
+                <div class="page-title-right text-muted small">
+                    {% if manager %}
+                        <i class="bx bx-user-check me-1" aria-hidden="true"></i>
+                        Manager : {{ manager.fullName }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Demandes en attente</h5>
+                    {% if pending_vacations is empty %}
+                        <p class="text-muted mb-0">
+                            <i class="bx bx-check-circle me-1" aria-hidden="true"></i>
+                            Aucune demande en attente. Tout est a jour.
+                        </p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle"
+                                   aria-label="Demandes de conges en attente de validation">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Collaborateur</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Du</th>
+                                        <th scope="col">Au</th>
+                                        <th scope="col">Jours ouvres</th>
+                                        <th scope="col">Soumise le</th>
+                                        <th scope="col" class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vacation in pending_vacations %}
+                                        <tr>
+                                            <td>{{ vacation.contributor.fullName }}</td>
+                                            <td>{{ vacation.typeLabel }}</td>
+                                            <td>{{ vacation.startDate|date('d/m/Y') }}</td>
+                                            <td>{{ vacation.endDate|date('d/m/Y') }}</td>
+                                            <td>{{ vacation.numberOfWorkingDays }}</td>
+                                            <td>{{ vacation.createdAt|date('d/m/Y H:i') }}</td>
+                                            <td class="text-end">
+                                                <a href="{{ path('vacation_approval_show', {'id': vacation.id.value}) }}"
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   aria-label="Voir le detail de la demande de {{ vacation.contributor.fullName }}">
+                                                    <i class="bx bx-show" aria-hidden="true"></i>
+                                                    Detail
+                                                </a>
+                                                <form method="post"
+                                                      action="{{ path('vacation_approval_approve', {'id': vacation.id.value}) }}"
+                                                      class="d-inline-block ms-1"
+                                                      onsubmit="return confirm('Approuver cette demande ?');">
+                                                    <input type="hidden" name="_token"
+                                                           value="{{ csrf_token('approve' ~ vacation.id.value) }}">
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-success"
+                                                            aria-label="Approuver la demande de {{ vacation.contributor.fullName }}">
+                                                        <i class="bx bx-check" aria-hidden="true"></i>
+                                                        Approuver
+                                                    </button>
+                                                </form>
+                                                <a href="{{ path('vacation_approval_show', {'id': vacation.id.value}) }}#rejection-reason-{{ vacation.id.value }}"
+                                                   class="btn btn-sm btn-outline-danger ms-1"
+                                                   aria-label="Rejeter la demande de {{ vacation.contributor.fullName }} avec un motif">
+                                                    <i class="bx bx-x" aria-hidden="true"></i>
+                                                    Rejeter avec motif
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if all_vacations is not empty %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Historique de l'equipe</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle"
+                                   aria-label="Historique des demandes de conges de l'equipe">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Collaborateur</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Periode</th>
+                                        <th scope="col">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vacation in all_vacations %}
+                                        {% set status = vacation.status %}
+                                        {% set badgeClass = {
+                                            'pending':   'bg-warning text-dark',
+                                            'approved':  'bg-success',
+                                            'rejected':  'bg-danger',
+                                            'cancelled': 'bg-secondary',
+                                        }[status.value] | default('bg-light text-dark') %}
+                                        <tr>
+                                            <td>{{ vacation.contributor.fullName }}</td>
+                                            <td>{{ vacation.typeLabel }}</td>
+                                            <td>
+                                                {{ vacation.startDate|date('d/m/Y') }}
+                                                &rarr;
+                                                {{ vacation.endDate|date('d/m/Y') }}
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ badgeClass }}">{{ status.label }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

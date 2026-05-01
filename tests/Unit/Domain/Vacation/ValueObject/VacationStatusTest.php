@@ -31,13 +31,14 @@ final class VacationStatusTest extends TestCase
         self::assertTrue($status->canTransitionTo(VacationStatus::CANCELLED));
     }
 
-    public function testApprovedCannotTransition(): void
+    public function testApprovedCanTransitionToCancelledForManagerCancel(): void
     {
+        // US-069: a manager may cancel a vacation that has already been approved.
         $status = VacationStatus::APPROVED;
 
         self::assertFalse($status->canTransitionTo(VacationStatus::PENDING));
         self::assertFalse($status->canTransitionTo(VacationStatus::REJECTED));
-        self::assertFalse($status->canTransitionTo(VacationStatus::CANCELLED));
+        self::assertTrue($status->canTransitionTo(VacationStatus::CANCELLED));
     }
 
     public function testRejectedCannotTransition(): void

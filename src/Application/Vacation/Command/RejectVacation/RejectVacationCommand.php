@@ -8,6 +8,7 @@ final readonly class RejectVacationCommand
 {
     public function __construct(
         public string $vacationId,
+        public ?string $rejectionReason = null,
     ) {
     }
 }

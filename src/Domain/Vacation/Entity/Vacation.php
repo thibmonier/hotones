@@ -32,6 +32,7 @@ final class Vacation implements CompanyOwnedInterface
     private VacationStatus $status;
     private DailyHours $dailyHours;
     private ?string $reason;
+    private ?string $rejectionReason = null;
     private DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $approvedAt;
     private ?User $approvedBy;
@@ -83,9 +84,10 @@ final class Vacation implements CompanyOwnedInterface
         $this->recordEvent(new VacationApproved($this->id, $approvedBy->getId()));
     }
 
-    public function reject(): void
+    public function reject(?string $rejectionReason = null): void
     {
-        $this->status = $this->status->transitionTo(VacationStatus::REJECTED);
+        $this->status          = $this->status->transitionTo(VacationStatus::REJECTED);
+        $this->rejectionReason = $rejectionReason;
 
         $this->recordEvent(new VacationRejected($this->id));
     }
@@ -171,6 +173,11 @@ final class Vacation implements CompanyOwnedInterface
     public function getReason(): ?string
     {
         return $this->reason;
+    }
+
+    public function getRejectionReason(): ?string
+    {
+        return $this->rejectionReason;
     }
 
     public function getCreatedAt(): DateTimeImmutable

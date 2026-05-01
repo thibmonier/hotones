@@ -101,16 +101,36 @@ final class VacationTest extends TestCase
         $vacation->approve($user);
     }
 
-    public function testCannotCancelApprovedVacation(): void
+    public function testManagerCanCancelApprovedVacation(): void
     {
+        // US-069: a manager-initiated cancellation must succeed on an APPROVED vacation.
         $vacation = $this->createVacation();
         $user     = $this->createMock(User::class);
         $user->method('getId')->willReturn(42);
 
         $vacation->approve($user);
-
-        $this->expectException(InvalidStatusTransitionException::class);
         $vacation->cancel();
+
+        self::assertSame(VacationStatus::CANCELLED, $vacation->getStatus());
+    }
+
+    public function testRejectStoresOptionalRejectionReason(): void
+    {
+        $vacation = $this->createVacation();
+
+        $vacation->reject('Planning sature');
+
+        self::assertSame(VacationStatus::REJECTED, $vacation->getStatus());
+        self::assertSame('Planning sature', $vacation->getRejectionReason());
+    }
+
+    public function testRejectWithoutReasonKeepsRejectionReasonNull(): void
+    {
+        $vacation = $this->createVacation();
+
+        $vacation->reject();
+
+        self::assertNull($vacation->getRejectionReason());
     }
 
     public function testGetTotalHours(): void

@@ -1,0 +1,96 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Mes demandes de conges{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Mes demandes de conges</h4>
+                <div class="page-title-right">
+                    <a href="{{ path('vacation_request_new') }}" class="btn btn-primary">
+                        <i class="bx bx-plus me-1" aria-hidden="true"></i>
+                        Nouvelle demande
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if vacations is empty %}
+                        <div class="text-center py-5">
+                            <i class="bx bx-calendar-x display-4 text-muted" aria-hidden="true"></i>
+                            <p class="mt-3 text-muted">Vous n'avez pas encore de demande de conge.</p>
+                            <a href="{{ path('vacation_request_new') }}" class="btn btn-primary mt-2">
+                                Faire une premiere demande
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" aria-label="Liste de mes demandes de conges">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Du</th>
+                                        <th scope="col">Au</th>
+                                        <th scope="col">Heures / jour</th>
+                                        <th scope="col">Statut</th>
+                                        <th scope="col">Soumise le</th>
+                                        <th scope="col" class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vacation in vacations %}
+                                        <tr>
+                                            <td>{{ vacation.typeLabel }}</td>
+                                            <td>{{ vacation.startDate|date('d/m/Y') }}</td>
+                                            <td>{{ vacation.endDate|date('d/m/Y') }}</td>
+                                            <td>{{ vacation.dailyHours.value }}h</td>
+                                            <td>
+                                                {% set status = vacation.status %}
+                                                {% set badgeClass = {
+                                                    'pending':   'bg-warning text-dark',
+                                                    'approved':  'bg-success',
+                                                    'rejected':  'bg-danger',
+                                                    'cancelled': 'bg-secondary',
+                                                }[status.value] | default('bg-light text-dark') %}
+                                                <span class="badge {{ badgeClass }}">{{ status.label }}</span>
+                                            </td>
+                                            <td>{{ vacation.createdAt|date('d/m/Y H:i') }}</td>
+                                            <td class="text-end">
+                                                <a href="{{ path('vacation_request_show', {'id': vacation.id.value}) }}"
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   aria-label="Voir le detail de la demande du {{ vacation.startDate|date('d/m/Y') }}">
+                                                    <i class="bx bx-show" aria-hidden="true"></i>
+                                                    Detail
+                                                </a>
+                                                {% if status.value == 'pending' %}
+                                                    <form method="post"
+                                                          action="{{ path('vacation_request_cancel', {'id': vacation.id.value}) }}"
+                                                          class="d-inline-block ms-1"
+                                                          onsubmit="return confirm('Annuler cette demande de conge ?');">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ vacation.id.value) }}">
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                aria-label="Annuler la demande du {{ vacation.startDate|date('d/m/Y') }}">
+                                                            <i class="bx bx-x" aria-hidden="true"></i>
+                                                            Annuler
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
