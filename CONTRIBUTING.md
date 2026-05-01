@@ -303,6 +303,42 @@ Votre PR doit :
 4. ✅ **Mettre à jour la documentation** si nécessaire
 5. ✅ **Avoir une description claire** du problème résolu et de la solution
 6. ✅ **Référencer les Issues** associées (`Closes #123`, `Fixes #456`)
+7. ✅ **Respecter la taille maximale** : voir section ci-dessous
+
+### Taille de Pull Request — politique <400 lignes
+
+Pour garder la review humaine efficace et accélérer les merges, **une PR ne doit pas dépasser 400 lignes diff cumulées** (additions + suppressions).
+
+Les fichiers suivants sont **exclus** du calcul :
+
+- Fichiers générés automatiquement : `composer.lock`, `package-lock.json`, `yarn.lock`, `phpstan-baseline.neon`
+- Migrations Doctrine auto-générées (`migrations/Version*.php` produits par `doctrine:migrations:diff`)
+- Snapshots de tests (`tests/__snapshots__/**`, `*.snap`)
+- Assets compilés (`public/build/**`, `public/assets/**`)
+- Fichiers de traduction auto-extraits (`translations/*.xlf` regénérés)
+
+**Si votre PR dépasse 400 lignes :**
+
+- Découpez-la en commits atomiques **clairement nommés** (chacun reviewable indépendamment) ; un reviewer doit pouvoir naviguer commit par commit via `gh pr diff --commit <sha>`
+- Ou découpez-la en **PRs stack** (chaque PR cible la précédente, exemple `feat/foo-base` → `feat/foo-extension`) ; voir le pattern utilisé sur sprint-002 (#32 → #39 → #40 → #43)
+- Ou justifiez explicitement la taille dans la description : reasons acceptées sont migration legacy massive, refacto sécurité OWASP, dépendance technique forçant un changement large
+
+**Le reviewer peut demander un découpage avant de commencer la revue** si la règle est cassée sans justification. Une PR > 800 lignes sans split sera systématiquement renvoyée.
+
+#### Mesurer la taille avant push
+
+```bash
+# Lignes diff cumulées sur le HEAD courant vs main
+git diff main...HEAD --shortstat
+
+# Avec exclusions (composer.lock, migrations, snapshots)
+git diff main...HEAD --shortstat -- ':(exclude)composer.lock' ':(exclude)package-lock.json' ':(exclude)migrations/Version*.php'
+```
+
+#### Référence
+
+- Origine : retro sprint-002, action 5 (OPS-006).
+- ADR : à venir si l'équipe décide d'un split policy plus formelle.
 
 **Template de PR** :
 
