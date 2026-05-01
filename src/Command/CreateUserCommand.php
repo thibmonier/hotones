@@ -87,11 +87,11 @@ class CreateUserCommand extends Command
         $user = new User();
         $user->setEmail($email);
         $user->firstName = $input->getArgument('firstName');
-        $user->lastName  = $input->getArgument('lastName');
+        $user->lastName = $input->getArgument('lastName');
         $user->setCompany($company);
 
         // Set role
-        $role       = $input->getOption('role');
+        $role = $input->getOption('role');
         $validRoles = ['ROLE_INTERVENANT', 'ROLE_CHEF_PROJET', 'ROLE_MANAGER', 'ROLE_SUPERADMIN'];
         if (!in_array($role, $validRoles, true)) {
             $io->error(sprintf('Invalid role "%s". Valid roles: %s', $role, implode(', ', $validRoles)));

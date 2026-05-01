@@ -98,10 +98,10 @@ class DoctrineVacationRepository extends ServiceEntityRepository implements Vaca
         $totalDays = 0.0;
         foreach ($vacations as $vacation) {
             $start = max($vacation->getStartDate(), $startDate);
-            $end   = min($vacation->getEndDate(), $endDate);
+            $end = min($vacation->getEndDate(), $endDate);
 
             $interval = $start->diff($end);
-            $days     = $interval->days + 1;
+            $days = $interval->days + 1;
 
             $totalDays += $days;
         }

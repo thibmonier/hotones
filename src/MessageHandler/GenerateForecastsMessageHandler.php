@@ -32,7 +32,7 @@ final readonly class GenerateForecastsMessageHandler
 
             $this->logger->info('[Scheduler] Prévisions générées avec succès', [
                 'forecasts_count' => count($forecasts),
-                'months'          => $months,
+                'months' => $months,
             ]);
         } catch (Exception $e) {
             $this->logger->error('[Scheduler] Erreur lors de la génération des prévisions', [

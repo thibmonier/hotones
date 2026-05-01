@@ -198,10 +198,10 @@ class Notification implements CompanyOwnedInterface
         }
 
         return match ($this->entityType) {
-            'Order'     => '/orders/'.$this->entityId,
-            'Project'   => '/projects/'.$this->entityId,
+            'Order' => '/orders/'.$this->entityId,
+            'Project' => '/projects/'.$this->entityId,
             'Timesheet' => '/timesheets/'.$this->entityId,
-            default     => null,
+            default => null,
         };
     }
 

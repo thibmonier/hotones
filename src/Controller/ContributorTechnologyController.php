@@ -34,12 +34,12 @@ class ContributorTechnologyController extends AbstractController
         }
 
         $technologiesByCategory = $this->contributorTechnologyRepository->findByContributorGroupedByCategory($contributor);
-        $countByLevel           = $this->getCountByLevel($contributor);
+        $countByLevel = $this->getCountByLevel($contributor);
 
         return $this->render('contributor_technology/index.html.twig', [
-            'contributor'            => $contributor,
+            'contributor' => $contributor,
             'technologiesByCategory' => $technologiesByCategory,
-            'countByLevel'           => $countByLevel,
+            'countByLevel' => $countByLevel,
         ]);
     }
 
@@ -69,9 +69,9 @@ class ContributorTechnologyController extends AbstractController
         }
 
         return $this->render('contributor_technology/new.html.twig', [
-            'contributor'           => $contributor,
+            'contributor' => $contributor,
             'contributorTechnology' => $contributorTechnology,
-            'form'                  => $form,
+            'form' => $form,
         ]);
     }
 
@@ -94,9 +94,9 @@ class ContributorTechnologyController extends AbstractController
         }
 
         return $this->render('contributor_technology/edit.html.twig', [
-            'contributor'           => $contributorTechnology->getContributor(),
+            'contributor' => $contributorTechnology->getContributor(),
             'contributorTechnology' => $contributorTechnology,
-            'form'                  => $form,
+            'form' => $form,
         ]);
     }
 
@@ -137,7 +137,7 @@ class ContributorTechnologyController extends AbstractController
             )
         ) {
             $managerLevel = $request->getPayload()->getInt('manager_level');
-            $notes        = $request->getPayload()->getString('notes');
+            $notes = $request->getPayload()->getString('notes');
 
             if (
                 $managerLevel >= ContributorTechnology::LEVEL_BEGINNER

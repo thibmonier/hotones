@@ -26,7 +26,7 @@ class NotificationPreferenceRepository extends CompanyAwareRepository
     public function findByUserAndEventType(User $user, NotificationType $eventType): ?NotificationPreference
     {
         return $this->findOneBy([
-            'user'      => $user,
+            'user' => $user,
             'eventType' => $eventType,
         ]);
     }
@@ -39,7 +39,7 @@ class NotificationPreferenceRepository extends CompanyAwareRepository
     public function findByUserIndexedByEventType(User $user): array
     {
         $preferences = $this->findBy(['user' => $user]);
-        $indexed     = [];
+        $indexed = [];
 
         foreach ($preferences as $preference) {
             $indexed[$preference->getEventType()->value] = $preference;

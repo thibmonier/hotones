@@ -151,10 +151,10 @@ class ProjectHealthScore implements CompanyOwnedInterface
     public function getBadgeColor(): string
     {
         return match ($this->healthLevel) {
-            'healthy'  => 'success',
-            'warning'  => 'warning',
+            'healthy' => 'success',
+            'warning' => 'warning',
             'critical' => 'danger',
-            default    => 'secondary',
+            default => 'secondary',
         };
     }
 
@@ -164,10 +164,10 @@ class ProjectHealthScore implements CompanyOwnedInterface
     public function getIcon(): string
     {
         return match ($this->healthLevel) {
-            'healthy'  => 'bx-check-circle',
-            'warning'  => 'bx-error-circle',
+            'healthy' => 'bx-check-circle',
+            'warning' => 'bx-error-circle',
             'critical' => 'bx-x-circle',
-            default    => 'bx-help-circle',
+            default => 'bx-help-circle',
         };
     }
 

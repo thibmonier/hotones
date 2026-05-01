@@ -33,21 +33,21 @@ class ImportTheTribeProjectsCommand extends Command
      * Normalisation des noms de projets (variantes trouvees dans le fichier).
      */
     private const array NAME_ALIASES = [
-        'AKIVI'                => 'Akivi',
-        'HE RC-Lot-2'          => 'HE RC Lot-2',
-        'HE RC-Lot2'           => 'HE RC Lot-2',
-        'Homeopath'            => 'Homéopath',
-        'Qonti AUDIT'          => 'Qonti Audit',
-        'Quonti AUDIT'         => 'Qonti Audit',
-        '88jobs'               => '88 Jobs',
-        '88 jobs'              => '88 Jobs',
+        'AKIVI' => 'Akivi',
+        'HE RC-Lot-2' => 'HE RC Lot-2',
+        'HE RC-Lot2' => 'HE RC Lot-2',
+        'Homeopath' => 'Homéopath',
+        'Qonti AUDIT' => 'Qonti Audit',
+        'Quonti AUDIT' => 'Qonti Audit',
+        '88jobs' => '88 Jobs',
+        '88 jobs' => '88 Jobs',
         '88 jobs / Job Public' => '88 Jobs',
-        'La Presse libre'      => 'La Presse Libre',
-        'UnivNantes'           => 'Univ Nantes',
-        'Paper.Club'           => 'Paper.club',
-        'Paper Club'           => 'Paper.club',
-        'Paper'                => 'Paper.club',
-        'AI Mother'            => 'MotherAI',
+        'La Presse libre' => 'La Presse Libre',
+        'UnivNantes' => 'Univ Nantes',
+        'Paper.Club' => 'Paper.club',
+        'Paper Club' => 'Paper.club',
+        'Paper' => 'Paper.club',
+        'AI Mother' => 'MotherAI',
     ];
 
     /**
@@ -70,11 +70,11 @@ class ImportTheTribeProjectsCommand extends Command
      * Priorite des types pour determiner le statut Order (plus eleve = prioritaire).
      */
     private const array TYPE_PRIORITY = [
-        'V'  => 6,
+        'V' => 6,
         'TO' => 5,
-        'O'  => 4,
+        'O' => 4,
         'NF' => 3,
-        'R'  => 2,
+        'R' => 2,
         'AV' => 1,
     ];
 
@@ -82,11 +82,11 @@ class ImportTheTribeProjectsCommand extends Command
      * Mapping type → Order status.
      */
     private const array TYPE_TO_ORDER_STATUS = [
-        'V'  => 'signe',
+        'V' => 'signe',
         'TO' => 'signe',
-        'O'  => 'gagne',
+        'O' => 'gagne',
         'NF' => 'signe',
-        'R'  => 'a_signer',
+        'R' => 'a_signer',
         'AV' => 'a_signer',
     ];
 
@@ -128,7 +128,7 @@ class ImportTheTribeProjectsCommand extends Command
         $io->title('Import des projets theTribe');
 
         $filePath = $input->getArgument('file');
-        $dryRun   = $input->getOption('dry-run');
+        $dryRun = $input->getOption('dry-run');
 
         if (!file_exists($filePath)) {
             $io->error(sprintf('Fichier introuvable: %s', $filePath));
@@ -183,20 +183,20 @@ class ImportTheTribeProjectsCommand extends Command
     {
         $io->section('Lecture du fichier Excel');
 
-        $reader      = new Xlsx();
+        $reader = new Xlsx();
         $spreadsheet = $reader->load($filePath);
-        $sheet       = $spreadsheet->getSheetByName('Staffing');
+        $sheet = $spreadsheet->getSheetByName('Staffing');
 
         if (!$sheet) {
             throw new RuntimeException('Feuille "Staffing" introuvable dans le fichier Excel');
         }
 
-        $highestColumn  = $sheet->getHighestDataColumn();
-        $highestColIdx  = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+        $highestColumn = $sheet->getHighestDataColumn();
+        $highestColIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
         $sectionHeaders = ['DEVS', 'PM', 'DESIGN', 'UX', 'DATA', 'QA'];
 
         $assignments = [];
-        $warnings    = 0;
+        $warnings = 0;
 
         for ($row = 3; $row <= $sheet->getHighestDataRow(); ++$row) {
             $contributorName = trim((string) $sheet->getCell('A'.$row)->getValue());
@@ -207,7 +207,7 @@ class ImportTheTribeProjectsCommand extends Command
 
             for ($col = self::STAFFING_START_COLUMN; $col <= $highestColIdx; ++$col) {
                 $coordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
-                $cellValue  = $sheet->getCell($coordinate.$row)->getValue();
+                $cellValue = $sheet->getCell($coordinate.$row)->getValue();
                 if ($cellValue === null || trim((string) $cellValue) === '') {
                     continue;
                 }
@@ -221,11 +221,11 @@ class ImportTheTribeProjectsCommand extends Command
                     }
 
                     $assignments[] = [
-                        'name'        => $entry['name'],
-                        'days'        => $entry['days'],
-                        'type'        => $entry['type'],
+                        'name' => $entry['name'],
+                        'days' => $entry['days'],
+                        'type' => $entry['type'],
                         'contributor' => $contributorName,
-                        'row'         => $row,
+                        'row' => $row,
                     ];
                 }
             }
@@ -323,8 +323,8 @@ class ImportTheTribeProjectsCommand extends Command
 
             if (!isset($projects[$key])) {
                 $projects[$key] = [
-                    'name'      => $assignment['name'],
-                    'types'     => [],
+                    'name' => $assignment['name'],
+                    'types' => [],
                     'totalDays' => 0.0,
                 ];
             }
@@ -344,20 +344,20 @@ class ImportTheTribeProjectsCommand extends Command
         // Afficher le resume
         $typeCounts = [];
         foreach ($projects as $project) {
-            $type              = $project['primaryType'];
+            $type = $project['primaryType'];
             $typeCounts[$type] = ($typeCounts[$type] ?? 0) + 1;
         }
 
         $io->writeln(sprintf('  %d projets uniques trouvés', count($projects)));
 
         $typeLabels = [
-            'V'  => 'vendus (V)',
+            'V' => 'vendus (V)',
             'TO' => 'TMA (TO)',
-            'O'  => 'devis gagnés (O)',
+            'O' => 'devis gagnés (O)',
             'NF' => 'non facturés (NF)',
-            'R'  => 'devis probables (R)',
+            'R' => 'devis probables (R)',
             'AV' => 'avant-vente (AV)',
-            'G'  => 'internes (G)',
+            'G' => 'internes (G)',
         ];
 
         foreach ($typeLabels as $type => $label) {
@@ -374,13 +374,13 @@ class ImportTheTribeProjectsCommand extends Command
      */
     private function determinePrimaryType(array $types): string
     {
-        $best     = $types[0];
+        $best = $types[0];
         $bestPrio = self::TYPE_PRIORITY[$best] ?? 0;
 
         foreach ($types as $type) {
             $prio = self::TYPE_PRIORITY[$type] ?? 0;
             if ($prio > $bestPrio) {
-                $best     = $type;
+                $best = $type;
                 $bestPrio = $prio;
             }
         }
@@ -455,14 +455,14 @@ class ImportTheTribeProjectsCommand extends Command
         $orderRepo = $this->entityManager->getRepository(Order::class);
         assert($orderRepo instanceof OrderRepository);
 
-        $year  = date('Y');
+        $year = date('Y');
         $month = date('m');
 
         $lastOrder = $orderRepo->findLastOrderNumberForMonth($year, $month);
         if ($lastOrder) {
             // Extraire le numero incremental du dernier devis
-            $number               = $lastOrder->orderNumber;
-            $suffix               = substr($number, 7); // Apres "D202602"
+            $number = $lastOrder->orderNumber;
+            $suffix = substr($number, 7); // Apres "D202602"
             $this->orderIncrement = (int) $suffix;
         }
     }
@@ -478,9 +478,9 @@ class ImportTheTribeProjectsCommand extends Command
             return false;
         }
 
-        $client          = new Client();
+        $client = new Client();
         $client->company = $company;
-        $client->name    = $name;
+        $client->name = $name;
 
         $this->entityManager->persist($client);
         $this->clientCache[$key] = $client;
@@ -506,13 +506,13 @@ class ImportTheTribeProjectsCommand extends Command
         }
 
         $isInternal = $data['primaryType'] === 'G';
-        $isRegie    = $data['primaryType'] === 'TO';
+        $isRegie = $data['primaryType'] === 'TO';
 
-        $project              = new Project();
-        $project->company     = $company;
-        $project->name        = $data['name'];
-        $project->status      = 'active';
-        $project->isInternal  = $isInternal;
+        $project = new Project();
+        $project->company = $company;
+        $project->name = $data['name'];
+        $project->status = 'active';
+        $project->isInternal = $isInternal;
         $project->projectType = $isRegie ? 'regie' : 'forfait';
 
         if (!$isInternal) {
@@ -539,7 +539,7 @@ class ImportTheTribeProjectsCommand extends Command
     private function createOrder(array $data, Company $company, SymfonyStyle $io): bool
     {
         $projectKey = mb_strtolower($data['name']);
-        $project    = $this->projectCache[$projectKey] ?? null;
+        $project = $this->projectCache[$projectKey] ?? null;
 
         if (!$project) {
             $io->warning(sprintf('  Projet introuvable pour le devis: %s', $data['name']));
@@ -561,18 +561,18 @@ class ImportTheTribeProjectsCommand extends Command
         }
 
         $orderNumber = $this->generateNextOrderNumber();
-        $status      = self::TYPE_TO_ORDER_STATUS[$data['primaryType']] ?? 'a_signer';
-        $isRegie     = $data['primaryType'] === 'TO';
+        $status = self::TYPE_TO_ORDER_STATUS[$data['primaryType']] ?? 'a_signer';
+        $isRegie = $data['primaryType'] === 'TO';
         $totalAmount = bcmul(number_format($data['totalDays'], 2, '.', ''), self::DEFAULT_TJM, 2);
 
-        $order               = new Order();
-        $order->company      = $company;
-        $order->project      = $project;
-        $order->name         = $data['name'];
-        $order->orderNumber  = $orderNumber;
-        $order->status       = $status;
+        $order = new Order();
+        $order->company = $company;
+        $order->project = $project;
+        $order->name = $data['name'];
+        $order->orderNumber = $orderNumber;
+        $order->status = $status;
         $order->contractType = $isRegie ? 'regie' : 'forfait';
-        $order->totalAmount  = $totalAmount;
+        $order->totalAmount = $totalAmount;
 
         $this->entityManager->persist($order);
 
@@ -593,7 +593,7 @@ class ImportTheTribeProjectsCommand extends Command
     {
         ++$this->orderIncrement;
 
-        $year  = date('Y');
+        $year = date('Y');
         $month = date('m');
 
         return sprintf('D%s%s%03d', $year, $month, $this->orderIncrement);

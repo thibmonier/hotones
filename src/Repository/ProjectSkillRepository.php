@@ -128,15 +128,15 @@ class ProjectSkillRepository extends CompanyAwareRepository
             return 100;
         }
 
-        $met   = 0;
+        $met = 0;
         $total = 0;
 
         foreach ($projectSkills as $projectSkill) {
             $weight = match ($projectSkill->getPriority()) {
                 ProjectSkill::PRIORITY_CRITICAL => 4,
-                ProjectSkill::PRIORITY_HIGH     => 3,
-                ProjectSkill::PRIORITY_MEDIUM   => 2,
-                default                         => 1,
+                ProjectSkill::PRIORITY_HIGH => 3,
+                ProjectSkill::PRIORITY_MEDIUM => 2,
+                default => 1,
             };
 
             $total += $weight;
@@ -157,7 +157,7 @@ class ProjectSkillRepository extends CompanyAwareRepository
     public function findMissingSkillsForContributor(Project $project, Contributor $contributor): array
     {
         $projectSkills = $this->findByProject($project);
-        $missing       = [];
+        $missing = [];
 
         foreach ($projectSkills as $projectSkill) {
             if (!$projectSkill->isMetByContributor($contributor)) {

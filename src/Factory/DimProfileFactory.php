@@ -36,11 +36,11 @@ final class DimProfileFactory extends PersistentObjectFactory
         }
 
         return [
-            'company'      => $company,
-            'name'         => $faker->randomElement(['Développeur', 'Lead Dev', 'Chef de projet', 'Designer']),
+            'company' => $company,
+            'name' => $faker->randomElement(['Développeur', 'Lead Dev', 'Chef de projet', 'Designer']),
             'isProductive' => $faker->boolean(80),
-            'isActive'     => true,
-            'profile'      => null, // Can be set explicitly if needed
+            'isActive' => true,
+            'profile' => null, // Can be set explicitly if needed
         ];
     }
 

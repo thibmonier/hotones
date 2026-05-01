@@ -78,8 +78,8 @@ class NpsSurveyRepository extends CompanyAwareRepository
             return null;
         }
 
-        $total      = count($surveys);
-        $promoters  = 0;
+        $total = count($surveys);
+        $promoters = 0;
         $detractors = 0;
 
         foreach ($surveys as $survey) {
@@ -113,17 +113,17 @@ class NpsSurveyRepository extends CompanyAwareRepository
         $total = count($surveys);
         if ($total === 0) {
             return [
-                'total'         => 0,
-                'promoters'     => 0,
-                'passives'      => 0,
-                'detractors'    => 0,
-                'nps_score'     => null,
+                'total' => 0,
+                'promoters' => 0,
+                'passives' => 0,
+                'detractors' => 0,
+                'nps_score' => null,
                 'average_score' => null,
             ];
         }
 
-        $promoters  = 0;
-        $passives   = 0;
+        $promoters = 0;
+        $passives = 0;
         $detractors = 0;
         $totalScore = 0;
 
@@ -142,11 +142,11 @@ class NpsSurveyRepository extends CompanyAwareRepository
         $npsScore = (($promoters / $total) - ($detractors / $total)) * 100;
 
         return [
-            'total'         => $total,
-            'promoters'     => $promoters,
-            'passives'      => $passives,
-            'detractors'    => $detractors,
-            'nps_score'     => round($npsScore, 1),
+            'total' => $total,
+            'promoters' => $promoters,
+            'passives' => $passives,
+            'detractors' => $detractors,
+            'nps_score' => round($npsScore, 1),
             'average_score' => round($totalScore / $total, 1),
         ];
     }

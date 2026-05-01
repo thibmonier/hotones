@@ -75,7 +75,7 @@ class BoondManagerSettingsController extends AbstractController
                 }
 
                 // Activation
-                $settings->enabled         = $request->request->getBoolean('enabled');
+                $settings->enabled = $request->request->getBoolean('enabled');
                 $settings->autoSyncEnabled = $request->request->getBoolean('auto_sync_enabled');
 
                 // Frequence de sync
@@ -137,12 +137,12 @@ class BoondManagerSettingsController extends AbstractController
         }
 
         $startDateStr = $request->request->get('start_date', new DateTime('-30 days')->format('Y-m-d'));
-        $endDateStr   = $request->request->get('end_date', new DateTime()->format('Y-m-d'));
-        $async        = $request->request->getBoolean('async');
+        $endDateStr = $request->request->get('end_date', new DateTime()->format('Y-m-d'));
+        $async = $request->request->getBoolean('async');
 
         try {
             $startDate = new DateTime($startDateStr);
-            $endDate   = new DateTime($endDateStr);
+            $endDate = new DateTime($endDateStr);
         } catch (Exception) {
             $this->addFlash('error', 'Format de date invalide');
 
@@ -165,21 +165,21 @@ class BoondManagerSettingsController extends AbstractController
 
         // Sync synchrone
         $syncResources = $request->request->getBoolean('sync_resources');
-        $syncProjects  = $request->request->getBoolean('sync_projects');
+        $syncProjects = $request->request->getBoolean('sync_projects');
 
         $messages = [];
 
         if ($syncResources) {
             $resourceResult = $syncService->syncResources($settings);
-            $messages[]     = 'Ressources: '.$resourceResult->getSummary();
+            $messages[] = 'Ressources: '.$resourceResult->getSummary();
         }
 
         if ($syncProjects) {
             $projectResult = $syncService->syncProjects($settings);
-            $messages[]    = 'Projets: '.$projectResult->getSummary();
+            $messages[] = 'Projets: '.$projectResult->getSummary();
         }
 
-        $result     = $syncService->sync($settings, $startDate, $endDate);
+        $result = $syncService->sync($settings, $startDate, $endDate);
         $messages[] = 'Temps: '.$result->getSummary();
 
         if ($result->success) {

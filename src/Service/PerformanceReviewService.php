@@ -46,7 +46,7 @@ class PerformanceReviewService
             $contributors = [];
             foreach ($managers as $manager) {
                 // Get team members for each manager
-                $teamMembers  = $this->getTeamMembers($manager);
+                $teamMembers = $this->getTeamMembers($manager);
                 $contributors = array_merge($contributors, $teamMembers);
             }
             $contributors = array_unique($contributors, SORT_REGULAR);
@@ -86,8 +86,8 @@ class PerformanceReviewService
     public function sendNotifications(PerformanceReview $review, string $step): void
     {
         $contributor = $review->getContributor();
-        $manager     = $review->getManager();
-        $year        = $review->getYear();
+        $manager = $review->getManager();
+        $year = $review->getYear();
 
         switch ($step) {
             case 'self_evaluation_request':
@@ -135,7 +135,7 @@ class PerformanceReviewService
     ): void {
         $review->setSelfEvaluation([
             'achievements' => $achievements,
-            'strengths'    => $strengths,
+            'strengths' => $strengths,
             'improvements' => $improvements,
             'completed_at' => new DateTimeImmutable()->format('Y-m-d H:i:s'),
         ]);
@@ -161,9 +161,9 @@ class PerformanceReviewService
     ): void {
         $review->setManagerEvaluation([
             'achievements' => $achievements,
-            'strengths'    => $strengths,
+            'strengths' => $strengths,
             'improvements' => $improvements,
-            'feedback'     => $feedback,
+            'feedback' => $feedback,
             'completed_at' => new DateTimeImmutable()->format('Y-m-d H:i:s'),
         ]);
 
@@ -278,7 +278,7 @@ class PerformanceReviewService
         }
 
         return [
-            'years'         => $years,
+            'years' => $years,
             'stats_by_year' => $statsByYear,
         ];
     }

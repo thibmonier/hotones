@@ -28,7 +28,7 @@ class CronExtension extends AbstractExtension
      */
     public function humanizeCron(string $expr, string $locale = 'fr'): string
     {
-        $expr  = trim($expr);
+        $expr = trim($expr);
         $parts = preg_split('/\s+/', $expr);
         if (!$parts || count($parts) !== 5) {
             return $this->t('Invalid CRON expression', $locale).': '.$expr;
@@ -36,7 +36,7 @@ class CronExtension extends AbstractExtension
         [$min, $hour, $dom, $mon, $dow] = $parts;
 
         // Helpers
-        $isStar  = fn (string $s): bool => $s === '*';
+        $isStar = fn (string $s): bool => $s === '*';
         $fmtTime = function (string $h, string $m, string $loc): string {
             if ($h === '*' && $m === '*') {
                 return $this->t('any time', $loc);
@@ -111,7 +111,7 @@ class CronExtension extends AbstractExtension
             // Reuse hour/min description
             if ($hourInfo['type'] === 'step_range') {
                 $minuteTxt = $min === '*' ? $this->t('any minute', $locale) : sprintf('%02d', (int) $min);
-                $timeTxt   = sprintf(
+                $timeTxt = sprintf(
                     $this->t('every %d hours between %s and %s at minute %s', $locale),
                     $hourInfo['step'],
                     sprintf('%02d:00', $hourInfo['start']),
@@ -120,7 +120,7 @@ class CronExtension extends AbstractExtension
                 );
             } elseif ($hourInfo['type'] === 'step') {
                 $minuteTxt = $min === '*' ? $this->t('any minute', $locale) : sprintf('%02d', (int) $min);
-                $timeTxt   = sprintf($this->t('every %d hours at minute %s', $locale), $hourInfo['step'], $minuteTxt);
+                $timeTxt = sprintf($this->t('every %d hours at minute %s', $locale), $hourInfo['step'], $minuteTxt);
             } elseif ($hourInfo['type'] === 'list') {
                 $times = array_map(fn ($h): string => sprintf(
                     '%02d:%02d',
@@ -143,7 +143,7 @@ class CronExtension extends AbstractExtension
         // 8) Specific months (with optional dom)
         if ($mon !== '*' && $dow === '*') {
             $months = $this->listToLabels($mon, $names['months']);
-            $onDom  = $dom !== '*'
+            $onDom = $dom !== '*'
                 ? sprintf($this->t('on day %s', $locale), $this->listToText($dom, $locale, 'day'))
                 : $this->t('every day', $locale);
 
@@ -207,36 +207,36 @@ class CronExtension extends AbstractExtension
             7 => 'Sunday',
         ];
         $months_fr = [
-            1  => 'janvier',
-            2  => 'février',
-            3  => 'mars',
-            4  => 'avril',
-            5  => 'mai',
-            6  => 'juin',
-            7  => 'juillet',
-            8  => 'août',
-            9  => 'septembre',
+            1 => 'janvier',
+            2 => 'février',
+            3 => 'mars',
+            4 => 'avril',
+            5 => 'mai',
+            6 => 'juin',
+            7 => 'juillet',
+            8 => 'août',
+            9 => 'septembre',
             10 => 'octobre',
             11 => 'novembre',
             12 => 'décembre',
         ];
         $months_en = [
-            1  => 'January',
-            2  => 'February',
-            3  => 'March',
-            4  => 'April',
-            5  => 'May',
-            6  => 'June',
-            7  => 'July',
-            8  => 'August',
-            9  => 'September',
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
             10 => 'October',
             11 => 'November',
             12 => 'December',
         ];
 
         return [
-            'days'   => $locale === 'en' ? $days_en : $days_fr,
+            'days' => $locale === 'en' ? $days_en : $days_fr,
             'months' => $locale === 'en' ? $months_en : $months_fr,
         ];
     }
@@ -244,18 +244,18 @@ class CronExtension extends AbstractExtension
     private function listToLabels(string $expr, array $labels): string
     {
         $parts = explode(',', $expr);
-        $out   = [];
+        $out = [];
         foreach ($parts as $p) {
             $p = trim($p);
             if ($p === '*') {
                 return implode(', ', array_values($labels));
             }
             if (ctype_digit($p)) {
-                $k     = (int) $p;
+                $k = (int) $p;
                 $out[] = $labels[$k] ?? $p;
             } elseif (preg_match('#^(\d+)-(\d+)$#', $p, $m)) {
                 $start = (int) $m[1];
-                $end   = (int) $m[2];
+                $end = (int) $m[2];
                 $out[] = ($labels[$start] ?? $start).' - '.($labels[$end] ?? $end);
             }
         }
@@ -267,7 +267,7 @@ class CronExtension extends AbstractExtension
     {
         // For day-of-month numbers
         $parts = array_map(trim(...), explode(',', $expr));
-        $fmt   = function (string $n) use ($locale) {
+        $fmt = function (string $n) use ($locale) {
             $i = (int) $n;
             if ($locale === 'en') {
                 return
@@ -300,48 +300,48 @@ class CronExtension extends AbstractExtension
     {
         $map = [
             'fr' => [
-                'Invalid CRON expression'                       => 'Expression CRON invalide',
-                'every minute'                                  => 'chaque minute',
-                'every %d minutes'                              => 'toutes les %d minutes',
-                'hourly at minute 00'                           => 'au début de chaque heure',
-                'every hour at minute %02d'                     => 'chaque heure à la minute %02d',
-                'any minute'                                    => 'chaque minute',
-                'any time'                                      => 'à toute heure',
-                'at each minute of'                             => 'à chaque minute de',
-                'at'                                            => 'à',
-                'every day at %s'                               => 'tous les jours à %s',
-                'every %s %s'                                   => 'chaque %s %s',
-                'every month on %s %s'                          => 'chaque mois le %s %s',
-                'on day %s'                                     => 'le jour %s',
-                'every day'                                     => 'tous les jours',
-                '%s in %s %s'                                   => '%s en %s %s',
-                'CRON'                                          => 'CRON',
-                'at minute'                                     => 'à la minute',
-                'every %d hours at minute %s'                   => 'toutes les %d heures à la minute %s',
+                'Invalid CRON expression' => 'Expression CRON invalide',
+                'every minute' => 'chaque minute',
+                'every %d minutes' => 'toutes les %d minutes',
+                'hourly at minute 00' => 'au début de chaque heure',
+                'every hour at minute %02d' => 'chaque heure à la minute %02d',
+                'any minute' => 'chaque minute',
+                'any time' => 'à toute heure',
+                'at each minute of' => 'à chaque minute de',
+                'at' => 'à',
+                'every day at %s' => 'tous les jours à %s',
+                'every %s %s' => 'chaque %s %s',
+                'every month on %s %s' => 'chaque mois le %s %s',
+                'on day %s' => 'le jour %s',
+                'every day' => 'tous les jours',
+                '%s in %s %s' => '%s en %s %s',
+                'CRON' => 'CRON',
+                'at minute' => 'à la minute',
+                'every %d hours at minute %s' => 'toutes les %d heures à la minute %s',
                 'every %d hours between %s and %s at minute %s' => 'toutes les %d heures entre %s et %s à la minute %s',
-                'at times %s'                                   => 'aux heures %s',
+                'at times %s' => 'aux heures %s',
             ],
             'en' => [
-                'Invalid CRON expression'                       => 'Invalid CRON expression',
-                'every minute'                                  => 'every minute',
-                'every %d minutes'                              => 'every %d minutes',
-                'hourly at minute 00'                           => 'hourly at minute 00',
-                'every hour at minute %02d'                     => 'every hour at minute %02d',
-                'any minute'                                    => 'any minute',
-                'any time'                                      => 'any time',
-                'at each minute of'                             => 'at each minute of',
-                'at'                                            => 'at',
-                'every day at %s'                               => 'every day at %s',
-                'every %s %s'                                   => 'every %s %s',
-                'every month on %s %s'                          => 'every month on %s %s',
-                'on day %s'                                     => 'on day %s',
-                'every day'                                     => 'every day',
-                '%s in %s %s'                                   => '%s in %s %s',
-                'CRON'                                          => 'CRON',
-                'at minute'                                     => 'at minute',
-                'every %d hours at minute %s'                   => 'every %d hours at minute %s',
+                'Invalid CRON expression' => 'Invalid CRON expression',
+                'every minute' => 'every minute',
+                'every %d minutes' => 'every %d minutes',
+                'hourly at minute 00' => 'hourly at minute 00',
+                'every hour at minute %02d' => 'every hour at minute %02d',
+                'any minute' => 'any minute',
+                'any time' => 'any time',
+                'at each minute of' => 'at each minute of',
+                'at' => 'at',
+                'every day at %s' => 'every day at %s',
+                'every %s %s' => 'every %s %s',
+                'every month on %s %s' => 'every month on %s %s',
+                'on day %s' => 'on day %s',
+                'every day' => 'every day',
+                '%s in %s %s' => '%s in %s %s',
+                'CRON' => 'CRON',
+                'at minute' => 'at minute',
+                'every %d hours at minute %s' => 'every %d hours at minute %s',
                 'every %d hours between %s and %s at minute %s' => 'every %d hours between %s and %s at minute %s',
-                'at times %s'                                   => 'at %s',
+                'at times %s' => 'at %s',
             ],
         ];
 
@@ -352,7 +352,7 @@ class CronExtension extends AbstractExtension
     {
         try {
             $cron = CronExpression::factory($expr);
-            $now  = new DateTimeImmutable('now', new DateTimeZone($tz));
+            $now = new DateTimeImmutable('now', new DateTimeZone($tz));
             $next = $cron->getNextRunDate($now, 0, false);
 
             return DateTimeImmutable::createFromMutable($next);

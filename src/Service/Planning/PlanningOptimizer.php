@@ -88,10 +88,10 @@ class PlanningOptimizer
 
         return [
             'recommendations' => $recommendations,
-            'analysis'        => $analysis,
-            'period'          => [
+            'analysis' => $analysis,
+            'period' => [
                 'start' => $startDate,
-                'end'   => $endDate,
+                'end' => $endDate,
             ],
             'summary' => $this->generateSummary($analysis, $recommendations),
         ];
@@ -108,14 +108,14 @@ class PlanningOptimizer
     ): array {
         /** @var Contributor $contributor */
         $contributor = $item['contributor'];
-        $tace        = $item['tace'];
-        $severity    = $item['severity'];
+        $tace = $item['tace'];
+        $severity = $item['severity'];
 
         $recommendations = [];
 
         // Récupérer les plannings actuels du contributeur
         $planningRepo = $this->entityManager->getRepository(PlanningEntity::class);
-        $plannings    = $planningRepo
+        $plannings = $planningRepo
             ->createQueryBuilder('p')
             ->where('p.contributor = :contributor')
             ->andWhere('p.startDate <= :end')
@@ -129,13 +129,13 @@ class PlanningOptimizer
         if (empty($plannings)) {
             // Pas de planning = recommandation générique
             $recommendations[] = [
-                'type'            => 'reduce_workload',
-                'contributor'     => $contributor,
-                'title'           => sprintf('%s est surchargé (%d%% de TACE)', $contributor->getFullName(), $tace),
-                'description'     => 'Aucun planning trouvé pour cette période. Vérifiez la charge de travail réelle.',
-                'priority_score'  => $severity,
-                'severity_level'  => $item['status'] === 'critical_high' ? 'critical' : 'high',
-                'actions'         => [],
+                'type' => 'reduce_workload',
+                'contributor' => $contributor,
+                'title' => sprintf('%s est surchargé (%d%% de TACE)', $contributor->getFullName(), $tace),
+                'description' => 'Aucun planning trouvé pour cette période. Vérifiez la charge de travail réelle.',
+                'priority_score' => $severity,
+                'severity_level' => $item['status'] === 'critical_high' ? 'critical' : 'high',
+                'actions' => [],
                 'expected_impact' => null,
             ];
 
@@ -145,13 +145,13 @@ class PlanningOptimizer
         // Analyser les plannings pour identifier les projets à décharger
         $projectsWorkload = [];
         foreach ($plannings as $planning) {
-            $project   = $planning->getProject();
+            $project = $planning->getProject();
             $projectId = $project->getId();
             if (!isset($projectsWorkload[$projectId])) {
                 $projectsWorkload[$projectId] = [
-                    'project'      => $project,
-                    'total_hours'  => 0,
-                    'plannings'    => [],
+                    'project' => $project,
+                    'total_hours' => 0,
+                    'plannings' => [],
                     'client_level' => $project->getClient()?->getServiceLevel(),
                 ];
             }
@@ -172,8 +172,8 @@ class PlanningOptimizer
             }
 
             $levelPriority = ['low' => 1, 'standard' => 2, 'priority' => 3, 'vip' => 4];
-            $aPrio         = $levelPriority[$a['client_level'] ?? 'standard'] ?? 2;
-            $bPrio         = $levelPriority[$b['client_level'] ?? 'standard'] ?? 2;
+            $aPrio = $levelPriority[$a['client_level'] ?? 'standard'] ?? 2;
+            $bPrio = $levelPriority[$b['client_level'] ?? 'standard'] ?? 2;
 
             if ($aPrio !== $bPrio) {
                 return $aPrio <=> $bPrio; // Commencer par les clients basse priorité
@@ -183,7 +183,7 @@ class PlanningOptimizer
         });
 
         // Trouver des contributeurs sous-utilisés avec les mêmes profils
-        $underutilized          = array_merge($fullAnalysis['underutilized'], $fullAnalysis['optimal']);
+        $underutilized = array_merge($fullAnalysis['underutilized'], $fullAnalysis['optimal']);
         $compatibleContributors = $this->findCompatibleContributors($contributor, $underutilized);
 
         // Générer des recommandations de réaffectation
@@ -193,25 +193,25 @@ class PlanningOptimizer
                 break;
             }
 
-            $project          = $pw['project'];
-            $clientLevel      = $pw['client_level'] ?? 'standard';
+            $project = $pw['project'];
+            $clientLevel = $pw['client_level'] ?? 'standard';
             $clientLevelLabel = match ($clientLevel) {
-                'vip'      => 'VIP',
+                'vip' => 'VIP',
                 'priority' => 'Prioritaire',
                 'standard' => 'Standard',
-                'low'      => 'Basse priorité',
-                default    => 'Non défini',
+                'low' => 'Basse priorité',
+                default => 'Non défini',
             };
 
             foreach ($compatibleContributors as $target) {
                 $targetContributor = $target['contributor'];
 
                 $recommendations[] = [
-                    'type'        => 'reassign_planning',
+                    'type' => 'reassign_planning',
                     'contributor' => $contributor,
-                    'target'      => $targetContributor,
-                    'project'     => $project,
-                    'title'       => sprintf(
+                    'target' => $targetContributor,
+                    'project' => $project,
+                    'title' => sprintf(
                         'Réaffecter %s de %s vers %s',
                         $project->getName(),
                         $contributor->getFullName(),
@@ -230,7 +230,7 @@ class PlanningOptimizer
                     ),
                     'priority_score' => $severity + ($clientLevel === 'low' ? 20 : 0),
                     'severity_level' => $item['status'] === 'critical_high' ? 'critical' : 'high',
-                    'actions'        => [
+                    'actions' => [
                         sprintf('Réduire l\'allocation de %s sur %s', $contributor->getFullName(), $project->getName()),
                         sprintf(
                             'Augmenter l\'allocation de %s sur %s',
@@ -265,8 +265,8 @@ class PlanningOptimizer
     ): array {
         /** @var Contributor $contributor */
         $contributor = $item['contributor'];
-        $tace        = $item['tace'];
-        $severity    = $item['severity'];
+        $tace = $item['tace'];
+        $severity = $item['severity'];
 
         $recommendations = [];
 
@@ -285,27 +285,27 @@ class PlanningOptimizer
             // Prioriser les projets clients VIP/Prioritaires
             usort($compatibleProjects, function ($a, $b) {
                 $levelPriority = ['vip' => 4, 'priority' => 3, 'standard' => 2, 'low' => 1];
-                $aPrio         = $levelPriority[$a->getClient()?->getServiceLevel() ?? 'standard'] ?? 2;
-                $bPrio         = $levelPriority[$b->getClient()?->getServiceLevel() ?? 'standard'] ?? 2;
+                $aPrio = $levelPriority[$a->getClient()?->getServiceLevel() ?? 'standard'] ?? 2;
+                $bPrio = $levelPriority[$b->getClient()?->getServiceLevel() ?? 'standard'] ?? 2;
 
                 return $bPrio <=> $aPrio;
             });
 
             foreach (array_slice($compatibleProjects, 0, 3) as $project) {
-                $clientLevel      = $project->getClient()?->getServiceLevel() ?? 'standard';
+                $clientLevel = $project->getClient()?->getServiceLevel() ?? 'standard';
                 $clientLevelLabel = match ($clientLevel) {
-                    'vip'      => 'VIP',
+                    'vip' => 'VIP',
                     'priority' => 'Prioritaire',
                     'standard' => 'Standard',
-                    'low'      => 'Basse priorité',
-                    default    => 'Non défini',
+                    'low' => 'Basse priorité',
+                    default => 'Non défini',
                 };
 
                 $recommendations[] = [
-                    'type'        => 'increase_allocation',
+                    'type' => 'increase_allocation',
                     'contributor' => $contributor,
-                    'project'     => $project,
-                    'title'       => sprintf(
+                    'project' => $project,
+                    'title' => sprintf(
                         'Augmenter l\'allocation de %s sur %s',
                         $contributor->getFullName(),
                         $project->getName(),
@@ -321,7 +321,7 @@ class PlanningOptimizer
                     ),
                     'priority_score' => $severity + ($clientLevel === 'vip' ? 30 : ($clientLevel === 'priority' ? 20 : 0)),
                     'severity_level' => $item['status'] === 'critical_low' ? 'critical' : 'medium',
-                    'actions'        => [
+                    'actions' => [
                         sprintf('Créer un planning pour %s sur %s', $contributor->getFullName(), $project->getName()),
                     ],
                     'expected_impact' => sprintf(
@@ -343,7 +343,7 @@ class PlanningOptimizer
     {
         // Extraire les IDs des profils du contributeur source
         $sourceProfileIds = array_map(fn ($p) => $p->getId(), $source->getProfiles()->toArray());
-        $compatible       = [];
+        $compatible = [];
 
         foreach ($candidates as $candidate) {
             /** @var Contributor $targetContributor */
@@ -384,7 +384,7 @@ class PlanningOptimizer
     private function calculatePlanningHours(PlanningEntity $planning): float
     {
         $start = $planning->getStartDate();
-        $end   = $planning->getEndDate();
+        $end = $planning->getEndDate();
 
         $days = $start->diff($end)->days + 1;
 
@@ -402,12 +402,12 @@ class PlanningOptimizer
                     + count($analysis['overloaded'])
                     + count($analysis['underutilized'])
                     + count($analysis['optimal']),
-            'critical_count'        => count($analysis['critical']),
-            'overloaded_count'      => count($analysis['overloaded']),
-            'underutilized_count'   => count($analysis['underutilized']),
-            'optimal_count'         => count($analysis['optimal']),
+            'critical_count' => count($analysis['critical']),
+            'overloaded_count' => count($analysis['overloaded']),
+            'underutilized_count' => count($analysis['underutilized']),
+            'optimal_count' => count($analysis['optimal']),
             'total_recommendations' => count($recommendations),
-            'high_priority_count'   => count(array_filter(
+            'high_priority_count' => count(array_filter(
                 $recommendations,
                 fn ($r): bool => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high',
             )),
@@ -420,7 +420,7 @@ class PlanningOptimizer
                 fn ($r): bool => $r['severity_level'] === 'low',
             )),
             'critical_workload_count' => count($analysis['critical']),
-            'contributors_analyzed'   => count($analysis['critical'])
+            'contributors_analyzed' => count($analysis['critical'])
                     + count($analysis['overloaded'])
                     + count($analysis['underutilized'])
                     + count($analysis['optimal']),
@@ -446,8 +446,8 @@ class PlanningOptimizer
         try {
             return match ($type) {
                 'increase_allocation' => $this->applyIncreaseAllocation($recommendation, $startDate, $endDate),
-                'reassign_planning'   => $this->applyReassignPlanning($recommendation, $startDate, $endDate),
-                'reduce_workload'     => [
+                'reassign_planning' => $this->applyReassignPlanning($recommendation, $startDate, $endDate),
+                'reduce_workload' => [
                     'success' => false,
                     'message' => 'La réduction de charge doit être effectuée manuellement',
                 ],
@@ -470,7 +470,7 @@ class PlanningOptimizer
     private function applyIncreaseAllocation(array $recommendation, DateTime $startDate, DateTime $endDate): array
     {
         $contributor = $recommendation['contributor'] ?? null;
-        $project     = $recommendation['project']     ?? null;
+        $project = $recommendation['project'] ?? null;
 
         if (!$contributor || !$project) {
             return [
@@ -510,8 +510,8 @@ class PlanningOptimizer
     private function applyReassignPlanning(array $recommendation, DateTime $startDate, DateTime $endDate): array
     {
         $sourceContributor = $recommendation['contributor'] ?? null;
-        $targetContributor = $recommendation['target']      ?? null;
-        $project           = $recommendation['project']     ?? null;
+        $targetContributor = $recommendation['target'] ?? null;
+        $project = $recommendation['project'] ?? null;
 
         if (!$sourceContributor || !$targetContributor || !$project) {
             return [
@@ -521,7 +521,7 @@ class PlanningOptimizer
         }
 
         // Récupérer le planning existant du contributeur source
-        $planningRepo      = $this->entityManager->getRepository(PlanningEntity::class);
+        $planningRepo = $this->entityManager->getRepository(PlanningEntity::class);
         $existingPlannings = $planningRepo
             ->createQueryBuilder('p')
             ->where('p.contributor = :contributor')
@@ -542,13 +542,13 @@ class PlanningOptimizer
             ];
         }
 
-        $messages         = [];
-        $planningIds      = [];
+        $messages = [];
+        $planningIds = [];
         $existingPlanning = $existingPlannings[0]; // Prendre le premier
 
         // Réduire l'allocation du contributeur source de 50%
         $currentHours = (float) $existingPlanning->getDailyHours();
-        $newHours     = $currentHours / 2;
+        $newHours = $currentHours / 2;
         $existingPlanning->setDailyHours((string) $newHours);
         $existingPlanning->setNotes(
             ($existingPlanning->getNotes() ?? '')
@@ -556,7 +556,7 @@ class PlanningOptimizer
         );
         $this->entityManager->flush();
 
-        $messages[]    = sprintf('Allocation de %s réduite à %.1fh/jour', $sourceContributor->getFullName(), $newHours);
+        $messages[] = sprintf('Allocation de %s réduite à %.1fh/jour', $sourceContributor->getFullName(), $newHours);
         $planningIds[] = $existingPlanning->getId();
 
         // Créer un planning pour le contributeur cible
@@ -575,12 +575,12 @@ class PlanningOptimizer
         $this->entityManager->persist($newPlanning);
         $this->entityManager->flush();
 
-        $messages[]    = sprintf('Planning créé pour %s (%.1fh/jour)', $targetContributor->getFullName(), $newHours);
+        $messages[] = sprintf('Planning créé pour %s (%.1fh/jour)', $targetContributor->getFullName(), $newHours);
         $planningIds[] = $newPlanning->getId();
 
         return [
-            'success'      => true,
-            'message'      => implode(', ', $messages),
+            'success' => true,
+            'message' => implode(', ', $messages),
             'planning_ids' => $planningIds,
         ];
     }

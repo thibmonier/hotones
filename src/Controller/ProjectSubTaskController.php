@@ -30,15 +30,15 @@ class ProjectSubTaskController extends AbstractController
     #[Route('/{id}/subtasks/kanban', name: 'project_subtasks_kanban', methods: ['GET'])]
     public function kanban(Project $project): Response
     {
-        $todo  = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_TODO);
+        $todo = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_TODO);
         $doing = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_IN_PROGRESS);
-        $done  = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_DONE);
+        $done = $this->subTasks->findByProjectAndStatus($project, ProjectSubTask::STATUS_DONE);
 
         return $this->render('project_subtask/kanban.html.twig', [
             'project' => $project,
-            'todo'    => $todo,
-            'doing'   => $doing,
-            'done'    => $done,
+            'todo' => $todo,
+            'doing' => $doing,
+            'done' => $done,
         ]);
     }
 
@@ -46,8 +46,8 @@ class ProjectSubTaskController extends AbstractController
     #[IsGranted('ROLE_CHEF_PROJET')]
     public function move(ProjectSubTask $subTask, Request $request): JsonResponse
     {
-        $data      = json_decode($request->getContent() ?: '[]', true);
-        $status    = $data['status']    ?? null;
+        $data = json_decode($request->getContent() ?: '[]', true);
+        $status = $data['status'] ?? null;
         $positions = $data['positions'] ?? []; // [subTaskId => position]
 
         if (!in_array($status, array_keys(ProjectSubTask::getAvailableStatuses()), true)) {
@@ -73,7 +73,7 @@ class ProjectSubTaskController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         $data = json_decode($request->getContent() ?: '[]', true);
-        $raf  = $data['remainingHours'] ?? null;
+        $raf = $data['remainingHours'] ?? null;
         if ($raf === null || !is_numeric($raf)) {
             return $this->json(['error' => 'Valeur invalide'], 400);
         }
@@ -82,8 +82,8 @@ class ProjectSubTaskController extends AbstractController
         $this->em->flush();
 
         return $this->json([
-            'ok'        => true,
-            'progress'  => $subTask->getProgressPercentage(),
+            'ok' => true,
+            'progress' => $subTask->getProgressPercentage(),
             'timeSpent' => $subTask->getTimeSpentHours(),
         ]);
     }
@@ -110,7 +110,7 @@ class ProjectSubTaskController extends AbstractController
             // Invalid -> return modal with errors
             $html = $this->renderView('project_subtask/_modal_form.html.twig', [
                 'subTask' => $subTask,
-                'form'    => $form->createView(),
+                'form' => $form->createView(),
             ]);
 
             return new JsonResponse(['ok' => false, 'html' => $html], 400);
@@ -119,7 +119,7 @@ class ProjectSubTaskController extends AbstractController
         // Initial GET -> return modal content
         return $this->render('project_subtask/_modal_form.html.twig', [
             'subTask' => $subTask,
-            'form'    => $form->createView(),
+            'form' => $form->createView(),
         ]);
     }
 }

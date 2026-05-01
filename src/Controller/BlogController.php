@@ -32,7 +32,7 @@ class BlogController extends AbstractController
     #[Route('/blog', name: 'blog_index', options: ['sitemap' => true], methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $page   = max(1, $request->query->getInt('page', 1));
+        $page = max(1, $request->query->getInt('page', 1));
         $offset = ($page - 1) * self::POSTS_PER_PAGE;
 
         $posts = $this->postRepository->findPublishedPublic(limit: self::POSTS_PER_PAGE, offset: $offset);
@@ -41,17 +41,17 @@ class BlogController extends AbstractController
         $totalPages = (int) ceil($totalPosts / self::POSTS_PER_PAGE);
 
         // Sidebar data
-        $categories  = $this->categoryRepository->findActiveWithPublishedPosts();
+        $categories = $this->categoryRepository->findActiveWithPublishedPosts();
         $popularTags = $this->tagRepository->findPopular(limit: 10);
         $recentPosts = $this->postRepository->findRecentPublishedPublic(limit: 5);
 
         return $this->render('blog/index.html.twig', [
-            'posts'       => $posts,
-            'categories'  => $categories,
+            'posts' => $posts,
+            'categories' => $categories,
             'popularTags' => $popularTags,
             'recentPosts' => $recentPosts,
             'currentPage' => $page,
-            'totalPages'  => $totalPages,
+            'totalPages' => $totalPages,
         ]);
     }
 
@@ -71,16 +71,16 @@ class BlogController extends AbstractController
         $relatedPosts = $this->postRepository->findRelatedPostsPublic($post, limit: 3);
 
         // Sidebar data
-        $categories  = $this->categoryRepository->findActiveWithPublishedPosts();
+        $categories = $this->categoryRepository->findActiveWithPublishedPosts();
         $popularTags = $this->tagRepository->findPopular(limit: 10);
         $recentPosts = $this->postRepository->findRecentPublishedPublic(limit: 5);
 
         return $this->render('blog/show.html.twig', [
-            'post'         => $post,
+            'post' => $post,
             'relatedPosts' => $relatedPosts,
-            'categories'   => $categories,
-            'popularTags'  => $popularTags,
-            'recentPosts'  => $recentPosts,
+            'categories' => $categories,
+            'popularTags' => $popularTags,
+            'recentPosts' => $recentPosts,
         ]);
     }
 
@@ -99,14 +99,14 @@ class BlogController extends AbstractController
         $posts = $this->postRepository->findByCategoryPublic($category);
 
         // Sidebar data
-        $categories  = $this->categoryRepository->findActiveWithPublishedPosts();
+        $categories = $this->categoryRepository->findActiveWithPublishedPosts();
         $popularTags = $this->tagRepository->findPopular(limit: 10);
         $recentPosts = $this->postRepository->findRecentPublishedPublic(limit: 5);
 
         return $this->render('blog/category.html.twig', [
-            'category'    => $category,
-            'posts'       => $posts,
-            'categories'  => $categories,
+            'category' => $category,
+            'posts' => $posts,
+            'categories' => $categories,
             'popularTags' => $popularTags,
             'recentPosts' => $recentPosts,
         ]);
@@ -127,14 +127,14 @@ class BlogController extends AbstractController
         $posts = $this->postRepository->findByTagPublic($tag);
 
         // Sidebar data
-        $categories  = $this->categoryRepository->findActiveWithPublishedPosts();
+        $categories = $this->categoryRepository->findActiveWithPublishedPosts();
         $popularTags = $this->tagRepository->findPopular(limit: 10);
         $recentPosts = $this->postRepository->findRecentPublishedPublic(limit: 5);
 
         return $this->render('blog/tag.html.twig', [
-            'tag'         => $tag,
-            'posts'       => $posts,
-            'categories'  => $categories,
+            'tag' => $tag,
+            'posts' => $posts,
+            'categories' => $categories,
             'popularTags' => $popularTags,
             'recentPosts' => $recentPosts,
         ]);

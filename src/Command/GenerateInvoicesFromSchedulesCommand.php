@@ -81,7 +81,7 @@ class GenerateInvoicesFromSchedulesCommand extends Command
             $referenceDate = new DateTime();
         }
 
-        $isDryRun     = $input->getOption('dry-run');
+        $isDryRun = $input->getOption('dry-run');
         $skipExisting = $input->getOption('skip-existing');
 
         $io->title('Génération des factures depuis échéances forfait');
@@ -113,7 +113,7 @@ class GenerateInvoicesFromSchedulesCommand extends Command
 
         // Générer les factures
         $invoices = [];
-        $skipped  = 0;
+        $skipped = 0;
 
         $io->progressStart(count($schedules));
 
@@ -127,7 +127,7 @@ class GenerateInvoicesFromSchedulesCommand extends Command
             }
 
             try {
-                $invoice    = $this->invoiceGenerator->generateFromOrderPaymentSchedule($schedule, !$isDryRun);
+                $invoice = $this->invoiceGenerator->generateFromOrderPaymentSchedule($schedule, !$isDryRun);
                 $invoices[] = $invoice;
             } catch (Exception $e) {
                 $io->error(sprintf(
@@ -158,22 +158,22 @@ class GenerateInvoicesFromSchedulesCommand extends Command
             $io->info(sprintf('%d échéance(s) déjà facturée(s) ignorée(s)', $skipped));
         }
 
-        $rows     = [];
-        $totalHt  = '0.00';
+        $rows = [];
+        $totalHt = '0.00';
         $totalTtc = '0.00';
 
         foreach ($invoices as $invoice) {
             $rows[] = [
                 $invoice->getInvoiceNumber(),
                 $invoice->getOrder()?->getOrderNumber() ?? 'N/A',
-                $invoice->getProject()?->getName()      ?? 'N/A',
+                $invoice->getProject()?->getName() ?? 'N/A',
                 $invoice->getClient()->getName(),
                 number_format((float) $invoice->getAmountHt(), 2, ',', ' ').' €',
                 number_format((float) $invoice->getAmountTtc(), 2, ',', ' ').' €',
                 $invoice->getStatus(),
             ];
 
-            $totalHt  = bcadd($totalHt, $invoice->getAmountHt(), 2);
+            $totalHt = bcadd($totalHt, $invoice->getAmountHt(), 2);
             $totalTtc = bcadd($totalTtc, $invoice->getAmountTtc(), 2);
         }
 

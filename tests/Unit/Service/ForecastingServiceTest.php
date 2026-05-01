@@ -26,8 +26,8 @@ class ForecastingServiceTest extends TestCase
 {
     private function createService(?ProjectRepository $projectRepository = null): ForecastingService
     {
-        $em                 = $this->createMock(EntityManagerInterface::class);
-        $companyContext     = $this->createMock(CompanyContext::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $companyContext = $this->createMock(CompanyContext::class);
         $forecastRepository = $this->createMock(FactForecastRepository::class);
         $projectRepository ??= $this->createMock(ProjectRepository::class);
         $dashboardService = $this->createMock(DashboardReadService::class);
@@ -72,7 +72,7 @@ class ForecastingServiceTest extends TestCase
 
         // Mock empty historical data
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $projectRepository->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
 
@@ -114,7 +114,7 @@ class ForecastingServiceTest extends TestCase
         }
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(Query::class);
+        $query = $this->createMock(Query::class);
 
         $projectRepository->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
 
@@ -126,7 +126,7 @@ class ForecastingServiceTest extends TestCase
         $query->method('getResult')->willReturn($projects);
 
         $service = $this->createService($projectRepository);
-        $result  = $service->forecastRevenue(6);
+        $result = $service->forecastRevenue(6);
 
         // Verify structure
         $this->assertIsArray($result);
@@ -162,7 +162,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('calculateWeightedMovingAverage');
+        $method = $reflection->getMethod('calculateWeightedMovingAverage');
 
         // Test with simple data
         $historical = [
@@ -181,7 +181,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('calculateSeasonalityFactors');
+        $method = $reflection->getMethod('calculateSeasonalityFactors');
 
         // Create historical data spanning multiple years with clear seasonality
         $historical = [
@@ -217,7 +217,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('calculateConfidence');
+        $method = $reflection->getMethod('calculateConfidence');
 
         // Less than 6 months = 40% confidence
         $historical = [
@@ -235,7 +235,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('calculateConfidence');
+        $method = $reflection->getMethod('calculateConfidence');
 
         // 6-11 months = 60% confidence
         $historical = [];
@@ -252,7 +252,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('calculateConfidence');
+        $method = $reflection->getMethod('calculateConfidence');
 
         // 24+ months with low volatility = high confidence
         $historical = [];
@@ -270,7 +270,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('determineTrendDirection');
+        $method = $reflection->getMethod('determineTrendDirection');
 
         // Clear growth: recent months 20% higher
         $historical = [
@@ -291,7 +291,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('determineTrendDirection');
+        $method = $reflection->getMethod('determineTrendDirection');
 
         // Stable: recent months within 10% of previous
         $historical = [
@@ -312,7 +312,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('determineTrendDirection');
+        $method = $reflection->getMethod('determineTrendDirection');
 
         // Decline: recent months 20% lower
         $historical = [
@@ -333,7 +333,7 @@ class ForecastingServiceTest extends TestCase
         $service = $this->createService();
 
         $reflection = new ReflectionClass($service);
-        $method     = $reflection->getMethod('determineTrendDirection');
+        $method = $reflection->getMethod('determineTrendDirection');
 
         // Less than 3 months
         $historical = [

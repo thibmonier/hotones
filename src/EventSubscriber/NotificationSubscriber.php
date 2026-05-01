@@ -39,8 +39,8 @@ class NotificationSubscriber implements EventSubscriberInterface
             $notifications = $this->notificationService->createFromEvent($event);
 
             $this->logger->info('Notifications created from event', [
-                'event_type'            => $event->getType()->value,
-                'recipients_count'      => count($event->getRecipients()),
+                'event_type' => $event->getType()->value,
+                'recipients_count' => count($event->getRecipients()),
                 'notifications_created' => count($notifications),
             ]);
 
@@ -56,7 +56,7 @@ class NotificationSubscriber implements EventSubscriberInterface
         } catch (Exception $e) {
             $this->logger->error('Error creating notifications from event', [
                 'event_type' => $event->getType()->value,
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }

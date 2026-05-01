@@ -38,8 +38,8 @@ class PredictionsController extends AbstractController
 
             return [
                 'profitability_predictions' => $this->getProfitabilityPredictions(),
-                'workload_data'             => $this->getWorkloadData(),
-                'alert_stats'               => $this->getAlertStats(),
+                'workload_data' => $this->getWorkloadData(),
+                'alert_stats' => $this->getAlertStats(),
             ];
         });
 
@@ -47,9 +47,9 @@ class PredictionsController extends AbstractController
 
         return $this->render('analytics/predictions.html.twig', [
             'profitability_predictions' => $data['profitability_predictions'],
-            'workload_data'             => $data['workload_data'],
-            'alert_stats'               => $data['alert_stats'],
-            'recent_alerts'             => $recentAlerts,
+            'workload_data' => $data['workload_data'],
+            'alert_stats' => $data['alert_stats'],
+            'recent_alerts' => $recentAlerts,
         ]);
     }
 
@@ -67,7 +67,7 @@ class PredictionsController extends AbstractController
 
             if ($prediction['canPredict']) {
                 $predictions[] = [
-                    'project'    => $project,
+                    'project' => $project,
                     'prediction' => $prediction,
                 ];
             }
@@ -85,38 +85,38 @@ class PredictionsController extends AbstractController
         $pipelineAnalysis = $this->workloadPredictionService->analyzePipeline([], [], includeConfirmed: true);
 
         // Prepare data for Chart.js stacked bar chart
-        $labels    = [];
+        $labels = [];
         $confirmed = [];
         $potential = [];
-        $now       = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         for ($i = 0; $i < 6; ++$i) {
-            $month    = $now->modify("+{$i} months");
+            $month = $now->modify("+{$i} months");
             $monthKey = $month->format('Y-m');
             $labels[] = $month->format('M Y');
 
-            $data        = $pipelineAnalysis['workloadByMonth'][$monthKey] ?? ['confirmed' => 0, 'potential' => 0];
+            $data = $pipelineAnalysis['workloadByMonth'][$monthKey] ?? ['confirmed' => 0, 'potential' => 0];
             $confirmed[] = round($data['confirmed'], 1);
             $potential[] = round($data['potential'], 1);
         }
 
         return [
-            'labels'   => $labels,
+            'labels' => $labels,
             'datasets' => [
                 [
-                    'label'           => 'Charge confirmée',
-                    'data'            => $confirmed,
+                    'label' => 'Charge confirmée',
+                    'data' => $confirmed,
                     'backgroundColor' => 'rgba(54, 162, 235, 0.8)',
-                    'borderColor'     => 'rgba(54, 162, 235, 1)',
-                    'borderWidth'     => 1,
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                    'borderWidth' => 1,
                 ],
                 [
-                    'label'           => 'Charge potentielle',
-                    'data'            => $potential,
+                    'label' => 'Charge potentielle',
+                    'data' => $potential,
                     'backgroundColor' => 'rgba(255, 206, 86, 0.6)',
-                    'borderColor'     => 'rgba(255, 206, 86, 1)',
-                    'borderWidth'     => 1,
-                    'borderDash'      => [5, 5],
+                    'borderColor' => 'rgba(255, 206, 86, 1)',
+                    'borderWidth' => 1,
+                    'borderDash' => [5, 5],
                 ],
             ],
         ];
@@ -171,11 +171,11 @@ class PredictionsController extends AbstractController
             ->getSingleScalarResult();
 
         return [
-            'budget'   => (int) $budgetAlerts,
-            'margin'   => (int) $marginAlerts,
+            'budget' => (int) $budgetAlerts,
+            'margin' => (int) $marginAlerts,
             'overload' => (int) $overloadAlerts,
-            'payment'  => (int) $paymentAlerts,
-            'total'    => (int) ($budgetAlerts + $marginAlerts + $overloadAlerts + $paymentAlerts),
+            'payment' => (int) $paymentAlerts,
+            'total' => (int) ($budgetAlerts + $marginAlerts + $overloadAlerts + $paymentAlerts),
         ];
     }
 

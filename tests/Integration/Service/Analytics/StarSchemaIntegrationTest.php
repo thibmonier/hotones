@@ -33,7 +33,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->entityManager        = static::getContainer()->get(EntityManagerInterface::class);
+        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
         $this->dashboardReadService = static::getContainer()->get(DashboardReadService::class);
         $this->setUpMultiTenant();
     }
@@ -70,7 +70,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status'      => 'active',
+            'status' => 'active',
         ]);
 
         $fact1 = new FactProjectMetrics()
@@ -107,7 +107,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
         $this->entityManager->clear();
 
         // Query aggregated data
-        $qb     = $this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $result = $qb
             ->select('SUM(f.totalRevenue) as totalRevenue', 'SUM(f.projectCount) as totalProjects')
             ->from(FactProjectMetrics::class, 'f')
@@ -130,7 +130,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
 
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status'      => 'active',
+            'status' => 'active',
         ]);
 
         $fact = new FactProjectMetrics()
@@ -178,22 +178,22 @@ class StarSchemaIntegrationTest extends KernelTestCase
         // Create dimension for project type
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status'      => 'active',
+            'status' => 'active',
         ]);
 
         // Create 3 months of data using relative dates (current month and 2 previous months)
         // This ensures data is always within the "last 12 months" range
-        $baseDate       = new DateTime('first day of this month');
+        $baseDate = new DateTime('first day of this month');
         $expectedMonths = [];
 
         for ($i = 2; $i >= 0; --$i) {
-            $date    = (clone $baseDate)->modify("-{$i} months")->modify('+14 days');
+            $date = (clone $baseDate)->modify("-{$i} months")->modify('+14 days');
             $dimTime = DimTimeFactory::createOne([
                 'date' => $date,
             ]);
 
             $multiplier = 3 - $i; // 1, 2, 3
-            $fact       = new FactProjectMetrics()
+            $fact = new FactProjectMetrics()
                 ->setCompany($this->getTestCompany())
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
@@ -224,12 +224,12 @@ class StarSchemaIntegrationTest extends KernelTestCase
         // Create dimension for project type
         $dimProjectType = DimProjectTypeFactory::createOne([
             'projectType' => 'forfait',
-            'status'      => 'active',
+            'status' => 'active',
         ]);
 
         // Create 100 entries to test performance - only set date
         for ($i = 1; $i <= 100; ++$i) {
-            $date    = new DateTime('2025-01-01')->modify("+{$i} days");
+            $date = new DateTime('2025-01-01')->modify("+{$i} days");
             $dimTime = DimTimeFactory::createOne([
                 'date' => $date,
             ]);

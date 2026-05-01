@@ -48,7 +48,7 @@ class EntityCreationTest extends KernelTestCase
     {
         self::bootKernel();
         $this->companyContext = static::getContainer()->get(CompanyContext::class);
-        $this->entityManager  = static::getContainer()->get(EntityManagerInterface::class);
+        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
 
         // Créer une Company manuellement pour éviter les problèmes de Factory
         $this->company = new Company();
@@ -82,14 +82,14 @@ class EntityCreationTest extends KernelTestCase
         $user->setEmail('test@test.com');
         $user->setPassword('password');
         $user->firstName = 'Test';
-        $user->lastName  = 'User';
+        $user->lastName = 'User';
         $user->setRoles(['ROLE_USER', 'ROLE_SUPERADMIN']); // SUPERADMIN required for switchCompany()
 
         // Persist user so it can be used as ProjectEvent.actor
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $token        = new UsernamePasswordToken($user, 'main', $user->getRoles());
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
         $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
         $tokenStorage->setToken($token);
     }
@@ -190,7 +190,7 @@ class EntityCreationTest extends KernelTestCase
      */
     public function testTimesheetInheritsCompanyFromProject(): void
     {
-        $project     = ProjectFactory::createOne(['company' => $this->company]);
+        $project = ProjectFactory::createOne(['company' => $this->company]);
         $contributor = ContributorFactory::createOne(['company' => $this->company]);
 
         $timesheet = new Timesheet();
@@ -212,7 +212,7 @@ class EntityCreationTest extends KernelTestCase
      */
     public function testPlanningInheritsCompanyFromProject(): void
     {
-        $project     = ProjectFactory::createOne(['company' => $this->company]);
+        $project = ProjectFactory::createOne(['company' => $this->company]);
         $contributor = ContributorFactory::createOne(['company' => $this->company]);
 
         $planning = new Planning();
@@ -237,10 +237,10 @@ class EntityCreationTest extends KernelTestCase
     public function testInvoiceHasCompanyFromContext(): void
     {
         // Create project and client
-        $client  = ClientFactory::createOne(['company' => $this->company]);
+        $client = ClientFactory::createOne(['company' => $this->company]);
         $project = ProjectFactory::createOne([
             'company' => $this->company,
-            'client'  => $client,
+            'client' => $client,
         ]);
 
         $invoice = new Invoice();
@@ -265,7 +265,7 @@ class EntityCreationTest extends KernelTestCase
      */
     public function testFactoriesAlwaysCreateEntitiesWithCompany(): void
     {
-        $project     = ProjectFactory::createOne();
+        $project = ProjectFactory::createOne();
         $contributor = ContributorFactory::createOne();
 
         $this->assertNotNull($project->getCompany());

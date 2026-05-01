@@ -46,7 +46,7 @@ class GenerateForecastTestDataCommand extends Command
 
         $io->title('Génération de données de test pour le forecasting');
 
-        $months           = (int) $input->getOption('months');
+        $months = (int) $input->getOption('months');
         $projectsPerMonth = (int) $input->getOption('projects-per-month');
 
         // Récupérer un client et un utilisateur existants
@@ -66,30 +66,30 @@ class GenerateForecastTestDataCommand extends Command
 
         $io->section(sprintf('Génération de %d mois d\'historique avec ~%d projets/mois', $months, $projectsPerMonth));
 
-        $now           = new DateTime();
-        $createdCount  = 0;
+        $now = new DateTime();
+        $createdCount = 0;
         $orderSequence = time() % 1000; // Partir d'un numéro basé sur le timestamp pour éviter les doublons
 
         // Coefficients de saisonnalité réalistes (industrie services IT)
         $seasonality = [
-            1  => 0.85, // Janvier - calme post-fêtes
-            2  => 0.95, // Février
-            3  => 1.10, // Mars - reprise
-            4  => 1.05, // Avril
-            5  => 1.00, // Mai
-            6  => 0.90, // Juin - ralentissement été
-            7  => 0.75, // Juillet - vacances
-            8  => 0.80, // Août - vacances
-            9  => 1.15, // Septembre - forte reprise
+            1 => 0.85, // Janvier - calme post-fêtes
+            2 => 0.95, // Février
+            3 => 1.10, // Mars - reprise
+            4 => 1.05, // Avril
+            5 => 1.00, // Mai
+            6 => 0.90, // Juin - ralentissement été
+            7 => 0.75, // Juillet - vacances
+            8 => 0.80, // Août - vacances
+            9 => 1.15, // Septembre - forte reprise
             10 => 1.20, // Octobre - rush fin d'année
             11 => 1.15, // Novembre - rush fin d'année
             12 => 0.90, // Décembre - ralentissement fêtes
         ];
 
         for ($i = $months - 1; $i >= 0; --$i) {
-            $monthDate   = (clone $now)->modify("-{$i} months");
+            $monthDate = (clone $now)->modify("-{$i} months");
             $monthNumber = (int) $monthDate->format('n');
-            $monthName   = $monthDate->format('F Y');
+            $monthName = $monthDate->format('F Y');
 
             // Appliquer la saisonnalité
             $projectCount = (int) round($projectsPerMonth * $seasonality[$monthNumber]);
@@ -121,7 +121,7 @@ class GenerateForecastTestDataCommand extends Command
 
                 // Date de début (dans le mois)
                 $dayOfMonth = random_int(1, 28);
-                $startDate  = (clone $monthDate)->setDate(
+                $startDate = (clone $monthDate)->setDate(
                     (int) $monthDate->format('Y'),
                     (int) $monthDate->format('n'),
                     $dayOfMonth,
@@ -130,7 +130,7 @@ class GenerateForecastTestDataCommand extends Command
 
                 // Date de fin (2-6 mois après)
                 $duration = random_int(2, 6);
-                $endDate  = (clone $startDate)->modify("+{$duration} months");
+                $endDate = (clone $startDate)->modify("+{$duration} months");
                 $project->setEndDate($endDate);
 
                 // Statut (80% completed, 20% in_progress)
@@ -153,7 +153,7 @@ class GenerateForecastTestDataCommand extends Command
 
                 // Ajouter une tendance de croissance (+2% par mois en moyenne)
                 $growthFactor = 1 + (($months - $i) * 0.02);
-                $soldAmount   = (int) ($soldAmount * $growthFactor);
+                $soldAmount = (int) ($soldAmount * $growthFactor);
 
                 $this->em->persist($project);
 

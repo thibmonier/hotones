@@ -21,8 +21,8 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->calculator    = $this->createMock(ClientServiceLevelCalculator::class);
-        $this->command       = new RecalculateClientServiceLevelCommand($this->calculator);
+        $this->calculator = $this->createMock(ClientServiceLevelCalculator::class);
+        $this->command = new RecalculateClientServiceLevelCommand($this->calculator);
         $this->commandTester = new CommandTester($this->command);
     }
 
@@ -33,9 +33,9 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $this->calculator
             ->method('getConfiguration')
             ->willReturn([
-                'top_vip_rank'      => 5,
+                'top_vip_rank' => 5,
                 'top_priority_rank' => 20,
-                'low_threshold'     => 5000,
+                'low_threshold' => 5000,
             ]);
 
         $this->calculator
@@ -61,9 +61,9 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $this->calculator
             ->method('getConfiguration')
             ->willReturn([
-                'top_vip_rank'      => 5,
+                'top_vip_rank' => 5,
                 'top_priority_rank' => 20,
-                'low_threshold'     => 5000,
+                'low_threshold' => 5000,
             ]);
 
         $this->calculator
@@ -85,9 +85,9 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
     public function testExecuteDisplaysConfiguration(): void
     {
         $config = [
-            'top_vip_rank'      => 3,
+            'top_vip_rank' => 3,
             'top_priority_rank' => 15,
-            'low_threshold'     => 10000,
+            'low_threshold' => 10000,
         ];
 
         $this->calculator
@@ -112,9 +112,9 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $this->calculator
             ->method('getConfiguration')
             ->willReturn([
-                'top_vip_rank'      => 5,
+                'top_vip_rank' => 5,
                 'top_priority_rank' => 20,
-                'low_threshold'     => 5000,
+                'low_threshold' => 5000,
             ]);
 
         $counts = [0, 1, 25, 100];
@@ -124,14 +124,14 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
             $calculator
                 ->method('getConfiguration')
                 ->willReturn([
-                    'top_vip_rank'      => 5,
+                    'top_vip_rank' => 5,
                     'top_priority_rank' => 20,
-                    'low_threshold'     => 5000,
+                    'low_threshold' => 5000,
                 ]);
             $calculator->method('recalculateAllAutoClients')->willReturn($count);
 
             $command = new RecalculateClientServiceLevelCommand($calculator);
-            $tester  = new CommandTester($command);
+            $tester = new CommandTester($command);
 
             $tester->execute([]);
             $output = $tester->getDisplay();
@@ -145,9 +145,9 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $this->calculator
             ->method('getConfiguration')
             ->willReturn([
-                'top_vip_rank'      => 5,
+                'top_vip_rank' => 5,
                 'top_priority_rank' => 20,
-                'low_threshold'     => 5000,
+                'low_threshold' => 5000,
             ]);
 
         $this->calculator->method('recalculateAllAutoClients')->willReturn(5);
@@ -164,9 +164,9 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
             ->expects($this->once())
             ->method('getConfiguration')
             ->willReturn([
-                'top_vip_rank'      => 5,
+                'top_vip_rank' => 5,
                 'top_priority_rank' => 20,
-                'low_threshold'     => 5000,
+                'low_threshold' => 5000,
             ]);
 
         $this->calculator
@@ -196,9 +196,9 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $this->calculator
             ->method('getConfiguration')
             ->willReturn([
-                'top_vip_rank'      => 5,
+                'top_vip_rank' => 5,
                 'top_priority_rank' => 20,
-                'low_threshold'     => 5000,
+                'low_threshold' => 5000,
             ]);
 
         $this->calculator

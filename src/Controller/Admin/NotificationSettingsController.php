@@ -24,7 +24,7 @@ class NotificationSettingsController extends AbstractController
         );
 
         if ($request->isMethod('POST')) {
-            $t   = (string) $request->request->get('timesheet_weekly_tolerance', '0.15');
+            $t = (string) $request->request->get('timesheet_weekly_tolerance', '0.15');
             $val = max(0.0, min(0.5, (float) $t)); // clamp 0..0.5
             $repo->setValue(NotificationSettingRepository::KEY_TIMESHEET_WEEKLY_TOLERANCE, $val);
             $this->addFlash('success', 'Tolérance mise à jour');

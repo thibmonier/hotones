@@ -47,9 +47,9 @@ class ContributorSatisfactionReminderCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $now    = new DateTime();
-        $year   = (int) ($input->getOption('year') ?? $now->format('Y'));
-        $month  = (int) ($input->getOption('month') ?? $now->format('n'));
+        $now = new DateTime();
+        $year = (int) ($input->getOption('year') ?? $now->format('Y'));
+        $month = (int) ($input->getOption('month') ?? $now->format('n'));
         $dryRun = (bool) $input->getOption('dry-run');
 
         $io->title(sprintf('Rappel satisfaction collaborateur - %s %d', $this->getMonthLabel($month), $year));
@@ -61,7 +61,7 @@ class ContributorSatisfactionReminderCommand extends Command
         // Récupérer tous les contributeurs actifs
         $contributors = $this->contributorRepository->findBy(['active' => true]);
 
-        $sent    = 0;
+        $sent = 0;
         $skipped = 0;
 
         foreach ($contributors as $contributor) {
@@ -127,18 +127,18 @@ class ContributorSatisfactionReminderCommand extends Command
     private function getMonthLabel(int $month): string
     {
         return match ($month) {
-            1       => 'Janvier',
-            2       => 'Février',
-            3       => 'Mars',
-            4       => 'Avril',
-            5       => 'Mai',
-            6       => 'Juin',
-            7       => 'Juillet',
-            8       => 'Août',
-            9       => 'Septembre',
-            10      => 'Octobre',
-            11      => 'Novembre',
-            12      => 'Décembre',
+            1 => 'Janvier',
+            2 => 'Février',
+            3 => 'Mars',
+            4 => 'Avril',
+            5 => 'Mai',
+            6 => 'Juin',
+            7 => 'Juillet',
+            8 => 'Août',
+            9 => 'Septembre',
+            10 => 'Octobre',
+            11 => 'Novembre',
+            12 => 'Décembre',
             default => '',
         };
     }

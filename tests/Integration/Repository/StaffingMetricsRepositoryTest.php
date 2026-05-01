@@ -41,22 +41,22 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
         $week2 = DimTimeFactory::createOne(['date' => new DateTime('2024-01-08')]);
 
         FactStaffingMetricsFactory::createOne([
-            'dimTime'       => $week1,
-            'contributor'   => $contributor,
-            'granularity'   => 'weekly',
+            'dimTime' => $week1,
+            'contributor' => $contributor,
+            'granularity' => 'weekly',
             'availableDays' => '5.00',
-            'staffedDays'   => '4.00',
-            'plannedDays'   => '0.50',
-            'vacationDays'  => '0.00',
+            'staffedDays' => '4.00',
+            'plannedDays' => '0.50',
+            'vacationDays' => '0.00',
         ]);
         FactStaffingMetricsFactory::createOne([
-            'dimTime'       => $week2,
-            'contributor'   => $contributor,
-            'granularity'   => 'weekly',
+            'dimTime' => $week2,
+            'contributor' => $contributor,
+            'granularity' => 'weekly',
             'availableDays' => '5.00',
-            'staffedDays'   => '3.00',
-            'plannedDays'   => '1.00',
-            'vacationDays'  => '0.00',
+            'staffedDays' => '3.00',
+            'plannedDays' => '1.00',
+            'vacationDays' => '0.00',
         ]);
 
         // Act
@@ -74,18 +74,18 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
     public function testGetWeeklyOccupancyByContributorWithProfileFilter(): void
     {
         // Arrange
-        $profile     = ProfileFactory::createOne(['name' => 'Développeur']);
+        $profile = ProfileFactory::createOne(['name' => 'Développeur']);
         $contributor = ContributorFactory::createOne(['firstName' => 'John', 'lastName' => 'Doe']);
-        $dimProfile  = DimProfileFactory::createOne(['profile' => $profile, 'name' => 'Développeur']);
-        $week1       = DimTimeFactory::createOne(['date' => new DateTime('2024-01-01')]);
+        $dimProfile = DimProfileFactory::createOne(['profile' => $profile, 'name' => 'Développeur']);
+        $week1 = DimTimeFactory::createOne(['date' => new DateTime('2024-01-01')]);
 
         FactStaffingMetricsFactory::createOne([
-            'dimTime'       => $week1,
-            'dimProfile'    => $dimProfile,
-            'contributor'   => $contributor,
-            'granularity'   => 'weekly',
+            'dimTime' => $week1,
+            'dimProfile' => $dimProfile,
+            'contributor' => $contributor,
+            'granularity' => 'weekly',
             'availableDays' => '5.00',
-            'staffedDays'   => '4.00',
+            'staffedDays' => '4.00',
         ]);
 
         // Act
@@ -98,23 +98,23 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
     public function testGetWeeklyGlobalTACE(): void
     {
         // Arrange
-        $week1      = DimTimeFactory::createOne(['date' => new DateTime('2024-01-01')]);
+        $week1 = DimTimeFactory::createOne(['date' => new DateTime('2024-01-01')]);
         $dimProfile = DimProfileFactory::createOne(['isProductive' => true]);
 
         FactStaffingMetricsFactory::createOne([
-            'dimTime'          => $week1,
-            'dimProfile'       => $dimProfile,
-            'granularity'      => 'weekly',
-            'staffedDays'      => '17.00',
-            'workedDays'       => '20.00',
+            'dimTime' => $week1,
+            'dimProfile' => $dimProfile,
+            'granularity' => 'weekly',
+            'staffedDays' => '17.00',
+            'workedDays' => '20.00',
             'contributorCount' => 3,
         ]);
         FactStaffingMetricsFactory::createOne([
-            'dimTime'          => $week1,
-            'dimProfile'       => $dimProfile,
-            'granularity'      => 'weekly',
-            'staffedDays'      => '19.00',
-            'workedDays'       => '20.00',
+            'dimTime' => $week1,
+            'dimProfile' => $dimProfile,
+            'granularity' => 'weekly',
+            'staffedDays' => '19.00',
+            'workedDays' => '20.00',
             'contributorCount' => 2,
         ]);
 
@@ -137,26 +137,26 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
         // Productive profile
         $dimProfileProductive = DimProfileFactory::createOne(['isProductive' => true]);
         FactStaffingMetricsFactory::createOne([
-            'dimTime'          => $week1,
-            'dimProfile'       => $dimProfileProductive,
-            'granularity'      => 'weekly',
+            'dimTime' => $week1,
+            'dimProfile' => $dimProfileProductive,
+            'granularity' => 'weekly',
             'contributorCount' => 3,
         ]);
 
         // Non-productive profile (should be excluded)
         $dimProfileNonProductive = DimProfileFactory::createOne(['isProductive' => false]);
         FactStaffingMetricsFactory::createOne([
-            'dimTime'          => $week1,
-            'dimProfile'       => $dimProfileNonProductive,
-            'granularity'      => 'weekly',
+            'dimTime' => $week1,
+            'dimProfile' => $dimProfileNonProductive,
+            'granularity' => 'weekly',
             'contributorCount' => 1,
         ]);
 
         // No profile (should be included)
         FactStaffingMetricsFactory::createOne([
-            'dimTime'          => $week1,
-            'dimProfile'       => null,
-            'granularity'      => 'weekly',
+            'dimTime' => $week1,
+            'dimProfile' => null,
+            'granularity' => 'weekly',
             'contributorCount' => 2,
         ]);
 

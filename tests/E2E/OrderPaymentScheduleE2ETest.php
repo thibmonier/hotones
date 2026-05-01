@@ -60,12 +60,12 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
     public function testAddPaymentSchedulePercent(): void
     {
         $client = static::createPantherClient();
-        $user   = UserFactory::createOne(['roles' => ['ROLE_CHEF_PROJET'], 'password' => 'password']);
-        $order  = $this->createOrderData();
+        $user = UserFactory::createOne(['roles' => ['ROLE_CHEF_PROJET'], 'password' => 'password']);
+        $order = $this->createOrderData();
 
         // Login
         $crawler = $client->request('GET', '/login');
-        $form    = $crawler
+        $form = $crawler
             ->filter('form')
             ->form([
                 '_username' => $user->getEmail(),

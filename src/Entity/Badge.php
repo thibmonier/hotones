@@ -57,7 +57,7 @@ class Badge implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->createdAt    = new DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->achievements = new ArrayCollection();
     }
 

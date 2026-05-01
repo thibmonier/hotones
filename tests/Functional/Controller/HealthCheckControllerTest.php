@@ -113,7 +113,7 @@ class HealthCheckControllerTest extends WebTestCase
         $this->assertInstanceOf(DateTime::class, $timestamp);
 
         // Verify timestamp is recent (within last 5 seconds)
-        $now  = new DateTime();
+        $now = new DateTime();
         $diff = $now->getTimestamp() - $timestamp->getTimestamp();
         $this->assertLessThan(5, $diff, 'Timestamp should be recent');
     }

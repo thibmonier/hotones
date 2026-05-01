@@ -53,7 +53,7 @@ class TaskApiController extends AbstractController
     public function overdueList(ProjectTaskRepository $repo): JsonResponse
     {
         $limit = max(1, (int) ($_GET['limit'] ?? 5));
-        $user  = $this->getUser();
+        $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['tasks' => []]);
         }
@@ -80,12 +80,12 @@ class TaskApiController extends AbstractController
         $data = [];
         foreach ($rows as $task) {
             $data[] = [
-                'id'         => $task->getId(),
-                'name'       => $task->getName(),
+                'id' => $task->getId(),
+                'name' => $task->getName(),
                 'project_id' => $task->getProject()->getId(),
-                'project'    => $task->getProject()->getName(),
-                'end_date'   => $task->getEndDate() ? $task->getEndDate()->format('Y-m-d') : null,
-                'url'        => sprintf('/project/%d/tasks/%d', $task->getProject()->getId(), $task->getId()),
+                'project' => $task->getProject()->getName(),
+                'end_date' => $task->getEndDate() ? $task->getEndDate()->format('Y-m-d') : null,
+                'url' => sprintf('/project/%d/tasks/%d', $task->getProject()->getId(), $task->getId()),
             ];
         }
 

@@ -27,11 +27,11 @@ class CheckAlertsMessageHandler
         $totalAlerts = array_sum($stats);
 
         $this->logger->info('Alert check completed', [
-            'budget_alerts'   => $stats['budget_alerts'],
-            'margin_alerts'   => $stats['margin_alerts'],
+            'budget_alerts' => $stats['budget_alerts'],
+            'margin_alerts' => $stats['margin_alerts'],
             'overload_alerts' => $stats['overload_alerts'],
-            'payment_alerts'  => $stats['payment_alerts'],
-            'total_alerts'    => $totalAlerts,
+            'payment_alerts' => $stats['payment_alerts'],
+            'total_alerts' => $totalAlerts,
         ]);
     }
 }

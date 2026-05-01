@@ -30,10 +30,10 @@ class LowMarginAlertEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'project_id'       => $project->getId(),
-                'project_name'     => $project->getName(),
+                'project_id' => $project->getId(),
+                'project_name' => $project->getName(),
                 'predicted_margin' => $predictedMargin,
-                'severity'         => $severity,
+                'severity' => $severity,
             ],
             entityType: 'Project',
             entityId: $project->getId(),

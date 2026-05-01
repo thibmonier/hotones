@@ -37,7 +37,7 @@ class BillingController extends AbstractController
         );
         $month = DateTime::createFromFormat('Y-m-d', $monthParam.'-01') ?: new DateTime('first day of this month');
         $start = (clone $month)->modify('first day of this month')->setTime(0, 0, 0);
-        $end   = (clone $month)->modify('last day of this month')->setTime(23, 59, 59);
+        $end = (clone $month)->modify('last day of this month')->setTime(23, 59, 59);
 
         // Forfait: échéances dans le mois
         $schedules = $this->em
@@ -69,7 +69,7 @@ class BillingController extends AbstractController
         $regieEntries = [];
         foreach ($ordersRegie as $order) {
             $project = $order->project;
-            $rows    = $timesheets->getMonthlyRevenueForProjectUsingContributorTjm($project, $start, $end);
+            $rows = $timesheets->getMonthlyRevenueForProjectUsingContributorTjm($project, $start, $end);
             foreach ($rows as $r) {
                 $regieEntries[] = [
                     'date' => DateTime::createFromFormat('Y-m-d', sprintf(
@@ -77,13 +77,13 @@ class BillingController extends AbstractController
                         (int) $r['year'],
                         (int) $r['month'],
                     )),
-                    'type'    => 'regie',
-                    'order'   => $order,
+                    'type' => 'regie',
+                    'order' => $order,
                     'project' => $project,
-                    'label'   => sprintf('Régie %02d/%04d', (int) $r['month'], (int) $r['year']),
-                    'amount'  => (float) ($r['revenue'] ?? 0),
-                    'year'    => (int) $r['year'],
-                    'month'   => (int) $r['month'],
+                    'label' => sprintf('Régie %02d/%04d', (int) $r['month'], (int) $r['year']),
+                    'amount' => (float) ($r['revenue'] ?? 0),
+                    'year' => (int) $r['year'],
+                    'month' => (int) $r['month'],
                 ];
             }
         }
@@ -91,14 +91,14 @@ class BillingController extends AbstractController
         // Forfait entries, calcul du montant à partir du devis (même logique que BillingService)
         $forfaitEntries = [];
         foreach ($schedules as $s) {
-            $o                = $s->getOrder();
+            $o = $s->getOrder();
             $forfaitEntries[] = [
-                'date'     => $s->getBillingDate(),
-                'type'     => 'forfait',
-                'order'    => $o,
-                'project'  => $o->project,
-                'label'    => $s->getLabel() ?: 'Échéance',
-                'amount'   => (float) $s->computeAmount($o->calculateTotalFromSections()),
+                'date' => $s->getBillingDate(),
+                'type' => 'forfait',
+                'order' => $o,
+                'project' => $o->project,
+                'label' => $s->getLabel() ?: 'Échéance',
+                'amount' => (float) $s->computeAmount($o->calculateTotalFromSections()),
                 'schedule' => $s,
             ];
         }
@@ -117,11 +117,11 @@ class BillingController extends AbstractController
         $next = (clone $start)->add(new DateInterval('P1M'))->format('Y-m');
 
         return $this->render('billing/index.html.twig', [
-            'entries'   => $entries,
-            'month'     => $start,
+            'entries' => $entries,
+            'month' => $start,
             'prevMonth' => $prev,
             'nextMonth' => $next,
-            'markers'   => $monthMarkers,
+            'markers' => $monthMarkers,
         ]);
     }
 
@@ -135,7 +135,7 @@ class BillingController extends AbstractController
         $bm = $repo->getOrCreateForSchedule($schedule);
         $bm->setIsIssued($request->request->getBoolean('is_issued'));
         $issuedAt = $request->request->get('issued_at');
-        $paidAt   = $request->request->get('paid_at');
+        $paidAt = $request->request->get('paid_at');
         $bm->setIssuedAt($issuedAt ? new DateTime($issuedAt) : null);
         $bm->setPaidAt($paidAt ? new DateTime($paidAt) : null);
         $bm->setComment($request->request->get('comment') ?: null);
@@ -158,12 +158,12 @@ class BillingController extends AbstractController
         if (!$order) {
             return $this->json(['ok' => false, 'error' => 'Order not found'], 404);
         }
-        $year  = (int) $request->request->get('year');
+        $year = (int) $request->request->get('year');
         $month = (int) $request->request->get('month');
-        $bm    = $repo->getOrCreateForRegiePeriod($order, $year, $month);
+        $bm = $repo->getOrCreateForRegiePeriod($order, $year, $month);
         $bm->setIsIssued($request->request->getBoolean('is_issued'));
         $issuedAt = $request->request->get('issued_at');
-        $paidAt   = $request->request->get('paid_at');
+        $paidAt = $request->request->get('paid_at');
         $bm->setIssuedAt($issuedAt ? new DateTime($issuedAt) : null);
         $bm->setPaidAt($paidAt ? new DateTime($paidAt) : null);
         $bm->setComment($request->request->get('comment') ?: null);

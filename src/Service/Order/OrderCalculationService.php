@@ -20,7 +20,7 @@ class OrderCalculationService
             $sectionsTotal = (float) $order->getTotalAmount();
         }
 
-        $servicesSubtotal  = 0.0;
+        $servicesSubtotal = 0.0;
         $purchasesSubtotal = 0.0;
         foreach ($order->getSections() as $section) {
             foreach ($section->getLines() as $line) {
@@ -36,9 +36,9 @@ class OrderCalculationService
             }
         }
 
-        $contPct           = $order->getContingencyPercentage() ? (float) $order->getContingencyPercentage() : 0.0;
+        $contPct = $order->getContingencyPercentage() ? (float) $order->getContingencyPercentage() : 0.0;
         $contingencyAmount = $sectionsTotal * ($contPct / 100.0);
-        $finalTotal        = $sectionsTotal - $contingencyAmount;
+        $finalTotal = $sectionsTotal - $contingencyAmount;
 
         $scheduledTotal = 0.0;
         if ($order->getContractType() === 'forfait') {
@@ -48,12 +48,12 @@ class OrderCalculationService
         }
 
         return [
-            'sectionsTotal'     => $sectionsTotal,
-            'servicesSubtotal'  => $servicesSubtotal,
+            'sectionsTotal' => $sectionsTotal,
+            'servicesSubtotal' => $servicesSubtotal,
             'purchasesSubtotal' => $purchasesSubtotal,
             'contingencyAmount' => $contingencyAmount,
-            'finalAmount'       => $finalTotal,
-            'scheduledTotal'    => $scheduledTotal,
+            'finalAmount' => $finalTotal,
+            'scheduledTotal' => $scheduledTotal,
         ];
     }
 

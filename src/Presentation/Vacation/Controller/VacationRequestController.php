@@ -37,7 +37,7 @@ class VacationRequestController extends AbstractController
     public function index(): Response
     {
         /** @var \App\Entity\User $user */
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
@@ -49,7 +49,7 @@ class VacationRequestController extends AbstractController
         $vacations = $this->vacationRepository->findByContributor($contributor);
 
         return $this->render('vacation_request/index.html.twig', [
-            'vacations'   => $vacations,
+            'vacations' => $vacations,
             'contributor' => $contributor,
         ]);
     }
@@ -58,7 +58,7 @@ class VacationRequestController extends AbstractController
     public function new(Request $request): Response
     {
         /** @var \App\Entity\User $user */
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         if (!$contributor) {
@@ -102,7 +102,7 @@ class VacationRequestController extends AbstractController
     public function show(string $id): Response
     {
         /** @var \App\Entity\User $user */
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         $vacation = $this->vacationRepository->findById(VacationId::fromString($id));
@@ -120,7 +120,7 @@ class VacationRequestController extends AbstractController
     public function cancel(Request $request, string $id): Response
     {
         /** @var \App\Entity\User $user */
-        $user        = $this->getUser();
+        $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
         $vacation = $this->vacationRepository->findById(VacationId::fromString($id));

@@ -107,7 +107,7 @@ class CompanyContext
     public function switchCompany(Company $company): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        $isCLI   = !$request || php_sapi_name() === 'cli';
+        $isCLI = !$request || php_sapi_name() === 'cli';
 
         // In CLI context (no HTTP request), bypass authentication checks
         if ($isCLI) {
@@ -207,7 +207,7 @@ class CompanyContext
         // Priority 1: JWT company_id claim (API requests)
         if ($request && $request->attributes->has('jwt_company_id')) {
             $companyId = $request->attributes->get('jwt_company_id');
-            $company   = $this->companyRepository->find($companyId);
+            $company = $this->companyRepository->find($companyId);
 
             if (!$company) {
                 throw new CompanyContextMissingException(sprintf('Company %d from JWT not found', $companyId));
@@ -222,7 +222,7 @@ class CompanyContext
 
             if ($session->has('current_company_id')) {
                 $companyId = $session->get('current_company_id');
-                $company   = $this->companyRepository->find($companyId);
+                $company = $this->companyRepository->find($companyId);
 
                 if ($company && $this->hasAccessToCompany($user, $company)) {
                     return $company;

@@ -38,13 +38,13 @@ class ForecastingController extends AbstractController
         }
 
         // Get forecast date range
-        $now       = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $startDate = $now->modify('first day of this month');
-        $endDate   = $now->modify("+{$months} months")->modify('last day of this month');
+        $endDate = $now->modify("+{$months} months")->modify('last day of this month');
 
         // Get forecasts from database
-        $realisticForecasts   = $this->forecastRepository->findByDateRange($startDate, $endDate, 'realistic');
-        $optimisticForecasts  = $this->forecastRepository->findByDateRange($startDate, $endDate, 'optimistic');
+        $realisticForecasts = $this->forecastRepository->findByDateRange($startDate, $endDate, 'realistic');
+        $optimisticForecasts = $this->forecastRepository->findByDateRange($startDate, $endDate, 'optimistic');
         $pessimisticForecasts = $this->forecastRepository->findByDateRange($startDate, $endDate, 'pessimistic');
 
         // Calculate average accuracy for realistic scenario
@@ -61,13 +61,13 @@ class ForecastingController extends AbstractController
         }
 
         return $this->render('forecasting/index.html.twig', [
-            'months'                => $months,
-            'realistic_forecasts'   => $realisticForecasts,
-            'optimistic_forecasts'  => $optimisticForecasts,
+            'months' => $months,
+            'realistic_forecasts' => $realisticForecasts,
+            'optimistic_forecasts' => $optimisticForecasts,
             'pessimistic_forecasts' => $pessimisticForecasts,
-            'chart_data'            => $chartData,
-            'average_accuracy'      => $averageAccuracy,
-            'legacy_forecast'       => $legacyForecast,
+            'chart_data' => $chartData,
+            'average_accuracy' => $averageAccuracy,
+            'legacy_forecast' => $legacyForecast,
         ]);
     }
 
@@ -89,7 +89,7 @@ class ForecastingController extends AbstractController
 
         return $this->render('forecasting/dashboard_legacy.html.twig', [
             'forecast' => $forecast,
-            'horizon'  => $horizon,
+            'horizon' => $horizon,
         ]);
     }
 
@@ -122,15 +122,15 @@ class ForecastingController extends AbstractController
      */
     private function prepareChartData(array $realistic, array $optimistic, array $pessimistic): array
     {
-        $labels          = [];
-        $realisticData   = [];
-        $optimisticData  = [];
+        $labels = [];
+        $realisticData = [];
+        $optimisticData = [];
         $pessimisticData = [];
-        $confidenceMin   = [];
-        $confidenceMax   = [];
+        $confidenceMin = [];
+        $confidenceMax = [];
 
         foreach ($realistic as $forecast) {
-            $labels[]        = $forecast->getPeriodStart()->format('M Y');
+            $labels[] = $forecast->getPeriodStart()->format('M Y');
             $realisticData[] = (float) $forecast->getPredictedRevenue();
             $confidenceMin[] = (float) $forecast->getConfidenceMin();
             $confidenceMax[] = (float) $forecast->getConfidenceMax();
@@ -145,49 +145,49 @@ class ForecastingController extends AbstractController
         }
 
         return [
-            'labels'   => $labels,
+            'labels' => $labels,
             'datasets' => [
                 [
-                    'label'           => 'Scénario Réaliste',
-                    'data'            => $realisticData,
-                    'borderColor'     => 'rgb(54, 162, 235)',
+                    'label' => 'Scénario Réaliste',
+                    'data' => $realisticData,
+                    'borderColor' => 'rgb(54, 162, 235)',
                     'backgroundColor' => 'rgba(54, 162, 235, 0.1)',
-                    'tension'         => 0.4,
+                    'tension' => 0.4,
                 ],
                 [
-                    'label'           => 'Scénario Optimiste',
-                    'data'            => $optimisticData,
-                    'borderColor'     => 'rgb(75, 192, 192)',
+                    'label' => 'Scénario Optimiste',
+                    'data' => $optimisticData,
+                    'borderColor' => 'rgb(75, 192, 192)',
                     'backgroundColor' => 'rgba(75, 192, 192, 0.1)',
-                    'borderDash'      => [5, 5],
-                    'tension'         => 0.4,
+                    'borderDash' => [5, 5],
+                    'tension' => 0.4,
                 ],
                 [
-                    'label'           => 'Scénario Pessimiste',
-                    'data'            => $pessimisticData,
-                    'borderColor'     => 'rgb(255, 99, 132)',
+                    'label' => 'Scénario Pessimiste',
+                    'data' => $pessimisticData,
+                    'borderColor' => 'rgb(255, 99, 132)',
                     'backgroundColor' => 'rgba(255, 99, 132, 0.1)',
-                    'borderDash'      => [5, 5],
-                    'tension'         => 0.4,
+                    'borderDash' => [5, 5],
+                    'tension' => 0.4,
                 ],
                 [
-                    'label'           => 'Intervalle de confiance (min)',
-                    'data'            => $confidenceMin,
-                    'borderColor'     => 'rgba(201, 203, 207, 0.5)',
+                    'label' => 'Intervalle de confiance (min)',
+                    'data' => $confidenceMin,
+                    'borderColor' => 'rgba(201, 203, 207, 0.5)',
                     'backgroundColor' => 'rgba(201, 203, 207, 0.1)',
-                    'borderDash'      => [2, 2],
-                    'pointRadius'     => 0,
-                    'tension'         => 0.4,
+                    'borderDash' => [2, 2],
+                    'pointRadius' => 0,
+                    'tension' => 0.4,
                 ],
                 [
-                    'label'           => 'Intervalle de confiance (max)',
-                    'data'            => $confidenceMax,
-                    'borderColor'     => 'rgba(201, 203, 207, 0.5)',
+                    'label' => 'Intervalle de confiance (max)',
+                    'data' => $confidenceMax,
+                    'borderColor' => 'rgba(201, 203, 207, 0.5)',
                     'backgroundColor' => 'rgba(201, 203, 207, 0.1)',
-                    'borderDash'      => [2, 2],
-                    'pointRadius'     => 0,
-                    'tension'         => 0.4,
-                    'fill'            => '-1',
+                    'borderDash' => [2, 2],
+                    'pointRadius' => 0,
+                    'tension' => 0.4,
+                    'fill' => '-1',
                 ],
             ],
         ];

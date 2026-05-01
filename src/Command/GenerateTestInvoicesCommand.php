@@ -42,7 +42,7 @@ class GenerateTestInvoicesCommand extends Command
         $count = (int) $input->getOption('count');
 
         // Récupérer clients et projets
-        $clients  = $this->em->getRepository(Client::class)->findAll();
+        $clients = $this->em->getRepository(Client::class)->findAll();
         $projects = $this->em->getRepository(Project::class)->findAll();
 
         if (empty($clients)) {
@@ -58,12 +58,12 @@ class GenerateTestInvoicesCommand extends Command
         }
 
         $statuses = [
-            Invoice::STATUS_SENT    => 40, // 40% envoyées
-            Invoice::STATUS_PAID    => 45, // 45% payées
+            Invoice::STATUS_SENT => 40, // 40% envoyées
+            Invoice::STATUS_PAID => 45, // 45% payées
             Invoice::STATUS_OVERDUE => 15, // 15% en retard
         ];
 
-        $today        = new DateTime();
+        $today = new DateTime();
         $createdCount = 0;
 
         $io->section(sprintf('Génération de %d factures', $count));
@@ -72,7 +72,7 @@ class GenerateTestInvoicesCommand extends Command
             $invoice = new Invoice();
 
             // Client et projet aléatoires
-            $client  = $clients[array_rand($clients)];
+            $client = $clients[array_rand($clients)];
             $project = $projects[array_rand($projects)];
 
             $invoice->setClient($client);
@@ -84,8 +84,8 @@ class GenerateTestInvoicesCommand extends Command
             $invoice->setInvoiceNumber($invoiceNumber);
 
             // Montant aléatoire entre 2000€ et 25000€
-            $amountHt  = random_int(2000, 25000);
-            $tvaRate   = 20.00;
+            $amountHt = random_int(2000, 25000);
+            $tvaRate = 20.00;
             $amountTva = ($amountHt * $tvaRate) / 100;
             $amountTtc = $amountHt + $amountTva;
 
@@ -96,12 +96,12 @@ class GenerateTestInvoicesCommand extends Command
 
             // Date d'émission entre -6 mois et maintenant
             $monthsAgo = random_int(0, 6);
-            $issuedAt  = (clone $today)->modify("-{$monthsAgo} months")->modify(sprintf('-%d days', random_int(0, 28)));
+            $issuedAt = (clone $today)->modify("-{$monthsAgo} months")->modify(sprintf('-%d days', random_int(0, 28)));
             $invoice->setIssuedAt($issuedAt);
 
             // Statut pondéré
-            $rand   = random_int(1, 100);
-            $cumul  = 0;
+            $rand = random_int(1, 100);
+            $cumul = 0;
             $status = Invoice::STATUS_SENT;
             foreach ($statuses as $st => $weight) {
                 $cumul += $weight;
@@ -119,7 +119,7 @@ class GenerateTestInvoicesCommand extends Command
             // Si payée, date de paiement entre échéance -10j et échéance +5j
             if ($status === Invoice::STATUS_PAID) {
                 $daysVariation = random_int(-10, 5);
-                $paidAt        = (clone $dueDate)->modify(sprintf('%+d days', $daysVariation));
+                $paidAt = (clone $dueDate)->modify(sprintf('%+d days', $daysVariation));
                 $invoice->setPaidAt($paidAt);
             }
 

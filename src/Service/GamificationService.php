@@ -75,7 +75,7 @@ class GamificationService
             $leveledUp = true;
             $this->logger->info('Contributor leveled up', [
                 'contributor' => $contributor->getFullName(),
-                'new_level'   => $progress->getLevel(),
+                'new_level' => $progress->getLevel(),
             ]);
         }
 
@@ -86,10 +86,10 @@ class GamificationService
         $unlockedBadges = $this->checkAndUnlockBadges($contributor, $progress);
 
         return [
-            'xp_gained'       => $xpAmount,
-            'level_up'        => $leveledUp,
-            'new_level'       => $progress->getLevel(),
-            'old_level'       => $oldLevel,
+            'xp_gained' => $xpAmount,
+            'level_up' => $leveledUp,
+            'new_level' => $progress->getLevel(),
+            'old_level' => $oldLevel,
             'badges_unlocked' => $unlockedBadges,
         ];
     }
@@ -106,7 +106,7 @@ class GamificationService
         }
 
         $unlockedBadges = [];
-        $allBadges      = $this->badgeRepository->findAllActive();
+        $allBadges = $this->badgeRepository->findAllActive();
 
         foreach ($allBadges as $badge) {
             // Vérifier si déjà unlocked
@@ -155,8 +155,8 @@ class GamificationService
 
         $this->logger->info('Badge unlocked', [
             'contributor' => $contributor->getFullName(),
-            'badge'       => $badge->getName(),
-            'xp_reward'   => $badge->getXpReward(),
+            'badge' => $badge->getName(),
+            'xp_reward' => $badge->getXpReward(),
         ]);
 
         return $badge;

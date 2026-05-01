@@ -355,7 +355,7 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         // Calculer le taux d'occupation et la capacité restante, formater le numéro de semaine
         foreach ($results as &$result) {
             // Calculer le numéro de semaine à partir de la date
-            $date    = $result['weekDate'];
+            $date = $result['weekDate'];
             $weekNum = $date instanceof DateTimeInterface ? (int) $date->format('W') : 0;
 
             // Formater le numéro de semaine comme 'YYYY-S##'
@@ -363,12 +363,12 @@ class StaffingMetricsRepository extends CompanyAwareRepository
             unset($result['weekDate']);
 
             $available = (float) $result['availableDays'];
-            $staffed   = (float) $result['staffedDays'];
-            $planned   = (float) $result['plannedDays'];
+            $staffed = (float) $result['staffedDays'];
+            $planned = (float) $result['plannedDays'];
 
             // Taux d'occupation = (staffé + planifié) / disponible * 100
-            $totalOccupied               = $staffed + $planned;
-            $result['occupancyRate']     = $available > 0 ? ($totalOccupied / $available) * 100 : 0;
+            $totalOccupied = $staffed + $planned;
+            $result['occupancyRate'] = $available > 0 ? ($totalOccupied / $available) * 100 : 0;
             $result['remainingCapacity'] = max(0, $available - $totalOccupied);
         }
 
@@ -421,7 +421,7 @@ class StaffingMetricsRepository extends CompanyAwareRepository
         // Formater le numéro de semaine comme 'YYYY-S##'
         foreach ($results as &$result) {
             // Calculer le numéro de semaine à partir de la date
-            $date    = $result['weekDate'];
+            $date = $result['weekDate'];
             $weekNum = $date instanceof DateTimeInterface ? (int) $date->format('W') : 0;
 
             $result['weekNumber'] = sprintf('%d-S%02d', $year, $weekNum);

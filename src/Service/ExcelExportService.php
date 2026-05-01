@@ -313,7 +313,7 @@ class ExcelExportService
             ->getStyle('A'.$row)
             ->applyFromArray([
                 'fill' => [
-                    'fillType'   => Fill::FILL_SOLID,
+                    'fillType' => Fill::FILL_SOLID,
                     'startColor' => ['rgb' => 'E2E8F0'],
                 ],
             ]);
@@ -327,8 +327,8 @@ class ExcelExportService
         $sheet
             ->getStyle($range)
             ->applyFromArray([
-                'font'      => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
-                'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '3B82F6']],
+                'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '3B82F6']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ]);
     }

@@ -95,8 +95,8 @@ class Skill implements Stringable, CompanyOwnedInterface
     public function __construct()
     {
         $this->contributorSkills = new ArrayCollection();
-        $this->createdAt         = new DateTime();
-        $this->updatedAt         = new DateTime();
+        $this->createdAt = new DateTime();
+        $this->updatedAt = new DateTime();
     }
 
     #[ORM\PrePersist]
@@ -157,11 +157,11 @@ class Skill implements Stringable, CompanyOwnedInterface
     public function getCategoryLabel(): string
     {
         return match ($this->category) {
-            'technique'    => 'Technique',
-            'soft_skill'   => 'Soft Skill',
+            'technique' => 'Technique',
+            'soft_skill' => 'Soft Skill',
             'methodologie' => 'Méthodologie',
-            'langue'       => 'Langue',
-            default        => $this->category,
+            'langue' => 'Langue',
+            default => $this->category,
         };
     }
 

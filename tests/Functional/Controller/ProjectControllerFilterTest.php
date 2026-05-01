@@ -22,9 +22,9 @@ class ProjectControllerFilterTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client      = static::createClient();
+        $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
-        $this->testUser    = $this->authenticateTestUser($this->testCompany, ['ROLE_INTERVENANT']);
+        $this->testUser = $this->authenticateTestUser($this->testCompany, ['ROLE_INTERVENANT']);
     }
 
     private function createProject(string $name, string $status = 'active', string $type = 'forfait'): Project
@@ -84,7 +84,7 @@ class ProjectControllerFilterTest extends WebTestCase
 
         $this->client->loginUser($this->getTestUser());
         $this->client->request('GET', '/projects', [
-            'status'       => 'active',
+            'status' => 'active',
             'project_type' => 'forfait',
         ]);
 

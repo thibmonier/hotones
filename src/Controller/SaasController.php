@@ -17,25 +17,25 @@ class SaasController extends AbstractController
     #[Route('', name: 'saas_dashboard', methods: ['GET'])]
     public function dashboard(SaasSubscriptionRepository $subscriptionRepository): Response
     {
-        $activeSubscriptions   = $subscriptionRepository->findActive();
+        $activeSubscriptions = $subscriptionRepository->findActive();
         $expiringSubscriptions = $subscriptionRepository->findExpiringInDays(30);
-        $dueForRenewal         = $subscriptionRepository->findDueForRenewal();
+        $dueForRenewal = $subscriptionRepository->findDueForRenewal();
 
         $stats = [
-            'total_active'      => $subscriptionRepository->countActive(),
-            'monthly_cost'      => $subscriptionRepository->calculateTotalMonthlyCost(),
-            'yearly_cost'       => $subscriptionRepository->calculateTotalYearlyCost(),
-            'expiring_soon'     => count($expiringSubscriptions),
-            'due_for_renewal'   => count($dueForRenewal),
-            'by_status'         => $subscriptionRepository->getStatsByStatus(),
+            'total_active' => $subscriptionRepository->countActive(),
+            'monthly_cost' => $subscriptionRepository->calculateTotalMonthlyCost(),
+            'yearly_cost' => $subscriptionRepository->calculateTotalYearlyCost(),
+            'expiring_soon' => count($expiringSubscriptions),
+            'due_for_renewal' => count($dueForRenewal),
+            'by_status' => $subscriptionRepository->getStatsByStatus(),
             'by_billing_period' => $subscriptionRepository->getStatsByBillingPeriod(),
         ];
 
         return $this->render('saas/dashboard.html.twig', [
-            'stats'                  => $stats,
-            'active_subscriptions'   => $activeSubscriptions,
+            'stats' => $stats,
+            'active_subscriptions' => $activeSubscriptions,
             'expiring_subscriptions' => $expiringSubscriptions,
-            'due_for_renewal'        => $dueForRenewal,
+            'due_for_renewal' => $dueForRenewal,
         ]);
     }
 }

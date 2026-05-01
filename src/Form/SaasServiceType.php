@@ -25,8 +25,8 @@ class SaasServiceType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom du service',
-                'attr'  => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Ex: Google Workspace, Slack Premium, GitHub Team',
                 ],
                 'constraints' => [
@@ -35,20 +35,20 @@ class SaasServiceType extends AbstractType
                 ],
             ])
             ->add('description', TextareaType::class, [
-                'label'    => 'Description',
+                'label' => 'Description',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
-                    'rows'        => 4,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 4,
                     'placeholder' => 'Description du service et de ses fonctionnalités',
                 ],
             ])
             ->add('provider', EntityType::class, [
-                'class'         => SaasProvider::class,
-                'label'         => 'Fournisseur',
-                'required'      => false,
-                'choice_label'  => 'name',
-                'placeholder'   => '-- Souscription directe (sans fournisseur) --',
+                'class' => SaasProvider::class,
+                'label' => 'Fournisseur',
+                'required' => false,
+                'choice_label' => 'name',
+                'placeholder' => '-- Souscription directe (sans fournisseur) --',
                 'query_builder' => fn ($repository) => $repository
                     ->createQueryBuilder('p')
                     ->where('p.active = :active')
@@ -60,56 +60,56 @@ class SaasServiceType extends AbstractType
                 'help' => 'Laisser vide si le service est souscrit directement',
             ])
             ->add('category', TextType::class, [
-                'label'    => 'Catégorie',
+                'label' => 'Catégorie',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Ex: Communication, Productivité, Développement, Design',
-                    'list'        => 'categories-list',
+                    'list' => 'categories-list',
                 ],
                 'help' => 'Catégorie pour organiser les services',
             ])
             ->add('serviceUrl', UrlType::class, [
-                'label'    => 'URL du service',
+                'label' => 'URL du service',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'https://example.com',
                 ],
             ])
             ->add('logoUrl', UrlType::class, [
-                'label'    => 'URL du logo',
+                'label' => 'URL du logo',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'https://example.com/logo.png',
                 ],
             ])
             ->add('defaultMonthlyPrice', MoneyType::class, [
-                'label'    => 'Prix mensuel par défaut',
+                'label' => 'Prix mensuel par défaut',
                 'currency' => 'EUR',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => '0.00',
                 ],
                 'help' => 'Prix mensuel de référence (optionnel)',
             ])
             ->add('defaultYearlyPrice', MoneyType::class, [
-                'label'    => 'Prix annuel par défaut',
+                'label' => 'Prix annuel par défaut',
                 'currency' => 'EUR',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => '0.00',
                 ],
                 'help' => 'Prix annuel de référence (optionnel)',
             ])
             ->add('currency', ChoiceType::class, [
-                'label'   => 'Devise',
+                'label' => 'Devise',
                 'choices' => [
-                    'Euro (EUR)'           => 'EUR',
-                    'Dollar (USD)'         => 'USD',
+                    'Euro (EUR)' => 'EUR',
+                    'Dollar (USD)' => 'USD',
                     'Livre Sterling (GBP)' => 'GBP',
                 ],
                 'attr' => [
@@ -117,18 +117,18 @@ class SaasServiceType extends AbstractType
                 ],
             ])
             ->add('notes', TextareaType::class, [
-                'label'    => 'Notes',
+                'label' => 'Notes',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
-                    'rows'        => 4,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 4,
                     'placeholder' => 'Notes internes sur ce service',
                 ],
             ])
             ->add('active', CheckboxType::class, [
-                'label'    => 'Service actif',
+                'label' => 'Service actif',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-check-input',
                 ],
                 'help' => 'Désactiver si le service n\'est plus proposé',

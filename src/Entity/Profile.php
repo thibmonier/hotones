@@ -103,7 +103,7 @@ class Profile implements CompanyOwnedInterface
     public function __construct()
     {
         $this->contributors = new ArrayCollection();
-        $this->orderTasks   = new ArrayCollection();
+        $this->orderTasks = new ArrayCollection();
     }
 
     // Collection methods

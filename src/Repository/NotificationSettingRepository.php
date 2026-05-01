@@ -14,10 +14,10 @@ use Doctrine\Persistence\ManagerRegistry;
 class NotificationSettingRepository extends CompanyAwareRepository
 {
     // Clés de configuration prédéfinies
-    public const KEY_BUDGET_ALERT_THRESHOLD     = 'budget_alert_threshold'; // Pourcentage (défaut: 80)
-    public const KEY_PAYMENT_DUE_DAYS           = 'payment_due_days'; // Nombre de jours (défaut: 7)
-    public const KEY_WEBHOOK_URL                = 'webhook_url'; // URL Slack/Discord
-    public const KEY_WEBHOOK_TOKEN              = 'webhook_token'; // Token d'authentification
+    public const KEY_BUDGET_ALERT_THRESHOLD = 'budget_alert_threshold'; // Pourcentage (défaut: 80)
+    public const KEY_PAYMENT_DUE_DAYS = 'payment_due_days'; // Nombre de jours (défaut: 7)
+    public const KEY_WEBHOOK_URL = 'webhook_url'; // URL Slack/Discord
+    public const KEY_WEBHOOK_TOKEN = 'webhook_token'; // Token d'authentification
     public const KEY_TIMESHEET_WEEKLY_TOLERANCE = 'timesheet_weekly_tolerance'; // Tolérance (0.15 = 15%)
 
     public function __construct(ManagerRegistry $registry, CompanyContext $companyContext)
@@ -68,10 +68,10 @@ class NotificationSettingRepository extends CompanyAwareRepository
     public function getAllAsArray(): array
     {
         $settings = $this->findAll();
-        $result   = [];
+        $result = [];
 
         foreach ($settings as $setting) {
-            $value                             = $setting->getSettingValue();
+            $value = $setting->getSettingValue();
             $result[$setting->getSettingKey()] = $value['value'] ?? $value;
         }
 
@@ -84,8 +84,8 @@ class NotificationSettingRepository extends CompanyAwareRepository
     public function initializeDefaults(): void
     {
         $defaults = [
-            self::KEY_BUDGET_ALERT_THRESHOLD     => 80,
-            self::KEY_PAYMENT_DUE_DAYS           => 7,
+            self::KEY_BUDGET_ALERT_THRESHOLD => 80,
+            self::KEY_PAYMENT_DUE_DAYS => 7,
             self::KEY_TIMESHEET_WEEKLY_TOLERANCE => 0.15,
         ];
 

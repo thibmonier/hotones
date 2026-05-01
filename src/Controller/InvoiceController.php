@@ -31,7 +31,7 @@ class InvoiceController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $session = $request->getSession();
-        $reset   = (bool) $request->query->get('reset', false);
+        $reset = (bool) $request->query->get('reset', false);
 
         if ($reset) {
             $session->remove('invoice_filters');
@@ -39,33 +39,33 @@ class InvoiceController extends AbstractController
             return $this->redirectToRoute('invoice_index');
         }
 
-        $queryAll   = $request->query->all();
+        $queryAll = $request->query->all();
         $filterKeys = ['client', 'project', 'status', 'start_date', 'end_date'];
-        $hasFilter  = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
-        $saved      = $session->has('invoice_filters') ? (array) $session->get('invoice_filters') : [];
+        $hasFilter = count(array_intersect(array_keys($queryAll), $filterKeys)) > 0;
+        $saved = $session->has('invoice_filters') ? (array) $session->get('invoice_filters') : [];
 
-        $clientId  = $hasFilter ? $request->query->get('client')     ?? null : $saved['client'] ?? null;
-        $projectId = $hasFilter ? $request->query->get('project')    ?? null : $saved['project'] ?? null;
-        $status    = $hasFilter ? $request->query->get('status')     ?? null : $saved['status'] ?? null;
+        $clientId = $hasFilter ? $request->query->get('client') ?? null : $saved['client'] ?? null;
+        $projectId = $hasFilter ? $request->query->get('project') ?? null : $saved['project'] ?? null;
+        $status = $hasFilter ? $request->query->get('status') ?? null : $saved['status'] ?? null;
         $startDate = $hasFilter ? $request->query->get('start_date') ?? null : $saved['start_date'] ?? null;
-        $endDate   = $hasFilter ? $request->query->get('end_date')   ?? null : $saved['end_date'] ?? null;
+        $endDate = $hasFilter ? $request->query->get('end_date') ?? null : $saved['end_date'] ?? null;
 
         // Optimisation: getReference() pour les filtres QueryBuilder (accepte les proxies)
-        $client  = $clientId ? $em->getReference(Client::class, $clientId) : null;
+        $client = $clientId ? $em->getReference(Client::class, $clientId) : null;
         $project = $projectId ? $em->getReference(Project::class, $projectId) : null;
 
         // Tri
         $sort = $hasFilter
-            ? $request->query->get('sort')              ?? $saved['sort'] ?? 'issuedAt'
-            : $saved['sort']                            ?? 'issuedAt';
+            ? $request->query->get('sort') ?? $saved['sort'] ?? 'issuedAt'
+            : $saved['sort'] ?? 'issuedAt';
         $dir = $hasFilter ? $request->query->get('dir') ?? $saved['dir'] ?? 'DESC' : $saved['dir'] ?? 'DESC';
 
         // Pagination
         $allowedPerPage = [10, 20, 50, 100];
-        $perPageParam   = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
-        $perPage        = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
-        $page           = max(1, (int) $request->query->get('page', 1));
-        $offset         = ($page - 1) * $perPage;
+        $perPageParam = (int) $request->query->get('per_page', $saved['per_page'] ?? 20);
+        $perPage = in_array($perPageParam, $allowedPerPage, true) ? $perPageParam : 20;
+        $page = max(1, (int) $request->query->get('page', 1));
+        $offset = ($page - 1) * $perPage;
 
         // Requête avec filtres
         $qb = $em
@@ -94,13 +94,13 @@ class InvoiceController extends AbstractController
         // Tri
         $sortField = match ($sort) {
             'invoiceNumber' => 'i.invoiceNumber',
-            'client'        => 'c.name',
-            'project'       => 'p.name',
-            'status'        => 'i.status',
-            'dueDate'       => 'i.dueDate',
-            'amountHt'      => 'i.amountHt',
-            'amountTtc'     => 'i.amountTtc',
-            default         => 'i.issuedAt',
+            'client' => 'c.name',
+            'project' => 'p.name',
+            'status' => 'i.status',
+            'dueDate' => 'i.dueDate',
+            'amountHt' => 'i.amountHt',
+            'amountTtc' => 'i.amountTtc',
+            default => 'i.issuedAt',
         };
         $qb->orderBy($sortField, strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC');
 
@@ -134,52 +134,52 @@ class InvoiceController extends AbstractController
         $invoices = $qb->setMaxResults($perPage)->setFirstResult($offset)->getQuery()->getResult();
 
         // Clients et projets pour les filtres
-        $clients  = $em->getRepository(Client::class)->findBy([], ['name' => 'ASC']);
+        $clients = $em->getRepository(Client::class)->findBy([], ['name' => 'ASC']);
         $projects = $em->getRepository(Project::class)->findBy([], ['name' => 'ASC']);
 
         $pagination = [
             'current_page' => $page,
-            'per_page'     => $perPage,
-            'total'        => $total,
-            'total_pages'  => (int) ceil($total / $perPage),
-            'has_prev'     => $page > 1,
-            'has_next'     => ($page * $perPage) < $total,
+            'per_page' => $perPage,
+            'total' => $total,
+            'total_pages' => (int) ceil($total / $perPage),
+            'has_prev' => $page > 1,
+            'has_next' => ($page * $perPage) < $total,
         ];
 
         // Sauvegarder les filtres
         $session->set('invoice_filters', [
-            'client'     => $clientId,
-            'project'    => $projectId,
-            'status'     => $status,
+            'client' => $clientId,
+            'project' => $projectId,
+            'status' => $status,
             'start_date' => $startDate,
-            'end_date'   => $endDate,
-            'sort'       => $sort,
-            'dir'        => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
-            'per_page'   => $perPage,
+            'end_date' => $endDate,
+            'sort' => $sort,
+            'dir' => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
+            'per_page' => $perPage,
         ]);
 
         return $this->render('invoice/index.html.twig', [
-            'invoices'        => $invoices,
-            'clients'         => $clients,
-            'projects'        => $projects,
-            'selectedClient'  => $clientId,
+            'invoices' => $invoices,
+            'clients' => $clients,
+            'projects' => $projects,
+            'selectedClient' => $clientId,
             'selectedProject' => $projectId,
-            'selectedStatus'  => $status,
-            'startDate'       => $startDate,
-            'endDate'         => $endDate,
-            'statusOptions'   => Invoice::STATUS_OPTIONS,
-            'filters_query'   => [
-                'client'     => $clientId,
-                'project'    => $projectId,
-                'status'     => $status,
+            'selectedStatus' => $status,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'statusOptions' => Invoice::STATUS_OPTIONS,
+            'filters_query' => [
+                'client' => $clientId,
+                'project' => $projectId,
+                'status' => $status,
                 'start_date' => $startDate,
-                'end_date'   => $endDate,
-                'sort'       => $sort,
-                'dir'        => $dir,
-                'per_page'   => $perPage,
+                'end_date' => $endDate,
+                'sort' => $sort,
+                'dir' => $dir,
+                'per_page' => $perPage,
             ],
-            'sort'       => $sort,
-            'dir'        => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
+            'sort' => $sort,
+            'dir' => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'pagination' => $pagination,
         ]);
     }
@@ -192,7 +192,7 @@ class InvoiceController extends AbstractController
         $invoice->setCompany($this->companyContext->getCurrentCompany());
 
         // Pré-remplir si client ou projet fourni dans l'URL
-        $clientId  = $request->query->get('client');
+        $clientId = $request->query->get('client');
         $projectId = $request->query->get('project');
 
         if ($projectId) {
@@ -233,7 +233,7 @@ class InvoiceController extends AbstractController
 
         return $this->render('invoice/new.html.twig', [
             'invoice' => $invoice,
-            'form'    => $form,
+            'form' => $form,
         ]);
     }
 
@@ -258,7 +258,7 @@ class InvoiceController extends AbstractController
         }
 
         return $this->render('invoice/show.html.twig', [
-            'invoice'       => $invoice,
+            'invoice' => $invoice,
             'statusOptions' => Invoice::STATUS_OPTIONS,
         ]);
     }
@@ -294,7 +294,7 @@ class InvoiceController extends AbstractController
 
         return $this->render('invoice/edit.html.twig', [
             'invoice' => $invoice,
-            'form'    => $form,
+            'form' => $form,
         ]);
     }
 
@@ -346,7 +346,7 @@ class InvoiceController extends AbstractController
         // Si marquée comme payée, enregistrer la date de paiement
         if ($status === Invoice::STATUS_PAID && !$invoice->getPaidAt()) {
             $paidAtStr = $request->request->get('paid_at');
-            $paidAt    = $paidAtStr ? new DateTime($paidAtStr) : new DateTime();
+            $paidAt = $paidAtStr ? new DateTime($paidAtStr) : new DateTime();
             $invoice->setPaidAt($paidAt);
         }
 
@@ -362,17 +362,17 @@ class InvoiceController extends AbstractController
     {
         // Données pour le template PDF
         $data = [
-            'invoice'         => $invoice,
-            'company_name'    => 'HotOnes Agency',
+            'invoice' => $invoice,
+            'company_name' => 'HotOnes Agency',
             'company_address' => 'Adresse de l\'entreprise',
-            'company_postal'  => 'Code postal',
-            'company_city'    => 'Ville',
-            'company_phone'   => '01 23 45 67 89',
-            'company_email'   => 'contact@hotones.com',
-            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',
+            'company_postal' => 'Code postal',
+            'company_city' => 'Ville',
+            'company_phone' => '01 23 45 67 89',
+            'company_email' => 'contact@hotones.com',
+            'company_legal' => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',
             'company_capital' => 'Capital social: 10 000 € - RCS Paris B XXX XXX XXX',
-            'company_iban'    => 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
-            'company_bic'     => 'XXXXFRPPXXX',
+            'company_iban' => 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
+            'company_bic' => 'XXXXFRPPXXX',
         ];
 
         // Générer le nom du fichier
@@ -387,17 +387,17 @@ class InvoiceController extends AbstractController
     {
         // Données pour le template PDF
         $data = [
-            'invoice'         => $invoice,
-            'company_name'    => 'HotOnes Agency',
+            'invoice' => $invoice,
+            'company_name' => 'HotOnes Agency',
             'company_address' => 'Adresse de l\'entreprise',
-            'company_postal'  => 'Code postal',
-            'company_city'    => 'Ville',
-            'company_phone'   => '01 23 45 67 89',
-            'company_email'   => 'contact@hotones.com',
-            'company_legal'   => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',
+            'company_postal' => 'Code postal',
+            'company_city' => 'Ville',
+            'company_phone' => '01 23 45 67 89',
+            'company_email' => 'contact@hotones.com',
+            'company_legal' => 'SIRET: XXX XXX XXX XXXXX - TVA: FR XX XXX XXX XXX',
             'company_capital' => 'Capital social: 10 000 € - RCS Paris B XXX XXX XXX',
-            'company_iban'    => 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
-            'company_bic'     => 'XXXXFRPPXXX',
+            'company_iban' => 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
+            'company_bic' => 'XXXXFRPPXXX',
         ];
 
         $filename = sprintf('facture_%s_preview.pdf', $invoice->getInvoiceNumber());
@@ -416,10 +416,10 @@ class InvoiceController extends AbstractController
     {
         // Récupérer les filtres (même logique que l'index)
         $startDate = $request->query->get('start_date');
-        $endDate   = $request->query->get('end_date');
-        $clientId  = $request->query->get('client');
+        $endDate = $request->query->get('end_date');
+        $clientId = $request->query->get('client');
         $projectId = $request->query->get('project');
-        $status    = $request->query->get('status');
+        $status = $request->query->get('status');
 
         // Dates par défaut : année en cours
         if (!$startDate) {
@@ -430,7 +430,7 @@ class InvoiceController extends AbstractController
         }
 
         $start = new DateTime($startDate);
-        $end   = new DateTime($endDate);
+        $end = new DateTime($endDate);
 
         // Construire la requête avec les mêmes filtres que l'index
         $qb = $em
@@ -494,17 +494,17 @@ class InvoiceController extends AbstractController
         // Générer les lignes pour chaque facture
         foreach ($invoices as $invoice) {
             $invoiceNumber = $invoice->getInvoiceNumber();
-            $ecritureNum   = str_replace('-', '', $invoiceNumber); // Numéro écriture unique
-            $clientCode    = $invoice->getClient()
+            $ecritureNum = str_replace('-', '', $invoiceNumber); // Numéro écriture unique
+            $clientCode = $invoice->getClient()
                 ? 'C'.str_pad((string) $invoice->getClient()->getId(), 6, '0', STR_PAD_LEFT)
                 : 'C000000';
             $clientName = $invoice->getClient() ? $invoice->getClient()->getName() : 'Client inconnu';
-            $totalHT    = $invoice->getAmountHt();
-            $totalTTC   = $invoice->getAmountTtc();
-            $tva        = bcsub((string) $totalTTC, (string) $totalHT, 2);
+            $totalHT = $invoice->getAmountHt();
+            $totalTTC = $invoice->getAmountTtc();
+            $tva = bcsub((string) $totalTTC, (string) $totalHT, 2);
 
             // Date au format YYYYMMDD
-            $dateFormat      = $invoice->getIssuedAt()->format('Ymd');
+            $dateFormat = $invoice->getIssuedAt()->format('Ymd');
             $validDateFormat = $invoice->getIssuedAt()->format('Ymd');
 
             // Ligne 1 : Débit client (411xxx)

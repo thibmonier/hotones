@@ -97,11 +97,11 @@ class SecurityHeadersTest extends WebTestCase
     public static function protectedRoutesProvider(): array
     {
         return [
-            'projects'     => ['/projects'],
+            'projects' => ['/projects'],
             'contributors' => ['/contributors'],
-            'orders'       => ['/orders'],
+            'orders' => ['/orders'],
             // timesheets route doesn't exist at root level (only /contributors/{id}/timesheets)
-            'planning'  => ['/planning'],
+            'planning' => ['/planning'],
             'analytics' => ['/analytics/dashboard'],
         ];
     }

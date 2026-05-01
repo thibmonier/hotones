@@ -20,7 +20,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->command       = new CheckPhpLimitsCommand();
+        $this->command = new CheckPhpLimitsCommand();
         $this->commandTester = new CommandTester($this->command);
     }
 
@@ -66,7 +66,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithMinusOne(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         $result = $method->invoke($this->command, '-1');
 
@@ -76,7 +76,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithGigabytes(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         $result = $method->invoke($this->command, '2G');
 
@@ -86,7 +86,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithMegabytes(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         $result = $method->invoke($this->command, '128M');
 
@@ -96,7 +96,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithKilobytes(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         $result = $method->invoke($this->command, '512K');
 
@@ -106,7 +106,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithPlainBytes(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         $result = $method->invoke($this->command, '1024');
 
@@ -116,7 +116,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithZero(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         $result = $method->invoke($this->command, '0');
 
@@ -126,7 +126,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithLowercaseUnits(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         // parseSize converts to uppercase internally
         $resultG = $method->invoke($this->command, '1g');
@@ -141,7 +141,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     public function testParseSizeWithVariousSizes(): void
     {
         $reflection = new ReflectionClass($this->command);
-        $method     = $reflection->getMethod('parseSize');
+        $method = $reflection->getMethod('parseSize');
 
         $testCases = [
             ['input' => '1G', 'expected' => 1073741824],

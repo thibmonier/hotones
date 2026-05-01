@@ -39,7 +39,7 @@ final class SaasRenewSubscriptionsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io     = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $dryRun = (bool) $input->getOption('dry-run');
 
         if ($dryRun) {
@@ -58,11 +58,11 @@ final class SaasRenewSubscriptionsCommand extends Command
         $io->title(sprintf('%d abonnement(s) à renouveler', count($subscriptionsDue)));
 
         $renewed = 0;
-        $errors  = 0;
+        $errors = 0;
 
         foreach ($subscriptionsDue as $subscription) {
             try {
-                $serviceName    = $subscription->getDisplayName();
+                $serviceName = $subscription->getDisplayName();
                 $oldRenewalDate = $subscription->getNextRenewalDate();
 
                 $io->section($serviceName);

@@ -201,7 +201,7 @@ class PerformanceReview implements CompanyOwnedInterface
      */
     public function validate(): self
     {
-        $this->status      = 'validee';
+        $this->status = 'validee';
         $this->validatedAt = new DateTimeImmutable();
 
         return $this;
@@ -213,11 +213,11 @@ class PerformanceReview implements CompanyOwnedInterface
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'en_attente'         => 'En attente',
-            'auto_eval_faite'    => 'Auto-évaluation complétée',
+            'en_attente' => 'En attente',
+            'auto_eval_faite' => 'Auto-évaluation complétée',
             'eval_manager_faite' => 'Évaluation manager complétée',
-            'validee'            => 'Validée',
-            default              => 'Inconnu',
+            'validee' => 'Validée',
+            default => 'Inconnu',
         };
     }
 
@@ -227,11 +227,11 @@ class PerformanceReview implements CompanyOwnedInterface
     public function getProgressPercentage(): int
     {
         return match ($this->status) {
-            'en_attente'         => 0,
-            'auto_eval_faite'    => 33,
+            'en_attente' => 0,
+            'auto_eval_faite' => 33,
             'eval_manager_faite' => 66,
-            'validee'            => 100,
-            default              => 0,
+            'validee' => 100,
+            default => 0,
         };
     }
 

@@ -37,8 +37,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  */
 class CompanyVoter extends Voter
 {
-    public const VIEW   = 'COMPANY_VIEW';
-    public const EDIT   = 'COMPANY_EDIT';
+    public const VIEW = 'COMPANY_VIEW';
+    public const EDIT = 'COMPANY_EDIT';
     public const DELETE = 'COMPANY_DELETE';
 
     public function __construct(
@@ -77,12 +77,12 @@ class CompanyVoter extends Voter
             // SUPERADMIN can access cross-tenant data (with logging)
             if ($user->isSuperAdmin()) {
                 $this->securityLogger->warning('SUPERADMIN cross-tenant access (allowed)', [
-                    'user_id'             => $user->getId(),
-                    'user_company_id'     => $currentCompany->getId(),
+                    'user_id' => $user->getId(),
+                    'user_company_id' => $currentCompany->getId(),
                     'accessed_company_id' => $subjectCompany->getId(),
-                    'attribute'           => $attribute,
-                    'entity_class'        => $subject::class,
-                    'entity_id'           => method_exists($subject, 'getId') ? $subject->getId() : null,
+                    'attribute' => $attribute,
+                    'entity_class' => $subject::class,
+                    'entity_id' => method_exists($subject, 'getId') ? $subject->getId() : null,
                 ]);
 
                 return true;
@@ -94,10 +94,10 @@ class CompanyVoter extends Voter
 
         // Company isolation passed, check action permissions
         return match ($attribute) {
-            self::VIEW   => $this->canView($user, $subject),
-            self::EDIT   => $this->canEdit($user, $subject),
+            self::VIEW => $this->canView($user, $subject),
+            self::EDIT => $this->canEdit($user, $subject),
             self::DELETE => $this->canDelete($user, $subject),
-            default      => false,
+            default => false,
         };
     }
 
@@ -207,15 +207,15 @@ class CompanyVoter extends Voter
         $currentCompany = $this->companyContext->getCurrentCompany();
 
         $this->securityLogger->error('SECURITY: Tenant isolation violation detected', [
-            'user_id'              => $user->getId(),
-            'user_email'           => $user->getEmail(),
-            'user_company_id'      => $currentCompany->getId(),
-            'user_company_name'    => $currentCompany->getName(),
+            'user_id' => $user->getId(),
+            'user_email' => $user->getEmail(),
+            'user_company_id' => $currentCompany->getId(),
+            'user_company_name' => $currentCompany->getName(),
             'attempted_company_id' => $attemptedCompanyId,
-            'attribute'            => $attribute,
-            'entity_class'         => $subject::class,
-            'entity_id'            => method_exists($subject, 'getId') ? $subject->getId() : null,
-            'timestamp'            => new DateTimeImmutable()->format(DateTimeInterface::ATOM),
+            'attribute' => $attribute,
+            'entity_class' => $subject::class,
+            'entity_id' => method_exists($subject, 'getId') ? $subject->getId() : null,
+            'timestamp' => new DateTimeImmutable()->format(DateTimeInterface::ATOM),
         ]);
     }
 }

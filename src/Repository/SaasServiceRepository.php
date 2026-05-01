@@ -118,7 +118,7 @@ class SaasServiceRepository extends CompanyAwareRepository
             ->getResult();
 
         return array_map(static fn (array $row): array => [
-            'service'           => $row[0],
+            'service' => $row[0],
             'subscriptionCount' => (int) $row['subscriptionCount'],
         ], $results);
     }

@@ -46,7 +46,7 @@ class ClientTest extends TestCase
 
     public function testClientContactsManagement(): void
     {
-        $client   = new Client();
+        $client = new Client();
         $contact1 = new ClientContact();
         $contact2 = new ClientContact();
 

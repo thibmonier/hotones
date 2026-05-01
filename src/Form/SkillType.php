@@ -19,34 +19,34 @@ class SkillType extends AbstractType
     {
         $builder->add('name', TextType::class, [
             'label' => 'Nom de la compétence',
-            'attr'  => [
+            'attr' => [
                 'placeholder' => 'Ex: PHP, JavaScript, Communication...',
-                'class'       => 'form-control',
+                'class' => 'form-control',
             ],
             'required' => true,
         ])->add('category', ChoiceType::class, [
-            'label'   => 'Catégorie',
+            'label' => 'Catégorie',
             'choices' => [
-                'Technique'    => 'technique',
-                'Soft Skill'   => 'soft_skill',
+                'Technique' => 'technique',
+                'Soft Skill' => 'soft_skill',
                 'Méthodologie' => 'methodologie',
-                'Langue'       => 'langue',
+                'Langue' => 'langue',
             ],
-            'attr'        => ['class' => 'form-select'],
+            'attr' => ['class' => 'form-select'],
             'placeholder' => 'Sélectionnez une catégorie',
-            'required'    => true,
+            'required' => true,
         ])->add('description', TextareaType::class, [
             'label' => 'Description',
-            'attr'  => [
-                'rows'        => 4,
-                'class'       => 'form-control',
+            'attr' => [
+                'rows' => 4,
+                'class' => 'form-control',
                 'placeholder' => 'Description détaillée de la compétence...',
             ],
             'required' => false,
         ])->add('active', CheckboxType::class, [
-            'label'      => 'Compétence active',
-            'required'   => false,
-            'attr'       => ['class' => 'form-check-input'],
+            'label' => 'Compétence active',
+            'required' => false,
+            'attr' => ['class' => 'form-check-input'],
             'label_attr' => ['class' => 'form-check-label'],
         ]);
     }

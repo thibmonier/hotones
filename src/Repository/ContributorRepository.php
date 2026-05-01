@@ -168,7 +168,7 @@ class ContributorRepository extends CompanyAwareRepository
     {
         // Récupérer les projets
         $projects = $this->findProjectsWithAssignedTasks($contributor);
-        $company  = $this->companyContext->getCurrentCompany();
+        $company = $this->companyContext->getCurrentCompany();
 
         // Pour chaque projet, récupérer les tâches assignées au contributeur
         $result = [];
@@ -193,7 +193,7 @@ class ContributorRepository extends CompanyAwareRepository
             if (!empty($assignedTasks)) {
                 $result[] = [
                     'project' => $project,
-                    'tasks'   => $assignedTasks,
+                    'tasks' => $assignedTasks,
                 ];
             }
         }
@@ -233,7 +233,7 @@ class ContributorRepository extends CompanyAwareRepository
                 ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :today)')
                 ->setParameter('today', $today);
         } elseif ($employmentStatus === 'inactive_employment') {
-            $today    = new DateTime();
+            $today = new DateTime();
             $subQuery = $this->getEntityManager()
                 ->createQueryBuilder()
                 ->select('IDENTITY(ep2.contributor)')
@@ -245,10 +245,10 @@ class ContributorRepository extends CompanyAwareRepository
                 ->setParameter('today', $today);
         }
 
-        $map       = ['name' => ['c.lastName', 'c.firstName'], 'email' => ['c.email'], 'active' => ['c.active']];
-        $columns   = $map[$sort] ?? ['c.lastName', 'c.firstName'];
+        $map = ['name' => ['c.lastName', 'c.firstName'], 'email' => ['c.email'], 'active' => ['c.active']];
+        $columns = $map[$sort] ?? ['c.lastName', 'c.firstName'];
         $direction = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
-        $first     = true;
+        $first = true;
         foreach ($columns as $col) {
             if ($first) {
                 $qb->orderBy($col, $direction);

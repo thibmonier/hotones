@@ -17,9 +17,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'idx_projecttask_company', columns: ['company_id'])]
 class ProjectTask implements CompanyOwnedInterface
 {
-    public const TYPE_AVV       = 'avv'; // Avant-vente
+    public const TYPE_AVV = 'avv'; // Avant-vente
     public const TYPE_NON_VENDU = 'non_vendu'; // Non-vendu
-    public const TYPE_REGULAR   = 'regular'; // Tâche normale (vendue)
+    public const TYPE_REGULAR = 'regular'; // Tâche normale (vendue)
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -239,10 +239,10 @@ class ProjectTask implements CompanyOwnedInterface
     public function getTypeLabel(): string
     {
         return match ($this->getType()) {
-            self::TYPE_AVV       => 'Avant-vente (AVV)',
+            self::TYPE_AVV => 'Avant-vente (AVV)',
             self::TYPE_NON_VENDU => 'Non-vendu',
-            self::TYPE_REGULAR   => 'Tâche vendue',
-            default              => 'Non défini',
+            self::TYPE_REGULAR => 'Tâche vendue',
+            default => 'Non défini',
         };
     }
 
@@ -256,24 +256,24 @@ class ProjectTask implements CompanyOwnedInterface
         // Tâche AVV
         $avvTask = new self();
         $avvTask->setProject($project);
-        $avvTask->name                   = 'AVV - Avant-vente';
-        $avvTask->description            = 'Temps passé en avant-vente (ne compte pas dans la rentabilité)';
-        $avvTask->type                   = self::TYPE_AVV;
-        $avvTask->isDefault              = true;
+        $avvTask->name = 'AVV - Avant-vente';
+        $avvTask->description = 'Temps passé en avant-vente (ne compte pas dans la rentabilité)';
+        $avvTask->type = self::TYPE_AVV;
+        $avvTask->isDefault = true;
         $avvTask->countsForProfitability = false;
-        $avvTask->position               = 1;
-        $tasks[]                         = $avvTask;
+        $avvTask->position = 1;
+        $tasks[] = $avvTask;
 
         // Tâche Non-vendu
         $nonVenduTask = new self();
         $nonVenduTask->setProject($project);
-        $nonVenduTask->name                   = 'Non-vendu';
-        $nonVenduTask->description            = 'Temps passé non-vendu (ne compte pas dans la rentabilité)';
-        $nonVenduTask->type                   = self::TYPE_NON_VENDU;
-        $nonVenduTask->isDefault              = true;
+        $nonVenduTask->name = 'Non-vendu';
+        $nonVenduTask->description = 'Temps passé non-vendu (ne compte pas dans la rentabilité)';
+        $nonVenduTask->type = self::TYPE_NON_VENDU;
+        $nonVenduTask->isDefault = true;
         $nonVenduTask->countsForProfitability = false;
-        $nonVenduTask->position               = 2;
-        $tasks[]                              = $nonVenduTask;
+        $nonVenduTask->position = 2;
+        $tasks[] = $nonVenduTask;
 
         return $tasks;
     }
@@ -343,9 +343,9 @@ class ProjectTask implements CompanyOwnedInterface
         return match ($this->getStatus()) {
             'not_started' => 'Non démarrée',
             'in_progress' => 'En cours',
-            'completed'   => 'Terminée',
-            'on_hold'     => 'En attente',
-            default       => 'Non défini',
+            'completed' => 'Terminée',
+            'on_hold' => 'En attente',
+            default => 'Non défini',
         };
     }
 
@@ -355,8 +355,8 @@ class ProjectTask implements CompanyOwnedInterface
     public function getRemainingHours(): string
     {
         $estimatedHours = (string) ($this->getEstimatedHoursRevised() ?? $this->estimatedHoursSold ?? 0);
-        $spentHours     = $this->getTotalHours();
-        $remaining      = bcsub($estimatedHours, $spentHours, 2);
+        $spentHours = $this->getTotalHours();
+        $remaining = bcsub($estimatedHours, $spentHours, 2);
 
         return bccomp($remaining, '0') > 0 ? $remaining : '0.00';
     }
@@ -408,12 +408,12 @@ class ProjectTask implements CompanyOwnedInterface
         foreach ($this->project->getTimesheets() as $timesheet) {
             if ($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId()) {
                 $contributor = $timesheet->getContributor();
-                $cjm         = $contributor->getCjm();
+                $cjm = $contributor->getCjm();
 
                 if ($cjm) {
                     $hourlyRate = bcdiv((string) $cjm, '8', 4); // CJM / 8h
-                    $timeCost   = bcmul((string) $timesheet->getHours(), $hourlyRate, 2);
-                    $totalCost  = bcadd($totalCost, $timeCost, 2);
+                    $timeCost = bcmul((string) $timesheet->getHours(), $hourlyRate, 2);
+                    $totalCost = bcadd($totalCost, $timeCost, 2);
                 }
             }
         }
@@ -427,7 +427,7 @@ class ProjectTask implements CompanyOwnedInterface
     public function getRealMargin(): string
     {
         $soldAmount = $this->getSoldAmount();
-        $realCost   = $this->getRealCost();
+        $realCost = $this->getRealCost();
 
         return bcsub($soldAmount, $realCost, 2);
     }
@@ -481,8 +481,8 @@ class ProjectTask implements CompanyOwnedInterface
     public static function getAvailableTypes(): array
     {
         return [
-            self::TYPE_REGULAR   => 'Tâche vendue',
-            self::TYPE_AVV       => 'Avant-vente (AVV)',
+            self::TYPE_REGULAR => 'Tâche vendue',
+            self::TYPE_AVV => 'Avant-vente (AVV)',
             self::TYPE_NON_VENDU => 'Non-vendu',
         ];
     }
@@ -495,8 +495,8 @@ class ProjectTask implements CompanyOwnedInterface
         return [
             'not_started' => 'Non démarrée',
             'in_progress' => 'En cours',
-            'completed'   => 'Terminée',
-            'on_hold'     => 'En attente',
+            'completed' => 'Terminée',
+            'on_hold' => 'En attente',
         ];
     }
 

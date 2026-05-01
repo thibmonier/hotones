@@ -31,8 +31,8 @@ class NotificationController extends AbstractController
     #[Route('', name: 'notification_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $user  = $this->getUser();
-        $page  = max(1, $request->query->getInt('page', 1));
+        $user = $this->getUser();
+        $page = max(1, $request->query->getInt('page', 1));
         $limit = 20;
 
         $queryBuilder = $this->notificationRepository
@@ -76,15 +76,15 @@ class NotificationController extends AbstractController
             $totalQuery->andWhere('n.readAt IS NOT NULL');
         }
 
-        $total      = (int) $totalQuery->getQuery()->getSingleScalarResult();
+        $total = (int) $totalQuery->getQuery()->getSingleScalarResult();
         $totalPages = (int) ceil($total / $limit);
 
         return $this->render('notification/index.html.twig', [
             'notifications' => $notifications,
-            'current_page'  => $page,
-            'total_pages'   => $totalPages,
-            'total'         => $total,
-            'type_filter'   => $type,
+            'current_page' => $page,
+            'total_pages' => $totalPages,
+            'total' => $total,
+            'type_filter' => $type,
             'status_filter' => $status,
         ]);
     }
@@ -95,25 +95,25 @@ class NotificationController extends AbstractController
     #[Route('/api/unread', name: 'notification_api_unread', methods: ['GET'])]
     public function getUnread(): JsonResponse
     {
-        $user          = $this->getUser();
+        $user = $this->getUser();
         $notifications = $this->notificationService->getUnreadNotifications($user, 10);
-        $count         = $this->notificationService->countUnreadNotifications($user);
+        $count = $this->notificationService->countUnreadNotifications($user);
 
         $data = array_map(fn (Notification $n): array => [
-            'id'               => $n->getId(),
-            'type'             => $n->getType()->value,
-            'title'            => $n->getTitle(),
-            'message'          => $n->getMessage(),
-            'icon'             => $n->getType()->getIcon(),
-            'color'            => $n->getType()->getColor(),
-            'url'              => $n->getEntityUrl(),
-            'created_at'       => $n->getCreatedAt()->format('c'),
+            'id' => $n->getId(),
+            'type' => $n->getType()->value,
+            'title' => $n->getTitle(),
+            'message' => $n->getMessage(),
+            'icon' => $n->getType()->getIcon(),
+            'color' => $n->getType()->getColor(),
+            'url' => $n->getEntityUrl(),
+            'created_at' => $n->getCreatedAt()->format('c'),
             'created_at_human' => $this->formatRelativeTime($n->getCreatedAt()),
         ], $notifications);
 
         return new JsonResponse([
             'notifications' => $data,
-            'count'         => $count,
+            'count' => $count,
         ]);
     }
 
@@ -139,12 +139,12 @@ class NotificationController extends AbstractController
     #[Route('/mark-all-read', name: 'notification_mark_all_read', methods: ['POST'])]
     public function markAllAsRead(): JsonResponse
     {
-        $user  = $this->getUser();
+        $user = $this->getUser();
         $count = $this->notificationService->markAllAsRead($user);
 
         return new JsonResponse([
             'success' => true,
-            'count'   => $count,
+            'count' => $count,
         ]);
     }
 
@@ -172,7 +172,7 @@ class NotificationController extends AbstractController
      */
     private function formatRelativeTime(DateTimeImmutable $date): string
     {
-        $now  = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $diff = $now->getTimestamp() - $date->getTimestamp();
         if ($diff < 60) {
             return 'À l\'instant';

@@ -36,7 +36,7 @@ final class DimTimeFactory extends PersistentObjectFactory
 
         return [
             'company' => $company,
-            'date'    => $faker->dateTimeBetween('-1 year', '+1 year'),
+            'date' => $faker->dateTimeBetween('-1 year', '+1 year'),
         ];
     }
 

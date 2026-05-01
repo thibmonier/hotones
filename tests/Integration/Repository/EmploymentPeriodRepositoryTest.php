@@ -187,7 +187,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
     public function testFindCurrentPeriodForContributorWithOnlyPastPeriods(): void
     {
         // Create contributor WITHOUT using factory to avoid auto-created active period
-        $em          = static::getContainer()->get('doctrine')->getManager();
+        $em = static::getContainer()->get('doctrine')->getManager();
         $contributor = new \App\Entity\Contributor();
         $contributor->setCompany($this->getTestCompany());
         $contributor->setFirstName('Test');
@@ -206,8 +206,8 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
     public function testFindWithProfiles(): void
     {
         $contributor = ContributorFactory::createOne();
-        $profile1    = ProfileFactory::createOne(['name' => 'Developer']);
-        $profile2    = ProfileFactory::createOne(['name' => 'Designer']);
+        $profile1 = ProfileFactory::createOne(['name' => 'Developer']);
+        $profile2 = ProfileFactory::createOne(['name' => 'Designer']);
 
         $period = $this->createEmploymentPeriod($contributor, '2025-01-01');
         $period->addProfile($profile1);
@@ -276,7 +276,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
     {
         // Jan 1-5, 2025: Wed, Thu, Fri, Sat, Sun = 3 working days
         $start = new DateTime('2025-01-01');
-        $end   = new DateTime('2025-01-05');
+        $end = new DateTime('2025-01-05');
 
         $workingDays = $this->repository->calculateWorkingDays($start, $end);
 
@@ -287,7 +287,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
     {
         // Jan 6-12, 2025: Mon-Sun = 5 working days
         $start = new DateTime('2025-01-06');
-        $end   = new DateTime('2025-01-12');
+        $end = new DateTime('2025-01-12');
 
         $workingDays = $this->repository->calculateWorkingDays($start, $end);
 

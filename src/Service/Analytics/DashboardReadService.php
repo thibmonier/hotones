@@ -47,7 +47,7 @@ readonly class DashboardReadService
     ): array {
         // Dates par défaut pour la clé de cache
         $start = $startDate ?? new DateTime('first day of January this year');
-        $end   = $endDate   ?? new DateTime();
+        $end = $endDate ?? new DateTime();
 
         // Clé de cache basée sur les dates et filtres
         $cacheKey = sprintf(
@@ -71,7 +71,7 @@ readonly class DashboardReadService
             if (empty($metrics['revenue']['total_revenue']) && empty($metrics['revenue']['total_cost'])) {
                 $this->logger->warning('Aucune donnée dans le modèle en étoile, fallback vers calcul temps réel', [
                     'start' => $startDate?->format('Y-m-d'),
-                    'end'   => $endDate?->format('Y-m-d'),
+                    'end' => $endDate?->format('Y-m-d'),
                 ]);
 
                 return $this->realTimeService->calculateKPIs($startDate, $endDate, $filters);
@@ -97,12 +97,12 @@ readonly class DashboardReadService
         return $this->analyticsCache->get($cacheKey, function (ItemInterface $item) use ($months, $filters) {
             $item->expiresAfter(1800); // 30 minutes
 
-            $endDate   = new DateTime('last day of this month');
+            $endDate = new DateTime('last day of this month');
             $startDate = (clone $endDate)->modify("-{$months} months")->modify('first day of this month');
 
             // Lire depuis le modèle en étoile
             $company = $this->companyContext->getCurrentCompany();
-            $qb      = $this->entityManager->createQueryBuilder();
+            $qb = $this->entityManager->createQueryBuilder();
             $qb
                 ->select(
                     'dt.year',
@@ -140,12 +140,12 @@ readonly class DashboardReadService
             // Formatter les résultats
             return array_map(
                 fn ($row): array => [
-                    'month'       => $row['monthName'],
+                    'month' => $row['monthName'],
                     'month_label' => $row['monthName'], // Pour le graphique Chart.js
-                    'revenue'     => (float) $row['totalRevenue'],
-                    'cost'        => (float) $row['totalCosts'], // Singulier pour Chart.js
-                    'costs'       => (float) $row['totalCosts'], // Pluriel pour compatibilité
-                    'margin'      => (float) $row['grossMargin'],
+                    'revenue' => (float) $row['totalRevenue'],
+                    'cost' => (float) $row['totalCosts'], // Singulier pour Chart.js
+                    'costs' => (float) $row['totalCosts'], // Pluriel pour compatibilité
+                    'margin' => (float) $row['grossMargin'],
                 ],
                 $results,
             );
@@ -162,10 +162,10 @@ readonly class DashboardReadService
     ): array {
         // Dates par défaut
         $startDate ??= new DateTime('first day of January this year');
-        $endDate   ??= new DateTime();
+        $endDate ??= new DateTime();
 
         $company = $this->companyContext->getCurrentCompany();
-        $qb      = $this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb
             ->select(
                 'SUM(f.totalRevenue) as totalRevenue',
@@ -200,39 +200,39 @@ readonly class DashboardReadService
         $result = $qb->getQuery()->getSingleResult();
 
         // Récupérer les répartitions et top contributeurs
-        $byType          = $this->getProjectsByType($startDate, $endDate, $filters);
-        $byClientType    = $this->getProjectsByClientType($startDate, $endDate, $filters);
-        $byCategory      = $this->getProjectsByCategory($startDate, $endDate, $filters);
+        $byType = $this->getProjectsByType($startDate, $endDate, $filters);
+        $byClientType = $this->getProjectsByClientType($startDate, $endDate, $filters);
+        $byCategory = $this->getProjectsByCategory($startDate, $endDate, $filters);
         $topContributors = $this->getTopContributors($startDate, $endDate, $filters, 5);
-        $workingDays     = $this->calculateWorkingDays($startDate, $endDate);
+        $workingDays = $this->calculateWorkingDays($startDate, $endDate);
 
         // Retourner la même structure que l'ancien service pour compatibilité template
         return [
             'period' => [
                 'start' => $startDate,
-                'end'   => $endDate,
+                'end' => $endDate,
             ],
             'revenue' => [
                 'total_revenue' => (float) ($result['totalRevenue'] ?? 0),
-                'total_cost'    => (float) ($result['totalCosts'] ?? 0),
-                'total_margin'  => (float) ($result['grossMargin'] ?? 0),
-                'margin_rate'   => (float) ($result['avgMarginPercentage'] ?? 0),
+                'total_cost' => (float) ($result['totalCosts'] ?? 0),
+                'total_margin' => (float) ($result['grossMargin'] ?? 0),
+                'margin_rate' => (float) ($result['avgMarginPercentage'] ?? 0),
             ],
             'projects' => [
-                'total'          => (int) ($result['totalProjects'] ?? 0),
-                'active'         => (int) ($result['activeProjects'] ?? 0),
-                'completed'      => (int) ($result['completedProjects'] ?? 0),
-                'in_period'      => (int) ($result['totalProjects'] ?? 0),
-                'by_type'        => $byType,
+                'total' => (int) ($result['totalProjects'] ?? 0),
+                'active' => (int) ($result['activeProjects'] ?? 0),
+                'completed' => (int) ($result['completedProjects'] ?? 0),
+                'in_period' => (int) ($result['totalProjects'] ?? 0),
+                'by_type' => $byType,
                 'by_client_type' => $byClientType,
-                'by_category'    => $byCategory,
+                'by_category' => $byCategory,
             ],
             'orders' => [
-                'total'           => (int) ($result['totalOrders'] ?? 0),
-                'pending'         => (int) ($result['pendingOrders'] ?? 0),
-                'won'             => (int) ($result['wonOrders'] ?? 0),
-                'signed'          => (int) ($result['signedOrders'] ?? 0),
-                'lost'            => (int) ($result['lostOrders'] ?? 0),
+                'total' => (int) ($result['totalOrders'] ?? 0),
+                'pending' => (int) ($result['pendingOrders'] ?? 0),
+                'won' => (int) ($result['wonOrders'] ?? 0),
+                'signed' => (int) ($result['signedOrders'] ?? 0),
+                'lost' => (int) ($result['lostOrders'] ?? 0),
                 'conversion_rate' => ($result['totalOrders'] ?? 0) > 0
                     ? round((($result['wonOrders'] ?? 0) / ($result['totalOrders'] ?? 1)) * 100, 2)
                     : 0,
@@ -240,14 +240,14 @@ readonly class DashboardReadService
             ],
             'contributors' => [
                 'active' => (int) ($result['contributorCount'] ?? 0),
-                'top'    => $topContributors,
+                'top' => $topContributors,
             ],
             'time' => [
-                'total_hours'            => (float) ($result['totalWorkedDays'] ?? 0) * 8, // Conversion jours -> heures
-                'total_days'             => (float) ($result['totalWorkedDays'] ?? 0),
+                'total_hours' => (float) ($result['totalWorkedDays'] ?? 0) * 8, // Conversion jours -> heures
+                'total_days' => (float) ($result['totalWorkedDays'] ?? 0),
                 'working_days_in_period' => $workingDays,
-                'theoretical_capacity'   => (float) ($result['totalSoldDays'] ?? 0) * 8, // Conversion jours -> heures
-                'occupation_rate'        => (float) ($result['avgUtilization'] ?? 0),
+                'theoretical_capacity' => (float) ($result['totalSoldDays'] ?? 0) * 8, // Conversion jours -> heures
+                'occupation_rate' => (float) ($result['avgUtilization'] ?? 0),
             ],
         ];
     }
@@ -317,7 +317,7 @@ readonly class DashboardReadService
         array $filters,
     ): array {
         $company = $this->companyContext->getCurrentCompany();
-        $qb      = $this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb
             ->select('dpt.projectType as type', 'SUM(f.projectCount) as count')
             ->from(FactProjectMetrics::class, 'f')
@@ -352,7 +352,7 @@ readonly class DashboardReadService
         array $filters,
     ): array {
         $company = $this->companyContext->getCurrentCompany();
-        $qb      = $this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb
             ->select('dpt.isInternal', 'SUM(f.projectCount) as count')
             ->from(FactProjectMetrics::class, 'f')
@@ -372,7 +372,7 @@ readonly class DashboardReadService
         // Formater en tableau associatif
         $byClientType = ['internal' => 0, 'client' => 0];
         foreach ($results as $row) {
-            $key                = $row['isInternal'] ? 'internal' : 'client';
+            $key = $row['isInternal'] ? 'internal' : 'client';
             $byClientType[$key] = (int) $row['count'];
         }
 
@@ -388,7 +388,7 @@ readonly class DashboardReadService
         array $filters,
     ): array {
         $company = $this->companyContext->getCurrentCompany();
-        $qb      = $this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb
             ->select('dpt.serviceCategory as category', 'SUM(f.projectCount) as count')
             ->from(FactProjectMetrics::class, 'f')
@@ -428,7 +428,7 @@ readonly class DashboardReadService
         int $limit = 5,
     ): array {
         $company = $this->companyContext->getCurrentCompany();
-        $qb      = $this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb
             ->select(
                 'dc.id',
@@ -456,11 +456,11 @@ readonly class DashboardReadService
 
         // Formater pour le template
         return array_map(fn ($row): array => [
-            'id'      => $row['id'],
-            'name'    => $row['name'],
+            'id' => $row['id'],
+            'name' => $row['name'],
             'revenue' => (float) $row['totalRevenue'],
-            'margin'  => (float) $row['totalMargin'],
-            'days'    => (float) $row['totalDays'],
+            'margin' => (float) $row['totalMargin'],
+            'days' => (float) $row['totalDays'],
         ], $results);
     }
 
@@ -470,8 +470,8 @@ readonly class DashboardReadService
     private function calculateWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
         $start = clone $startDate;
-        $end   = clone $endDate;
-        $days  = 0;
+        $end = clone $endDate;
+        $days = 0;
 
         while ($start <= $end) {
             // Exclure samedi (6) et dimanche (0)

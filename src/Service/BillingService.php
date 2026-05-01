@@ -51,16 +51,16 @@ class BillingService
      */
     private function buildForfaitEntries(Order $order): array
     {
-        $total  = $order->calculateTotalFromSections();
+        $total = $order->calculateTotalFromSections();
         $result = [];
         /** @var OrderPaymentSchedule $s */
         foreach ($order->getPaymentSchedules() as $s) {
             $result[] = [
-                'date'   => $s->getBillingDate(),
-                'label'  => $s->getLabel() ?: 'Échéance',
+                'date' => $s->getBillingDate(),
+                'label' => $s->getLabel() ?: 'Échéance',
                 'amount' => (float) $s->computeAmount($total),
-                'type'   => 'forfait',
-                'order'  => $order,
+                'type' => 'forfait',
+                'order' => $order,
             ];
         }
 
@@ -73,19 +73,19 @@ class BillingService
     private function buildRegieEntries(Order $order): array
     {
         $project = $order->getProject();
-        $rows    = $this->timesheetRepository->getMonthlyRevenueForProjectUsingContributorTjm($project);
+        $rows = $this->timesheetRepository->getMonthlyRevenueForProjectUsingContributorTjm($project);
 
         $result = [];
         foreach ($rows as $r) {
-            $year     = (int) $r['year'];
-            $month    = (int) $r['month'];
-            $date     = new DateTime(sprintf('%04d-%02d-01', $year, $month));
+            $year = (int) $r['year'];
+            $month = (int) $r['month'];
+            $date = new DateTime(sprintf('%04d-%02d-01', $year, $month));
             $result[] = [
-                'date'   => $date,
-                'label'  => sprintf('Régie %02d/%04d', $month, $year),
+                'date' => $date,
+                'label' => sprintf('Régie %02d/%04d', $month, $year),
                 'amount' => (float) ($r['revenue'] ?? 0),
-                'type'   => 'regie',
-                'order'  => $order,
+                'type' => 'regie',
+                'order' => $order,
             ];
         }
 

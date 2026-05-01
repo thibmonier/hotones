@@ -38,14 +38,14 @@ final class RejectVacationHandlerTest extends KernelTestCase
         self::bootKernel();
         $this->setUpMultiTenant();
         $this->requestHandler = static::getContainer()->get(RequestVacationHandler::class);
-        $this->rejectHandler  = static::getContainer()->get(RejectVacationHandler::class);
-        $this->repository     = static::getContainer()->get(VacationRepositoryInterface::class);
+        $this->rejectHandler = static::getContainer()->get(RejectVacationHandler::class);
+        $this->repository = static::getContainer()->get(VacationRepositoryInterface::class);
     }
 
     public function testHandlerPersistsRejectionReason(): void
     {
         $contributor = $this->createContributor();
-        $vacationId  = ($this->requestHandler)(new RequestVacationCommand(
+        $vacationId = ($this->requestHandler)(new RequestVacationCommand(
             contributorId: $contributor->getId(),
             startDate: new DateTimeImmutable('+1 day'),
             endDate: new DateTimeImmutable('+2 days'),
@@ -64,7 +64,7 @@ final class RejectVacationHandlerTest extends KernelTestCase
     public function testHandlerKeepsNullRejectionReasonWhenOmitted(): void
     {
         $contributor = $this->createContributor();
-        $vacationId  = ($this->requestHandler)(new RequestVacationCommand(
+        $vacationId = ($this->requestHandler)(new RequestVacationCommand(
             contributorId: $contributor->getId(),
             startDate: new DateTimeImmutable('+1 day'),
             endDate: new DateTimeImmutable('+2 days'),
@@ -81,7 +81,7 @@ final class RejectVacationHandlerTest extends KernelTestCase
 
     private function createContributor(): Contributor
     {
-        $em          = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $contributor = new Contributor();
         $contributor->setCompany($this->getTestCompany());
         $contributor->setUser($this->testUser);

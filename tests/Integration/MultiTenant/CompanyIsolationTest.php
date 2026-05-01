@@ -45,7 +45,7 @@ class CompanyIsolationTest extends KernelTestCase
     {
         self::bootKernel();
         $this->companyContext = static::getContainer()->get(CompanyContext::class);
-        $this->entityManager  = static::getContainer()->get(EntityManagerInterface::class);
+        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
 
         // Créer 2 Companies manuellement pour éviter les problèmes de Factory
         $this->company1 = new Company();
@@ -90,14 +90,14 @@ class CompanyIsolationTest extends KernelTestCase
         $user->setEmail('test@test.com');
         $user->setPassword('password');
         $user->firstName = 'Test';
-        $user->lastName  = 'User';
+        $user->lastName = 'User';
         $user->setRoles(['ROLE_USER', 'ROLE_SUPERADMIN']); // SUPERADMIN required for switchCompany()
 
         // Persist user so it can be used as ProjectEvent.actor
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $token        = new UsernamePasswordToken($user, 'main', $user->getRoles());
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
         $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
         $tokenStorage->setToken($token);
     }
@@ -112,15 +112,15 @@ class CompanyIsolationTest extends KernelTestCase
 
         // Créer des projets pour chaque Company
         ProjectFactory::createOne([
-            'name'    => 'Project Alpha 1',
+            'name' => 'Project Alpha 1',
             'company' => $this->company1,
         ]);
         ProjectFactory::createOne([
-            'name'    => 'Project Alpha 2',
+            'name' => 'Project Alpha 2',
             'company' => $this->company1,
         ]);
         ProjectFactory::createOne([
-            'name'    => 'Project Beta 1',
+            'name' => 'Project Beta 1',
             'company' => $this->company2,
         ]);
 
@@ -156,11 +156,11 @@ class CompanyIsolationTest extends KernelTestCase
 
         // Créer des clients pour chaque Company
         ClientFactory::createOne([
-            'name'    => 'Client Alpha',
+            'name' => 'Client Alpha',
             'company' => $this->company1,
         ]);
         ClientFactory::createOne([
-            'name'    => 'Client Beta',
+            'name' => 'Client Beta',
             'company' => $this->company2,
         ]);
 
@@ -190,13 +190,13 @@ class CompanyIsolationTest extends KernelTestCase
         // Créer des contributeurs pour chaque Company
         ContributorFactory::createOne([
             'firstName' => 'Alice',
-            'lastName'  => 'Alpha',
-            'company'   => $this->company1,
+            'lastName' => 'Alpha',
+            'company' => $this->company1,
         ]);
         ContributorFactory::createOne([
             'firstName' => 'Bob',
-            'lastName'  => 'Beta',
-            'company'   => $this->company2,
+            'lastName' => 'Beta',
+            'company' => $this->company2,
         ]);
 
         // Context Company 1
@@ -230,14 +230,14 @@ class CompanyIsolationTest extends KernelTestCase
         $contributor2 = ContributorFactory::createOne(['company' => $this->company2]);
 
         TimesheetFactory::createMany(3, [
-            'company'     => $this->company1,
-            'project'     => $project1,
+            'company' => $this->company1,
+            'project' => $project1,
             'contributor' => $contributor1,
         ]);
 
         TimesheetFactory::createMany(2, [
-            'company'     => $this->company2,
-            'project'     => $project2,
+            'company' => $this->company2,
+            'project' => $project2,
             'contributor' => $contributor2,
         ]);
 
@@ -270,7 +270,7 @@ class CompanyIsolationTest extends KernelTestCase
 
         // Créer un projet pour Company 2
         $project2 = ProjectFactory::createOne([
-            'name'    => 'Project Beta Secret',
+            'name' => 'Project Beta Secret',
             'company' => $this->company2,
         ]);
 
@@ -293,11 +293,11 @@ class CompanyIsolationTest extends KernelTestCase
 
         // Créer des projets avec des noms similaires
         ProjectFactory::createOne([
-            'name'    => 'E-commerce Platform',
+            'name' => 'E-commerce Platform',
             'company' => $this->company1,
         ]);
         ProjectFactory::createOne([
-            'name'    => 'E-commerce Shop',
+            'name' => 'E-commerce Shop',
             'company' => $this->company2,
         ]);
 
@@ -352,11 +352,11 @@ class CompanyIsolationTest extends KernelTestCase
         // Créer des projets actifs pour chaque Company
         ProjectFactory::createMany(4, [
             'company' => $this->company1,
-            'status'  => 'active',
+            'status' => 'active',
         ]);
         ProjectFactory::createMany(2, [
             'company' => $this->company2,
-            'status'  => 'active',
+            'status' => 'active',
         ]);
 
         // Context Company 1

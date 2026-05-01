@@ -14,7 +14,7 @@ class ProjectBudgetAlertEvent extends NotificationEvent
         private readonly float $usedPercentage,
         array $recipients,
     ) {
-        $title   = 'Alerte budget projet';
+        $title = 'Alerte budget projet';
         $message = sprintf(
             'Le projet "%s" a consommé %.1f%% de son budget. Il reste %.0f jours prévus sur %.0f jours budgétés.',
             $project->getName(),
@@ -29,11 +29,11 @@ class ProjectBudgetAlertEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'project_id'      => $project->getId(),
-                'project_name'    => $project->getName(),
+                'project_id' => $project->getId(),
+                'project_name' => $project->getName(),
                 'used_percentage' => $usedPercentage,
-                'remaining_days'  => $project->calculateRemainingDays(),
-                'budgeted_days'   => $project->calculateBudgetedDays(),
+                'remaining_days' => $project->calculateRemainingDays(),
+                'budgeted_days' => $project->calculateBudgetedDays(),
             ],
             entityType: 'Project',
             entityId: $project->getId(),

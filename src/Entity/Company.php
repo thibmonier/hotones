@@ -46,21 +46,21 @@ class Company implements Stringable
     // Constants
     // ===========================
 
-    public const STATUS_ACTIVE    = 'active';
-    public const STATUS_TRIAL     = 'trial';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_TRIAL = 'trial';
     public const STATUS_SUSPENDED = 'suspended';
     public const STATUS_CANCELLED = 'cancelled';
 
-    public const TIER_STARTER      = 'starter';
+    public const TIER_STARTER = 'starter';
     public const TIER_PROFESSIONAL = 'professional';
-    public const TIER_ENTERPRISE   = 'enterprise';
+    public const TIER_ENTERPRISE = 'enterprise';
 
-    public const FEATURE_INVOICING      = 'invoicing';
-    public const FEATURE_PLANNING       = 'planning';
-    public const FEATURE_ANALYTICS      = 'analytics';
+    public const FEATURE_INVOICING = 'invoicing';
+    public const FEATURE_PLANNING = 'planning';
+    public const FEATURE_ANALYTICS = 'analytics';
     public const FEATURE_BUSINESS_UNITS = 'business_units';
-    public const FEATURE_AI_TOOLS       = 'ai_tools';
-    public const FEATURE_API_ACCESS     = 'api_access';
+    public const FEATURE_AI_TOOLS = 'ai_tools';
+    public const FEATURE_API_ACCESS = 'api_access';
 
     // ===========================
     // Primary Key
@@ -324,8 +324,8 @@ class Company implements Stringable
 
     public function __construct()
     {
-        $this->businessUnits   = new ArrayCollection();
-        $this->users           = new ArrayCollection();
+        $this->businessUnits = new ArrayCollection();
+        $this->users = new ArrayCollection();
         $this->enabledFeatures = [
             self::FEATURE_PLANNING,
             self::FEATURE_ANALYTICS,
@@ -395,8 +395,8 @@ class Company implements Stringable
     public function enableFeature(string $feature): self
     {
         if (!in_array($feature, $this->enabledFeatures, true)) {
-            $features              = $this->enabledFeatures;
-            $features[]            = $feature;
+            $features = $this->enabledFeatures;
+            $features[] = $feature;
             $this->enabledFeatures = $features;
         }
 
@@ -443,7 +443,7 @@ class Company implements Stringable
      */
     public function setSetting(string $key, mixed $value): self
     {
-        $settings       = $this->settings;
+        $settings = $this->settings;
         $settings[$key] = $value;
         $this->settings = $settings;
 

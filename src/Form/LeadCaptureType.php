@@ -25,8 +25,8 @@ class LeadCaptureType extends AbstractType
         $builder
             ->add('firstName', TextType::class, [
                 'label' => 'Prénom',
-                'attr'  => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Jean',
                 ],
                 'constraints' => [
@@ -41,8 +41,8 @@ class LeadCaptureType extends AbstractType
             ])
             ->add('lastName', TextType::class, [
                 'label' => 'Nom',
-                'attr'  => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Dupont',
                 ],
                 'constraints' => [
@@ -57,8 +57,8 @@ class LeadCaptureType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email professionnel',
-                'attr'  => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'jean.dupont@agence.fr',
                 ],
                 'constraints' => [
@@ -67,32 +67,32 @@ class LeadCaptureType extends AbstractType
                 ],
             ])
             ->add('company', TextType::class, [
-                'label'    => 'Nom de votre agence',
+                'label' => 'Nom de votre agence',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Mon Agence Web',
                 ],
             ])
             ->add('phone', TelType::class, [
-                'label'    => 'Téléphone (optionnel)',
+                'label' => 'Téléphone (optionnel)',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => '+33 6 12 34 56 78',
                 ],
             ])
             ->add('marketingConsent', CheckboxType::class, [
-                'label'    => 'J\'accepte de recevoir des emails avec des conseils et actualités sur la gestion d\'agence',
+                'label' => 'J\'accepte de recevoir des emails avec des conseils et actualités sur la gestion d\'agence',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-check-input',
                 ],
             ])
             ->add('rgpdConsent', CheckboxType::class, [
-                'label'  => 'J\'accepte la politique de confidentialité et le traitement de mes données personnelles',
+                'label' => 'J\'accepte la politique de confidentialité et le traitement de mes données personnelles',
                 'mapped' => false,
-                'attr'   => [
+                'attr' => [
                     'class' => 'form-check-input',
                 ],
                 'constraints' => [
@@ -110,8 +110,8 @@ class LeadCaptureType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class'   => LeadCapture::class,
-            'source'       => LeadCapture::SOURCE_OTHER,
+            'data_class' => LeadCapture::class,
+            'source' => LeadCapture::SOURCE_OTHER,
             'content_type' => 'guide-kpis',
         ]);
     }

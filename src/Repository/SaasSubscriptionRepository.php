@@ -123,7 +123,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
     public function calculateTotalMonthlyCost(): float
     {
         $subscriptions = $this->findActive();
-        $total         = 0.0;
+        $total = 0.0;
 
         foreach ($subscriptions as $subscription) {
             $total += $subscription->getMonthlyCost();
@@ -138,7 +138,7 @@ class SaasSubscriptionRepository extends CompanyAwareRepository
     public function calculateTotalYearlyCost(): float
     {
         $subscriptions = $this->findActive();
-        $total         = 0.0;
+        $total = 0.0;
 
         foreach ($subscriptions as $subscription) {
             $total += $subscription->getYearlyCost();

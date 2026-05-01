@@ -14,7 +14,7 @@ class ApiDocController extends AbstractController
     public function index(): Response
     {
         return $this->render('api/swagger.html.twig', [
-            'title'      => 'HotOnes API - Documentation',
+            'title' => 'HotOnes API - Documentation',
             'apiDocsUrl' => '/api/docs.json',
         ]);
     }

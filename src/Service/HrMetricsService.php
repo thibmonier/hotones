@@ -31,18 +31,18 @@ class HrMetricsService
         $departuresCount = $this->employmentPeriodRepository->countDepartures($startDate, $endDate);
 
         // Effectif moyen = (effectif début + effectif fin) / 2
-        $headcountStart   = $this->employmentPeriodRepository->countActiveAt($startDate);
-        $headcountEnd     = $this->employmentPeriodRepository->countActiveAt($endDate);
+        $headcountStart = $this->employmentPeriodRepository->countActiveAt($startDate);
+        $headcountEnd = $this->employmentPeriodRepository->countActiveAt($endDate);
         $averageHeadcount = ($headcountStart + $headcountEnd) / 2;
 
         $turnoverRate = $averageHeadcount > 0 ? ($departuresCount / $averageHeadcount) * 100 : 0;
 
         return [
-            'turnoverRate'     => round($turnoverRate, 2),
-            'departures'       => $departuresCount,
+            'turnoverRate' => round($turnoverRate, 2),
+            'departures' => $departuresCount,
             'averageHeadcount' => round($averageHeadcount, 1),
-            'headcountStart'   => $headcountStart,
-            'headcountEnd'     => $headcountEnd,
+            'headcountStart' => $headcountStart,
+            'headcountEnd' => $headcountEnd,
         ];
     }
 
@@ -58,21 +58,21 @@ class HrMetricsService
         $vacationDays = $this->vacationRepository->countApprovedDaysBetween($startDate, $endDate);
 
         // Jours travaillés théoriques = effectif moyen * jours ouvrés dans la période
-        $workingDays      = $this->countWorkingDays($startDate, $endDate);
+        $workingDays = $this->countWorkingDays($startDate, $endDate);
         $averageHeadcount = (
             $this->employmentPeriodRepository->countActiveAt($startDate)
             + $this->employmentPeriodRepository->countActiveAt($endDate)
         )
             / 2;
 
-        $theoreticalDays = $averageHeadcount                                         * $workingDays;
+        $theoreticalDays = $averageHeadcount * $workingDays;
         $absenteeismRate = $theoreticalDays > 0 ? ($vacationDays / $theoreticalDays) * 100 : 0;
 
         return [
             'absenteeismRate' => round($absenteeismRate, 2),
-            'absentDays'      => $vacationDays,
+            'absentDays' => $vacationDays,
             'theoreticalDays' => round($theoreticalDays, 1),
-            'workingDays'     => $workingDays,
+            'workingDays' => $workingDays,
         ];
     }
 
@@ -88,16 +88,16 @@ class HrMetricsService
         if (count($activeContributors) === 0) {
             return [
                 'averageSeniority' => 0,
-                'bySeniority'      => [],
-                'totalActive'      => 0,
+                'bySeniority' => [],
+                'totalActive' => 0,
             ];
         }
 
-        $totalSeniority   = 0;
+        $totalSeniority = 0;
         $bySeniorityRange = [
-            '< 1 an'   => 0,
-            '1-2 ans'  => 0,
-            '2-5 ans'  => 0,
+            '< 1 an' => 0,
+            '1-2 ans' => 0,
+            '2-5 ans' => 0,
             '5-10 ans' => 0,
             '> 10 ans' => 0,
         ];
@@ -131,8 +131,8 @@ class HrMetricsService
 
         return [
             'averageSeniority' => round($averageSeniority, 1),
-            'bySeniority'      => $bySeniorityRange,
-            'totalActive'      => count($activeContributors),
+            'bySeniority' => $bySeniorityRange,
+            'totalActive' => count($activeContributors),
         ];
     }
 
@@ -147,34 +147,34 @@ class HrMetricsService
 
         if (count($activeContributors) === 0) {
             return [
-                'ageRanges'   => [],
-                'averageAge'  => 0,
+                'ageRanges' => [],
+                'averageAge' => 0,
                 'totalActive' => 0,
-                'byGender'    => ['male' => 0, 'female' => 0, 'other' => 0],
-                'parityRate'  => 0,
+                'byGender' => ['male' => 0, 'female' => 0, 'other' => 0],
+                'parityRate' => 0,
             ];
         }
 
         $ageRanges = [
-            '< 25 ans'  => 0,
+            '< 25 ans' => 0,
             '25-30 ans' => 0,
             '30-40 ans' => 0,
             '40-50 ans' => 0,
             '50-60 ans' => 0,
-            '> 60 ans'  => 0,
+            '> 60 ans' => 0,
         ];
 
         // Structure pour la pyramide par genre
         $ageRangesByGender = [
-            'male'   => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+            'male' => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
             'female' => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
-            'other'  => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
+            'other' => ['< 25 ans' => 0, '25-30 ans' => 0, '30-40 ans' => 0, '40-50 ans' => 0, '50-60 ans' => 0, '> 60 ans' => 0],
         ];
 
         $genderCounts = ['male' => 0, 'female' => 0, 'other' => 0];
-        $totalAge     = 0;
-        $count        = 0;
-        $now          = new DateTime();
+        $totalAge = 0;
+        $count = 0;
+        $now = new DateTime();
 
         foreach ($activeContributors as $contributor) {
             $age = $contributor->getAge($now);
@@ -214,15 +214,15 @@ class HrMetricsService
 
         // Calcul du taux de parité (% femmes parmi homme + femme)
         $totalGendered = $genderCounts['male'] + $genderCounts['female'];
-        $parityRate    = $totalGendered > 0 ? ($genderCounts['female'] / $totalGendered) * 100 : 0;
+        $parityRate = $totalGendered > 0 ? ($genderCounts['female'] / $totalGendered) * 100 : 0;
 
         return [
-            'ageRanges'          => $ageRanges,
-            'averageAge'         => round($averageAge, 1),
-            'totalActive'        => count($activeContributors),
-            'byGender'           => $genderCounts,
-            'ageByGender'        => $ageRangesByGender,
-            'parityRate'         => round($parityRate, 1),
+            'ageRanges' => $ageRanges,
+            'averageAge' => round($averageAge, 1),
+            'totalActive' => count($activeContributors),
+            'byGender' => $genderCounts,
+            'ageByGender' => $ageRangesByGender,
+            'parityRate' => round($parityRate, 1),
             'countWithBirthDate' => $count,
         ];
     }
@@ -256,7 +256,7 @@ class HrMetricsService
         arsort($byProfile);
 
         return [
-            'byProfile'   => $byProfile,
+            'byProfile' => $byProfile,
             'totalActive' => count($activeContributors),
         ];
     }
@@ -269,10 +269,10 @@ class HrMetricsService
     public function getAllMetrics(DateTimeInterface $startDate, DateTimeInterface $endDate): array
     {
         return [
-            'turnover'      => $this->calculateTurnover($startDate, $endDate),
-            'absenteeism'   => $this->calculateAbsenteeism($startDate, $endDate),
-            'seniority'     => $this->calculateAverageSeniority(),
-            'agePyramid'    => $this->getAgePyramid(),
+            'turnover' => $this->calculateTurnover($startDate, $endDate),
+            'absenteeism' => $this->calculateAbsenteeism($startDate, $endDate),
+            'seniority' => $this->calculateAverageSeniority(),
+            'agePyramid' => $this->getAgePyramid(),
             'skillsPyramid' => $this->getSkillsPyramid(),
         ];
     }
@@ -283,8 +283,8 @@ class HrMetricsService
     private function countWorkingDays(DateTimeInterface $startDate, DateTimeInterface $endDate): int
     {
         $workingDays = 0;
-        $current     = (clone $startDate);
-        $end         = (clone $endDate);
+        $current = (clone $startDate);
+        $end = (clone $endDate);
 
         while ($current <= $end) {
             $dayOfWeek = (int) $current->format('N'); // 1 (lundi) à 7 (dimanche)

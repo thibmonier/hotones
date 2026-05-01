@@ -53,8 +53,8 @@ class NotificationService
 
         $this->logger->info('Notification created', [
             'notification_id' => $notification->getId(),
-            'recipient'       => $recipient->getEmail(),
-            'type'            => $type->value,
+            'recipient' => $recipient->getEmail(),
+            'type' => $type->value,
         ]);
 
         return $notification;
@@ -179,7 +179,7 @@ class NotificationService
 
         $this->logger->info('Old notifications cleaned up', [
             'deleted_count' => $deleted,
-            'days_old'      => $daysOld,
+            'days_old' => $daysOld,
         ]);
 
         return $deleted;

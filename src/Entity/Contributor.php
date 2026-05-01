@@ -223,11 +223,11 @@ class Contributor implements CompanyOwnedInterface
 
     public function __construct()
     {
-        $this->profiles                = new ArrayCollection();
-        $this->employmentPeriods       = new ArrayCollection();
-        $this->timesheets              = new ArrayCollection();
-        $this->managedContributors     = new ArrayCollection();
-        $this->contributorSkills       = new ArrayCollection();
+        $this->profiles = new ArrayCollection();
+        $this->employmentPeriods = new ArrayCollection();
+        $this->timesheets = new ArrayCollection();
+        $this->managedContributors = new ArrayCollection();
+        $this->contributorSkills = new ArrayCollection();
         $this->contributorTechnologies = new ArrayCollection();
     }
 
@@ -254,7 +254,7 @@ class Contributor implements CompanyOwnedInterface
         }
 
         $reference = $referenceDate ?? new DateTime();
-        $interval  = $this->birthDate->diff($reference);
+        $interval = $this->birthDate->diff($reference);
 
         return $interval->y;
     }
@@ -265,10 +265,10 @@ class Contributor implements CompanyOwnedInterface
     public function getGenderLabel(): string
     {
         return match ($this->gender) {
-            'male'   => 'Homme',
+            'male' => 'Homme',
             'female' => 'Femme',
-            'other'  => 'Autre',
-            default  => 'Non renseigné',
+            'other' => 'Autre',
+            default => 'Non renseigné',
         };
     }
 

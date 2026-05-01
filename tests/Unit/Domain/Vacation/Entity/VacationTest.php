@@ -36,7 +36,7 @@ final class VacationTest extends TestCase
     public function testRequestRecordsDomainEvent(): void
     {
         $vacation = $this->createVacation();
-        $events   = $vacation->pullDomainEvents();
+        $events = $vacation->pullDomainEvents();
 
         self::assertCount(1, $events);
         self::assertInstanceOf(VacationRequested::class, $events[0]);
@@ -92,7 +92,7 @@ final class VacationTest extends TestCase
     public function testCannotApproveAlreadyApprovedVacation(): void
     {
         $vacation = $this->createVacation();
-        $user     = $this->createMock(User::class);
+        $user = $this->createMock(User::class);
         $user->method('getId')->willReturn(42);
 
         $vacation->approve($user);
@@ -105,7 +105,7 @@ final class VacationTest extends TestCase
     {
         // US-069: a manager-initiated cancellation must succeed on an APPROVED vacation.
         $vacation = $this->createVacation();
-        $user     = $this->createMock(User::class);
+        $user = $this->createMock(User::class);
         $user->method('getId')->willReturn(42);
 
         $vacation->approve($user);

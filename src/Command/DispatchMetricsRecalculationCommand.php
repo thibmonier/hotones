@@ -40,8 +40,8 @@ final class DispatchMetricsRecalculationCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $year        = $input->getOption('year');
-        $dateString  = $input->getOption('date');
+        $year = $input->getOption('year');
+        $dateString = $input->getOption('date');
         $granularity = $input->getOption('granularity') ?? 'monthly';
 
         if ($year) {

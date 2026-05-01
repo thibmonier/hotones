@@ -36,44 +36,44 @@ class EmploymentPeriodType extends AbstractType
 
         $builder
             ->add('contributor', EntityType::class, [
-                'label'        => 'Collaborateur',
-                'class'        => Contributor::class,
+                'label' => 'Collaborateur',
+                'class' => Contributor::class,
                 'choice_label' => 'name',
-                'required'     => true,
-                'placeholder'  => '-- Sélectionner un collaborateur --',
-                'attr'         => ['class' => 'form-select'],
-                'constraints'  => [
+                'required' => true,
+                'placeholder' => '-- Sélectionner un collaborateur --',
+                'attr' => ['class' => 'form-select'],
+                'constraints' => [
                     new NotBlank(message: 'Le collaborateur est obligatoire'),
                 ],
             ])
             ->add('startDate', DateType::class, [
-                'label'       => 'Date de début',
-                'widget'      => 'single_text',
-                'required'    => true,
-                'attr'        => ['class' => 'form-control'],
+                'label' => 'Date de début',
+                'widget' => 'single_text',
+                'required' => true,
+                'attr' => ['class' => 'form-control'],
                 'constraints' => [
                     new NotBlank(message: 'La date de début est obligatoire'),
                 ],
             ])
             ->add('endDate', DateType::class, [
-                'label'    => 'Date de fin',
-                'widget'   => 'single_text',
+                'label' => 'Date de fin',
+                'widget' => 'single_text',
                 'required' => false,
-                'attr'     => ['class' => 'form-control'],
-                'help'     => 'Laisser vide si la période est en cours',
+                'attr' => ['class' => 'form-control'],
+                'help' => 'Laisser vide si la période est en cours',
             ])
             ->add('employeeLevel', EntityType::class, [
-                'label'        => 'Niveau',
-                'class'        => EmployeeLevel::class,
+                'label' => 'Niveau',
+                'class' => EmployeeLevel::class,
                 'choice_label' => fn (EmployeeLevel $level) => sprintf(
                     'Niveau %d - %s (%s)',
                     $level->level,
                     $level->name,
                     $level->getCategoryLabel(),
                 ),
-                'required'      => false,
-                'placeholder'   => '-- Sélectionner un niveau --',
-                'attr'          => ['class' => 'form-select'],
+                'required' => false,
+                'placeholder' => '-- Sélectionner un niveau --',
+                'attr' => ['class' => 'form-select'],
                 'query_builder' => fn (EmployeeLevelRepository $repo) => $repo
                     ->createQueryBuilder('el')
                     ->andWhere('el.company = :company')
@@ -81,46 +81,46 @@ class EmploymentPeriodType extends AbstractType
                     ->setParameter('company', $company)
                     ->setParameter('active', true)
                     ->orderBy('el.level', 'ASC'),
-                'help'     => 'Niveau 1-3: Junior, 4-6: Expérimenté, 7-9: Senior, 10-12: Lead',
+                'help' => 'Niveau 1-3: Junior, 4-6: Expérimenté, 7-9: Senior, 10-12: Lead',
                 'group_by' => fn (EmployeeLevel $level) => $level->getCategoryLabel(),
             ])
             ->add('salary', MoneyType::class, [
-                'label'    => 'Salaire mensuel brut',
+                'label' => 'Salaire mensuel brut',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr'     => [
-                    'class'              => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'data-calculate-cjm' => 'true',
                 ],
                 'help' => 'Salaire brut mensuel du collaborateur',
             ])
             ->add('cjm', MoneyType::class, [
-                'label'    => 'CJM (Coût Journalier Moyen)',
+                'label' => 'CJM (Coût Journalier Moyen)',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr'     => [
-                    'class'           => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'data-cjm-target' => 'true',
                 ],
                 'help' => 'Calculé automatiquement si non fourni',
             ])
             ->add('tjm', MoneyType::class, [
-                'label'    => 'TJM (Tarif Journalier Moyen)',
+                'label' => 'TJM (Tarif Journalier Moyen)',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr'     => ['class' => 'form-control'],
-                'help'     => 'Tarif de vente moyen',
+                'attr' => ['class' => 'form-control'],
+                'help' => 'Tarif de vente moyen',
             ])
             ->add('weeklyHours', NumberType::class, [
-                'label'    => 'Heures hebdomadaires',
+                'label' => 'Heures hebdomadaires',
                 'required' => true,
-                'scale'    => 2,
-                'attr'     => [
-                    'class'              => 'form-control',
-                    'step'               => '0.5',
+                'scale' => 2,
+                'attr' => [
+                    'class' => 'form-control',
+                    'step' => '0.5',
                     'data-calculate-cjm' => 'true',
                 ],
-                'data'        => 35.0,
+                'data' => 35.0,
                 'constraints' => [
                     new Range(
                         min: 1,
@@ -131,15 +131,15 @@ class EmploymentPeriodType extends AbstractType
                 'help' => 'Nombre d\'heures travaillées par semaine (ex: 35, 39)',
             ])
             ->add('workTimePercentage', NumberType::class, [
-                'label'    => 'Temps de travail (%)',
+                'label' => 'Temps de travail (%)',
                 'required' => true,
-                'scale'    => 2,
-                'attr'     => [
-                    'class'              => 'form-control',
-                    'step'               => '5',
+                'scale' => 2,
+                'attr' => [
+                    'class' => 'form-control',
+                    'step' => '5',
                     'data-calculate-cjm' => 'true',
                 ],
-                'data'        => 100.0,
+                'data' => 100.0,
                 'constraints' => [
                     new Range(
                         min: 1,
@@ -150,20 +150,20 @@ class EmploymentPeriodType extends AbstractType
                 'help' => '100% = temps plein, 80% = 4/5ème, etc.',
             ])
             ->add('profiles', EntityType::class, [
-                'label'        => 'Profils métier pendant cette période',
-                'class'        => Profile::class,
+                'label' => 'Profils métier pendant cette période',
+                'class' => Profile::class,
                 'choice_label' => 'name',
-                'multiple'     => true,
-                'expanded'     => true,
-                'required'     => false,
-                'attr'         => ['class' => 'form-check-input'],
+                'multiple' => true,
+                'expanded' => true,
+                'required' => false,
+                'attr' => ['class' => 'form-check-input'],
             ])
             ->add('notes', TextareaType::class, [
-                'label'    => 'Notes',
+                'label' => 'Notes',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-control',
-                    'rows'  => 3,
+                    'rows' => 3,
                 ],
             ]);
 

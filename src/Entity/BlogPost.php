@@ -34,23 +34,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class BlogPost implements CompanyOwnedInterface, Stringable
 {
-    public const STATUS_DRAFT     = 'draft';
+    public const STATUS_DRAFT = 'draft';
     public const STATUS_PUBLISHED = 'published';
-    public const STATUS_ARCHIVED  = 'archived';
+    public const STATUS_ARCHIVED = 'archived';
 
     public const STATUS_OPTIONS = [
         'Brouillon' => self::STATUS_DRAFT,
-        'Publié'    => self::STATUS_PUBLISHED,
-        'Archivé'   => self::STATUS_ARCHIVED,
+        'Publié' => self::STATUS_PUBLISHED,
+        'Archivé' => self::STATUS_ARCHIVED,
     ];
 
     // Image source constants
-    public const IMAGE_SOURCE_EXTERNAL     = 'external';
-    public const IMAGE_SOURCE_UPLOAD       = 'upload';
+    public const IMAGE_SOURCE_EXTERNAL = 'external';
+    public const IMAGE_SOURCE_UPLOAD = 'upload';
     public const IMAGE_SOURCE_AI_GENERATED = 'ai_generated';
 
     public const IMAGE_SOURCE_OPTIONS = [
-        'URL externe'   => self::IMAGE_SOURCE_EXTERNAL,
+        'URL externe' => self::IMAGE_SOURCE_EXTERNAL,
         'Upload manuel' => self::IMAGE_SOURCE_UPLOAD,
         'Généré par IA' => self::IMAGE_SOURCE_AI_GENERATED,
     ];
@@ -460,7 +460,7 @@ class BlogPost implements CompanyOwnedInterface, Stringable
      */
     public function getReadingTime(): int
     {
-        $text      = strip_tags($this->content ?? '');
+        $text = strip_tags($this->content ?? '');
         $wordCount = str_word_count($text);
 
         // Average reading speed: 200 words per minute

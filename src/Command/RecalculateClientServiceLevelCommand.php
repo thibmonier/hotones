@@ -33,7 +33,7 @@ class RecalculateClientServiceLevelCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io   = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $year = (int) $input->getOption('year');
 
         $io->title('Recalcul des niveaux de service clients');

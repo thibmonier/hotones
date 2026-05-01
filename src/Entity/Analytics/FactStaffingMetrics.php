@@ -289,7 +289,7 @@ class FactStaffingMetrics implements CompanyOwnedInterface
         if (bccomp($this->workedDays, '0', 2) > 0) {
             // Utiliser staffedDays + plannedDays pour inclure les plannings futurs
             $totalProductiveDays = bcadd($this->staffedDays, $this->plannedDays, 2);
-            $this->tace          = bcmul(bcdiv($totalProductiveDays, $this->workedDays, 4), '100', 2);
+            $this->tace = bcmul(bcdiv($totalProductiveDays, $this->workedDays, 4), '100', 2);
         } else {
             $this->tace = '0.00';
         }

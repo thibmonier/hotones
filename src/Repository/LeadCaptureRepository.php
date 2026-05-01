@@ -121,20 +121,20 @@ class LeadCaptureRepository extends CompanyAwareRepository
             ->getSingleScalarResult();
 
         // Calcul des taux
-        $consentRate  = $total > 0 ? ($withConsent / $total) * 100 : 0;
-        $downloadRate = $total > 0 ? ($downloaded / $total)  * 100 : 0;
+        $consentRate = $total > 0 ? ($withConsent / $total) * 100 : 0;
+        $downloadRate = $total > 0 ? ($downloaded / $total) * 100 : 0;
 
         return [
-            'total'        => $total,
-            'withConsent'  => $withConsent,
-            'downloaded'   => $downloaded,
+            'total' => $total,
+            'withConsent' => $withConsent,
+            'downloaded' => $downloaded,
             'avgDownloads' => round($avgDownloads, 2),
             // Clés calculées pour les taux
-            'consent_rate'  => round($consentRate, 2),
+            'consent_rate' => round($consentRate, 2),
             'download_rate' => round($downloadRate, 2),
             // Alias snake_case pour compatibilité template
             'with_marketing_consent' => $withConsent,
-            'avg_downloads'          => round($avgDownloads, 2),
+            'avg_downloads' => round($avgDownloads, 2),
         ];
     }
 }

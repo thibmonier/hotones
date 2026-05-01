@@ -15,7 +15,7 @@ class TimesheetPendingValidationEvent extends NotificationEvent
         private readonly float $totalHours,
         array $recipients,
     ) {
-        $title   = 'Temps en attente de validation';
+        $title = 'Temps en attente de validation';
         $message = sprintf(
             '%s a %d entrée(s) de temps en attente de validation, pour un total de %.1f heures.',
             $contributor->getFullName(),
@@ -29,10 +29,10 @@ class TimesheetPendingValidationEvent extends NotificationEvent
             message: $message,
             recipients: $recipients,
             data: [
-                'contributor_id'   => $contributor->getId(),
+                'contributor_id' => $contributor->getId(),
                 'contributor_name' => $contributor->getFullName(),
-                'pending_count'    => $pendingCount,
-                'total_hours'      => $totalHours,
+                'pending_count' => $pendingCount,
+                'total_hours' => $totalHours,
             ],
             entityType: 'Timesheet',
             entityId: null, // Pas d'entité spécifique car multiple

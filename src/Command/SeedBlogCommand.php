@@ -42,7 +42,7 @@ class SeedBlogCommand extends Command
 
         // Get company and author
         $companyId = $input->getOption('company-id');
-        $authorId  = $input->getOption('author-id');
+        $authorId = $input->getOption('author-id');
 
         if (!$companyId || !$authorId) {
             $io->error('Please specify --company-id and --author-id options');
@@ -52,7 +52,7 @@ class SeedBlogCommand extends Command
         }
 
         $company = $this->entityManager->getRepository(Company::class)->find($companyId);
-        $author  = $this->entityManager->getRepository(User::class)->find($authorId);
+        $author = $this->entityManager->getRepository(User::class)->find($authorId);
 
         if (!$company || !$author) {
             $io->error('Company or Author not found');
@@ -72,7 +72,7 @@ class SeedBlogCommand extends Command
 
         // Reload company and author (they might be detached after clear())
         $company = $this->entityManager->getRepository(Company::class)->find($companyId);
-        $author  = $this->entityManager->getRepository(User::class)->find($authorId);
+        $author = $this->entityManager->getRepository(User::class)->find($authorId);
 
         // Create blog posts
         $io->section('Creating Blog Posts...');
@@ -91,28 +91,28 @@ class SeedBlogCommand extends Command
     {
         $categoriesData = [
             'gestion-projet' => [
-                'name'        => 'Gestion de projet',
-                'color'       => '#6366f1',
+                'name' => 'Gestion de projet',
+                'color' => '#6366f1',
                 'description' => 'Méthodes et outils pour optimiser la gestion de vos projets',
             ],
             'rentabilite' => [
-                'name'        => 'Rentabilité',
-                'color'       => '#10b981',
+                'name' => 'Rentabilité',
+                'color' => '#10b981',
                 'description' => 'Maximiser la profitabilité de votre agence',
             ],
             'kpis' => [
-                'name'        => 'KPIs & Métriques',
-                'color'       => '#f59e0b',
+                'name' => 'KPIs & Métriques',
+                'color' => '#f59e0b',
                 'description' => 'Suivre et améliorer vos indicateurs de performance',
             ],
             'planning' => [
-                'name'        => 'Planning & Resources',
-                'color'       => '#8b5cf6',
+                'name' => 'Planning & Resources',
+                'color' => '#8b5cf6',
                 'description' => 'Optimiser l\'allocation des ressources et le planning',
             ],
             'best-practices' => [
-                'name'        => 'Best Practices',
-                'color'       => '#ec4899',
+                'name' => 'Best Practices',
+                'color' => '#ec4899',
                 'description' => 'Bonnes pratiques pour les agences web',
             ],
         ];
@@ -206,49 +206,49 @@ class SeedBlogCommand extends Command
     ): void {
         $posts = [
             [
-                'title'       => '5 KPIs essentiels pour piloter votre agence web',
-                'category'    => 'kpis',
-                'tags'        => ['rentabilite', 'marge', 'taux-journalier'],
-                'excerpt'     => 'Découvrez les 5 indicateurs de performance clés que toute agence web devrait suivre pour optimiser sa rentabilité et prendre des décisions éclairées.',
-                'content'     => $this->getArticleContent1(),
+                'title' => '5 KPIs essentiels pour piloter votre agence web',
+                'category' => 'kpis',
+                'tags' => ['rentabilite', 'marge', 'taux-journalier'],
+                'excerpt' => 'Découvrez les 5 indicateurs de performance clés que toute agence web devrait suivre pour optimiser sa rentabilité et prendre des décisions éclairées.',
+                'content' => $this->getArticleContent1(),
                 'publishedAt' => new DateTimeImmutable('-10 days'),
-                'image'       => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200',
+                'image' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200',
             ],
             [
-                'title'       => 'Comment optimiser le taux de charge de vos équipes',
-                'category'    => 'planning',
-                'tags'        => ['planning', 'ressources', 'staffing', 'productivite'],
-                'excerpt'     => 'Le taux de charge est un indicateur critique pour la rentabilité. Voici nos conseils pour maintenir un équilibre optimal entre disponibilité et saturation.',
-                'content'     => $this->getArticleContent2(),
+                'title' => 'Comment optimiser le taux de charge de vos équipes',
+                'category' => 'planning',
+                'tags' => ['planning', 'ressources', 'staffing', 'productivite'],
+                'excerpt' => 'Le taux de charge est un indicateur critique pour la rentabilité. Voici nos conseils pour maintenir un équilibre optimal entre disponibilité et saturation.',
+                'content' => $this->getArticleContent2(),
                 'publishedAt' => new DateTimeImmutable('-7 days'),
-                'image'       => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200',
+                'image' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200',
             ],
             [
-                'title'       => 'Forfait vs Régie : quelle facturation choisir ?',
-                'category'    => 'rentabilite',
-                'tags'        => ['facturation', 'rentabilite', 'best-practices'],
-                'excerpt'     => 'Comprendre les avantages et inconvénients de chaque mode de facturation pour maximiser votre marge tout en satisfaisant vos clients.',
-                'content'     => $this->getArticleContent3(),
+                'title' => 'Forfait vs Régie : quelle facturation choisir ?',
+                'category' => 'rentabilite',
+                'tags' => ['facturation', 'rentabilite', 'best-practices'],
+                'excerpt' => 'Comprendre les avantages et inconvénients de chaque mode de facturation pour maximiser votre marge tout en satisfaisant vos clients.',
+                'content' => $this->getArticleContent3(),
                 'publishedAt' => new DateTimeImmutable('-5 days'),
-                'image'       => 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200',
+                'image' => 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200',
             ],
             [
-                'title'       => 'Méthodologie Agile : implémenter Scrum dans votre agence',
-                'category'    => 'gestion-projet',
-                'tags'        => ['agile', 'scrum', 'productivite', 'best-practices'],
-                'excerpt'     => 'Guide pratique pour adopter la méthodologie Scrum et améliorer la collaboration, la transparence et la livraison de valeur dans vos projets.',
-                'content'     => $this->getArticleContent4(),
+                'title' => 'Méthodologie Agile : implémenter Scrum dans votre agence',
+                'category' => 'gestion-projet',
+                'tags' => ['agile', 'scrum', 'productivite', 'best-practices'],
+                'excerpt' => 'Guide pratique pour adopter la méthodologie Scrum et améliorer la collaboration, la transparence et la livraison de valeur dans vos projets.',
+                'content' => $this->getArticleContent4(),
                 'publishedAt' => new DateTimeImmutable('-3 days'),
-                'image'       => 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1200',
+                'image' => 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1200',
             ],
             [
-                'title'       => 'Timesheet : 7 astuces pour un suivi du temps efficace',
-                'category'    => 'best-practices',
-                'tags'        => ['timesheet', 'productivite', 'rentabilite'],
-                'excerpt'     => 'Le suivi du temps est crucial pour la rentabilité. Découvrez 7 bonnes pratiques pour encourager vos équipes à saisir leurs heures régulièrement et précisément.',
-                'content'     => $this->getArticleContent5(),
+                'title' => 'Timesheet : 7 astuces pour un suivi du temps efficace',
+                'category' => 'best-practices',
+                'tags' => ['timesheet', 'productivite', 'rentabilite'],
+                'excerpt' => 'Le suivi du temps est crucial pour la rentabilité. Découvrez 7 bonnes pratiques pour encourager vos équipes à saisir leurs heures régulièrement et précisément.',
+                'content' => $this->getArticleContent5(),
                 'publishedAt' => new DateTimeImmutable('-1 day'),
-                'image'       => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200',
+                'image' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200',
             ],
         ];
 

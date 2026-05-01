@@ -127,7 +127,7 @@ class OrderLine implements CompanyOwnedInterface
         switch ($this->type) {
             case 'service':
                 if ($this->profile && $this->dailyRate && $this->days) {
-                    $serviceAmount  = bcmul($this->dailyRate, $this->days, 2);
+                    $serviceAmount = bcmul($this->dailyRate, $this->days, 2);
                     $purchaseAmount = $this->attachedPurchaseAmount ?? '0';
 
                     return bcadd($serviceAmount, $purchaseAmount, 2);
@@ -212,7 +212,7 @@ class OrderLine implements CompanyOwnedInterface
         }
 
         $revenue = $this->getServiceAmount(); // CA sans achats
-        $cost    = $this->getEstimatedCost();
+        $cost = $this->getEstimatedCost();
 
         return bcsub($revenue, $cost, 2);
     }
@@ -235,7 +235,7 @@ class OrderLine implements CompanyOwnedInterface
         if ($cjm !== null) {
             // Appliquer le coefficient de marge (par défaut 1.0)
             $marginCoefficient = $this->profile->getMarginCoefficient() ?? '1.00';
-            $adjustedCjm       = bcmul($cjm, $marginCoefficient, 2);
+            $adjustedCjm = bcmul($cjm, $marginCoefficient, 2);
 
             return bcmul($this->days, $adjustedCjm, 2);
         }

@@ -85,17 +85,17 @@ class SyncBoondManagerCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $startDateStr   = $input->getOption('start-date');
-        $endDateStr     = $input->getOption('end-date');
-        $syncResources  = $input->getOption('sync-resources');
-        $syncProjects   = $input->getOption('sync-projects');
+        $startDateStr = $input->getOption('start-date');
+        $endDateStr = $input->getOption('end-date');
+        $syncResources = $input->getOption('sync-resources');
+        $syncProjects = $input->getOption('sync-projects');
         $testConnection = $input->getOption('test-connection');
-        $async          = $input->getOption('async');
-        $all            = $input->getOption('all');
+        $async = $input->getOption('async');
+        $all = $input->getOption('all');
 
         try {
             $startDate = new DateTime($startDateStr);
-            $endDate   = new DateTime($endDateStr);
+            $endDate = new DateTime($endDateStr);
         } catch (Exception $e) {
             $io->error('Format de date invalide. Utilisez YYYY-MM-DD');
 
@@ -156,7 +156,7 @@ class SyncBoondManagerCommand extends Command
         $io->info(sprintf('Synchronisation de %d entreprise(s)...', count($settingsList)));
 
         $successCount = 0;
-        $errorCount   = 0;
+        $errorCount = 0;
 
         foreach ($settingsList as $settings) {
             $companyName = $settings->getCompany()->getName();

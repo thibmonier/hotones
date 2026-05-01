@@ -22,13 +22,13 @@ class ProjectCreationE2ETest extends PantherTestCase
         $client = static::createPantherClient();
 
         $user = UserFactory::createOne([
-            'roles'    => ['ROLE_CHEF_PROJET', 'ROLE_INTERVENANT'],
+            'roles' => ['ROLE_CHEF_PROJET', 'ROLE_INTERVENANT'],
             'password' => 'password',
         ]);
 
         // Login
         $crawler = $client->request('GET', '/login');
-        $form    = $crawler
+        $form = $crawler
             ->filter('form')
             ->form([
                 '_username' => $user->getEmail(),
@@ -45,8 +45,8 @@ class ProjectCreationE2ETest extends PantherTestCase
         $form = $crawler
             ->filter('form')
             ->form([
-                'project[name]'        => 'E2E Demo Project',
-                'project[status]'      => 'active',
+                'project[name]' => 'E2E Demo Project',
+                'project[status]' => 'active',
                 'project[projectType]' => 'forfait',
             ]);
         $client->submit($form);

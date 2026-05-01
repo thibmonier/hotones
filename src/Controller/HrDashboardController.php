@@ -29,33 +29,33 @@ class HrDashboardController extends AbstractController
     public function dashboard(Request $request): Response
     {
         // Période par défaut : année en cours
-        $year      = (int) ($request->query->get('year') ?: date('Y'));
+        $year = (int) ($request->query->get('year') ?: date('Y'));
         $startDate = new DateTime($year.'-01-01');
-        $endDate   = new DateTime($year.'-12-31');
+        $endDate = new DateTime($year.'-12-31');
 
         // Si période personnalisée
         if ($request->query->has('start_date') && $request->query->has('end_date')) {
             $startDate = new DateTime($request->query->get('start_date'));
-            $endDate   = new DateTime($request->query->get('end_date'));
+            $endDate = new DateTime($request->query->get('end_date'));
         }
 
         // Récupérer toutes les métriques RH
         $metrics = $this->hrMetricsService->getAllMetrics($startDate, $endDate);
 
         // Analyse des gaps de compétences
-        $skillGaps        = $this->skillGapAnalyzer->analyzeGlobalGaps();
-        $trainingNeeds    = $this->skillGapAnalyzer->identifyTrainingNeeds();
+        $skillGaps = $this->skillGapAnalyzer->analyzeGlobalGaps();
+        $trainingNeeds = $this->skillGapAnalyzer->identifyTrainingNeeds();
         $recruitmentNeeds = $this->skillGapAnalyzer->getRecruitmentRecommendations();
 
         return $this->render('hr/dashboard.html.twig', [
-            'metrics'          => $metrics,
-            'skillGaps'        => $skillGaps,
-            'trainingNeeds'    => $trainingNeeds,
+            'metrics' => $metrics,
+            'skillGaps' => $skillGaps,
+            'trainingNeeds' => $trainingNeeds,
             'recruitmentNeeds' => $recruitmentNeeds,
-            'period'           => [
-                'year'      => $year,
+            'period' => [
+                'year' => $year,
                 'startDate' => $startDate,
-                'endDate'   => $endDate,
+                'endDate' => $endDate,
             ],
         ]);
     }
@@ -64,17 +64,17 @@ class HrDashboardController extends AbstractController
     public function skillsMatrix(): Response
     {
         $contributorRepository = $this->hrMetricsService->contributorRepository;
-        $contributors          = $contributorRepository->findBy(['active' => true], ['lastName' => 'ASC']);
+        $contributors = $contributorRepository->findBy(['active' => true], ['lastName' => 'ASC']);
 
-        $technologies           = $this->technologyRepository->findUsedByActiveContributors();
+        $technologies = $this->technologyRepository->findUsedByActiveContributors();
         $technologiesByCategory = [];
         foreach ($technologies as $technology) {
             $technologiesByCategory[$technology->category][] = $technology;
         }
 
         return $this->render('hr/skills_matrix.html.twig', [
-            'contributors'           => $contributors,
-            'technologies'           => $technologies,
+            'contributors' => $contributors,
+            'technologies' => $technologies,
             'technologiesByCategory' => $technologiesByCategory,
         ]);
     }
@@ -82,13 +82,13 @@ class HrDashboardController extends AbstractController
     #[Route('/gap-analysis', name: 'hr_gap_analysis', methods: ['GET'])]
     public function gapAnalysis(): Response
     {
-        $skillGaps        = $this->skillGapAnalyzer->analyzeGlobalGaps();
-        $trainingNeeds    = $this->skillGapAnalyzer->identifyTrainingNeeds();
+        $skillGaps = $this->skillGapAnalyzer->analyzeGlobalGaps();
+        $trainingNeeds = $this->skillGapAnalyzer->identifyTrainingNeeds();
         $recruitmentNeeds = $this->skillGapAnalyzer->getRecruitmentRecommendations();
 
         return $this->render('hr/gap_analysis.html.twig', [
-            'skillGaps'        => $skillGaps,
-            'trainingNeeds'    => $trainingNeeds,
+            'skillGaps' => $skillGaps,
+            'trainingNeeds' => $trainingNeeds,
             'recruitmentNeeds' => $recruitmentNeeds,
         ]);
     }

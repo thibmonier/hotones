@@ -40,11 +40,11 @@ class ContextProcessor implements ProcessorInterface
             }
 
             $extra = [
-                'request_id'     => $this->requestId,
+                'request_id' => $this->requestId,
                 'request_method' => $request->getMethod(),
-                'request_uri'    => $request->getRequestUri(),
-                'client_ip'      => $request->getClientIp(),
-                'environment'    => $this->environment,
+                'request_uri' => $request->getRequestUri(),
+                'client_ip' => $request->getClientIp(),
+                'environment' => $this->environment,
             ];
 
             // Add session ID if available
@@ -67,7 +67,7 @@ class ContextProcessor implements ProcessorInterface
         // For CLI/non-HTTP contexts
         return $record->with(extra: array_merge($record->extra, [
             'environment' => $this->environment,
-            'context'     => 'cli',
+            'context' => 'cli',
         ]));
     }
 

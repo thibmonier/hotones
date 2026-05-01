@@ -31,12 +31,12 @@ class ValidationController extends AbstractController
 
         if (!$data || !isset($data['type'], $data['value'], $data['field'])) {
             return new JsonResponse([
-                'valid'   => false,
+                'valid' => false,
                 'message' => 'Données invalides',
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $type  = $data['type'];
+        $type = $data['type'];
         $value = $data['value'];
         $field = $data['field'];
 
@@ -45,12 +45,12 @@ class ValidationController extends AbstractController
 
         return match ($type) {
             'client_name_unique' => $this->validateClientNameUnique($value, $excludeId),
-            'email'              => $this->validateEmail($value),
-            'siret'              => $this->validateSiret($value, $excludeId),
-            'phone'              => $this->validatePhone($value),
-            'url'                => $this->validateUrl($value),
-            default              => new JsonResponse([
-                'valid'   => false,
+            'email' => $this->validateEmail($value),
+            'siret' => $this->validateSiret($value, $excludeId),
+            'phone' => $this->validatePhone($value),
+            'url' => $this->validateUrl($value),
+            default => new JsonResponse([
+                'valid' => false,
                 'message' => 'Type de validation inconnu',
             ], Response::HTTP_BAD_REQUEST),
         };
@@ -65,13 +65,13 @@ class ValidationController extends AbstractController
 
         if ($client && $client->getId() !== $excludeId) {
             return new JsonResponse([
-                'valid'   => false,
+                'valid' => false,
                 'message' => 'Un client avec ce nom existe déjà',
             ]);
         }
 
         return new JsonResponse([
-            'valid'   => true,
+            'valid' => true,
             'message' => '✓ Nom de client disponible',
         ]);
     }
@@ -83,13 +83,13 @@ class ValidationController extends AbstractController
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return new JsonResponse([
-                'valid'   => false,
+                'valid' => false,
                 'message' => 'Format d\'email invalide',
             ]);
         }
 
         return new JsonResponse([
-            'valid'   => true,
+            'valid' => true,
             'message' => '✓ Email valide',
         ]);
     }
@@ -105,7 +105,7 @@ class ValidationController extends AbstractController
         // Check length
         if (strlen($siret) !== 14) {
             return new JsonResponse([
-                'valid'   => false,
+                'valid' => false,
                 'message' => 'Le SIRET doit contenir 14 chiffres',
             ]);
         }
@@ -113,7 +113,7 @@ class ValidationController extends AbstractController
         // Check numeric
         if (!ctype_digit($siret)) {
             return new JsonResponse([
-                'valid'   => false,
+                'valid' => false,
                 'message' => 'Le SIRET ne doit contenir que des chiffres',
             ]);
         }
@@ -129,7 +129,7 @@ class ValidationController extends AbstractController
         // }
 
         return new JsonResponse([
-            'valid'   => true,
+            'valid' => true,
             'message' => '✓ SIRET valide',
         ]);
     }
@@ -145,13 +145,13 @@ class ValidationController extends AbstractController
         // Validate French phone number format
         if (!preg_match('/^(\+33|0)[1-9]\d{8}$/', (string) $cleaned)) {
             return new JsonResponse([
-                'valid'   => false,
+                'valid' => false,
                 'message' => 'Format de téléphone invalide (ex: 01 23 45 67 89)',
             ]);
         }
 
         return new JsonResponse([
-            'valid'   => true,
+            'valid' => true,
             'message' => '✓ Téléphone valide',
         ]);
     }
@@ -163,13 +163,13 @@ class ValidationController extends AbstractController
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             return new JsonResponse([
-                'valid'   => false,
+                'valid' => false,
                 'message' => 'Format d\'URL invalide',
             ]);
         }
 
         return new JsonResponse([
-            'valid'   => true,
+            'valid' => true,
             'message' => '✓ URL valide',
         ]);
     }

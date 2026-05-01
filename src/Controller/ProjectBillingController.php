@@ -23,7 +23,7 @@ class ProjectBillingController extends AbstractController
         // Regrouper par type pour l'affichage
         $totals = [
             'forfait' => 0.0,
-            'regie'   => 0.0,
+            'regie' => 0.0,
         ];
         foreach ($entries as $e) {
             $totals[$e['type']] += $e['amount'];
@@ -32,7 +32,7 @@ class ProjectBillingController extends AbstractController
         return $this->render('project/billing.html.twig', [
             'project' => $project,
             'entries' => $entries,
-            'totals'  => $totals,
+            'totals' => $totals,
         ]);
     }
 }

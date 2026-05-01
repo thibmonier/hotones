@@ -43,11 +43,11 @@ final class NotificationServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->em                     = $this->createMock(EntityManagerInterface::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->notificationRepository = $this->createMock(NotificationRepository::class);
-        $this->preferenceRepository   = $this->createMock(NotificationPreferenceRepository::class);
-        $this->companyContext         = $this->createMock(CompanyContext::class);
-        $this->logger                 = $this->createMock(LoggerInterface::class);
+        $this->preferenceRepository = $this->createMock(NotificationPreferenceRepository::class);
+        $this->companyContext = $this->createMock(CompanyContext::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->company = new Company();
 
@@ -81,7 +81,7 @@ final class NotificationServiceTest extends TestCase
             ->with(
                 'Notification created',
                 self::callback(static fn (array $ctx): bool => $ctx['recipient'] === 'alice@example.com'
-                    && $ctx['type']                                              === 'quote_won'),
+                    && $ctx['type'] === 'quote_won'),
             );
 
         $notification = $this->service->createNotification(
@@ -126,7 +126,7 @@ final class NotificationServiceTest extends TestCase
     public function createFromEventCreatesOneNotificationPerEligibleRecipient(): void
     {
         $alice = $this->createUser('alice@example.com');
-        $bob   = $this->createUser('bob@example.com');
+        $bob = $this->createUser('bob@example.com');
 
         $event = new TestNotificationEvent(
             type: NotificationType::QUOTE_WON,
@@ -157,7 +157,7 @@ final class NotificationServiceTest extends TestCase
     public function createFromEventSkipsRecipientWithInAppDisabled(): void
     {
         $alice = $this->createUser('alice@example.com');
-        $bob   = $this->createUser('bob@example.com');
+        $bob = $this->createUser('bob@example.com');
 
         $event = new TestNotificationEvent(
             type: NotificationType::QUOTE_WON,
@@ -238,7 +238,7 @@ final class NotificationServiceTest extends TestCase
     #[Test]
     public function getUnreadNotificationsDelegatesToRepository(): void
     {
-        $user     = $this->createUser('alice@example.com');
+        $user = $this->createUser('alice@example.com');
         $expected = [new Notification(), new Notification()];
 
         $this->notificationRepository->expects(self::once())

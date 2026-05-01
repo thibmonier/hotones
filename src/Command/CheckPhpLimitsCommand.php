@@ -25,14 +25,14 @@ class CheckPhpLimitsCommand extends Command
 
         $limits = [
             'upload_max_filesize' => ini_get('upload_max_filesize'),
-            'post_max_size'       => ini_get('post_max_size'),
-            'memory_limit'        => ini_get('memory_limit'),
-            'max_execution_time'  => ini_get('max_execution_time'),
-            'max_input_time'      => ini_get('max_input_time'),
-            'file_uploads'        => ini_get('file_uploads') ? 'Activé' : 'Désactivé',
-            'max_file_uploads'    => ini_get('max_file_uploads'),
-            'upload_tmp_dir'      => ini_get('upload_tmp_dir') ?: sys_get_temp_dir(),
-            'tmp_dir_writable'    => is_writable(ini_get('upload_tmp_dir') ?: sys_get_temp_dir()) ? '✓ Oui' : '✗ Non',
+            'post_max_size' => ini_get('post_max_size'),
+            'memory_limit' => ini_get('memory_limit'),
+            'max_execution_time' => ini_get('max_execution_time'),
+            'max_input_time' => ini_get('max_input_time'),
+            'file_uploads' => ini_get('file_uploads') ? 'Activé' : 'Désactivé',
+            'max_file_uploads' => ini_get('max_file_uploads'),
+            'upload_tmp_dir' => ini_get('upload_tmp_dir') ?: sys_get_temp_dir(),
+            'tmp_dir_writable' => is_writable(ini_get('upload_tmp_dir') ?: sys_get_temp_dir()) ? '✓ Oui' : '✗ Non',
         ];
 
         $io->table(['Configuration', 'Valeur'], array_map(fn ($k, $v): array => [$k, $v], array_keys($limits), $limits));
@@ -41,8 +41,8 @@ class CheckPhpLimitsCommand extends Command
         $io->section('Vérifications');
 
         $uploadMaxBytes = $this->parseSize(ini_get('upload_max_filesize'));
-        $postMaxBytes   = $this->parseSize(ini_get('post_max_size'));
-        $memoryBytes    = $this->parseSize(ini_get('memory_limit'));
+        $postMaxBytes = $this->parseSize(ini_get('post_max_size'));
+        $memoryBytes = $this->parseSize(ini_get('memory_limit'));
 
         if ($uploadMaxBytes < (2 * 1024 * 1024)) {
             $io->warning(sprintf(
@@ -93,12 +93,12 @@ class CheckPhpLimitsCommand extends Command
         }
 
         $unit = strtoupper(substr($size, -1));
-        $num  = (int) substr($size, 0, -1);
+        $num = (int) substr($size, 0, -1);
 
         return match ($unit) {
-            'G'     => $num * 1024 * 1024 * 1024,
-            'M'     => $num * 1024 * 1024,
-            'K'     => $num * 1024,
+            'G' => $num * 1024 * 1024 * 1024,
+            'M' => $num * 1024 * 1024,
+            'K' => $num * 1024,
             default => (int) $size,
         };
     }

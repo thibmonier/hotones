@@ -92,30 +92,30 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         // Profitable tasks
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
-            'position'               => 2,
+            'type' => ProjectTask::TYPE_REGULAR,
+            'position' => 2,
         ]);
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
-            'position'               => 1,
+            'type' => ProjectTask::TYPE_REGULAR,
+            'position' => 1,
         ]);
 
         // Not profitable (countsForProfitability = false)
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => false,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
 
         // Not profitable (type = avv)
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_AVV,
+            'type' => ProjectTask::TYPE_AVV,
         ]);
 
         $results = $this->repository->findProfitableTasksByProject($project);
@@ -132,35 +132,35 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         // Profitable completed tasks
         ProjectTaskFactory::createOne([
-            'project'                => $project,
-            'status'                 => 'completed',
+            'project' => $project,
+            'status' => 'completed',
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
         ProjectTaskFactory::createOne([
-            'project'                => $project,
-            'status'                 => 'completed',
+            'project' => $project,
+            'status' => 'completed',
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
 
         // Profitable in_progress task
         ProjectTaskFactory::createOne([
-            'project'                => $project,
-            'status'                 => 'in_progress',
+            'project' => $project,
+            'status' => 'in_progress',
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
 
         // Not profitable completed task
         ProjectTaskFactory::createOne([
-            'project'                => $project,
-            'status'                 => 'completed',
+            'project' => $project,
+            'status' => 'completed',
             'countsForProfitability' => false,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
 
-        $completedCount  = $this->repository->countProfitableTasksByStatus($project, 'completed');
+        $completedCount = $this->repository->countProfitableTasksByStatus($project, 'completed');
         $inProgressCount = $this->repository->countProfitableTasksByStatus($project, 'in_progress');
 
         $this->assertEquals(2, $completedCount);
@@ -173,31 +173,31 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         // Profitable tasks
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
 
         // Not profitable tasks
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => false,
-            'type'                   => ProjectTask::TYPE_REGULAR,
+            'type' => ProjectTask::TYPE_REGULAR,
         ]);
         ProjectTaskFactory::createOne([
-            'project'                => $project,
+            'project' => $project,
             'countsForProfitability' => true,
-            'type'                   => ProjectTask::TYPE_NON_VENDU,
+            'type' => ProjectTask::TYPE_NON_VENDU,
         ]);
 
         $count = $this->repository->countProfitableTasks($project);
@@ -208,38 +208,38 @@ class ProjectTaskRepositoryTest extends KernelTestCase
     public function testFindOverdueTasksByContributor(): void
     {
         $contributor = ContributorFactory::createOne();
-        $project     = ProjectFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         // Overdue task (endDate in past, not completed)
         ProjectTaskFactory::createOne([
-            'project'             => $project,
+            'project' => $project,
             'assignedContributor' => $contributor,
-            'endDate'             => new DateTime('-5 days'),
-            'status'              => 'in_progress',
+            'endDate' => new DateTime('-5 days'),
+            'status' => 'in_progress',
         ]);
 
         // Another overdue task (more recent)
         ProjectTaskFactory::createOne([
-            'project'             => $project,
+            'project' => $project,
             'assignedContributor' => $contributor,
-            'endDate'             => new DateTime('-2 days'),
-            'status'              => 'todo',
+            'endDate' => new DateTime('-2 days'),
+            'status' => 'todo',
         ]);
 
         // Not overdue (endDate in future)
         ProjectTaskFactory::createOne([
-            'project'             => $project,
+            'project' => $project,
             'assignedContributor' => $contributor,
-            'endDate'             => new DateTime('+5 days'),
-            'status'              => 'in_progress',
+            'endDate' => new DateTime('+5 days'),
+            'status' => 'in_progress',
         ]);
 
         // Overdue but completed (excluded)
         ProjectTaskFactory::createOne([
-            'project'             => $project,
+            'project' => $project,
             'assignedContributor' => $contributor,
-            'endDate'             => new DateTime('-3 days'),
-            'status'              => 'completed',
+            'endDate' => new DateTime('-3 days'),
+            'status' => 'completed',
         ]);
 
         $results = $this->repository->findOverdueTasksByContributor($contributor);

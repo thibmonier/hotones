@@ -33,31 +33,31 @@ class ImportTheTribeNotionCommand extends Command
      * Mapping des noms de projets CSV Notion → noms en base (créés par ImportTheTribeProjectsCommand).
      */
     private const array PROJECT_ALIASES = [
-        '88jobs-jobpublic'         => '88 Jobs',
-        '88 Jobs / Job Public'     => '88 Jobs',
-        'Paperclub'                => 'Paper.club',
-        'La Presse Libre / LPL'    => 'La Presse Libre',
-        'Homeopath'                => 'Homéopath',
-        'Cogite - AIMother'        => 'MotherAI',
-        'BiddingSport'             => 'Bidding Sport',
-        'Bidding sport'            => 'Bidding Sport',
-        'Université de Nantes'     => 'Univ Nantes',
-        'HomeExchange RC'          => 'HE RC Lot-2',
-        'Home Exchange Days'       => 'HE Days',
-        'Senek / eskimoz'          => 'Senek',
-        'Mutuelle Just / MJ'       => 'Mutuelle Just',
+        '88jobs-jobpublic' => '88 Jobs',
+        '88 Jobs / Job Public' => '88 Jobs',
+        'Paperclub' => 'Paper.club',
+        'La Presse Libre / LPL' => 'La Presse Libre',
+        'Homeopath' => 'Homéopath',
+        'Cogite - AIMother' => 'MotherAI',
+        'BiddingSport' => 'Bidding Sport',
+        'Bidding sport' => 'Bidding Sport',
+        'Université de Nantes' => 'Univ Nantes',
+        'HomeExchange RC' => 'HE RC Lot-2',
+        'Home Exchange Days' => 'HE Days',
+        'Senek / eskimoz' => 'Senek',
+        'Mutuelle Just / MJ' => 'Mutuelle Just',
         'Université Lorraine / UL' => 'Univ Lorraine',
-        'AKIVI'                    => 'Akivi',
-        'HE RC-Lot-2'              => 'HE RC Lot-2',
-        'HE RC-Lot2'               => 'HE RC Lot-2',
-        'Qonti AUDIT'              => 'Qonti Audit',
-        'Quonti AUDIT'             => 'Qonti Audit',
-        'La Presse libre'          => 'La Presse Libre',
-        'UnivNantes'               => 'Univ Nantes',
-        'Paper.Club'               => 'Paper.club',
-        'Paper Club'               => 'Paper.club',
-        'Paper'                    => 'Paper.club',
-        'AI Mother'                => 'MotherAI',
+        'AKIVI' => 'Akivi',
+        'HE RC-Lot-2' => 'HE RC Lot-2',
+        'HE RC-Lot2' => 'HE RC Lot-2',
+        'Qonti AUDIT' => 'Qonti Audit',
+        'Quonti AUDIT' => 'Qonti Audit',
+        'La Presse libre' => 'La Presse Libre',
+        'UnivNantes' => 'Univ Nantes',
+        'Paper.Club' => 'Paper.club',
+        'Paper Club' => 'Paper.club',
+        'Paper' => 'Paper.club',
+        'AI Mother' => 'MotherAI',
     ];
 
     /**
@@ -65,8 +65,8 @@ class ImportTheTribeNotionCommand extends Command
      */
     private const array STATUS_MAP = [
         'En cours' => 'active',
-        'Terminé'  => 'completed',
-        'Archivé'  => 'cancelled',
+        'Terminé' => 'completed',
+        'Archivé' => 'cancelled',
         'En pause' => 'active',
     ];
 
@@ -74,37 +74,37 @@ class ImportTheTribeNotionCommand extends Command
      * Mapping des noms de technologies CSV → noms normalisés en base.
      */
     private const array TECH_ALIASES = [
-        'Node'          => 'Node.js',
-        'Express'       => 'Express.js',
-        'Nextjs'        => 'Next.js',
-        'Next.js'       => 'Next.js',
-        'Vue'           => 'Vue.js',
-        'Strapi'        => 'Strapi',
-        'Symfony'       => 'Symfony',
-        'Laravel'       => 'Laravel',
-        'Django'        => 'Django',
-        'Flask'         => 'Flask',
-        'React'         => 'React',
-        'Svelte'        => 'Svelte',
-        'Ionic'         => 'Ionic',
-        'Flutter'       => 'Flutter',
-        'React Native'  => 'React Native',
-        'Bubble'        => 'Bubble',
-        'Weweb'         => 'WeWeb',
-        'WeWeb'         => 'WeWeb',
-        'Bolt'          => 'Bolt',
-        'Supabase'      => 'Supabase',
-        'NestJS'        => 'NestJS',
-        'Nuxt'          => 'Nuxt.js',
-        'Nuxt.js'       => 'Nuxt.js',
+        'Node' => 'Node.js',
+        'Express' => 'Express.js',
+        'Nextjs' => 'Next.js',
+        'Next.js' => 'Next.js',
+        'Vue' => 'Vue.js',
+        'Strapi' => 'Strapi',
+        'Symfony' => 'Symfony',
+        'Laravel' => 'Laravel',
+        'Django' => 'Django',
+        'Flask' => 'Flask',
+        'React' => 'React',
+        'Svelte' => 'Svelte',
+        'Ionic' => 'Ionic',
+        'Flutter' => 'Flutter',
+        'React Native' => 'React Native',
+        'Bubble' => 'Bubble',
+        'Weweb' => 'WeWeb',
+        'WeWeb' => 'WeWeb',
+        'Bolt' => 'Bolt',
+        'Supabase' => 'Supabase',
+        'NestJS' => 'NestJS',
+        'Nuxt' => 'Nuxt.js',
+        'Nuxt.js' => 'Nuxt.js',
         'Ruby on Rails' => 'Ruby on Rails',
-        'Rails'         => 'Ruby on Rails',
-        'TypeScript'    => 'TypeScript',
-        'Xano'          => 'Xano',
-        'Flutterflow'   => 'Flutterflow',
-        'Ksaar'         => 'Ksaar',
-        'Firebase'      => 'Firebase',
-        'AdonisJS'      => 'AdonisJS',
+        'Rails' => 'Ruby on Rails',
+        'TypeScript' => 'TypeScript',
+        'Xano' => 'Xano',
+        'Flutterflow' => 'Flutterflow',
+        'Ksaar' => 'Ksaar',
+        'Firebase' => 'Firebase',
+        'AdonisJS' => 'AdonisJS',
     ];
 
     /** @var array<string, Project> Clé = nom normalisé en lowercase */
@@ -150,7 +150,7 @@ class ImportTheTribeNotionCommand extends Command
         $io->title('Import Notion → enrichissement projets');
 
         $filePath = $input->getArgument('file');
-        $dryRun   = $input->getOption('dry-run');
+        $dryRun = $input->getOption('dry-run');
 
         if (!file_exists($filePath)) {
             $io->error(sprintf('Fichier introuvable: %s', $filePath));
@@ -225,14 +225,14 @@ class ImportTheTribeNotionCommand extends Command
         // Users
         $users = $this->entityManager->getRepository(User::class)->findBy(['company' => $company]);
         foreach ($users as $user) {
-            $key                   = mb_strtolower($user->firstName.' '.$user->lastName);
+            $key = mb_strtolower($user->firstName.' '.$user->lastName);
             $this->userCache[$key] = $user;
         }
 
         // Contributors
         $contributors = $this->entityManager->getRepository(Contributor::class)->findBy(['company' => $company]);
         foreach ($contributors as $contributor) {
-            $key                          = mb_strtolower($contributor->firstName.' '.$contributor->lastName);
+            $key = mb_strtolower($contributor->firstName.' '.$contributor->lastName);
             $this->contributorCache[$key] = $contributor;
         }
 
@@ -275,7 +275,7 @@ class ImportTheTribeNotionCommand extends Command
         $columnIndex = [];
         foreach ($header as $i => $col) {
             // Supprimer le BOM UTF-8 éventuel sur la première colonne
-            $col                     = preg_replace('/^\x{FEFF}/u', '', trim($col));
+            $col = preg_replace('/^\x{FEFF}/u', '', trim($col));
             $columnIndex[trim($col)] = $i;
         }
 
@@ -318,14 +318,14 @@ class ImportTheTribeNotionCommand extends Command
         $csvStatus = $row['📍 Statut'] ?? '';
         if ($csvStatus !== '' && isset(self::STATUS_MAP[$csvStatus])) {
             $project->status = self::STATUS_MAP[$csvStatus];
-            $updates[]       = 'statut='.$project->status;
+            $updates[] = 'statut='.$project->status;
         }
 
         // 3. Dates
         $startDate = $this->parseDate($row['🗓️ Début contrat'] ?? '');
         if ($startDate !== null) {
             $project->startDate = $startDate;
-            $updates[]          = 'dates';
+            $updates[] = 'dates';
         }
 
         $endDate = $this->parseDate($row['🗓️ Fin contrat'] ?? '');
@@ -342,7 +342,7 @@ class ImportTheTribeNotionCommand extends Command
             $pmUser = $this->resolveUser($pmName, $company, $io);
             if ($pmUser) {
                 $project->projectManager = $pmUser;
-                $updates[]               = 'PM='.$pmName;
+                $updates[] = 'PM='.$pmName;
             }
         }
 
@@ -351,7 +351,7 @@ class ImportTheTribeNotionCommand extends Command
             $leadUser = $this->resolveUser($leadName, $company, $io);
             if ($leadUser) {
                 $project->projectDirector = $leadUser;
-                $updates[]                = 'Lead='.$leadName;
+                $updates[] = 'Lead='.$leadName;
             }
         }
 
@@ -360,7 +360,7 @@ class ImportTheTribeNotionCommand extends Command
             $salesUser = $this->resolveUser($salesName, $company, $io);
             if ($salesUser) {
                 $project->salesPerson = $salesUser;
-                $updates[]            = 'Sales='.$salesName;
+                $updates[] = 'Sales='.$salesName;
             }
         }
 
@@ -473,7 +473,7 @@ class ImportTheTribeNotionCommand extends Command
 
         // 3. Chercher un contributeur existant
         $contributorKey = mb_strtolower($parsed['firstName'].' '.$parsed['lastName']);
-        $contributor    = $this->contributorCache[$contributorKey] ?? null;
+        $contributor = $this->contributorCache[$contributorKey] ?? null;
 
         if ($contributor !== null && $contributor->user !== null) {
             // Contributeur avec User existant
@@ -492,10 +492,10 @@ class ImportTheTribeNotionCommand extends Command
             $io->writeln(sprintf('  <info>+</info> User créé: %s (lié au contributeur existant)', $user->email));
         } else {
             // Créer aussi un Contributor
-            $newContributor            = new Contributor();
-            $newContributor->company   = $company;
+            $newContributor = new Contributor();
+            $newContributor->company = $company;
             $newContributor->firstName = $parsed['firstName'];
-            $newContributor->lastName  = $parsed['lastName'];
+            $newContributor->lastName = $parsed['lastName'];
             $newContributor->setActive(true);
             $newContributor->user = $user;
 
@@ -521,10 +521,10 @@ class ImportTheTribeNotionCommand extends Command
             return $existing;
         }
 
-        $user            = new User();
-        $user->email     = $email;
+        $user = new User();
+        $user->email = $email;
         $user->firstName = $firstName;
-        $user->lastName  = $lastName;
+        $user->lastName = $lastName;
         $user->setCompany($company);
         $user->setRoles(['ROLE_INTERVENANT']);
         $user->setPassword($this->passwordHasher->hashPassword($user, bin2hex(random_bytes(16))));
@@ -537,8 +537,8 @@ class ImportTheTribeNotionCommand extends Command
     private function generateEmail(string $firstName, string $lastName): string
     {
         $transliterator = Transliterator::create('NFD; [:Nonspacing Mark:] Remove; NFC');
-        $first          = mb_strtolower($transliterator->transliterate($firstName));
-        $last           = mb_strtolower($transliterator->transliterate($lastName));
+        $first = mb_strtolower($transliterator->transliterate($firstName));
+        $last = mb_strtolower($transliterator->transliterate($lastName));
 
         return str_replace(' ', '-', $first).'.'.str_replace(' ', '-', $last).'@thetribe.io';
     }
@@ -554,12 +554,12 @@ class ImportTheTribeNotionCommand extends Command
         }
 
         // Le dernier mot est le nom de famille
-        $lastName  = array_pop($parts);
+        $lastName = array_pop($parts);
         $firstName = implode(' ', $parts);
 
         return [
             'firstName' => $firstName,
-            'lastName'  => $lastName,
+            'lastName' => $lastName,
         ];
     }
 
@@ -567,7 +567,7 @@ class ImportTheTribeNotionCommand extends Command
     {
         // 1. Normaliser
         $normalized = self::TECH_ALIASES[$techName] ?? $techName;
-        $key        = mb_strtolower($normalized);
+        $key = mb_strtolower($normalized);
 
         // 2. Chercher en base
         $technology = $this->technologyCache[$key] ?? null;
@@ -575,7 +575,7 @@ class ImportTheTribeNotionCommand extends Command
         // Essayer le nom original
         if ($technology === null) {
             $originalKey = mb_strtolower($techName);
-            $technology  = $this->technologyCache[$originalKey] ?? null;
+            $technology = $this->technologyCache[$originalKey] ?? null;
         }
 
         if ($technology === null) {
@@ -622,18 +622,18 @@ class ImportTheTribeNotionCommand extends Command
 
         // Essayer aussi "F j, Y" avec des variantes de mois français
         $frenchMonths = [
-            'janvier'   => 'January',
-            'février'   => 'February',
-            'mars'      => 'March',
-            'avril'     => 'April',
-            'mai'       => 'May',
-            'juin'      => 'June',
-            'juillet'   => 'July',
-            'août'      => 'August',
+            'janvier' => 'January',
+            'février' => 'February',
+            'mars' => 'March',
+            'avril' => 'April',
+            'mai' => 'May',
+            'juin' => 'June',
+            'juillet' => 'July',
+            'août' => 'August',
             'septembre' => 'September',
-            'octobre'   => 'October',
-            'novembre'  => 'November',
-            'décembre'  => 'December',
+            'octobre' => 'October',
+            'novembre' => 'November',
+            'décembre' => 'December',
         ];
 
         $lower = mb_strtolower($dateString);

@@ -23,35 +23,35 @@ class ExcelExportServiceTest extends TestCase
         $kpis = [
             'revenue' => [
                 'total_revenue' => 100000.00,
-                'total_cost'    => 60000.00,
-                'total_margin'  => 40000.00,
-                'margin_rate'   => 40.00,
+                'total_cost' => 60000.00,
+                'total_margin' => 40000.00,
+                'margin_rate' => 40.00,
             ],
             'projects' => [
-                'total'     => 10,
-                'active'    => 5,
+                'total' => 10,
+                'active' => 5,
                 'completed' => 5,
             ],
         ];
 
         $monthlyEvolution = [
             [
-                'month'   => 'Janvier 2025',
+                'month' => 'Janvier 2025',
                 'revenue' => 10000.00,
-                'costs'   => 6000.00,
-                'margin'  => 4000.00,
+                'costs' => 6000.00,
+                'margin' => 4000.00,
             ],
             [
-                'month'   => 'Février 2025',
+                'month' => 'Février 2025',
                 'revenue' => 12000.00,
-                'costs'   => 7000.00,
-                'margin'  => 5000.00,
+                'costs' => 7000.00,
+                'margin' => 5000.00,
             ],
         ];
 
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-02-28');
-        $filters   = [];
+        $endDate = new DateTime('2025-02-28');
+        $filters = [];
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate, $filters);
 
@@ -63,15 +63,15 @@ class ExcelExportServiceTest extends TestCase
         $kpis = [
             'revenue' => [
                 'total_revenue' => 50000.00,
-                'total_cost'    => 30000.00,
-                'total_margin'  => 20000.00,
-                'margin_rate'   => 40.00,
+                'total_cost' => 30000.00,
+                'total_margin' => 20000.00,
+                'margin_rate' => 40.00,
             ],
         ];
 
         $monthlyEvolution = [];
-        $startDate        = new DateTime('2025-01-01');
-        $endDate          = new DateTime('2025-12-31');
+        $startDate = new DateTime('2025-01-01');
+        $endDate = new DateTime('2025-12-31');
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate);
 
@@ -89,10 +89,10 @@ class ExcelExportServiceTest extends TestCase
 
     public function testExportDashboardGeneratesCorrectFilename(): void
     {
-        $kpis             = ['revenue' => ['total_revenue' => 10000.00]];
+        $kpis = ['revenue' => ['total_revenue' => 10000.00]];
         $monthlyEvolution = [];
-        $startDate        = new DateTime('2025-03-15');
-        $endDate          = new DateTime('2025-06-20');
+        $startDate = new DateTime('2025-03-15');
+        $endDate = new DateTime('2025-06-20');
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate);
 
@@ -106,15 +106,15 @@ class ExcelExportServiceTest extends TestCase
         $kpis = [
             'revenue' => [
                 'total_revenue' => 100000.00,
-                'total_cost'    => 60000.00,
+                'total_cost' => 60000.00,
             ],
             'projectsByType' => [
                 'forfait' => 5,
-                'regie'   => 3,
+                'regie' => 3,
             ],
             'projectsByCategory' => [
                 'development' => 4,
-                'design'      => 4,
+                'design' => 4,
             ],
             'topContributors' => [
                 ['name' => 'John Doe', 'hours' => 160],
@@ -127,7 +127,7 @@ class ExcelExportServiceTest extends TestCase
         ];
 
         $startDate = new DateTime('2025-01-01');
-        $endDate   = new DateTime('2025-12-31');
+        $endDate = new DateTime('2025-12-31');
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate);
 
@@ -140,13 +140,13 @@ class ExcelExportServiceTest extends TestCase
 
     public function testExportDashboardWithFilters(): void
     {
-        $kpis             = ['revenue' => ['total_revenue' => 75000.00]];
+        $kpis = ['revenue' => ['total_revenue' => 75000.00]];
         $monthlyEvolution = [];
-        $startDate        = new DateTime('2025-01-01');
-        $endDate          = new DateTime('2025-03-31');
-        $filters          = [
+        $startDate = new DateTime('2025-01-01');
+        $endDate = new DateTime('2025-03-31');
+        $filters = [
             'projectType' => 'forfait',
-            'technology'  => 'symfony',
+            'technology' => 'symfony',
         ];
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate, $filters);

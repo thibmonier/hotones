@@ -45,7 +45,7 @@ class InvoiceGeneratorService
      */
     public function generateFromOrderPaymentSchedule(OrderPaymentSchedule $schedule, bool $autoSave = true): Invoice
     {
-        $order   = $schedule->getOrder();
+        $order = $schedule->getOrder();
         $project = $order->getProject();
 
         if (!$project) {
@@ -99,10 +99,10 @@ class InvoiceGeneratorService
             $this->entityManager->flush();
 
             $this->logger->info('Invoice generated from payment schedule', [
-                'invoice_number'      => $invoice->getInvoiceNumber(),
+                'invoice_number' => $invoice->getInvoiceNumber(),
                 'payment_schedule_id' => $schedule->getId(),
-                'order_id'            => $order->id,
-                'amount_ht'           => $invoice->getAmountHt(),
+                'order_id' => $order->id,
+                'amount_ht' => $invoice->getAmountHt(),
             ]);
         }
 
@@ -146,7 +146,7 @@ class InvoiceGeneratorService
             $this->logger->warning('No timesheets found for regie invoice generation', [
                 'project_id' => $project->getId(),
                 'start_date' => $startDate->format('Y-m-d'),
-                'end_date'   => $endDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
             ]);
 
             return null;
@@ -161,7 +161,7 @@ class InvoiceGeneratorService
             $this->logger->warning('Revenue is zero for regie invoice', [
                 'project_id' => $project->getId(),
                 'start_date' => $startDate->format('Y-m-d'),
-                'end_date'   => $endDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
             ]);
 
             return null;
@@ -203,9 +203,9 @@ class InvoiceGeneratorService
         // Créer une ligne par contributeur
         foreach ($timesheetDetails as $detail) {
             $contributorName = trim("{$detail['firstName']} {$detail['lastName']}");
-            $hours           = (float) $detail['totalHours'];
-            $tjm             = $detail['tjm'] ?? '0.00';
-            $days            = round($hours / 8, 2);
+            $hours = (float) $detail['totalHours'];
+            $tjm = $detail['tjm'] ?? '0.00';
+            $days = round($hours / 8, 2);
 
             // Calcul : montant HT = (heures × TJM) / 8
             $lineAmountHt = bcmul((string) $hours, bcdiv((string) $tjm, '8', 4), 2);
@@ -231,12 +231,12 @@ class InvoiceGeneratorService
         }
 
         // Calculer les totaux de la facture
-        $totalHt  = '0.00';
+        $totalHt = '0.00';
         $totalTva = '0.00';
         $totalTtc = '0.00';
 
         foreach ($invoice->getLines() as $line) {
-            $totalHt  = bcadd($totalHt, $line->getTotalHt(), 2);
+            $totalHt = bcadd($totalHt, $line->getTotalHt(), 2);
             $totalTva = bcadd($totalTva, $line->getTvaAmount(), 2);
             $totalTtc = bcadd($totalTtc, $line->getTotalTtc(), 2);
         }
@@ -251,9 +251,9 @@ class InvoiceGeneratorService
 
             $this->logger->info('Monthly regie invoice generated', [
                 'invoice_number' => $invoice->getInvoiceNumber(),
-                'project_id'     => $project->getId(),
-                'amount_ht'      => $invoice->getAmountHt(),
-                'period'         => sprintf('%s to %s', $startDate->format('Y-m-d'), $endDate->format('Y-m-d')),
+                'project_id' => $project->getId(),
+                'amount_ht' => $invoice->getAmountHt(),
+                'period' => sprintf('%s to %s', $startDate->format('Y-m-d'), $endDate->format('Y-m-d')),
             ]);
         }
 
@@ -271,7 +271,7 @@ class InvoiceGeneratorService
     public function generateAllMonthlyRegieInvoices(DateTimeInterface $month, bool $autoSave = true): array
     {
         $startDate = (clone $month)->modify('first day of this month');
-        $endDate   = (clone $month)->modify('last day of this month');
+        $endDate = (clone $month)->modify('last day of this month');
 
         // Récupérer tous les projets en régie actifs
         $regieProjects = $this->entityManager
@@ -294,13 +294,13 @@ class InvoiceGeneratorService
             } catch (Exception $e) {
                 $this->logger->error('Failed to generate regie invoice', [
                     'project_id' => $project->getId(),
-                    'error'      => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
 
         $this->logger->info('Batch regie invoice generation completed', [
-            'month'            => $month->format('Y-m'),
+            'month' => $month->format('Y-m'),
             'invoices_created' => count($invoices),
         ]);
 
@@ -329,7 +329,7 @@ class InvoiceGeneratorService
     public function invoiceExistsForRegieMonth(Project $project, DateTimeInterface $month): bool
     {
         $startDate = (clone $month)->modify('first day of this month');
-        $endDate   = (clone $month)->modify('last day of this month');
+        $endDate = (clone $month)->modify('last day of this month');
 
         $count = $this->invoiceRepository
             ->createQueryBuilder('i')

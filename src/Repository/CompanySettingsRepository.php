@@ -24,7 +24,7 @@ class CompanySettingsRepository extends CompanyAwareRepository
      */
     public function getSettings(): CompanySettings
     {
-        $company  = $this->companyContext->getCurrentCompany();
+        $company = $this->companyContext->getCurrentCompany();
         $settings = $this->findOneBy(['company' => $company]);
 
         if (!$settings) {

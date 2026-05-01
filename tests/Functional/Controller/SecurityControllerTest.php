@@ -25,7 +25,7 @@ final class SecurityControllerTest extends WebTestCase
     }
 
     #[Test]
-    public function login_page_is_accessible_anonymously_and_returns_200(): void
+    public function loginPageIsAccessibleAnonymouslyAndReturns200(): void
     {
         $this->client->request('GET', '/login');
 
@@ -34,7 +34,7 @@ final class SecurityControllerTest extends WebTestCase
     }
 
     #[Test]
-    public function login_page_renders_security_login_template(): void
+    public function loginPageRendersSecurityLoginTemplate(): void
     {
         $this->client->request('GET', '/login');
 
@@ -46,7 +46,7 @@ final class SecurityControllerTest extends WebTestCase
     }
 
     #[Test]
-    public function logout_route_is_intercepted_by_firewall(): void
+    public function logoutRouteIsInterceptedByFirewall(): void
     {
         // Symfony's logout listener intercepts the route before the controller
         // runs. Calling it without an active session typically returns a
@@ -58,7 +58,7 @@ final class SecurityControllerTest extends WebTestCase
     }
 
     #[Test]
-    public function login_page_shows_last_username_after_failed_attempt(): void
+    public function loginPageShowsLastUsernameAfterFailedAttempt(): void
     {
         // Simulate a previous failed login by submitting bad credentials and
         // following back to the form. The session should retain `_security.last_username`.

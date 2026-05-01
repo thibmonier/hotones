@@ -59,7 +59,7 @@ class LeadMagnetController extends AbstractController
         $leadCapture->setContentType('guide-kpis');
 
         $form = $this->createForm(LeadCaptureType::class, $leadCapture, [
-            'source'       => $source,
+            'source' => $source,
             'content_type' => 'guide-kpis',
         ]);
 
@@ -102,7 +102,7 @@ class LeadMagnetController extends AbstractController
         }
 
         return $this->render('lead_magnet/guide_kpis.html.twig', [
-            'form'   => $form,
+            'form' => $form,
             'source' => $source,
         ]);
     }

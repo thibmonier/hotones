@@ -38,12 +38,12 @@ final class VacationRequestControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client      = static::createClient();
+        $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
-        $this->testUser    = $this->authenticateTestUser($this->testCompany, ['ROLE_INTERVENANT']);
+        $this->testUser = $this->authenticateTestUser($this->testCompany, ['ROLE_INTERVENANT']);
 
         // The controller looks up Contributor by user; create one bound to the test user.
-        $em          = $this->getEntityManager();
+        $em = $this->getEntityManager();
         $contributor = new Contributor();
         $contributor->setCompany($this->testCompany);
         $contributor->setUser($this->testUser);
@@ -79,14 +79,14 @@ final class VacationRequestControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', '/mes-conges/nouvelle-demande');
         self::assertResponseIsSuccessful();
 
-        $tomorrow                             = (new DateTimeImmutable('+1 day'))->format('Y-m-d');
-        $dayAfter                             = (new DateTimeImmutable('+2 days'))->format('Y-m-d');
-        $form                                 = $crawler->selectButton('Soumettre la demande')->form();
-        $form['vacation_request[type]']       = 'conges_payes';
-        $form['vacation_request[startDate]']  = $tomorrow;
-        $form['vacation_request[endDate]']    = $dayAfter;
+        $tomorrow = (new DateTimeImmutable('+1 day'))->format('Y-m-d');
+        $dayAfter = (new DateTimeImmutable('+2 days'))->format('Y-m-d');
+        $form = $crawler->selectButton('Soumettre la demande')->form();
+        $form['vacation_request[type]'] = 'conges_payes';
+        $form['vacation_request[startDate]'] = $tomorrow;
+        $form['vacation_request[endDate]'] = $dayAfter;
         $form['vacation_request[dailyHours]'] = '8';
-        $form['vacation_request[reason]']     = 'Vacances de printemps';
+        $form['vacation_request[reason]'] = 'Vacances de printemps';
 
         $this->client->submit($form);
 
@@ -96,7 +96,7 @@ final class VacationRequestControllerTest extends WebTestCase
 
         // Vacation was persisted via the handler.
         /** @var VacationRepositoryInterface $repo */
-        $repo  = static::getContainer()->get(VacationRepositoryInterface::class);
+        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
         $found = $repo->findByContributor($this->loadContributor());
 
         self::assertCount(1, $found);
@@ -118,9 +118,9 @@ final class VacationRequestControllerTest extends WebTestCase
 
     public function testShowIsForbiddenForVacationOwnedByAnotherContributor(): void
     {
-        $em               = $this->getEntityManager();
-        $otherCompany     = $this->createTestCompany('Other Co');
-        $otherUser        = $this->authenticateTestUser($otherCompany, ['ROLE_INTERVENANT']);
+        $em = $this->getEntityManager();
+        $otherCompany = $this->createTestCompany('Other Co');
+        $otherUser = $this->authenticateTestUser($otherCompany, ['ROLE_INTERVENANT']);
         $otherContributor = new Contributor();
         $otherContributor->setCompany($otherCompany);
         $otherContributor->setUser($otherUser);

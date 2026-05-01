@@ -14,9 +14,9 @@ use function in_array;
 class ClientServiceLevelCalculator
 {
     // Paramètres configurables (à externaliser plus tard dans la config)
-    private const int TOP_VIP_RANK      = 20; // Top 20 = VIP
+    private const int TOP_VIP_RANK = 20; // Top 20 = VIP
     private const int TOP_PRIORITY_RANK = 50; // Top 50 = Prioritaire
-    private const int LOW_THRESHOLD     = 5000; // < 5000€ = Basse priorité
+    private const int LOW_THRESHOLD = 5000; // < 5000€ = Basse priorité
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -64,7 +64,7 @@ class ClientServiceLevelCalculator
     public function recalculateAllAutoClients(?int $year = null): int
     {
         $clients = $this->clientRepository->findBy(['serviceLevelMode' => 'auto']);
-        $count   = 0;
+        $count = 0;
 
         foreach ($clients as $client) {
             $newLevel = $this->calculateServiceLevel($client, $year);
@@ -116,7 +116,7 @@ class ClientServiceLevelCalculator
     private function getClientRankByRevenue(Client $client, int $year): int
     {
         $allClients = $this->clientRepository->findAll();
-        $revenues   = [];
+        $revenues = [];
 
         foreach ($allClients as $c) {
             $revenues[$c->getId()] = $this->getClientRevenueForYear($c, $year);
@@ -143,9 +143,9 @@ class ClientServiceLevelCalculator
     public function getConfiguration(): array
     {
         return [
-            'top_vip_rank'      => self::TOP_VIP_RANK,
+            'top_vip_rank' => self::TOP_VIP_RANK,
             'top_priority_rank' => self::TOP_PRIORITY_RANK,
-            'low_threshold'     => self::LOW_THRESHOLD,
+            'low_threshold' => self::LOW_THRESHOLD,
         ];
     }
 }

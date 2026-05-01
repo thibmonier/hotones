@@ -61,16 +61,16 @@ class ProjectAnalyzeRisksCommand extends Command
             $io->success(sprintf('%d projets analysés avec succès', count($healthScores)));
 
             // Display summary by health level
-            $healthy  = 0;
-            $warning  = 0;
+            $healthy = 0;
+            $warning = 0;
             $critical = 0;
 
             foreach ($healthScores as $healthScore) {
                 match ($healthScore->getHealthLevel()) {
-                    'healthy'  => $healthy++,
-                    'warning'  => $warning++,
+                    'healthy' => $healthy++,
+                    'warning' => $warning++,
                     'critical' => $critical++,
-                    default    => null,
+                    default => null,
                 };
             }
 
@@ -89,7 +89,7 @@ class ProjectAnalyzeRisksCommand extends Command
 
                 foreach ($healthScores as $healthScore) {
                     if ($healthScore->getHealthLevel() === 'critical') {
-                        $project        = $healthScore->getProject();
+                        $project = $healthScore->getProject();
                         $criticalData[] = [
                             $project->getName(),
                             $healthScore->getScore().'/100',
@@ -115,7 +115,7 @@ class ProjectAnalyzeRisksCommand extends Command
 
                 foreach ($healthScores as $healthScore) {
                     if ($healthScore->getHealthLevel() === 'warning') {
-                        $project       = $healthScore->getProject();
+                        $project = $healthScore->getProject();
                         $warningData[] = [
                             $project->getName(),
                             $healthScore->getScore().'/100',

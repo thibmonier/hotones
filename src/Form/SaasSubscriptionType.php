@@ -25,9 +25,9 @@ class SaasSubscriptionType extends AbstractType
     {
         $builder
             ->add('service', EntityType::class, [
-                'class'        => SaasService::class,
-                'label'        => 'Service',
-                'required'     => true,
+                'class' => SaasService::class,
+                'label' => 'Service',
+                'required' => true,
                 'choice_label' => function (?SaasService $service) {
                     if (!$service) {
                         return null;
@@ -53,18 +53,18 @@ class SaasSubscriptionType extends AbstractType
                 ],
             ])
             ->add('customName', TextType::class, [
-                'label'    => 'Nom personnalisé',
+                'label' => 'Nom personnalisé',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Nom personnalisé pour cet abonnement (optionnel)',
                 ],
                 'help' => 'Si vide, le nom du service sera utilisé',
             ])
             ->add('billingPeriod', ChoiceType::class, [
-                'label'   => 'Périodicité de facturation',
+                'label' => 'Périodicité de facturation',
                 'choices' => array_flip(SaasSubscription::BILLING_PERIODS),
-                'attr'    => [
+                'attr' => [
                     'class' => 'form-select',
                 ],
                 'constraints' => [
@@ -72,23 +72,23 @@ class SaasSubscriptionType extends AbstractType
                 ],
             ])
             ->add('price', MoneyType::class, [
-                'label'    => 'Prix',
+                'label' => 'Prix',
                 'currency' => 'EUR',
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => '0.00',
                 ],
-                'help'        => 'Prix par mois ou par an selon la périodicité',
+                'help' => 'Prix par mois ou par an selon la périodicité',
                 'constraints' => [
                     new Assert\NotBlank(message: 'Le prix est requis'),
                     new Assert\PositiveOrZero(message: 'Le prix doit être positif'),
                 ],
             ])
             ->add('currency', ChoiceType::class, [
-                'label'   => 'Devise',
+                'label' => 'Devise',
                 'choices' => [
-                    'Euro (EUR)'           => 'EUR',
-                    'Dollar (USD)'         => 'USD',
+                    'Euro (EUR)' => 'EUR',
+                    'Dollar (USD)' => 'USD',
                     'Livre Sterling (GBP)' => 'GBP',
                 ],
                 'attr' => [
@@ -97,20 +97,20 @@ class SaasSubscriptionType extends AbstractType
             ])
             ->add('quantity', IntegerType::class, [
                 'label' => 'Quantité / Licences',
-                'attr'  => [
+                'attr' => [
                     'class' => 'form-control',
-                    'min'   => 1,
+                    'min' => 1,
                 ],
-                'help'        => 'Nombre de licences ou d\'utilisateurs',
+                'help' => 'Nombre de licences ou d\'utilisateurs',
                 'constraints' => [
                     new Assert\NotBlank(message: 'La quantité est requise'),
                     new Assert\Positive(message: 'La quantité doit être positive'),
                 ],
             ])
             ->add('startDate', DateType::class, [
-                'label'  => 'Date de début',
+                'label' => 'Date de début',
                 'widget' => 'single_text',
-                'attr'   => [
+                'attr' => [
                     'class' => 'form-control',
                 ],
                 'constraints' => [
@@ -118,18 +118,18 @@ class SaasSubscriptionType extends AbstractType
                 ],
             ])
             ->add('endDate', DateType::class, [
-                'label'    => 'Date de fin',
-                'widget'   => 'single_text',
+                'label' => 'Date de fin',
+                'widget' => 'single_text',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-control',
                 ],
                 'help' => 'Laisser vide si l\'abonnement est actif',
             ])
             ->add('nextRenewalDate', DateType::class, [
-                'label'  => 'Prochaine date de renouvellement',
+                'label' => 'Prochaine date de renouvellement',
                 'widget' => 'single_text',
-                'attr'   => [
+                'attr' => [
                     'class' => 'form-control',
                 ],
                 'constraints' => [
@@ -137,25 +137,25 @@ class SaasSubscriptionType extends AbstractType
                 ],
             ])
             ->add('lastRenewalDate', DateType::class, [
-                'label'    => 'Dernière date de renouvellement',
-                'widget'   => 'single_text',
+                'label' => 'Dernière date de renouvellement',
+                'widget' => 'single_text',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-control',
                 ],
             ])
             ->add('autoRenewal', CheckboxType::class, [
-                'label'    => 'Renouvellement automatique',
+                'label' => 'Renouvellement automatique',
                 'required' => false,
-                'attr'     => [
+                'attr' => [
                     'class' => 'form-check-input',
                 ],
                 'help' => 'L\'abonnement sera renouvelé automatiquement à la date de renouvellement',
             ])
             ->add('status', ChoiceType::class, [
-                'label'   => 'Statut',
+                'label' => 'Statut',
                 'choices' => array_flip(SaasSubscription::STATUSES),
-                'attr'    => [
+                'attr' => [
                     'class' => 'form-select',
                 ],
                 'constraints' => [
@@ -163,19 +163,19 @@ class SaasSubscriptionType extends AbstractType
                 ],
             ])
             ->add('externalReference', TextType::class, [
-                'label'    => 'Référence externe',
+                'label' => 'Référence externe',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
+                'attr' => [
+                    'class' => 'form-control',
                     'placeholder' => 'Numéro de commande, référence fournisseur, etc.',
                 ],
             ])
             ->add('notes', TextareaType::class, [
-                'label'    => 'Notes',
+                'label' => 'Notes',
                 'required' => false,
-                'attr'     => [
-                    'class'       => 'form-control',
-                    'rows'        => 4,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 4,
                     'placeholder' => 'Notes internes sur cet abonnement',
                 ],
             ]);

@@ -17,13 +17,13 @@ use RuntimeException;
 
 class ForecastingService
 {
-    private const string SCENARIO_REALISTIC   = 'realistic';
-    private const string SCENARIO_OPTIMISTIC  = 'optimistic';
+    private const string SCENARIO_REALISTIC = 'realistic';
+    private const string SCENARIO_OPTIMISTIC = 'optimistic';
     private const string SCENARIO_PESSIMISTIC = 'pessimistic';
 
     private const array SCENARIO_ADJUSTMENTS = [
-        self::SCENARIO_OPTIMISTIC  => 1.10, // +10%
-        self::SCENARIO_REALISTIC   => 1.00, // baseline
+        self::SCENARIO_OPTIMISTIC => 1.10, // +10%
+        self::SCENARIO_REALISTIC => 1.00, // baseline
         self::SCENARIO_PESSIMISTIC => 0.85, // -15%
     ];
 
@@ -69,26 +69,26 @@ class ForecastingService
 
         // 4. Générer les prévisions
         $predictions = [];
-        $lastMonth   = new DateTimeImmutable(end($historical)['month']);
+        $lastMonth = new DateTimeImmutable(end($historical)['month']);
 
         for ($i = 1; $i <= $horizon; ++$i) {
             $forecastMonth = $lastMonth->modify("+{$i} months");
-            $monthKey      = (int) $forecastMonth->format('n');
+            $monthKey = (int) $forecastMonth->format('n');
 
             // Prévision de base (tendance)
             $baseForecast = $trend * (1 + ($i * 0.02)); // 2% de croissance mensuelle
 
             // Ajustement saisonnier
             $seasonalFactor = $seasonality[$monthKey] ?? 1.0;
-            $predicted      = $baseForecast * $seasonalFactor;
+            $predicted = $baseForecast * $seasonalFactor;
 
             // Intervalles de confiance (±15% pour les 3 premiers mois, ±25% au-delà)
             $confidenceMargin = $i <= 3 ? 0.15 : 0.25;
-            $predictions[]    = [
-                'month'     => $forecastMonth->format('Y-m'),
+            $predictions[] = [
+                'month' => $forecastMonth->format('Y-m'),
                 'predicted' => round($predicted, 2),
-                'min'       => round($predicted * (1 - $confidenceMargin), 2),
-                'max'       => round($predicted * (1 + $confidenceMargin), 2),
+                'min' => round($predicted * (1 - $confidenceMargin), 2),
+                'max' => round($predicted * (1 + $confidenceMargin), 2),
             ];
         }
 
@@ -100,9 +100,9 @@ class ForecastingService
 
         return [
             'predictions' => $predictions,
-            'trend'       => $trendDirection,
-            'confidence'  => round($confidence, 2),
-            'historical'  => $historical,
+            'trend' => $trendDirection,
+            'confidence' => round($confidence, 2),
+            'historical' => $historical,
         ];
     }
 
@@ -123,7 +123,7 @@ class ForecastingService
      */
     private function getRevenueFromProjects(int $months): array
     {
-        $endDate   = new DateTime();
+        $endDate = new DateTime();
         $startDate = (clone $endDate)->modify("-{$months} months");
 
         $projects = $this->projectRepository
@@ -156,7 +156,7 @@ class ForecastingService
         $historical = [];
         foreach ($monthlyRevenue as $month => $revenue) {
             $historical[] = [
-                'month'  => $month,
+                'month' => $month,
                 'actual' => (float) $revenue,
             ];
         }
@@ -174,7 +174,7 @@ class ForecastingService
             $period = $count;
         }
 
-        $recentData  = array_slice($historical, -$period);
+        $recentData = array_slice($historical, -$period);
         $totalWeight = 0;
         $weightedSum = 0;
 
@@ -197,13 +197,13 @@ class ForecastingService
         $monthlyTotals = array_fill(1, 12, []);
 
         foreach ($historical as $data) {
-            $date                    = new DateTimeImmutable($data['month']);
-            $month                   = (int) $date->format('n');
+            $date = new DateTimeImmutable($data['month']);
+            $month = (int) $date->format('n');
             $monthlyTotals[$month][] = $data['actual'];
         }
 
         // Calculer la moyenne globale
-        $allValues     = array_merge(...array_values($monthlyTotals));
+        $allValues = array_merge(...array_values($monthlyTotals));
         $globalAverage = count($allValues) > 0 ? array_sum($allValues) / count($allValues) : 1;
 
         // Calculer le facteur pour chaque mois
@@ -214,7 +214,7 @@ class ForecastingService
                 continue;
             }
 
-            $monthAverage        = array_sum($monthlyTotals[$month])  / count($monthlyTotals[$month]);
+            $monthAverage = array_sum($monthlyTotals[$month]) / count($monthlyTotals[$month]);
             $seasonality[$month] = $globalAverage > 0 ? $monthAverage / $globalAverage : 1.0;
         }
 
@@ -240,13 +240,13 @@ class ForecastingService
         }
 
         // Confiance réduite si forte volatilité
-        $values   = array_column($historical, 'actual');
-        $mean     = array_sum($values) / count($values);
+        $values = array_column($historical, 'actual');
+        $mean = array_sum($values) / count($values);
         $variance = 0;
         foreach ($values as $value) {
             $variance += ($value - $mean) ** 2;
         }
-        $stdDev                 = sqrt($variance / count($values));
+        $stdDev = sqrt($variance / count($values));
         $coefficientOfVariation = $mean > 0 ? $stdDev / $mean : 0;
 
         // Plus la variation est faible, plus la confiance est élevée
@@ -266,10 +266,10 @@ class ForecastingService
         }
 
         // Comparer la moyenne des 3 derniers mois vs 3 mois précédents
-        $recent   = array_slice($historical, -3);
+        $recent = array_slice($historical, -3);
         $previous = array_slice($historical, -6, 3);
 
-        $recentAvg   = array_sum(array_column($recent, 'actual')) / count($recent);
+        $recentAvg = array_sum(array_column($recent, 'actual')) / count($recent);
         $previousAvg = count($previous) > 0
             ? array_sum(array_column($previous, 'actual')) / count($previous)
             : $recentAvg;
@@ -298,17 +298,17 @@ class ForecastingService
     public function generateForecasts(int $months = 12): array
     {
         $forecasts = [];
-        $now       = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         // Pre-calculate historical data ONCE to avoid repeated expensive queries
         $historicalData = $this->preCalculateHistoricalData();
 
         for ($i = 1; $i <= $months; ++$i) {
             $periodStart = $now->modify("+{$i} months")->modify('first day of this month');
-            $periodEnd   = $periodStart->modify('last day of this month');
+            $periodEnd = $periodStart->modify('last day of this month');
 
             // Calculate base prediction ONCE per month
-            $trendPrediction   = $this->calculateTrendPredictionFromCache($periodStart, $historicalData);
+            $trendPrediction = $this->calculateTrendPredictionFromCache($periodStart, $historicalData);
             $seasonalityFactor = $this->calculateSeasonalityFromCache($periodStart, $historicalData);
 
             $basePrediction = ($trendPrediction * 0.70) + ($trendPrediction * $seasonalityFactor * 0.30);
@@ -345,21 +345,21 @@ class ForecastingService
     private function preCalculateHistoricalData(): array
     {
         $historicalMonths = 6; // Reduced from 12 for performance
-        $trendData        = [];
-        $seasonalityData  = [];
+        $trendData = [];
+        $seasonalityData = [];
 
         // Collect last 6 months for trend analysis (sufficient for short-term forecasting)
         for ($i = $historicalMonths; $i >= 1; --$i) {
-            $month     = new DateTimeImmutable()->modify("-{$i} months");
+            $month = new DateTimeImmutable()->modify("-{$i} months");
             $startDate = $month->modify('first day of this month');
-            $endDate   = $month->modify('last day of this month');
+            $endDate = $month->modify('last day of this month');
 
             $metrics = $this->dashboardService->getKPIs($startDate, $endDate);
             $revenue = (float) ($metrics['revenue'] ?? 0);
 
             $trendData[] = [
-                'x'     => $historicalMonths - $i + 1,
-                'y'     => $revenue,
+                'x' => $historicalMonths - $i + 1,
+                'y' => $revenue,
                 'month' => $month,
             ];
         }
@@ -367,10 +367,10 @@ class ForecastingService
         // Collect last 12 months for seasonality analysis (1 year instead of 3)
         // This is much faster and still captures seasonal patterns
         for ($i = 12; $i >= 1; --$i) {
-            $month     = new DateTimeImmutable()->modify("-{$i} months");
-            $monthNum  = (int) $month->format('m');
+            $month = new DateTimeImmutable()->modify("-{$i} months");
+            $monthNum = (int) $month->format('m');
             $startDate = $month->modify('first day of this month');
-            $endDate   = $month->modify('last day of this month');
+            $endDate = $month->modify('last day of this month');
 
             $metrics = $this->dashboardService->getKPIs($startDate, $endDate);
             if (isset($metrics['revenue'])) {
@@ -382,7 +382,7 @@ class ForecastingService
         $yearAverage = !empty($seasonalityData) ? array_sum($seasonalityData) / count($seasonalityData) : 1.0;
 
         return [
-            'trend'       => $trendData,
+            'trend' => $trendData,
             'seasonality' => $seasonalityData,
             'yearAverage' => $yearAverage,
         ];
@@ -395,7 +395,7 @@ class ForecastingService
     {
         $dataPoints = array_map(fn ($item): array => ['x' => $item['x'], 'y' => $item['y']], $historicalData['trend']);
 
-        $regression  = $this->linearRegressionSimple($dataPoints);
+        $regression = $this->linearRegressionSimple($dataPoints);
         $monthsAhead = $this->getMonthsDifference(new DateTimeImmutable(), $targetMonth);
 
         $prediction = ($regression['slope'] * (count($dataPoints) + $monthsAhead)) + $regression['intercept'];
@@ -408,9 +408,9 @@ class ForecastingService
      */
     private function calculateSeasonalityFromCache(DateTimeImmutable $targetMonth, array $historicalData): float
     {
-        $targetMonthNum  = (int) $targetMonth->format('m');
+        $targetMonthNum = (int) $targetMonth->format('m');
         $seasonalityData = $historicalData['seasonality'];
-        $yearAverage     = $historicalData['yearAverage'];
+        $yearAverage = $historicalData['yearAverage'];
 
         if (!isset($seasonalityData[$targetMonthNum]) || $yearAverage <= 0) {
             return 1.0;
@@ -436,8 +436,8 @@ class ForecastingService
 
         // Calculate confidence intervals
         $confidenceRange = $scenario === self::SCENARIO_REALISTIC ? 0.15 : 0.25;
-        $confidenceMin   = bcmul($predictedRevenue, (string) (1 - $confidenceRange), 2);
-        $confidenceMax   = bcmul($predictedRevenue, (string) (1 + $confidenceRange), 2);
+        $confidenceMin = bcmul($predictedRevenue, (string) (1 - $confidenceRange), 2);
+        $confidenceMax = bcmul($predictedRevenue, (string) (1 + $confidenceRange), 2);
 
         $forecast = new FactForecast();
         $forecast->setCompany($this->companyContext->getCurrentCompany());
@@ -448,9 +448,9 @@ class ForecastingService
         $forecast->setConfidenceMin($confidenceMin);
         $forecast->setConfidenceMax($confidenceMax);
         $forecast->setMetadata([
-            'trend_prediction'   => $trendPrediction,
+            'trend_prediction' => $trendPrediction,
             'seasonality_factor' => $seasonalityFactor,
-            'method'             => 'hybrid_linear_regression_seasonality',
+            'method' => 'hybrid_linear_regression_seasonality',
         ]);
 
         return $forecast;
@@ -470,14 +470,14 @@ class ForecastingService
             return ['slope' => 0.0, 'intercept' => 0.0];
         }
 
-        $sumX  = 0;
-        $sumY  = 0;
+        $sumX = 0;
+        $sumY = 0;
         $sumXY = 0;
         $sumX2 = 0;
 
         foreach ($points as $point) {
-            $sumX  += $point['x'];
-            $sumY  += $point['y'];
+            $sumX += $point['x'];
+            $sumY += $point['y'];
             $sumXY += $point['x'] * $point['y'];
             $sumX2 += $point['x'] * $point['x'];
         }
@@ -487,8 +487,8 @@ class ForecastingService
             return ['slope' => 0.0, 'intercept' => $sumY / $n];
         }
 
-        $slope     = (($n * $sumXY) - ($sumX * $sumY)) / $denominator;
-        $intercept = ($sumY - ($slope * $sumX))        / $n;
+        $slope = (($n * $sumXY) - ($sumX * $sumY)) / $denominator;
+        $intercept = ($sumY - ($slope * $sumX)) / $n;
 
         return ['slope' => $slope, 'intercept' => $intercept];
     }
@@ -509,10 +509,10 @@ class ForecastingService
     public function updateForecastAccuracy(DateTimeImmutable $period): void
     {
         $periodStart = $period->modify('first day of this month');
-        $periodEnd   = $period->modify('last day of this month');
+        $periodEnd = $period->modify('last day of this month');
 
         // Get actual revenue for the period
-        $metrics       = $this->dashboardService->getKPIs($periodStart, $periodEnd);
+        $metrics = $this->dashboardService->getKPIs($periodStart, $periodEnd);
         $actualRevenue = (string) ($metrics['revenue'] ?? 0);
 
         // Update all forecasts for this period
@@ -524,10 +524,10 @@ class ForecastingService
 
                 // Calculate accuracy: (1 - |predicted - actual| / actual) * 100
                 $predicted = (float) $forecast->getPredictedRevenue();
-                $actual    = (float) $actualRevenue;
+                $actual = (float) $actualRevenue;
 
                 if ($actual > 0) {
-                    $error    = abs($predicted - $actual) / $actual;
+                    $error = abs($predicted - $actual) / $actual;
                     $accuracy = bcmul((string) (1 - $error), '100', 2);
                     $forecast->setAccuracy($accuracy);
                 }

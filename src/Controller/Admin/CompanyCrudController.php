@@ -58,16 +58,16 @@ class CompanyCrudController extends AbstractCrudController
 
         // Status & Subscription
         yield ChoiceField::new('status', 'Statut')->setChoices([
-            'Actif'    => Company::STATUS_ACTIVE,
-            'Essai'    => Company::STATUS_TRIAL,
+            'Actif' => Company::STATUS_ACTIVE,
+            'Essai' => Company::STATUS_TRIAL,
             'Suspendu' => Company::STATUS_SUSPENDED,
-            'Annulé'   => Company::STATUS_CANCELLED,
+            'Annulé' => Company::STATUS_CANCELLED,
         ])->setRequired(true);
 
         yield ChoiceField::new('subscriptionTier', 'Forfait')->setChoices([
-            'Starter'      => Company::TIER_STARTER,
+            'Starter' => Company::TIER_STARTER,
             'Professional' => Company::TIER_PROFESSIONAL,
-            'Enterprise'   => Company::TIER_ENTERPRISE,
+            'Enterprise' => Company::TIER_ENTERPRISE,
         ])->setRequired(true);
 
         // Limits
@@ -145,14 +145,14 @@ class CompanyCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters->add(ChoiceFilter::new('status', 'Statut')->setChoices([
-            'Actif'    => Company::STATUS_ACTIVE,
-            'Essai'    => Company::STATUS_TRIAL,
+            'Actif' => Company::STATUS_ACTIVE,
+            'Essai' => Company::STATUS_TRIAL,
             'Suspendu' => Company::STATUS_SUSPENDED,
-            'Annulé'   => Company::STATUS_CANCELLED,
+            'Annulé' => Company::STATUS_CANCELLED,
         ]))->add(ChoiceFilter::new('subscriptionTier', 'Forfait')->setChoices([
-            'Starter'      => Company::TIER_STARTER,
+            'Starter' => Company::TIER_STARTER,
             'Professional' => Company::TIER_PROFESSIONAL,
-            'Enterprise'   => Company::TIER_ENTERPRISE,
+            'Enterprise' => Company::TIER_ENTERPRISE,
         ]));
     }
 

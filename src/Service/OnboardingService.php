@@ -40,7 +40,7 @@ class OnboardingService
 
         // Try to find a template for the first profile
         if (!$profiles->isEmpty()) {
-            $profile  = $profiles->first();
+            $profile = $profiles->first();
             $template = $this->templateRepository->findByProfile($profile);
         }
 
@@ -66,7 +66,7 @@ class OnboardingService
         OnboardingTemplate $template,
         ?EmploymentPeriod $employmentPeriod = null,
     ): int {
-        $tasks   = $template->getTasks();
+        $tasks = $template->getTasks();
         $created = 0;
 
         // Get start date from employment period or use today
@@ -89,7 +89,7 @@ class OnboardingService
 
             // Calculate due date
             $daysAfter = $taskDef['days_after_start'] ?? 0;
-            $dueDate   = $startDate->modify("+{$daysAfter} days");
+            $dueDate = $startDate->modify("+{$daysAfter} days");
             $task->setDueDate($dueDate);
 
             $this->em->persist($task);
@@ -130,9 +130,9 @@ class OnboardingService
 
             if (!isset($grouped[$weekNum])) {
                 $grouped[$weekNum] = [
-                    'week_num'   => $weekNum,
+                    'week_num' => $weekNum,
                     'week_label' => $this->getWeekLabel($weekNum),
-                    'tasks'      => [],
+                    'tasks' => [],
                 ];
             }
 
@@ -209,20 +209,20 @@ class OnboardingService
      */
     public function getOnboardingSummary(Contributor $contributor): array
     {
-        $allTasks     = $this->taskRepository->findByContributor($contributor);
+        $allTasks = $this->taskRepository->findByContributor($contributor);
         $overdueTasks = $this->getOverdueTasks($contributor);
         $pendingTasks = $this->getPendingTasks($contributor);
 
-        $total     = count($allTasks);
+        $total = count($allTasks);
         $completed = $total - count($pendingTasks);
-        $progress  = $this->calculateProgress($contributor);
+        $progress = $this->calculateProgress($contributor);
 
         return [
-            'progress'    => $progress,
-            'total'       => $total,
-            'completed'   => $completed,
-            'pending'     => count($pendingTasks),
-            'overdue'     => count($overdueTasks),
+            'progress' => $progress,
+            'total' => $total,
+            'completed' => $completed,
+            'pending' => count($pendingTasks),
+            'overdue' => count($overdueTasks),
             'is_complete' => 100 === $progress,
         ];
     }
@@ -267,7 +267,7 @@ class OnboardingService
         }
 
         $startDay = (($weekNum - 1) * 7) + 1;
-        $endDay   = $weekNum * 7;
+        $endDay = $weekNum * 7;
 
         return "Semaine {$weekNum} (Jour {$startDay}-{$endDay})";
     }

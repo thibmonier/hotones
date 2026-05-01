@@ -44,8 +44,8 @@ class LeadMagnetMailer
             ->htmlTemplate('emails/lead_magnet/guide_kpis.html.twig')
             ->textTemplate('emails/lead_magnet/guide_kpis.txt.twig')
             ->context([
-                'lead'        => $lead,
-                'firstName'   => $lead->getFirstName(),
+                'lead' => $lead,
+                'firstName' => $lead->getFirstName(),
                 'downloadUrl' => $downloadUrl,
                 'thankYouUrl' => $thankYouUrl,
             ]);
@@ -71,8 +71,8 @@ class LeadMagnetMailer
             ->htmlTemplate('emails/lead_magnet/nurturing_day1.html.twig')
             ->textTemplate('emails/lead_magnet/nurturing_day1.txt.twig')
             ->context([
-                'lead'         => $lead,
-                'firstName'    => $lead->getFirstName(),
+                'lead' => $lead,
+                'firstName' => $lead->getFirstName(),
                 'analyticsUrl' => $analyticsUrl,
             ]);
 
@@ -99,10 +99,10 @@ class LeadMagnetMailer
             ->htmlTemplate('emails/lead_magnet/nurturing_day3.html.twig')
             ->textTemplate('emails/lead_magnet/nurturing_day3.txt.twig')
             ->context([
-                'lead'         => $lead,
-                'firstName'    => $lead->getFirstName(),
+                'lead' => $lead,
+                'firstName' => $lead->getFirstName(),
                 'analyticsUrl' => $analyticsUrl,
-                'pricingUrl'   => $pricingUrl,
+                'pricingUrl' => $pricingUrl,
             ]);
 
         $this->mailer->send($email);
@@ -122,8 +122,8 @@ class LeadMagnetMailer
             ->htmlTemplate('emails/lead_magnet/nurturing_day7.html.twig')
             ->textTemplate('emails/lead_magnet/nurturing_day7.txt.twig')
             ->context([
-                'lead'       => $lead,
-                'firstName'  => $lead->getFirstName(),
+                'lead' => $lead,
+                'firstName' => $lead->getFirstName(),
                 'pricingUrl' => $pricingUrl,
             ]);
 
