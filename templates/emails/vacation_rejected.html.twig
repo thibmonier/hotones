@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Votre demande de conge a ete rejetee</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #dc3545;">Demande rejetee</h2>
+
+    <p>Bonjour {{ contributor.firstName }},</p>
+
+    <p>Votre demande de conge n'a pas ete validee par votre manager.</p>
+
+    <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+        <tr><th align="left">Type</th><td>{{ vacation.typeLabel }}</td></tr>
+        <tr><th align="left">Du</th><td>{{ vacation.startDate|date('d/m/Y') }}</td></tr>
+        <tr><th align="left">Au</th><td>{{ vacation.endDate|date('d/m/Y') }}</td></tr>
+        {% if vacation.rejectionReason %}
+            <tr>
+                <th align="left">Motif du rejet</th>
+                <td style="color: #dc3545;">{{ vacation.rejectionReason }}</td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <p>Vous pouvez en discuter directement avec votre manager ou re-soumettre une demande sur d'autres dates.</p>
+
+    <p>
+        <a href="{{ url('vacation_request_index') }}"
+           style="background-color: #dc3545; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+            Mes demandes
+        </a>
+    </p>
+
+    <hr>
+    <p style="font-size: 12px; color: #666;">HotOnes — notification automatique.</p>
+</body>
+</html>

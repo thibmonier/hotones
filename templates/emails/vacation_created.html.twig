@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Nouvelle demande de conge a valider</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2>Nouvelle demande de conge a valider</h2>
+
+    <p>Bonjour {{ manager.firstName ?: manager.email }},</p>
+
+    <p>{{ contributor.fullName }} a soumis une nouvelle demande de conge.</p>
+
+    <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+        <tr><th align="left">Type</th><td>{{ vacation.typeLabel }}</td></tr>
+        <tr><th align="left">Du</th><td>{{ vacation.startDate|date('d/m/Y') }}</td></tr>
+        <tr><th align="left">Au</th><td>{{ vacation.endDate|date('d/m/Y') }}</td></tr>
+        <tr><th align="left">Jours ouvres</th><td>{{ vacation.numberOfWorkingDays }}</td></tr>
+        {% if vacation.reason %}
+            <tr><th align="left">Motif</th><td>{{ vacation.reason }}</td></tr>
+        {% endif %}
+    </table>
+
+    <p>
+        <a href="{{ url('vacation_approval_show', {'id': vacation.id.value}) }}"
+           style="background-color: #0d6efd; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+            Voir et valider la demande
+        </a>
+    </p>
+
+    <hr>
+    <p style="font-size: 12px; color: #666;">HotOnes — notification automatique. Ne pas repondre directement a cet email.</p>
+</body>
+</html>
