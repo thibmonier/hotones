@@ -47,6 +47,12 @@ jobs:
       WAIT_SECONDS: ${{ github.event.inputs.wait_seconds || '90' }}
       TRIGGER_RUN_URL: ${{ github.event.workflow_run.html_url || '' }}
       SMOKE_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      # TEST-E2E-STAGING-001 (sprint-005): JWT login + authenticated read.
+      # When SMOKE_USERNAME / SMOKE_PASSWORD are not set on the repo, the
+      # script skips steps 4 + 5 with a SKIP message. To activate, add the
+      # secrets via Settings → Secrets → Actions.
+      SMOKE_USERNAME: ${{ secrets.SMOKE_USERNAME }}
+      SMOKE_PASSWORD: ${{ secrets.SMOKE_PASSWORD }}
 
     steps:
       - name: Checkout
