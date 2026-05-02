@@ -103,6 +103,48 @@ Les hooks `.githooks/pre-commit` et `.githooks/pre-push` détectent automatiquem
 
 Si vous voulez bypasser **intentionnellement** un hook : `git commit --no-verify` / `git push --no-verify`. Documentez la raison dans le message de commit.
 
+### Pre-push baseline (OPS-011)
+
+Le pre-push hook lance la suite **sans** les tests marqués `#[Group('skip-pre-push')]`. CI lance la suite **complète**. Cette dichotomie permet :
+
+- Au développeur de pusher rapidement sans heurter la baseline historique de tests fragiles (multi-tenant filters, session brittleness, repository inverse-side sync).
+- À la CI de continuer à signaler ces failures pour qu'elles soient adressées.
+
+#### Liste des classes skippées
+
+| Test | Catégorie | Raison |
+|---|---|---|
+| `MultiTenant\ControllerAccessControlTest` | Multi-tenant | Filtre company-context fait fail certains asserts |
+| `Controller\Analytics\DashboardControllerTest` | Session | Period selection state perdu entre requests |
+| `Controller\HomeControllerTest` | Auth | Auth flow flaky en test |
+| `Service\NotificationEventChainTest` | Integration | Event dispatch non-déterministe en test container |
+| `Controller\OnboardingControllerTest` | Session/CSRF | Token resolution avant 1ère request |
+| `Controller\Admin\OnboardingTemplateControllerTest` | Admin | Patterns admin EA5 non couverts par fixtures |
+| `Controller\OrderControllerPreviewTest` | Form | Choice values mismatch |
+| `Controller\PerformanceReviewControllerTest` | Session | Same as Onboarding |
+| `Controller\ProjectControllerFilterTest` | URL params | Query string state lost on redirect |
+| `Repository\RunningTimerRepositoryTest` | Repository | Inverse-side Collection pas hydratée |
+| `Controller\TimesheetControllerTest` | Multi-tenant | Filter exclut les fixtures cross-company |
+| Vacation tests (3) | DDD migration | Fixés par PR #82 ; le marker est neutre une fois mergé |
+
+#### Comment ajouter un test
+
+```php
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('skip-pre-push')]
+final class MyBrittleTest extends WebTestCase { /* ... */ }
+```
+
+Justifier par un commentaire **au-dessus** du marker indiquant la raison + la story de fix prévue (sinon refus en review).
+
+#### Comment retirer un test
+
+1. Fixer la cause racine
+2. Supprimer le marker `#[Group('skip-pre-push')]` (et l'import `Group` si plus utilisé)
+3. Vérifier que le test passe en local
+4. Mettre à jour la table ci-dessus
+
 ## 📏 Standards de code
 
 ### Style de code

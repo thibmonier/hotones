@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
 /**
  * Functional tests for the VacationRequestController routes (US-066).
  *
@@ -28,6 +29,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * ROLE_INTERVENANT user bound to a Contributor in the test company so the
  * controller can resolve `$this->getUser()` -> Contributor.
  */
+#[Group('skip-pre-push')]
 final class VacationRequestControllerTest extends WebTestCase
 {
     use Factories;

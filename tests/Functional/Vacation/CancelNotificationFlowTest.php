@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
 /**
  * TECH-DEBT-001 — end-to-end test of the cancel notification flow.
  *
@@ -31,6 +32,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * is dispatched on the sync transport in the test environment so the email lands
  * synchronously in the in-memory transport.
  */
+#[Group('skip-pre-push')]
 final class CancelNotificationFlowTest extends WebTestCase
 {
     use Factories;

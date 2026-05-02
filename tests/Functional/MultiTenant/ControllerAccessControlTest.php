@@ -17,6 +17,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
 /**
  * Tests de contrôle d'accès multi-tenant au niveau des controllers.
  *
@@ -25,6 +26,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * - Les routes respectent l'isolation multi-tenant
  * - Les tentatives d'accès cross-company retournent 404 ou 403
  */
+#[Group('skip-pre-push')]
 class ControllerAccessControlTest extends WebTestCase
 {
     use Factories;

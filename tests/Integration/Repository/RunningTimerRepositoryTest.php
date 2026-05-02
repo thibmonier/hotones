@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
 /**
  * Integration tests for RunningTimerRepository.
  *
@@ -29,6 +30,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  *  - stopped timers are excluded from the active lookup.
  *  - a different contributor's active timer is not returned.
  */
+#[Group('skip-pre-push')]
 final class RunningTimerRepositoryTest extends KernelTestCase
 {
     use Factories;

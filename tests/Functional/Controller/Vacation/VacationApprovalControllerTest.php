@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
 /**
  * Functional tests for the VacationApprovalController routes (US-067).
  *
@@ -33,6 +34,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * (ROLE_INTERVENANT) contributor. The intervenant submits a vacation through
  * the real RequestVacationHandler, then the manager exercises approve / reject.
  */
+#[Group('skip-pre-push')]
 final class VacationApprovalControllerTest extends WebTestCase
 {
     use Factories;

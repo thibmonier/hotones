@@ -16,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
+#[Group('skip-pre-push')]
 class PerformanceReviewControllerTest extends WebTestCase
 {
     use Factories;

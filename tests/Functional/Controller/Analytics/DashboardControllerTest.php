@@ -9,9 +9,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
 /**
  * Tests fonctionnels pour le DashboardController Analytics.
  */
+#[Group('skip-pre-push')]
 class DashboardControllerTest extends WebTestCase
 {
     use Factories;
