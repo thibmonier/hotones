@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Call to an undefined method EasyCorp\\Bundle\\EasyAdminBundle\\Context\\AdminContext\:\:getReferrer\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Admin/BlogPostCrudController.php
+
+		-
 			message: '#^QueryBuilder\: \[Semantical Error\] line 0, col 247 near ''company LIKE''\: Error\: Invalid PathExpression\. Must be a StateFieldPathExpression\.$#'
 			identifier: doctrine.dql
 			count: 1
@@ -25,6 +31,54 @@ parameters:
 			path: src/Controller/ExpenseReportController.php
 
 		-
+			message: '#^Call to an undefined method Doctrine\\ORM\\EntityRepository\<App\\Entity\\Vacation\>\:\:findPendingForContributors\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/HomeController.php
+
+		-
+			message: '#^Class App\\Entity\\Vacation not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Controller/HomeController.php
+
+		-
+			message: '#^Call to method getContributor\(\) on an unknown class App\\Entity\\Vacation\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Controller/PlanningController.php
+
+		-
+			message: '#^Call to method getEndDate\(\) on an unknown class App\\Entity\\Vacation\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Controller/PlanningController.php
+
+		-
+			message: '#^Call to method getStartDate\(\) on an unknown class App\\Entity\\Vacation\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Controller/PlanningController.php
+
+		-
+			message: '#^Class App\\Entity\\Vacation not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/PlanningController.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$vacation contains unknown class App\\Entity\\Vacation\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Controller/PlanningController.php
+
+		-
+			message: '#^QueryBuilder\: \[Semantical Error\] line 0, col 18 near ''App\\Entity\\Vacation''\: Error\: Class ''App\\Entity\\Vacation'' is not defined\.$#'
+			identifier: doctrine.dql
+			count: 1
+			path: src/Controller/PlanningController.php
+
+		-
 			message: '#^Property App\\Controller\\ProjectDetailController\:\:\$companyContext is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -41,4 +95,34 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: src/Controller/ProjectTechnologyController.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 2
+			path: src/Domain/Vacation/ValueObject/DateRange.php
+
+		-
+			message: '#^Property App\\Entity\\ExpenseReport\:\:\$vatRate \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Entity/ExpenseReport.php
+
+		-
+			message: '#^Match arm comparison between App\\Enum\\OrderStatus\:\:PENDING and App\\Enum\\OrderStatus\:\:PENDING is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 2
+			path: src/Event/QuoteStatusChangedEvent.php
+
+		-
+			message: '#^Parameter \#3 \$preferredStartDate of method App\\Service\\Planning\\ProjectPlanningAssistant\:\:suggestAssignment\(\) expects DateTime, DateTimeInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Planning/ProjectPlanningAssistant.php
+
+		-
+			message: '#^QueryBuilder\: \[Semantical Error\] line 0, col 118 near ''endDate \>\= \:start''\: Error\: Class App\\Domain\\Vacation\\Entity\\Vacation has no field or association named endDate$#'
+			identifier: doctrine.dql
+			count: 1
+			path: src/Service/Planning/ProjectPlanningAssistant.php
 
