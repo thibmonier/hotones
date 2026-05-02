@@ -17,20 +17,21 @@ use App\Repository\StaffingMetricsRepository;
 use App\Repository\UserRepository;
 use App\Service\AlertDetectionService;
 use App\Service\ProfitabilityPredictor;
+use App\Service\Workload\WorkloadCalculatorInterface;
+use App\Entity\Contributor;
+use App\Event\ContributorOverloadAlertEvent;
 use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Unit tests for AlertDetectionService threshold/dispatch behaviour
- * (TEST-007, sprint-004 — gap-analysis Critical #4).
+ * Unit tests for AlertDetectionService threshold/dispatch behaviour.
  *
- * Each detection branch (budget / margin / payment) is exercised in
- * isolation. Workload alerts are excluded because they rely on a Doctrine
- * QueryBuilder against StaffingMetricsRepository, which would require an
- * integration-test setup; that path is left to a follow-up integration
- * story (sprint-005 candidate).
+ * - Sprint-004 / TEST-007 covered budget / margin / payment branches.
+ *   Workload was deferred because it built a Doctrine QueryBuilder inline.
+ * - Sprint-005 / TEST-WORKLOAD-001 extracts that QueryBuilder into
+ *   `WorkloadCalculatorInterface` and adds the workload-alert tests below.
  */
 final class AlertDetectionServiceTest extends TestCase
 {
@@ -41,6 +42,7 @@ final class AlertDetectionServiceTest extends TestCase
     private StaffingMetricsRepository&MockObject $staffingMetricsRepository;
     private ProfitabilityPredictor&MockObject $profitabilityPredictor;
     private EventDispatcherInterface&MockObject $eventDispatcher;
+    private WorkloadCalculatorInterface&MockObject $workloadCalculator;
     private AlertDetectionService $service;
 
     protected function setUp(): void
@@ -52,6 +54,7 @@ final class AlertDetectionServiceTest extends TestCase
         $this->staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $this->profitabilityPredictor = $this->createMock(ProfitabilityPredictor::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->workloadCalculator = $this->createMock(WorkloadCalculatorInterface::class);
 
         $this->userRepository->method('findByRole')->willReturn([]);
         $this->contributorRepository->method('findActiveContributors')->willReturn([]);
@@ -64,6 +67,7 @@ final class AlertDetectionServiceTest extends TestCase
             $this->staffingMetricsRepository,
             $this->profitabilityPredictor,
             $this->eventDispatcher,
+            $this->workloadCalculator,
         );
     }
 
@@ -259,6 +263,85 @@ final class AlertDetectionServiceTest extends TestCase
         self::assertSame(0, $stats['payment_alerts']);
     }
 
+    public function testWorkloadAlertDispatchedWhenCapacityRateAboveOneHundred(): void
+    {
+        $contributor = $this->makeContributor(42);
+        $this->contributorRepository = $this->createMock(ContributorRepository::class);
+        $this->contributorRepository->method('findActiveContributors')->willReturn([$contributor]);
+        $this->userRepository->method('findByRole')->willReturn([]);
+
+        // The service iterates 3 months: now / +1m / +2m. We return overloaded
+        // for the first month and normal for the rest, so a single alert fires.
+        $this->workloadCalculator
+            ->method('forContributor')
+            ->willReturnOnConsecutiveCalls(
+                ['totalDays' => 25.0, 'capacityRate' => 110.0],
+                ['totalDays' => 18.0, 'capacityRate' => 80.0],
+                ['totalDays' => 18.0, 'capacityRate' => 80.0],
+            );
+
+        $this->projectRepository->method('findBy')->willReturn([]);
+        $this->orderRepository->method('findBy')->willReturn([]);
+
+        $service = $this->buildServiceWithContributors([$contributor]);
+
+        $this->eventDispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(ContributorOverloadAlertEvent::class));
+
+        $stats = $service->checkAllAlerts();
+
+        self::assertSame(1, $stats['overload_alerts']);
+    }
+
+    public function testWorkloadAlertSkippedWhenCapacityWithinBounds(): void
+    {
+        $contributor = $this->makeContributor(99);
+        $this->contributorRepository = $this->createMock(ContributorRepository::class);
+        $this->contributorRepository->method('findActiveContributors')->willReturn([$contributor]);
+        $this->userRepository->method('findByRole')->willReturn([]);
+
+        $this->workloadCalculator
+            ->method('forContributor')
+            ->willReturn(['totalDays' => 18.0, 'capacityRate' => 80.0]);
+
+        $this->projectRepository->method('findBy')->willReturn([]);
+        $this->orderRepository->method('findBy')->willReturn([]);
+
+        $service = $this->buildServiceWithContributors([$contributor]);
+
+        $this->eventDispatcher->expects(self::never())->method('dispatch');
+
+        $stats = $service->checkAllAlerts();
+        self::assertSame(0, $stats['overload_alerts']);
+    }
+
+    public function testWorkloadAlertSkippedWhenCalculatorReturnsZero(): void
+    {
+        $contributor = $this->makeContributor(7);
+        $this->contributorRepository = $this->createMock(ContributorRepository::class);
+        $this->contributorRepository->method('findActiveContributors')->willReturn([$contributor]);
+        $this->userRepository->method('findByRole')->willReturn([]);
+
+        // No metrics for the contributor → calculator returns 0/0 — no alert
+        // should fire even though `capacityRate` happens to be the threshold's
+        // floor edge.
+        $this->workloadCalculator
+            ->method('forContributor')
+            ->willReturn(['totalDays' => 0.0, 'capacityRate' => 0.0]);
+
+        $this->projectRepository->method('findBy')->willReturn([]);
+        $this->orderRepository->method('findBy')->willReturn([]);
+
+        $service = $this->buildServiceWithContributors([$contributor]);
+
+        $this->eventDispatcher->expects(self::never())->method('dispatch');
+
+        $stats = $service->checkAllAlerts();
+        self::assertSame(0, $stats['overload_alerts']);
+    }
+
     private function makeProject(
         float $budgetedDays = 100.0,
         float $spentHours = 0.0,
@@ -272,5 +355,34 @@ final class AlertDetectionServiceTest extends TestCase
         $project->method('getKeyAccountManager')->willReturn(null);
 
         return $project;
+    }
+
+    private function makeContributor(int $id): Contributor&MockObject
+    {
+        $contributor = $this->createMock(Contributor::class);
+        $contributor->method('getId')->willReturn($id);
+
+        return $contributor;
+    }
+
+    /**
+     * Rebuild the service with a refreshed contributor repository — the
+     * default setUp() returned `[]`, but workload tests need active
+     * contributors. This wraps the boilerplate.
+     *
+     * @param Contributor[] $contributors
+     */
+    private function buildServiceWithContributors(array $contributors): AlertDetectionService
+    {
+        return new AlertDetectionService(
+            $this->projectRepository,
+            $this->orderRepository,
+            $this->userRepository,
+            $this->contributorRepository,
+            $this->staffingMetricsRepository,
+            $this->profitabilityPredictor,
+            $this->eventDispatcher,
+            $this->workloadCalculator,
+        );
     }
 }

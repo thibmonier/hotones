@@ -14,21 +14,33 @@ use App\Repository\OrderRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\StaffingMetricsRepository;
 use App\Repository\UserRepository;
+use App\Service\Workload\DoctrineWorkloadCalculator;
+use App\Service\Workload\WorkloadCalculatorInterface;
 use DateTime;
 use DateTimeImmutable;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AlertDetectionService
 {
+    private readonly WorkloadCalculatorInterface $workloadCalculator;
+
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly OrderRepository $orderRepository,
         private readonly UserRepository $userRepository,
         private readonly ContributorRepository $contributorRepository,
-        private readonly StaffingMetricsRepository $staffingMetricsRepository,
+        StaffingMetricsRepository $staffingMetricsRepository,
         private readonly ProfitabilityPredictor $profitabilityPredictor,
         private readonly EventDispatcherInterface $eventDispatcher,
+        ?WorkloadCalculatorInterface $workloadCalculator = null,
     ) {
+        // Backwards-compatible default: build the Doctrine impl from the
+        // injected StaffingMetricsRepository when no calculator is explicitly
+        // provided. Tests pass a mock to bypass the real QueryBuilder. The
+        // repository itself is no longer kept as a property — only the
+        // calculator is needed afterwards.
+        $this->workloadCalculator = $workloadCalculator
+            ?? new DoctrineWorkloadCalculator($staffingMetricsRepository);
     }
 
     /**
@@ -145,7 +157,7 @@ class AlertDetectionService
 
             foreach ($contributors as $contributor) {
                 // Calculate contributor workload for the month
-                $workload = $this->calculateContributorWorkload($contributor->getId(), $month);
+                $workload = $this->workloadCalculator->forContributor($contributor->getId(), $month);
 
                 if ($workload['capacityRate'] > 100) {
                     $recipients = $this->getWorkloadAlertRecipients();
@@ -198,45 +210,6 @@ class AlertDetectionService
         }
 
         return $alertCount;
-    }
-
-    /**
-     * Calculate contributor workload for a specific month.
-     */
-    private function calculateContributorWorkload(int $contributorId, DateTimeImmutable $month): array
-    {
-        // Query staffing metrics for the month using yearMonth field
-        $yearMonth = $month->format('Y-m');
-
-        $qb = $this->staffingMetricsRepository->createQueryBuilder('sm');
-        $qb
-            ->leftJoin('sm.dimTime', 'dt')
-            ->where('sm.contributor = :contributorId')
-            ->andWhere('dt.yearMonth = :yearMonth')
-            ->andWhere('sm.granularity = :granularity')
-            ->setParameter('contributorId', $contributorId)
-            ->setParameter('yearMonth', $yearMonth)
-            ->setParameter('granularity', 'monthly')
-            ->setMaxResults(1);
-
-        $metrics = $qb->getQuery()->getOneOrNullResult();
-
-        if ($metrics) {
-            $plannedDays = (float) $metrics->getPlannedDays();
-            $availableDays = (float) $metrics->getAvailableDays();
-            $capacityRate = $availableDays > 0 ? ($plannedDays / $availableDays) * 100 : 0;
-
-            return [
-                'totalDays' => $plannedDays,
-                'capacityRate' => $capacityRate,
-            ];
-        }
-
-        // Fallback: no metrics available
-        return [
-            'totalDays' => 0,
-            'capacityRate' => 0,
-        ];
     }
 
     /**
