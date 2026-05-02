@@ -103,6 +103,43 @@ Les hooks `.githooks/pre-commit` et `.githooks/pre-push` détectent automatiquem
 
 Si vous voulez bypasser **intentionnellement** un hook : `git commit --no-verify` / `git push --no-verify`. Documentez la raison dans le message de commit.
 
+## 🗂️ Fichiers auto-générés
+
+Certains fichiers sont régénérés par les outils à chaque `cache:clear` /
+`composer install` et **ne doivent jamais apparaître en commit**. Ils
+sont gitignored.
+
+| Fichier | Outil régénérateur | Raison |
+|---|---|---|
+| `config/reference.php` | Symfony Maker (`cache:clear`) | Métadonnées d'annotations, jamais utilisé en runtime |
+| `var/cache/`, `var/log/`, `var/coverage/` | Symfony / PHPUnit | Sortie outils dev |
+| `.phpunit.cache/` | PHPUnit | Cache résultats |
+| `.deptrac.cache` | Deptrac | Cache résultats |
+
+Si un de ces fichiers apparaît dans `git status` après une commande
+locale, c'est probablement parce qu'il était tracké avant l'ajout au
+`.gitignore`. Faire un `git rm --cached <fichier>` (cf OPS-012).
+
+## 📊 phpstan-baseline.neon
+
+La baseline PHPStan accumule les erreurs **tolérées historiquement**.
+Toute *nouvelle* erreur PHPStan doit être **fixée**, pas ajoutée au
+baseline. Le baseline est régénéré from-scratch quand il dérive (cf
+OPS-012 sprint-005) ; ce process se résume à :
+
+```bash
+rm phpstan-baseline.neon && touch phpstan-baseline.neon
+docker compose exec app vendor/bin/phpstan analyse \
+    --configuration=phpstan.neon \
+    --memory-limit=512M \
+    --generate-baseline=phpstan-baseline.neon
+```
+
+Notez que le baseline doit être idempotent : un 2e run de `phpstan
+analyse` doit retourner *0 erreur*. Si ça n'est pas le cas, relancez
+la régénération (Doctrine DQL est parfois non-déterministe au 1er
+passage).
+
 ## 📏 Standards de code
 
 ### Style de code
