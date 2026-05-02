@@ -3,3 +3,12 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+# DDD presentation layer controllers (sprint-003 vacation migration moved
+# them out of `App\Controller`; without this stanza they're never picked
+# up by the router). REFACTOR-001 (sprint-004).
+presentation_controllers:
+    resource:
+        path: ../src/Presentation/
+        namespace: App\Presentation
+    type: attribute

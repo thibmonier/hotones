@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# bin/stacked-pr — Helper pour stacked PRs (OPS-007, sprint-004)
+#
+# Sub-commands:
+#   start <story>           Crée la branche feat/<story>-base depuis main et la pousse
+#   add <story> <step>      Crée la branche feat/<story>-<step> depuis la précédente
+#   rebase                  Rebase la branche courante sur sa base et pousse en --force-with-lease
+#   pr <title> [body]       Ouvre une PR ciblant la branche parente détectée
+#   chain                   Affiche la chaîne d'ancêtres jusqu'à main
+#
+# Convention: feat/<story>-base -> feat/<story>-stepN. La base est inférée
+# du nom : on remonte aux suffixes "step<N-1>" / "base".
+
+set -euo pipefail
+
+usage() {
+  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+  exit 1
+}
+
+cmd="${1:-}"
+[[ -z "$cmd" ]] && usage
+
+current_branch() {
+  git rev-parse --abbrev-ref HEAD
+}
+
+infer_parent() {
+  # feat/foo-step3 -> feat/foo-step2
+  # feat/foo-step1 -> feat/foo-base
+  # feat/foo-base  -> main
+  local b="$1"
+  if [[ "$b" =~ -step([0-9]+)$ ]]; then
+    local n="${BASH_REMATCH[1]}"
+    if [[ "$n" -le 1 ]]; then
+      echo "${b%-step${n}}-base"
+    else
+      echo "${b%-step${n}}-step$((n - 1))"
+    fi
+    return
+  fi
+  if [[ "$b" =~ -base$ ]]; then
+    echo "main"
+    return
+  fi
+  echo "main"
+}
+
+ensure_clean() {
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "ERROR: Working tree not clean. Commit or stash first." >&2
+    exit 2
+  fi
+}
+
+case "$cmd" in
+  start)
+    story="${2:-}"
+    [[ -z "$story" ]] && { echo "Usage: $0 start <story>" >&2; exit 1; }
+    ensure_clean
+    git fetch origin main
+    git checkout -B "feat/${story}-base" origin/main
+    git push -u origin "feat/${story}-base"
+    echo "Created and pushed feat/${story}-base"
+    ;;
+
+  add)
+    story="${2:-}"; step="${3:-}"
+    [[ -z "$story" || -z "$step" ]] && { echo "Usage: $0 add <story> <step>" >&2; exit 1; }
+    ensure_clean
+    if [[ "$step" =~ ^[0-9]+$ ]]; then
+      step="step${step}"
+    fi
+    parent_step=$(infer_parent "feat/${story}-${step}")
+    git fetch origin "$parent_step"
+    git checkout -B "feat/${story}-${step}" "origin/${parent_step}"
+    echo "Created feat/${story}-${step} from ${parent_step}. Push when ready:"
+    echo "  git push -u origin feat/${story}-${step}"
+    ;;
+
+  rebase)
+    branch=$(current_branch)
+    parent=$(infer_parent "$branch")
+    ensure_clean
+    git fetch origin "$parent" main
+    git rebase "origin/${parent}"
+    git push --force-with-lease
+    if [[ "$parent" != "main" ]]; then
+      echo "Rebased $branch on $parent. After $parent merges to main, re-run with --base main:"
+      echo "  gh pr edit \$(gh pr view --json number -q .number) --base main"
+    fi
+    ;;
+
+  pr)
+    title="${2:-}"
+    [[ -z "$title" ]] && { echo "Usage: $0 pr <title> [body]" >&2; exit 1; }
+    body="${3:-}"
+    branch=$(current_branch)
+    parent=$(infer_parent "$branch")
+    args=(--title "$title" --base "$parent")
+    if [[ -n "$body" ]]; then
+      args+=(--body "$body")
+    else
+      args+=(--fill)
+    fi
+    gh pr create "${args[@]}"
+    ;;
+
+  chain)
+    branch=$(current_branch)
+    while [[ "$branch" != "main" ]]; do
+      echo "$branch"
+      branch=$(infer_parent "$branch")
+    done
+    echo "main"
+    ;;
+
+  *)
+    usage
+    ;;
+esac

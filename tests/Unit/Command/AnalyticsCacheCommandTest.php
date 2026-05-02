@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Command;
 
 use App\Command\AnalyticsCacheCommand;
 use App\Service\AnalyticsCacheService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * Unit tests for AnalyticsCacheCommand.
  */
+#[AllowMockObjectsWithoutExpectations]
 class AnalyticsCacheCommandTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $cacheService;

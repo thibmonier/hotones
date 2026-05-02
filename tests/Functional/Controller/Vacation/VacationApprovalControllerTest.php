@@ -4,18 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller\Vacation;
 
-use App\Application\Vacation\Command\RequestVacation\RequestVacationCommand;
-use App\Application\Vacation\Command\RequestVacation\RequestVacationHandler;
-use App\Domain\Vacation\Entity\Vacation;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationStatus;
 use App\Entity\Contributor;
-use App\Entity\User;
 use App\Tests\Support\MultiTenantTestTrait;
-use DateTimeImmutable;
+use App\Tests\Support\VacationFunctionalTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -40,6 +35,7 @@ final class VacationApprovalControllerTest extends WebTestCase
     use Factories;
     use ResetDatabase;
     use MultiTenantTestTrait;
+    use VacationFunctionalTrait;
 
     private KernelBrowser $client;
     private Contributor $manager;
@@ -50,8 +46,8 @@ final class VacationApprovalControllerTest extends WebTestCase
         $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
 
-        $this->manager = $this->provisionContributor('manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
-        $this->employee = $this->provisionContributor('employee@test.com', 'Adrien', 'Test', ['ROLE_INTERVENANT'], $this->manager);
+        $this->manager = $this->provisionVacationContributor('manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
+        $this->employee = $this->provisionVacationContributor('employee@test.com', 'Adrien', 'Test', ['ROLE_INTERVENANT'], $this->manager);
 
         // Authenticate as the manager so the controller resolves $this->getUser() to a managing contributor.
         $this->loginAs($this->manager->getUser());
@@ -59,7 +55,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testIndexShowsPendingVacationsOfManagedContributors(): void
     {
-        $this->createPendingVacation($this->employee);
+        $this->createPendingVacationFor($this->employee);
 
         $this->client->request('GET', '/manager/conges');
 
@@ -70,9 +66,9 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testShowIsForbiddenWhenManagerDoesNotManageContributor(): void
     {
-        $unrelatedManager = $this->provisionContributor('other@test.com', 'Other', 'Manager', ['ROLE_MANAGER']);
-        $unrelatedEmployee = $this->provisionContributor('other-emp@test.com', 'Lone', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
-        $foreignVacation = $this->createPendingVacation($unrelatedEmployee);
+        $unrelatedManager = $this->provisionVacationContributor('other@test.com', 'Other', 'Manager', ['ROLE_MANAGER']);
+        $unrelatedEmployee = $this->provisionVacationContributor('other-emp@test.com', 'Lone', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
+        $foreignVacation = $this->createPendingVacationFor($unrelatedEmployee);
 
         $this->loginAs($this->manager->getUser());
 
@@ -83,7 +79,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testApproveTransitionsVacationToApproved(): void
     {
-        $vacation = $this->createPendingVacation($this->employee);
+        $vacation = $this->createPendingVacationFor($this->employee);
 
         $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/approuver', [
             '_token' => $this->generateCsrfToken('approve'.$vacation->getId()->getValue()),
@@ -98,7 +94,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testRejectTransitionsVacationToRejected(): void
     {
-        $vacation = $this->createPendingVacation($this->employee);
+        $vacation = $this->createPendingVacationFor($this->employee);
 
         $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
             '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
@@ -113,7 +109,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testRejectPersistsRejectionReasonWhenSupplied(): void
     {
-        $vacation = $this->createPendingVacation($this->employee);
+        $vacation = $this->createPendingVacationFor($this->employee);
 
         $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
             '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
@@ -131,7 +127,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testRejectKeepsNullReasonWhenFieldOmitted(): void
     {
-        $vacation = $this->createPendingVacation($this->employee);
+        $vacation = $this->createPendingVacationFor($this->employee);
 
         $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
             '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
@@ -145,7 +141,7 @@ final class VacationApprovalControllerTest extends WebTestCase
     public function testManagerCancelTransitionsApprovedVacationToCancelled(): void
     {
         // US-069: an approved vacation can be cancelled by the manager.
-        $vacation = $this->createPendingVacation($this->employee);
+        $vacation = $this->createPendingVacationFor($this->employee);
 
         // Approve first
         $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/approuver', [
@@ -166,9 +162,9 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testManagerCancelIsForbiddenForUnmanagedContributor(): void
     {
-        $unrelatedManager = $this->provisionContributor('rogue@test.com', 'Rogue', 'Manager', ['ROLE_MANAGER']);
-        $unrelatedEmployee = $this->provisionContributor('rogue-emp@test.com', 'Stranger', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
-        $foreignVacation = $this->createPendingVacation($unrelatedEmployee);
+        $unrelatedManager = $this->provisionVacationContributor('rogue@test.com', 'Rogue', 'Manager', ['ROLE_MANAGER']);
+        $unrelatedEmployee = $this->provisionVacationContributor('rogue-emp@test.com', 'Stranger', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
+        $foreignVacation = $this->createPendingVacationFor($unrelatedEmployee);
 
         $this->loginAs($this->manager->getUser());
 
@@ -181,8 +177,8 @@ final class VacationApprovalControllerTest extends WebTestCase
 
     public function testPendingCountApiReturnsJsonForManagedContributors(): void
     {
-        $this->createPendingVacation($this->employee);
-        $this->createPendingVacation($this->employee);
+        $this->createPendingVacationFor($this->employee);
+        $this->createPendingVacationFor($this->employee);
 
         $this->client->request('GET', '/manager/conges/api/pending-count');
 
@@ -193,71 +189,4 @@ final class VacationApprovalControllerTest extends WebTestCase
         self::assertCount(2, $payload['vacations']);
     }
 
-    /**
-     * @param array<string> $roles
-     */
-    private function provisionContributor(
-        string $email,
-        string $firstName,
-        string $lastName,
-        array $roles,
-        ?Contributor $manager = null,
-    ): Contributor {
-        $em = $this->getEntityManager();
-
-        $user = new User();
-        $user->setCompany($this->testCompany);
-        $user->setEmail($email);
-        $user->setPassword('password');
-        $user->firstName = $firstName;
-        $user->lastName = $lastName;
-        $user->setRoles($roles);
-        $em->persist($user);
-
-        $contributor = new Contributor();
-        $contributor->setCompany($this->testCompany);
-        $contributor->setUser($user);
-        $contributor->setFirstName($firstName);
-        $contributor->setLastName($lastName);
-        $contributor->setActive(true);
-        if ($manager !== null) {
-            $contributor->setManager($manager);
-        }
-        $em->persist($contributor);
-        $em->flush();
-
-        return $contributor;
-    }
-
-    private function createPendingVacation(Contributor $contributor): Vacation
-    {
-        /** @var RequestVacationHandler $handler */
-        $handler = static::getContainer()->get(RequestVacationHandler::class);
-
-        ($handler)(new RequestVacationCommand(
-            contributorId: $contributor->getId(),
-            startDate: new DateTimeImmutable('+1 day'),
-            endDate: new DateTimeImmutable('+2 days'),
-            type: 'conges_payes',
-            dailyHours: '8',
-            reason: 'Manager test pending',
-        ));
-
-        /** @var VacationRepositoryInterface $repo */
-        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
-        $vacations = $repo->findByContributor($contributor);
-
-        return end($vacations);
-    }
-
-    private function generateCsrfToken(string $id): string
-    {
-        return static::getContainer()->get('security.csrf.token_manager')->getToken($id)->getValue();
-    }
-
-    private function loginAs(User $user): void
-    {
-        $tokenStorage = static::getContainer()->get('security.token_storage');
-        $tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
-    }
 }

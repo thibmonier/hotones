@@ -10,12 +10,11 @@ use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use App\Domain\Vacation\ValueObject\VacationId;
 use App\Domain\Vacation\ValueObject\VacationStatus;
 use App\Entity\Contributor;
-use App\Entity\User;
 use App\Tests\Support\MultiTenantTestTrait;
+use App\Tests\Support\VacationFunctionalTrait;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -38,6 +37,7 @@ final class CancelNotificationFlowTest extends WebTestCase
     use Factories;
     use ResetDatabase;
     use MultiTenantTestTrait;
+    use VacationFunctionalTrait;
 
     private KernelBrowser $client;
     private Contributor $manager;
@@ -48,8 +48,8 @@ final class CancelNotificationFlowTest extends WebTestCase
         $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
 
-        $this->manager = $this->provisionContributor('cancel-manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
-        $this->employee = $this->provisionContributor('cancel-employee@test.com', 'Adrien', 'Employee', ['ROLE_INTERVENANT'], $this->manager);
+        $this->manager = $this->provisionVacationContributor('cancel-manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
+        $this->employee = $this->provisionVacationContributor('cancel-employee@test.com', 'Adrien', 'Employee', ['ROLE_INTERVENANT'], $this->manager);
     }
 
     public function testManagerCancelOfApprovedVacationEmailsTheContributor(): void
@@ -81,7 +81,7 @@ final class CancelNotificationFlowTest extends WebTestCase
 
         // Email assertion: intervenant must have received "annulee par votre manager"
         self::assertEmailCount(2); // 1 vacation_created (manager) + 1 vacation_cancelled_by_manager (intervenant)
-        $email = $this->mailerMessageWithSubject('Votre demande de conge a ete annulee par votre manager');
+        $email = $this->findMailerMessageWithSubject('Votre demande de conge a ete annulee par votre manager');
         self::assertNotNull($email, 'Expected the contributor to receive a cancellation email');
         self::assertSame('cancel-employee@test.com', $email->getTo()[0]->getAddress());
     }
@@ -99,7 +99,7 @@ final class CancelNotificationFlowTest extends WebTestCase
         self::assertResponseRedirects('/mes-conges');
 
         // Manager receives the heads-up email
-        $email = $this->mailerMessageWithSubject('Demande de conge annulee par le collaborateur');
+        $email = $this->findMailerMessageWithSubject('Demande de conge annulee par le collaborateur');
         self::assertNotNull($email, 'Expected the manager to be notified of the self-cancel');
         self::assertSame('cancel-manager@test.com', $email->getTo()[0]->getAddress());
     }
@@ -120,58 +120,5 @@ final class CancelNotificationFlowTest extends WebTestCase
         ));
 
         return $vacationId->getValue();
-    }
-
-    /**
-     * @param array<string> $roles
-     */
-    private function provisionContributor(string $email, string $first, string $last, array $roles, ?Contributor $manager = null): Contributor
-    {
-        $em = $this->getEntityManager();
-        $user = new User();
-        $user->setCompany($this->testCompany);
-        $user->setEmail($email);
-        $user->setPassword('password');
-        $user->firstName = $first;
-        $user->lastName = $last;
-        $user->setRoles($roles);
-        $em->persist($user);
-
-        $contributor = new Contributor();
-        $contributor->setCompany($this->testCompany);
-        $contributor->setUser($user);
-        $contributor->setFirstName($first);
-        $contributor->setLastName($last);
-        $contributor->setActive(true);
-        if ($manager) {
-            $contributor->setManager($manager);
-        }
-        $em->persist($contributor);
-
-        $em->flush();
-
-        return $contributor;
-    }
-
-    private function loginAs(User $user): void
-    {
-        $tokenStorage = static::getContainer()->get('security.token_storage');
-        $tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
-    }
-
-    private function generateCsrfToken(string $id): string
-    {
-        return static::getContainer()->get('security.csrf.token_manager')->getToken($id)->getValue();
-    }
-
-    private function mailerMessageWithSubject(string $subject): ?\Symfony\Component\Mime\Email
-    {
-        foreach (self::getMailerMessages() as $message) {
-            if ($message instanceof \Symfony\Component\Mime\Email && $message->getSubject() === $subject) {
-                return $message;
-            }
-        }
-
-        return null;
     }
 }

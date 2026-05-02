@@ -12,6 +12,7 @@ use App\Repository\CompanyRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
@@ -21,6 +22,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 /**
  * Comprehensive unit tests for CreateUserCommand.
  */
+#[AllowMockObjectsWithoutExpectations]
 class CreateUserCommandTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $entityManager;

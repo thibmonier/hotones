@@ -18,8 +18,10 @@ use App\Domain\Vacation\ValueObject\VacationType;
 use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Entity\User;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class VacationTest extends TestCase
 {
     public function testRequestCreatesVacationWithPendingStatus(): void

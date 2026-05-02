@@ -17,6 +17,7 @@ use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Repository\ContributorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ use PHPUnit\Framework\TestCase;
  *  - Manager found -> repository queried with the managed contributors collection
  *    and result mapped to VacationDTO[]
  */
+#[AllowMockObjectsWithoutExpectations]
 final class GetPendingVacationsForManagerHandlerTest extends TestCase
 {
     private VacationRepositoryInterface&MockObject $vacationRepo;
@@ -63,10 +65,10 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
         $managed = new ArrayCollection([$teamMate]);
         $manager->method('getManagedContributors')->willReturn($managed);
 
-        $this->contributorRepo->method('findOneBy')->with(['user' => 7])->willReturn($manager);
+        $this->contributorRepo->expects(self::once())->method('findOneBy')->with(['user' => 7])->willReturn($manager);
 
         $vacations = [$this->buildVacation('Adrien Test', VacationType::PAID_LEAVE)];
-        $this->vacationRepo->method('findPendingForContributors')
+        $this->vacationRepo->expects(self::once())->method('findPendingForContributors')
             ->with([$teamMate])
             ->willReturn($vacations);
 

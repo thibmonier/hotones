@@ -10,8 +10,10 @@ use App\Service\ProjectRiskAnalyzer;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ProjectRiskAnalyzerTest extends TestCase
 {
     private ProjectRiskAnalyzer $service;
