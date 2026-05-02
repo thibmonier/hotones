@@ -10,19 +10,14 @@ use App\Entity\Project;
 use App\Repository\TimesheetRepository;
 use App\Service\BillingService;
 use DateTime;
-use DateTimeInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\TestCase;
-
-#[AllowMockObjectsWithoutExpectations]
-class BillingServiceTest extends TestCase
+use DateTimeInterface;use PHPUnit\Framework\TestCase;class BillingServiceTest extends TestCase
 {
     private BillingService $billingService;
-    private \PHPUnit\Framework\MockObject\MockObject $timesheetRepositoryMock;
+    private \PHPUnit\Framework\MockObject\Stub $timesheetRepositoryMock;
 
     protected function setUp(): void
     {
-        $this->timesheetRepositoryMock = $this->createMock(TimesheetRepository::class);
+        $this->timesheetRepositoryMock = $this->createStub(TimesheetRepository::class);
         $this->billingService = new BillingService($this->timesheetRepositoryMock);
     }
 

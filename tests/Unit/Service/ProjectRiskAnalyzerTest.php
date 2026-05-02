@@ -9,26 +9,21 @@ use App\Security\CompanyContext;
 use App\Service\ProjectRiskAnalyzer;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\TestCase;
-
-#[AllowMockObjectsWithoutExpectations]
-class ProjectRiskAnalyzerTest extends TestCase
+use Doctrine\ORM\EntityManagerInterface;use PHPUnit\Framework\TestCase;class ProjectRiskAnalyzerTest extends TestCase
 {
     private ProjectRiskAnalyzer $service;
 
     protected function setUp(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $companyContext = $this->createMock(CompanyContext::class);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $companyContext = $this->createStub(CompanyContext::class);
 
         $this->service = new ProjectRiskAnalyzer($em, $companyContext);
     }
 
     public function testAnalyzeProjectReturnsHealthyScoreForGoodProject(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getTotalTasksSoldHours')->willReturn('700'); // 100 days
         $project->method('getTotalTasksSpentHours')->willReturn('350'); // 50 days (good progress)
         $project->method('getTotalSoldAmount')->willReturn('100000');
@@ -52,7 +47,7 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     public function testAnalyzeProjectDetectsBudgetOverrun(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getTotalTasksSoldHours')->willReturn('350'); // 50 days
         $project->method('getTotalTasksSpentHours')->willReturn('490'); // 70 days (40% overrun)
         $project->method('getTotalSoldAmount')->willReturn('50000');
@@ -74,7 +69,7 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     public function testAnalyzeProjectDetectsScheduleDelay(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
 
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('350');
@@ -98,7 +93,7 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     public function testAnalyzeProjectDetectsLowMargin(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getTotalTasksSoldHours')->willReturn('350');
         $project->method('getTotalTasksSpentHours')->willReturn('350'); // Full budget used
         $project->method('getTotalSoldAmount')->willReturn('20000'); // Low revenue
@@ -117,7 +112,7 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     public function testAnalyzeProjectDetectsMissingTimesheets(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
 
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('350');
@@ -142,7 +137,7 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     public function testAnalyzeProjectDetectsStagnation(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
 
         $project->method('getTotalTasksSoldHours')->willReturn('700');
         $project->method('getTotalTasksSpentHours')->willReturn('0'); // No hours spent
@@ -203,7 +198,7 @@ class ProjectRiskAnalyzerTest extends TestCase
 
     private function createHealthyProject(int $targetScore): Project
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
 
         // Configure project to achieve target score
         // Score = 100 - total penalties

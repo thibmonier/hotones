@@ -17,12 +17,7 @@ use App\Domain\Vacation\ValueObject\VacationStatus;
 use App\Domain\Vacation\ValueObject\VacationType;
 use App\Entity\Company;
 use App\Entity\Contributor;
-use App\Entity\User;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\TestCase;
-
-#[AllowMockObjectsWithoutExpectations]
-final class VacationTest extends TestCase
+use App\Entity\User;use PHPUnit\Framework\TestCase;final class VacationTest extends TestCase
 {
     public function testRequestCreatesVacationWithPendingStatus(): void
     {
@@ -49,7 +44,7 @@ final class VacationTest extends TestCase
         $vacation = $this->createVacation();
         $vacation->pullDomainEvents(); // clear creation event
 
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $user->method('getId')->willReturn(42);
 
         $vacation->approve($user);
@@ -94,7 +89,7 @@ final class VacationTest extends TestCase
     public function testCannotApproveAlreadyApprovedVacation(): void
     {
         $vacation = $this->createVacation();
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $user->method('getId')->willReturn(42);
 
         $vacation->approve($user);
@@ -107,7 +102,7 @@ final class VacationTest extends TestCase
     {
         // US-069: a manager-initiated cancellation must succeed on an APPROVED vacation.
         $vacation = $this->createVacation();
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $user->method('getId')->willReturn(42);
 
         $vacation->approve($user);
@@ -148,8 +143,8 @@ final class VacationTest extends TestCase
         // Mon Jan 6 to Fri Jan 10 = 5 working days
         $vacation = Vacation::request(
             VacationId::generate(),
-            $this->createMock(Company::class),
-            $this->createMock(Contributor::class),
+            $this->createStub(Company::class),
+            $this->createStub(Contributor::class),
             DateRange::fromStrings('2025-01-06', '2025-01-10'),
             VacationType::PAID_LEAVE,
             DailyHours::fullDay(),
@@ -173,8 +168,8 @@ final class VacationTest extends TestCase
     {
         return Vacation::request(
             VacationId::generate(),
-            $this->createMock(Company::class),
-            $this->createMock(Contributor::class),
+            $this->createStub(Company::class),
+            $this->createStub(Contributor::class),
             DateRange::fromStrings('2025-01-10', '2025-01-14'),
             VacationType::PAID_LEAVE,
             DailyHours::fullDay(),
