@@ -87,7 +87,9 @@ final class VacationRequestControllerTest extends WebTestCase
         $tomorrow = (new DateTimeImmutable('+1 day'))->format('Y-m-d');
         $dayAfter = (new DateTimeImmutable('+2 days'))->format('Y-m-d');
         $form = $crawler->selectButton('Soumettre la demande')->form();
+
         $form['vacation_request[type]'] = 'conges_payes';
+
         $form['vacation_request[startDate]'] = $tomorrow;
         $form['vacation_request[endDate]'] = $dayAfter;
         $form['vacation_request[dailyHours]'] = '8';
@@ -111,9 +113,10 @@ final class VacationRequestControllerTest extends WebTestCase
     public function testCancelOnPendingVacationFlashesSuccess(): void
     {
         $vacation = $this->createPendingVacationFor($this->loadContributor());
+        $id = $vacation->getId()->getValue();
 
-        $this->client->request('POST', '/mes-conges/'.$vacation->getId()->getValue().'/annuler', [
-            '_token' => $this->generateCsrfToken('cancel'.$vacation->getId()->getValue()),
+        $this->client->request('POST', '/mes-conges/'.$id.'/annuler', [
+            '_token' => $this->csrfTokenFromForm('cancel', $id, '/mes-conges/'.$id),
         ]);
 
         self::assertResponseRedirects('/mes-conges');
@@ -123,23 +126,25 @@ final class VacationRequestControllerTest extends WebTestCase
 
     public function testShowIsForbiddenForVacationOwnedByAnotherContributor(): void
     {
-        $em = $this->getEntityManager();
+        // Provision a foreign contributor in another company. The trait helper
+        // takes care of disambiguating the email so we don't collide with the
+        // already-provisioned `test@test.com` from setUp.
         $otherCompany = $this->createTestCompany('Other Co');
-        $otherUser = $this->authenticateTestUser($otherCompany, ['ROLE_INTERVENANT']);
-        $otherContributor = new Contributor();
-        $otherContributor->setCompany($otherCompany);
-        $otherContributor->setUser($otherUser);
-        $otherContributor->setFirstName('Mallory');
-        $otherContributor->setLastName('Adversary');
-        $otherContributor->setActive(true);
-        $em->persist($otherContributor);
-        $em->flush();
+        $previousCompany = $this->testCompany;
+        $this->testCompany = $otherCompany;
+        $otherContributor = $this->provisionVacationContributor(
+            'mallory@test.com',
+            'Mallory',
+            'Adversary',
+            ['ROLE_INTERVENANT'],
+        );
+        $this->testCompany = $previousCompany;
 
         $foreignVacation = $this->createPendingVacationFor($otherContributor);
 
-        // Re-authenticate as the original Adrien (ROLE_INTERVENANT in testCompany)
-        $this->testUser = $this->authenticateTestUser($this->testCompany, ['ROLE_INTERVENANT']);
-
+        // The test client is still logged in as Adrien (setUp), so the
+        // controller's ownership check should refuse access to the foreign
+        // vacation.
         $this->client->request('GET', '/mes-conges/'.$foreignVacation->getId()->getValue());
 
         self::assertResponseStatusCodeSame(403);

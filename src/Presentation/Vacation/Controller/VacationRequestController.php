@@ -105,9 +105,17 @@ class VacationRequestController extends AbstractController
         $user = $this->getUser();
         $contributor = $this->contributorRepository->findOneBy(['user' => $user]);
 
-        $vacation = $this->vacationRepository->findById(VacationId::fromString($id));
+        // Use findByIdOrNull so the company-context filter swallowing a
+        // foreign vacation surfaces as 403 (access denied) rather than as an
+        // uncaught VacationNotFoundException — the latter would 500 and leak
+        // implementation details in the response.
+        $vacation = $this->vacationRepository->findByIdOrNull(VacationId::fromString($id));
 
-        if (!$contributor || $vacation->getContributor()->getId() !== $contributor->getId()) {
+        if (
+            $vacation === null
+            || !$contributor
+            || $vacation->getContributor()->getId() !== $contributor->getId()
+        ) {
             throw $this->createAccessDeniedException('Vous n\'avez pas acces a cette demande.');
         }
 

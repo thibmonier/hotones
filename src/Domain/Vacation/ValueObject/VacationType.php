@@ -26,13 +26,16 @@ enum VacationType: string
     }
 
     /**
+     * Returns the enum cases formatted for Symfony's ChoiceType:
+     * keys = displayed labels, values = submitted backing values.
+     *
      * @return array<string, string>
      */
     public static function choices(): array
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $case->label();
+            $choices[$case->label()] = $case->value;
         }
 
         return $choices;

@@ -78,9 +78,10 @@ final class VacationApprovalControllerTest extends WebTestCase
     public function testApproveTransitionsVacationToApproved(): void
     {
         $vacation = $this->createPendingVacationFor($this->employee);
+        $id = $vacation->getId()->getValue();
 
-        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/approuver', [
-            '_token' => $this->generateCsrfToken('approve'.$vacation->getId()->getValue()),
+        $this->client->request('POST', '/manager/conges/'.$id.'/approuver', [
+            '_token' => $this->csrfTokenFromForm('approve', $id, '/manager/conges/'.$id),
         ]);
 
         self::assertResponseRedirects('/manager/conges');
@@ -93,9 +94,10 @@ final class VacationApprovalControllerTest extends WebTestCase
     public function testRejectTransitionsVacationToRejected(): void
     {
         $vacation = $this->createPendingVacationFor($this->employee);
+        $id = $vacation->getId()->getValue();
 
-        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
-            '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
+        $this->client->request('POST', '/manager/conges/'.$id.'/rejeter', [
+            '_token' => $this->csrfTokenFromForm('reject', $id, '/manager/conges/'.$id),
         ]);
 
         self::assertResponseRedirects('/manager/conges');
@@ -108,9 +110,10 @@ final class VacationApprovalControllerTest extends WebTestCase
     public function testRejectPersistsRejectionReasonWhenSupplied(): void
     {
         $vacation = $this->createPendingVacationFor($this->employee);
+        $id = $vacation->getId()->getValue();
 
-        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
-            '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
+        $this->client->request('POST', '/manager/conges/'.$id.'/rejeter', [
+            '_token' => $this->csrfTokenFromForm('reject', $id, '/manager/conges/'.$id),
             'rejection_reason' => 'Planning sature sur la periode',
         ]);
 
@@ -126,9 +129,10 @@ final class VacationApprovalControllerTest extends WebTestCase
     public function testRejectKeepsNullReasonWhenFieldOmitted(): void
     {
         $vacation = $this->createPendingVacationFor($this->employee);
+        $id = $vacation->getId()->getValue();
 
-        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/rejeter', [
-            '_token' => $this->generateCsrfToken('reject'.$vacation->getId()->getValue()),
+        $this->client->request('POST', '/manager/conges/'.$id.'/rejeter', [
+            '_token' => $this->csrfTokenFromForm('reject', $id, '/manager/conges/'.$id),
         ]);
 
         /** @var VacationRepositoryInterface $repo */
@@ -140,15 +144,17 @@ final class VacationApprovalControllerTest extends WebTestCase
     {
         // US-069: an approved vacation can be cancelled by the manager.
         $vacation = $this->createPendingVacationFor($this->employee);
+        $id = $vacation->getId()->getValue();
 
-        // Approve first
-        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/approuver', [
-            '_token' => $this->generateCsrfToken('approve'.$vacation->getId()->getValue()),
+        // Approve first (the show page renders the approve form pre-approval).
+        $this->client->request('POST', '/manager/conges/'.$id.'/approuver', [
+            '_token' => $this->csrfTokenFromForm('approve', $id, '/manager/conges/'.$id),
         ]);
 
-        // Manager-cancel the approved vacation
-        $this->client->request('POST', '/manager/conges/'.$vacation->getId()->getValue().'/annuler', [
-            '_token' => $this->generateCsrfToken('cancel-manager'.$vacation->getId()->getValue()),
+        // Manager-cancel the now-approved vacation. The show page now renders
+        // the cancel form (the approve form is gone) — same /annuler suffix.
+        $this->client->request('POST', '/manager/conges/'.$id.'/annuler', [
+            '_token' => $this->csrfTokenFromForm('cancel-manager', $id, '/manager/conges/'.$id),
         ]);
 
         self::assertResponseRedirects('/manager/conges');
@@ -163,11 +169,16 @@ final class VacationApprovalControllerTest extends WebTestCase
         $unrelatedManager = $this->provisionVacationContributor('rogue@test.com', 'Rogue', 'Manager', ['ROLE_MANAGER']);
         $unrelatedEmployee = $this->provisionVacationContributor('rogue-emp@test.com', 'Stranger', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
         $foreignVacation = $this->createPendingVacationFor($unrelatedEmployee);
+        $id = $foreignVacation->getId()->getValue();
 
         $this->loginAs($this->manager->getUser());
 
-        $this->client->request('POST', '/manager/conges/'.$foreignVacation->getId()->getValue().'/annuler', [
-            '_token' => $this->generateCsrfToken('cancel-manager'.$foreignVacation->getId()->getValue()),
+        // The current manager cannot fetch the foreign vacation's show page,
+        // so we cannot retrieve the form-bound CSRF token. Submit a deliberately
+        // bogus token: the controller's authorization check fires before the
+        // CSRF check, so a 403 is the expected outcome regardless.
+        $this->client->request('POST', '/manager/conges/'.$id.'/annuler', [
+            '_token' => 'forbidden-marker',
         ]);
 
         self::assertResponseStatusCodeSame(403);

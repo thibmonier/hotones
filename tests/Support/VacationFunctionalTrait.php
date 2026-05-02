@@ -57,8 +57,20 @@ trait VacationFunctionalTrait
         $contributor->setFirstName($firstName);
         $contributor->setLastName($lastName);
         $contributor->setActive(true);
+        // Contributor has its own `email` field separate from the User's
+        // `email`, and the email-sending pipeline reads from
+        // Contributor::getEmail() (not User). Set it explicitly so the
+        // notification handler can deliver.
+        $contributor->email = $email;
         if ($manager !== null) {
             $contributor->setManager($manager);
+            // Sync the inverse side — Doctrine doesn't auto-update the
+            // manager's `managedContributors` Collection when only the owning
+            // side is set. Without this, a subsequent
+            // `findOneBy(...)->getManagedContributors()` on the manager would
+            // return an empty Collection from the identity-map cached instance
+            // and break controller-side authorization checks.
+            $manager->addManagedContributor($contributor);
         }
         $em->persist($contributor);
         $em->flush();
@@ -88,22 +100,76 @@ trait VacationFunctionalTrait
     }
 
     /**
-     * Generate a CSRF token for a controller action.
+     * Resolve a CSRF token from a form rendered by the application.
      *
-     * The CsrfTokenManager pulls/stores from the session, which only exists
-     * once the KernelBrowser has issued at least one request. We warm-up
-     * the session with a GET to /mes-conges (an authenticated route, no-op
-     * for the action under test) before resolving the token, so the value
-     * we hand back is valid for the *same* session the next POST will reuse.
+     * The CsrfTokenManager binds tokens to the active session, which only
+     * exists during a request lifecycle. After `$client->request()` returns,
+     * the session is closed and `RequestStack::getCurrentRequest()` is null,
+     * so a direct `tokenManager->getToken($id)` call throws
+     * `SessionNotFoundException`.
+     *
+     * This helper renders the authenticated GET page for the given vacation,
+     * extracts the `<input name="_token">` value of the form whose `action`
+     * matches the route `$intent` is suffixed onto. The token returned is
+     * therefore the *same* one the next POST will receive in the session.
+     *
+     * Falls back to direct token-manager access for tests that don't carry a
+     * `$client` (kernel-only). On strict session firewalls, that path will
+     * still throw — callers in that situation should use this method.
+     *
+     * @param string $intent  e.g. "approve", "reject", "cancel-manager", "cancel"
+     * @param string $vacationId  UUID of the vacation
+     * @param string $rendererPath  GET route that renders the form
      */
+    protected function csrfTokenFromForm(
+        string $intent,
+        string $vacationId,
+        string $rendererPath,
+    ): string {
+        $crawler = $this->client->request('GET', $rendererPath);
+
+        $intentSuffix = $this->intentRouteSuffix($intent);
+        $tokenInput = $crawler->filter("input[name='_token']")
+            ->reduce(static function (\Symfony\Component\DomCrawler\Crawler $node) use ($intentSuffix): bool {
+                // Only accept tokens whose surrounding form action targets the
+                // expected intent: a vacation detail page renders multiple
+                // forms (approve/reject/cancel) sharing the same DOM tree.
+                $form = $node->ancestors()->filter('form')->first();
+                if ($form->count() === 0) {
+                    return false;
+                }
+
+                return str_contains((string) $form->attr('action'), $intentSuffix);
+            });
+
+        if ($tokenInput->count() === 0) {
+            throw new \RuntimeException(sprintf(
+                'Could not locate CSRF token for intent "%s" on %s',
+                $intent,
+                $rendererPath,
+            ));
+        }
+
+        return (string) $tokenInput->first()->attr('value');
+    }
+
     /**
-     * Generate a CSRF token for a controller action.
-     *
-     * Note: caller must ensure a session is active in the test container
-     * (e.g. the test's KernelBrowser has already issued one request that
-     * populated `RequestStack`). On strict session-based CSRF setups, this
-     * may still fail with `SessionNotFoundException` — see the trait's
-     * doc-block for the limitation.
+     * Map a CSRF intent to the URL suffix the form's `action` ends with.
+     */
+    private function intentRouteSuffix(string $intent): string
+    {
+        return match ($intent) {
+            'approve' => '/approuver',
+            'reject' => '/rejeter',
+            'cancel-manager', 'cancel' => '/annuler',
+            default => '/' . $intent,
+        };
+    }
+
+    /**
+     * Legacy programmatic CSRF resolver — only works if the session is open.
+     * Kept for tests that submit to routes whose form is on a separate page
+     * (e.g. CSRF on `/mes-conges/{id}/annuler` rendered from `/mes-conges`).
      */
     protected function generateCsrfToken(string $id): string
     {
@@ -126,7 +192,7 @@ trait VacationFunctionalTrait
         /** @var RequestVacationHandler $handler */
         $handler = static::getContainer()->get(RequestVacationHandler::class);
 
-        ($handler)(new RequestVacationCommand(
+        $vacationId = ($handler)(new RequestVacationCommand(
             contributorId: $contributor->getId(),
             startDate: new DateTimeImmutable(sprintf('+%d days', $startInDays)),
             endDate: new DateTimeImmutable(sprintf('+%d days', $startInDays + $durationDays)),
@@ -135,11 +201,21 @@ trait VacationFunctionalTrait
             reason: $reason,
         ));
 
-        /** @var VacationRepositoryInterface $repo */
-        $repo = static::getContainer()->get(VacationRepositoryInterface::class);
-        $vacations = $repo->findByContributor($contributor);
+        // Bypass the repository (which applies a company-context filter)
+        // because the test may create a vacation for a contributor in a
+        // *different* company than the currently authenticated one. Use the
+        // EntityManager directly so the filter is not applied.
+        $em = $this->getEntityManager();
+        $vacation = $em->find(Vacation::class, $vacationId);
 
-        return end($vacations);
+        if ($vacation === null) {
+            throw new \RuntimeException(sprintf(
+                'Just-created Vacation %s could not be re-fetched',
+                $vacationId->getValue(),
+            ));
+        }
+
+        return $vacation;
     }
 
     /**

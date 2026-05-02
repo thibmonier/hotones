@@ -54,18 +54,18 @@ final class CancelNotificationFlowTest extends WebTestCase
     {
         $vacationId = $this->submitAsEmployee();
 
-        // Manager approves first
+        // Manager approves first.
         $this->loginAs($this->manager->getUser());
         $this->client->request('POST', '/manager/conges/'.$vacationId.'/approuver', [
-            '_token' => $this->generateCsrfToken('approve'.$vacationId),
+            '_token' => $this->csrfTokenFromForm('approve', $vacationId, '/manager/conges/'.$vacationId),
         ]);
 
-        // Reset emails captured during approve (out of scope here)
+        // Reset emails captured during approve (out of scope here).
         $this->client->getProfile();
 
-        // Manager cancels the approved vacation -> TECH-DEBT-001 path
+        // Manager cancels the approved vacation -> TECH-DEBT-001 path.
         $this->client->request('POST', '/manager/conges/'.$vacationId.'/annuler', [
-            '_token' => $this->generateCsrfToken('cancel-manager'.$vacationId),
+            '_token' => $this->csrfTokenFromForm('cancel-manager', $vacationId, '/manager/conges/'.$vacationId),
         ]);
 
         self::assertResponseRedirects('/manager/conges');
@@ -77,8 +77,11 @@ final class CancelNotificationFlowTest extends WebTestCase
         self::assertNotNull($found);
         self::assertSame(VacationStatus::CANCELLED, $found->getStatus());
 
-        // Email assertion: intervenant must have received "annulee par votre manager"
-        self::assertEmailCount(2); // 1 vacation_created (manager) + 1 vacation_cancelled_by_manager (intervenant)
+        // assertEmailCount inspects only the *last* request — here the
+        // cancel POST. The vacation_created and vacation_approved emails
+        // were captured on prior requests and live in `getMailerMessages()`
+        // (cumulative), but not in `getMailerEvents()` for this request.
+        self::assertEmailCount(1);
         $email = $this->findMailerMessageWithSubject('Votre demande de conge a ete annulee par votre manager');
         self::assertNotNull($email, 'Expected the contributor to receive a cancellation email');
         self::assertSame('cancel-employee@test.com', $email->getTo()[0]->getAddress());
@@ -88,10 +91,10 @@ final class CancelNotificationFlowTest extends WebTestCase
     {
         $vacationId = $this->submitAsEmployee();
 
-        // Intervenant cancels their own PENDING request
+        // Intervenant cancels their own PENDING request.
         $this->loginAs($this->employee->getUser());
         $this->client->request('POST', '/mes-conges/'.$vacationId.'/annuler', [
-            '_token' => $this->generateCsrfToken('cancel'.$vacationId),
+            '_token' => $this->csrfTokenFromForm('cancel', $vacationId, '/mes-conges/'.$vacationId),
         ]);
 
         self::assertResponseRedirects('/mes-conges');

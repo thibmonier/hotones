@@ -1,3 +1,11 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        # Default From header for every outgoing email when the sender omits
+        # one explicitly. Without this, the SendEmailMessage handler aborts
+        # with "An email must have a From or Sender header" on senders that
+        # rely on the framework default (e.g. VacationNotificationHandler).
+        envelope:
+            sender: '%env(MAIL_FROM_ADDRESS)%'
+        headers:
+            From: '%env(MAIL_FROM_NAME)% <%env(MAIL_FROM_ADDRESS)%>'
