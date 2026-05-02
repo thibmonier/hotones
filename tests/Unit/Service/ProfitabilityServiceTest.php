@@ -16,8 +16,10 @@ use App\Entity\Timesheet;
 use App\Service\ProfitabilityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ProfitabilityServiceTest extends TestCase
 {
     private function createProjectWithRevenueAndCosts(): Project

@@ -8,6 +8,7 @@ use App\Application\Vacation\Query\CountApprovedDays\CountApprovedDaysHandler;
 use App\Application\Vacation\Query\CountApprovedDays\CountApprovedDaysQuery;
 use App\Domain\Vacation\Repository\VacationRepositoryInterface;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
  * Pure thin-shim test : assert the query parameters reach the repository
  * verbatim and the float total is forwarded back to the caller.
  */
+#[AllowMockObjectsWithoutExpectations]
 final class CountApprovedDaysHandlerTest extends TestCase
 {
     private VacationRepositoryInterface&MockObject $repository;
