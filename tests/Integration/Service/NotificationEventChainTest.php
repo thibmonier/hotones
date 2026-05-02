@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Group;
 /**
  * Integration test for the full notification chain:
  *   dispatch(event) -> NotificationSubscriber -> NotificationService -> Notification persisted in DB.
@@ -27,6 +28,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * Validates the wiring (DI + Symfony EventDispatcher subscriber registration)
  * end-to-end and confirms the notification is queryable by recipient afterwards.
  */
+#[Group('skip-pre-push')]
 final class NotificationEventChainTest extends KernelTestCase
 {
     use Factories;

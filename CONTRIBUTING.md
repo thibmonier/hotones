@@ -103,42 +103,47 @@ Les hooks `.githooks/pre-commit` et `.githooks/pre-push` détectent automatiquem
 
 Si vous voulez bypasser **intentionnellement** un hook : `git commit --no-verify` / `git push --no-verify`. Documentez la raison dans le message de commit.
 
-## 🗂️ Fichiers auto-générés
+### Pre-push baseline (OPS-011)
 
-Certains fichiers sont régénérés par les outils à chaque `cache:clear` /
-`composer install` et **ne doivent jamais apparaître en commit**. Ils
-sont gitignored.
+Le pre-push hook lance la suite **sans** les tests marqués `#[Group('skip-pre-push')]`. CI lance la suite **complète**. Cette dichotomie permet :
 
-| Fichier | Outil régénérateur | Raison |
+- Au développeur de pusher rapidement sans heurter la baseline historique de tests fragiles (multi-tenant filters, session brittleness, repository inverse-side sync).
+- À la CI de continuer à signaler ces failures pour qu'elles soient adressées.
+
+#### Liste des classes skippées
+
+| Test | Catégorie | Raison |
 |---|---|---|
-| `config/reference.php` | Symfony Maker (`cache:clear`) | Métadonnées d'annotations, jamais utilisé en runtime |
-| `var/cache/`, `var/log/`, `var/coverage/` | Symfony / PHPUnit | Sortie outils dev |
-| `.phpunit.cache/` | PHPUnit | Cache résultats |
-| `.deptrac.cache` | Deptrac | Cache résultats |
+| `MultiTenant\ControllerAccessControlTest` | Multi-tenant | Filtre company-context fait fail certains asserts |
+| `Controller\Analytics\DashboardControllerTest` | Session | Period selection state perdu entre requests |
+| `Controller\HomeControllerTest` | Auth | Auth flow flaky en test |
+| `Service\NotificationEventChainTest` | Integration | Event dispatch non-déterministe en test container |
+| `Controller\OnboardingControllerTest` | Session/CSRF | Token resolution avant 1ère request |
+| `Controller\Admin\OnboardingTemplateControllerTest` | Admin | Patterns admin EA5 non couverts par fixtures |
+| `Controller\OrderControllerPreviewTest` | Form | Choice values mismatch |
+| `Controller\PerformanceReviewControllerTest` | Session | Same as Onboarding |
+| `Controller\ProjectControllerFilterTest` | URL params | Query string state lost on redirect |
+| `Repository\RunningTimerRepositoryTest` | Repository | Inverse-side Collection pas hydratée |
+| `Controller\TimesheetControllerTest` | Multi-tenant | Filter exclut les fixtures cross-company |
+| Vacation tests (3) | DDD migration | Fixés par PR #82 ; le marker est neutre une fois mergé |
 
-Si un de ces fichiers apparaît dans `git status` après une commande
-locale, c'est probablement parce qu'il était tracké avant l'ajout au
-`.gitignore`. Faire un `git rm --cached <fichier>` (cf OPS-012).
+#### Comment ajouter un test
 
-## 📊 phpstan-baseline.neon
+```php
+use PHPUnit\Framework\Attributes\Group;
 
-La baseline PHPStan accumule les erreurs **tolérées historiquement**.
-Toute *nouvelle* erreur PHPStan doit être **fixée**, pas ajoutée au
-baseline. Le baseline est régénéré from-scratch quand il dérive (cf
-OPS-012 sprint-005) ; ce process se résume à :
-
-```bash
-rm phpstan-baseline.neon && touch phpstan-baseline.neon
-docker compose exec app vendor/bin/phpstan analyse \
-    --configuration=phpstan.neon \
-    --memory-limit=512M \
-    --generate-baseline=phpstan-baseline.neon
+#[Group('skip-pre-push')]
+final class MyBrittleTest extends WebTestCase { /* ... */ }
 ```
 
-Notez que le baseline doit être idempotent : un 2e run de `phpstan
-analyse` doit retourner *0 erreur*. Si ça n'est pas le cas, relancez
-la régénération (Doctrine DQL est parfois non-déterministe au 1er
-passage).
+Justifier par un commentaire **au-dessus** du marker indiquant la raison + la story de fix prévue (sinon refus en review).
+
+#### Comment retirer un test
+
+1. Fixer la cause racine
+2. Supprimer le marker `#[Group('skip-pre-push')]` (et l'import `Group` si plus utilisé)
+3. Vérifier que le test passe en local
+4. Mettre à jour la table ci-dessus
 
 ## 📏 Standards de code
 

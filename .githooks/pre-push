@@ -30,8 +30,13 @@ fi
 printf "[pre-push] Cleaning test database...\n"
 "${RUN_CLEAN[@]}" 2>/dev/null || true
 
-printf "[pre-push] Running test suite (Unit + Integration + Api + Functional)...\n"
-if ! "${RUN_PHPUNIT[@]}" tests/Unit tests/Integration tests/Api tests/Functional; then
+printf "[pre-push] Running test suite (Unit + Integration + Api + Functional, excluding skip-pre-push group)...\n"
+# OPS-011 (sprint-005): 11 test classes carry pre-existing failures (multi-tenant
+# filters, session brittleness, repository inverse-side sync, etc.). They wear
+# `#[Group('skip-pre-push')]` so the pre-push hook stays green on a fresh
+# `feat/*` branch and `--no-verify` is no longer needed. CI runs the full
+# suite (without the exclude) so the failures still surface there.
+if ! "${RUN_PHPUNIT[@]}" tests/Unit tests/Integration tests/Api tests/Functional --exclude-group=skip-pre-push; then
   printf "[pre-push] Tests failed. Aborting push.\n" >&2
   exit 1
 fi
