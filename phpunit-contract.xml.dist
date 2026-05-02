@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    TEST-CONNECTORS-CONTRACT-001 — phpunit configuration for live contract
+    tests against external sandboxes (BoondManager, HubSpot).
+
+    Usage:
+      composer test-contract
+      phpunit -c phpunit-contract.xml.dist
+
+    The default suite (phpunit.xml.dist) excludes the "contract" group, so
+    these tests do NOT run on every developer push or in the standard CI
+    pipeline. They are triggered only here, or via the weekly cron in
+    .github/workflows/contract-tests.yml.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         bootstrap="tests/bootstrap.php"
+>
+    <php>
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
+        <ini name="memory_limit" value="512M" />
+        <server name="APP_ENV" value="test" force="true" />
+        <server name="SHELL_VERBOSITY" value="-1" />
+    </php>
+
+    <testsuites>
+        <testsuite name="contract">
+            <directory>tests/Contract</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
+
+    <groups>
+        <include>
+            <group>contract</group>
+        </include>
+    </groups>
+</phpunit>
