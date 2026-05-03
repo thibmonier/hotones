@@ -362,6 +362,7 @@ Votre PR doit :
 5. ✅ **Avoir une description claire** du problème résolu et de la solution
 6. ✅ **Référencer les Issues** associées (`Closes #123`, `Fixes #456`)
 7. ✅ **Respecter la taille maximale** : voir section ci-dessous
+8. ✅ **Si workflow gated** : section "Workflow gated" du `PULL_REQUEST_TEMPLATE.md` cochée — secrets/vars provisionnés AVANT merge (politique OPS-015).
 
 ### Taille de Pull Request — politique <400 lignes
 

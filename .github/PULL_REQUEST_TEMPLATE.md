@@ -63,6 +63,28 @@
 - [ ] Pas de requêtes N+1 introduites
 - [ ] Pas de memory leaks introduits
 
+### Workflow gated (OPS-015 — si applicable)
+
+<!--
+Cocher uniquement si la PR ajoute / modifie un workflow GitHub Actions
+gated par `vars.X_ENABLED` ou nécessitant un nouveau `secrets.Y`.
+Sprint-005 a vu plusieurs PRs mergées avec workflows skipped en silence
+faute de provisioning.
+-->
+
+- [ ] N/A — la PR n'ajoute pas de workflow gated.
+- [ ] Variables / secrets provisionnés sur le repo **AVANT** merge (`Settings → Secrets and variables → Actions`)
+- [ ] OU déficience documentée : le workflow restera dormant jusqu'au provisioning ops, et c'est acceptable parce que :
+
+      <!-- expliquer pourquoi : ex. workflow non critique, secret payant, etc. -->
+
+- [ ] Test manuel `workflow_dispatch` planifié post-merge (mentionner dans la todo)
+
+### Quota PR (OPS-013)
+
+- [ ] J'ai au plus 4 PRs en review active simultanément (cf. `CONTRIBUTING.md`).
+- [ ] Si > 4 : cette PR est ouverte en `draft`, j'ai noté quelle PR de mon stack je vais undraft en premier.
+
 ## Comment tester
 
 <!-- Instructions pour tester les changements -->
