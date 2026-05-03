@@ -6,10 +6,8 @@ namespace App\Tests\Unit\Service;
 
 use App\Entity\Project;
 use App\Service\ProfitabilityPredictor;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
-#[AllowMockObjectsWithoutExpectations]
 class ProfitabilityPredictorTest extends TestCase
 {
     private ProfitabilityPredictor $service;
@@ -21,7 +19,7 @@ class ProfitabilityPredictorTest extends TestCase
 
     public function testPredictProfitabilityReturnsFalseWhenProgressLessThan30Percent(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getGlobalProgress')->willReturn('25');
 
         $result = $this->service->predictProfitability($project);
@@ -33,7 +31,7 @@ class ProfitabilityPredictorTest extends TestCase
 
     public function testPredictProfitabilityReturnsFalseWhenInsufficientData(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getGlobalProgress')->willReturn('50');
         $project->method('getTotalSoldAmount')->willReturn('0'); // Missing CA
         $project->method('getTotalTasksSoldHours')->willReturn('100');
@@ -47,7 +45,7 @@ class ProfitabilityPredictorTest extends TestCase
 
     public function testPredictProfitabilityReturnsValidPredictionWhenSufficientData(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getGlobalProgress')->willReturn('50');
         $project->method('getTotalSoldAmount')->willReturn('100000');
         $project->method('getTotalTasksSoldHours')->willReturn('700'); // 100 days * 7h
@@ -81,7 +79,7 @@ class ProfitabilityPredictorTest extends TestCase
 
     public function testPredictProfitabilityDetectsBudgetOverrun(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getGlobalProgress')->willReturn('40');
         $project->method('getTotalSoldAmount')->willReturn('50000');
         $project->method('getTotalTasksSoldHours')->willReturn('350'); // 50 days * 7h
@@ -101,7 +99,7 @@ class ProfitabilityPredictorTest extends TestCase
 
     public function testPredictProfitabilityGeneratesScenarios(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getGlobalProgress')->willReturn('60');
         $project->method('getTotalSoldAmount')->willReturn('100000');
         $project->method('getTotalTasksSoldHours')->willReturn('700');
@@ -129,7 +127,7 @@ class ProfitabilityPredictorTest extends TestCase
 
     public function testPredictProfitabilityGeneratesRecommendationsForLowMargin(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getGlobalProgress')->willReturn('50');
         $project->method('getTotalSoldAmount')->willReturn('30000'); // Low revenue
         $project->method('getTotalTasksSoldHours')->willReturn('350'); // 50 days
@@ -152,7 +150,7 @@ class ProfitabilityPredictorTest extends TestCase
 
     public function testPredictProfitabilityOptimisticScenarioIsBetterThanPessimistic(): void
     {
-        $project = $this->createMock(Project::class);
+        $project = $this->createStub(Project::class);
         $project->method('getGlobalProgress')->willReturn('40');
         $project->method('getTotalSoldAmount')->willReturn('80000');
         $project->method('getTotalTasksSoldHours')->willReturn('560');

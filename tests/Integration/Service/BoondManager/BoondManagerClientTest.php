@@ -7,7 +7,6 @@ namespace App\Tests\Integration\Service\BoondManager;
 use App\Entity\BoondManagerSettings;
 use App\Service\BoondManager\BoondManagerClient;
 use DateTimeImmutable;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -28,7 +27,6 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  *   - the pagination loop (`hasMore` flag) for getTimes/getResources/getProjects
  *   - the not-found path for getResource/getProject
  */
-#[AllowMockObjectsWithoutExpectations]
 final class BoondManagerClientTest extends TestCase
 {
     private const BASE_URL = 'https://example.boondmanager.com';

@@ -16,10 +16,8 @@ use App\Entity\Timesheet;
 use App\Service\ProfitabilityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
-#[AllowMockObjectsWithoutExpectations]
 class ProfitabilityServiceTest extends TestCase
 {
     private function createProjectWithRevenueAndCosts(): Project
@@ -94,7 +92,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateProjectProfitabilityForExternalProject(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = $this->createProjectWithRevenueAndCosts();
@@ -120,7 +118,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateProjectProfitabilityForInternalProject(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = new Project()
@@ -157,7 +155,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateProjectProfitabilityWithContingency(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = new Project()->setName('Test Project');
@@ -194,7 +192,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateProjectProfitabilityWithNonBillableTasks(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = new Project()->setName('Test Project');
@@ -254,7 +252,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateGlobalKPIsExcludesInternalProjects(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         // External project with revenue
@@ -294,7 +292,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCalculateGlobalKPIsWithZeroRevenue(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
         $projects = [];
         $result = $service->calculateGlobalKPIs($projects);
@@ -307,7 +305,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testCompareProjectForecastVsRealizedOverrun(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = new Project()->setName('Test Project');
@@ -370,7 +368,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testGenerateProfitabilityAlertsNegativeMargin(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = new Project()->setName('Test Project');
@@ -433,7 +431,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testFormatProfitabilityForDisplay(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $profitability = [
@@ -459,7 +457,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testBuildBudgetDonut(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = $this->createProjectWithRevenueAndCosts();
@@ -476,7 +474,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testMultipleOrdersCalculation(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = new Project()->setName('Multi-order Project');
@@ -528,7 +526,7 @@ class ProfitabilityServiceTest extends TestCase
 
     public function testOrderStatusFiltering(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $service = new ProfitabilityService($em);
 
         $project = new Project()->setName('Test Project');
