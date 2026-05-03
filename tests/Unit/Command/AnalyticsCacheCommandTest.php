@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Command;
 
 use App\Command\AnalyticsCacheCommand;
 use App\Service\AnalyticsCacheService;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -14,23 +14,31 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * Unit tests for AnalyticsCacheCommand.
  */
-#[AllowMockObjectsWithoutExpectations]
 class AnalyticsCacheCommandTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $cacheService;
     private AnalyticsCacheCommand $command;
     private CommandTester $commandTester;
 
-    protected function setUp(): void
+    /**
+     * Create a fresh command bound to a new mock and store both for the test
+     * to set expectations on. Called per-test (instead of setUp) so that tests
+     * that don't need the mock can skip its creation entirely (PHPUnit 13
+     * notice-free).
+     */
+    private function buildCommand(): MockObject
     {
-        $this->cacheService = $this->createMock(AnalyticsCacheService::class);
-        $this->command = new AnalyticsCacheCommand($this->cacheService);
+        /** @var AnalyticsCacheService&MockObject $cacheService */
+        $cacheService = $this->createMock(AnalyticsCacheService::class);
+        $this->command = new AnalyticsCacheCommand($cacheService);
         $this->commandTester = new CommandTester($this->command);
+
+        return $cacheService;
     }
 
     public function testExecuteWithClearOption(): void
     {
-        $this->cacheService->expects($this->once())->method('invalidateAll');
+        $cacheService = $this->buildCommand();
+        $cacheService->expects($this->once())->method('invalidateAll');
 
         $exitCode = $this->commandTester->execute([
             '--clear' => true,
@@ -45,7 +53,8 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithWarmupOption(): void
     {
-        $this->cacheService
+        $cacheService = $this->buildCommand();
+        $cacheService
             ->expects($this->once())
             ->method('warmup')
             ->with($this->isArray());
@@ -63,9 +72,9 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithBothOptions(): void
     {
-        $this->cacheService->expects($this->once())->method('invalidateAll');
-
-        $this->cacheService->expects($this->once())->method('warmup');
+        $cacheService = $this->buildCommand();
+        $cacheService->expects($this->once())->method('invalidateAll');
+        $cacheService->expects($this->once())->method('warmup');
 
         $exitCode = $this->commandTester->execute([
             '--clear' => true,
@@ -81,9 +90,9 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithNoOptionsShowsUsage(): void
     {
-        $this->cacheService->expects($this->never())->method('invalidateAll');
-
-        $this->cacheService->expects($this->never())->method('warmup');
+        $cacheService = $this->buildCommand();
+        $cacheService->expects($this->never())->method('invalidateAll');
+        $cacheService->expects($this->never())->method('warmup');
 
         $exitCode = $this->commandTester->execute([]);
 
@@ -98,7 +107,10 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteReturnsSuccess(): void
     {
-        $this->cacheService->method('invalidateAll');
+        // Pure-stub test: no expectation, just verify exit code.
+        $cacheService = $this->createStub(AnalyticsCacheService::class);
+        $this->command = new AnalyticsCacheCommand($cacheService);
+        $this->commandTester = new CommandTester($this->command);
 
         $exitCode = $this->commandTester->execute(['--clear' => true]);
 
@@ -108,6 +120,10 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testConfigureDefinesOptions(): void
     {
+        // Configuration test: no service interaction, use a stub.
+        $cacheService = $this->createStub(AnalyticsCacheService::class);
+        $this->command = new AnalyticsCacheCommand($cacheService);
+
         $definition = $this->command->getDefinition();
 
         $this->assertTrue($definition->hasOption('clear'));
@@ -124,7 +140,8 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithClearShortOption(): void
     {
-        $this->cacheService->expects($this->once())->method('invalidateAll');
+        $cacheService = $this->buildCommand();
+        $cacheService->expects($this->once())->method('invalidateAll');
 
         $this->commandTester->execute(['-c' => true]);
 
@@ -134,7 +151,8 @@ class AnalyticsCacheCommandTest extends TestCase
 
     public function testExecuteWithWarmupShortOption(): void
     {
-        $this->cacheService->expects($this->once())->method('warmup');
+        $cacheService = $this->buildCommand();
+        $cacheService->expects($this->once())->method('warmup');
 
         $this->commandTester->execute(['-w' => true]);
 
@@ -146,7 +164,8 @@ class AnalyticsCacheCommandTest extends TestCase
     {
         $capturedMetrics = null;
 
-        $this->cacheService
+        $cacheService = $this->buildCommand();
+        $cacheService
             ->expects($this->once())
             ->method('warmup')
             ->willReturnCallback(function ($metrics) use (&$capturedMetrics): void {
