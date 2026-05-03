@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
+# OPS-014 (sprint-006) — fail-fast sur fichiers auto-générés.
+# Doit tourner AVANT cs-fixer/api-tests pour que la friction soit minimale
+# (pas la peine de run un cs-fixer si on va rejeter le commit pour fichier
+# auto-généré).
+"$(dirname "$0")/pre-commit-autogenfiles.sh"
+
 # OPS-005 (sprint-003) — fallback sans Docker daemon
 #
 # Detection order:

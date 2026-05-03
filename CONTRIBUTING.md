@@ -103,6 +103,35 @@ Les hooks `.githooks/pre-commit` et `.githooks/pre-push` détectent automatiquem
 
 Si vous voulez bypasser **intentionnellement** un hook : `git commit --no-verify` / `git push --no-verify`. Documentez la raison dans le message de commit.
 
+### Pre-commit fichiers auto-générés (OPS-014)
+
+Le hook `pre-commit` rejette systématiquement les fichiers auto-générés stagés.
+Sprint-005 a vu `config/reference.php` polluer les diffs avant qu'OPS-012 le
+gitignore ; ce hook agit comme garde-fou en amont.
+
+Patterns refusés :
+
+| Pattern | Régénéré par |
+|---|---|
+| `config/reference.php` | Symfony Maker (introspection config) |
+| `var/cache/**` | Symfony cache:warmup |
+| `var/log/**` | Symfony logs runtime |
+| `.phpunit.cache` | PHPUnit 13 result cache |
+| `.deptrac.cache` | Deptrac analyze |
+| `.php-cs-fixer.cache` | CS-Fixer cache |
+
+Si le hook se déclenche :
+
+1. **Tracké à tort** (ajouté avant le `.gitignore`) :
+   ```bash
+   git rm --cached <fichier>
+   git commit -m "chore: untrack auto-generated <fichier>"
+   ```
+2. **Modification volontaire** (rare) : `git commit --no-verify` avec justification dans le message.
+
+Le check tourne **avant** php-cs-fixer pour fail-fast. Implémentation :
+`.githooks/pre-commit-autogenfiles.sh`.
+
 ### Pre-push baseline (OPS-011)
 
 Le pre-push hook lance la suite **sans** les tests marqués `#[Group('skip-pre-push')]`. CI lance la suite **complète**. Cette dichotomie permet :
