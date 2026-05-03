@@ -6,7 +6,6 @@ namespace App\Tests\Integration\Service\HubSpot;
 
 use App\Entity\HubSpotSettings;
 use App\Service\HubSpot\HubSpotClient;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -26,7 +25,6 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  *   - testConnection: 200 vs non-200
  *   - getAccountInfo: returns null on exception
  */
-#[AllowMockObjectsWithoutExpectations]
 final class HubSpotClientTest extends TestCase
 {
     public function testConnectionReturnsTrueWhenContactsEndpointIs200(): void
