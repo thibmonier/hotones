@@ -76,6 +76,8 @@
     <groups>
         <exclude>
             <group>e2e</group>
+            <!-- TEST-CONNECTORS-CONTRACT-001: live API contract tests run via composer test-contract -->
+            <group>contract</group>
         </exclude>
     </groups>
 

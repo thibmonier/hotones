@@ -1,0 +1,141 @@
+name: Contract Tests
+
+# TEST-CONNECTORS-CONTRACT-001 (sprint-005) — weekly cron that runs the live
+# contract tests against the BoondManager + HubSpot sandboxes.
+#
+# Detects upstream API drift (response shape change, auth break, endpoint
+# rename) before it surfaces in production sync errors.
+#
+# Gating: the job only runs when the repo variable CONTRACT_TESTS_ENABLED is
+# set to "true". This lets the workflow ship with the codebase but stay dormant
+# until sandboxes + secrets are provisioned (see
+# docs/04-development/contract-tests.md).
+#
+# Failure handling: opens a GitHub issue with label `contract-failure`. If one
+# is already open, comments on it. Auto-closes when a subsequent run is green.
+#
+# All inputs to `run:` blocks come from trusted sources (github.token,
+# github.run_id, secrets.*, vars.*). No user-controlled input is interpolated.
+
+on:
+  schedule:
+    # Lundi 04:23 UTC — heure creuse, hors fenêtres de maintenance Boond/HubSpot.
+    - cron: '23 4 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: contract-tests
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    name: Run live contract tests
+    runs-on: ubuntu-latest
+    if: ${{ vars.CONTRACT_TESTS_ENABLED == 'true' }}
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      # Boond sandbox (basic auth)
+      BOOND_SANDBOX_BASE_URL: ${{ secrets.BOOND_SANDBOX_BASE_URL }}
+      BOOND_SANDBOX_USERNAME: ${{ secrets.BOOND_SANDBOX_USERNAME }}
+      BOOND_SANDBOX_PASSWORD: ${{ secrets.BOOND_SANDBOX_PASSWORD }}
+      # HubSpot Developer test account private app token
+      HUBSPOT_SANDBOX_TOKEN: ${{ secrets.HUBSPOT_SANDBOX_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, pdo_sqlite, bcmath, redis
+          coverage: none
+          tools: composer
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        env:
+          APP_ENV: test
+          DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
+        run: composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run contract tests
+        id: contract
+        env:
+          APP_ENV: test
+        run: composer test-contract 2>&1 | tee /tmp/contract.log
+
+      - name: Compose failure issue body
+        if: failure()
+        run: |
+          {
+            echo "## Contract tests KO"
+            echo
+            echo "Le run hebdomadaire des contract tests sandbox a échoué."
+            echo
+            echo "- Run : ${RUN_URL}"
+            echo
+            echo "## Sortie phpunit"
+            echo
+            echo '```'
+            tail -n 120 /tmp/contract.log 2>/dev/null || echo '(log non disponible)'
+            echo '```'
+            echo
+            echo "## Pistes"
+            echo
+            echo "- Sandbox Boond/HubSpot temporairement indisponible : relancer manuellement le workflow."
+            echo "- Credential expiré : régénérer le token + mettre à jour le secret."
+            echo "- API contract a changé : adapter le client dans \`src/Service/...\` puis relancer."
+            echo
+            echo "_Auto-ouvert par TEST-CONNECTORS-CONTRACT-001. Cette issue se ferme automatiquement quand le prochain run passe._"
+          } > /tmp/issue-body.md
+
+      - name: Open or update incident issue
+        if: failure()
+        run: |
+          set -euo pipefail
+          existing="$(
+            gh issue list \
+              --state open \
+              --label contract-failure \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+
+          if [[ -z "${existing:-}" ]]; then
+            gh issue create \
+              --title "Contract tests KO" \
+              --label contract-failure,ops \
+              --body-file /tmp/issue-body.md
+          else
+            gh issue comment "${existing}" --body-file /tmp/issue-body.md
+          fi
+
+      - name: Auto-close contract-failure incidents on success
+        if: success()
+        run: |
+          set -euo pipefail
+          for issue in $(gh issue list --state open --label contract-failure --json number --jq '.[].number'); do
+            gh issue comment "${issue}" --body "✅ Contract tests OK (run ${RUN_URL}). Auto-fermeture par TEST-CONNECTORS-CONTRACT-001."
+            gh issue close "${issue}" --reason completed
+          done

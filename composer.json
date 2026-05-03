@@ -210,6 +210,7 @@
         "test-api": "phpunit --testsuite api",
         "test-security": "phpunit --testsuite security",
         "test-e2e": "phpunit --testsuite e2e",
+        "test-contract": "phpunit -c phpunit-contract.xml.dist",
         "infection": "infection --threads=4 --min-msi=70 --min-covered-msi=80 --show-mutations --no-interaction",
         "infection-ci": "infection --threads=max --min-msi=70 --min-covered-msi=80 --logger-github --no-interaction",
         "infection-debug": "infection --threads=1 --min-msi=70 --min-covered-msi=80 --show-mutations --debug",
