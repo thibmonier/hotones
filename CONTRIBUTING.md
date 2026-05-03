@@ -320,6 +320,9 @@ class Resource
    git push origin feat/ma-nouvelle-feature
    ```
 5. **Ouvrez une Pull Request** vers `main`
+   - ⚠️ Vérifier le quota : max **4 PRs en review active** par développeur
+     (voir [PRs ouvertes simultanées](#prs-ouvertes-simultanées--quota-par-développeur)).
+     Au-delà → ouvrir en draft.
 
 ### Conventions de commits
 
@@ -477,6 +480,37 @@ bien `main` avant de mergrer.
 
 **Référence** : sprint-002 stack #32 → #39 → #40 → #43, sprint-003 stack
 #50 → #54, #56 → #57, #66 → #67. Action retro sprint-003 #1.
+
+### PRs ouvertes simultanées — quota par développeur
+
+Pour garder la file de review humaine viable, **chaque développeur ne doit
+pas avoir plus de 4 PRs en review active simultanément**.
+
+Au-delà :
+
+- Mettre les PRs supplémentaires en **draft** (`gh pr create --draft` ou
+  `gh pr ready --undo` sur une PR existante).
+- Sortir du draft uniquement quand l'une des PRs en review est mergée.
+
+**Pourquoi 4** :
+
+- 4 = nombre raisonnable pour un reviewer humain à garder en tête sans
+  perdre le contexte.
+- Sprint-004 a tenté 10 PRs en parallèle : file de review ingérable,
+  certaines PRs ont attendu plusieurs jours faute de bande passante.
+
+**Exception : stack PR**. Les PRs d'une même chaîne (cf section ci-dessus)
+comptent pour **1 seule** dans le quota — le reviewer descend la stack en
+une session, donc le coût cognitif est partagé.
+
+**Vérifier son quota courant** :
+
+```bash
+gh pr list --author=@me --state=open --json number,title,isDraft \
+  --jq '.[] | select(.isDraft|not) | "#\(.number) \(.title)"'
+```
+
+**Référence** : retro sprint-004 action #4. Story OPS-013 (sprint-005).
 
 **Template de PR** :
 

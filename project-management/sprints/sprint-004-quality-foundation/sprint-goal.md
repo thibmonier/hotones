@@ -58,7 +58,7 @@ Sprint-004 absorbe les 2 categories en parallele : un cluster TEST-006..009 sur 
 | OPS-007 | Stacked PR merge procedure (CONTRIBUTING.md + script aide) | 2 | Must | retro sprint-003 action 1 |
 | OPS-008 | Auto-comment CI rouge sur PR (extension OPS-004) | 3 | Should | retro sprint-003 action 2 |
 | OPS-009 | Smoke test staging automatique post-deploy | 3 | Should | retro sprint-003 action 3 |
-| OPS-010 | Review + merge cascade des 4 majors PRs ouverts (#65 #66 #67 #68) | 2 | Must | sprint-003 J1 carry-over |
+| ~~OPS-010~~ | ~~Review + merge cascade des 4 majors PRs ouverts (#65 #66 #67 #68)~~ | ~~2~~ | ~~Must~~ | retiré (cf. REFACTOR-002) |
 
 ### Cluster Dependances (livre en avance pendant sprint-003 J1)
 
@@ -175,3 +175,19 @@ Chaque story :
 | #57 | US-071 | #56 |
 
 **Ordre recommandé** : #50 → #54 (cs-fixer cascade) ; #56 → #57 (staging) ; les autres en parallèle.
+
+## OPS-010 — décision finale (sprint-005 / REFACTOR-002)
+
+**Statut** : ❌ Retiré sans implémentation.
+
+**Origine** : story réinjectée en sprint-004 PR #69 (2 pts, "review + merge cascade des 4 majors PRs ouverts") pour réutiliser les pts libérés par DEPS-001/2/3 livrés en sprint-003 J1.
+
+**Constat sprint-005 J-2** : pendant le status check sprint-004, l'utilisateur a indiqué que rien n'avait été fait sur OPS-010 et que le scope était flou — la "cascade" se résumait à merger 4 PRs déjà ouvertes, ce que la procédure stacked-PR (`docs/04-development/stacked-prs.md`) couvre déjà à plat.
+
+**Décision REFACTOR-002 (sprint-005)** : Option A — supprimer.
+
+- Sans définition claire au-delà du fait de "merger 4 PRs", autant ne pas accumuler de dette de scope.
+- Les 4 PRs majors d'origine (#65 #66 #67 #68) ont été mergées en sprint-004 J1 par le pipeline stacked-PR habituel.
+- Si un besoin "review cascade" formel réémerge, il sera ré-instruit comme nouvelle story plutôt que ressuscité depuis ce backlog.
+
+**Pts** : 2 pts non comptabilisés au livré sprint-004 (déjà documenté dans la review sprint-004).
