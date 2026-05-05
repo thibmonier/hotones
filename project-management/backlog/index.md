@@ -1,6 +1,6 @@
 # Backlog Index
 
-> Dernière mise à jour: $(date +%Y-%m-%d)
+> Dernière mise à jour: 2026-05-05
 
 ---
 
@@ -8,9 +8,11 @@
 
 | Type | 🔴 To Do | 🟡 In Progress | ⏸️ Blocked | 🟢 Done | Total |
 |------|----------|----------------|------------|---------|-------|
-| EPICs | 0 | 0 | 0 | 0 | 0 |
-| User Stories | 0 | 0 | 0 | 0 | 0 |
+| EPICs | 1 | 0 | 0 | 0 | 1 |
+| User Stories | 85 | 0 | 0 | 0 | 85 |
 | Tasks | 0 | 0 | 0 | 0 | 0 |
+
+> Stories: voir détail par module dans `backlog/user-stories/INDEX.md` (85 stories US-001..US-086, 391 pts, 1 fusionnée US-077).
 
 ---
 
@@ -18,7 +20,7 @@
 
 | ID | Nom | Statut | Priorité | US | Progression |
 |----|-----|--------|----------|-----|-------------|
-| - | Aucun EPIC créé | - | - | - | - |
+| [EPIC-001](epics/EPIC-001-migration-clean-architecture-ddd.md) | Migration vers Clean Architecture + DDD | 🔴 To Do | High | 0/13 | 0% |
 
 ---
 
