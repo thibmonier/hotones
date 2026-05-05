@@ -185,4 +185,96 @@ class WorkloadPredictionServiceTest extends TestCase
 
         $this->assertIsArray($result['workloadByMonth']);
     }
+
+    // -----------------------------------------------------------------
+    // T-TC1-02b coverage push
+    // -----------------------------------------------------------------
+
+    public function testAnalyzePipelineIncludeConfirmedFlagFetchesConfirmedOrders(): void
+    {
+        $orderRepository = $this->createMock(OrderRepository::class);
+        $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        // includeConfirmed=true → service queries both confirmed statuses + pending.
+        $orderRepository->expects($this->exactly(2))
+            ->method('findBy')
+            ->willReturnOnConsecutiveCalls([], []);
+
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
+        $result = $service->analyzePipeline([], [], true);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('pipeline', $result);
+    }
+
+    public function testAnalyzePipelineAppliesAgePenaltyOnOldOrder(): void
+    {
+        $orderRepository = $this->createMock(OrderRepository::class);
+        $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $profile = new Profile();
+        $profile->setName('Senior Dev');
+
+        $line = new OrderLine();
+        $line->setDays('5');
+        $line->setDailyRate('500');
+        $line->setProfile($profile);
+
+        $section = new OrderSection();
+        $section->setTitle('Phase 1');
+        $section->addLine($line);
+
+        // Order is 90 days old → -20 probability penalty branch (daysOld > 60).
+        $order = new Order();
+        $order->setOrderNumber('OLD-2025-001');
+        $order->setStatus('a_signer');
+        $order->setCreatedAt(new DateTimeImmutable('-90 days'));
+        $order->addSection($section);
+
+        $orderRepository->method('findBy')->willReturn([$order]);
+
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
+        $result = $service->analyzePipeline();
+
+        $this->assertNotEmpty($result['pipeline']);
+        $entry = $result['pipeline'][0];
+        $this->assertLessThan(50, $entry['winProbability']);
+    }
+
+    public function testAnalyzePipelineHandlesEmptyContributorRepositoryForCapacity(): void
+    {
+        $orderRepository = $this->createMock(OrderRepository::class);
+        $contributorRepository = $this->createMock(ContributorRepository::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $profile = new Profile();
+        $profile->setName('Dev');
+
+        $line = new OrderLine();
+        $line->setDays('25');
+        $line->setDailyRate('500');
+        $line->setProfile($profile);
+
+        $section = new OrderSection();
+        $section->setTitle('Phase 1');
+        $section->addLine($line);
+
+        $order = new Order();
+        $order->setOrderNumber('CAP-2025-001');
+        $order->setStatus('a_signer');
+        $order->setCreatedAt(new DateTimeImmutable());
+        $order->addSection($section);
+
+        $orderRepository->method('findBy')->willReturn([$order]);
+        // Empty active contributors → team capacity falls back to 20 days/month.
+        $contributorRepository->method('findBy')->willReturn([]);
+
+        $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
+        $result = $service->analyzePipeline();
+
+        $this->assertIsArray($result['workloadByMonth']);
+        $this->assertIsArray($result['alerts']);
+    }
 }
