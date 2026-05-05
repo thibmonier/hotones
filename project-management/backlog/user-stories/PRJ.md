@@ -84,20 +84,25 @@ Then liste paginée chronologique
 ```
 Given projet en cours
 When job batch s'exécute
-Then ProjectHealthScore (0-100) calculé selon formule
-And historique conservé
+Then 4 sous-scores calculés ∈ [0,100]: budgetScore, timelineScore, velocityScore, qualityScore
+And composite score = 0.25 * budgetScore + 0.25 * timelineScore + 0.25 * velocityScore + 0.25 * qualityScore
+And healthLevel mappé: [0,30]=critical / [30,60]=at-risk / [60,80]=healthy / [80,100]=excellent
+And ProjectHealthScore persisté avec recommendations[] + details[] (JSON)
 ```
 ```
-When GET /project-health
-Then liste projets avec scores triés
+When GET /risks/projects (RiskController) ou /project-health (ProjectHealthController)
+Then liste projets avec scores triés desc + healthLevel + nb à risque par catégorie
 ```
 ```
-Given score < seuil critique
-Then ProjectBudgetAlertEvent ou KpiThresholdExceededEvent dispatché (FR-AN-01)
+Given score franchit seuil critique (=30) à la baisse
+Then KpiThresholdExceededEvent dispatché (FR-AN-01) + notification
 ```
 
 ### Technical Notes
-- Formule du score à expliciter (PO + tech)
+- **Pondération validée (atelier 2026-05-15)**: 25/25/25/25 (V1; rebalancing futur possible).
+- **Mapping healthLevel** (V1): critical < 30 ≤ at-risk < 60 ≤ healthy < 80 ≤ excellent.
+- Implémentation: `ProjectHealthScore` entity + service de calcul (à isoler si dispersé).
+- Test unitaire pondération composite + tests de mapping healthLevel.
 
 ---
 
@@ -128,9 +133,9 @@ Then les contributeurs avec ces skills/techs sont remontés
 
 ---
 
-## US-024 — Vue des risques projet
+## US-024 — Score de risque projet (calculé)
 
-> INFERRED from `RiskController`.
+> INFERRED from `RiskController` + `ProjectRiskAnalyzer` + `AnalyzeProjectRisksMessage`.
 
 - **Implements**: FR-PRJ-05
 - **Persona**: P-002, P-003
@@ -138,19 +143,35 @@ Then les contributeurs avec ces skills/techs sont remontés
 - **MoSCoW**: Should
 
 ### Card
-**As** chef de projet
-**I want** déclarer les risques projet (probabilité, impact, mitigation)
-**So that** j'anticipe.
+**As** chef de projet ou manager
+**I want** un `riskLevel` calculé automatiquement par projet (critical / high / medium / low)
+**So that** je priorise mes interventions sans saisie manuelle.
 
 ### Acceptance Criteria
 ```
-Given projet
-When add risque {description, proba, impact, mitigation}
-Then visible dans /risk
+Given projet actif
+When ProjectRiskAnalyzer s'exécute (cron ou async via AnalyzeProjectRisksMessage)
+Then riskLevel calculé à partir des 5 signaux:
+  1. Budget consommé % (>80% = high, >100% = critical)
+  2. Glissement planning (jours retard / jours initiaux > 20% = high, > 40% = critical)
+  3. Marge projet % (<10% = high, <0 = critical)
+  4. Score satisfaction contributeur (<5/10 = medium)
+  5. Dépendances bloquées (≥1 dep critique = high)
+And riskLevel = max() des niveaux des signaux atteints
+```
+```
+When GET /risks/projects
+Then liste atRiskProjects + stats {total, atRisk, critical, high, medium}
+```
+```
+Given riskLevel passe à critical
+Then notification + dispatch KPI_THRESHOLD_EXCEEDED
 ```
 
 ### Technical Notes
-- Modèle Risk pas trouvé comme entité dédiée → vérifier (peut être dans Project ou JSON column)
+- Pas d'entité `Risk` dédiée: sortie = array `['analysis' => ['riskLevel' => ...]]` (computed).
+- Seuils paramétrables côté `CompanySettings` (V2).
+- Tests par signal + test combinatoire (max niveau).
 
 ---
 

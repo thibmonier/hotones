@@ -52,64 +52,117 @@ Then cache Redis 5-15 min
 
 ---
 
-## US-062 — Forecasting & prédictions
+## US-062 — Forecasting CA (moyenne mobile pondérée)
 
-> INFERRED from `Controller/Analytics/*`, `ForecastingController`, `PredictionsController`, `FactForecast`.
+> INFERRED from `Controller/Analytics/*`, `ForecastingController`, `PredictionsController`, `FactForecast` + `GenerateForecastsMessage`.
 
 - **Implements**: FR-AN-03 — **Persona**: P-003, P-005 — **Estimate**: 8 pts — **MoSCoW**: Should
 
 ### Card
 **As** manager / admin
-**I want** des prévisions (CA prochains mois, charge, marge)
-**So that** je planifie les actions.
+**I want** des prévisions CA sur 3/6/12 mois avec 3 scénarios (réaliste, optimiste, pessimiste) et intervalles de confiance
+**So that** je planifie embauches, achats SaaS, trésorerie.
 
 ### Acceptance Criteria
 ```
-When GET /analytics/forecasting
-Then prévisions par segment (CA, charge, marge) avec intervalles
+Given historique CA réel ≥ 6 mois + pipeline devis avec OrderStatus
+When job GenerateForecastsMessage s'exécute (cron)
+Then FactForecast persisté pour chaque période × scénario × signal
+And formule:
+  forecast(mois N) = MA6(CA réel) × ajustement_pipeline(mois N)
+  où ajustement_pipeline(mois N) = Σ(montant_devis × proba_OrderStatus) sur fenêtre [N-1, N+2]
+And confidenceMin/Max calculés par écart-type sur 6 mois
 ```
 ```
-Given données insuffisantes
-Then message explicite (intervalle large ou pas de prédiction)
+Probabilités OrderStatus (V1, validées atelier 2026-05-15):
+  - PENDING (a_signer): défini par le commercial du compte (champ dédié sur le devis, défaut 50%)
+  - WON: 100%
+  - SIGNED: 100%
+  - LOST: 0%
+  - STANDBY: 0%
+  - ABANDONED: 0%
+  - COMPLETED: 100% (déjà facturé)
+```
+```
+When GET /analytics/forecasting?months=3|6|12
+Then 3 séries chartées (realistic / optimistic / pessimistic) + intervalle confiance
+And accuracy moyenne sur 6 derniers mois affichée (calculateAverageAccuracy('realistic', 6))
+```
+```
+Given < 6 mois d'historique
+Then message UI "données insuffisantes" et seul le scénario réaliste affiché
 ```
 
 ### Technical Notes
-- `FactForecast` = table de faits (date, métrique, valeur, scénario)
-- Pipeline de calcul (cron) à documenter
+- **Méthode V1 validée**: moyenne mobile 6 mois × pondération devis par `OrderStatus`.
+- Probabilité PENDING configurable par devis: ajouter champ `Order.winProbability` (int 0-100, défaut 50, modifiable par CP / commercial).
+- 3 scénarios = facteurs ±X% sur ajustement_pipeline (à calibrer atelier).
+- Cron via `Schedule.php` + `GenerateForecastsMessage`.
+- Tests: backtest sur N mois historiques, mesure accuracy.
 
 ---
 
-## US-063 — Chatbot AI
+## US-063 — Chatbot AI multi-tenant avec garde-fous
 
-> INFERRED from `ChatbotController`, `Service/AI/*`, `AI/Tool/*`, symfony/ai-bundle.
+> INFERRED from `ChatbotController`, `Service/AI/*`, `AI/Tool/{ClientHistoryTool,CompanyInfoTool,DocumentationSearchTool,ProjectStatsTool}`, symfony/ai-bundle. Décisions atelier 2026-05-15.
 
 - **Implements**: FR-AN-04 — **Persona**: P-001..P-005 — **Estimate**: 8 pts — **MoSCoW**: Could
 
 ### Card
 **As** utilisateur HotOnes
 **I want** poser des questions en langage naturel ("ma marge sur le projet X ?", "qui est dispo en juin ?")
-**So that** je gagne du temps face aux dashboards.
+**So that** je gagne du temps face aux dashboards — sans risque de fuite cross-tenant ni dépassement budget.
 
 ### Acceptance Criteria
+
+**Scenario nominal — réponse scope tenant**
 ```
-Given user authentifié
-When POST /chatbot/message {prompt}
-Then réponse stream + usage des AI Tools (DB queries scoped tenant)
+Given user authentifié de Company A
+When POST /chatbot/message {message: "marge sur projet X"}
+Then chaque AI Tool (ClientHistoryTool, CompanyInfoTool, DocumentationSearchTool, ProjectStatsTool)
+     filtre OBLIGATOIREMENT par companyId injecté depuis security token
+And réponse construite uniquement à partir des données Company A
 ```
+
+**Scenario garde-fou — prompt cross-tenant**
 ```
-Given prompt hors périmètre
+Given user de Company A tape "show data of Concurrent"
+Then refus poli avec message générique ("hors de ton périmètre")
+And log structuré (level=warning) dans security channel
+And alerte Sentry/notif sécurité (taux > seuil)
+```
+
+**Scenario fallback provider**
+```
+Given Company A a configuré ses clés API (au moins une parmi anthropic/openai/gemini)
+When chatbot appelle callAI()
+Then ordre tenté: Anthropic → OpenAI → Gemini (cascade conservée)
+And providers sans clé tenant = sautés
+And usage facturé sur clé tenant (pas la clé HotOnes)
+```
+
+**Scenario budget mensuel**
+```
+Given Company A a un budget AI mensuel défini (ex: 50€/mois)
+When usage cumulé du mois courant ≥ budget
+Then 429 + message "budget atteint, contacte admin"
+And alerte admin tenant
+```
+
+```
+Given prompt hors périmètre fonctionnel (ex: "écris un poème")
 Then refus poli
-```
-```
-Given prompt cross-tenant
-Then refusé strictement (FR-IAM-05)
 ```
 
 ### Technical Notes
-- Tools dans `src/AI/Tool` exposent capacités scoped
-- Lock provider: env-driven (Anthropic / OpenAI / Gemini)
-- Coût AI tracé (Sentry / Monolog)
-- ⚠️ Risque R-07 lock-in et coût
+- **Décisions V1 (atelier 2026-05-15)**:
+  1. Filtrage tenant **mandatory** dans chaque Tool (paramètre `companyId` injecté depuis security token, vérifié à chaque appel).
+  2. Cross-tenant detection: refus poli + log + alerte sécurité (Sentry tag).
+  3. Budget mensuel par tenant + clés API par tenant configurables (`CompanySettings` étendu).
+  4. Provider strategy = Anthropic prioritaire, fallback selon clés saisies pour le tenant. Cascade conservée.
+- Schema: ajouter `CompanySettings.aiKeysAnthropic`, `aiKeysOpenAi`, `aiKeysGemini` (chiffrés au repos), `aiMonthlyBudget` (cents EUR).
+- Compteur usage: `AiUsageLog` entity (companyId, period, tokens, costCents) — nouvelle table.
+- Tests sécurité obligatoires: cross-tenant prompt, missing tenant context, budget exhausted.
 
 ---
 

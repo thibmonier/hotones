@@ -60,31 +60,15 @@ Then SEO tags présents (title, og:image, schema.org)
 
 ---
 
-## US-077 — Lead-magnet capture
+## US-077 — ⛔ MERGED INTO US-012
 
-> INFERRED from `LeadMagnetController`, `LeadCapture`.
+> Décision atelier 2026-05-15: fusion avec US-012 en une story unique "Lead funnel" couvrant capture publique + pipeline backend.
+>
+> Voir `backlog/user-stories/CRM.md` US-012.
 
-- **Implements**: FR-MKT-03 — **Persona**: P-005, P-007 — **Estimate**: 5 pts — **MoSCoW**: Should
-
-### Card
-**As** visiteur
-**I want** recevoir une ressource gratuite contre mon email
-**So that** j'obtiens de la valeur et m'inscris au funnel.
-
-### Acceptance Criteria
-```
-When visiteur soumet email + intérêt
-Then LeadCapture (FR-CRM-03)
-And ressource envoyée par email (URL S3 signée)
-```
-```
-Given email déjà en base
-Then renvoi du lien sans nouvelle inscription
-```
-
-### Technical Notes
-- Cf. US-012 (FR-CRM-03)
-- Anti-bot honeypot + rate limiter
+- **Statut**: MERGED → US-012
+- **FR consolidée**: FR-CRM-03 + FR-MKT-03
+- **Pts retransférés** sur US-012 (5 → 8 pts)
 
 ---
 
@@ -113,6 +97,6 @@ Then sitemap valide listant pages publiques + blog
 |----|-------|----|----|--------|
 | US-075 | Pages marketing | FR-MKT-01 | 5 | Should |
 | US-076 | Blog public | FR-MKT-02 | 5 | Should |
-| US-077 | Lead-magnet | FR-MKT-03 | 5 | Should |
+| ~~US-077~~ | MERGED → US-012 (CRM) | — | 0 | — |
 | US-078 | Sitemap | FR-MKT-04 | 2 | Should |
-| **Total** | | | **17** | |
+| **Total** | | | **12** (-5 fusion) | |
