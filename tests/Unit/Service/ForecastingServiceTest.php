@@ -346,4 +346,78 @@ class ForecastingServiceTest extends TestCase
         $result = $method->invoke($service, $historical);
         $this->assertEquals('insufficient_data', $result);
     }
+
+    // -----------------------------------------------------------------
+    // T-TC1-02c — pure math helpers (no entity graph)
+    // -----------------------------------------------------------------
+
+    public function testLinearRegressionSimpleReturnsZeroSlopeForSinglePoint(): void
+    {
+        $service = $this->createService();
+        $reflection = new ReflectionClass($service);
+        $method = $reflection->getMethod('linearRegressionSimple');
+
+        $result = $method->invoke($service, [['x' => 1.0, 'y' => 100.0]]);
+
+        $this->assertSame(0.0, $result['slope']);
+        $this->assertSame(0.0, $result['intercept']);
+    }
+
+    public function testLinearRegressionSimpleHandlesEmptyArray(): void
+    {
+        $service = $this->createService();
+        $reflection = new ReflectionClass($service);
+        $method = $reflection->getMethod('linearRegressionSimple');
+
+        $result = $method->invoke($service, []);
+
+        $this->assertSame(0.0, $result['slope']);
+        $this->assertSame(0.0, $result['intercept']);
+    }
+
+    public function testLinearRegressionSimplePerfectLinearFit(): void
+    {
+        // y = 2x + 1 → slope=2, intercept=1.
+        $service = $this->createService();
+        $reflection = new ReflectionClass($service);
+        $method = $reflection->getMethod('linearRegressionSimple');
+
+        $points = [
+            ['x' => 0.0, 'y' => 1.0],
+            ['x' => 1.0, 'y' => 3.0],
+            ['x' => 2.0, 'y' => 5.0],
+            ['x' => 3.0, 'y' => 7.0],
+            ['x' => 4.0, 'y' => 9.0],
+        ];
+
+        $result = $method->invoke($service, $points);
+
+        $this->assertEqualsWithDelta(2.0, $result['slope'], 0.001);
+        $this->assertEqualsWithDelta(1.0, $result['intercept'], 0.001);
+    }
+
+    public function testGetMonthsDifferenceReturnsZeroForSameMonth(): void
+    {
+        $service = $this->createService();
+        $reflection = new ReflectionClass($service);
+        $method = $reflection->getMethod('getMonthsDifference');
+
+        $from = new \DateTimeImmutable('2026-05-01');
+        $to = new \DateTimeImmutable('2026-05-31');
+
+        $this->assertSame(0, $method->invoke($service, $from, $to));
+    }
+
+    public function testGetMonthsDifferenceReturnsExpectedMonthsAcrossYears(): void
+    {
+        $service = $this->createService();
+        $reflection = new ReflectionClass($service);
+        $method = $reflection->getMethod('getMonthsDifference');
+
+        $from = new \DateTimeImmutable('2025-01-15');
+        $to = new \DateTimeImmutable('2026-04-15');
+
+        // 1 year × 12 + 3 months = 15.
+        $this->assertSame(15, $method->invoke($service, $from, $to));
+    }
 }
