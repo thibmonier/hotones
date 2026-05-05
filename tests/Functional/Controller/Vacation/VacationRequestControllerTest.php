@@ -114,6 +114,9 @@ final class VacationRequestControllerTest extends WebTestCase
     {
         $vacation = $this->createPendingVacationFor($this->loadContributor());
 
+        // Warm up session before generating CSRF token (session-based storage).
+        $this->client->request('GET', '/mes-conges');
+
         $this->client->request('POST', '/mes-conges/'.$vacation->getId()->getValue().'/annuler', [
             '_token' => $this->generateCsrfToken('cancel'.$vacation->getId()->getValue()),
         ]);
