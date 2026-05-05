@@ -642,7 +642,7 @@ class MyServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $dependency = $this->createMock(DependencyInterface::class);
+        $dependency = $this->createStub(DependencyInterface::class);
         $this->service = new MyService($dependency);
     }
 
@@ -654,6 +654,47 @@ class MyServiceTest extends TestCase
     }
 }
 ```
+
+#### `createStub` vs `createMock` — quand utiliser quoi
+
+Sprint-006 (TEST-MOCKS-002, PRs #95/#96/#97/#105) a normalisé l'usage de `createStub` et `createMock` pour aligner sur PHPUnit 13+ :
+
+| Méthode | Quand l'utiliser | Notice PHPUnit |
+|---------|------------------|----------------|
+| **`createStub(Interface::class)`** | Tu as juste besoin de la **valeur de retour** d'une méthode (`willReturn(...)`) — pas d'assertion sur l'appel. | ✅ Aucune. |
+| **`createMock(Interface::class)`** + `expects(...)` | Tu vérifies **comment** la dépendance est appelée (`->expects($this->once())`, `->with(...)`). Le test doit échouer si l'appel n'a pas lieu ou avec mauvais args. | ✅ Aucune si `expects()` ou `with()` présent. |
+| **`createMock(Interface::class)`** sans `expects()` | ❌ **Anti-pattern**. PHPUnit 13 émet `PHPUnit\Framework\MockObject\Notice` : *"Test ... uses MockObject but does not specify expectations on it"*. Si tu n'asseries rien, prends `createStub`. |
+
+**Règle pratique** :
+
+```php
+// ✅ Stub : retourne juste une valeur
+$repo = $this->createStub(UserRepositoryInterface::class);
+$repo->method('findByEmail')->willReturn($user);
+
+// ✅ Mock : vérifie l'interaction
+$mailer = $this->createMock(MailerInterface::class);
+$mailer->expects($this->once())
+    ->method('send')
+    ->with($this->isInstanceOf(Email::class));
+
+// ❌ Mock sans assertion = code smell
+$repo = $this->createMock(UserRepositoryInterface::class); // émet Notice PHPUnit
+$repo->method('findByEmail')->willReturn($user);
+```
+
+**Historique de la migration sprint-006** :
+
+- Sprint-005 a découvert ~31 classes avec `createMock` sans `expects()`. Pour amortir le bruit pendant la migration PHPUnit 12→13, l'attribut `#[AllowMockObjectsWithoutExpectations]` a été ajouté pour silencier les Notices.
+- Sprint-006 (TEST-MOCKS-002) a retiré l'attribut sur les 31 classes :
+  - **9 classes Cas A/A-B** (PRs #85/#96/#97) — `createMock` converti en `createStub` quand le mock ne servait qu'au `willReturn`.
+  - **22 classes Cas C** (PR #105) — l'attribut a été retiré, `createMock` conservé. Les **203 Notices PHPUnit** restantes sont visibles mais n'échouent pas la suite (`failOnNotice` non set en config).
+
+**Ce que ça veut dire pour toi** :
+
+- Pour un **nouveau test**, choisis `createStub` ou `createMock` selon le tableau ci-dessus. **Ne jamais** ajouter `#[AllowMockObjectsWithoutExpectations]` (refus en review).
+- Si tu touches une classe Cas C (cf liste audit `project-management/sprints/sprint-006-test-debt-cleanup/tasks/TEST-MOCKS-002-audit.md`), c'est une **bonne occasion** de convertir le test en `createStub` quand c'est trivial — chaque conversion réduit le bruit Notices et clarifie l'intention du test.
+- L'objectif moyen-terme (TEST-MOCKS-003 sprint-007+) est d'amener les Notices à 0.
 
 #### Tests fonctionnels
 
