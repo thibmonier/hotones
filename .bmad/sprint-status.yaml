@@ -1,12 +1,15 @@
 metadata:
-  sprint_id: "sprint-005"
-  name: "Test Stabilization & Tech-Debt"
+  sprint_id: "sprint-006"
+  name: "Test Debt Cleanup & Workflow Hygiene"
   start_date: "2026-05-04"
   end_date: "2026-05-15"
-  goal: "Stabiliser la suite de tests fonctionnels (Vacation + connectors), eliminer la dette mockObjects et fiabiliser le pre-push hook pour ne plus recourir a --no-verify"
+  goal: "Eliminer la dette AllowMockObjectsWithoutExpectations (31 classes), auditer les 14 classes encore en skip-pre-push, et fiabiliser les guards workflow (pre-commit auto-generes, PR template gating)."
   capacity_points: 32
-  velocity_target: "26-32"
-  last_sync: "2026-05-02T00:00:00Z"
+  capacity_projected_points: 28
+  committed_points: 22
+  velocity_target: "22-28"
+  last_sync: "2026-05-05T11:00:00Z"
+  current_day: 2
 
 # History of completed sprints, kept for traceability and velocity tracking.
 sprint_history:
@@ -33,6 +36,15 @@ sprint_history:
     points_planned: 30
     points_delivered: 30
     velocity: 30
+
+  sprint-005:
+    name: "Test Stabilization & Tech-Debt"
+    points_planned: 26
+    points_delivered: 26
+    velocity: 26
+    closed_at: "2026-05-04"
+    review: "project-management/sprints/sprint-005-test-stabilization/sprint-review.md"
+    retro: "project-management/sprints/sprint-005-test-stabilization/sprint-retro.md"
 
 stories:
 
