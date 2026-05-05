@@ -15,7 +15,6 @@ use App\Domain\Vacation\ValueObject\VacationId;
 use App\Domain\Vacation\ValueObject\VacationType;
 use App\Entity\Company;
 use App\Entity\Contributor;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +32,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
  * The persistence side (Vacation::cancel + repository save) is already covered
  * elsewhere; this test focuses on the new notification-routing behaviour.
  */
-#[AllowMockObjectsWithoutExpectations]
 final class CancelVacationHandlerDispatchTest extends TestCase
 {
     private VacationRepositoryInterface&MockObject $repository;

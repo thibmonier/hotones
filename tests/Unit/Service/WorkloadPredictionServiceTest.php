@@ -14,7 +14,6 @@ use App\Repository\OrderRepository;
 use App\Service\WorkloadPredictionService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -22,7 +21,6 @@ use ReflectionClass;
  * Basic unit tests for WorkloadPredictionService.
  * Note: Full integration tests should be created in tests/Integration/.
  */
-#[AllowMockObjectsWithoutExpectations]
 class WorkloadPredictionServiceTest extends TestCase
 {
     public function testAnalyzePipelineReturnsCorrectStructure(): void

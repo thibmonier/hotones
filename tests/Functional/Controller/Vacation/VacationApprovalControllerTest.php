@@ -29,6 +29,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * (ROLE_INTERVENANT) contributor. The intervenant submits a vacation through
  * the real RequestVacationHandler, then the manager exercises approve / reject.
  */
+// Tolérance test legacy permanente — voir docs/02-architecture/adr/0003-test-legacy-tolerance-vacation-csrf-session-boundary.md
+// Bloqueur: SessionNotFoundException sur CSRF token via container test (Symfony 7+/8+ isolation request/container).
+// Tests exécutés en CI complet (workflow `quality.yml` + `ci.yml`). Skip uniquement en pre-push hook local.
 #[Group('skip-pre-push')]
 final class VacationApprovalControllerTest extends WebTestCase
 {
