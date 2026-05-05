@@ -6,6 +6,7 @@
 +==============================================================+
 | Project: HotOnes                                               |
 | Analysis Date: 2026-05-04                                      |
+| Last update:   2026-05-04 (post atelier — GAP-C3 + GAP-C5 ✅)  |
 | Scope: full repository                                         |
 | Branch: chore/housekeeping-001-doc-bundle                      |
 +==============================================================+
@@ -141,9 +142,22 @@ denyAccessUnlessGranted(...) usage:    ← 2 occurrences
 
 ---
 
-### GAP-C3 🔴 CRITICAL — `ROLE_COMMERCIAL` orphan + dead code
+### GAP-C3 ✅ RESOLVED — `ROLE_COMMERCIAL` wired into role_hierarchy
 
-**Severity**: Major (down from Critical because located in fixture only)
+**Severity**: Major → **RESOLVED** (commit 2026-05-04)
+**Decision**: Option B — wire role into hierarchy.
+
+**Change applied** to `config/packages/security.yaml`:
+
+```yaml
+ROLE_COMMERCIAL: [ROLE_INTERVENANT, ROLE_USER]
+ROLE_MANAGER: [ROLE_CHEF_PROJET, ROLE_COMMERCIAL, ROLE_INTERVENANT, ROLE_USER]
+ROLE_ADMIN: [ROLE_MANAGER, ROLE_CHEF_PROJET, ROLE_COMMERCIAL, ROLE_INTERVENANT, ROLE_USER]
+```
+
+`ROLE_COMMERCIAL` is now a peer of `ROLE_CHEF_PROJET`, transitively inherited by `ROLE_MANAGER`, `ROLE_COMPTA`, `ROLE_ADMIN`, `ROLE_SUPERADMIN`.
+
+**Original state** (kept for traceability):
 
 **Spec claim**: PRD FR-IAM-04 hierarchy of 7 roles.
 
@@ -180,20 +194,25 @@ src/Command/CreateTestDataCommand.php   ← only reference
 
 ---
 
-### GAP-C5 — DDD bounded contexts `Catalog`, `Notification`, `Reservation` are stubs
+### GAP-C5 ✅ RESOLVED — DDD BC stubs cleaned up
 
-**Severity**: Major
+**Severity**: Major → **RESOLVED** (commit 2026-05-04)
+**Decision**: cleanup all stub directories.
 
-**Spec claim**: PRD §5.7 mentions `Reservation` BC; INDEX.md flags it as "likely template".
+**Removed directories** (empty, scaffolding-only):
+- `src/Domain/Catalog/`, `src/Domain/Notification/`, `src/Domain/Reservation/`
+- `src/Application/Catalog/`, `src/Application/Client/`, `src/Application/Notification/`, `src/Application/Reservation/`
 
-**Code reality**: `src/Domain/{Catalog,Notification,Reservation}` contain only `Event` files (no Entities, ValueObjects, Repository interfaces, or Services). `src/Application/{Catalog,Client,Notification,Reservation}` contain **directory scaffolding only** — actual PHP files exist solely under `src/Application/Vacation`.
+**Remaining DDD BCs**:
+- `src/Domain/Vacation/` (real CQRS reference implementation)
+- `src/Application/Vacation/`
 
-**Recommendation**:
-- Cleanup: delete `src/Domain/{Reservation}` and `src/Application/{Reservation}` entirely (Reservation is **not** a HotOnes concept).
-- Decision: keep `Catalog` and `Notification` if they reflect the next BCs to migrate; otherwise prune.
-- Document in PRD which BCs are migrated, in-flight, or planned.
+**Notes**:
+- 0 PHP files were impacted (all dirs were empty).
+- Future DDD BC migrations will recreate dirs as needed (e.g. `Order`, `Project`, `Invoice`).
+- `Reservation` is **not** a HotOnes concept; permanent removal.
 
-**Effort**: S (deletion) + M (decision/documentation).
+**Effort**: S (done).
 
 ---
 
@@ -295,13 +314,14 @@ Minor:    GAP-A1, GAP-A2, GAP-B1, GAP-B4, GAP-B5, GAP-B11, GAP-B14,
 Info:     GAP-B6, GAP-B7, GAP-B9, GAP-B10, GAP-B12, GAP-B13
 ```
 
-| Severity | Count |
-|----------|------:|
-| Critical | 3 |
-| Major | 14 |
-| Minor | 17 |
-| Info | 6 |
-| **Total raw items** | **40** |
+| Severity | v1 | v2 (post atelier) |
+|----------|---:|------------------:|
+| Critical | 3 | 3 (R-01/C1, R-02/C2, D1) |
+| Major | 14 | 12 (-GAP-C3, -GAP-C5 résolus) |
+| Minor | 17 | 17 |
+| Info | 6 | 6 |
+| **Total raw items** | **40** | **38** |
+| ✅ RESOLVED | 0 | 2 (GAP-C3, GAP-C5) |
 
 > Headline `21 gaps` at top counts **distinct themes** (some IDs cover several findings, e.g. B18+B20 = star-schema theme).
 

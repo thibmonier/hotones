@@ -46,7 +46,7 @@ The platform exposes:
 - AI-assisted features (chatbot, predictions, forecasting) backed by Anthropic Claude / OpenAI / Gemini through `symfony/ai-bundle`.
 - Operational integrations with HubSpot (CRM) and BoondManager (staffing).
 
-**Stack**: Symfony 8.0.1 / PHP 8.5 / MariaDB 11.4 / Redis 7 / Docker / Sentry / SonarCloud / Snyk. ~63 entities, ~80 controllers (~338 routes), ~48 services, ~46 CLI commands, ~102 test files.
+**Stack**: Symfony 8.0.x / PHP 8.5 / MariaDB 11.4 / Redis 7 / Docker / Sentry / SonarCloud / Snyk. ~63 entities, ~80 controllers (~338 routes), ~48 services, ~46 CLI commands, ~102 test files.
 
 ---
 
@@ -72,14 +72,14 @@ Web / digital service agencies suffer from fragmented operational data:
 
 ### 3.1 Business goals — TODO
 
-- [ ] Primary OKR (e.g. ARR target, paying tenants, retention, NRR)
+- [X] Primary OKR (e.g. ARR target, paying tenants, retention, NRR)
 - [ ] Activation metric (e.g. time-to-first-margin-report < N days)
 - [ ] Retention KPI (e.g. monthly active companies, weekly active contributors)
 
 ### 3.2 Product success metrics — TODO
 
-- [ ] Average time saved per project review (vs spreadsheets)
-- [ ] % of projects where alert preceded budget overrun
+- [X] Average time saved per project review (vs spreadsheets)
+- [X] % of projects where alert preceded budget overrun
 - [ ] Adoption rate of automated timesheet validation
 - [ ] NPS target on contributor side
 
@@ -97,13 +97,14 @@ Web / digital service agencies suffer from fragmented operational data:
 
 ## 4. Target Users / Personas `INFERRED`
 
-> INFERRED from `security.yaml` `role_hierarchy` (7 roles) + README `app:create-test-users` command + controller naming. Persona names, demographics and goals require human validation.
+> INFERRED from `security.yaml` `role_hierarchy` (8 roles, post atelier 2026-05-15) + README `app:create-test-users` command + controller naming. Persona names, demographics and goals require human validation.
 
 ```
-ROLE_SUPERADMIN ─┬─ ROLE_ADMIN ─┬─ ROLE_MANAGER ─┬─ ROLE_CHEF_PROJET ─┬─ ROLE_INTERVENANT ─ ROLE_USER
-                 │              │                │                    │
-                 └─ ROLE_COMPTA ─┘                │                    │
-                                                  └────────────────────┘
+ROLE_SUPERADMIN ─┬─ ROLE_ADMIN ─┬─ ROLE_MANAGER ─┬─ ROLE_CHEF_PROJET ────┐
+                 │              │                ├─ ROLE_COMMERCIAL ─────┤
+                 │              │                │                       ├─ ROLE_INTERVENANT ─ ROLE_USER
+                 └─ ROLE_COMPTA ─┘                │                       │
+                                                  └───────────────────────┘
 ```
 
 | ID | Persona | Role(s) | Primary surface | Inferred jobs-to-be-done |
@@ -116,12 +117,12 @@ ROLE_SUPERADMIN ─┬─ ROLE_ADMIN ─┬─ ROLE_MANAGER ─┬─ ROLE_CHEF_
 | **P-006** | Superadmin (platform) | `ROLE_SUPERADMIN` | EasyAdmin + cross-tenant | platform-wide ops, multi-tenant supervision, scheduler, GDPR account-deletion requests |
 | **P-007** | Visitor (anonymous) | `PUBLIC_ACCESS` | marketing site | discover features, pricing, blog, lead capture (`LeadMagnetController`, `LeadCapture`), public NPS |
 | **P-008** | External integration | API key / JWT | `/api/**` | machine-to-machine consumers (CRM sync, BoondManager) |
-| **P-009 ⚠️** | Commercial | `ROLE_COMMERCIAL` (orphan in code) | TBD | TBD — role exists in code but is not in role hierarchy. **Decision needed**: wire into hierarchy or remove. |
+| **P-009** | Commercial | `ROLE_COMMERCIAL` (peer of `ROLE_CHEF_PROJET`) | web app | manage clients, leads, quotes (`OrderStatus` lifecycle), define `Order.winProbability`, sales dashboard |
 
 **⚠️ To validate**:
 - Persona names, real-world archetypes (agency size, seniority, daily routines).
 - Whether intervenants and chefs de projet are distinct user populations or the same person wearing two hats.
-- Whether `ROLE_COMMERCIAL` corresponds to a real persona or is dead code.
+- ✅ ~~Whether `ROLE_COMMERCIAL` corresponds to a real persona or is dead code~~ — **resolved 2026-05-04** (atelier Q decision: wire into role_hierarchy as peer of `ROLE_CHEF_PROJET`).
 
 ---
 
