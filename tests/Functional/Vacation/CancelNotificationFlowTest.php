@@ -31,6 +31,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * is dispatched on the sync transport in the test environment so the email lands
  * synchronously in the in-memory transport.
  */
+// Tolérance test legacy permanente — voir docs/02-architecture/adr/0003-test-legacy-tolerance-vacation-csrf-session-boundary.md
+// Bloqueur: SessionNotFoundException sur CSRF token via container test (Symfony 7+/8+ isolation request/container).
+// Tests exécutés en CI complet (workflow `quality.yml` + `ci.yml`). Skip uniquement en pre-push hook local.
 #[Group('skip-pre-push')]
 final class CancelNotificationFlowTest extends WebTestCase
 {
