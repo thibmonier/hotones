@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller\Analytics;
 
 use App\Factory\UserFactory;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Group;
 /**
  * Tests fonctionnels pour le DashboardController Analytics.
  */

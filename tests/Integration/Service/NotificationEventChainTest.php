@@ -13,6 +13,7 @@ use App\Factory\CompanyFactory;
 use App\Factory\UserFactory;
 use App\Repository\NotificationRepository;
 use App\Tests\Integration\Service\Fixture\StubNotificationEvent;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,7 +21,6 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Group;
 /**
  * Integration test for the full notification chain:
  *   dispatch(event) -> NotificationSubscriber -> NotificationService -> Notification persisted in DB.

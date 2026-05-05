@@ -13,11 +13,11 @@ use App\Repository\RunningTimerRepository;
 use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Group;
 /**
  * Integration tests for RunningTimerRepository.
  *

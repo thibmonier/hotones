@@ -10,12 +10,12 @@ use App\Entity\OrderSection;
 use App\Entity\Project;
 use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Group;
 #[Group('skip-pre-push')]
 class OrderControllerPreviewTest extends WebTestCase
 {

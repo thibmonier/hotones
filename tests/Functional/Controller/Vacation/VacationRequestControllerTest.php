@@ -10,12 +10,12 @@ use App\Entity\Contributor;
 use App\Tests\Support\MultiTenantTestTrait;
 use App\Tests\Support\VacationFunctionalTrait;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Group;
 /**
  * Functional tests for the VacationRequestController routes (US-066).
  *
@@ -155,5 +155,4 @@ final class VacationRequestControllerTest extends WebTestCase
 
         return $contributor;
     }
-
 }

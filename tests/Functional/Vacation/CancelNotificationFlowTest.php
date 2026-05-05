@@ -13,12 +13,12 @@ use App\Entity\Contributor;
 use App\Tests\Support\MultiTenantTestTrait;
 use App\Tests\Support\VacationFunctionalTrait;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Group;
 /**
  * TECH-DEBT-001 — end-to-end test of the cancel notification flow.
  *
