@@ -9,12 +9,12 @@ use App\Domain\Vacation\ValueObject\VacationStatus;
 use App\Entity\Contributor;
 use App\Tests\Support\MultiTenantTestTrait;
 use App\Tests\Support\VacationFunctionalTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Group;
 /**
  * Functional tests for the VacationApprovalController routes (US-067).
  *
@@ -188,5 +188,4 @@ final class VacationApprovalControllerTest extends WebTestCase
         self::assertSame(2, $payload['count']);
         self::assertCount(2, $payload['vacations']);
     }
-
 }
