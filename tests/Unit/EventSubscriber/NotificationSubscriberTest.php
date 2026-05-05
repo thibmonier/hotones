@@ -11,7 +11,6 @@ use App\Event\NotificationEvent;
 use App\EventSubscriber\NotificationSubscriber;
 use App\Service\NotificationService;
 use App\Tests\Unit\Service\Fixture\TestNotificationEvent;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +26,6 @@ use RuntimeException;
  *  - errors raised by the service are caught and logged (does not break dispatch)
  *  - log payload contains event_type / recipient count / created count
  */
-#[AllowMockObjectsWithoutExpectations]
 final class NotificationSubscriberTest extends TestCase
 {
     private NotificationService&MockObject $notificationService;
