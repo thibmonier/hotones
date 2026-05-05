@@ -373,7 +373,7 @@ class ProjectRepository extends CompanyAwareRepository
             'start' => 'p.startDate',
             'end' => 'p.endDate',
         ];
-        $col = $map[$sortField] ?? 'p.name';
+        $col = $map[(string) $sortField] ?? 'p.name';
         $dir = strtoupper((string) $sortDir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($col, $dir);
 
