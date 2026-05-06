@@ -6,13 +6,10 @@ namespace App\Controller;
 
 use App\Application\Client\UseCase\CreateClient\CreateClientCommand;
 use App\Application\Client\UseCase\CreateClient\CreateClientUseCase;
-<<<<<<< feat/ddd-phase3-client-edit-via-ddd
 use App\Application\Client\UseCase\UpdateClient\UpdateClientCommand;
 use App\Application\Client\UseCase\UpdateClient\UpdateClientUseCase;
 use App\Domain\Client\Repository\ClientRepositoryInterface as DddClientRepositoryInterface;
 use App\Domain\Client\ValueObject\ClientId as DddClientId;
-=======
->>>>>>> main
 use App\Entity\Client;
 use App\Entity\ClientContact;
 use App\Security\CompanyContext;
@@ -185,12 +182,22 @@ class ClientController extends AbstractController
                 return $this->redirectToRoute('client_show', ['id' => $clientId->toLegacyInt()]);
             } catch (InvalidArgumentException $e) {
                 $this->addFlash('danger', 'Validation: '.$e->getMessage());
+<<<<<<< test/functional-e2e-client-ddd
+
+                return $this->redirectToRoute('client_index');
+            }
+        }
+
+        // GET fallback: redirect to legacy form (Phase 2 ACL doesn't render its own form template yet).
+        return $this->redirectToRoute('client_new');
+=======
             }
         }
 
         return $this->render('client/new.html.twig', [
             'client' => null,
         ]);
+>>>>>>> main
     }
 
     #[Route('/new', name: 'client_new', methods: ['GET', 'POST'])]
