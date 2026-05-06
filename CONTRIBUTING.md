@@ -182,7 +182,7 @@ Le pre-push hook lance la suite **sans** les tests marqués `#[Group('skip-pre-p
 
 Refonte planifiée **EPIC-001 phase 2** (migration BC Vacation → DDD complet) ou refactor centralisé `SessionAwareTestTrait`.
 
-**Markers à auditer (hors scope sprint-006, candidats sprint-007+)**
+**Markers à auditer (hors scope sprint-006, candidats sprint-009+)**
 
 | Test | Catégorie | Raison |
 |---|---|---|
@@ -190,8 +190,9 @@ Refonte planifiée **EPIC-001 phase 2** (migration BC Vacation → DDD complet) 
 | `Controller\Analytics\DashboardControllerTest` | Session | Period selection state perdu entre requests |
 | `Controller\HomeControllerTest` | Auth | Auth flow flaky en test |
 | `Service\NotificationEventChainTest` | Integration | Event dispatch non-déterministe en test container |
-| `Controller\Admin\OnboardingTemplateControllerTest` | Admin | Patterns admin EA5 non couverts par fixtures |
+| `Controller\Admin\OnboardingTemplateControllerTest` | Admin | Patterns admin EA5 non couverts par fixtures (cf ADR-0004 sprint-008) |
 | `Controller\TimesheetControllerTest` | Multi-tenant | Filter exclut les fixtures cross-company |
+| `MultiTenant\TenantFilterRegressionTest` | Multi-tenant | **Régression sprint-007** (3/4 tests) — `find()` ne semble pas appliquer le SQLFilter. Story `SEC-MULTITENANT-FIX-001` sprint-009 (2 pts). cf ADR-0004 |
 
 **Markers retirés (causes racines fixées sprint-006)**
 
