@@ -83,6 +83,47 @@ final class Project implements AggregateRootInterface
         return $project;
     }
 
+<<<<<<< feat/ddd-phase2-project-acl
+    /**
+     * Reconstitute an aggregate from persisted state — used by ACL adapters
+     * during EPIC-001 Phase 2 strangler fig. Does NOT record domain events.
+     *
+     * @param array<string, mixed> $extra
+     */
+    public static function reconstitute(
+        ProjectId $id,
+        string $name,
+        ClientId $clientId,
+        ProjectType $projectType,
+        bool $isInternal,
+        array $extra = [],
+    ): self {
+        $project = new self($id, $name, $clientId, $projectType, $isInternal);
+
+        if (isset($extra['status']) && $extra['status'] instanceof ProjectStatus) {
+            $project->status = $extra['status'];
+        }
+        $project->description = $extra['description'] ?? null;
+        $project->reference = $extra['reference'] ?? null;
+        $project->budget = $extra['budget'] ?? null;
+        $project->soldAmount = $extra['soldAmount'] ?? null;
+        $project->startDate = $extra['startDate'] ?? null;
+        $project->endDate = $extra['endDate'] ?? null;
+        $project->completedAt = $extra['completedAt'] ?? null;
+        $project->repositoryUrl = $extra['repositoryUrl'] ?? null;
+        $project->documentationUrl = $extra['documentationUrl'] ?? null;
+        $project->notes = $extra['notes'] ?? null;
+
+        if (isset($extra['createdAt']) && $extra['createdAt'] instanceof DateTimeImmutable) {
+            $project->createdAt = $extra['createdAt'];
+        }
+        $project->updatedAt = $extra['updatedAt'] ?? null;
+
+        return $project;
+    }
+
+=======
+>>>>>>> main
     public function updateDetails(
         string $name,
         ?string $description,
