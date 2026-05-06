@@ -13,6 +13,7 @@ use App\Security\CompanyContext;
 use App\Security\Voter\ClientVoter;
 use App\Security\Voter\ContributorVoter;
 use App\Security\Voter\ExpenseReportVoter;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
@@ -23,6 +24,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * Combined coverage of ClientVoter, ContributorVoter, ExpenseReportVoter.
  * Same triplet base class — share a single fixture file.
  */
+#[AllowMockObjectsWithoutExpectations]
 final class ClientContributorExpenseVoterTest extends TestCase
 {
     private function makeCompany(int $id = 1): Company
