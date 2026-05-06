@@ -37,12 +37,18 @@ trait MultiTenantTestTrait
 
     /**
      * Crée une Company de test avec des valeurs par défaut valides.
+     *
+     * Le slug et le nom sont rendus uniques via uniqid() pour éviter les
+     * collisions UNIQUE quand plusieurs tests s'exécutent dans le même process
+     * (Foundry ResetDatabase ne couvre pas tous les cas selon la stratégie).
      */
     protected function createTestCompany(string $name = 'Test Company'): Company
     {
+        $unique = uniqid('', true);
+
         $company = new Company();
-        $company->setName($name);
-        $company->setSlug(strtolower(str_replace(' ', '-', $name)));
+        $company->setName($name.' '.$unique);
+        $company->setSlug(strtolower(str_replace(' ', '-', $name)).'-'.substr(str_replace('.', '', $unique), 0, 12));
         $company->setSubscriptionTier(Company::TIER_PROFESSIONAL);
         $company->setCurrency('EUR');
         $company->setStructureCostCoefficient('1.35');
@@ -61,12 +67,17 @@ trait MultiTenantTestTrait
 
     /**
      * Authentifie un User mocké pour fournir CompanyContext.
+     *
+     * L'email est unique par appel pour éviter les collisions UNIQUE quand
+     * plusieurs tests s'exécutent dans le même process.
      */
     protected function authenticateTestUser(Company $company, array $roles = ['ROLE_USER']): User
     {
+        $unique = uniqid('', true);
+
         $user = new User();
         $user->setCompany($company);
-        $user->setEmail('test@test.com');
+        $user->setEmail('test-'.substr(str_replace('.', '', $unique), 0, 12).'@test.com');
         $user->setPassword('password');
         $user->firstName = 'Test';
         $user->lastName = 'User';

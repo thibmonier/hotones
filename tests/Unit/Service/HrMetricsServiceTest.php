@@ -12,7 +12,6 @@ use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
 use App\Service\HrMetricsService;
 use DateTime;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,7 +20,6 @@ use PHPUnit\Framework\TestCase;
  * Coverage: All public methods + edge cases
  * P0 Priority: 0.66% → 100% coverage target
  */
-#[AllowMockObjectsWithoutExpectations]
 class HrMetricsServiceTest extends TestCase
 {
     private HrMetricsService $service;

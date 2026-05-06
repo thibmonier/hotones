@@ -15,10 +15,8 @@ use App\Security\CompanyContext;
 use App\Service\OnboardingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
-#[AllowMockObjectsWithoutExpectations]
 class OnboardingServiceTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $em;

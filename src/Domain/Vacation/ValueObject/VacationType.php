@@ -26,13 +26,17 @@ enum VacationType: string
     }
 
     /**
+     * Mapping `[label => value]` for Symfony ChoiceType.
+     *
+     * Symfony ChoiceType convention: keys = displayed labels, values = submitted values.
+     *
      * @return array<string, string>
      */
     public static function choices(): array
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $case->label();
+            $choices[$case->label()] = $case->value;
         }
 
         return $choices;

@@ -15,7 +15,6 @@ use App\Security\CompanyContext;
 use App\Service\NotificationService;
 use App\Tests\Unit\Service\Fixture\TestNotificationEvent;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -32,7 +31,6 @@ use Psr\Log\LoggerInterface;
  *  - shouldSendEmail / shouldSendWebhook: default fallbacks
  *  - cleanupOldNotifications: repo delegation + log
  */
-#[AllowMockObjectsWithoutExpectations]
 final class NotificationServiceTest extends TestCase
 {
     private EntityManagerInterface&MockObject $em;

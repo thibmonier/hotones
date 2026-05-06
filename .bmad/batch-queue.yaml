@@ -2,20 +2,98 @@ execution:
   mode: "sequential"
   resume_on_failure: true
   checkpoint_interval: 1
-  started_at: "2026-02-22T10:00:00Z"
-  completed_at: "2026-02-22T16:00:00Z"
+  sprint: "sprint-006"
+  reset_at: "2026-05-05T11:30:00Z"
+  reset_reason: "Reset après merge PR #99 reverse-engineering bundle. Reflète les stories réellement restantes du sprint-006."
 
 queue:
-  US-001:
-    title: "Filtres avances liste projets"
+  TEST-FUNCTIONAL-FIXES-002:
+    title: "Auditer 14 classes skip-pre-push : fix ou ADR de tolérance permanente"
     points: 5
     priority: 1
-    status: "completed"
+    status: "pending"
     depends_on: []
+    nature: "test"
+    tasks:
+      - id: "T-TFF2-01"
+        title: "Cleanup 3 Vacation markers obsolètes"
+        estimate_hours: 1
+      - id: "T-TFF2-02"
+        title: "Lot fix #1 — Onboarding + PerformanceReview"
+        estimate_hours: 3
+      - id: "T-TFF2-03"
+        title: "Lot fix #2 — RunningTimer + Order + Project"
+        estimate_hours: 3
+      - id: "T-TFF2-04"
+        title: "ADR-0003 tolérance test legacy permanente"
+        estimate_hours: 1
+      - id: "T-TFF2-05"
+        title: "Update CONTRIBUTING.md + référence ADR-0003"
+        estimate_hours: 0.5
 
-  US-002:
-    title: "Previsualisation PDF devis"
+  TEST-MOCKS-002:
+    title: "Convertir createMock → createStub sur 26 classes mixtes (carryover lots 2-4)"
     points: 5
     priority: 2
-    status: "completed"
+    status: "in-progress"
     depends_on: []
+    nature: "refactor"
+    note: "Audit T-TM2-01 (#95) + lot 1 (#96) + lot 2 pilot (#97) déjà mergés. Reste lots 2 finition + lot 3 + lot 4 + doc."
+    tasks:
+      - id: "T-TM2-03"
+        title: "Lot 2 — finition 8 classes Cas A restantes"
+        estimate_hours: 2
+      - id: "T-TM2-04"
+        title: "Lot 3 — 6 classes Cas B/C"
+        estimate_hours: 3
+      - id: "T-TM2-05"
+        title: "Lot 4 — 6 classes B/C/D"
+        estimate_hours: 3
+      - id: "T-TM2-06"
+        title: "Doc createStub vs createMock dans CONTRIBUTING.md"
+        estimate_hours: 1
+
+  TEST-COVERAGE-001:
+    title: "Pousser coverage SonarCloud → 45% (cible sprint-007 = 50%)"
+    points: 3
+    priority: 3
+    status: "pending"
+    depends_on: []
+    nature: "test"
+    tasks:
+      - id: "T-TC1-01"
+        title: "Audit SonarCloud top 10 fichiers sous-couverts"
+        estimate_hours: 1
+      - id: "T-TC1-02"
+        title: "Lot 1 — Forecasting + calculator"
+        estimate_hours: 2
+      - id: "T-TC1-03"
+        title: "Lot 2 — Analytics ou Notification"
+        estimate_hours: 2
+      - id: "T-TC1-04"
+        title: "Doc tests.md cible progressive (45→50→55%)"
+        estimate_hours: 0.5
+
+  # HOUSEKEEPING-001 partial — déjà en partie livré via PR #98 (sprints index + velocity tracker)
+  # et PR #99 (reverse-engineering bundle, hors scope sprint mais sur la même branche).
+  # Restant: éventuels CHANGELOG / liens cassés / typos. Closurable au fil de l'eau.
+  HOUSEKEEPING-001:
+    title: "Bundle Could doc-only (CHANGELOG, README, liens, typos)"
+    points: 2
+    priority: 4
+    status: "partially-done"
+    depends_on: []
+    nature: "doc-only"
+    note: "PR #98 (02dddc0/0ec4849) + PR #99 (6 commits reverse-engineering) = livraison majeure. Reste: CHANGELOG sprint-005 si manquant + liens cassés docs/."
+    tasks:
+      - id: "T-HK1-01"
+        title: "CHANGELOG sprint-005 (vérifier si manquant)"
+        estimate_hours: 0.5
+      - id: "T-HK1-03"
+        title: "Audit liens cassés docs/"
+        estimate_hours: 0.5
+
+# Carryover identifiés pour sprint-007 (non en file sprint-006):
+# - GAP-C1 multi-tenant SQLFilter + GAP-C2 voters (32 pts) → epic Security Hardening
+# - EPIC-001 phase 0 cherry-pick (5 pts)
+# - Migrations DB atelier (Order.winProbability, CompanySettings.aiKeys, AiUsageLog, FULLTEXT) (~5 pts)
