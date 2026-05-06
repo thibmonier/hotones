@@ -141,38 +141,73 @@ Le pre-push hook lance la suite **sans** les tests marqués `#[Group('skip-pre-p
 
 #### Liste des classes skippées
 
+> **Audit sprint-006** (TEST-FUNCTIONAL-FIXES-002, PRs #100 → #103) :
+> 5 markers retirés (causes racines fixées), 3 markers conservés via ADR-0003,
+> 6 markers restent à auditer hors scope sprint-006.
+
+**Markers conservés (legacy tolérée — voir [ADR-0003](docs/02-architecture/adr/0003-test-legacy-tolerance-vacation-csrf-session-boundary.md))**
+
+| Test | Catégorie | Raison |
+|---|---|---|
+| `Functional\Vacation\CancelNotificationFlowTest` | CSRF + Messenger | `SessionNotFoundException` sur CSRF token via container test (Symfony 7+/8+ isolation request/container) |
+| `Functional\Controller\Vacation\VacationApprovalControllerTest` | CSRF/Session | Idem |
+| `Functional\Controller\Vacation\VacationRequestControllerTest` | CSRF/Session | Idem |
+
+Refonte planifiée **EPIC-001 phase 2** (migration BC Vacation → DDD complet) ou refactor centralisé `SessionAwareTestTrait`.
+
+**Markers à auditer (hors scope sprint-006, candidats sprint-007+)**
+
 | Test | Catégorie | Raison |
 |---|---|---|
 | `MultiTenant\ControllerAccessControlTest` | Multi-tenant | Filtre company-context fait fail certains asserts |
 | `Controller\Analytics\DashboardControllerTest` | Session | Period selection state perdu entre requests |
 | `Controller\HomeControllerTest` | Auth | Auth flow flaky en test |
 | `Service\NotificationEventChainTest` | Integration | Event dispatch non-déterministe en test container |
-| `Controller\OnboardingControllerTest` | Session/CSRF | Token resolution avant 1ère request |
 | `Controller\Admin\OnboardingTemplateControllerTest` | Admin | Patterns admin EA5 non couverts par fixtures |
-| `Controller\OrderControllerPreviewTest` | Form | Choice values mismatch |
-| `Controller\PerformanceReviewControllerTest` | Session | Same as Onboarding |
-| `Controller\ProjectControllerFilterTest` | URL params | Query string state lost on redirect |
-| `Repository\RunningTimerRepositoryTest` | Repository | Inverse-side Collection pas hydratée |
 | `Controller\TimesheetControllerTest` | Multi-tenant | Filter exclut les fixtures cross-company |
-| Vacation tests (3) | DDD migration | Fixés par PR #82 ; le marker est neutre une fois mergé |
+
+**Markers retirés (causes racines fixées sprint-006)**
+
+| Test | Story | Cause racine |
+|---|---|---|
+| `Controller\OnboardingControllerTest` | T-TFF2-02 #101 | Bloqué par `MultiTenantTestTrait` UNIQUE collisions (fix T-TFF2-01) |
+| `Controller\PerformanceReviewControllerTest` | T-TFF2-02 #101 | Idem |
+| `Controller\OrderControllerPreviewTest` | T-TFF2-03 #102 | Idem (passait déjà après fix T-TFF2-01) |
+| `Controller\ProjectControllerFilterTest` | T-TFF2-03 #102 | Deprecation PHP 8.4 sur `null` array offset (`ProjectRepository:376`) |
+| `Repository\RunningTimerRepositoryTest` | T-TFF2-03 #102 | API drift Foundry v2 — `->_real()` obsolète |
 
 #### Comment ajouter un test
 
 ```php
 use PHPUnit\Framework\Attributes\Group;
 
+// {Justification métier ou technique — référence ADR si applicable}
+// Ex: voir docs/02-architecture/adr/NNNN-...md
 #[Group('skip-pre-push')]
 final class MyBrittleTest extends WebTestCase { /* ... */ }
 ```
 
-Justifier par un commentaire **au-dessus** du marker indiquant la raison + la story de fix prévue (sinon refus en review).
+**Règle de review** : tout nouveau marker `#[Group('skip-pre-push')]` doit être accompagné :
+1. D'un commentaire au-dessus indiquant la cause racine + la story de fix prévue OU une référence ADR existante.
+2. D'une PR de fix planifiée dans le sprint courant ou sprint suivant.
+3. Sinon **refus en review**.
 
 #### Comment retirer un test
 
-1. Fixer la cause racine
-2. Supprimer le marker `#[Group('skip-pre-push')]` (et l'import `Group` si plus utilisé)
-3. Vérifier que le test passe en local
-4. Mettre à jour la table ci-dessus
+**Avant de retirer** :
+
+1. Vérifier si le test fait partie de la liste **markers conservés** ci-dessus → consulter l'ADR référencé. Ne pas retirer à l'aveugle.
+2. Sinon : identifier la cause racine du fail (ex: bug production révélé par le test, ou bug d'infrastructure de test).
+
+**Procédure** :
+
+1. **Fixer la cause racine** (côté production OU côté infrastructure de test). Documenter en commit.
+2. Supprimer le marker `#[Group('skip-pre-push')]` (et l'import `Group` si devenu inutilisé).
+3. Vérifier que le test passe en local : `vendor/bin/phpunit chemin/vers/MyTest.php`.
+4. Vérifier que le pre-push complet passe : `make pre-push` (ou équivalent) sans `--no-verify`.
+5. Mettre à jour la table **Markers retirés** ci-dessus avec story + PR + cause racine.
+
+**Bonus T-TFF2-01** : si plusieurs markers tombent simultanément après une seule correction (ex: fix `MultiTenantTestTrait` débloque ~3 tests), c'est probablement le bon signal — un seul fix architectural peut résoudre plusieurs tests à la fois. Privilégier ce type de refactor centralisé aux fixes individuels.
 
 ## 📏 Standards de code
 

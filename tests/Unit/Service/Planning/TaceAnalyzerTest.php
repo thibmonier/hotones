@@ -10,14 +10,12 @@ use App\Repository\ContributorRepository;
 use App\Repository\StaffingMetricsRepository;
 use App\Service\Planning\TaceAnalyzer;
 use DateTime;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
  * Comprehensive unit tests for TaceAnalyzer.
  */
-#[AllowMockObjectsWithoutExpectations]
 class TaceAnalyzerTest extends TestCase
 {
     private function createService(

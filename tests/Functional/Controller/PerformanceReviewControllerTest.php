@@ -11,13 +11,11 @@ use App\Repository\ContributorRepository;
 use App\Repository\PerformanceReviewRepository;
 use App\Repository\UserRepository;
 use App\Tests\Support\MultiTenantTestTrait;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-#[Group('skip-pre-push')]
 class PerformanceReviewControllerTest extends WebTestCase
 {
     use Factories;
