@@ -83,6 +83,7 @@ final class Project implements AggregateRootInterface
         return $project;
     }
 
+<<<<<<< feat/ddd-phase2-project-acl
     /**
      * Reconstitute an aggregate from persisted state — used by ACL adapters
      * during EPIC-001 Phase 2 strangler fig. Does NOT record domain events.
@@ -121,6 +122,8 @@ final class Project implements AggregateRootInterface
         return $project;
     }
 
+=======
+>>>>>>> main
     public function updateDetails(
         string $name,
         ?string $description,

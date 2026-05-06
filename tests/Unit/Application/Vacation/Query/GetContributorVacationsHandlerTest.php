@@ -16,6 +16,7 @@ use App\Domain\Vacation\ValueObject\VacationType;
 use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Repository\ContributorRepository;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\TestCase;
  *  - Unknown contributor -> empty array (no repository call attempted on missing id)
  *  - Existing contributor -> array of VacationDTO mapped via fromEntity()
  */
+#[AllowMockObjectsWithoutExpectations]
 final class GetContributorVacationsHandlerTest extends TestCase
 {
     private VacationRepositoryInterface&MockObject $vacationRepo;
@@ -54,7 +56,7 @@ final class GetContributorVacationsHandlerTest extends TestCase
     #[Test]
     public function mapsContributorVacationsToDTOs(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getFullName')->willReturn('Adrien Test');
 
         $this->contributorRepo->expects(self::once())->method('find')->with(42)->willReturn($contributor);
@@ -75,12 +77,12 @@ final class GetContributorVacationsHandlerTest extends TestCase
 
     private function buildVacation(string $contributorName, VacationType $type): Vacation
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getFullName')->willReturn($contributorName);
 
         return Vacation::request(
             VacationId::generate(),
-            $this->createMock(Company::class),
+            $this->createStub(Company::class),
             $contributor,
             DateRange::fromStrings('2026-06-01', '2026-06-03'),
             $type,
