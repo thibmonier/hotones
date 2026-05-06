@@ -81,6 +81,63 @@ class CompanySettings implements CompanyOwnedInterface
     }
 
     /**
+     * Clés API IA par tenant (atelier business 2026-05-15, Q8).
+     *
+     * Permettent à chaque company de configurer ses propres clés vers les
+     * fournisseurs IA (Anthropic / OpenAI / Mistral / Google). Si null:
+     * fallback sur les clés globales définies dans `.env`.
+     *
+     * ⚠️ Stocké en clair pour Phase 1 (atelier accepte trade-off rapide).
+     * Phase 2: encryption via Symfony AbstractEncryptedFieldsListener
+     * (cf TODO `aiKeys-encryption` sprint-009+).
+     */
+    #[ORM\Column(type: 'text', nullable: true)]
+    public ?string $aiKeyAnthropic = null {
+        get => $this->aiKeyAnthropic;
+        set {
+            $this->aiKeyAnthropic = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    public ?string $aiKeyOpenai = null {
+        get => $this->aiKeyOpenai;
+        set {
+            $this->aiKeyOpenai = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    public ?string $aiKeyMistral = null {
+        get => $this->aiKeyMistral;
+        set {
+            $this->aiKeyMistral = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    public ?string $aiKeyGoogle = null {
+        get => $this->aiKeyGoogle;
+        set {
+            $this->aiKeyGoogle = $value;
+        }
+    }
+
+    /**
+     * Budget mensuel maximum IA par tenant (en USD).
+     *
+     * Garde-fou contre l'abus AI. Atelier business 2026-05-15 Q8.
+     * 0 ou null = pas de limite (fallback global).
+     */
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    public ?string $aiMonthlyBudgetUsd = null {
+        get => $this->aiMonthlyBudgetUsd;
+        set {
+            $this->aiMonthlyBudgetUsd = $value;
+        }
+    }
+
+    /**
      * Dates de mise à jour.
      */
     #[ORM\Column(type: 'datetime')]
