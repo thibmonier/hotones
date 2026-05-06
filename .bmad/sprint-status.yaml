@@ -1,15 +1,15 @@
 metadata:
-  sprint_id: "sprint-006"
-  name: "Test Debt Cleanup & Workflow Hygiene"
-  start_date: "2026-05-04"
-  end_date: "2026-05-15"
-  goal: "Eliminer la dette AllowMockObjectsWithoutExpectations (31 classes), auditer les 14 classes encore en skip-pre-push, et fiabiliser les guards workflow (pre-commit auto-generes, PR template gating)."
-  capacity_points: 32
-  capacity_projected_points: 28
-  committed_points: 22
-  velocity_target: "22-28"
-  last_sync: "2026-05-05T11:00:00Z"
-  current_day: 2
+  sprint_id: "sprint-011"
+  name: "DDD Phase 3 Completion + E2E Tests"
+  start_date: "2026-05-06"
+  end_date: "TBD"
+  goal: "Compléter Phase 3 EPIC-001 par la migration des controllers Project + Order + Client edit/delete vers les use cases DDD, ajouter test E2E sur la route DDD livrée sprint-010, et activer le buffer DDD-PHASE1-INVOICE."
+  capacity_points: 22
+  capacity_projected_points: 22
+  committed_points: 17
+  velocity_target: "17-22"
+  last_sync: "2026-05-06T18:00:00Z"
+  current_day: 1
 
 # History of completed sprints, kept for traceability and velocity tracking.
 sprint_history:
@@ -45,6 +45,54 @@ sprint_history:
     closed_at: "2026-05-04"
     review: "project-management/sprints/sprint-005-test-stabilization/sprint-review.md"
     retro: "project-management/sprints/sprint-005-test-stabilization/sprint-retro.md"
+
+  sprint-006:
+    name: "Test Debt Cleanup & Workflow Hygiene"
+    points_planned: 22
+    points_delivered: 19
+    velocity: 19
+    closed_at: "2026-05-05"
+    notes: "TEST-MOCKS-002 audit + cleanup + PR template gating + pre-commit auto-generes guards. PRs #100-#105."
+
+  sprint-007:
+    name: "Security Hardening + DDD Foundation"
+    points_planned: 32
+    points_delivered: 32
+    velocity: 32
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-007-security-hardening-ddd/sprint-review.md"
+    retro: "project-management/sprints/sprint-007-security-hardening-ddd/sprint-retro.md"
+    notes: "Mode agentic accéléré 2j. EPIC-001 Phase 0 ✅. SEC-MULTITENANT-001/002/003 + SEC-VOTERS-001/002 + DDD-PHASE0-001/002 + TEST-MOCKS-003. 10 PRs (#114-#123). 3 gap-analysis Critical résolus (C1+C2+D1)."
+
+  sprint-008:
+    name: "DDD Phase 1 + Tech Debt + PRD/DB"
+    points_planned: 17
+    points_delivered: 17
+    velocity: 17
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-008-ddd-phase1-and-tech-debt/sprint-review.md"
+    retro: "project-management/sprints/sprint-008-ddd-phase1-and-tech-debt/sprint-retro.md"
+    notes: "EPIC-001 Phase 1 ✅ 100% (3 BCs additifs Client+Project+Order). 8 PRs (#126-#133). 4 ADRs (0004/0005/0006/0007)."
+
+  sprint-009:
+    name: "DDD Phase 2 Strangler Fig + Critical Fixes"
+    points_planned: 15
+    points_delivered: 14
+    velocity: 14
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-009-strangler-fig-and-fixes/sprint-review.md"
+    retro: "project-management/sprints/sprint-009-strangler-fig-and-fixes/sprint-retro.md"
+    notes: "EPIC-001 Phase 2 amorcée (Client BC ACL + use cases). PHPUnit Notices 251→0. INVESTIGATE-CAT-C déférée sprint-010. 6 PRs (#136-#141). 2 ADRs (0008 ACL pattern)."
+
+  sprint-010:
+    name: "DDD Phase 2 Completion + Phase 3 Start"
+    points_planned: 17
+    points_delivered: 17
+    velocity: 17
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-010-ddd-phase2-completion/sprint-review.md"
+    retro: "project-management/sprints/sprint-010-ddd-phase2-completion/sprint-retro.md"
+    notes: "EPIC-001 Phase 2 ✅ 100% (3/3 BCs ACL Client+Project+Order). Phase 3 amorcée (1er controller migré). 5 PRs (#144-#148). ADR-0009 controller migration pattern."
 
 stories:
 
