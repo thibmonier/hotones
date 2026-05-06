@@ -33,4 +33,67 @@ final class InvoiceNumberTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         InvoiceNumber::fromString('F1');
     }
+
+    public function testGenerateProducesExpectedValue(): void
+    {
+        $number = InvoiceNumber::generate(2025, 3, 42);
+        $this->assertSame('F202503042', $number->getValue());
+    }
+
+    public function testGenerateExtractsYearMonthSequence(): void
+    {
+        $number = InvoiceNumber::generate(2025, 3, 42);
+        $this->assertSame(2025, $number->getYear());
+        $this->assertSame(3, $number->getMonth());
+        $this->assertSame(42, $number->getSequence());
+    }
+
+    public function testGenerateRejectsYearTooSmall(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        InvoiceNumber::generate(1999, 1, 1);
+    }
+
+    public function testGenerateRejectsYearTooLarge(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        InvoiceNumber::generate(2101, 1, 1);
+    }
+
+    public function testGenerateRejectsMonthBelowOne(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        InvoiceNumber::generate(2025, 0, 1);
+    }
+
+    public function testGenerateRejectsMonthAbove12(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        InvoiceNumber::generate(2025, 13, 1);
+    }
+
+    public function testGenerateRejectsZeroSequence(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        InvoiceNumber::generate(2025, 1, 0);
+    }
+
+    public function testEqualsTrueForSameValue(): void
+    {
+        $a = InvoiceNumber::fromString('F202501001');
+        $b = InvoiceNumber::fromString('F202501001');
+        $this->assertTrue($a->equals($b));
+    }
+
+    public function testEqualsFalseForDifferentValues(): void
+    {
+        $a = InvoiceNumber::fromString('F202501001');
+        $b = InvoiceNumber::fromString('F202501002');
+        $this->assertFalse($a->equals($b));
+    }
+
+    public function testToStringReturnsValue(): void
+    {
+        $this->assertSame('F202501001', (string) InvoiceNumber::fromString('F202501001'));
+    }
 }
