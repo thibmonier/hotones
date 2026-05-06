@@ -103,6 +103,33 @@ Les hooks `.githooks/pre-commit` et `.githooks/pre-push` détectent automatiquem
 
 Si vous voulez bypasser **intentionnellement** un hook : `git commit --no-verify` / `git push --no-verify`. Documentez la raison dans le message de commit.
 
+#### Cas légitimes pour `--no-verify`
+
+| Cas | OK avec `--no-verify` ? | Raison |
+|---|:-:|---|
+| Doc-only commit (pas de code modifié) | ✅ | Hook lourd inutile sur Markdown pur |
+| Commit qui suit immédiatement un fix de hook (rebase / amend) | ✅ | Hook déjà passé sur version précédente |
+| Pre-existing test failures sur main (non introduits par votre PR) | ✅ avec ADR | Documentez via ADR + skip-pre-push marker |
+| Vous voulez juste pousser plus vite | ❌ | Le hook a une raison d'être |
+| Vous savez que le hook va échouer sur votre code | ❌ | Fixez le code, pas bypassez la vérif |
+| CI / production push | ❌ jamais | La CI doit toujours vérifier |
+
+#### Pre-flight check avant push
+
+Avant un push, exécutez localement la même validation que le hook :
+
+```bash
+# Tests unitaires (rapides, ~1s)
+docker compose exec app vendor/bin/phpunit --testsuite=unit
+
+# Suite complète (peut révéler des pre-existing failures)
+docker compose exec app vendor/bin/phpunit
+```
+
+Si la suite complète a des failures **pre-existing** (sur main, non introduits par votre branche) :
+1. Ouvrez une issue documentant les failures (cf. `INVESTIGATE-FUNCTIONAL-FAILURES` sprint-008)
+2. Push avec `--no-verify` est acceptable, mais référencez l'issue dans le message de commit
+
 ### Pre-commit fichiers auto-générés (OPS-014)
 
 Le hook `pre-commit` rejette systématiquement les fichiers auto-générés stagés.
@@ -653,6 +680,60 @@ class MyServiceTest extends TestCase
         $this->assertSame('expected', $result);
     }
 }
+```
+
+#### `createMock` vs `createStub` — guide de décision
+
+> **Origine**: TEST-MOCKS-002/003 (sprints 006-007). PHPUnit 13 émet une PHPUnit Notice "No expectations were configured" pour chaque `createMock(...)` qui n'utilise jamais `->expects(...)`. Solution: utiliser `createStub` quand on n'a pas besoin de vérifier les appels.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Le mock va-t-il utiliser ->expects(...) ou ->with(...) ?│
+├─────────────────────────────────────────────────────────┤
+│   OUI → createMock (vérification d'appel)               │
+│   NON → createStub (juste un faux retour de méthode)    │
+└─────────────────────────────────────────────────────────┘
+```
+
+##### Règles concrètes
+
+| Cas | Outil | Raison |
+|---|---|---|
+| `$mock->expects($this->once())->method('do')` | `createMock` | Vérification du nombre d'appels |
+| `$mock->expects($this->once())->method('do')->with($arg)` | `createMock` | Vérification arguments |
+| `$mock->method('find')->willReturn($entity)` | `createStub` | Juste configurer un retour |
+| `$mock->method('find')->willReturnCallback(fn ...)` | `createStub` | Pas de vérification d'appel |
+| Mock passé en argument et jamais asserted | `createStub` | Inline arg-passed mock |
+| Type declaration: `private TYPE&MockObject $foo` | `createMock` ou changer → `&Stub` | Sinon TypeError sur assignation |
+
+##### Audit script
+
+Pour identifier rapidement les conversions safe sur un fichier (ou batch):
+
+```bash
+# Audit un fichier
+perl tools/count-mocks.pl tests/Unit/Service/FooTest.php
+
+# Audit toute la suite Unit (JSON pour scripting)
+perl tools/count-mocks.pl --json $(find tests/Unit -name '*Test.php')
+```
+
+Le script identifie chaque mock et indique si la conversion est `CONVERTIBLE` ou nécessite une `REVIEW` (présence d'`expects`/`with` ou type declaration plain `MockObject`).
+
+##### Type declarations
+
+```php
+// ❌ MauvAis: après conversion à createStub, TypeError sur assignation
+private MyClass&MockObject $foo;
+$this->foo = $this->createStub(MyClass::class);
+
+// ✅ Bon: type aligné
+private MyClass&Stub $foo;
+$this->foo = $this->createStub(MyClass::class);
+
+// ✅ Acceptable: pas de type d'intersection
+private MyClass $foo;
+$this->foo = $this->createStub(MyClass::class);
 ```
 
 #### Tests fonctionnels
