@@ -8,7 +8,15 @@
 | Source: Codebase analysis (project-management/scan-report.md)  |
 | Status: DRAFT - Requires human validation                      |
 | Generated: 2026-05-04                                          |
-| Branch:    chore/housekeeping-001-doc-bundle                   |
+| Updated:   2026-05-06 (PRD-UPDATE-001 atelier business reflect)|
+| Branch:    docs/prd-update-001-atelier-reflect                 |
++==============================================================+
+| Changelog:                                                     |
+|  v1.0 (2026-05-04) — initial reverse-engineered draft          |
+|  v1.1 (2026-05-06) — PRD-UPDATE-001:                           |
+|    + FR-OPS-08 (cascading dependent form fields, US-086)       |
+|    + FR-MKT-03 absorbe FR-CRM-03 (lead funnel unifié)          |
+|    + ROLE_COMMERCIAL persona P-009 documenté + role_hierarchy  |
 +==============================================================+
 | Confidence Levels:                                             |
 | - Executive Summary:       HIGH                                |
@@ -150,7 +158,7 @@ ROLE_SUPERADMIN ─┬─ ROLE_ADMIN ─┬─ ROLE_MANAGER ─┬─ ROLE_CHEF_
 |----|-------------|--------|----------|
 | FR-CRM-01 | Manage clients (companies on the buyer side) | `Client`, `ClientController` | P-002, P-003, P-005 |
 | FR-CRM-02 | Manage client contacts | `ClientContact`, `ClientContactController` | P-002, P-003 |
-| FR-CRM-03 | CRM lead pipeline (capture + nurture) | `LeadCapture`, `CrmLeadController`, `LeadMagnetController` | P-005, P-007 |
+| ~~FR-CRM-03~~ | ~~CRM lead pipeline (capture + nurture)~~ — **MERGED INTO FR-MKT-03** (atelier 2026-05-15) | — | — |
 | FR-CRM-04 | HubSpot synchronisation | `HubSpotSettings`, `Service/HubSpot/*`, `HubSpotSettingsController` | P-005 |
 | FR-CRM-05 | Sales dashboard (pipeline, win-rate, forecast) | `SalesDashboardController`, `FactForecast` | P-003, P-005 |
 
@@ -275,8 +283,10 @@ ROLE_SUPERADMIN ─┬─ ROLE_ADMIN ─┬─ ROLE_MANAGER ─┬─ ROLE_CHEF_
 |----|-------------|--------|----------|
 | FR-MKT-01 | Public marketing pages (`/`, `/features`, `/pricing`, `/about`, `/contact`, `/legal`) | `PublicController`, `HomeController`, `AboutController` | P-007 |
 | FR-MKT-02 | Public blog with categories + tags | `BlogPost`, `BlogCategory`, `BlogTag`, `BlogController`, `BlogPostCrudController` | P-005, P-007 |
-| FR-MKT-03 | Lead-magnet capture (email gating) | `LeadMagnetController`, `LeadCapture` | P-005, P-007 |
+| FR-MKT-03 | Unified lead funnel (capture + nurture) — replaces FR-CRM-03 | `LeadMagnetController`, `LeadCapture`, `CrmLeadController` | P-005, P-007 |
 | FR-MKT-04 | Sitemap generation | `presta/sitemap-bundle` | system |
+
+> **FR-MKT-03 fusion** (atelier business 2026-05-15): l'ancienne `FR-CRM-03` ("CRM lead pipeline (capture + nurture)") fusionne avec `FR-MKT-03` ("Lead-magnet capture") en une seule FR unifiée "Lead funnel". US-012 ("Lead funnel") absorbe US-077 (marquée MERGED). Justification: les deux décrivaient le même funnel utilisateur (entrée marketing → CRM nurturing → conversion), pas deux capabilities distinctes.
 
 ### 5.15 Operations & platform
 
@@ -288,9 +298,12 @@ ROLE_SUPERADMIN ─┬─ ROLE_ADMIN ─┬─ ROLE_MANAGER ─┬─ ROLE_CHEF_
 | FR-OPS-04 | Async messaging (Redis + Doctrine transports) | `MessageHandler/*`, `messenger.yaml` | system |
 | FR-OPS-05 | CSP violation reporting | `CspReportController`, `/csp/report` | system |
 | FR-OPS-06 | Search across resources | `SearchController`, `/api/search` | All authenticated |
-| FR-OPS-07 | Validation endpoint(s) | `ValidationController` | All authenticated |
+| FR-OPS-07 | Atomic validation endpoint(s) | `ValidationController`, `/api/validate` | All authenticated |
+| FR-OPS-08 | Cascading dependent form fields (Client → Projects → Tasks → SubTasks) | `DependentFieldsController` (US-086) | All authenticated |
 
-> **Coverage**: 14 functional capability groups, **~80 requirements** (FR-IAM-01 through FR-OPS-07).
+> **Coverage**: 14 functional capability groups, **~81 requirements** (FR-IAM-01 through FR-OPS-08).
+>
+> **FR-OPS-08 source**: atelier business 2026-05-15 question Q7 (validation atomique vs cascading). Décision: séparation des deux périmètres. FR-OPS-07 reste pour validation atomique (5 types), FR-OPS-08 nouveau pour cascading selects côté UI. Implémenté via US-086 (3 pts, Should).
 
 ---
 
@@ -411,9 +424,9 @@ ROLE_SUPERADMIN ─┬─ ROLE_ADMIN ─┬─ ROLE_MANAGER ─┬─ ROLE_CHEF_
 
 | ID | Risk | Severity | Mitigation |
 |----|------|----------|------------|
-| R-01 | Authorization gap: 1 voter for ~80 controllers — relies on `IsGranted` annotations + path-based access control | 🔴 high | Audit per-controller `IsGranted`; create entity-level voters for `Project`, `Order`, `Invoice`, `Timesheet`, `Vacation`, `Contributor`. Track in security backlog. |
-| R-02 | `ROLE_COMMERCIAL` exists in code but not in `role_hierarchy` | 🔴 high | Decide: wire into hierarchy or remove. Audit grep references. |
-| R-03 | Multi-tenant SQLFilter / TenantContext not located by scan | 🟠 med | Verify implementation against `.claude/rules/14-multitenant.md`; add isolation regression tests. |
+| ~~R-01~~ | ~~Authorization gap: 1 voter for ~80 controllers~~ — **RESOLVED sprint-007** (PR #119, #120: 8 voters Project/Order/Invoice/Timesheet/Vacation/Client/ExpenseReport/Contributor) | ✅ resolved | — |
+| ~~R-02~~ | ~~`ROLE_COMMERCIAL` exists in code but not in `role_hierarchy`~~ — **RESOLVED 2026-05-04** (atelier B Q décision: wire as peer of `ROLE_CHEF_PROJET`, sprint-006 PR #99) | ✅ resolved | — |
+| ~~R-03~~ | ~~Multi-tenant SQLFilter / TenantContext not located~~ — **RESOLVED sprint-007** (PR #114-#118: TenantId VO + TenantContext + TenantFilter + bridge CompanyOwnedInterface + 4 régression tests) | ✅ resolved | — |
 | R-04 | Architectural drift: legacy `Entity/Controller` vs DDD layers — partial migration | 🟠 med | Owner: tech lead. Roadmap: BC-by-BC migration; Deptrac to enforce boundaries. |
 | R-05 | `Application/Reservation` + `Domain/{Catalog,Notification,Reservation}` look like template stubs (not aligned with HotOnes domain) | 🟠 med | Audit and either flesh out as real BCs or remove to avoid confusion. |
 | R-06 | Test debt: sprint-005 explicitly tackles mockObjects, flaky functional tests, pre-push hook bypass | 🟠 med | Sprint-005 in flight (capacity 32 pts) tracks this. |

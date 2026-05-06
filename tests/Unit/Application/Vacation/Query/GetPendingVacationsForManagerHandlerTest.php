@@ -17,6 +17,7 @@ use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Repository\ContributorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ use PHPUnit\Framework\TestCase;
  *  - Manager found -> repository queried with the managed contributors collection
  *    and result mapped to VacationDTO[]
  */
+#[AllowMockObjectsWithoutExpectations]
 final class GetPendingVacationsForManagerHandlerTest extends TestCase
 {
     private VacationRepositoryInterface&MockObject $vacationRepo;
@@ -56,8 +58,8 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
     #[Test]
     public function mapsPendingVacationsToDTOs(): void
     {
-        $manager = $this->createMock(Contributor::class);
-        $teamMate = $this->createMock(Contributor::class);
+        $manager = $this->createStub(Contributor::class);
+        $teamMate = $this->createStub(Contributor::class);
         $teamMate->method('getFullName')->willReturn('Adrien Test');
 
         $managed = new ArrayCollection([$teamMate]);
@@ -80,12 +82,12 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
 
     private function buildVacation(string $contributorName, VacationType $type): Vacation
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getFullName')->willReturn($contributorName);
 
         return Vacation::request(
             VacationId::generate(),
-            $this->createMock(Company::class),
+            $this->createStub(Company::class),
             $contributor,
             DateRange::fromStrings('2026-06-15', '2026-06-19'),
             $type,
