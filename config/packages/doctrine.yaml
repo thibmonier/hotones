@@ -43,6 +43,11 @@ doctrine:
                 DAY: DoctrineExtensions\Query\Mysql\Day
                 DATEDIFF: DoctrineExtensions\Query\Mysql\DateDiff
 
+        filters:
+            tenant_filter:
+                class: App\Infrastructure\Multitenant\Doctrine\Filter\TenantFilter
+                enabled: false # Activated at runtime by TenantBootstrapListener (sprint-007 SEC-MULTITENANT-001)
+
 when@test:
     doctrine:
         dbal:
