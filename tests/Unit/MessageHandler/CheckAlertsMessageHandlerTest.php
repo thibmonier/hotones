@@ -7,6 +7,7 @@ namespace App\Tests\Unit\MessageHandler;
 use App\Message\CheckAlertsMessage;
 use App\MessageHandler\CheckAlertsMessageHandler;
 use App\Service\AlertDetectionService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,7 @@ use Psr\Log\LoggerInterface;
  * and the aggregated total, and that it forwards the call without
  * mutating the result.
  */
+#[AllowMockObjectsWithoutExpectations]
 final class CheckAlertsMessageHandlerTest extends TestCase
 {
     private AlertDetectionService&MockObject $service;

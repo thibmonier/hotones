@@ -18,7 +18,9 @@ use App\Repository\UserRepository;
 use App\Service\AlertDetectionService;
 use App\Service\ProfitabilityPredictor;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -32,25 +34,26 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * integration-test setup; that path is left to a follow-up integration
  * story (sprint-005 candidate).
  */
+#[AllowMockObjectsWithoutExpectations]
 final class AlertDetectionServiceTest extends TestCase
 {
-    private ProjectRepository&MockObject $projectRepository;
-    private OrderRepository&MockObject $orderRepository;
-    private UserRepository&MockObject $userRepository;
-    private ContributorRepository&MockObject $contributorRepository;
-    private StaffingMetricsRepository&MockObject $staffingMetricsRepository;
-    private ProfitabilityPredictor&MockObject $profitabilityPredictor;
+    private ProjectRepository&Stub $projectRepository;
+    private OrderRepository&Stub $orderRepository;
+    private UserRepository&Stub $userRepository;
+    private ContributorRepository&Stub $contributorRepository;
+    private StaffingMetricsRepository&Stub $staffingMetricsRepository;
+    private ProfitabilityPredictor&Stub $profitabilityPredictor;
     private EventDispatcherInterface&MockObject $eventDispatcher;
     private AlertDetectionService $service;
 
     protected function setUp(): void
     {
-        $this->projectRepository = $this->createMock(ProjectRepository::class);
-        $this->orderRepository = $this->createMock(OrderRepository::class);
-        $this->userRepository = $this->createMock(UserRepository::class);
-        $this->contributorRepository = $this->createMock(ContributorRepository::class);
-        $this->staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
-        $this->profitabilityPredictor = $this->createMock(ProfitabilityPredictor::class);
+        $this->projectRepository = $this->createStub(ProjectRepository::class);
+        $this->orderRepository = $this->createStub(OrderRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->contributorRepository = $this->createStub(ContributorRepository::class);
+        $this->staffingMetricsRepository = $this->createStub(StaffingMetricsRepository::class);
+        $this->profitabilityPredictor = $this->createStub(ProfitabilityPredictor::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->userRepository->method('findByRole')->willReturn([]);
@@ -226,8 +229,8 @@ final class AlertDetectionServiceTest extends TestCase
     {
         $this->projectRepository->method('findBy')->willReturn([]);
 
-        $order = $this->createMock(Order::class);
-        $schedule = $this->createMock(OrderPaymentSchedule::class);
+        $order = $this->createStub(Order::class);
+        $schedule = $this->createStub(OrderPaymentSchedule::class);
         $schedule->method('getBillingDate')->willReturn(new DateTimeImmutable('+3 days'));
         $order->method('getPaymentSchedules')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$schedule]));
 
@@ -246,8 +249,8 @@ final class AlertDetectionServiceTest extends TestCase
     {
         $this->projectRepository->method('findBy')->willReturn([]);
 
-        $order = $this->createMock(Order::class);
-        $schedule = $this->createMock(OrderPaymentSchedule::class);
+        $order = $this->createStub(Order::class);
+        $schedule = $this->createStub(OrderPaymentSchedule::class);
         $schedule->method('getBillingDate')->willReturn(new DateTimeImmutable('+30 days'));
         $order->method('getPaymentSchedules')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$schedule]));
 
@@ -263,8 +266,8 @@ final class AlertDetectionServiceTest extends TestCase
         float $budgetedDays = 100.0,
         float $spentHours = 0.0,
         float $globalProgress = 0.0,
-    ): Project&MockObject {
-        $project = $this->createMock(Project::class);
+    ): Project&Stub {
+        $project = $this->createStub(Project::class);
         $project->method('calculateBudgetedDays')->willReturn($budgetedDays);
         $project->method('getTotalTasksSpentHours')->willReturn((string) $spentHours);
         $project->method('getGlobalProgress')->willReturn((string) $globalProgress);

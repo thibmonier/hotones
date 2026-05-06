@@ -12,6 +12,7 @@ use App\Repository\ContributorRepository;
 use App\Repository\EmploymentPeriodRepository;
 use App\Service\HrMetricsService;
 use DateTime;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
  * Coverage: All public methods + edge cases
  * P0 Priority: 0.66% → 100% coverage target
  */
+#[AllowMockObjectsWithoutExpectations]
 class HrMetricsServiceTest extends TestCase
 {
     private HrMetricsService $service;
@@ -322,7 +324,7 @@ class HrMetricsServiceTest extends TestCase
         // Given: 3 contributors, but 1 has no employment period
         $contributorWithPeriod1 = $this->createContributorWithSeniority(2.0);
         $contributorWithPeriod2 = $this->createContributorWithSeniority(3.0);
-        $contributorNoPeriod = $this->createMock(Contributor::class);
+        $contributorNoPeriod = $this->createStub(Contributor::class);
 
         $this->contributorRepository
             ->expects($this->once())
@@ -435,7 +437,7 @@ class HrMetricsServiceTest extends TestCase
         // Given: 3 contributors, but 1 has no birthDate
         $contributorWithAge1 = $this->createContributorWithAge(30, 'male');
         $contributorWithAge2 = $this->createContributorWithAge(40, 'female');
-        $contributorNoAge = $this->createMock(Contributor::class);
+        $contributorNoAge = $this->createStub(Contributor::class);
         $contributorNoAge->method('getAge')->willReturn(null);
         $contributorNoAge->method('getGender')->willReturn('male');
 
@@ -561,7 +563,7 @@ class HrMetricsServiceTest extends TestCase
         $profileDev = $this->createProfile('Developer');
         $contributor1 = $this->createContributorWithProfiles([$profileDev]);
 
-        $contributor2 = $this->createMock(Contributor::class);
+        $contributor2 = $this->createStub(Contributor::class);
         $contributor2->method('getCurrentEmploymentPeriod')->willReturn(null);
 
         $this->contributorRepository
@@ -617,7 +619,7 @@ class HrMetricsServiceTest extends TestCase
 
     private function createContributorWithSeniority(float $yearsAgo): Contributor
     {
-        return $this->createMock(Contributor::class);
+        return $this->createStub(Contributor::class);
     }
 
     private function createEmploymentPeriodStartedYearsAgo(float $yearsAgo): EmploymentPeriod
@@ -647,7 +649,7 @@ class HrMetricsServiceTest extends TestCase
 
     private function createProfile(string $name): Profile
     {
-        $profile = $this->createMock(Profile::class);
+        $profile = $this->createStub(Profile::class);
         $profile->method('getName')->willReturn($name);
 
         return $profile;
@@ -661,7 +663,7 @@ class HrMetricsServiceTest extends TestCase
             $period->addProfile($profile);
         }
 
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getCurrentEmploymentPeriod')->willReturn($period);
 
         return $contributor;

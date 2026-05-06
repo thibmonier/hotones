@@ -13,9 +13,11 @@ use App\Security\CompanyContext;
 use App\Service\PerformanceReviewService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\MailerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class PerformanceReviewServiceTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $em;
@@ -318,7 +320,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     private function createContributor(int $id, string $firstName, string $lastName, ?User $user = null): Contributor
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getId')->willReturn($id);
         $contributor->method('getFirstName')->willReturn($firstName);
         $contributor->method('getLastName')->willReturn($lastName);
@@ -330,7 +332,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     private function createMockUser(string $email): User
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $user->method('getEmail')->willReturn($email);
 
         return $user;
