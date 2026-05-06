@@ -52,7 +52,7 @@ final class TenantBootstrapListenerTest extends TestCase
      */
     private function makeEmWithRealFilter(bool $alreadyEnabled = false): array
     {
-        $connection = $this->createMock(Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('quote')->willReturnCallback(static fn ($value) => "'".(string) $value."'");
 
         $em = $this->createMock(EntityManagerInterface::class);

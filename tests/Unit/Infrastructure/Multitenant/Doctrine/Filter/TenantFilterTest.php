@@ -24,13 +24,13 @@ final class TenantFilterTest extends TestCase
      */
     private function makeFilter(int $tenantId): TenantFilter
     {
-        $connection = $this->createMock(Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('quote')->willReturnCallback(static fn ($value) => "'".(string) $value."'");
 
-        $filterCollection = $this->createMock(FilterCollection::class);
+        $filterCollection = $this->createStub(FilterCollection::class);
         $filterCollection->method('setFiltersStateDirty');
 
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getConnection')->willReturn($connection);
         $em->method('getFilters')->willReturn($filterCollection);
 
@@ -92,5 +92,32 @@ final class TenantFilterTest extends TestCase
         $constraint = $filter->addFilterConstraint($metadata, 't');
 
         $this->assertSame("t.company_id = '987654321'", $constraint);
+    }
+
+    public function testLegacyCompanyOwnedInterfaceTriggersFilter(): void
+    {
+        // SEC-MULTITENANT-002 bridge: 52 legacy `src/Entity/*` entities already
+        // implement CompanyOwnedInterface. The filter must recognize them
+        // without requiring a backfill of TenantAwareInterface.
+        $filter = $this->makeFilter(11);
+
+        $legacyEntity = new class implements CompanyOwnedInterface {
+            public function getCompany(): Company
+            {
+                return new Company();
+            }
+
+            public function setCompany(Company $company): self
+            {
+                return $this;
+            }
+        };
+
+        $metadata = $this->createStub(ClassMetadata::class);
+        $metadata->method('getName')->willReturn($legacyEntity::class);
+
+        $constraint = $filter->addFilterConstraint($metadata, 'l');
+
+        $this->assertSame("l.company_id = '11'", $constraint);
     }
 }

@@ -61,7 +61,7 @@ final class TimesheetExportServiceTest extends TestCase
 
     public function testExportToExcelReturnsXlsxResponseWithEmptyTimesheets(): void
     {
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -89,7 +89,7 @@ final class TimesheetExportServiceTest extends TestCase
         $timesheet1 = $this->createTimesheet($project, '7', null, 'kickoff');
         $timesheet2 = $this->createTimesheet($project, '3.5');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$timesheet1, $timesheet2]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -117,7 +117,7 @@ final class TimesheetExportServiceTest extends TestCase
         $tsMatch = $this->createTimesheet($projectMatch, '4');
         $tsOther = $this->createTimesheet($projectOther, '4');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$tsMatch, $tsOther]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -143,7 +143,7 @@ final class TimesheetExportServiceTest extends TestCase
         $project = $this->createProject('PdfProj');
         $ts = $this->createTimesheet($project, '6');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$ts]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -185,7 +185,7 @@ final class TimesheetExportServiceTest extends TestCase
         $project = $this->createProject('PdfFiltered', null, 7);
         $ts = $this->createTimesheet($project, '8');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$ts]);
 
         $projectRef = $this->createStub(Project::class);

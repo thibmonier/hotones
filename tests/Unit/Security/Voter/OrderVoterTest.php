@@ -46,12 +46,12 @@ final class OrderVoterTest extends TestCase
 
     private function vote(User $user, Order $order, string $attribute): int
     {
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($user->getCompany());
 
         $voter = new OrderVoter($context, new NullLogger());
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         return $voter->vote($token, $order, [$attribute]);

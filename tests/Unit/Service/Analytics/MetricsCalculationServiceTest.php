@@ -41,14 +41,14 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock DimTime repository
         $dimTimeRepo = $this->createMock(EntityRepository::class);
-        $dimTime = $this->createMock(DimTime::class);
+        $dimTime = $this->createStub(DimTime::class);
         $dimTime->method('getDate')->willReturn($date);
 
         $dimTimeRepo->expects($this->once())->method('findOneBy')->with(['date' => $date])->willReturn($dimTime);
 
         // Mock Project repository
         $projectRepo = $this->createMock(ProjectRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
         $query = $this->createMock(Query::class);
 
         $projectRepo->expects($this->once())->method('createQueryBuilder')->with('p')->willReturn($queryBuilder);
@@ -98,7 +98,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock Project repository
         $projectRepo = $this->createMock(ProjectRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
         $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
@@ -139,7 +139,7 @@ class MetricsCalculationServiceTest extends TestCase
         $dimTimeRepo->method('findOneBy')->willReturn($dimTime);
 
         $projectRepo = $this->createMock(ProjectRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
         $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
@@ -178,7 +178,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         // Mock Project repository
         $projectRepo = $this->createMock(ProjectRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
         $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);
@@ -248,7 +248,7 @@ class MetricsCalculationServiceTest extends TestCase
         $year = 2025;
 
         // Mock DQL delete query
-        $deleteQuery = $this->createMock(Query::class);
+        $deleteQuery = $this->createStub(Query::class);
         $deleteQuery->method('getResult')->willReturn([]);
 
         $this->entityManager
@@ -260,7 +260,7 @@ class MetricsCalculationServiceTest extends TestCase
         // Mock repositories for metric calculations
         $dimTimeRepo = $this->createMock(EntityRepository::class);
         $projectRepo = $this->createMock(ProjectRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
         $query = $this->createMock(Query::class);
 
         $dimTimeRepo->method('findOneBy')->willReturn(new DimTime());
@@ -295,7 +295,7 @@ class MetricsCalculationServiceTest extends TestCase
         $year = 2025;
 
         // Mock delete query
-        $deleteQuery = $this->createMock(Query::class);
+        $deleteQuery = $this->createStub(Query::class);
         $deleteQuery->method('getResult')->willReturn([]);
         $this->entityManager->method('createQuery')->willReturn($deleteQuery);
 
@@ -304,7 +304,7 @@ class MetricsCalculationServiceTest extends TestCase
         $dimTimeRepo->method('findOneBy')->willReturn(new DimTime());
 
         $projectRepo = $this->createMock(ProjectRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
         $query = $this->createMock(Query::class);
 
         $projectRepo->method('createQueryBuilder')->willReturn($queryBuilder);

@@ -54,7 +54,7 @@ final class GetContributorVacationsHandlerTest extends TestCase
     #[Test]
     public function mapsContributorVacationsToDTOs(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getFullName')->willReturn('Adrien Test');
 
         $this->contributorRepo->expects(self::once())->method('find')->with(42)->willReturn($contributor);
@@ -75,12 +75,12 @@ final class GetContributorVacationsHandlerTest extends TestCase
 
     private function buildVacation(string $contributorName, VacationType $type): Vacation
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getFullName')->willReturn($contributorName);
 
         return Vacation::request(
             VacationId::generate(),
-            $this->createMock(Company::class),
+            $this->createStub(Company::class),
             $contributor,
             DateRange::fromStrings('2026-06-01', '2026-06-03'),
             $type,

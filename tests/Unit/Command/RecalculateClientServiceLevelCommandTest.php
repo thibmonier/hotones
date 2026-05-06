@@ -120,7 +120,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $counts = [0, 1, 25, 100];
 
         foreach ($counts as $count) {
-            $calculator = $this->createMock(ClientServiceLevelCalculator::class);
+            $calculator = $this->createStub(ClientServiceLevelCalculator::class);
             $calculator
                 ->method('getConfiguration')
                 ->willReturn([

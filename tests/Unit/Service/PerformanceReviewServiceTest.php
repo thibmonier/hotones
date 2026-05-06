@@ -318,7 +318,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     private function createContributor(int $id, string $firstName, string $lastName, ?User $user = null): Contributor
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getId')->willReturn($id);
         $contributor->method('getFirstName')->willReturn($firstName);
         $contributor->method('getLastName')->willReturn($lastName);
@@ -330,7 +330,7 @@ class PerformanceReviewServiceTest extends TestCase
 
     private function createMockUser(string $email): User
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $user->method('getEmail')->willReturn($email);
 
         return $user;

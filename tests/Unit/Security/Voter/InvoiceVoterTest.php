@@ -45,12 +45,12 @@ final class InvoiceVoterTest extends TestCase
 
     private function vote(User $user, Invoice $invoice, string $attribute): int
     {
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($user->getCompany());
 
         $voter = new InvoiceVoter($context, new NullLogger());
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         return $voter->vote($token, $invoice, [$attribute]);
