@@ -6,6 +6,13 @@ namespace App\Controller;
 
 use App\Application\Client\UseCase\CreateClient\CreateClientCommand;
 use App\Application\Client\UseCase\CreateClient\CreateClientUseCase;
+<<<<<<< feat/ddd-phase3-client-edit-via-ddd
+use App\Application\Client\UseCase\UpdateClient\UpdateClientCommand;
+use App\Application\Client\UseCase\UpdateClient\UpdateClientUseCase;
+use App\Domain\Client\Repository\ClientRepositoryInterface as DddClientRepositoryInterface;
+use App\Domain\Client\ValueObject\ClientId as DddClientId;
+=======
+>>>>>>> main
 use App\Entity\Client;
 use App\Entity\ClientContact;
 use App\Security\CompanyContext;
@@ -248,6 +255,77 @@ class ClientController extends AbstractController
         return $this->render('client/show.html.twig', [
             'client' => $client,
         ]);
+    }
+
+    /**
+     * EPIC-001 Phase 3 — sprint-011 client edit migration to DDD.
+     *
+     * @see ADR-0009 controller migration pattern
+     */
+    #[Route('/{id}/edit-via-ddd', name: 'client_edit_ddd', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function editViaDdd(int $id, Request $request, UpdateClientUseCase $useCase, DddClientRepositoryInterface $repository): Response
+    {
+        if ($request->isMethod('POST')) {
+            try {
+                $command = new UpdateClientCommand(
+                    clientId: $id,
+                    name: trim((string) $request->request->get('name', '')),
+                    serviceLevel: (string) $request->request->get('service_level', 'standard'),
+                    notes: $request->request->get('description'),
+                );
+                $useCase->execute($command);
+
+                $this->addFlash('success', 'Client modifié avec succès via DDD use case');
+
+                return $this->redirectToRoute('client_show', ['id' => $id]);
+            } catch (InvalidArgumentException $e) {
+                $this->addFlash('danger', 'Validation: '.$e->getMessage());
+            }
+        }
+
+        // GET: read via DDD repository (proves the read path works too)
+        $ddd = $repository->findByIdOrNull(DddClientId::fromLegacyInt($id));
+        if ($ddd === null) {
+            throw $this->createNotFoundException('Client not found');
+        }
+
+        // Render existing edit template; populate flat-shape fields from DDD
+        // to keep template compatible.
+        $clientView = (object) [
+            'id' => $id,
+            'name' => $ddd->getName()->getValue(),
+            'website' => null,
+            'description' => $ddd->getNotes(),
+            'serviceLevel' => $ddd->getServiceLevel()->value,
+            'serviceLevelMode' => 'manual',
+            'logoPath' => null,
+        ];
+
+        return $this->render('client/edit.html.twig', [
+            'client' => $clientView,
+        ]);
+    }
+
+    /**
+     * EPIC-001 Phase 3 — sprint-011 client delete migration to DDD.
+     *
+     * @see ADR-0009 controller migration pattern
+     */
+    #[Route('/{id}/delete-via-ddd', name: 'client_delete_ddd', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function deleteViaDdd(int $id, DddClientRepositoryInterface $repository): Response
+    {
+        $ddd = $repository->findByIdOrNull(DddClientId::fromLegacyInt($id));
+        if ($ddd === null) {
+            throw $this->createNotFoundException('Client not found');
+        }
+
+        $repository->delete($ddd);
+
+        $this->addFlash('success', 'Client supprimé via DDD use case');
+
+        return $this->redirectToRoute('client_index');
     }
 
     #[Route('/{id}/edit', name: 'client_edit', methods: ['GET', 'POST'])]
