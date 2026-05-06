@@ -33,13 +33,13 @@ class CreateUserCommandTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
 
-        // Mock repositories
-        $userRepository = $this->createMock(UserRepository::class);
+        // Stub repositories (only return values, no expectation on calls).
+        $userRepository = $this->createStub(UserRepository::class);
         $userRepository->method('findOneBy')->willReturn(null); // No existing user
 
-        $companyRepository = $this->createMock(CompanyRepository::class);
+        $companyRepository = $this->createStub(CompanyRepository::class);
 
-        // Create a mock Company
+        // Create a Company instance via reflection (avoids needing a fully built fixture)
         $company = new Company();
         $reflection = new ReflectionClass($company);
         $idProperty = $reflection->getProperty('id');
@@ -52,10 +52,12 @@ class CreateUserCommandTest extends TestCase
         $companyRepository->method('findOneBy')->willReturn($company);
         $companyRepository->method('find')->willReturn($company);
 
-        // Configure EntityManager to return appropriate repositories
+        // Configure EntityManager to return appropriate repositories.
+        // Closure return type is `object` because PHPUnit returns a generated
+        // stub class whose name is not stable.
         $this->entityManager
             ->method('getRepository')
-            ->willReturnCallback(fn ($entityClass): \PHPUnit\Framework\MockObject\MockObject => match ($entityClass) {
+            ->willReturnCallback(fn ($entityClass): object => match ($entityClass) {
                 User::class => $userRepository,
                 Company::class => $companyRepository,
                 default => throw new Exception('Unexpected repository requested: '.$entityClass),

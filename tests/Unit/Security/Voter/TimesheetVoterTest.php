@@ -46,9 +46,11 @@ final class TimesheetVoterTest extends TestCase
         $contributor->setFirstName('X');
         $contributor->setLastName('Y');
 
-        $timesheet = $this->createPartialMock(Timesheet::class, ['getContributor', 'getCompany']);
-        $timesheet->method('getContributor')->willReturn($contributor);
-        $timesheet->method('getCompany')->willReturn($company);
+        // Real Timesheet instance with reflection-injected fields. Avoids
+        // createPartialMock + the associated PHPUnit notice (TEST-MOCKS-004).
+        $timesheet = new Timesheet();
+        (new ReflectionProperty(Timesheet::class, 'company'))->setValue($timesheet, $company);
+        (new ReflectionProperty(Timesheet::class, 'contributor'))->setValue($timesheet, $contributor);
 
         return $timesheet;
     }
