@@ -7,6 +7,7 @@ namespace App\Tests\Unit\EventSubscriber;
 use App\EventSubscriber\LoginSecuritySubscriber;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -37,7 +38,7 @@ final class LoginSecuritySubscriberTest extends TestCase
 {
     private RateLimiterFactory $loginLimiter;
     private LoggerInterface&MockObject $logger;
-    private RequestStack&MockObject $requestStack;
+    private RequestStack&Stub $requestStack;
     private LoginSecuritySubscriber $subscriber;
 
     protected function setUp(): void
@@ -52,7 +53,7 @@ final class LoginSecuritySubscriberTest extends TestCase
             new InMemoryStorage(),
         );
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack = $this->createStub(RequestStack::class);
         $this->subscriber = new LoginSecuritySubscriber(
             $this->loginLimiter,
             $this->logger,
@@ -178,7 +179,7 @@ final class LoginSecuritySubscriberTest extends TestCase
 
     private function makeFailureEvent(): LoginFailureEvent
     {
-        $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $authenticator = $this->createStub(AuthenticatorInterface::class);
 
         return new LoginFailureEvent(
             new BadCredentialsException(),
@@ -191,15 +192,15 @@ final class LoginSecuritySubscriberTest extends TestCase
 
     private function makeSuccessEvent(string $userIdentifier): LoginSuccessEvent
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = $this->createStub(UserInterface::class);
         $user->method('getUserIdentifier')->willReturn($userIdentifier);
 
-        $passport = $this->createMock(Passport::class);
+        $passport = $this->createStub(Passport::class);
         $passport->method('getUser')->willReturn($user);
 
-        $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $authenticator = $this->createStub(AuthenticatorInterface::class);
 
-        $token = $this->createMock(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class);
+        $token = $this->createStub(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         return new LoginSuccessEvent(

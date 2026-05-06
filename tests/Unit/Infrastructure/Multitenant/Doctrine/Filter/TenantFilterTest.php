@@ -24,13 +24,13 @@ final class TenantFilterTest extends TestCase
      */
     private function makeFilter(int $tenantId): TenantFilter
     {
-        $connection = $this->createMock(Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('quote')->willReturnCallback(static fn ($value) => "'".(string) $value."'");
 
-        $filterCollection = $this->createMock(FilterCollection::class);
+        $filterCollection = $this->createStub(FilterCollection::class);
         $filterCollection->method('setFiltersStateDirty');
 
-        $em = $this->createMock(EntityManagerInterface::class);
+        $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getConnection')->willReturn($connection);
         $em->method('getFilters')->willReturn($filterCollection);
 

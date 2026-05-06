@@ -84,7 +84,7 @@ class NpsMarkExpiredCommandTest extends TestCase
         $counts = [1, 10, 100];
 
         foreach ($counts as $count) {
-            $repository = $this->createMock(NpsSurveyRepository::class);
+            $repository = $this->createStub(NpsSurveyRepository::class);
             $repository->method('markExpiredSurveysAsExpired')->willReturn($count);
 
             $command = new NpsMarkExpiredCommand($repository);
