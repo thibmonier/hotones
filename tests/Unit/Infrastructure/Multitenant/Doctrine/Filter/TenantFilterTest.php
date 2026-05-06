@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Infrastructure\Multitenant\Doctrine\Filter;
 
 use App\Domain\Shared\Tenant\TenantAwareInterface;
+<<<<<<< feat/sec-voters-002-vacation-client-expense-contributor
+use App\Entity\Company;
+use App\Entity\Interface\CompanyOwnedInterface;
+=======
+>>>>>>> main
 use App\Infrastructure\Multitenant\Doctrine\Filter\TenantFilter;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -93,4 +98,34 @@ final class TenantFilterTest extends TestCase
 
         $this->assertSame("t.company_id = '987654321'", $constraint);
     }
+<<<<<<< feat/sec-voters-002-vacation-client-expense-contributor
+
+    public function testLegacyCompanyOwnedInterfaceTriggersFilter(): void
+    {
+        // SEC-MULTITENANT-002 bridge: 52 legacy `src/Entity/*` entities already
+        // implement CompanyOwnedInterface. The filter must recognize them
+        // without requiring a backfill of TenantAwareInterface.
+        $filter = $this->makeFilter(11);
+
+        $legacyEntity = new class implements CompanyOwnedInterface {
+            public function getCompany(): Company
+            {
+                return new Company();
+            }
+
+            public function setCompany(Company $company): self
+            {
+                return $this;
+            }
+        };
+
+        $metadata = $this->createStub(ClassMetadata::class);
+        $metadata->method('getName')->willReturn($legacyEntity::class);
+
+        $constraint = $filter->addFilterConstraint($metadata, 'l');
+
+        $this->assertSame("l.company_id = '11'", $constraint);
+    }
+=======
+>>>>>>> main
 }

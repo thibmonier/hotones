@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Infrastructure\Multitenant\Doctrine\Filter;
 
 use App\Domain\Shared\Tenant\TenantAwareInterface;
+<<<<<<< feat/sec-voters-002-vacation-client-expense-contributor
+use App\Entity\Interface\CompanyOwnedInterface;
+=======
+>>>>>>> main
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Filter\SQLFilter;
 
@@ -40,8 +44,23 @@ final class TenantFilter extends SQLFilter
 
     public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias): string
     {
+<<<<<<< feat/sec-voters-002-vacation-client-expense-contributor
+        $class = $targetEntity->getName();
+
+        // Two markers are honored:
+        //   - `TenantAwareInterface` (Domain Shared): forward-compatible marker
+        //     for future DDD-aligned entities under `src/Domain/`.
+        //   - `CompanyOwnedInterface` (legacy `App\Entity\Interface`): every
+        //     existing tenant-scoped entity in `src/Entity/` already implements
+        //     this. Reuse it to avoid touching 52 files for this story.
+        if (
+            !is_subclass_of($class, TenantAwareInterface::class)
+            && !is_subclass_of($class, CompanyOwnedInterface::class)
+        ) {
+=======
         // Skip entities that opted out (do not implement the marker interface).
         if (!is_subclass_of($targetEntity->getName(), TenantAwareInterface::class)) {
+>>>>>>> main
             return '';
         }
 
