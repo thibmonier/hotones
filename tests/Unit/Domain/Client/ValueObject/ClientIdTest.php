@@ -27,7 +27,7 @@ final class ClientIdTest extends TestCase
     public function testFromStringInvalidThrows(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUID format for ClientId');
+        $this->expectExceptionMessage('Invalid ClientId format');
         ClientId::fromString('not-a-uuid');
     }
 

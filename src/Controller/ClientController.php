@@ -152,21 +152,19 @@ class ClientController extends AbstractController
     }
 
     /**
-     * EPIC-001 Phase 3 — sprint-010 first controller migration to DDD.
+     * EPIC-001 Phase 4 — sprint-012 1ère décommission legacy.
      *
-     * New CRUD endpoint that exercises the DDD use case + ACL stack
-     * (CreateClientUseCase → DoctrineDddClientRepository → ClientDddToFlatTranslator
-     * → flat App\Entity\Client persistence).
+     * Route principale `/clients/new` migrée vers DDD use case (était sur
+     * route alternative `/new-via-ddd` depuis sprint-010 PR #148).
      *
-     * The legacy `/clients/new` route remains untouched for backwards
-     * compatibility (logo upload + service_level_mode features unique to it).
-     * Once feature parity is reached this route will replace the legacy one.
+     * Logo upload séparé sur `/clients/{id}/upload-logo` (post-création).
      *
+     * @see ADR-0009 controller migration pattern (Phase 4 critères)
      * @see ADR-0008 Anti-Corruption Layer pattern
      */
-    #[Route('/new-via-ddd', name: 'client_new_ddd', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'client_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function newViaDdd(Request $request, CreateClientUseCase $useCase): Response
+    public function new(Request $request, CreateClientUseCase $useCase): Response
     {
         if ($request->isMethod('POST')) {
             try {
@@ -177,76 +175,52 @@ class ClientController extends AbstractController
                 );
                 $clientId = $useCase->execute($command);
 
-                $this->addFlash('success', 'Client créé avec succès via DDD use case');
+                $this->addFlash('success', 'Client créé avec succès');
 
                 return $this->redirectToRoute('client_show', ['id' => $clientId->toLegacyInt()]);
             } catch (InvalidArgumentException $e) {
                 $this->addFlash('danger', 'Validation: '.$e->getMessage());
-<<<<<<< test/functional-e2e-client-ddd
 
                 return $this->redirectToRoute('client_index');
             }
         }
 
-        // GET fallback: redirect to legacy form (Phase 2 ACL doesn't render its own form template yet).
-        return $this->redirectToRoute('client_new');
-=======
-            }
-        }
-
-        return $this->render('client/new.html.twig', [
-            'client' => null,
-        ]);
->>>>>>> main
-    }
-
-    #[Route('/new', name: 'client_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_CHEF_PROJET')]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
+        // GET: render form template (template existant continue de fonctionner)
         $client = new Client();
         $client->setCompany($this->companyContext->getCurrentCompany());
-
-        if ($request->isMethod('POST')) {
-            $client->setName($request->request->get('name'));
-            $client->setWebsite($request->request->get('website'));
-            $client->setDescription($request->request->get('description'));
-
-            // Gestion du niveau de service
-            $serviceLevelMode = $request->request->get('service_level_mode', 'auto');
-            $client->setServiceLevelMode($serviceLevelMode);
-
-            if ($serviceLevelMode === 'manual') {
-                $client->setServiceLevel($request->request->get('service_level'));
-            } else {
-                // En mode auto, le niveau sera calculé plus tard par la commande
-                $client->setServiceLevel(null);
-            }
-
-            /** @var UploadedFile|null $logo */
-            $logo = $request->files->get('logo');
-            if ($logo instanceof UploadedFile && $logo->isValid()) {
-                $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads/clients';
-                $fs = new Filesystem();
-                if (!$fs->exists($uploadDir)) {
-                    $fs->mkdir($uploadDir, 0775);
-                }
-                $safeName = uniqid('client_', true).'.'.$logo->guessExtension();
-                $logo->move($uploadDir, $safeName);
-                $client->setLogoPath('/uploads/clients/'.$safeName);
-            }
-
-            $em->persist($client);
-            $em->flush();
-
-            $this->addFlash('success', 'Client créé avec succès');
-
-            return $this->redirectToRoute('client_show', ['id' => $client->getId()]);
-        }
 
         return $this->render('client/new.html.twig', [
             'client' => $client,
         ]);
+    }
+
+    /**
+     * EPIC-001 Phase 4 — endpoint séparé pour logo upload (séparation des concerns).
+     *
+     * Le UC DDD CreateClient ne gère pas le logo (filesystem side-effect).
+     * Cet endpoint accepte un upload post-création.
+     */
+    #[Route('/{id}/upload-logo', name: 'client_upload_logo', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function uploadLogo(Client $client, Request $request, EntityManagerInterface $em): Response
+    {
+        /** @var UploadedFile|null $logo */
+        $logo = $request->files->get('logo');
+        if ($logo instanceof UploadedFile && $logo->isValid()) {
+            $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads/clients';
+            $fs = new Filesystem();
+            if (!$fs->exists($uploadDir)) {
+                $fs->mkdir($uploadDir, 0775);
+            }
+            $safeName = uniqid('client_', true).'.'.$logo->guessExtension();
+            $logo->move($uploadDir, $safeName);
+            $client->setLogoPath('/uploads/clients/'.$safeName);
+            $em->flush();
+
+            $this->addFlash('success', 'Logo uploadé');
+        }
+
+        return $this->redirectToRoute('client_show', ['id' => $client->getId()]);
     }
 
     #[Route('/{id}', name: 'client_show', methods: ['GET'])]

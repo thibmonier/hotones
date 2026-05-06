@@ -74,7 +74,6 @@ final readonly class CreateClientUseCase
 
         $persistedId = ClientId::fromLegacyInt($flat->id ?? throw new InvalidArgumentException('Persisted Client has null id'));
 
-<<<<<<< test/functional-e2e-client-ddd
         // Dispatch domain events. Phase 2: handlers are optional — silently
         // skip NoHandlerForMessageException (events queued for future handlers
         // configured Phase 4+). Once the event bus has dedicated handlers,
@@ -85,13 +84,6 @@ final readonly class CreateClientUseCase
             } catch (\Symfony\Component\Messenger\Exception\NoHandlerForMessageException) {
                 // No handler registered for this domain event — Phase 2 acceptable.
             }
-=======
-        // Dispatch domain events (uses the placeholder id; consumers that
-        // care about the persisted id should listen to a higher-level
-        // application event instead).
-        foreach ($ddd->pullDomainEvents() as $event) {
-            $this->messageBus->dispatch($event);
->>>>>>> main
         }
 
         return $persistedId;

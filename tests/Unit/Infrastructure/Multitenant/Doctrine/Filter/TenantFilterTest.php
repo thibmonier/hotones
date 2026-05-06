@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Infrastructure\Multitenant\Doctrine\Filter;
 
 use App\Domain\Shared\Tenant\TenantAwareInterface;
+use App\Entity\Company;
+use App\Entity\Interface\CompanyOwnedInterface;
 use App\Infrastructure\Multitenant\Doctrine\Filter\TenantFilter;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
