@@ -121,7 +121,6 @@ final class Project implements AggregateRootInterface
         return $project;
     }
 
-
     public function updateDetails(
         string $name,
         ?string $description,
