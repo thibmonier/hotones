@@ -58,7 +58,11 @@ trait VacationFunctionalTrait
         $contributor->setLastName($lastName);
         $contributor->setActive(true);
         if ($manager !== null) {
-            $contributor->setManager($manager);
+            // Use addManagedContributor so both sides of the bidirectional
+            // relation are kept in sync — otherwise `$manager->getManagedContributors()`
+            // returns stale empty in tests that immediately query it.
+            // (sprint-010 fix INVESTIGATE-CAT-C)
+            $manager->addManagedContributor($contributor);
         }
         $em->persist($contributor);
         $em->flush();

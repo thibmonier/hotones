@@ -9,12 +9,14 @@ use App\Entity\Invoice;
 use App\Entity\User;
 use App\Security\CompanyContext;
 use App\Security\Voter\InvoiceVoter;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class InvoiceVoterTest extends TestCase
 {
     private function makeCompany(int $id = 1): Company
@@ -45,12 +47,12 @@ final class InvoiceVoterTest extends TestCase
 
     private function vote(User $user, Invoice $invoice, string $attribute): int
     {
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($user->getCompany());
 
         $voter = new InvoiceVoter($context, new NullLogger());
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         return $voter->vote($token, $invoice, [$attribute]);
