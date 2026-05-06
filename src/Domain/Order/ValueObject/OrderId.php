@@ -9,11 +9,17 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class OrderId
 {
+    private const string LEGACY_PREFIX = 'legacy:';
+
     private function __construct(
         private string $value,
     ) {
+        if (str_starts_with($value, self::LEGACY_PREFIX)) {
+            return;
+        }
+
         if (!Uuid::isValid($value)) {
-            throw new InvalidArgumentException(sprintf('Invalid UUID format for OrderId: %s', $value));
+            throw new InvalidArgumentException(sprintf('Invalid OrderId format: %s', $value));
         }
     }
 
@@ -25,6 +31,29 @@ final readonly class OrderId
     public static function fromString(string $id): self
     {
         return new self($id);
+    }
+
+    public static function fromLegacyInt(int $id): self
+    {
+        if ($id <= 0) {
+            throw new InvalidArgumentException('Legacy id must be positive');
+        }
+
+        return new self(self::LEGACY_PREFIX.$id);
+    }
+
+    public function isLegacy(): bool
+    {
+        return str_starts_with($this->value, self::LEGACY_PREFIX);
+    }
+
+    public function toLegacyInt(): int
+    {
+        if (!$this->isLegacy()) {
+            throw new InvalidArgumentException('OrderId is not a legacy int wrapper');
+        }
+
+        return (int) substr($this->value, strlen(self::LEGACY_PREFIX));
     }
 
     public function getValue(): string

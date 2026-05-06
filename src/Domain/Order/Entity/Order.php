@@ -84,6 +84,41 @@ final class Order implements AggregateRootInterface
         return $order;
     }
 
+    /**
+     * Reconstitute an aggregate from persisted state — ACL adapters Phase 2.
+     * Does NOT record domain events.
+     *
+     * @param array<string, mixed> $extra
+     */
+    public static function reconstitute(
+        OrderId $id,
+        string $reference,
+        ClientId $clientId,
+        ContractType $contractType,
+        Money $amount,
+        array $extra = [],
+    ): self {
+        $order = new self($id, $reference, $clientId, $contractType, $amount);
+
+        if (isset($extra['status']) && $extra['status'] instanceof OrderStatus) {
+            $order->status = $extra['status'];
+        }
+        $order->title = $extra['title'] ?? null;
+        $order->description = $extra['description'] ?? null;
+        $order->discount = $extra['discount'] ?? null;
+        $order->startDate = $extra['startDate'] ?? null;
+        $order->endDate = $extra['endDate'] ?? null;
+        $order->signedAt = $extra['signedAt'] ?? null;
+        $order->notes = $extra['notes'] ?? null;
+
+        if (isset($extra['createdAt']) && $extra['createdAt'] instanceof DateTimeImmutable) {
+            $order->createdAt = $extra['createdAt'];
+        }
+        $order->updatedAt = $extra['updatedAt'] ?? null;
+
+        return $order;
+    }
+
     public function updateDetails(
         ?string $title,
         ?string $description,

@@ -38,7 +38,6 @@ final readonly class ProjectId
         return new self($value);
     }
 
-<<<<<<< feat/ddd-phase2-project-acl
     /**
      * Wrap a legacy auto-increment int id during EPIC-001 Phase 2 strangler fig.
      */
@@ -65,8 +64,6 @@ final readonly class ProjectId
         return (int) substr($this->value, strlen(self::LEGACY_PREFIX));
     }
 
-=======
->>>>>>> main
     public function value(): string
     {
         return $this->value;
