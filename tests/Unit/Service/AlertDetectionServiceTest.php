@@ -18,6 +18,7 @@ use App\Repository\UserRepository;
 use App\Service\AlertDetectionService;
 use App\Service\ProfitabilityPredictor;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +34,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * integration-test setup; that path is left to a follow-up integration
  * story (sprint-005 candidate).
  */
+#[AllowMockObjectsWithoutExpectations]
 final class AlertDetectionServiceTest extends TestCase
 {
     private ProjectRepository&Stub $projectRepository;

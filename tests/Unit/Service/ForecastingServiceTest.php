@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -23,6 +24,7 @@ use RuntimeException;
 /**
  * Comprehensive unit tests for ForecastingService.
  */
+#[AllowMockObjectsWithoutExpectations]
 class ForecastingServiceTest extends TestCase
 {
     private function createService(?ProjectRepository $projectRepository = null): ForecastingService

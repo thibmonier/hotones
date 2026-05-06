@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Service;
 use App\Service\SecureFileUploadService;
 use Exception;
 use League\Flysystem\FilesystemOperator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -20,6 +21,7 @@ use Symfony\Component\String\UnicodeString;
  * Coverage: All public methods + security validation
  * P0 Priority: 0.97% → 80%+ coverage target
  */
+#[AllowMockObjectsWithoutExpectations]
 class SecureFileUploadServiceTest extends TestCase
 {
     private SecureFileUploadService $service;

@@ -14,12 +14,14 @@ use App\Service\PdfGeneratorService;
 use App\Service\Timesheet\TimesheetExportService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Coverage push (T-TC1-03 lot 2) — TimesheetExportService était à 0.88% coverage.
  */
+#[AllowMockObjectsWithoutExpectations]
 final class TimesheetExportServiceTest extends TestCase
 {
     private function createContributor(string $firstName = 'Jean', string $lastName = 'Dupont', float $hoursPerDay = 7.0): Contributor

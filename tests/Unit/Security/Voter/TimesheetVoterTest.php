@@ -10,12 +10,14 @@ use App\Entity\Timesheet;
 use App\Entity\User;
 use App\Security\CompanyContext;
 use App\Security\Voter\TimesheetVoter;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class TimesheetVoterTest extends TestCase
 {
     private function makeCompany(int $id = 1): Company

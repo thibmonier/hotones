@@ -16,6 +16,7 @@ use App\Domain\Vacation\ValueObject\VacationType;
 use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Repository\ContributorRepository;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\TestCase;
  *  - Unknown contributor -> empty array (no repository call attempted on missing id)
  *  - Existing contributor -> array of VacationDTO mapped via fromEntity()
  */
+#[AllowMockObjectsWithoutExpectations]
 final class GetContributorVacationsHandlerTest extends TestCase
 {
     private VacationRepositoryInterface&MockObject $vacationRepo;
