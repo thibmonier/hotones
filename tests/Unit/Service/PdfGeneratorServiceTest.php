@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Service\PdfGeneratorService;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-#[AllowMockObjectsWithoutExpectations]
 class PdfGeneratorServiceTest extends TestCase
 {
     private PdfGeneratorService $service;

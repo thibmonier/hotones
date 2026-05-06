@@ -29,6 +29,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * ROLE_INTERVENANT user bound to a Contributor in the test company so the
  * controller can resolve `$this->getUser()` -> Contributor.
  */
+// Tolérance test legacy permanente — voir docs/02-architecture/adr/0003-test-legacy-tolerance-vacation-csrf-session-boundary.md
+// Bloqueur: SessionNotFoundException sur CSRF token via container test (Symfony 7+/8+ isolation request/container).
+// Tests exécutés en CI complet (workflow `quality.yml` + `ci.yml`). Skip uniquement en pre-push hook local.
 #[Group('skip-pre-push')]
 final class VacationRequestControllerTest extends WebTestCase
 {
@@ -113,6 +116,9 @@ final class VacationRequestControllerTest extends WebTestCase
     public function testCancelOnPendingVacationFlashesSuccess(): void
     {
         $vacation = $this->createPendingVacationFor($this->loadContributor());
+
+        // Warm up session before generating CSRF token (session-based storage).
+        $this->client->request('GET', '/mes-conges');
 
         $this->client->request('POST', '/mes-conges/'.$vacation->getId()->getValue().'/annuler', [
             '_token' => $this->generateCsrfToken('cancel'.$vacation->getId()->getValue()),

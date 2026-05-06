@@ -7,7 +7,6 @@ namespace App\Tests\Unit\Command;
 use App\Command\DispatchMetricsRecalculationCommand;
 use App\Message\RecalculateMetricsMessage;
 use Exception;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\Console\Command\Command;
@@ -18,7 +17,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * Unit tests for DispatchMetricsRecalculationCommand.
  */
-#[AllowMockObjectsWithoutExpectations]
 class DispatchMetricsRecalculationCommandTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $messageBus;
