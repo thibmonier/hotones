@@ -10,12 +10,14 @@ use App\Repository\ContributorRepository;
 use App\Repository\StaffingMetricsRepository;
 use App\Service\Planning\TaceAnalyzer;
 use DateTime;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
  * Comprehensive unit tests for TaceAnalyzer.
  */
+#[AllowMockObjectsWithoutExpectations]
 class TaceAnalyzerTest extends TestCase
 {
     private function createService(
@@ -30,7 +32,7 @@ class TaceAnalyzerTest extends TestCase
 
     private function createMockMetric(float $tace, float $availableDays, float $workedDays): FactStaffingMetrics
     {
-        $metric = $this->createMock(FactStaffingMetrics::class);
+        $metric = $this->createStub(FactStaffingMetrics::class);
         $metric->method('getTace')->willReturn((string) $tace);
         $metric->method('getAvailableDays')->willReturn((string) $availableDays);
         $metric->method('getWorkedDays')->willReturn((string) $workedDays);
@@ -57,7 +59,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorWithNoMetrics(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
         $staffingMetricsRepository->method('findByPeriod')->willReturn([]);
@@ -79,7 +81,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorWithOptimalTace(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         // Create metrics with TACE = 80 (optimal: between 70 and 90)
         $metrics = [
@@ -105,7 +107,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorWithOverloadedTace(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         // Create metrics with TACE = 95 (overloaded: > 90 but < 110)
         $metrics = [
@@ -129,7 +131,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorWithUnderutilizedTace(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         // Create metrics with TACE = 60 (underutilized: < 70 but > 50)
         $metrics = [
@@ -153,7 +155,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorWithCriticalHighTace(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         // Create metrics with TACE = 115 (critical_high: >= 110)
         $metrics = [
@@ -177,7 +179,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorWithCriticalLowTace(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         // Create metrics with TACE = 45 (critical_low: <= 50)
         $metrics = [
@@ -201,7 +203,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorWithMultipleMetricsCalculatesAverage(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         // Create metrics with varying TACE values
         $metrics = [
@@ -228,7 +230,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeContributorRoundingToTwoDecimals(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         // Create metrics that will produce decimals when averaged
         $metrics = [
@@ -273,7 +275,7 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeAllContributorsWithDefaultDates(): void
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
         $contributorRepository->expects(self::once())->method('findBy')->with(['active' => true])->willReturn([$contributor]);
@@ -307,11 +309,11 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeAllContributorsCategorizesCorrectly(): void
     {
-        $optimalContributor = $this->createMock(Contributor::class);
-        $overloadedContributor = $this->createMock(Contributor::class);
-        $underutilizedContributor = $this->createMock(Contributor::class);
-        $criticalHighContributor = $this->createMock(Contributor::class);
-        $criticalLowContributor = $this->createMock(Contributor::class);
+        $optimalContributor = $this->createStub(Contributor::class);
+        $overloadedContributor = $this->createStub(Contributor::class);
+        $underutilizedContributor = $this->createStub(Contributor::class);
+        $criticalHighContributor = $this->createStub(Contributor::class);
+        $criticalLowContributor = $this->createStub(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
         $contributorRepository
@@ -371,9 +373,9 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeAllContributorsSortsOverloadedByTaceDescending(): void
     {
-        $contributor1 = $this->createMock(Contributor::class);
-        $contributor2 = $this->createMock(Contributor::class);
-        $contributor3 = $this->createMock(Contributor::class);
+        $contributor1 = $this->createStub(Contributor::class);
+        $contributor2 = $this->createStub(Contributor::class);
+        $contributor3 = $this->createStub(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
         $contributorRepository->method('findBy')->willReturn([$contributor1, $contributor2, $contributor3]);
@@ -411,9 +413,9 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeAllContributorsSortsUnderutilizedByTaceAscending(): void
     {
-        $contributor1 = $this->createMock(Contributor::class);
-        $contributor2 = $this->createMock(Contributor::class);
-        $contributor3 = $this->createMock(Contributor::class);
+        $contributor1 = $this->createStub(Contributor::class);
+        $contributor2 = $this->createStub(Contributor::class);
+        $contributor3 = $this->createStub(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
         $contributorRepository->method('findBy')->willReturn([$contributor1, $contributor2, $contributor3]);
@@ -451,9 +453,9 @@ class TaceAnalyzerTest extends TestCase
 
     public function testAnalyzeAllContributorsSortsCriticalByDeviationFromIdeal(): void
     {
-        $contributor1 = $this->createMock(Contributor::class);
-        $contributor2 = $this->createMock(Contributor::class);
-        $contributor3 = $this->createMock(Contributor::class);
+        $contributor1 = $this->createStub(Contributor::class);
+        $contributor2 = $this->createStub(Contributor::class);
+        $contributor3 = $this->createStub(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
         $contributorRepository->method('findBy')->willReturn([$contributor1, $contributor2, $contributor3]);
