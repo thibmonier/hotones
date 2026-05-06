@@ -13,7 +13,6 @@ use App\Repository\RunningTimerRepository;
 use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -30,7 +29,6 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  *  - stopped timers are excluded from the active lookup.
  *  - a different contributor's active timer is not returned.
  */
-#[Group('skip-pre-push')]
 final class RunningTimerRepositoryTest extends KernelTestCase
 {
     use Factories;
@@ -50,15 +48,15 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
     public function testFindActiveByContributorReturnsNullWhenNoTimerExists(): void
     {
-        $contributor = ContributorFactory::createOne()->_real();
+        $contributor = ContributorFactory::createOne();
 
         self::assertNull($this->repository->findActiveByContributor($contributor));
     }
 
     public function testFindActiveByContributorReturnsRunningTimer(): void
     {
-        $contributor = ContributorFactory::createOne()->_real();
-        $project = ProjectFactory::createOne()->_real();
+        $contributor = ContributorFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         $timer = $this->createTimer($contributor, $project, startedAt: new DateTime('2026-04-30 09:00:00'));
 
@@ -71,8 +69,8 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
     public function testFindActiveByContributorIgnoresStoppedTimer(): void
     {
-        $contributor = ContributorFactory::createOne()->_real();
-        $project = ProjectFactory::createOne()->_real();
+        $contributor = ContributorFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         $stopped = $this->createTimer(
             $contributor,
@@ -87,8 +85,8 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
     public function testFindActiveByContributorReturnsActiveAmongMixedHistory(): void
     {
-        $contributor = ContributorFactory::createOne()->_real();
-        $project = ProjectFactory::createOne()->_real();
+        $contributor = ContributorFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         $this->createTimer(
             $contributor,
@@ -116,9 +114,9 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
     public function testFindActiveByContributorIsolatesPerContributor(): void
     {
-        $alice = ContributorFactory::createOne()->_real();
-        $bob = ContributorFactory::createOne()->_real();
-        $project = ProjectFactory::createOne()->_real();
+        $alice = ContributorFactory::createOne();
+        $bob = ContributorFactory::createOne();
+        $project = ProjectFactory::createOne();
 
         $this->createTimer($alice, $project, startedAt: new DateTime('2026-04-30 09:00:00'));
 

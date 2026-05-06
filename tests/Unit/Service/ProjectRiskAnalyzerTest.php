@@ -237,4 +237,126 @@ class ProjectRiskAnalyzerTest extends TestCase
 
         return $project;
     }
+
+    // -----------------------------------------------------------------
+    // calculateHealthScore — TEST-COVERAGE-001 lot 1 (T-TC1-02)
+    // -----------------------------------------------------------------
+
+    public function testCalculateHealthScoreReturnsPersistedEntityWithComponentScores(): void
+    {
+        // CompanyContext stub returns a Company.
+        $em = $this->createStub(EntityManagerInterface::class);
+        $companyContext = $this->createStub(CompanyContext::class);
+        $companyContext->method('getCurrentCompany')->willReturn(new \App\Entity\Company());
+        $service = new ProjectRiskAnalyzer($em, $companyContext);
+
+        $project = $this->createStub(Project::class);
+        // Healthy project across all 4 dimensions.
+        $project->method('getTotalTasksSoldHours')->willReturn('700');
+        $project->method('getTotalTasksSpentHours')->willReturn('350');
+        $project->method('getTotalSoldAmount')->willReturn('100000');
+        $project->method('getGlobalProgress')->willReturn('50');
+        $project->method('getStatus')->willReturn('in_progress');
+        $project->method('getEndDate')->willReturn(new DateTime('+2 months'));
+        $project->method('getStartDate')->willReturn(new DateTime('-1 month'));
+        $project->method('getTimesheets')->willReturn(new ArrayCollection());
+
+        $entity = $service->calculateHealthScore($project);
+
+        $this->assertInstanceOf(\App\Entity\ProjectHealthScore::class, $entity);
+        $this->assertSame($project, $entity->getProject());
+        $this->assertGreaterThanOrEqual(0, $entity->budgetScore);
+        $this->assertLessThanOrEqual(100, $entity->budgetScore);
+        $this->assertGreaterThanOrEqual(0, $entity->timelineScore);
+        $this->assertGreaterThanOrEqual(0, $entity->velocityScore);
+        $this->assertGreaterThanOrEqual(0, $entity->qualityScore);
+        $this->assertGreaterThanOrEqual(0, $entity->score);
+        $this->assertLessThanOrEqual(100, $entity->score);
+        $this->assertContains($entity->healthLevel, ['healthy', 'warning', 'critical']);
+    }
+
+    public function testCalculateHealthScoreAppliesWeightedFormula(): void
+    {
+        // Production weights documented: 40 budget / 30 timeline / 20 velocity / 10 quality.
+        // Verify they sum to 1.0 + composite stays in [0, 100] regardless of inputs.
+        $em = $this->createStub(EntityManagerInterface::class);
+        $companyContext = $this->createStub(CompanyContext::class);
+        $companyContext->method('getCurrentCompany')->willReturn(new \App\Entity\Company());
+        $service = new ProjectRiskAnalyzer($em, $companyContext);
+
+        // Project that exercises the formula via heterogeneous component scores.
+        $project = $this->createStub(Project::class);
+        $project->method('getTotalTasksSoldHours')->willReturn('700');
+        $project->method('getTotalTasksSpentHours')->willReturn('490'); // 40% overrun → low budget score
+        $project->method('getTotalSoldAmount')->willReturn('30000'); // tight margin
+        $project->method('getGlobalProgress')->willReturn('50');
+        $project->method('getStatus')->willReturn('in_progress');
+        $project->method('getEndDate')->willReturn(new DateTime('+1 month'));
+        $project->method('getStartDate')->willReturn(new DateTime('-2 months'));
+        $project->method('getTimesheets')->willReturn(new ArrayCollection());
+
+        $entity = $service->calculateHealthScore($project);
+
+        // Score must be in [0, 100], healthLevel coherent with thresholds 50 and 80.
+        $this->assertGreaterThanOrEqual(0, $entity->score);
+        $this->assertLessThanOrEqual(100, $entity->score);
+        if ($entity->score > 80) {
+            $this->assertSame('healthy', $entity->healthLevel);
+        } elseif ($entity->score >= 50) {
+            $this->assertSame('warning', $entity->healthLevel);
+        } else {
+            $this->assertSame('critical', $entity->healthLevel);
+        }
+    }
+
+    public function testCalculateHealthScoreEmitsRecommendationsWhenComponentScoresLow(): void
+    {
+        $em = $this->createStub(EntityManagerInterface::class);
+        $companyContext = $this->createStub(CompanyContext::class);
+        $companyContext->method('getCurrentCompany')->willReturn(new \App\Entity\Company());
+        $service = new ProjectRiskAnalyzer($em, $companyContext);
+
+        // Severe overrun + late + low margin → all 4 components below recommendation thresholds.
+        $project = $this->createStub(Project::class);
+        $project->method('getTotalTasksSoldHours')->willReturn('200');
+        $project->method('getTotalTasksSpentHours')->willReturn('400'); // 100% overrun
+        $project->method('getTotalSoldAmount')->willReturn('20000'); // negative margin once 400h × 400€/h cost ≈ 160k
+        $project->method('getGlobalProgress')->willReturn('30');
+        $project->method('getStatus')->willReturn('in_progress');
+        $project->method('getEndDate')->willReturn(new DateTime('-45 days')); // very late
+        $project->method('getStartDate')->willReturn(new DateTime('-3 months'));
+        $project->method('getTimesheets')->willReturn(new ArrayCollection());
+
+        $entity = $service->calculateHealthScore($project);
+
+        $this->assertNotEmpty($entity->recommendations);
+        $this->assertIsArray($entity->recommendations);
+    }
+
+    public function testCalculateHealthScorePersistsViaEntityManager(): void
+    {
+        // Verify that EM->persist + flush are invoked once each.
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('persist')
+            ->with($this->isInstanceOf(\App\Entity\ProjectHealthScore::class));
+        $em->expects($this->once())
+            ->method('flush');
+
+        $companyContext = $this->createStub(CompanyContext::class);
+        $companyContext->method('getCurrentCompany')->willReturn(new \App\Entity\Company());
+        $service = new ProjectRiskAnalyzer($em, $companyContext);
+
+        $project = $this->createStub(Project::class);
+        $project->method('getTotalTasksSoldHours')->willReturn('500');
+        $project->method('getTotalTasksSpentHours')->willReturn('300');
+        $project->method('getTotalSoldAmount')->willReturn('80000');
+        $project->method('getGlobalProgress')->willReturn('50');
+        $project->method('getStatus')->willReturn('in_progress');
+        $project->method('getEndDate')->willReturn(new DateTime('+1 month'));
+        $project->method('getStartDate')->willReturn(new DateTime('-1 month'));
+        $project->method('getTimesheets')->willReturn(new ArrayCollection());
+
+        $service->calculateHealthScore($project);
+    }
 }

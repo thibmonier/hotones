@@ -17,7 +17,6 @@ use App\Entity\Company;
 use App\Entity\Contributor;
 use App\Repository\ContributorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +29,6 @@ use PHPUnit\Framework\TestCase;
  *  - Manager found -> repository queried with the managed contributors collection
  *    and result mapped to VacationDTO[]
  */
-#[AllowMockObjectsWithoutExpectations]
 final class GetPendingVacationsForManagerHandlerTest extends TestCase
 {
     private VacationRepositoryInterface&MockObject $vacationRepo;

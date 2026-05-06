@@ -9,7 +9,6 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use App\Entity\User;
 use App\Security\CompanyContext;
 use App\Security\Voter\CompanyVoter;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -32,7 +31,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * - SUPERADMIN bypass + audit logging
  * - role-based CRUD authorization for entity classes
  */
-#[AllowMockObjectsWithoutExpectations]
 final class CompanyVoterTest extends TestCase
 {
     private CompanyContext&MockObject $companyContext;

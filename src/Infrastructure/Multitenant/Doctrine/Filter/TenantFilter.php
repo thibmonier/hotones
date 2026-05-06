@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Infrastructure\Multitenant\Doctrine\Filter;
 
 use App\Domain\Shared\Tenant\TenantAwareInterface;
-use App\Entity\Interface\CompanyOwnedInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Filter\SQLFilter;
 
@@ -53,6 +52,8 @@ final class TenantFilter extends SQLFilter
             !is_subclass_of($class, TenantAwareInterface::class)
             && !is_subclass_of($class, CompanyOwnedInterface::class)
         ) {
+        // Skip entities that opted out (do not implement the marker interface).
+        if (!is_subclass_of($targetEntity->getName(), TenantAwareInterface::class)) {
             return '';
         }
 
