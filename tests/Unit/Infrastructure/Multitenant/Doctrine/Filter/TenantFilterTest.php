@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Infrastructure\Multitenant\Doctrine\Filter;
 
 use App\Domain\Shared\Tenant\TenantAwareInterface;
-<<<<<<< feat/sec-voters-002-vacation-client-expense-contributor
-use App\Entity\Company;
-use App\Entity\Interface\CompanyOwnedInterface;
-=======
->>>>>>> main
 use App\Infrastructure\Multitenant\Doctrine\Filter\TenantFilter;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -98,7 +93,6 @@ final class TenantFilterTest extends TestCase
 
         $this->assertSame("t.company_id = '987654321'", $constraint);
     }
-<<<<<<< feat/sec-voters-002-vacation-client-expense-contributor
 
     public function testLegacyCompanyOwnedInterfaceTriggersFilter(): void
     {
@@ -126,6 +120,4 @@ final class TenantFilterTest extends TestCase
 
         $this->assertSame("l.company_id = '11'", $constraint);
     }
-=======
->>>>>>> main
 }
