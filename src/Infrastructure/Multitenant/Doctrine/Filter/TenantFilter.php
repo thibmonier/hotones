@@ -53,11 +53,6 @@ final class TenantFilter extends SQLFilter
             !is_subclass_of($class, TenantAwareInterface::class)
             && !is_subclass_of($class, CompanyOwnedInterface::class)
         ) {
-<<<<<<< fix/sec-multitenant-fix-001-tenant-filter-find
-=======
-        // Skip entities that opted out (do not implement the marker interface).
-        if (!is_subclass_of($targetEntity->getName(), TenantAwareInterface::class)) {
->>>>>>> main
             return '';
         }
 
