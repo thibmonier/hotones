@@ -67,6 +67,56 @@ final class Client implements AggregateRootInterface
         return $client;
     }
 
+<<<<<<< feat/ddd-phase2-client-acl
+    /**
+     * Reconstitute an aggregate from persisted state — used by ACL adapters
+     * during EPIC-001 Phase 2 strangler fig. Does NOT record a domain event
+     * (the entity already exists in the legacy store).
+     *
+     * @param array{
+     *     email?: ?Email,
+     *     phone?: ?string,
+     *     address?: ?string,
+     *     city?: ?string,
+     *     postalCode?: ?string,
+     *     country?: ?string,
+     *     vatNumber?: ?string,
+     *     isActive?: bool,
+     *     notes?: ?string,
+     *     createdAt?: DateTimeImmutable,
+     *     updatedAt?: ?DateTimeImmutable,
+     * } $extra
+     */
+    public static function reconstitute(
+        ClientId $id,
+        CompanyName $name,
+        ServiceLevel $serviceLevel,
+        array $extra = [],
+    ): self {
+        $client = new self($id, $name, $serviceLevel);
+
+        if (isset($extra['email'])) {
+            $client->email = $extra['email'];
+        }
+        $client->phone = $extra['phone'] ?? null;
+        $client->address = $extra['address'] ?? null;
+        $client->city = $extra['city'] ?? null;
+        $client->postalCode = $extra['postalCode'] ?? null;
+        $client->country = $extra['country'] ?? null;
+        $client->vatNumber = $extra['vatNumber'] ?? null;
+        $client->isActive = $extra['isActive'] ?? true;
+        $client->notes = $extra['notes'] ?? null;
+
+        if (isset($extra['createdAt'])) {
+            $client->createdAt = $extra['createdAt'];
+        }
+        $client->updatedAt = $extra['updatedAt'] ?? null;
+
+        return $client;
+    }
+
+=======
+>>>>>>> main
     public function updateContactInfo(
         ?Email $email,
         ?string $phone,
