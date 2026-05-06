@@ -8,6 +8,7 @@ Suivez le format [Michael Nygard](https://cognitect.com/blog/2011/11/15/document
 |---|---|---|---|
 | 0001 | _placeholder_ — premier ADR à venir | — | — |
 | [0002](0002-mago-vs-php-cs-fixer-alignment.md) | Conflit alignement Mago vs PHP-CS-Fixer | Accepté | 2026-05-01 |
+| [0003](0003-test-legacy-tolerance-vacation-csrf-session-boundary.md) | Tolérance test legacy permanente : 3 fichiers Vacation `skip-pre-push` (CSRF/session boundary) | Accepté | 2026-05-05 |
 
 ## Comment ajouter un ADR
 

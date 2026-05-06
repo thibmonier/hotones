@@ -13,11 +13,9 @@ use App\Security\CompanyContext;
 use App\Service\PerformanceReviewService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\MailerInterface;
 
-#[AllowMockObjectsWithoutExpectations]
 class PerformanceReviewServiceTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $em;

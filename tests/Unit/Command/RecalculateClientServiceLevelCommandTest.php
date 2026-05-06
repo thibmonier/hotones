@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Command;
 
 use App\Command\RecalculateClientServiceLevelCommand;
 use App\Service\ClientServiceLevelCalculator;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -14,7 +13,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * Unit tests for RecalculateClientServiceLevelCommand.
  */
-#[AllowMockObjectsWithoutExpectations]
 class RecalculateClientServiceLevelCommandTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $calculator;
