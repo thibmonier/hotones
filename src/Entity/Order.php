@@ -197,6 +197,23 @@ class Order implements CompanyOwnedInterface
         }
     }
 
+    /**
+     * Probabilité de signature (0-100), saisie commerciale.
+     *
+     * Source: atelier business 2026-05-15 (Q5). Utilisé par US-062 pour pondérer
+     * les forecasts. Valeurs métier: PENDING / a_signer = champ commercial,
+     * WON/SIGNED/gagne/signe/termine = 100% (computed), LOST/perdu/standby/
+     * abandonne = 0% (computed).
+     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Assert\Range(min: 0, max: 100, notInRangeMessage: 'La probabilité doit être entre {{ min }} et {{ max }}.')]
+    public ?int $winProbability = null {
+        get => $this->winProbability;
+        set {
+            $this->winProbability = $value;
+        }
+    }
+
     // Type de contractualisation du devis: forfait (échéancier) ou regie (temps passé)
     #[ORM\Column(type: 'string', length: 20, options: ['default' => 'forfait'])]
     public string $contractType = 'forfait' { // forfait, regie
