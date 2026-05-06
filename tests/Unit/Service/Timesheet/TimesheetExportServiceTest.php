@@ -14,12 +14,14 @@ use App\Service\PdfGeneratorService;
 use App\Service\Timesheet\TimesheetExportService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Coverage push (T-TC1-03 lot 2) — TimesheetExportService était à 0.88% coverage.
  */
+#[AllowMockObjectsWithoutExpectations]
 final class TimesheetExportServiceTest extends TestCase
 {
     private function createContributor(string $firstName = 'Jean', string $lastName = 'Dupont', float $hoursPerDay = 7.0): Contributor
@@ -61,7 +63,7 @@ final class TimesheetExportServiceTest extends TestCase
 
     public function testExportToExcelReturnsXlsxResponseWithEmptyTimesheets(): void
     {
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -89,7 +91,7 @@ final class TimesheetExportServiceTest extends TestCase
         $timesheet1 = $this->createTimesheet($project, '7', null, 'kickoff');
         $timesheet2 = $this->createTimesheet($project, '3.5');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$timesheet1, $timesheet2]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -117,7 +119,7 @@ final class TimesheetExportServiceTest extends TestCase
         $tsMatch = $this->createTimesheet($projectMatch, '4');
         $tsOther = $this->createTimesheet($projectOther, '4');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$tsMatch, $tsOther]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -143,7 +145,7 @@ final class TimesheetExportServiceTest extends TestCase
         $project = $this->createProject('PdfProj');
         $ts = $this->createTimesheet($project, '6');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$ts]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -185,7 +187,7 @@ final class TimesheetExportServiceTest extends TestCase
         $project = $this->createProject('PdfFiltered', null, 7);
         $ts = $this->createTimesheet($project, '8');
 
-        $repo = $this->createMock(TimesheetRepository::class);
+        $repo = $this->createStub(TimesheetRepository::class);
         $repo->method('findByContributorAndDateRange')->willReturn([$ts]);
 
         $projectRef = $this->createStub(Project::class);

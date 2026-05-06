@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\Vacation\Entity\Vacation;
 use App\Entity\Contributor;
 use App\Entity\Invoice;
 use App\Entity\Order;
 use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\Timesheet;
-use App\Entity\Vacation;
 use App\Enum\OrderStatus;
 use App\Service\Analytics\DashboardReadService;
 use App\Service\HrMetricsService;

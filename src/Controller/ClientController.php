@@ -182,6 +182,7 @@ class ClientController extends AbstractController
                 return $this->redirectToRoute('client_show', ['id' => $clientId->toLegacyInt()]);
             } catch (InvalidArgumentException $e) {
                 $this->addFlash('danger', 'Validation: '.$e->getMessage());
+<<<<<<< test/functional-e2e-client-ddd
 
                 return $this->redirectToRoute('client_index');
             }
@@ -189,6 +190,14 @@ class ClientController extends AbstractController
 
         // GET fallback: redirect to legacy form (Phase 2 ACL doesn't render its own form template yet).
         return $this->redirectToRoute('client_new');
+=======
+            }
+        }
+
+        return $this->render('client/new.html.twig', [
+            'client' => null,
+        ]);
+>>>>>>> main
     }
 
     #[Route('/new', name: 'client_new', methods: ['GET', 'POST'])]
