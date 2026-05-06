@@ -10,12 +10,14 @@ use App\Entity\Timesheet;
 use App\Entity\User;
 use App\Security\CompanyContext;
 use App\Security\Voter\TimesheetVoter;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class TimesheetVoterTest extends TestCase
 {
     private function makeCompany(int $id = 1): Company
@@ -46,21 +48,23 @@ final class TimesheetVoterTest extends TestCase
         $contributor->setFirstName('X');
         $contributor->setLastName('Y');
 
-        $timesheet = $this->createPartialMock(Timesheet::class, ['getContributor', 'getCompany']);
-        $timesheet->method('getContributor')->willReturn($contributor);
-        $timesheet->method('getCompany')->willReturn($company);
+        // Real Timesheet instance with reflection-injected fields. Avoids
+        // createPartialMock + the associated PHPUnit notice (TEST-MOCKS-004).
+        $timesheet = new Timesheet();
+        (new ReflectionProperty(Timesheet::class, 'company'))->setValue($timesheet, $company);
+        (new ReflectionProperty(Timesheet::class, 'contributor'))->setValue($timesheet, $contributor);
 
         return $timesheet;
     }
 
     private function vote(User $user, Timesheet $timesheet, string $attribute): int
     {
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($user->getCompany());
 
         $voter = new TimesheetVoter($context, new NullLogger());
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         return $voter->vote($token, $timesheet, [$attribute]);

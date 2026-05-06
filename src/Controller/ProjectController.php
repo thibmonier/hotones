@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Application\Project\UseCase\CreateProject\CreateProjectCommand;
+use App\Application\Project\UseCase\CreateProject\CreateProjectUseCase;
+use App\Application\Project\UseCase\UpdateProject\UpdateProjectCommand;
+use App\Application\Project\UseCase\UpdateProject\UpdateProjectUseCase;
 use App\Entity\Project;
 use App\Entity\ProjectTask;
 use App\Entity\Technology;
@@ -16,6 +20,7 @@ use App\Service\ProjectRiskAnalyzer;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -209,6 +214,63 @@ class ProjectController extends AbstractController
             'sort' => $sort,
             'dir' => strtoupper((string) $dir) === 'DESC' ? 'DESC' : 'ASC',
         ]);
+    }
+
+    /**
+     * EPIC-001 Phase 3 — sprint-011 ProjectController DDD migration.
+     *
+     * @see ADR-0009 controller migration pattern
+     */
+    #[Route('/new-via-ddd', name: 'project_new_ddd', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function newViaDdd(Request $request, CreateProjectUseCase $useCase): Response
+    {
+        try {
+            $command = new CreateProjectCommand(
+                name: trim((string) $request->request->get('name', '')),
+                clientId: $request->request->getInt('client_id') ?: null,
+                projectType: (string) $request->request->get('project_type', 'forfait'),
+                isInternal: $request->request->getBoolean('is_internal'),
+                description: $request->request->get('description'),
+            );
+            $projectId = $useCase->execute($command);
+            $this->addFlash('success', 'Projet créé via DDD use case');
+
+            return $this->redirectToRoute('project_show', ['id' => $projectId->toLegacyInt()]);
+        } catch (InvalidArgumentException $e) {
+            $this->addFlash('danger', 'Validation: '.$e->getMessage());
+
+            return $this->redirectToRoute('project_index');
+        }
+    }
+
+    /**
+     * EPIC-001 Phase 3 — change project status via DDD state machine.
+     * Démontre l'invariant métier (transitions validées).
+     *
+     * @see ADR-0009 controller migration pattern
+     */
+    #[Route('/{id}/change-status-via-ddd', name: 'project_change_status_ddd', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function changeStatusViaDdd(int $id, Request $request, UpdateProjectUseCase $useCase): Response
+    {
+        try {
+            $command = new UpdateProjectCommand(
+                projectId: $id,
+                name: (string) $request->request->get('name', ''),
+                description: $request->request->get('description'),
+                reference: $request->request->get('reference'),
+                status: (string) $request->request->get('status'),
+            );
+            $useCase->execute($command);
+            $this->addFlash('success', 'Statut projet modifié via DDD state machine');
+        } catch (InvalidArgumentException $e) {
+            $this->addFlash('danger', $e->getMessage());
+        } catch (\App\Domain\Project\Exception\InvalidProjectStatusTransitionException $e) {
+            $this->addFlash('danger', 'Transition invalide: '.$e->getMessage());
+        }
+
+        return $this->redirectToRoute('project_show', ['id' => $id]);
     }
 
     #[Route('/new', name: 'project_new', methods: ['GET', 'POST'])]

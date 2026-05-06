@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Application\Order\UseCase\CreateOrderQuote\CreateOrderQuoteCommand;
+use App\Application\Order\UseCase\CreateOrderQuote\CreateOrderQuoteUseCase;
 use App\DTO\Pagination;
 use App\Entity\Order;
 use App\Entity\OrderLine;
@@ -22,6 +24,7 @@ use function array_key_exists;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -104,6 +107,38 @@ class OrderController extends AbstractController
             'dir' => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'pagination' => $pagination->toArray(),
         ]);
+    }
+
+    /**
+     * EPIC-001 Phase 3 — sprint-011 OrderController DDD migration.
+     *
+     * Create order quote via DDD use case (no form, simple POST).
+     *
+     * @see ADR-0009 controller migration pattern
+     */
+    #[Route('/new-via-ddd', name: 'order_new_ddd', methods: ['POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function newViaDdd(Request $request, CreateOrderQuoteUseCase $useCase): Response
+    {
+        try {
+            $command = new CreateOrderQuoteCommand(
+                clientId: $request->request->getInt('client_id'),
+                projectId: $request->request->getInt('project_id') ?: null,
+                reference: trim((string) $request->request->get('reference', '')),
+                contractType: (string) $request->request->get('contract_type', 'forfait'),
+                amount: (float) $request->request->get('amount', 0),
+                title: $request->request->get('title'),
+                description: $request->request->get('description'),
+            );
+            $orderId = $useCase->execute($command);
+            $this->addFlash('success', 'Devis créé via DDD use case');
+
+            return $this->redirectToRoute('order_show', ['id' => $orderId->toLegacyInt()]);
+        } catch (InvalidArgumentException $e) {
+            $this->addFlash('danger', 'Validation: '.$e->getMessage());
+
+            return $this->redirectToRoute('order_index');
+        }
     }
 
     #[Route('/new', name: 'order_new', methods: ['GET', 'POST'])]

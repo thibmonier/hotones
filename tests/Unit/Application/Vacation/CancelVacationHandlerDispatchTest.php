@@ -15,8 +15,10 @@ use App\Domain\Vacation\ValueObject\VacationId;
 use App\Domain\Vacation\ValueObject\VacationType;
 use App\Entity\Company;
 use App\Entity\Contributor;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -32,15 +34,16 @@ use Symfony\Component\Messenger\MessageBusInterface;
  * The persistence side (Vacation::cancel + repository save) is already covered
  * elsewhere; this test focuses on the new notification-routing behaviour.
  */
+#[AllowMockObjectsWithoutExpectations]
 final class CancelVacationHandlerDispatchTest extends TestCase
 {
-    private VacationRepositoryInterface&MockObject $repository;
+    private VacationRepositoryInterface&Stub $repository;
     private MessageBusInterface&MockObject $messageBus;
     private CancelVacationHandler $handler;
 
     protected function setUp(): void
     {
-        $this->repository = $this->createMock(VacationRepositoryInterface::class);
+        $this->repository = $this->createStub(VacationRepositoryInterface::class);
         $this->messageBus = $this->createMock(MessageBusInterface::class);
         $this->handler = new CancelVacationHandler($this->repository, $this->messageBus);
     }
@@ -85,8 +88,8 @@ final class CancelVacationHandlerDispatchTest extends TestCase
     {
         return Vacation::request(
             VacationId::generate(),
-            $this->createMock(Company::class),
-            $this->createMock(Contributor::class),
+            $this->createStub(Company::class),
+            $this->createStub(Contributor::class),
             DateRange::fromStrings('2026-06-01', '2026-06-03'),
             VacationType::PAID_LEAVE,
             DailyHours::fullDay(),

@@ -7,7 +7,7 @@ namespace App\Domain\Shared\Trait;
 use App\Domain\Shared\Interface\DomainEventInterface;
 
 /**
- * Foundation trait for DDD aggregates.
+ * Foundation trait for DDD aggregates. Consumers will land in EPIC-001 phases 1-3.
  *
  * @phpstan-ignore trait.unused
  */

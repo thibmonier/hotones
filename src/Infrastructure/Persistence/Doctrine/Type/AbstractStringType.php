@@ -41,7 +41,7 @@ abstract class AbstractStringType extends Type
 
         $class = $this->getValueObjectClass();
 
-        /* @phpstan-ignore-next-line method.notFound */
+        /* @phpstan-ignore-next-line method.notFound (subclasses are documented to expose static fromString) */
         return $class::fromString($value);
     }
 
