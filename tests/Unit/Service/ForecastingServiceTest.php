@@ -11,10 +11,12 @@ use App\Security\CompanyContext;
 use App\Service\Analytics\DashboardReadService;
 use App\Service\ForecastingService;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -22,6 +24,7 @@ use RuntimeException;
 /**
  * Comprehensive unit tests for ForecastingService.
  */
+#[AllowMockObjectsWithoutExpectations]
 class ForecastingServiceTest extends TestCase
 {
     private function createService(?ProjectRepository $projectRepository = null): ForecastingService
@@ -400,8 +403,8 @@ class ForecastingServiceTest extends TestCase
         $reflection = new ReflectionClass($service);
         $method = $reflection->getMethod('getMonthsDifference');
 
-        $from = new \DateTimeImmutable('2026-05-01');
-        $to = new \DateTimeImmutable('2026-05-31');
+        $from = new DateTimeImmutable('2026-05-01');
+        $to = new DateTimeImmutable('2026-05-31');
 
         $this->assertSame(0, $method->invoke($service, $from, $to));
     }
@@ -412,8 +415,8 @@ class ForecastingServiceTest extends TestCase
         $reflection = new ReflectionClass($service);
         $method = $reflection->getMethod('getMonthsDifference');
 
-        $from = new \DateTimeImmutable('2025-01-15');
-        $to = new \DateTimeImmutable('2026-04-15');
+        $from = new DateTimeImmutable('2025-01-15');
+        $to = new DateTimeImmutable('2026-04-15');
 
         // 1 year × 12 + 3 months = 15.
         $this->assertSame(15, $method->invoke($service, $from, $to));

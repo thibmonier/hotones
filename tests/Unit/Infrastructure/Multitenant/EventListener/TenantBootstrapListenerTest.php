@@ -12,6 +12,7 @@ use App\Infrastructure\Multitenant\TenantContext;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\FilterCollection;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -29,6 +30,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *     TenantFilter with mocked EntityManager + Connection (matches the pattern
  *     established in TenantFilterTest).
  */
+#[AllowMockObjectsWithoutExpectations]
 final class TenantBootstrapListenerTest extends TestCase
 {
     private function makeEvent(int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent

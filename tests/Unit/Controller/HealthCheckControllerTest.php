@@ -10,6 +10,7 @@ use Doctrine\DBAL\Result;
 
 use const JSON_THROW_ON_ERROR;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -36,6 +37,7 @@ use Symfony\Component\Serializer\Serializer;
  *
  * Closes gap-analysis Critical #3 (Healthcheck Doctrine non couvert).
  */
+#[AllowMockObjectsWithoutExpectations]
 final class HealthCheckControllerTest extends TestCase
 {
     private Connection&MockObject $connection;

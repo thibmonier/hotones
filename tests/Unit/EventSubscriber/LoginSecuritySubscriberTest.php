@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\EventSubscriber;
 
 use App\EventSubscriber\LoginSecuritySubscriber;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +34,7 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  * InMemoryStorage instead of a mock — exercises the real sliding-window
  * algorithm while keeping the test deterministic.
  */
+#[AllowMockObjectsWithoutExpectations]
 final class LoginSecuritySubscriberTest extends TestCase
 {
     private RateLimiterFactory $loginLimiter;

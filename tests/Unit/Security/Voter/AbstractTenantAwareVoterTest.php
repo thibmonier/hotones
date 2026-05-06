@@ -9,11 +9,13 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use App\Entity\User;
 use App\Security\CompanyContext;
 use App\Security\Voter\AbstractTenantAwareVoter;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class AbstractTenantAwareVoterTest extends TestCase
 {
     private function makeCompany(int $id): Company
