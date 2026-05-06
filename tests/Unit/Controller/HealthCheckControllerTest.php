@@ -168,7 +168,7 @@ final class HealthCheckControllerTest extends TestCase
 
     private function stubHealthyDatabase(): void
     {
-        $result = $this->createMock(Result::class);
+        $result = $this->createStub(Result::class);
         $result->method('fetchOne')->willReturn(1);
 
         $this->connection
@@ -181,7 +181,7 @@ final class HealthCheckControllerTest extends TestCase
         $store = [];
 
         $itemFactory = function (string $key) use (&$store): CacheItemInterface {
-            $item = $this->createMock(CacheItemInterface::class);
+            $item = $this->createStub(CacheItemInterface::class);
             $item->method('isHit')->willReturnCallback(static fn () => isset($store[$key]));
             $item->method('get')->willReturnCallback(static fn () => $store[$key] ?? null);
             $item->method('set')->willReturnCallback(static function ($value) use ($item, $key, &$store) {

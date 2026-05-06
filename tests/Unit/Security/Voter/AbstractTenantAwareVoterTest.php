@@ -78,12 +78,12 @@ final class AbstractTenantAwareVoterTest extends TestCase
     public function testRejectsNonUser(): void
     {
         $company = $this->makeCompany(1);
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($company);
 
         $voter = $this->makeVoter($context);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn(null);
 
         $vote = $voter->vote($token, $this->makeSubject($company), ['TEST_VIEW']);
@@ -95,12 +95,12 @@ final class AbstractTenantAwareVoterTest extends TestCase
     {
         $company = $this->makeCompany(42);
         $user = $this->makeUserWithCompany($company);
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($company);
 
         $voter = $this->makeVoter($context);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         $vote = $voter->vote($token, $this->makeSubject($company), ['TEST_VIEW']);
@@ -114,12 +114,12 @@ final class AbstractTenantAwareVoterTest extends TestCase
         $companyB = $this->makeCompany(2);
         $user = $this->makeUserWithCompany($companyA);
 
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($companyA);
 
         $voter = $this->makeVoter($context);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         $vote = $voter->vote($token, $this->makeSubject($companyB), ['TEST_VIEW']);
@@ -133,12 +133,12 @@ final class AbstractTenantAwareVoterTest extends TestCase
         $companyB = $this->makeCompany(2);
         $user = $this->makeUserWithCompany($companyA, ['ROLE_SUPERADMIN']);
 
-        $context = $this->createMock(CompanyContext::class);
+        $context = $this->createStub(CompanyContext::class);
         $context->method('getCurrentCompany')->willReturn($companyA);
 
         $voter = $this->makeVoter($context);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         $vote = $voter->vote($token, $this->makeSubject($companyB), ['TEST_VIEW']);

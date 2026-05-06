@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -35,7 +36,7 @@ final class NotificationServiceTest extends TestCase
 {
     private EntityManagerInterface&MockObject $em;
     private NotificationRepository&MockObject $notificationRepository;
-    private NotificationPreferenceRepository&MockObject $preferenceRepository;
+    private NotificationPreferenceRepository&Stub $preferenceRepository;
     private CompanyContext&MockObject $companyContext;
     private LoggerInterface&MockObject $logger;
     private NotificationService $service;
@@ -45,7 +46,7 @@ final class NotificationServiceTest extends TestCase
     {
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->notificationRepository = $this->createMock(NotificationRepository::class);
-        $this->preferenceRepository = $this->createMock(NotificationPreferenceRepository::class);
+        $this->preferenceRepository = $this->createStub(NotificationPreferenceRepository::class);
         $this->companyContext = $this->createMock(CompanyContext::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 

@@ -114,7 +114,7 @@ class SecureFileUploadServiceTest extends TestCase
     public function testUploadImageWithInvalidMimeTypeThrowsException(): void
     {
         // Given: a file with invalid MIME type (text/plain pretending to be image)
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $file->method('getSize')->willReturn(1024);
         $file->method('getClientOriginalName')->willReturn('malicious.jpg');
 
@@ -404,7 +404,7 @@ class SecureFileUploadServiceTest extends TestCase
      */
     private function createValidUploadedFile(string $filename, string $mimeType, int $size): UploadedFile
     {
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $file->method('getSize')->willReturn($size);
         $file->method('getClientOriginalName')->willReturn($filename);
         $file->method('guessExtension')->willReturn(pathinfo($filename, PATHINFO_EXTENSION));

@@ -142,7 +142,7 @@ class CheckAlertsCommandTest extends TestCase
         ];
 
         foreach ($testCases as $testCase) {
-            $service = $this->createMock(AlertDetectionService::class);
+            $service = $this->createStub(AlertDetectionService::class);
             $service->method('checkAllAlerts')->willReturn($testCase['stats']);
 
             $command = new CheckAlertsCommand($service);

@@ -56,8 +56,8 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
     #[Test]
     public function mapsPendingVacationsToDTOs(): void
     {
-        $manager = $this->createMock(Contributor::class);
-        $teamMate = $this->createMock(Contributor::class);
+        $manager = $this->createStub(Contributor::class);
+        $teamMate = $this->createStub(Contributor::class);
         $teamMate->method('getFullName')->willReturn('Adrien Test');
 
         $managed = new ArrayCollection([$teamMate]);
@@ -80,12 +80,12 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
 
     private function buildVacation(string $contributorName, VacationType $type): Vacation
     {
-        $contributor = $this->createMock(Contributor::class);
+        $contributor = $this->createStub(Contributor::class);
         $contributor->method('getFullName')->willReturn($contributorName);
 
         return Vacation::request(
             VacationId::generate(),
-            $this->createMock(Company::class),
+            $this->createStub(Company::class),
             $contributor,
             DateRange::fromStrings('2026-06-15', '2026-06-19'),
             $type,

@@ -11,6 +11,7 @@ use App\Security\CompanyContext;
 use App\Service\Analytics\DashboardReadService;
 use App\Service\ForecastingService;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -26,11 +27,11 @@ class ForecastingServiceTest extends TestCase
 {
     private function createService(?ProjectRepository $projectRepository = null): ForecastingService
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $companyContext = $this->createMock(CompanyContext::class);
-        $forecastRepository = $this->createMock(FactForecastRepository::class);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $companyContext = $this->createStub(CompanyContext::class);
+        $forecastRepository = $this->createStub(FactForecastRepository::class);
         $projectRepository ??= $this->createMock(ProjectRepository::class);
-        $dashboardService = $this->createMock(DashboardReadService::class);
+        $dashboardService = $this->createStub(DashboardReadService::class);
 
         return new ForecastingService($em, $companyContext, $forecastRepository, $projectRepository, $dashboardService);
     }
@@ -71,8 +72,8 @@ class ForecastingServiceTest extends TestCase
         $projectRepository = $this->createMock(ProjectRepository::class);
 
         // Mock empty historical data
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(Query::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $query = $this->createStub(Query::class);
 
         $projectRepository->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
 
@@ -113,8 +114,8 @@ class ForecastingServiceTest extends TestCase
             $projects[] = $project;
         }
 
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(Query::class);
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $query = $this->createStub(Query::class);
 
         $projectRepository->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
 
@@ -400,8 +401,8 @@ class ForecastingServiceTest extends TestCase
         $reflection = new ReflectionClass($service);
         $method = $reflection->getMethod('getMonthsDifference');
 
-        $from = new \DateTimeImmutable('2026-05-01');
-        $to = new \DateTimeImmutable('2026-05-31');
+        $from = new DateTimeImmutable('2026-05-01');
+        $to = new DateTimeImmutable('2026-05-31');
 
         $this->assertSame(0, $method->invoke($service, $from, $to));
     }
@@ -412,8 +413,8 @@ class ForecastingServiceTest extends TestCase
         $reflection = new ReflectionClass($service);
         $method = $reflection->getMethod('getMonthsDifference');
 
-        $from = new \DateTimeImmutable('2025-01-15');
-        $to = new \DateTimeImmutable('2026-04-15');
+        $from = new DateTimeImmutable('2025-01-15');
+        $to = new DateTimeImmutable('2026-04-15');
 
         // 1 year × 12 + 3 months = 15.
         $this->assertSame(15, $method->invoke($service, $from, $to));
