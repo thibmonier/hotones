@@ -290,8 +290,8 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates');
 
-        // Extract token from the toggle button
-        $token = $crawler->filter('button[onclick*="toggleTemplate('.$template->getId().'"]')->attr('data-token');
+        // Extract token from the toggle button (Stimulus-like data-action pattern, sprint-009 fix INVESTIGATE-CAT-B)
+        $token = $crawler->filter('button[data-action="toggle-template"][data-template-id="'.$template->getId().'"]')->attr('data-token');
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$template->getId().'/toggle', [
             '_token' => $token,
@@ -315,8 +315,8 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         $crawler = $this->client->request('GET', '/admin/onboarding-templates');
 
-        // Extract token from the delete button
-        $token = $crawler->filter('button[onclick*="deleteTemplate('.$templateId.'"]')->attr('data-token');
+        // Extract token from the delete button (Stimulus-like data-action pattern, sprint-009 fix INVESTIGATE-CAT-B)
+        $token = $crawler->filter('button[data-action="delete-template"][data-template-id="'.$templateId.'"]')->attr('data-token');
 
         $this->client->request('POST', '/admin/onboarding-templates/'.$templateId.'/delete', [
             '_token' => $token,

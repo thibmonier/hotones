@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Command;
 
 use App\Command\RecalculateClientServiceLevelCommand;
 use App\Service\ClientServiceLevelCalculator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * Unit tests for RecalculateClientServiceLevelCommand.
  */
+#[AllowMockObjectsWithoutExpectations]
 class RecalculateClientServiceLevelCommandTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $calculator;
@@ -120,7 +122,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $counts = [0, 1, 25, 100];
 
         foreach ($counts as $count) {
-            $calculator = $this->createMock(ClientServiceLevelCalculator::class);
+            $calculator = $this->createStub(ClientServiceLevelCalculator::class);
             $calculator
                 ->method('getConfiguration')
                 ->willReturn([
