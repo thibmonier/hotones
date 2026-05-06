@@ -9,11 +9,19 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class ClientId
 {
+    /** Legacy int-id prefix used during EPIC-001 Phase 2 strangler fig. */
+    private const string LEGACY_PREFIX = 'legacy:';
+
     private function __construct(
         private string $value,
     ) {
+        if (str_starts_with($value, self::LEGACY_PREFIX)) {
+            // Legacy int wrapped as `legacy:NNN` during ACL bridge phase.
+            return;
+        }
+
         if (!Uuid::isValid($value)) {
-            throw new InvalidArgumentException(sprintf('Invalid UUID format for ClientId: %s', $value));
+            throw new InvalidArgumentException(sprintf('Invalid ClientId format: %s', $value));
         }
     }
 

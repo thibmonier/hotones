@@ -67,7 +67,6 @@ final class Client implements AggregateRootInterface
         return $client;
     }
 
-<<<<<<< feat/ddd-phase2-client-acl
     /**
      * Reconstitute an aggregate from persisted state — used by ACL adapters
      * during EPIC-001 Phase 2 strangler fig. Does NOT record a domain event
@@ -115,8 +114,6 @@ final class Client implements AggregateRootInterface
         return $client;
     }
 
-=======
->>>>>>> main
     public function updateContactInfo(
         ?Email $email,
         ?string $phone,
