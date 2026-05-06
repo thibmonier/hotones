@@ -10,6 +10,7 @@ use Doctrine\DBAL\Result;
 
 use const JSON_THROW_ON_ERROR;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -36,6 +37,7 @@ use Symfony\Component\Serializer\Serializer;
  *
  * Closes gap-analysis Critical #3 (Healthcheck Doctrine non couvert).
  */
+#[AllowMockObjectsWithoutExpectations]
 final class HealthCheckControllerTest extends TestCase
 {
     private Connection&MockObject $connection;
@@ -168,7 +170,7 @@ final class HealthCheckControllerTest extends TestCase
 
     private function stubHealthyDatabase(): void
     {
-        $result = $this->createMock(Result::class);
+        $result = $this->createStub(Result::class);
         $result->method('fetchOne')->willReturn(1);
 
         $this->connection
@@ -181,7 +183,7 @@ final class HealthCheckControllerTest extends TestCase
         $store = [];
 
         $itemFactory = function (string $key) use (&$store): CacheItemInterface {
-            $item = $this->createMock(CacheItemInterface::class);
+            $item = $this->createStub(CacheItemInterface::class);
             $item->method('isHit')->willReturnCallback(static fn () => isset($store[$key]));
             $item->method('get')->willReturnCallback(static fn () => $store[$key] ?? null);
             $item->method('set')->willReturnCallback(static function ($value) use ($item, $key, &$store) {

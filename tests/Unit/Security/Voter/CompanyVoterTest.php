@@ -9,8 +9,10 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use App\Entity\User;
 use App\Security\CompanyContext;
 use App\Security\Voter\CompanyVoter;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionMethod;
@@ -31,15 +33,16 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * - SUPERADMIN bypass + audit logging
  * - role-based CRUD authorization for entity classes
  */
+#[AllowMockObjectsWithoutExpectations]
 final class CompanyVoterTest extends TestCase
 {
-    private CompanyContext&MockObject $companyContext;
+    private CompanyContext&Stub $companyContext;
     private LoggerInterface&MockObject $securityLogger;
     private CompanyVoter $voter;
 
     protected function setUp(): void
     {
-        $this->companyContext = $this->createMock(CompanyContext::class);
+        $this->companyContext = $this->createStub(CompanyContext::class);
         $this->securityLogger = $this->createMock(LoggerInterface::class);
         $this->voter = new CompanyVoter($this->companyContext, $this->securityLogger);
     }
@@ -47,7 +50,7 @@ final class CompanyVoterTest extends TestCase
     #[Test]
     public function supportsReturnsTrueForViewOnCompanyOwnedSubject(): void
     {
-        $subject = $this->createMock(CompanyOwnedInterface::class);
+        $subject = $this->createStub(CompanyOwnedInterface::class);
 
         $result = $this->invokeSupports(CompanyVoter::VIEW, $subject);
 
@@ -57,21 +60,21 @@ final class CompanyVoterTest extends TestCase
     #[Test]
     public function supportsReturnsTrueForEditOnCompanyOwnedSubject(): void
     {
-        $subject = $this->createMock(CompanyOwnedInterface::class);
+        $subject = $this->createStub(CompanyOwnedInterface::class);
         self::assertTrue($this->invokeSupports(CompanyVoter::EDIT, $subject));
     }
 
     #[Test]
     public function supportsReturnsTrueForDeleteOnCompanyOwnedSubject(): void
     {
-        $subject = $this->createMock(CompanyOwnedInterface::class);
+        $subject = $this->createStub(CompanyOwnedInterface::class);
         self::assertTrue($this->invokeSupports(CompanyVoter::DELETE, $subject));
     }
 
     #[Test]
     public function supportsReturnsFalseForUnsupportedAttribute(): void
     {
-        $subject = $this->createMock(CompanyOwnedInterface::class);
+        $subject = $this->createStub(CompanyOwnedInterface::class);
         self::assertFalse($this->invokeSupports('UNKNOWN', $subject));
     }
 
@@ -213,9 +216,9 @@ final class CompanyVoterTest extends TestCase
     #[Test]
     public function voteAbstainsIfTokenUserIsNotAppUser(): void
     {
-        $subject = $this->createMock(CompanyOwnedInterface::class);
+        $subject = $this->createStub(CompanyOwnedInterface::class);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn(null);
 
         // Voter::vote returns ABSTAIN when voteOnAttribute returns false
@@ -233,9 +236,9 @@ final class CompanyVoterTest extends TestCase
         return (bool) $reflection->invoke($this->voter, $attribute, $subject);
     }
 
-    private function makeCompany(int $id): Company&MockObject
+    private function makeCompany(int $id): Company&Stub
     {
-        $company = $this->createMock(Company::class);
+        $company = $this->createStub(Company::class);
         $company->method('getId')->willReturn($id);
         $company->method('getName')->willReturn('Company '.$id);
 
@@ -252,8 +255,8 @@ final class CompanyVoterTest extends TestCase
         bool $isSuperAdmin = false,
         bool $isChefProjet = false,
         bool $isManager = false,
-    ): User&MockObject {
-        $user = $this->createMock(User::class);
+    ): User&Stub {
+        $user = $this->createStub(User::class);
         $user->method('getId')->willReturn($id);
         $user->method('getEmail')->willReturn('user'.$id.'@test.com');
         $user->method('getRoles')->willReturn($roles);
@@ -283,9 +286,9 @@ final class CompanyVoterTest extends TestCase
         return $subject;
     }
 
-    private function makeToken(User $user): TokenInterface&MockObject
+    private function makeToken(User $user): TokenInterface&Stub
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         return $token;
