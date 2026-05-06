@@ -11,6 +11,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 /**
  * Tests unitaires pour DashboardReadService.
  */
+#[AllowMockObjectsWithoutExpectations]
 class DashboardReadServiceTest extends TestCase
 {
     private MockObject $entityManager;
@@ -73,7 +75,7 @@ class DashboardReadServiceTest extends TestCase
             ]);
         $query->method('getResult')->willReturn([]);
 
-        $qb = $this->createMock(QueryBuilder::class);
+        $qb = $this->createStub(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('from')->willReturnSelf();
         $qb->method('join')->willReturnSelf();
@@ -122,7 +124,7 @@ class DashboardReadServiceTest extends TestCase
             ]);
         $query->method('getResult')->willReturn([]);
 
-        $qb = $this->createMock(QueryBuilder::class);
+        $qb = $this->createStub(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('from')->willReturnSelf();
         $qb->method('join')->willReturnSelf();
@@ -197,7 +199,7 @@ class DashboardReadServiceTest extends TestCase
                 ],
             ]);
 
-        $qb = $this->createMock(QueryBuilder::class);
+        $qb = $this->createStub(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('from')->willReturnSelf();
         $qb->method('join')->willReturnSelf();
@@ -238,7 +240,7 @@ class DashboardReadServiceTest extends TestCase
         $query = $this->createMock(Query::class);
         $query->expects($this->once())->method('getResult')->willReturn([]);
 
-        $qb = $this->createMock(QueryBuilder::class);
+        $qb = $this->createStub(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('from')->willReturnSelf();
         $qb->method('join')->willReturnSelf();

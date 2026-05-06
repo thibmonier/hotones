@@ -210,6 +210,14 @@ Badge et détails : section [Code Quality (SonarCloud)](#code-quality-sonarcloud
 
 - Rapport complet : [sonarcloud.io/project/overview?id=thibmonier_hotones](https://sonarcloud.io/project/overview?id=thibmonier_hotones)
 
+### Tooling
+
+- `tools/count-mocks.pl` — audit des `createMock` vs `createStub` dans la suite Unit. Identifie les mocks safely-convertible. Voir `CONTRIBUTING.md` section "Tests" pour le guide de décision.
+  ```bash
+  perl tools/count-mocks.pl tests/Unit/Service/FooTest.php
+  perl tools/count-mocks.pl --json $(find tests/Unit -name '*Test.php')
+  ```
+
 - Environnement de test: `.env.test` utilise SQLite (isolation sans DB externe)
 - E2E (Panther): nécessite Chrome/Chromium; variables utiles (si besoin):
 ```bash
