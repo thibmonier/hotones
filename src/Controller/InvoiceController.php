@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Application\Invoice\UseCase\CreateInvoiceDraft\CreateInvoiceDraftCommand;
+use App\Application\Invoice\UseCase\CreateInvoiceDraft\CreateInvoiceDraftUseCase;
 use App\Entity\Client;
 use App\Entity\Invoice;
 use App\Entity\Project;
@@ -12,6 +14,7 @@ use App\Repository\InvoiceRepository;
 use App\Security\CompanyContext;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -182,6 +185,36 @@ class InvoiceController extends AbstractController
             'dir' => strtoupper((string) $dir) === 'ASC' ? 'ASC' : 'DESC',
             'pagination' => $pagination,
         ]);
+    }
+
+    /**
+     * EPIC-001 Phase 3 — sprint-012 InvoiceController DDD migration.
+     *
+     * Crée un draft Invoice via DDD UC. Bypasse InvoiceType form.
+     *
+     * @see ADR-0009 controller migration pattern
+     */
+    #[Route('/new-via-ddd', name: 'invoice_new_ddd', methods: ['POST'])]
+    #[IsGranted('ROLE_COMPTA')]
+    public function newViaDdd(Request $request, CreateInvoiceDraftUseCase $useCase): Response
+    {
+        try {
+            $command = new CreateInvoiceDraftCommand(
+                companyId: $this->companyContext->getCurrentCompany()->getId() ?? throw new InvalidArgumentException('No current company'),
+                clientId: $request->request->getInt('client_id'),
+                orderId: $request->request->getInt('order_id') ?: null,
+                projectId: $request->request->getInt('project_id') ?: null,
+                paymentTerms: $request->request->get('payment_terms'),
+            );
+            $invoiceId = $useCase->execute($command);
+            $this->addFlash('success', 'Facture créée via DDD use case');
+
+            return $this->redirectToRoute('invoice_show', ['id' => $invoiceId->toLegacyInt()]);
+        } catch (InvalidArgumentException $e) {
+            $this->addFlash('danger', 'Validation: '.$e->getMessage());
+
+            return $this->redirectToRoute('invoice_index');
+        }
     }
 
     #[Route('/new', name: 'invoice_new', methods: ['GET', 'POST'])]

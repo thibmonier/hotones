@@ -2,28 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Invoice\ValueObject;
+namespace App\Domain\Company\ValueObject;
 
 use InvalidArgumentException;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Invoice identifier value object.
+ * Value object representing a Company's unique identifier.
  */
-final readonly class InvoiceId
+final readonly class CompanyId
 {
     private const string LEGACY_PREFIX = 'legacy:';
 
     private function __construct(
         private string $value,
     ) {
-        if (str_starts_with($value, self::LEGACY_PREFIX)) {
-            return;
-        }
-
-        if (!Uuid::isValid($value)) {
-            throw new InvalidArgumentException(sprintf('Invalid InvoiceId format: %s', $value));
-        }
     }
 
     public static function generate(): self
@@ -31,9 +24,17 @@ final readonly class InvoiceId
         return new self(Uuid::v4()->toRfc4122());
     }
 
-    public static function fromString(string $id): self
+    public static function fromString(string $value): self
     {
-        return new self($id);
+        if (str_starts_with($value, self::LEGACY_PREFIX)) {
+            return new self($value);
+        }
+
+        if (!Uuid::isValid($value)) {
+            throw new InvalidArgumentException(sprintf('Invalid Company ID format: %s', $value));
+        }
+
+        return new self($value);
     }
 
     public static function fromLegacyInt(int $id): self
@@ -53,7 +54,7 @@ final readonly class InvoiceId
     public function toLegacyInt(): int
     {
         if (!$this->isLegacy()) {
-            throw new InvalidArgumentException('InvoiceId is not a legacy int wrapper');
+            throw new InvalidArgumentException('CompanyId is not a legacy int wrapper');
         }
 
         return (int) substr($this->value, strlen(self::LEGACY_PREFIX));
