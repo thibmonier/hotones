@@ -42,6 +42,10 @@ services:
     App\Domain\Vacation\Repository\VacationRepositoryInterface:
         alias: App\Infrastructure\Vacation\Persistence\Doctrine\DoctrineVacationRepository
 
+    # Order Bounded Context - Interface bindings (EPIC-001 Phase 2/3)
+    App\Domain\Order\Repository\OrderRepositoryInterface:
+        alias: App\Infrastructure\Order\Persistence\Doctrine\DoctrineDddOrderRepository
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
