@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Application\Client\UseCase\CreateClient\CreateClientCommand;
+use App\Application\Client\UseCase\CreateClient\CreateClientUseCase;
 use App\Entity\Client;
 use App\Entity\ClientContact;
 use App\Security\CompanyContext;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -142,6 +145,45 @@ class ClientController extends AbstractController
         ));
 
         return $response;
+    }
+
+    /**
+     * EPIC-001 Phase 3 — sprint-010 first controller migration to DDD.
+     *
+     * New CRUD endpoint that exercises the DDD use case + ACL stack
+     * (CreateClientUseCase → DoctrineDddClientRepository → ClientDddToFlatTranslator
+     * → flat App\Entity\Client persistence).
+     *
+     * The legacy `/clients/new` route remains untouched for backwards
+     * compatibility (logo upload + service_level_mode features unique to it).
+     * Once feature parity is reached this route will replace the legacy one.
+     *
+     * @see ADR-0008 Anti-Corruption Layer pattern
+     */
+    #[Route('/new-via-ddd', name: 'client_new_ddd', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_CHEF_PROJET')]
+    public function newViaDdd(Request $request, CreateClientUseCase $useCase): Response
+    {
+        if ($request->isMethod('POST')) {
+            try {
+                $command = new CreateClientCommand(
+                    name: trim((string) $request->request->get('name', '')),
+                    serviceLevel: (string) $request->request->get('service_level', 'standard'),
+                    notes: $request->request->get('description'),
+                );
+                $clientId = $useCase->execute($command);
+
+                $this->addFlash('success', 'Client créé avec succès via DDD use case');
+
+                return $this->redirectToRoute('client_show', ['id' => $clientId->toLegacyInt()]);
+            } catch (InvalidArgumentException $e) {
+                $this->addFlash('danger', 'Validation: '.$e->getMessage());
+            }
+        }
+
+        return $this->render('client/new.html.twig', [
+            'client' => null,
+        ]);
     }
 
     #[Route('/new', name: 'client_new', methods: ['GET', 'POST'])]
