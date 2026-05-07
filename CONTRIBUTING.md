@@ -832,6 +832,72 @@ public function myMethod(ParamType $param, OtherType $other): ReturnType
 }
 ```
 
+## 📦 Cadence updates dépendances
+
+> **US-089 (sprint-014)** — Routine de mise à jour des dépendances Composer + npm.
+
+### Dependabot (automatique)
+
+Le projet utilise [Dependabot](.github/dependabot.yml) pour ouvrir des PRs
+automatiques de mise à jour :
+
+| Écosystème | Cadence | Limite PRs ouvertes |
+|---|---|---:|
+| Composer (PHP) | Hebdomadaire (lundi 06:00 Europe/Paris) | 5 |
+| npm (JS) | Hebdomadaire (lundi 06:00 Europe/Paris) | 5 |
+| GitHub Actions | Mensuelle (1er lundi 06:00) | 3 |
+| Docker | Mensuelle (1er lundi 06:00) | 3 |
+
+Les PRs sont **groupées** par famille (Symfony, Doctrine, Webpack) pour
+les versions minor + patch afin de réduire le bruit.
+
+### Convention manuelle (entre 2 cycles Dependabot)
+
+Pour rafraîchir manuellement les dépendances :
+
+```bash
+# 1. Composer (patch + minor uniquement, jamais major sans ADR)
+docker exec hotones_app composer update --with-all-dependencies "symfony/*" "doctrine/*"
+
+# 2. npm
+docker exec hotones_app npm update --no-audit
+
+# 3. composer bump (mettre à jour les contraintes vers les versions installées)
+docker exec hotones_app composer bump
+
+# 4. Validation
+docker exec hotones_app php bin/phpunit --no-coverage
+docker exec hotones_app composer phpstan
+docker exec hotones_app composer phpcsfixer
+```
+
+### Rebase Dependabot PRs
+
+Avant merge, **toujours rebaser** la PR Dependabot sur main :
+
+```bash
+gh pr checkout <numéro>
+git rebase origin/main
+git push --force-with-lease
+```
+
+### Politique de merge
+
+- **Patch (x.y.Z)** : merge auto si CI verte
+- **Minor (x.Y.z)** : revue rapide + merge si CI verte + tests Unit
+- **Major (X.y.z)** : ADR obligatoire (breaking changes) + sprint dédié
+
+### Audit sécurité ponctuel
+
+```bash
+docker exec hotones_app composer audit  # PHP
+docker exec hotones_app npm audit       # JS
+```
+
+Cf. `.snyk` policy pour la stratégie Snyk (US-088).
+
+---
+
 ## ❓ Questions ?
 
 Si vous avez des questions :
