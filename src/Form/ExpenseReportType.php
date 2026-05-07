@@ -65,8 +65,7 @@ class ExpenseReportType extends AbstractType
             ])
             ->add('project', EntityType::class, [
                 'class' => Project::class,
-                'choice_label' => fn (Project $project): string =>
-                    $project->getName().($project->getClient() ? ' - '.$project->getClient()->getName() : ''),
+                'choice_label' => fn (Project $project): string => $project->getName().($project->getClient() ? ' - '.$project->getClient()->getName() : ''),
                 'required' => false,
                 'placeholder' => '-- Sélectionner un projet --',
                 'label' => 'Projet',

@@ -195,12 +195,10 @@ class OnboardingServiceTest extends TestCase
             ->expects($this->once())
             ->method('persist')
             ->with($this->callback(
-                fn (OnboardingTemplate $template): bool =>
-                    $template->getName() === $name
+                fn (OnboardingTemplate $template): bool => $template->getName() === $name
                     && $template->getDescription() === $description
                     && $template->isActive() === true
-                    && count($template->getTasks()) === 1
-                ,
+                    && count($template->getTasks()) === 1,
             ));
 
         $this->em->expects($this->once())->method('flush');
@@ -250,12 +248,10 @@ class OnboardingServiceTest extends TestCase
             ->expects($this->once())
             ->method('persist')
             ->with($this->callback(
-                fn (OnboardingTemplate $duplicate): bool =>
-                    str_contains($duplicate->getName(), 'Copie')
+                fn (OnboardingTemplate $duplicate): bool => str_contains($duplicate->getName(), 'Copie')
                     && $duplicate->getDescription() === 'Original description'
                     && $duplicate->isActive() === true
-                    && count($duplicate->getTasks()) === 1
-                ,
+                    && count($duplicate->getTasks()) === 1,
             ));
 
         $this->em->expects($this->once())->method('flush');

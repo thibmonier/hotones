@@ -80,10 +80,8 @@ final class NotificationServiceTest extends TestCase
             ->with(
                 'Notification created',
                 self::callback(
-                    static fn (array $ctx): bool =>
-                        $ctx['recipient'] === 'alice@example.com'
-                        && $ctx['type'] === 'quote_won'
-                    ,
+                    static fn (array $ctx): bool => $ctx['recipient'] === 'alice@example.com'
+                        && $ctx['type'] === 'quote_won',
                 ),
             );
 
