@@ -61,6 +61,9 @@ when@prod:
                 path: php://stderr
                 level: debug
                 formatter: monolog.formatter.json
+                # US-095 : interpolation des placeholders {var} dans le message PSR-3
+                # afin que les logs JSON gardent un message lisible côté Render dashboard.
+                process_psr_3_messages: true
             # Business events: always logged (info and above)
             business:
                 type: stream
