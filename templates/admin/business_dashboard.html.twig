@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Business — HotOnes{% endblock %}
+
+{% block body %}
+<div class="container my-4" data-controller="business-dashboard" data-business-dashboard-refresh-interval-value="300000">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📊 Dashboard Business</h1>
+        <div>
+            <span class="text-muted me-2" data-business-dashboard-target="lastRefresh">
+                Cache : 5 min
+            </span>
+            <button class="btn btn-sm btn-outline-primary" data-action="business-dashboard#refresh">
+                <i class="bx bx-refresh"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        {# 1. DAU / MAU #}
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Active Users</h6>
+                    <div class="fs-2 fw-bold">{{ kpis.dau }} / {{ kpis.mau }}</div>
+                    <small class="text-muted">DAU / MAU (24h / 30j)</small>
+                </div>
+            </div>
+        </div>
+
+        {# 2. Projets créés / jour #}
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Projets / jour</h6>
+                    <div class="fs-2 fw-bold">{{ kpis.projects_per_day }}</div>
+                    <small class="text-muted">moyenne 30 derniers jours</small>
+                </div>
+            </div>
+        </div>
+
+        {# 3. Devis signés ce mois #}
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Devis signés</h6>
+                    <div class="fs-2 fw-bold">{{ kpis.signed_quotes_this_month }}</div>
+                    <small class="text-muted">mois en cours</small>
+                </div>
+            </div>
+        </div>
+
+        {# 4. Factures émises ce mois #}
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Factures émises</h6>
+                    <div class="fs-2 fw-bold">{{ kpis.invoices_this_month_count }}</div>
+                    <small class="text-muted">{{ kpis.invoices_this_month_amount|number_format(2, ',', ' ') }} € TTC</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {# 5. Conversion devis -> projet #}
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Conversion devis → projet</h6>
+                    <div class="fs-2 fw-bold">{{ kpis.conversion_rate_pct }} %</div>
+                    <small class="text-muted">30 derniers jours</small>
+                </div>
+            </div>
+        </div>
+
+        {# 6. Revenu trail 30j #}
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Revenu trail 30j</h6>
+                    <div class="fs-2 fw-bold">{{ kpis.revenue_trail_30d|number_format(2, ',', ' ') }} €</div>
+                    <small class="text-muted">factures payées</small>
+                </div>
+            </div>
+        </div>
+
+        {# 7. Marge moyenne projet #}
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Marge moyenne / projet</h6>
+                    <div class="fs-2 fw-bold">{{ kpis.avg_project_margin|number_format(2, ',', ' ') }} €</div>
+                    <small class="text-muted">projets actifs</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4 small">
+        <strong>US-093 (sprint-017 EPIC-002)</strong> — Dashboard pilotage PO.
+        Cache 5 min via Redis. KPIs calculés sur tenant courant.
+    </div>
+</div>
+{% endblock %}
