@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use stdClass;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -143,7 +144,7 @@ final class CreateClientUseCaseTest extends TestCase
 
         $bus = $messageBus ?? $this->createMock(MessageBusInterface::class);
         if ($messageBus === null) {
-            $bus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+            $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
         }
 
         return new CreateClientUseCase($em, $companyContext, $translator, $bus);

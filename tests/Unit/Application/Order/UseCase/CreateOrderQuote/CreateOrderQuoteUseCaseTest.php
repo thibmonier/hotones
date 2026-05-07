@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use stdClass;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -133,8 +134,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('find')->willReturnCallback(
-            static fn (string $class, mixed $id): ?FlatProject =>
-                FlatProject::class === $class && 33 === $id ? $project : null,
+            static fn (string $class, mixed $id): ?FlatProject => FlatProject::class === $class && 33 === $id ? $project : null,
         );
         $em->method('persist')->willReturnCallback(function (FlatOrder $flat): void {
             (new ReflectionProperty(FlatOrder::class, 'id'))->setValue($flat, 9);
@@ -142,7 +142,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
         $em->method('flush');
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+        $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
         $useCase = new CreateOrderQuoteUseCase($em, new OrderDddToFlatTranslator(), $bus);
 
@@ -172,7 +172,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
         $em->method('flush');
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+        $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
         return new CreateOrderQuoteUseCase($em, new OrderDddToFlatTranslator(), $bus);
     }
