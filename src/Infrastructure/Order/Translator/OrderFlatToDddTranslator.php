@@ -60,8 +60,8 @@ final class OrderFlatToDddTranslator
                     ? DateTimeImmutable::createFromInterface($flat->validatedAt)
                     : null,
                 'notes' => $flat->notes,
-                'createdAt' => $flat->createdAt instanceof DateTimeInterface
-                    ? DateTimeImmutable::createFromInterface($flat->createdAt)
+                'createdAt' => $flat->getCreatedAt() instanceof DateTimeInterface
+                    ? DateTimeImmutable::createFromInterface($flat->getCreatedAt())
                     : new DateTimeImmutable(),
             ],
         );
