@@ -217,34 +217,6 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * EPIC-001 Phase 3 — sprint-011 ProjectController DDD migration.
-     *
-     * @see ADR-0009 controller migration pattern
-     */
-    #[Route('/new-via-ddd', name: 'project_new_ddd', methods: ['POST'])]
-    #[IsGranted('ROLE_CHEF_PROJET')]
-    public function newViaDdd(Request $request, CreateProjectUseCase $useCase): Response
-    {
-        try {
-            $command = new CreateProjectCommand(
-                name: trim((string) $request->request->get('name', '')),
-                clientId: $request->request->getInt('client_id') ?: null,
-                projectType: (string) $request->request->get('project_type', 'forfait'),
-                isInternal: $request->request->getBoolean('is_internal'),
-                description: $request->request->get('description'),
-            );
-            $projectId = $useCase->execute($command);
-            $this->addFlash('success', 'Projet créé via DDD use case');
-
-            return $this->redirectToRoute('project_show', ['id' => $projectId->toLegacyInt()]);
-        } catch (InvalidArgumentException $e) {
-            $this->addFlash('danger', 'Validation: '.$e->getMessage());
-
-            return $this->redirectToRoute('project_index');
-        }
-    }
-
-    /**
      * EPIC-001 Phase 3 — change project status via DDD state machine.
      * Démontre l'invariant métier (transitions validées).
      *
@@ -273,31 +245,57 @@ class ProjectController extends AbstractController
         return $this->redirectToRoute('project_show', ['id' => $id]);
     }
 
+    /**
+     * EPIC-001 Phase 4 — sprint-013 décommission Project legacy.
+     *
+     * Route principale `/projects/new` migrée vers DDD use case (était sur
+     * route alternative `/new-via-ddd` depuis sprint-011 PR #146).
+     *
+     * Side-effect ProjectTask::createDefaultTasks préservé post-UC.
+     *
+     * @see ADR-0009 controller migration pattern (Phase 4 critères)
+     * @see ADR-0008 Anti-Corruption Layer pattern
+     */
     #[Route('/new', name: 'project_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, CreateProjectUseCase $useCase): Response
     {
+        if ($request->isMethod('POST')) {
+            try {
+                $command = new CreateProjectCommand(
+                    name: trim((string) $request->request->get('name', '')),
+                    clientId: $request->request->getInt('client_id') ?: null,
+                    projectType: (string) $request->request->get('project_type', 'forfait'),
+                    isInternal: $request->request->getBoolean('is_internal'),
+                    description: $request->request->get('description'),
+                );
+                $projectId = $useCase->execute($command);
+                $persistedId = $projectId->toLegacyInt();
+
+                // Side-effect : tâches par défaut (AVV, Non-vendu) — non couvertes par DDD UC
+                $persistedProject = $em->find(Project::class, $persistedId);
+                if ($persistedProject !== null) {
+                    foreach (ProjectTask::createDefaultTasks($persistedProject) as $task) {
+                        $em->persist($task);
+                    }
+                    $em->flush();
+                }
+
+                $this->addFlash('success', 'Projet créé avec succès');
+
+                return $this->redirectToRoute('project_show', ['id' => $persistedId]);
+            } catch (InvalidArgumentException $e) {
+                $this->addFlash('danger', 'Validation: '.$e->getMessage());
+
+                return $this->redirectToRoute('project_index');
+            }
+        }
+
+        // GET: render form template (formulaire legacy continue d'afficher tous les champs)
         $project = new Project();
         $project->setCompany($this->companyContext->getCurrentCompany());
 
         $form = $this->createForm(ProjectFormType::class, $project);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($project);
-            $em->flush();
-
-            // Créer les tâches par défaut (AVV, Non-vendu)
-            $defaultTasks = ProjectTask::createDefaultTasks($project);
-            foreach ($defaultTasks as $task) {
-                $em->persist($task);
-            }
-            $em->flush();
-
-            $this->addFlash('success', 'Projet créé avec succès');
-
-            return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
-        }
 
         return $this->render('project/new.html.twig', [
             'project' => $project,

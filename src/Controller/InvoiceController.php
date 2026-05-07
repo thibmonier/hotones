@@ -188,59 +188,46 @@ class InvoiceController extends AbstractController
     }
 
     /**
-     * EPIC-001 Phase 3 — sprint-012 InvoiceController DDD migration.
+     * EPIC-001 Phase 4 — sprint-013 décommission Invoice legacy.
      *
-     * Crée un draft Invoice via DDD UC. Bypasse InvoiceType form.
+     * Route principale `/invoices/new` migrée vers DDD use case (était sur
+     * route alternative `/new-via-ddd` depuis sprint-012 PR #160).
      *
-     * @see ADR-0009 controller migration pattern
+     * Hybrid Phase 4 :
+     *   - UC crée le draft (DDD aggregate + events + persistance ACL)
+     *   - Side-effects legacy préservés : generateNextInvoiceNumber +
+     *     amounts/dates depuis le formulaire
+     *
+     * @see ADR-0009 controller migration pattern (Phase 4 critères)
+     * @see ADR-0008 Anti-Corruption Layer pattern
      */
-    #[Route('/new-via-ddd', name: 'invoice_new_ddd', methods: ['POST'])]
-    #[IsGranted('ROLE_COMPTA')]
-    public function newViaDdd(Request $request, CreateInvoiceDraftUseCase $useCase): Response
-    {
-        try {
-            $command = new CreateInvoiceDraftCommand(
-                companyId: $this->companyContext->getCurrentCompany()->getId() ?? throw new InvalidArgumentException('No current company'),
-                clientId: $request->request->getInt('client_id'),
-                orderId: $request->request->getInt('order_id') ?: null,
-                projectId: $request->request->getInt('project_id') ?: null,
-                paymentTerms: $request->request->get('payment_terms'),
-            );
-            $invoiceId = $useCase->execute($command);
-            $this->addFlash('success', 'Facture créée via DDD use case');
-
-            return $this->redirectToRoute('invoice_show', ['id' => $invoiceId->toLegacyInt()]);
-        } catch (InvalidArgumentException $e) {
-            $this->addFlash('danger', 'Validation: '.$e->getMessage());
-
-            return $this->redirectToRoute('invoice_index');
-        }
-    }
-
     #[Route('/new', name: 'invoice_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_COMPTA')]
-    public function new(Request $request, EntityManagerInterface $em, InvoiceRepository $invoiceRepository): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        InvoiceRepository $invoiceRepository,
+        CreateInvoiceDraftUseCase $useCase,
+    ): Response {
         $invoice = new Invoice();
         $invoice->setCompany($this->companyContext->getCurrentCompany());
 
-        // Pré-remplir si client ou projet fourni dans l'URL
-        $clientId = $request->query->get('client');
-        $projectId = $request->query->get('project');
+        // Pré-remplir si client ou projet fourni dans l'URL (GET only)
+        $queryClientId = $request->query->get('client');
+        $queryProjectId = $request->query->get('project');
 
-        if ($projectId) {
-            $project = $em->getRepository(Project::class)->find($projectId);
+        if ($queryProjectId) {
+            $project = $em->getRepository(Project::class)->find($queryProjectId);
             if ($project) {
                 $invoice->setProject($project);
-                // Set client from project if not explicitly provided
-                if (!$clientId && $project->getClient()) {
+                if (!$queryClientId && $project->getClient()) {
                     $invoice->setClient($project->getClient());
                 }
             }
         }
 
-        if ($clientId) {
-            $client = $em->getRepository(Client::class)->find($clientId);
+        if ($queryClientId) {
+            $client = $em->getRepository(Client::class)->find($queryClientId);
             if ($client) {
                 $invoice->setClient($client);
             }
@@ -250,18 +237,39 @@ class InvoiceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Générer le numéro de facture
-            $invoice->setInvoiceNumber($invoiceRepository->generateNextInvoiceNumber($invoice->getIssuedAt()));
+            try {
+                $command = new CreateInvoiceDraftCommand(
+                    companyId: $this->companyContext->getCurrentCompany()->getId() ?? throw new InvalidArgumentException('No current company'),
+                    clientId: $invoice->getClient()?->id ?? throw new InvalidArgumentException('Client required'),
+                    orderId: null,
+                    projectId: $invoice->getProject()?->getId(),
+                    paymentTerms: $invoice->getPaymentTerms(),
+                );
+                $invoiceId = $useCase->execute($command);
+                $persistedId = $invoiceId->toLegacyInt();
 
-            // Calculer les montants
-            $invoice->calculateAmounts();
+                // Side-effects legacy : compléter avec les champs form non couverts par le UC
+                $persistedInvoice = $em->find(Invoice::class, $persistedId);
+                if ($persistedInvoice !== null) {
+                    $persistedInvoice->setIssuedAt($invoice->getIssuedAt());
+                    $persistedInvoice->setDueDate($invoice->getDueDate());
+                    $persistedInvoice->setAmountHt($invoice->getAmountHt());
+                    $persistedInvoice->setTvaRate($invoice->getTvaRate());
+                    $persistedInvoice->setStatus($invoice->getStatus());
+                    $persistedInvoice->setInternalNotes($invoice->getInternalNotes());
+                    $persistedInvoice->setInvoiceNumber($invoiceRepository->generateNextInvoiceNumber($persistedInvoice->getIssuedAt()));
+                    $persistedInvoice->calculateAmounts();
+                    $em->flush();
 
-            $em->persist($invoice);
-            $em->flush();
+                    $this->addFlash('success', sprintf('Facture %s créée avec succès', $persistedInvoice->getInvoiceNumber()));
 
-            $this->addFlash('success', sprintf('Facture %s créée avec succès', $invoice->getInvoiceNumber()));
+                    return $this->redirectToRoute('invoice_show', ['id' => $persistedId]);
+                }
+            } catch (InvalidArgumentException $e) {
+                $this->addFlash('danger', 'Validation: '.$e->getMessage());
 
-            return $this->redirectToRoute('invoice_show', ['id' => $invoice->getId()]);
+                return $this->redirectToRoute('invoice_index');
+            }
         }
 
         return $this->render('invoice/new.html.twig', [

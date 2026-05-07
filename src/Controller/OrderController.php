@@ -116,39 +116,66 @@ class OrderController extends AbstractController
      *
      * @see ADR-0009 controller migration pattern
      */
-    #[Route('/new-via-ddd', name: 'order_new_ddd', methods: ['POST'])]
-    #[IsGranted('ROLE_CHEF_PROJET')]
-    public function newViaDdd(Request $request, CreateOrderQuoteUseCase $useCase): Response
-    {
-        try {
-            $command = new CreateOrderQuoteCommand(
-                clientId: $request->request->getInt('client_id'),
-                projectId: $request->request->getInt('project_id') ?: null,
-                reference: trim((string) $request->request->get('reference', '')),
-                contractType: (string) $request->request->get('contract_type', 'forfait'),
-                amount: (float) $request->request->get('amount', 0),
-                title: $request->request->get('title'),
-                description: $request->request->get('description'),
-            );
-            $orderId = $useCase->execute($command);
-            $this->addFlash('success', 'Devis créé via DDD use case');
-
-            return $this->redirectToRoute('order_show', ['id' => $orderId->toLegacyInt()]);
-        } catch (InvalidArgumentException $e) {
-            $this->addFlash('danger', 'Validation: '.$e->getMessage());
-
-            return $this->redirectToRoute('order_index');
-        }
-    }
-
+    /**
+     * EPIC-001 Phase 4 — sprint-013 décommission Order legacy.
+     *
+     * Route principale `/orders/new` migrée vers DDD use case (était sur
+     * route alternative `/new-via-ddd` depuis sprint-011 PR #147).
+     *
+     * Side-effect generateOrderNumber préservé : auto-généré si non fourni
+     * dans le POST.
+     *
+     * @see ADR-0009 controller migration pattern (Phase 4 critères)
+     * @see ADR-0008 Anti-Corruption Layer pattern
+     */
     #[Route('/new', name: 'order_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, CreateOrderQuoteUseCase $useCase): Response
     {
+        if ($request->isMethod('POST')) {
+            try {
+                $reference = trim((string) $request->request->get('reference', ''));
+                if ($reference === '') {
+                    $reference = $this->generateOrderNumber($em);
+                }
+
+                $clientId = $request->request->getInt('client_id');
+                if ($clientId === 0) {
+                    // Resolve via project if needed
+                    $projectId = $request->request->getInt('project_id') ?: null;
+                    if ($projectId !== null) {
+                        $project = $em->find(Project::class, $projectId);
+                        if ($project !== null && $project->getClient() !== null) {
+                            $clientId = $project->getClient()->id ?? 0;
+                        }
+                    }
+                }
+
+                $command = new CreateOrderQuoteCommand(
+                    clientId: $clientId,
+                    projectId: $request->request->getInt('project_id') ?: null,
+                    reference: $reference,
+                    contractType: (string) $request->request->get('contract_type', 'forfait'),
+                    amount: (float) $request->request->get('amount', 0),
+                    title: $request->request->get('name') ?? $request->request->get('title'),
+                    description: $request->request->get('description'),
+                );
+                $orderId = $useCase->execute($command);
+
+                $this->addFlash('success', 'Devis créé avec succès');
+
+                return $this->redirectToRoute('order_show', ['id' => $orderId->toLegacyInt()]);
+            } catch (InvalidArgumentException $e) {
+                $this->addFlash('danger', 'Validation: '.$e->getMessage());
+
+                return $this->redirectToRoute('order_index');
+            }
+        }
+
+        // GET: render form template (formulaire legacy continue d'afficher tous les champs)
         $order = new Order();
         $order->setCompany($this->companyContext->getCurrentCompany());
 
-        // Pré-sélectionner le projet si fourni dans l'URL
         if ($projectId = $request->query->get('project')) {
             $project = $em->getRepository(Project::class)->find($projectId);
             if ($project) {
@@ -157,18 +184,6 @@ class OrderController extends AbstractController
         }
 
         $form = $this->createForm(OrderFormType::class, $order);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $order->setOrderNumber($this->generateOrderNumber($em));
-
-            $em->persist($order);
-            $em->flush();
-
-            $this->addFlash('success', 'Devis créé avec succès');
-
-            return $this->redirectToRoute('order_show', ['id' => $order->id]);
-        }
 
         return $this->render('order/new.html.twig', [
             'order' => $order,
