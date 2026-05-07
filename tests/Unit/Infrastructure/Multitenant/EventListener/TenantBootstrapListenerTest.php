@@ -67,8 +67,12 @@ final class TenantBootstrapListenerTest extends TestCase
 
         $filter = new TenantFilter($em);
 
-        $filterCollection->method('isEnabled')->with('tenant_filter')->willReturn($alreadyEnabled);
-        $filterCollection->method('getFilter')->with('tenant_filter')->willReturn($filter);
+        $filterCollection->method('isEnabled')->willReturnCallback(
+            static fn (string $name) => 'tenant_filter' === $name ? $alreadyEnabled : false,
+        );
+        $filterCollection->method('getFilter')->willReturnCallback(
+            static fn (string $name) => 'tenant_filter' === $name ? $filter : null,
+        );
 
         return [$em, $filter, $filterCollection];
     }

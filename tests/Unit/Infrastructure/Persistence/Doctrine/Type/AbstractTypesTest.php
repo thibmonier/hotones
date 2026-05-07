@@ -8,6 +8,7 @@ use App\Infrastructure\Persistence\Doctrine\Type\AbstractEnumType;
 use App\Infrastructure\Persistence\Doctrine\Type\AbstractStringType;
 use App\Infrastructure\Persistence\Doctrine\Type\AbstractUuidType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,6 +40,7 @@ final readonly class TestStringValueObject
     }
 }
 
+#[AllowMockObjectsWithoutExpectations]
 final class AbstractTypesTest extends TestCase
 {
     public function testEnumTypeRoundTrip(): void
