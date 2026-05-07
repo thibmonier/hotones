@@ -54,7 +54,7 @@ services:
         value: Europe/Paris
       # Default URI for CLI commands
       - key: DEFAULT_URI
-        value: https://hotones-app.onrender.com  # Remplacez par votre domaine Render
+        value: https://hotones.onrender.com  # Domaine Render réel (US-090 fix : ancien `hotones-app` obsolète)
       # Avatar storage path (on persistent disk)
       - key: AVATARS_DIRECTORY
         value: /var/www/html/var/uploads/avatars

@@ -134,8 +134,18 @@ COPY ./docker/scripts/start-render.sh /usr/local/bin/start-render.sh
 COPY ./docker/scripts/start-staging.sh /usr/local/bin/start-staging.sh
 RUN chmod +x /usr/local/bin/start-render.sh /usr/local/bin/start-staging.sh
 
-# Create simple health check endpoint
-RUN echo '<?php http_response_code(200); echo "OK";' > /var/www/html/public/health
+# US-090 (sprint-014) : Static `/health` file REMOVED.
+#
+# Bug : nginx `try_files $uri /index.php` matched the literal file
+# `public/health` first → served raw `<?php http_response_code(200);`
+# source instead of executing PHP. Render `healthCheckPath: /health`
+# saw 200 but content was source code.
+#
+# Fix : let Symfony `HealthCheckController` (route `/health`) handle the
+# request via `index.php` fallback. The controller returns proper JSON
+# `{status, db, redis, version}` with full DB + Redis checks.
+#
+# DO NOT recreate the static file.
 
 # Expose port (Render uses PORT environment variable)
 EXPOSE 8080
