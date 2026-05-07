@@ -72,10 +72,7 @@ final class BoondManagerContractTest extends TestCase
 
         self::assertNotNull($dictionary, 'Dictionary call returned null.');
         self::assertIsArray($dictionary);
-        self::assertNotEmpty(
-            $dictionary,
-            'Dictionary array is empty — Boond may have changed the response shape.',
-        );
+        self::assertNotEmpty($dictionary, 'Dictionary array is empty — Boond may have changed the response shape.');
     }
 
     public function testGetTimesAcceptsDateRangeWithoutCrashing(): void

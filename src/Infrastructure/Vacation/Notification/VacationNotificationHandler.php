@@ -22,9 +22,7 @@ final readonly class VacationNotificationHandler
 
     public function __invoke(VacationNotificationMessage $message): void
     {
-        $vacation = $this->vacationRepository->findByIdOrNull(
-            VacationId::fromString($message->getVacationId()),
-        );
+        $vacation = $this->vacationRepository->findByIdOrNull(VacationId::fromString($message->getVacationId()));
 
         if ($vacation === null) {
             return;
@@ -49,7 +47,7 @@ final readonly class VacationNotificationHandler
             return;
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($manager->getEmail())
             ->subject('Nouvelle demande de conge a valider')
             ->htmlTemplate('emails/vacation_created.html.twig')
@@ -68,7 +66,7 @@ final readonly class VacationNotificationHandler
             return;
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($contributor->getEmail())
             ->subject('Votre demande de conge a ete approuvee')
             ->htmlTemplate('emails/vacation_approved.html.twig')
@@ -86,7 +84,7 @@ final readonly class VacationNotificationHandler
             return;
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($contributor->getEmail())
             ->subject('Votre demande de conge a ete rejetee')
             ->htmlTemplate('emails/vacation_rejected.html.twig')
@@ -107,7 +105,7 @@ final readonly class VacationNotificationHandler
             return;
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($manager->getEmail())
             ->subject('Demande de conge annulee par le collaborateur')
             ->htmlTemplate('emails/vacation_cancelled.html.twig')
@@ -129,7 +127,7 @@ final readonly class VacationNotificationHandler
             return;
         }
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($contributor->getEmail())
             ->subject('Votre demande de conge a ete annulee par votre manager')
             ->htmlTemplate('emails/vacation_cancelled_by_manager.html.twig')

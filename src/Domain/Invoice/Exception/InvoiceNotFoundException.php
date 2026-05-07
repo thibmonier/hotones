@@ -15,15 +15,11 @@ final class InvoiceNotFoundException extends DomainException
 {
     public static function withId(InvoiceId $invoiceId): self
     {
-        return new self(
-            sprintf('Invoice with ID "%s" was not found.', $invoiceId->getValue()),
-        );
+        return new self(sprintf('Invoice with ID "%s" was not found.', $invoiceId->getValue()));
     }
 
     public static function withNumber(InvoiceNumber $invoiceNumber): self
     {
-        return new self(
-            sprintf('Invoice with number "%s" was not found.', $invoiceNumber->getValue()),
-        );
+        return new self(sprintf('Invoice with number "%s" was not found.', $invoiceNumber->getValue()));
     }
 }

@@ -140,7 +140,8 @@ class AppFixtures extends Fixture
                 }
 
                 // Choose contributor: bias to assigned contributor if available
-                $contrib = $task && $task->getAssignedContributor() && random_int(1, 100) <= 60
+                $contrib =
+                    $task && $task->getAssignedContributor() && random_int(1, 100) <= 60
                         ? $task->getAssignedContributor()
                         : ContributorFactory::random();
 

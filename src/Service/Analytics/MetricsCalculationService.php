@@ -447,16 +447,13 @@ readonly class MetricsCalculationService
         $this->logger->info('Recalcul des métriques pour l\'année', ['year' => $year]);
 
         // Supprimer les métriques existantes pour cette année
-        $this->entityManager
-            ->createQuery('
+        $this->entityManager->createQuery('
             DELETE FROM App\Entity\Analytics\FactProjectMetrics f
             WHERE f.dimTime IN (
                 SELECT t.id FROM App\Entity\Analytics\DimTime t
                 WHERE t.year = :year
             )
-        ')
-            ->setParameter('year', $year)
-            ->getResult();
+        ')->setParameter('year', $year)->getResult();
 
         // Recalculer mois par mois
         for ($month = 1; $month <= 12; ++$month) {

@@ -30,7 +30,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
     private function makeCompany(int $id = 1): Company
     {
         $company = new Company();
-        (new ReflectionProperty(Company::class, 'id'))->setValue($company, $id);
+        new ReflectionProperty(Company::class, 'id')->setValue($company, $id);
 
         return $company;
     }
@@ -40,7 +40,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
         $user = new User();
         $user->setCompany($company);
         $user->setRoles($roles);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }
@@ -74,7 +74,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ClientVoter($this->ctx($user), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token($user), $client, [ClientVoter::VIEW]));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+            $this->token($user),
+            $client,
+            [ClientVoter::VIEW],
+        ));
     }
 
     public function testClientEditDeniedForBasicUser(): void
@@ -86,7 +90,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ClientVoter($this->ctx($user), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token($user), $client, [ClientVoter::EDIT]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+            $this->token($user),
+            $client,
+            [ClientVoter::EDIT],
+        ));
     }
 
     public function testClientEditGrantedForCommercial(): void
@@ -98,7 +106,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ClientVoter($this->ctx($user), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token($user), $client, [ClientVoter::EDIT]));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+            $this->token($user),
+            $client,
+            [ClientVoter::EDIT],
+        ));
     }
 
     public function testClientDeleteAdminOnly(): void
@@ -109,11 +121,19 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $manager = $this->makeUser($company, ['ROLE_MANAGER']);
         $voterManager = new ClientVoter($this->ctx($manager), new NullLogger());
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voterManager->vote($this->token($manager), $client, [ClientVoter::DELETE]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voterManager->vote(
+            $this->token($manager),
+            $client,
+            [ClientVoter::DELETE],
+        ));
 
         $admin = $this->makeUser($company, ['ROLE_ADMIN']);
         $voterAdmin = new ClientVoter($this->ctx($admin), new NullLogger());
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voterAdmin->vote($this->token($admin), $client, [ClientVoter::DELETE]));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voterAdmin->vote(
+            $this->token($admin),
+            $client,
+            [ClientVoter::DELETE],
+        ));
     }
 
     // -----------------------------------------------------------------
@@ -132,7 +152,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ContributorVoter($this->ctx($self), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token($self), $contributor, [ContributorVoter::VIEW]));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+            $this->token($self),
+            $contributor,
+            [ContributorVoter::VIEW],
+        ));
     }
 
     public function testContributorSelfCannotDeactivate(): void
@@ -147,7 +171,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ContributorVoter($this->ctx($self), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token($self), $contributor, [ContributorVoter::DEACTIVATE]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+            $this->token($self),
+            $contributor,
+            [ContributorVoter::DEACTIVATE],
+        ));
     }
 
     public function testContributorOtherDeniedToBasicUser(): void
@@ -163,15 +191,22 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ContributorVoter($this->ctx($self), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token($self), $contributor, [ContributorVoter::EDIT]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+            $this->token($self),
+            $contributor,
+            [ContributorVoter::EDIT],
+        ));
     }
 
     // -----------------------------------------------------------------
     // ExpenseReportVoter
     // -----------------------------------------------------------------
 
-    private function makeExpense(Company $company, ?User $owner, string $status = ExpenseReport::STATUS_DRAFT): ExpenseReport
-    {
+    private function makeExpense(
+        Company $company,
+        ?User $owner,
+        string $status = ExpenseReport::STATUS_DRAFT,
+    ): ExpenseReport {
         $contributor = new Contributor();
         $contributor->setCompany($company);
         if ($owner !== null) {
@@ -196,7 +231,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($owner), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token($owner), $report, [ExpenseReportVoter::EDIT]));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+            $this->token($owner),
+            $report,
+            [ExpenseReportVoter::EDIT],
+        ));
     }
 
     public function testExpenseEditDeniedAfterSubmit(): void
@@ -207,7 +246,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($owner), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token($owner), $report, [ExpenseReportVoter::EDIT]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+            $this->token($owner),
+            $report,
+            [ExpenseReportVoter::EDIT],
+        ));
     }
 
     public function testExpenseApproveDeniedToOwner(): void
@@ -218,7 +261,11 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($owner), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token($owner), $report, [ExpenseReportVoter::APPROVE]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+            $this->token($owner),
+            $report,
+            [ExpenseReportVoter::APPROVE],
+        ));
     }
 
     public function testExpenseApproveGrantedToCompta(): void
@@ -230,6 +277,10 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($compta), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token($compta), $report, [ExpenseReportVoter::APPROVE]));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+            $this->token($compta),
+            $report,
+            [ExpenseReportVoter::APPROVE],
+        ));
     }
 }

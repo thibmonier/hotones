@@ -43,10 +43,7 @@ final class CheckAlertsMessageHandlerTest extends TestCase
             'payment_alerts' => 2,
         ];
 
-        $this->service
-            ->expects(self::once())
-            ->method('checkAllAlerts')
-            ->willReturn($stats);
+        $this->service->expects(self::once())->method('checkAllAlerts')->willReturn($stats);
 
         $logCalls = [];
         $this->logger

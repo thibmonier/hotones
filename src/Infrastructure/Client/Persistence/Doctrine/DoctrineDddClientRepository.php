@@ -84,10 +84,7 @@ final readonly class DoctrineDddClientRepository implements ClientRepositoryInte
     {
         $flatClients = $this->flatRepository->findAllForCurrentCompany(['name' => 'ASC']);
 
-        return array_map(
-            fn (FlatClient $flat): DddClient => $this->flatToDdd->translate($flat),
-            $flatClients,
-        );
+        return array_map(fn (FlatClient $flat): DddClient => $this->flatToDdd->translate($flat), $flatClients);
     }
 
     /**
@@ -106,8 +103,7 @@ final readonly class DoctrineDddClientRepository implements ClientRepositoryInte
 
         if ($id->isLegacy()) {
             // Update existing flat entity
-            $flat = $this->flatRepository->find($id->toLegacyInt())
-                ?? throw new ClientNotFoundException(sprintf('Cannot update Client %s: not found', $id->getValue()));
+            $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new ClientNotFoundException(sprintf('Cannot update Client %s: not found', $id->getValue()));
         } else {
             // Pure DDD UUID — phase 4 path. Out of scope sprint-009.
             throw new RuntimeException('Saving DDD Client with pure UUID id is not yet supported during Phase 2. Use ClientId::fromLegacyInt() for now.');
@@ -126,8 +122,7 @@ final readonly class DoctrineDddClientRepository implements ClientRepositoryInte
             throw new RuntimeException('Deleting DDD Client with pure UUID id not yet supported');
         }
 
-        $flat = $this->flatRepository->find($id->toLegacyInt())
-            ?? throw new ClientNotFoundException(sprintf('Cannot delete Client %s: not found', $id->getValue()));
+        $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new ClientNotFoundException(sprintf('Cannot delete Client %s: not found', $id->getValue()));
 
         $this->entityManager->remove($flat);
         $this->entityManager->flush();

@@ -46,10 +46,14 @@ final readonly class CreateInvoiceDraftUseCase
     public function execute(CreateInvoiceDraftCommand $command): InvoiceId
     {
         // Resolve flat entities (must exist)
-        $flatCompany = $this->entityManager->find(FlatCompany::class, $command->companyId)
-            ?? throw new InvalidArgumentException(sprintf('Company %d not found', $command->companyId));
-        $flatClient = $this->entityManager->find(FlatClient::class, $command->clientId)
-            ?? throw new InvalidArgumentException(sprintf('Client %d not found', $command->clientId));
+        $flatCompany = $this->entityManager->find(
+            FlatCompany::class,
+            $command->companyId,
+        ) ?? throw new InvalidArgumentException(sprintf('Company %d not found', $command->companyId));
+        $flatClient = $this->entityManager->find(
+            FlatClient::class,
+            $command->clientId,
+        ) ?? throw new InvalidArgumentException(sprintf('Client %d not found', $command->clientId));
 
         $flatOrder = $command->orderId !== null
             ? $this->entityManager->find(FlatOrder::class, $command->orderId)
@@ -86,7 +90,7 @@ final readonly class CreateInvoiceDraftUseCase
 
         // Set required dates (DRAFT → editable later)
         $flat->issuedAt = new DateTime();
-        $flat->dueDate = (new DateTime())->modify('+30 days');
+        $flat->dueDate = new DateTime()->modify('+30 days');
 
         // Apply DDD-side fields
         $this->dddToFlat->applyTo($ddd, $flat);
@@ -101,7 +105,9 @@ final readonly class CreateInvoiceDraftUseCase
         $this->entityManager->persist($flat);
         $this->entityManager->flush();
 
-        $persistedId = InvoiceId::fromLegacyInt($flat->getId() ?? throw new InvalidArgumentException('Persisted Invoice has null id'));
+        $persistedId = InvoiceId::fromLegacyInt(
+            $flat->getId() ?? throw new InvalidArgumentException('Persisted Invoice has null id'),
+        );
 
         foreach ($ddd->pullDomainEvents() as $event) {
             try {

@@ -199,8 +199,10 @@ class BlogPostCrudController extends AbstractCrudController
             ->linkToCrudAction('regenerateImageAction')
             ->setIcon('fa fa-refresh')
             ->displayIf(
-                static fn (BlogPost $post): bool => $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
-                    && $post->imagePrompt !== null,
+                static fn (BlogPost $post): bool =>
+                    $post->imageSource === BlogPost::IMAGE_SOURCE_AI_GENERATED
+                    && $post->imagePrompt !== null
+                ,
             )
             ->addCssClass('btn btn-warning');
 

@@ -76,9 +76,7 @@ final class HealthCheckControllerTest extends TestCase
     {
         $this->stubHealthyDatabase();
 
-        $this->cache
-            ->method('getItem')
-            ->willThrowException(new RuntimeException('redis unreachable'));
+        $this->cache->method('getItem')->willThrowException(new RuntimeException('redis unreachable'));
 
         $controller = $this->buildController();
 
@@ -95,13 +93,9 @@ final class HealthCheckControllerTest extends TestCase
 
     public function testCheckAggregatesMultipleFailures(): void
     {
-        $this->connection
-            ->method('executeQuery')
-            ->willThrowException($this->makeDoctrineException('db down'));
+        $this->connection->method('executeQuery')->willThrowException($this->makeDoctrineException('db down'));
 
-        $this->cache
-            ->method('getItem')
-            ->willThrowException(new RuntimeException('cache down'));
+        $this->cache->method('getItem')->willThrowException(new RuntimeException('cache down'));
 
         $controller = $this->buildController();
 
@@ -117,9 +111,7 @@ final class HealthCheckControllerTest extends TestCase
 
     public function testReadinessReportsNotReadyWhenDatabaseDown(): void
     {
-        $this->connection
-            ->method('executeQuery')
-            ->willThrowException($this->makeDoctrineException('db down'));
+        $this->connection->method('executeQuery')->willThrowException($this->makeDoctrineException('db down'));
 
         $this->stubHealthyCache();
 
@@ -173,9 +165,7 @@ final class HealthCheckControllerTest extends TestCase
         $result = $this->createStub(Result::class);
         $result->method('fetchOne')->willReturn(1);
 
-        $this->connection
-            ->method('executeQuery')
-            ->willReturn($result);
+        $this->connection->method('executeQuery')->willReturn($result);
     }
 
     private function stubHealthyCache(): void
@@ -198,11 +188,13 @@ final class HealthCheckControllerTest extends TestCase
 
         $this->cache->method('getItem')->willReturnCallback($itemFactory);
         $this->cache->method('save')->willReturn(true);
-        $this->cache->method('deleteItem')->willReturnCallback(static function (string $key) use (&$store) {
-            unset($store[$key]);
+        $this->cache
+            ->method('deleteItem')
+            ->willReturnCallback(static function (string $key) use (&$store) {
+                unset($store[$key]);
 
-            return true;
-        });
+                return true;
+            });
     }
 
     private function buildController(): HealthCheckController

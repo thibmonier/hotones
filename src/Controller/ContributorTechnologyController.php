@@ -33,7 +33,8 @@ class ContributorTechnologyController extends AbstractController
             throw $this->createNotFoundException('Collaborateur non trouvé');
         }
 
-        $technologiesByCategory = $this->contributorTechnologyRepository->findByContributorGroupedByCategory($contributor);
+        $technologiesByCategory =
+            $this->contributorTechnologyRepository->findByContributorGroupedByCategory($contributor);
         $countByLevel = $this->getCountByLevel($contributor);
 
         return $this->render('contributor_technology/index.html.twig', [

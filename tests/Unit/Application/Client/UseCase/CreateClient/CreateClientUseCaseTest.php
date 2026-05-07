@@ -27,10 +27,7 @@ final class CreateClientUseCaseTest extends TestCase
     {
         $useCase = $this->makeUseCase(persistedId: 42);
 
-        $id = $useCase->execute(new CreateClientCommand(
-            name: 'Acme Corp',
-            serviceLevel: 'standard',
-        ));
+        $id = $useCase->execute(new CreateClientCommand(name: 'Acme Corp', serviceLevel: 'standard'));
 
         $this->assertTrue($id->isLegacy());
         $this->assertSame(42, $id->toLegacyInt());
@@ -39,7 +36,9 @@ final class CreateClientUseCaseTest extends TestCase
     public function testNameValueObjectAppliedToFlat(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+            &$persistedFlat,
+        ) {
             $persistedFlat = clone $flat;
         });
 
@@ -51,7 +50,9 @@ final class CreateClientUseCaseTest extends TestCase
     public function testServiceLevelMappingEnterprise(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+            &$persistedFlat,
+        ) {
             $persistedFlat = clone $flat;
         });
 
@@ -63,7 +64,9 @@ final class CreateClientUseCaseTest extends TestCase
     public function testServiceLevelMappingPremium(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+            &$persistedFlat,
+        ) {
             $persistedFlat = clone $flat;
         });
 
@@ -83,7 +86,9 @@ final class CreateClientUseCaseTest extends TestCase
     public function testNotesPropagatedToAggregate(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+            &$persistedFlat,
+        ) {
             $persistedFlat = clone $flat;
         });
 
@@ -95,7 +100,9 @@ final class CreateClientUseCaseTest extends TestCase
     public function testNullNotesPersistedAsNull(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+            &$persistedFlat,
+        ) {
             $persistedFlat = clone $flat;
         });
 
@@ -107,9 +114,7 @@ final class CreateClientUseCaseTest extends TestCase
     public function testNoHandlerForEventIsTolerated(): void
     {
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willThrowException(
-            new NoHandlerForMessageException('no handler'),
-        );
+        $bus->method('dispatch')->willThrowException(new NoHandlerForMessageException('no handler'));
 
         $useCase = $this->makeUseCase(persistedId: 7, messageBus: $bus);
 
@@ -127,9 +132,12 @@ final class CreateClientUseCaseTest extends TestCase
         ?MessageBusInterface $messageBus = null,
     ): CreateClientUseCase {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(function (FlatClient $flat) use ($persistedId, $persistCapture): void {
+        $em->method('persist')->willReturnCallback(function (FlatClient $flat) use (
+            $persistedId,
+            $persistCapture,
+        ): void {
             // Simule auto-increment Doctrine
-            (new ReflectionProperty(FlatClient::class, 'id'))->setValue($flat, $persistedId);
+            new ReflectionProperty(FlatClient::class, 'id')->setValue($flat, $persistedId);
             if ($persistCapture !== null) {
                 $persistCapture($flat);
             }

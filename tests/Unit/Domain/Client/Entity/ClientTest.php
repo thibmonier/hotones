@@ -16,10 +16,7 @@ final class ClientTest extends TestCase
 {
     private function makeClient(): Client
     {
-        return Client::create(
-            ClientId::generate(),
-            CompanyName::fromString('Acme Corp'),
-        );
+        return Client::create(ClientId::generate(), CompanyName::fromString('Acme Corp'));
     }
 
     public function testCreateInitializesDefaults(): void

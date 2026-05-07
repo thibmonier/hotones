@@ -68,23 +68,23 @@ final class NotificationServiceTest extends TestCase
     {
         $user = $this->createUser('alice@example.com');
 
-        $this->companyContext->expects(self::once())
-            ->method('getCurrentCompany')
-            ->willReturn($this->company);
+        $this->companyContext->expects(self::once())->method('getCurrentCompany')->willReturn($this->company);
 
-        $this->em->expects(self::once())
-            ->method('persist')
-            ->with(self::isInstanceOf(Notification::class));
+        $this->em->expects(self::once())->method('persist')->with(self::isInstanceOf(Notification::class));
 
-        $this->em->expects(self::once())
-            ->method('flush');
+        $this->em->expects(self::once())->method('flush');
 
-        $this->logger->expects(self::once())
+        $this->logger
+            ->expects(self::once())
             ->method('info')
             ->with(
                 'Notification created',
-                self::callback(static fn (array $ctx): bool => $ctx['recipient'] === 'alice@example.com'
-                    && $ctx['type'] === 'quote_won'),
+                self::callback(
+                    static fn (array $ctx): bool =>
+                        $ctx['recipient'] === 'alice@example.com'
+                        && $ctx['type'] === 'quote_won'
+                    ,
+                ),
             );
 
         $notification = $this->service->createNotification(
@@ -169,14 +169,15 @@ final class NotificationServiceTest extends TestCase
             recipients: [$alice, $bob],
         );
 
-        $bobPreference = (new NotificationPreference())
+        $bobPreference = new NotificationPreference()
             ->setUser($bob)
             ->setEventType(NotificationType::QUOTE_WON)
             ->setInApp(false)
             ->setEmail(true)
             ->setWebhook(false);
 
-        $this->preferenceRepository->method('findByUserAndEventType')
+        $this->preferenceRepository
+            ->method('findByUserAndEventType')
             ->willReturnCallback(static fn (User $u): ?NotificationPreference => $u === $bob ? $bobPreference : null);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($this->company);
@@ -193,7 +194,7 @@ final class NotificationServiceTest extends TestCase
     #[Test]
     public function markAsReadDoesNothingWhenAlreadyRead(): void
     {
-        $notification = (new Notification())->markAsRead();
+        $notification = new Notification()->markAsRead();
 
         $this->em->expects(self::never())->method('flush');
 
@@ -219,7 +220,8 @@ final class NotificationServiceTest extends TestCase
     {
         $user = $this->createUser('alice@example.com');
 
-        $this->notificationRepository->expects(self::once())
+        $this->notificationRepository
+            ->expects(self::once())
             ->method('markAllAsReadForUser')
             ->with($user)
             ->willReturn(7);
@@ -244,7 +246,8 @@ final class NotificationServiceTest extends TestCase
         $user = $this->createUser('alice@example.com');
         $expected = [new Notification(), new Notification()];
 
-        $this->notificationRepository->expects(self::once())
+        $this->notificationRepository
+            ->expects(self::once())
             ->method('findUnreadByUser')
             ->with($user, 5)
             ->willReturn($expected);
@@ -257,10 +260,7 @@ final class NotificationServiceTest extends TestCase
     {
         $user = $this->createUser('alice@example.com');
 
-        $this->notificationRepository->expects(self::once())
-            ->method('countUnreadByUser')
-            ->with($user)
-            ->willReturn(3);
+        $this->notificationRepository->expects(self::once())->method('countUnreadByUser')->with($user)->willReturn(3);
 
         self::assertSame(3, $this->service->countUnreadNotifications($user));
     }
@@ -298,8 +298,10 @@ final class NotificationServiceTest extends TestCase
 
     #[Test]
     #[DataProvider('webhookPreferenceProvider')]
-    public function shouldSendWebhookDefaultsToFalseWhenNoPreference(?NotificationPreference $preference, bool $expected): void
-    {
+    public function shouldSendWebhookDefaultsToFalseWhenNoPreference(
+        ?NotificationPreference $preference,
+        bool $expected,
+    ): void {
         $user = $this->createUser('alice@example.com');
 
         $this->preferenceRepository->method('findByUserAndEventType')->willReturn($preference);
@@ -310,12 +312,14 @@ final class NotificationServiceTest extends TestCase
     #[Test]
     public function cleanupOldNotificationsReturnsRepositoryCountAndLogs(): void
     {
-        $this->notificationRepository->expects(self::once())
+        $this->notificationRepository
+            ->expects(self::once())
             ->method('deleteOldReadNotifications')
             ->with(45)
             ->willReturn(12);
 
-        $this->logger->expects(self::once())
+        $this->logger
+            ->expects(self::once())
             ->method('info')
             ->with('Old notifications cleaned up', ['deleted_count' => 12, 'days_old' => 45]);
 
@@ -324,12 +328,12 @@ final class NotificationServiceTest extends TestCase
 
     private function createUser(string $email): User
     {
-        return (new User())->setEmail($email);
+        return new User()->setEmail($email);
     }
 
     private static function makePref(bool $inApp, bool $email, bool $webhook): NotificationPreference
     {
-        return (new NotificationPreference())
+        return new NotificationPreference()
             ->setEventType(NotificationType::QUOTE_WON)
             ->setInApp($inApp)
             ->setEmail($email)

@@ -26,7 +26,7 @@ class ProjectPlanningAssistant
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ContributorRepository $contributorRepository,
-        private readonly PlanningRepository $planningRepository
+        private readonly PlanningRepository $planningRepository,
     ) {
     }
 
@@ -162,7 +162,7 @@ class ProjectPlanningAssistant
     private function evaluateContributorAvailability(
         Contributor $contributor,
         DateTime $startDate,
-        float $estimatedDays
+        float $estimatedDays,
     ): ?array {
         // Calculer la date de fin estimée
         $endDate = $this->calculateEndDate($startDate, $estimatedDays);
@@ -209,7 +209,7 @@ class ProjectPlanningAssistant
         array $candidates,
         ProjectTask $task,
         DateTime $preferredStartDate,
-        float $estimatedDays
+        float $estimatedDays,
     ): ?array {
         if (empty($candidates)) {
             return null;
@@ -262,7 +262,10 @@ class ProjectPlanningAssistant
         }
 
         // Tâche déjà assignée (20 points)
-        if ($task->getAssignedContributor() && $task->getAssignedContributor()->getId() === $candidate['contributor']->getId()) {
+        if (
+            $task->getAssignedContributor()
+            && $task->getAssignedContributor()->getId() === $candidate['contributor']->getId()
+        ) {
             $score += 20;
             $reasoning[] = 'Déjà assigné à cette tâche';
         }
@@ -285,7 +288,8 @@ class ProjectPlanningAssistant
      */
     private function getUnassignedTasks(Project $project): array
     {
-        return $this->entityManager->getRepository(ProjectTask::class)
+        return $this->entityManager
+            ->getRepository(ProjectTask::class)
             ->createQueryBuilder('t')
             ->where('t.project = :project')
             ->andWhere('t.active = true')
@@ -338,7 +342,8 @@ class ProjectPlanningAssistant
      */
     private function getActiveEmploymentPeriod(Contributor $contributor, DateTime $date): ?EmploymentPeriod
     {
-        return $this->entityManager->getRepository(EmploymentPeriod::class)
+        return $this->entityManager
+            ->getRepository(EmploymentPeriod::class)
             ->createQueryBuilder('ep')
             ->where('ep.contributor = :contributor')
             ->andWhere('ep.startDate <= :date')
@@ -365,7 +370,7 @@ class ProjectPlanningAssistant
         $weeklyHours = (float) $period->getWeeklyHours();
         $workPct = (float) $period->getWorkTimePercentage();
 
-        return ($weeklyHours * $workPct / 100) / 5; // 5 jours ouvrés
+        return (($weeklyHours * $workPct) / 100) / 5; // 5 jours ouvrés
     }
 
     /**
@@ -373,7 +378,8 @@ class ProjectPlanningAssistant
      */
     private function calculateCurrentLoad(Contributor $contributor, DateTime $startDate, DateTime $endDate): float
     {
-        $plannings = $this->planningRepository->createQueryBuilder('p')
+        $plannings = $this->planningRepository
+            ->createQueryBuilder('p')
             ->where('p.contributor = :contributor')
             ->andWhere('p.status != :cancelled')
             ->andWhere('p.endDate >= :start')
@@ -409,7 +415,8 @@ class ProjectPlanningAssistant
      */
     private function hasVacations(Contributor $contributor, DateTime $startDate, DateTime $endDate): bool
     {
-        $vacations = $this->entityManager->getRepository(DomainVacation::class)
+        $vacations = $this->entityManager
+            ->getRepository(DomainVacation::class)
             ->createQueryBuilder('v')
             ->where('v.contributor = :contributor')
             ->andWhere('v.status = :approved')
@@ -431,7 +438,8 @@ class ProjectPlanningAssistant
      */
     private function hasWorkedOnProject(Contributor $contributor, Project $project): bool
     {
-        $count = $this->entityManager->getRepository(Planning::class)
+        $count = $this->entityManager
+            ->getRepository(Planning::class)
             ->createQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->where('p.contributor = :contributor')

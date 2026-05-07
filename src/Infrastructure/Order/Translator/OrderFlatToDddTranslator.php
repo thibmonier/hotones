@@ -34,9 +34,10 @@ final class OrderFlatToDddTranslator
 
         // Order flat doesn't have a direct ClientId reference — resolved via Project.client.
         // Phase 2 ACL fallback: PHP_INT_MAX placeholder when project/client unavailable.
-        $clientId = $flat->project !== null && $flat->project->client !== null && $flat->project->client->id !== null
-            ? ClientId::fromLegacyInt($flat->project->client->id)
-            : ClientId::fromLegacyInt(PHP_INT_MAX);
+        $clientId =
+            $flat->project !== null && $flat->project->client !== null && $flat->project->client->id !== null
+                ? ClientId::fromLegacyInt($flat->project->client->id)
+                : ClientId::fromLegacyInt(PHP_INT_MAX);
 
         $contractType = $this->mapContractType($flat->contractType);
         $status = $this->mapStatus($flat->status);

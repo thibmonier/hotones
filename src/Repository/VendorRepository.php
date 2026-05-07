@@ -39,10 +39,6 @@ class VendorRepository extends CompanyAwareRepository
     #[Override]
     public function findAll(): array
     {
-        return $this
-            ->createCompanyQueryBuilder('v')
-            ->orderBy('v.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $this->createCompanyQueryBuilder('v')->orderBy('v.name', 'ASC')->getQuery()->getResult();
     }
 }

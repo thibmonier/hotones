@@ -22,7 +22,7 @@ final class ProjectVoterTest extends TestCase
     private function makeCompany(int $id): Company
     {
         $company = new Company();
-        (new ReflectionProperty(Company::class, 'id'))->setValue($company, $id);
+        new ReflectionProperty(Company::class, 'id')->setValue($company, $id);
 
         return $company;
     }
@@ -33,7 +33,7 @@ final class ProjectVoterTest extends TestCase
         $user->setCompany($company);
         $user->setRoles($roles);
         if ($userId !== null) {
-            (new ReflectionProperty(User::class, 'id'))->setValue($user, $userId);
+            new ReflectionProperty(User::class, 'id')->setValue($user, $userId);
         }
 
         return $user;

@@ -31,9 +31,10 @@ final class ProjectFlatToDddTranslator
         $id = ProjectId::fromLegacyInt($flat->id ?? throw new RuntimeException('Cannot translate unsaved Project'));
 
         // Project flat may have null client (internal projects); fallback to legacy:0 marker.
-        $clientId = $flat->client !== null && $flat->client->id !== null
-            ? ClientId::fromLegacyInt($flat->client->id)
-            : ClientId::fromLegacyInt(PHP_INT_MAX);
+        $clientId =
+            $flat->client !== null && $flat->client->id !== null
+                ? ClientId::fromLegacyInt($flat->client->id)
+                : ClientId::fromLegacyInt(PHP_INT_MAX);
 
         $projectType = $this->mapProjectType($flat);
         $status = $this->mapStatus($flat->status);

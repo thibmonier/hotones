@@ -769,7 +769,7 @@ class OrderController extends AbstractController
     public function pdf(Order $order, \App\Service\PdfGeneratorService $pdfGenerator): Response
     {
         $data = $this->buildPdfData($order);
-        $filename = sprintf('devis_%s_%s.pdf', $order->getOrderNumber(), (new DateTime())->format('Y-m-d'));
+        $filename = sprintf('devis_%s_%s.pdf', $order->getOrderNumber(), new DateTime()->format('Y-m-d'));
 
         return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: false);
     }
@@ -778,7 +778,10 @@ class OrderController extends AbstractController
     public function pdfPreview(Order $order, \App\Service\PdfGeneratorService $pdfGenerator): Response
     {
         if ($order->getSections()->isEmpty()) {
-            return new Response('Le devis ne contient aucune ligne de prestation.', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return new Response(
+                'Le devis ne contient aucune ligne de prestation.',
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
         }
 
         $hasLines = false;
@@ -789,7 +792,10 @@ class OrderController extends AbstractController
             }
         }
         if (!$hasLines) {
-            return new Response('Le devis ne contient aucune ligne de prestation.', Response::HTTP_UNPROCESSABLE_ENTITY);
+            return new Response(
+                'Le devis ne contient aucune ligne de prestation.',
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
         }
 
         try {
@@ -798,7 +804,10 @@ class OrderController extends AbstractController
 
             return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: true);
         } catch (Throwable $e) {
-            return new Response('Impossible de generer la previsualisation. Veuillez reessayer.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response(
+                'Impossible de generer la previsualisation. Veuillez reessayer.',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+            );
         }
     }
 

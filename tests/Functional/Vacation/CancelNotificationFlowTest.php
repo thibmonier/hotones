@@ -55,8 +55,19 @@ final class CancelNotificationFlowTest extends WebTestCase
         $this->client = static::createClient();
         $this->testCompany = $this->createTestCompany();
 
-        $this->manager = $this->provisionVacationContributor('cancel-manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
-        $this->employee = $this->provisionVacationContributor('cancel-employee@test.com', 'Adrien', 'Employee', ['ROLE_INTERVENANT'], $this->manager);
+        $this->manager = $this->provisionVacationContributor(
+            'cancel-manager@test.com',
+            'Manon',
+            'Manager',
+            ['ROLE_MANAGER'],
+        );
+        $this->employee = $this->provisionVacationContributor(
+            'cancel-employee@test.com',
+            'Adrien',
+            'Employee',
+            ['ROLE_INTERVENANT'],
+            $this->manager,
+        );
     }
 
     public function testManagerCancelOfApprovedVacationEmailsTheContributor(): void
@@ -117,7 +128,7 @@ final class CancelNotificationFlowTest extends WebTestCase
 
         /** @var RequestVacationHandler $handler */
         $handler = static::getContainer()->get(RequestVacationHandler::class);
-        $vacationId = ($handler)(new RequestVacationCommand(
+        $vacationId = $handler(new RequestVacationCommand(
             contributorId: $this->employee->getId(),
             startDate: new DateTimeImmutable('+5 days'),
             endDate: new DateTimeImmutable('+7 days'),

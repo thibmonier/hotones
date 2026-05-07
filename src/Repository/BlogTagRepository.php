@@ -42,11 +42,7 @@ class BlogTagRepository extends ServiceEntityRepository
      */
     public function findAllOrdered(): array
     {
-        return $this
-            ->createQueryBuilder('t')
-            ->orderBy('t.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('t')->orderBy('t.name', 'ASC')->getQuery()->getResult();
     }
 
     /**

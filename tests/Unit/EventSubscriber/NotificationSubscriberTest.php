@@ -39,10 +39,7 @@ final class NotificationSubscriberTest extends TestCase
         $this->notificationService = $this->createMock(NotificationService::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->subscriber = new NotificationSubscriber(
-            $this->notificationService,
-            $this->logger,
-        );
+        $this->subscriber = new NotificationSubscriber($this->notificationService, $this->logger);
     }
 
     #[Test]
@@ -57,18 +54,20 @@ final class NotificationSubscriberTest extends TestCase
     #[Test]
     public function onNotificationEventDelegatesToServiceAndLogsSuccess(): void
     {
-        $alice = (new User())->setEmail('alice@example.com');
-        $bob = (new User())->setEmail('bob@example.com');
+        $alice = new User()->setEmail('alice@example.com');
+        $bob = new User()->setEmail('bob@example.com');
         $event = $this->makeEvent([$alice, $bob]);
 
         $created = [new Notification(), new Notification()];
 
-        $this->notificationService->expects(self::once())
+        $this->notificationService
+            ->expects(self::once())
             ->method('createFromEvent')
             ->with($event)
             ->willReturn($created);
 
-        $this->logger->expects(self::once())
+        $this->logger
+            ->expects(self::once())
             ->method('info')
             ->with('Notifications created from event', [
                 'event_type' => 'quote_won',
@@ -82,12 +81,13 @@ final class NotificationSubscriberTest extends TestCase
     #[Test]
     public function onNotificationEventLogsZeroWhenAllRecipientsFiltered(): void
     {
-        $alice = (new User())->setEmail('alice@example.com');
+        $alice = new User()->setEmail('alice@example.com');
         $event = $this->makeEvent([$alice]);
 
         $this->notificationService->method('createFromEvent')->willReturn([]);
 
-        $this->logger->expects(self::once())
+        $this->logger
+            ->expects(self::once())
             ->method('info')
             ->with('Notifications created from event', [
                 'event_type' => 'quote_won',
@@ -101,13 +101,14 @@ final class NotificationSubscriberTest extends TestCase
     #[Test]
     public function onNotificationEventSwallowsServiceExceptionsAndLogsError(): void
     {
-        $event = $this->makeEvent([(new User())->setEmail('alice@example.com')]);
+        $event = $this->makeEvent([new User()->setEmail('alice@example.com')]);
 
         $this->notificationService
             ->method('createFromEvent')
             ->willThrowException(new RuntimeException('DB unreachable'));
 
-        $this->logger->expects(self::once())
+        $this->logger
+            ->expects(self::once())
             ->method('error')
             ->with('Error creating notifications from event', [
                 'event_type' => 'quote_won',

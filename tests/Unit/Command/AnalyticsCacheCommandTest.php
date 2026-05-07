@@ -54,10 +54,7 @@ class AnalyticsCacheCommandTest extends TestCase
     public function testExecuteWithWarmupOption(): void
     {
         $cacheService = $this->buildCommand();
-        $cacheService
-            ->expects($this->once())
-            ->method('warmup')
-            ->with($this->isArray());
+        $cacheService->expects($this->once())->method('warmup')->with($this->isArray());
 
         $exitCode = $this->commandTester->execute([
             '--warmup' => true,

@@ -39,8 +39,9 @@ final class AbstractTenantAwareVoterTest extends TestCase
     private function makeSubject(Company $company): CompanyOwnedInterface
     {
         return new class($company) implements CompanyOwnedInterface {
-            public function __construct(private Company $company)
-            {
+            public function __construct(
+                private Company $company,
+            ) {
             }
 
             public function getCompany(): Company

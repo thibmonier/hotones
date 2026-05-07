@@ -144,9 +144,6 @@ final class OrderTest extends TestCase
         $order = $this->makeOrder();
 
         $this->expectException(InvalidArgumentException::class);
-        $order->setDates(
-            new DateTimeImmutable('2026-12-31'),
-            new DateTimeImmutable('2026-01-01'),
-        );
+        $order->setDates(new DateTimeImmutable('2026-12-31'), new DateTimeImmutable('2026-01-01'));
     }
 }

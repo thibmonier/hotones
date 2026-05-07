@@ -130,7 +130,7 @@ trait VacationFunctionalTrait
         /** @var RequestVacationHandler $handler */
         $handler = static::getContainer()->get(RequestVacationHandler::class);
 
-        ($handler)(new RequestVacationCommand(
+        $handler(new RequestVacationCommand(
             contributorId: $contributor->getId(),
             startDate: new DateTimeImmutable(sprintf('+%d days', $startInDays)),
             endDate: new DateTimeImmutable(sprintf('+%d days', $startInDays + $durationDays)),

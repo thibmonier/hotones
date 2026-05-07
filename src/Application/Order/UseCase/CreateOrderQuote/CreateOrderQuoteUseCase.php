@@ -41,13 +41,7 @@ final readonly class CreateOrderQuoteUseCase
         $amount = Money::fromAmount($command->amount);
 
         $tempId = OrderId::fromLegacyInt(PHP_INT_MAX);
-        $ddd = Order::create(
-            $tempId,
-            $command->reference,
-            $clientId,
-            $contractType,
-            $amount,
-        );
+        $ddd = Order::create($tempId, $command->reference, $clientId, $contractType, $amount);
         if ($command->title !== null || $command->description !== null) {
             $ddd->updateDetails($command->title, $command->description, null);
         }
@@ -64,7 +58,9 @@ final readonly class CreateOrderQuoteUseCase
         $this->entityManager->persist($flat);
         $this->entityManager->flush();
 
-        $persistedId = OrderId::fromLegacyInt($flat->id ?? throw new InvalidArgumentException('Persisted Order has null id'));
+        $persistedId = OrderId::fromLegacyInt(
+            $flat->id ?? throw new InvalidArgumentException('Persisted Order has null id'),
+        );
 
         foreach ($ddd->pullDomainEvents() as $event) {
             try {

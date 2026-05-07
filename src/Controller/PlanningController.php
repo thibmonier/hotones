@@ -144,7 +144,8 @@ class PlanningController extends AbstractController
                 $w = (int) $cursor->format('w');
                 if ($w !== 0 && $w !== 6) {
                     $key = $cursor->format('Y-m-d');
-                    $plannedByContributor[$cid][$key] = ($plannedByContributor[$cid][$key] ?? 0) + (float) $planning->getDailyHours();
+                    $plannedByContributor[$cid][$key] =
+                        ($plannedByContributor[$cid][$key] ?? 0) + (float) $planning->getDailyHours();
                 }
                 $cursor = (clone $cursor)->modify('+1 day');
             }
@@ -189,8 +190,8 @@ class PlanningController extends AbstractController
             ->createQueryBuilder('v')
             ->leftJoin('v.contributor', 'vc')
             ->addSelect('vc')
-            ->where('v.endDate >= :start')
-            ->andWhere('v.startDate <= :end')
+            ->where('v.dateRange.endDate >= :start')
+            ->andWhere('v.dateRange.startDate <= :end')
             ->andWhere('v.status = :approved')
             ->setParameter('start', $start)
             ->setParameter('end', $end)

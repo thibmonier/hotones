@@ -37,10 +37,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $year = 2024;
 
         // Expect 17 dispatches: 12 monthly + 4 quarterly + 1 yearly
-        $this->messageBus
-            ->expects($this->exactly(17))
-            ->method('dispatch')
-            ->willReturn(new Envelope(new stdClass()));
+        $this->messageBus->expects($this->exactly(17))->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
         $exitCode = $this->commandTester->execute([
             '--year' => (string) $year,

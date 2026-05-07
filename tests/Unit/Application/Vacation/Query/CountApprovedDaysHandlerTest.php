@@ -28,13 +28,10 @@ final class CountApprovedDaysHandlerTest extends TestCase
 
         /** @var VacationRepositoryInterface&MockObject $repository */
         $repository = $this->createMock(VacationRepositoryInterface::class);
-        $repository->expects(self::once())
-            ->method('countApprovedDaysBetween')
-            ->with($start, $end)
-            ->willReturn(12.5);
+        $repository->expects(self::once())->method('countApprovedDaysBetween')->with($start, $end)->willReturn(12.5);
         $handler = new CountApprovedDaysHandler($repository);
 
-        self::assertSame(12.5, ($handler)(new CountApprovedDaysQuery($start, $end)));
+        self::assertSame(12.5, $handler(new CountApprovedDaysQuery($start, $end)));
     }
 
     #[Test]
@@ -44,10 +41,9 @@ final class CountApprovedDaysHandlerTest extends TestCase
         $stubRepository->method('countApprovedDaysBetween')->willReturn(0.0);
         $handler = new CountApprovedDaysHandler($stubRepository);
 
-        $result = ($handler)(new CountApprovedDaysQuery(
-            new DateTimeImmutable('2026-06-01'),
-            new DateTimeImmutable('2026-06-30'),
-        ));
+        $result = $handler(
+            new CountApprovedDaysQuery(new DateTimeImmutable('2026-06-01'), new DateTimeImmutable('2026-06-30')),
+        );
 
         self::assertSame(0.0, $result);
     }

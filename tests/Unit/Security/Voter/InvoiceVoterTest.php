@@ -22,7 +22,7 @@ final class InvoiceVoterTest extends TestCase
     private function makeCompany(int $id = 1): Company
     {
         $company = new Company();
-        (new ReflectionProperty(Company::class, 'id'))->setValue($company, $id);
+        new ReflectionProperty(Company::class, 'id')->setValue($company, $id);
 
         return $company;
     }

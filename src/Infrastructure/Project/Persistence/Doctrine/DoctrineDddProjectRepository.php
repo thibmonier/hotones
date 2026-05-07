@@ -61,10 +61,9 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
      */
     public function findAll(): array
     {
-        return array_map(
-            fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat),
-            $this->flatRepository->findAll(),
-        );
+        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate(
+            $flat,
+        ), $this->flatRepository->findAll());
     }
 
     public function findByReference(string $reference): ?DddProject
@@ -84,10 +83,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
 
         $flatClients = $this->flatRepository->findBy(['client' => $clientId->toLegacyInt()]);
 
-        return array_map(
-            fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat),
-            $flatClients,
-        );
+        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat), $flatClients);
     }
 
     /**
@@ -103,10 +99,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
 
         $flats = $this->flatRepository->findBy(['status' => $flatStatus]);
 
-        return array_map(
-            fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat),
-            $flats,
-        );
+        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat), $flats);
     }
 
     /**
@@ -133,10 +126,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
     {
         $flats = $this->flatRepository->findBy(['client' => null]);
 
-        return array_map(
-            fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat),
-            $flats,
-        );
+        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat), $flats);
     }
 
     public function save(DddProject $project): void
@@ -146,8 +136,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
             throw new RuntimeException('Saving DDD Project with pure UUID id is not yet supported during Phase 2.');
         }
 
-        $flat = $this->flatRepository->find($id->toLegacyInt())
-            ?? throw new ProjectNotFoundException(sprintf('Cannot update Project %s: not found', (string) $id));
+        $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new ProjectNotFoundException(sprintf('Cannot update Project %s: not found', (string) $id));
 
         // Resolve flat client (if any). Phase 2 ACL: client must already exist
         // in legacy table. Internal projects (DDD isInternal()) keep null.
@@ -166,8 +155,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
             throw new RuntimeException('Deleting DDD Project with pure UUID id not yet supported');
         }
 
-        $flat = $this->flatRepository->find($id->toLegacyInt())
-            ?? throw new ProjectNotFoundException(sprintf('Cannot delete Project %s: not found', (string) $id));
+        $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new ProjectNotFoundException(sprintf('Cannot delete Project %s: not found', (string) $id));
 
         $this->entityManager->remove($flat);
         $this->entityManager->flush();

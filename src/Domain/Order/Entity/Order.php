@@ -77,9 +77,7 @@ final class Order implements AggregateRootInterface
     ): self {
         $order = new self($id, $reference, $clientId, $contractType, $amount);
 
-        $order->recordEvent(
-            OrderCreatedEvent::create($id, $clientId, $reference),
-        );
+        $order->recordEvent(OrderCreatedEvent::create($id, $clientId, $reference));
 
         return $order;
     }
@@ -119,21 +117,16 @@ final class Order implements AggregateRootInterface
         return $order;
     }
 
-    public function updateDetails(
-        ?string $title,
-        ?string $description,
-        ?Money $discount,
-    ): void {
+    public function updateDetails(?string $title, ?string $description, ?Money $discount): void
+    {
         $this->title = $title;
         $this->description = $description;
         $this->discount = $discount;
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function setDates(
-        ?DateTimeImmutable $startDate,
-        ?DateTimeImmutable $endDate,
-    ): void {
+    public function setDates(?DateTimeImmutable $startDate, ?DateTimeImmutable $endDate): void
+    {
         if ($startDate !== null && $endDate !== null && $startDate > $endDate) {
             throw new InvalidArgumentException('Start date cannot be after end date');
         }
@@ -161,9 +154,7 @@ final class Order implements AggregateRootInterface
             $this->signedAt = new DateTimeImmutable();
         }
 
-        $this->recordEvent(
-            OrderStatusChangedEvent::create($this->id, $previousStatus, $newStatus),
-        );
+        $this->recordEvent(OrderStatusChangedEvent::create($this->id, $previousStatus, $newStatus));
     }
 
     public function updateAmount(Money $amount): void
@@ -194,10 +185,8 @@ final class Order implements AggregateRootInterface
 
     // Section management
 
-    public function addSection(
-        OrderSectionId $sectionId,
-        string $title,
-    ): void {
+    public function addSection(OrderSectionId $sectionId, string $title): void
+    {
         $sectionPosition = count($this->sections) + 1;
         $section = OrderSection::create($sectionId, $title, $sectionPosition);
 
@@ -205,10 +194,8 @@ final class Order implements AggregateRootInterface
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function updateSection(
-        OrderSectionId $sectionId,
-        string $title,
-    ): void {
+    public function updateSection(OrderSectionId $sectionId, string $title): void
+    {
         $section = $this->findSection($sectionId);
         $section->update($title);
         $this->updatedAt = new DateTimeImmutable();
@@ -254,10 +241,8 @@ final class Order implements AggregateRootInterface
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function removeLineFromSection(
-        OrderSectionId $sectionId,
-        OrderLineId $lineId,
-    ): void {
+    public function removeLineFromSection(OrderSectionId $sectionId, OrderLineId $lineId): void
+    {
         $section = $this->findSection($sectionId);
         $section->removeLine($lineId);
         $this->updatedAt = new DateTimeImmutable();

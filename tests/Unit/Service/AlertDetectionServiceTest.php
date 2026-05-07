@@ -95,9 +95,7 @@ final class AlertDetectionServiceTest extends TestCase
         $this->orderRepository->method('findBy')->willReturn([]);
         $this->profitabilityPredictor->method('predictProfitability')->willReturn(['canPredict' => false]);
 
-        $this->eventDispatcher
-            ->expects(self::never())
-            ->method('dispatch');
+        $this->eventDispatcher->expects(self::never())->method('dispatch');
 
         $stats = $this->service->checkAllAlerts();
 
@@ -215,9 +213,7 @@ final class AlertDetectionServiceTest extends TestCase
         $project = $this->makeProject();
         $this->projectRepository->method('findBy')->willReturn([$project]);
         $this->orderRepository->method('findBy')->willReturn([]);
-        $this->profitabilityPredictor
-            ->method('predictProfitability')
-            ->willReturn(['canPredict' => false]);
+        $this->profitabilityPredictor->method('predictProfitability')->willReturn(['canPredict' => false]);
 
         $this->eventDispatcher->expects(self::never())->method('dispatch');
 
@@ -232,7 +228,9 @@ final class AlertDetectionServiceTest extends TestCase
         $order = $this->createStub(Order::class);
         $schedule = $this->createStub(OrderPaymentSchedule::class);
         $schedule->method('getBillingDate')->willReturn(new DateTimeImmutable('+3 days'));
-        $order->method('getPaymentSchedules')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$schedule]));
+        $order
+            ->method('getPaymentSchedules')
+            ->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$schedule]));
 
         $this->orderRepository->method('findBy')->willReturn([$order]);
 
@@ -252,7 +250,9 @@ final class AlertDetectionServiceTest extends TestCase
         $order = $this->createStub(Order::class);
         $schedule = $this->createStub(OrderPaymentSchedule::class);
         $schedule->method('getBillingDate')->willReturn(new DateTimeImmutable('+30 days'));
-        $order->method('getPaymentSchedules')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$schedule]));
+        $order
+            ->method('getPaymentSchedules')
+            ->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$schedule]));
 
         $this->orderRepository->method('findBy')->willReturn([$order]);
 

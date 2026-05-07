@@ -278,7 +278,11 @@ class TaceAnalyzerTest extends TestCase
         $contributor = $this->createStub(Contributor::class);
 
         $contributorRepository = $this->createMock(ContributorRepository::class);
-        $contributorRepository->expects(self::once())->method('findBy')->with(['active' => true])->willReturn([$contributor]);
+        $contributorRepository
+            ->expects(self::once())
+            ->method('findBy')
+            ->with(['active' => true])
+            ->willReturn([$contributor]);
 
         $staffingMetricsRepository = $this->createMock(StaffingMetricsRepository::class);
 

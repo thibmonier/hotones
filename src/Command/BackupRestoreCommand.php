@@ -42,9 +42,12 @@ final class BackupRestoreCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addArgument('file', InputArgument::REQUIRED, 'Dump file path (.sql or .sql.gz).')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Allow running against the prod environment.');
+        $this->addArgument('file', InputArgument::REQUIRED, 'Dump file path (.sql or .sql.gz).')->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Allow running against the prod environment.',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -83,7 +86,9 @@ final class BackupRestoreCommand extends Command
         $driver = $params['driver'] ?? '';
 
         return match ($driver) {
-            'pdo_mysql', 'mysqli' => str_contains((string) ($params['serverVersion'] ?? ''), 'mariadb') ? 'mariadb' : 'mysql',
+            'pdo_mysql', 'mysqli' => str_contains((string) ($params['serverVersion'] ?? ''), 'mariadb')
+                ? 'mariadb'
+                : 'mysql',
             'pdo_pgsql', 'pgsql' => 'pgsql',
             'pdo_sqlite', 'sqlite3' => 'sqlite',
             default => $driver,
@@ -164,10 +169,12 @@ final class BackupRestoreCommand extends Command
     {
         $normalized = strtoupper(trim($statement));
 
-        return str_starts_with($normalized, 'BEGIN')
+        return
+            str_starts_with($normalized, 'BEGIN')
             || str_starts_with($normalized, 'COMMIT')
             || str_starts_with($normalized, 'ROLLBACK')
-            || str_starts_with($normalized, 'END TRANSACTION');
+            || str_starts_with($normalized, 'END TRANSACTION')
+        ;
     }
 
     /**
@@ -185,7 +192,7 @@ final class BackupRestoreCommand extends Command
             $char = $sql[$i];
 
             if ($char === "'") {
-                if ($inString && ($i + 1 < $length) && $sql[$i + 1] === "'") {
+                if ($inString && ($i + 1) < $length && $sql[$i + 1] === "'") {
                     // Escaped quote inside string literal.
                     $buffer .= "''";
                     ++$i;

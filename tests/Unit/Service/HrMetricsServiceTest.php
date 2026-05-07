@@ -125,10 +125,7 @@ class HrMetricsServiceTest extends TestCase
         $startDate = new DateTime('2025-01-01');
         $endDate = new DateTime('2025-12-31');
 
-        $this->employmentPeriodRepository
-            ->expects($this->once())
-            ->method('countDepartures')
-            ->willReturn(0);
+        $this->employmentPeriodRepository->expects($this->once())->method('countDepartures')->willReturn(0);
 
         $this->employmentPeriodRepository
             ->expects($this->exactly(2))
@@ -223,10 +220,7 @@ class HrMetricsServiceTest extends TestCase
         $startDate = new DateTime('2025-01-01');
         $endDate = new DateTime('2025-01-31');
 
-        $this->vacationRepository
-            ->expects($this->once())
-            ->method('countApprovedDaysBetween')
-            ->willReturn(0.0);
+        $this->vacationRepository->expects($this->once())->method('countApprovedDaysBetween')->willReturn(0.0);
 
         $this->employmentPeriodRepository
             ->expects($this->exactly(2))
@@ -290,15 +284,13 @@ class HrMetricsServiceTest extends TestCase
             ->willReturn($contributors);
 
         // Mock repository to return employment periods in order
-        $this->employmentPeriodRepository
-            ->method('findFirstByContributor')
-            ->willReturnOnConsecutiveCalls(
-                $this->createEmploymentPeriodStartedYearsAgo(0.5),
-                $this->createEmploymentPeriodStartedYearsAgo(1.5),
-                $this->createEmploymentPeriodStartedYearsAgo(3.0),
-                $this->createEmploymentPeriodStartedYearsAgo(7.0),
-                $this->createEmploymentPeriodStartedYearsAgo(12.0),
-            );
+        $this->employmentPeriodRepository->method('findFirstByContributor')->willReturnOnConsecutiveCalls(
+            $this->createEmploymentPeriodStartedYearsAgo(0.5),
+            $this->createEmploymentPeriodStartedYearsAgo(1.5),
+            $this->createEmploymentPeriodStartedYearsAgo(3.0),
+            $this->createEmploymentPeriodStartedYearsAgo(7.0),
+            $this->createEmploymentPeriodStartedYearsAgo(12.0),
+        );
 
         // When: calculate average seniority
         $result = $this->service->calculateAverageSeniority();
@@ -387,12 +379,12 @@ class HrMetricsServiceTest extends TestCase
     {
         // Given: 6 contributors with different ages and genders
         $contributors = [
-            $this->createContributorWithAge(22, 'male'),   // < 25 ans
+            $this->createContributorWithAge(22, 'male'), // < 25 ans
             $this->createContributorWithAge(28, 'female'), // 25-30 ans
-            $this->createContributorWithAge(35, 'male'),   // 30-40 ans
+            $this->createContributorWithAge(35, 'male'), // 30-40 ans
             $this->createContributorWithAge(45, 'female'), // 40-50 ans
-            $this->createContributorWithAge(55, 'male'),   // 50-60 ans
-            $this->createContributorWithAge(65, 'other'),  // > 60 ans
+            $this->createContributorWithAge(55, 'male'), // 50-60 ans
+            $this->createContributorWithAge(65, 'other'), // > 60 ans
         ];
 
         $this->contributorRepository
@@ -622,6 +614,8 @@ class HrMetricsServiceTest extends TestCase
         return $this->createStub(Contributor::class);
     }
 
+    // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter
+    // PHPCS heuristic faux-positif : `$yearsAgo` est utilisé dans le sprintf ligne 622.
     private function createEmploymentPeriodStartedYearsAgo(float $yearsAgo): EmploymentPeriod
     {
         // Use real EmploymentPeriod object instead of mock to avoid PHPUnit property hooks conflict
@@ -632,6 +626,7 @@ class HrMetricsServiceTest extends TestCase
 
         return $period;
     }
+    // phpcs:enable Generic.CodeAnalysis.UnusedFunctionParameter
 
     private function createContributorWithAge(int $age, string $gender): Contributor
     {

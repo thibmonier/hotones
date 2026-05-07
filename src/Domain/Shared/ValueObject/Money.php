@@ -109,8 +109,7 @@ final readonly class Money
 
     public function equals(self $other): bool
     {
-        return $this->amountCents === $other->amountCents
-            && $this->currency === $other->currency;
+        return $this->amountCents === $other->amountCents && $this->currency === $other->currency;
     }
 
     public function getAmountCents(): int

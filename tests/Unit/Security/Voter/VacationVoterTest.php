@@ -25,7 +25,7 @@ final class VacationVoterTest extends TestCase
     private function makeCompany(int $id = 1): Company
     {
         $company = new Company();
-        (new ReflectionProperty(Company::class, 'id'))->setValue($company, $id);
+        new ReflectionProperty(Company::class, 'id')->setValue($company, $id);
 
         return $company;
     }
@@ -35,13 +35,16 @@ final class VacationVoterTest extends TestCase
         $user = new User();
         $user->setCompany($company);
         $user->setRoles($roles);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }
 
-    private function makeVacation(Company $company, ?User $contributorUser, VacationStatus $status = VacationStatus::PENDING): Vacation
-    {
+    private function makeVacation(
+        Company $company,
+        ?User $contributorUser,
+        VacationStatus $status = VacationStatus::PENDING,
+    ): Vacation {
         $contributor = new Contributor();
         $contributor->setCompany($company);
         if ($contributorUser !== null) {
@@ -55,9 +58,9 @@ final class VacationVoterTest extends TestCase
         $reflection = new ReflectionClass(Vacation::class);
         $vacation = $reflection->newInstanceWithoutConstructor();
 
-        (new ReflectionProperty(Vacation::class, 'company'))->setValue($vacation, $company);
-        (new ReflectionProperty(Vacation::class, 'contributor'))->setValue($vacation, $contributor);
-        (new ReflectionProperty(Vacation::class, 'status'))->setValue($vacation, $status);
+        new ReflectionProperty(Vacation::class, 'company')->setValue($vacation, $company);
+        new ReflectionProperty(Vacation::class, 'contributor')->setValue($vacation, $contributor);
+        new ReflectionProperty(Vacation::class, 'status')->setValue($vacation, $status);
 
         return $vacation;
     }

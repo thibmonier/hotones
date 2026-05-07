@@ -37,24 +37,19 @@ final class ClientFlatToDddTranslator
         // contacts are tracked via ClientContact. Phase 2 ACL focuses on
         // basic profile only, contacts are out of scope.
 
-        return DddClient::reconstitute(
-            id: $id,
-            name: $name,
-            serviceLevel: $serviceLevel,
-            extra: [
-                'email' => $email,
-                'phone' => null,
-                'address' => null,
-                'city' => null,
-                'postalCode' => null,
-                'country' => null,
-                'vatNumber' => null,
-                'isActive' => true, // Flat has no soft-delete, all visible clients are active
-                'notes' => $flat->description,
-                'createdAt' => new DateTimeImmutable(),
-                'updatedAt' => null,
-            ],
-        );
+        return DddClient::reconstitute(id: $id, name: $name, serviceLevel: $serviceLevel, extra: [
+            'email' => $email,
+            'phone' => null,
+            'address' => null,
+            'city' => null,
+            'postalCode' => null,
+            'country' => null,
+            'vatNumber' => null,
+            'isActive' => true, // Flat has no soft-delete, all visible clients are active
+            'notes' => $flat->description,
+            'createdAt' => new DateTimeImmutable(),
+            'updatedAt' => null,
+        ]);
     }
 
     /**

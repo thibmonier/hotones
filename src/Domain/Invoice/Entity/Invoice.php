@@ -91,9 +91,7 @@ final class Invoice implements AggregateRootInterface
     ): self {
         $invoice = new self($id, $number, $companyId, $clientId, $orderId, $projectId);
 
-        $invoice->recordEvent(
-            InvoiceCreatedEvent::create($id, $number, $companyId, $clientId),
-        );
+        $invoice->recordEvent(InvoiceCreatedEvent::create($id, $number, $companyId, $clientId));
 
         return $invoice;
     }

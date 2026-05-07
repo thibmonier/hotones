@@ -48,9 +48,7 @@ class VacationApprovalController extends AbstractController
 
         $managedContributors = $managerContributor->getManagedContributors();
 
-        $pendingVacations = $this->vacationRepository->findPendingForContributors(
-            $managedContributors->toArray(),
-        );
+        $pendingVacations = $this->vacationRepository->findPendingForContributors($managedContributors->toArray());
 
         $allVacations = [];
         foreach ($managedContributors as $contributor) {
@@ -182,9 +180,7 @@ class VacationApprovalController extends AbstractController
         }
 
         $managedContributors = $managerContributor->getManagedContributors();
-        $pendingVacations = $this->vacationRepository->findPendingForContributors(
-            $managedContributors->toArray(),
-        );
+        $pendingVacations = $this->vacationRepository->findPendingForContributors($managedContributors->toArray());
 
         $vacationData = [];
         foreach (array_slice($pendingVacations, 0, 5) as $vacation) {

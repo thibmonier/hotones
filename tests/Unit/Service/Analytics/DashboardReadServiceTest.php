@@ -83,9 +83,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager
-            ->method('createQueryBuilder')
-            ->willReturn($qb);
+        $this->entityManager->method('createQueryBuilder')->willReturn($qb);
 
         // Mock cache to execute callback immediately
         $this->cache
@@ -132,9 +130,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager
-            ->method('createQueryBuilder')
-            ->willReturn($qb);
+        $this->entityManager->method('createQueryBuilder')->willReturn($qb);
 
         // Vérifier que le service temps réel est appelé en fallback
         $realTimeData = [
@@ -211,9 +207,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('addOrderBy')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager
-            ->method('createQueryBuilder')
-            ->willReturn($qb);
+        $this->entityManager->method('createQueryBuilder')->willReturn($qb);
 
         // Mock cache to execute callback immediately
         $this->cache
@@ -252,9 +246,7 @@ class DashboardReadServiceTest extends TestCase
         $qb->method('addOrderBy')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
 
-        $this->entityManager
-            ->method('createQueryBuilder')
-            ->willReturn($qb);
+        $this->entityManager->method('createQueryBuilder')->willReturn($qb);
 
         $realTimeEvolution = [
             ['month' => 'Jan 2025', 'revenue' => 5000, 'costs' => 3000, 'margin' => 2000],

@@ -26,7 +26,7 @@ final class TimesheetVoter extends AbstractTenantAwareVoter
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [self::VIEW, self::EDIT, self::DELETE, self::VALIDATE], true)
-            && $subject instanceof Timesheet;
+        && $subject instanceof Timesheet;
     }
 
     protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool
@@ -95,13 +95,7 @@ final class TimesheetVoter extends AbstractTenantAwareVoter
             return false;
         }
 
-        return $this->userHasAnyRole(
-            $user,
-            'ROLE_CHEF_PROJET',
-            'ROLE_MANAGER',
-            'ROLE_ADMIN',
-            'ROLE_SUPERADMIN',
-        );
+        return $this->userHasAnyRole($user, 'ROLE_CHEF_PROJET', 'ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN');
     }
 
     private function isValidated(Timesheet $timesheet): bool

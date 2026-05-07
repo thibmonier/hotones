@@ -26,7 +26,7 @@ final class ProjectDddToFlatTranslatorTest extends TestCase
         );
         if ($status !== null) {
             // Manual status set without state machine (test only)
-            (new ReflectionProperty(DddProject::class, 'status'))->setValue($project, $status);
+            new ReflectionProperty(DddProject::class, 'status')->setValue($project, $status);
         }
 
         return $project;

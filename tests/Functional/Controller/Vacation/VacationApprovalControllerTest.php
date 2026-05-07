@@ -54,7 +54,13 @@ final class VacationApprovalControllerTest extends WebTestCase
         $this->testCompany = $this->createTestCompany();
 
         $this->manager = $this->provisionVacationContributor('manager@test.com', 'Manon', 'Manager', ['ROLE_MANAGER']);
-        $this->employee = $this->provisionVacationContributor('employee@test.com', 'Adrien', 'Test', ['ROLE_INTERVENANT'], $this->manager);
+        $this->employee = $this->provisionVacationContributor(
+            'employee@test.com',
+            'Adrien',
+            'Test',
+            ['ROLE_INTERVENANT'],
+            $this->manager,
+        );
 
         // Authenticate as the manager so the controller resolves $this->getUser() to a managing contributor.
         $this->loginAs($this->manager->getUser());
@@ -74,7 +80,13 @@ final class VacationApprovalControllerTest extends WebTestCase
     public function testShowIsForbiddenWhenManagerDoesNotManageContributor(): void
     {
         $unrelatedManager = $this->provisionVacationContributor('other@test.com', 'Other', 'Manager', ['ROLE_MANAGER']);
-        $unrelatedEmployee = $this->provisionVacationContributor('other-emp@test.com', 'Lone', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
+        $unrelatedEmployee = $this->provisionVacationContributor(
+            'other-emp@test.com',
+            'Lone',
+            'Wolf',
+            ['ROLE_INTERVENANT'],
+            $unrelatedManager,
+        );
         $foreignVacation = $this->createPendingVacationFor($unrelatedEmployee);
 
         $this->loginAs($this->manager->getUser());
@@ -170,7 +182,13 @@ final class VacationApprovalControllerTest extends WebTestCase
     public function testManagerCancelIsForbiddenForUnmanagedContributor(): void
     {
         $unrelatedManager = $this->provisionVacationContributor('rogue@test.com', 'Rogue', 'Manager', ['ROLE_MANAGER']);
-        $unrelatedEmployee = $this->provisionVacationContributor('rogue-emp@test.com', 'Stranger', 'Wolf', ['ROLE_INTERVENANT'], $unrelatedManager);
+        $unrelatedEmployee = $this->provisionVacationContributor(
+            'rogue-emp@test.com',
+            'Stranger',
+            'Wolf',
+            ['ROLE_INTERVENANT'],
+            $unrelatedManager,
+        );
         $foreignVacation = $this->createPendingVacationFor($unrelatedEmployee);
 
         $this->loginAs($this->manager->getUser());

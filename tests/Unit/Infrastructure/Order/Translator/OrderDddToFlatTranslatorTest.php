@@ -27,7 +27,7 @@ final class OrderDddToFlatTranslatorTest extends TestCase
             Money::fromAmount(10000),
         );
         if ($status !== null) {
-            (new ReflectionProperty(DddOrder::class, 'status'))->setValue($order, $status);
+            new ReflectionProperty(DddOrder::class, 'status')->setValue($order, $status);
         }
 
         return $order;

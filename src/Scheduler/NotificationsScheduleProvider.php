@@ -18,9 +18,10 @@ class NotificationsScheduleProvider implements ScheduleProviderInterface
         $schedule = new Schedule();
 
         // Rappel de saisie des temps hebdo: vendredi 12:00 (Europe/Paris)
-        $trigger = new CronExpressionTrigger(new CronExpression('0 12 * * 5'), new DateTimeZone('Europe/Paris'))->withDescription(
-            'Rappel hebdomadaire de saisie des temps',
-        );
+        $trigger = new CronExpressionTrigger(
+            new CronExpression('0 12 * * 5'),
+            new DateTimeZone('Europe/Paris'),
+        )->withDescription('Rappel hebdomadaire de saisie des temps');
 
         $schedule->add(new RecurringCommand($trigger, 'app:notify:timesheets-weekly')->withName(
             'notifications:timesheets-weekly',

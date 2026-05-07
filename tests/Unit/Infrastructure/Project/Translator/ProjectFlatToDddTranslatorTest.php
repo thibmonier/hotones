@@ -14,17 +14,21 @@ use RuntimeException;
 
 final class ProjectFlatToDddTranslatorTest extends TestCase
 {
-    private function makeFlatProject(int $id, string $name, string $status = 'active', ?int $clientId = null): FlatProject
-    {
+    private function makeFlatProject(
+        int $id,
+        string $name,
+        string $status = 'active',
+        ?int $clientId = null,
+    ): FlatProject {
         $flat = new FlatProject();
-        (new ReflectionProperty(FlatProject::class, 'id'))->setValue($flat, $id);
+        new ReflectionProperty(FlatProject::class, 'id')->setValue($flat, $id);
         $flat->name = $name;
         $flat->status = $status;
         $flat->description = null;
 
         if ($clientId !== null) {
             $client = new FlatClient();
-            (new ReflectionProperty(FlatClient::class, 'id'))->setValue($client, $clientId);
+            new ReflectionProperty(FlatClient::class, 'id')->setValue($client, $clientId);
             $flat->client = $client;
         }
 

@@ -27,7 +27,8 @@ class AiUsageLogRepository extends CompanyAwareRepository
     {
         $monthEnd = $monthStart->modify('first day of next month');
 
-        $result = $this->createQueryBuilder('a')
+        $result = $this
+            ->createQueryBuilder('a')
             ->select('COALESCE(SUM(a.costUsd), 0) AS total')
             ->where('a.company = :company')
             ->andWhere('a.occurredAt >= :start')

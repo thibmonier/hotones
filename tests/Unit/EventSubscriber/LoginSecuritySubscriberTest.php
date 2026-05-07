@@ -45,22 +45,15 @@ final class LoginSecuritySubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->loginLimiter = new RateLimiterFactory(
-            [
-                'id' => 'login',
-                'policy' => 'sliding_window',
-                'limit' => 5,
-                'interval' => '15 minutes',
-            ],
-            new InMemoryStorage(),
-        );
+        $this->loginLimiter = new RateLimiterFactory([
+            'id' => 'login',
+            'policy' => 'sliding_window',
+            'limit' => 5,
+            'interval' => '15 minutes',
+        ], new InMemoryStorage());
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->requestStack = $this->createStub(RequestStack::class);
-        $this->subscriber = new LoginSecuritySubscriber(
-            $this->loginLimiter,
-            $this->logger,
-            $this->requestStack,
-        );
+        $this->subscriber = new LoginSecuritySubscriber($this->loginLimiter, $this->logger, $this->requestStack);
     }
 
     #[Test]
@@ -92,15 +85,14 @@ final class LoginSecuritySubscriberTest extends TestCase
         $this->logger
             ->expects(self::once())
             ->method('warning')
-            ->with(
-                'Login attempt failed',
-                self::callback(static function (array $ctx): bool {
-                    return $ctx['username'] === 'jean@test.com'
-                        && $ctx['ip'] === '10.0.0.42'
-                        // 5 max - 1 consumed = 4 remaining on first attempt
-                        && $ctx['remaining_attempts'] === 4;
-                }),
-            );
+            ->with('Login attempt failed', self::callback(static function (array $ctx): bool {
+                return
+                    $ctx['username'] === 'jean@test.com'
+                    && $ctx['ip'] === '10.0.0.42'
+                    // 5 max - 1 consumed = 4 remaining on first attempt
+                    && $ctx['remaining_attempts'] === 4
+                ;
+            }));
         $this->logger->expects(self::never())->method('error');
 
         $this->subscriber->onLoginFailure($this->makeFailureEvent());
@@ -136,7 +128,9 @@ final class LoginSecuritySubscriberTest extends TestCase
             ->method('warning')
             ->with(
                 'Login attempt failed',
-                self::callback(static fn (array $ctx): bool => $ctx['username'] === 'unknown' && $ctx['ip'] === 'unknown'),
+                self::callback(
+                    static fn (array $ctx): bool => $ctx['username'] === 'unknown' && $ctx['ip'] === 'unknown',
+                ),
             );
 
         $this->subscriber->onLoginFailure($this->makeFailureEvent());
@@ -162,7 +156,9 @@ final class LoginSecuritySubscriberTest extends TestCase
             ->method('info')
             ->with(
                 'User logged in successfully',
-                self::callback(static fn (array $ctx): bool => $ctx['username'] === 'alice@test.com' && $ctx['ip'] === '10.0.0.7'),
+                self::callback(
+                    static fn (array $ctx): bool => $ctx['username'] === 'alice@test.com' && $ctx['ip'] === '10.0.0.7',
+                ),
             );
 
         $this->subscriber->onLoginSuccess($this->makeSuccessEvent('alice@test.com'));
@@ -170,10 +166,7 @@ final class LoginSecuritySubscriberTest extends TestCase
 
     private function makeRequestWithIp(string $ip, string $username = 'jean@test.com'): Request
     {
-        $request = new Request(
-            request: ['_username' => $username],
-            server: ['REMOTE_ADDR' => $ip],
-        );
+        $request = new Request(request: ['_username' => $username], server: ['REMOTE_ADDR' => $ip]);
         $request->headers = new HeaderBag(['User-Agent' => 'PHPUnit/12']);
 
         return $request;
@@ -205,13 +198,6 @@ final class LoginSecuritySubscriberTest extends TestCase
         $token = $this->createStub(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
-        return new LoginSuccessEvent(
-            $authenticator,
-            $passport,
-            $token,
-            Request::create('/login'),
-            null,
-            'main',
-        );
+        return new LoginSuccessEvent($authenticator, $passport, $token, Request::create('/login'), null, 'main');
     }
 }

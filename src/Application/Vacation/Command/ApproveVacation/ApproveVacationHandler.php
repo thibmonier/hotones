@@ -23,20 +23,13 @@ final readonly class ApproveVacationHandler
 
     public function __invoke(ApproveVacationCommand $command): void
     {
-        $vacation = $this->vacationRepository->findById(
-            VacationId::fromString($command->vacationId),
-        );
+        $vacation = $this->vacationRepository->findById(VacationId::fromString($command->vacationId));
 
-        $approvedBy = $this->entityManager->getReference(
-            \App\Entity\User::class,
-            $command->approvedByUserId,
-        );
+        $approvedBy = $this->entityManager->getReference(\App\Entity\User::class, $command->approvedByUserId);
 
         $vacation->approve($approvedBy);
         $this->vacationRepository->save($vacation);
 
-        $this->messageBus->dispatch(
-            new VacationNotificationMessage($command->vacationId, 'approved'),
-        );
+        $this->messageBus->dispatch(new VacationNotificationMessage($command->vacationId, 'approved'));
     }
 }

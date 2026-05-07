@@ -80,8 +80,8 @@ final class CancelVacationHandlerDispatchTest extends TestCase
     #[Test]
     public function commandReportsManagerInitiatedFlag(): void
     {
-        self::assertFalse((new CancelVacationCommand('id', null))->isManagerInitiated());
-        self::assertTrue((new CancelVacationCommand('id', 1))->isManagerInitiated());
+        self::assertFalse(new CancelVacationCommand('id', null)->isManagerInitiated());
+        self::assertTrue(new CancelVacationCommand('id', 1)->isManagerInitiated());
     }
 
     private function givenPendingVacation(): Vacation
@@ -102,7 +102,8 @@ final class CancelVacationHandlerDispatchTest extends TestCase
     private function expectDispatchedMessage(): callable
     {
         $captured = null;
-        $this->messageBus->expects(self::once())
+        $this->messageBus
+            ->expects(self::once())
             ->method('dispatch')
             ->willReturnCallback(static function (object $message) use (&$captured): Envelope {
                 $captured = $message;

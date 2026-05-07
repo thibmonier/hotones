@@ -50,7 +50,9 @@ final class NotificationEventChainTest extends KernelTestCase
         // Pre-existing bug : `findUnreadByUser` retourne 0 même après persist + flush
         // (sans doute interaction TenantFilter avec authenticate manuel via TokenStorage).
         // À investiguer dans US-PERFORMANCE-NOTIFICATIONS séparée.
-        self::markTestSkipped('Pre-existing : NotificationEvent dispatch + queryBack issue, requires CompanyContext tenant filter investigation');
+        self::markTestSkipped(
+            'Pre-existing : NotificationEvent dispatch + queryBack issue, requires CompanyContext tenant filter investigation',
+        );
 
         // Given: a company + 2 users authenticated in that company
         $company = CompanyFactory::createOne();

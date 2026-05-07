@@ -31,9 +31,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
         $flat = $this->makeFlatClient(42, 'Acme');
 
         $flatRepo = $this->createMock(FlatClientRepository::class);
-        $flatRepo->method('find')->willReturnCallback(
-            static fn (mixed $id): ?FlatClient => 42 === $id ? $flat : null,
-        );
+        $flatRepo->method('find')->willReturnCallback(static fn (mixed $id): ?FlatClient => 42 === $id ? $flat : null);
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
@@ -137,10 +135,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $ddd = DddClient::create(
-            ClientId::fromLegacyInt(999),
-            CompanyName::fromString('Acme'),
-        );
+        $ddd = DddClient::create(ClientId::fromLegacyInt(999), CompanyName::fromString('Acme'));
 
         $this->expectException(ClientNotFoundException::class);
         $repo->save($ddd);
@@ -150,10 +145,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
     {
         $repo = $this->makeRepo();
 
-        $ddd = DddClient::create(
-            ClientId::generate(),
-            CompanyName::fromString('Future'),
-        );
+        $ddd = DddClient::create(ClientId::generate(), CompanyName::fromString('Future'));
 
         $this->expectException(RuntimeException::class);
         $repo->save($ddd);
@@ -172,10 +164,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo, em: $em);
 
-        $ddd = DddClient::create(
-            ClientId::fromLegacyInt(7),
-            CompanyName::fromString('Doomed'),
-        );
+        $ddd = DddClient::create(ClientId::fromLegacyInt(7), CompanyName::fromString('Doomed'));
         $repo->delete($ddd);
     }
 
@@ -183,10 +172,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
     {
         $repo = $this->makeRepo();
 
-        $ddd = DddClient::create(
-            ClientId::generate(),
-            CompanyName::fromString('Acme'),
-        );
+        $ddd = DddClient::create(ClientId::generate(), CompanyName::fromString('Acme'));
 
         $this->expectException(RuntimeException::class);
         $repo->delete($ddd);
@@ -199,10 +185,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $ddd = DddClient::create(
-            ClientId::fromLegacyInt(999),
-            CompanyName::fromString('Acme'),
-        );
+        $ddd = DddClient::create(ClientId::fromLegacyInt(999), CompanyName::fromString('Acme'));
 
         $this->expectException(ClientNotFoundException::class);
         $repo->delete($ddd);
@@ -211,7 +194,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
     private function makeFlatClient(int $id, string $name): FlatClient
     {
         $flat = new FlatClient();
-        (new ReflectionProperty(FlatClient::class, 'id'))->setValue($flat, $id);
+        new ReflectionProperty(FlatClient::class, 'id')->setValue($flat, $id);
         $flat->name = $name;
         $flat->serviceLevel = 'standard';
         $flat->description = null;

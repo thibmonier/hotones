@@ -42,7 +42,9 @@ final class SecurityControllerTest extends WebTestCase
         // The template should expose `last_username` and `error` variables; we
         // assert the rendered form contains the username input regardless of
         // template language.
-        self::assertSelectorExists('input[name="_username"], input[name="email"], input[type="email"], input[type="text"]');
+        self::assertSelectorExists(
+            'input[name="_username"], input[name="email"], input[type="email"], input[type="text"]',
+        );
     }
 
     #[Test]

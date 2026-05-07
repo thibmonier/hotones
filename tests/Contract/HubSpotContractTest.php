@@ -37,9 +37,7 @@ final class HubSpotContractTest extends TestCase
         $token = $_SERVER['HUBSPOT_SANDBOX_TOKEN'] ?? $_ENV['HUBSPOT_SANDBOX_TOKEN'] ?? null;
 
         if (!$token) {
-            self::markTestSkipped(
-                'HubSpot sandbox token not provided (set HUBSPOT_SANDBOX_TOKEN).',
-            );
+            self::markTestSkipped('HubSpot sandbox token not provided (set HUBSPOT_SANDBOX_TOKEN).');
         }
 
         $this->settings = new HubSpotSettings();

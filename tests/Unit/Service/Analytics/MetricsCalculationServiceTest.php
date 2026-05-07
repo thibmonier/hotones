@@ -204,10 +204,7 @@ class MetricsCalculationServiceTest extends TestCase
             });
 
         // Expect persist to be called for new DimTime
-        $this->entityManager
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf(DimTime::class));
+        $this->entityManager->expects($this->once())->method('persist')->with($this->isInstanceOf(DimTime::class));
 
         // Expect flush to be called twice: once for DimTime, once at the end
         $this->entityManager->expects($this->exactly(2))->method('flush');

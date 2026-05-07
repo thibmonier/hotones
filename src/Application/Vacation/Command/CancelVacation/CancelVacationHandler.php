@@ -21,9 +21,7 @@ final readonly class CancelVacationHandler
 
     public function __invoke(CancelVacationCommand $command): void
     {
-        $vacation = $this->vacationRepository->findById(
-            VacationId::fromString($command->vacationId),
-        );
+        $vacation = $this->vacationRepository->findById(VacationId::fromString($command->vacationId));
 
         $vacation->cancel();
         $this->vacationRepository->save($vacation);
@@ -35,8 +33,6 @@ final readonly class CancelVacationHandler
         //   the manager is notified to keep the team view in sync.
         $type = $command->isManagerInitiated() ? 'cancelled-by-manager' : 'cancelled';
 
-        $this->messageBus->dispatch(
-            new VacationNotificationMessage($command->vacationId, $type),
-        );
+        $this->messageBus->dispatch(new VacationNotificationMessage($command->vacationId, $type));
     }
 }

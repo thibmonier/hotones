@@ -17,9 +17,6 @@ final readonly class CountApprovedDaysHandler
 
     public function __invoke(CountApprovedDaysQuery $query): float
     {
-        return $this->vacationRepository->countApprovedDaysBetween(
-            $query->startDate,
-            $query->endDate,
-        );
+        return $this->vacationRepository->countApprovedDaysBetween($query->startDate, $query->endDate);
     }
 }

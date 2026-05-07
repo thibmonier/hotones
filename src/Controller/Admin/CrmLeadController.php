@@ -86,7 +86,10 @@ class CrmLeadController extends AbstractController
         // Pagination
         $query = $qb->getQuery();
         $total = count($query->getResult());
-        $leads = $query->setFirstResult(($page - 1) * $perPage)->setMaxResults($perPage)->getResult();
+        $leads = $query
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage)
+            ->getResult();
 
         $totalPages = (int) ceil($total / $perPage);
 

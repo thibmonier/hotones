@@ -35,8 +35,7 @@ final class OrderDddToFlatTranslator
     private function mapStatus(OrderStatus $status): string
     {
         return match ($status) {
-            OrderStatus::DRAFT,
-            OrderStatus::TO_SIGN => 'a_signer',
+            OrderStatus::DRAFT, OrderStatus::TO_SIGN => 'a_signer',
             OrderStatus::WON => 'gagne',
             OrderStatus::SIGNED => 'signe',
             OrderStatus::LOST => 'perdu',

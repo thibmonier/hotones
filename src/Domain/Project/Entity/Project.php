@@ -76,9 +76,7 @@ final class Project implements AggregateRootInterface
     ): self {
         $project = new self($id, $name, $clientId, $projectType, $isInternal);
 
-        $project->recordEvent(
-            ProjectCreatedEvent::create($id, $clientId, $name),
-        );
+        $project->recordEvent(ProjectCreatedEvent::create($id, $clientId, $name));
 
         return $project;
     }
@@ -121,21 +119,16 @@ final class Project implements AggregateRootInterface
         return $project;
     }
 
-    public function updateDetails(
-        string $name,
-        ?string $description,
-        ?string $reference,
-    ): void {
+    public function updateDetails(string $name, ?string $description, ?string $reference): void
+    {
         $this->name = $name;
         $this->description = $description;
         $this->reference = $reference;
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function setDates(
-        ?DateTimeImmutable $startDate,
-        ?DateTimeImmutable $endDate,
-    ): void {
+    public function setDates(?DateTimeImmutable $startDate, ?DateTimeImmutable $endDate): void
+    {
         if ($startDate !== null && $endDate !== null && $startDate > $endDate) {
             throw new InvalidArgumentException('Start date cannot be after end date');
         }
@@ -157,10 +150,8 @@ final class Project implements AggregateRootInterface
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function setTechnicalInfo(
-        ?string $repositoryUrl,
-        ?string $documentationUrl,
-    ): void {
+    public function setTechnicalInfo(?string $repositoryUrl, ?string $documentationUrl): void
+    {
         $this->repositoryUrl = $repositoryUrl;
         $this->documentationUrl = $documentationUrl;
         $this->updatedAt = new DateTimeImmutable();
@@ -190,9 +181,7 @@ final class Project implements AggregateRootInterface
             $this->completedAt = new DateTimeImmutable();
         }
 
-        $this->recordEvent(
-            ProjectStatusChangedEvent::create($this->id, $previousStatus, $newStatus),
-        );
+        $this->recordEvent(ProjectStatusChangedEvent::create($this->id, $previousStatus, $newStatus));
     }
 
     public function activate(): void

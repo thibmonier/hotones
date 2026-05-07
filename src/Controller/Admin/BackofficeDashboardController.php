@@ -29,10 +29,7 @@ class BackofficeDashboardController extends AbstractDashboardController
     #[Override]
     public function configureDashboard(): Dashboard
     {
-        return Dashboard::new()
-            ->setTitle('HotOnes - Backoffice')
-            ->setFaviconPath('favicon.ico')
-            ->setLocales(['fr']);
+        return Dashboard::new()->setTitle('HotOnes - Backoffice')->setFaviconPath('favicon.ico')->setLocales(['fr']);
     }
 
     #[Override]

@@ -231,7 +231,8 @@ class ProjectDetailController extends AbstractController
 
         foreach ($tasks as $task) {
             if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $labels[] = substr((string) $task->getName(), 0, 20).(strlen((string) $task->getName()) > 20 ? '...' : '');
+                $labels[] =
+                    substr((string) $task->getName(), 0, 20).(strlen((string) $task->getName()) > 20 ? '...' : '');
                 $progressData[] = (float) $task->getProgressPercentage();
                 $spentHours[] = (float) $task->getTotalHours();
                 $remainingHours[] = (float) $task->getRemainingHours();

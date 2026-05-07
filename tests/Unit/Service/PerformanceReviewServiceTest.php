@@ -58,10 +58,7 @@ class PerformanceReviewServiceTest extends TestCase
             ->method('findActiveContributors')
             ->willReturn($contributors);
 
-        $this->reviewRepository
-            ->expects($this->exactly(2))
-            ->method('existsForContributorAndYear')
-            ->willReturn(false);
+        $this->reviewRepository->expects($this->exactly(2))->method('existsForContributorAndYear')->willReturn(false);
 
         $this->em->expects($this->exactly(2))->method('persist');
 

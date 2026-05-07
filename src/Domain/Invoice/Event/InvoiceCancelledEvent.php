@@ -22,10 +22,8 @@ final readonly class InvoiceCancelledEvent implements DomainEventInterface
         $this->occurredOn = new DateTimeImmutable();
     }
 
-    public static function create(
-        InvoiceId $invoiceId,
-        string $reason,
-    ): self {
+    public static function create(InvoiceId $invoiceId, string $reason): self
+    {
         return new self($invoiceId, $reason);
     }
 

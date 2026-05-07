@@ -359,9 +359,11 @@ jobs:
 
       - name: Run Mago Format Check
         run: composer mago-format
+        continue-on-error: true  # US-087 : Mago format conflits avec PHP-CS-Fixer (CS-Fixer = source de vérité)
 
       - name: Run Mago Lint
         run: composer mago-lint
+        continue-on-error: true  # US-087 : Mago lint warnings non bloquants Phase 1 adoption
 
       - name: Run Mago Analyze
         run: composer mago-analyze

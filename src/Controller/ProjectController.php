@@ -269,7 +269,9 @@ class ProjectController extends AbstractController
                 $clientId = isset($formArray['client'])
                     ? (int) $formArray['client']
                     : $request->request->getInt('client_id');
-                $projectType = (string) ($formArray['projectType'] ?? $request->request->get('project_type', 'forfait'));
+                $projectType = (string) (
+                    $formArray['projectType'] ?? $request->request->get('project_type', 'forfait')
+                );
                 $isInternal = isset($formArray['isInternal'])
                     ? (bool) $formArray['isInternal']
                     : $request->request->getBoolean('is_internal');
