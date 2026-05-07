@@ -92,14 +92,22 @@ jobs:
       - name: Prepare asset directories required by Liip Imagine kernel boot
         run: mkdir -p public/assets/images public/assets/css public/assets/js public/assets/fonts assets/images
 
-      - name: Generate empty Webpack Encore entrypoints.json placeholder
+      - name: Generate Webpack Encore entrypoints.json with mocked entries
         # US-087 (sprint-014) : `public/assets/entrypoints.json` requis par
         # Twig `webpack_encore` dans templates/public/base.html.twig:42.
-        # En CI on évite `yarn build` (lent) — placeholder vide suffit
+        # En CI on évite `yarn build` (lent) — entries mockées vides suffisent
         # pour les tests fonctionnels (les pages se rendent sans JS/CSS bundle).
+        # Entries scannées dans templates/ (cf grep encore_entry_*_tags).
         run: |
           cat > public/assets/entrypoints.json <<'JSON'
-          {"entrypoints":{},"integrity":{}}
+          {
+            "entrypoints": {
+              "public-theme": {"css": [], "js": []},
+              "public-theme-toggle": {"css": [], "js": []},
+              "public-pages": {"css": [], "js": []}
+            },
+            "integrity": {}
+          }
           JSON
           cat > public/assets/manifest.json <<'JSON'
           {}
