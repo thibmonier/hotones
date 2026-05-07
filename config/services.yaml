@@ -58,6 +58,10 @@ services:
     App\Domain\Invoice\Repository\InvoiceRepositoryInterface:
         alias: App\Infrastructure\Invoice\Persistence\Doctrine\DoctrineDddInvoiceRepository
 
+    # Contributor Bounded Context - Interface bindings (sprint-015 buffer promotion)
+    App\Domain\Contributor\Repository\ContributorRepositoryInterface:
+        alias: App\Infrastructure\Contributor\Persistence\Doctrine\DoctrineDddContributorRepository
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
