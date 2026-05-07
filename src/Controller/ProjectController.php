@@ -262,12 +262,25 @@ class ProjectController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             try {
+                // Support flat POST fields ET Symfony Form `project[*]` array.
+                $formArray = (array) $request->request->all('project');
+
+                $name = trim((string) ($formArray['name'] ?? $request->request->get('name', '')));
+                $clientId = isset($formArray['client'])
+                    ? (int) $formArray['client']
+                    : $request->request->getInt('client_id');
+                $projectType = (string) ($formArray['projectType'] ?? $request->request->get('project_type', 'forfait'));
+                $isInternal = isset($formArray['isInternal'])
+                    ? (bool) $formArray['isInternal']
+                    : $request->request->getBoolean('is_internal');
+                $description = $formArray['description'] ?? $request->request->get('description');
+
                 $command = new CreateProjectCommand(
-                    name: trim((string) $request->request->get('name', '')),
-                    clientId: $request->request->getInt('client_id') ?: null,
-                    projectType: (string) $request->request->get('project_type', 'forfait'),
-                    isInternal: $request->request->getBoolean('is_internal'),
-                    description: $request->request->get('description'),
+                    name: $name,
+                    clientId: $clientId !== 0 ? $clientId : null,
+                    projectType: $projectType,
+                    isInternal: $isInternal,
+                    description: $description,
                 );
                 $projectId = $useCase->execute($command);
                 $persistedId = $projectId->toLegacyInt();

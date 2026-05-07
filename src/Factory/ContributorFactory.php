@@ -57,6 +57,13 @@ final class ContributorFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this->afterInstantiate(function (Contributor $contributor): void {
+            // Multi-tenant alignment : si user fourni, hériter de sa company
+            // (priorité sur le default qui peut créer une nouvelle company isolée).
+            $user = $contributor->getUser();
+            if ($user !== null && $user->getCompany() !== null) {
+                $contributor->setCompany($user->getCompany());
+            }
+
             // Create an active employment period with CJM/TJM
             $faker = self::faker();
             $employmentPeriod = new EmploymentPeriod();
