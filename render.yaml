@@ -53,6 +53,12 @@ services:
       # Free tier : 5k errors + 10k transactions/mois (sampling 5 %)
       - key: SENTRY_DSN
         sync: false  # À définir manuellement dans le dashboard Render
+      # Slack alerting (US-094 sprint-017 EPIC-002)
+      # Webhook URL Slack incoming-webhook (canal #alerts-prod)
+      - key: SLACK_WEBHOOK_URL
+        sync: false  # À définir manuellement dans le dashboard Render
+      - key: SLACK_ALERTS_CHANNEL
+        value: "#alerts-prod"
       # Timezone
       - key: TZ
         value: Europe/Paris

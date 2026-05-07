@@ -69,3 +69,6 @@ yarn-error.log
 # OPS-012 (sprint-005) — retro sprint-004 action #1.
 /config/reference.php
 ###< auto-generated config ###
+
+# DB dumps user-local (PII)
+save-db/
