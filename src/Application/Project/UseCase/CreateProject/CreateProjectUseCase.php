@@ -27,6 +27,7 @@ final readonly class CreateProjectUseCase
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private \App\Security\CompanyContext $companyContext,
         private ProjectDddToFlatTranslator $dddToFlat,
         private MessageBusInterface $messageBus,
     ) {
@@ -59,6 +60,7 @@ final readonly class CreateProjectUseCase
         }
 
         $flat = new FlatProject();
+        $flat->setCompany($this->companyContext->getCurrentCompany());
         $this->dddToFlat->applyTo($ddd, $flat, $flatClient);
         $this->entityManager->persist($flat);
         $this->entityManager->flush();
@@ -66,7 +68,11 @@ final readonly class CreateProjectUseCase
         $persistedId = ProjectId::fromLegacyInt($flat->id ?? throw new InvalidArgumentException('Persisted Project has null id'));
 
         foreach ($ddd->pullDomainEvents() as $event) {
-            $this->messageBus->dispatch($event);
+            try {
+                $this->messageBus->dispatch($event);
+            } catch (\Symfony\Component\Messenger\Exception\NoHandlerForMessageException) {
+                // Phase 2: handlers optionnels
+            }
         }
 
         return $persistedId;

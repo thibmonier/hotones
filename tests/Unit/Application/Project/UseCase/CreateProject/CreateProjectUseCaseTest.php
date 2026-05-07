@@ -135,7 +135,7 @@ final class CreateProjectUseCaseTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
-        $useCase = new CreateProjectUseCase($em, new ProjectDddToFlatTranslator(), $bus);
+        $useCase = new CreateProjectUseCase($em, $this->makeCompanyContext(), new ProjectDddToFlatTranslator(), $bus);
 
         $id = $useCase->execute(new CreateProjectCommand(
             name: 'External',
@@ -163,6 +163,14 @@ final class CreateProjectUseCaseTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
-        return new CreateProjectUseCase($em, new ProjectDddToFlatTranslator(), $bus);
+        return new CreateProjectUseCase($em, $this->makeCompanyContext(), new ProjectDddToFlatTranslator(), $bus);
+    }
+
+    private function makeCompanyContext(): \App\Security\CompanyContext
+    {
+        $ctx = $this->createMock(\App\Security\CompanyContext::class);
+        $ctx->method('getCurrentCompany')->willReturn(new \App\Entity\Company());
+
+        return $ctx;
     }
 }

@@ -144,7 +144,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
-        $useCase = new CreateOrderQuoteUseCase($em, new OrderDddToFlatTranslator(), $bus);
+        $useCase = new CreateOrderQuoteUseCase($em, $this->makeCompanyContext(), new OrderDddToFlatTranslator(), $bus);
 
         $id = $useCase->execute(new CreateOrderQuoteCommand(
             clientId: 1,
@@ -174,6 +174,14 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
-        return new CreateOrderQuoteUseCase($em, new OrderDddToFlatTranslator(), $bus);
+        return new CreateOrderQuoteUseCase($em, $this->makeCompanyContext(), new OrderDddToFlatTranslator(), $bus);
+    }
+
+    private function makeCompanyContext(): \App\Security\CompanyContext
+    {
+        $ctx = $this->createMock(\App\Security\CompanyContext::class);
+        $ctx->method('getCurrentCompany')->willReturn(new \App\Entity\Company());
+
+        return $ctx;
     }
 }

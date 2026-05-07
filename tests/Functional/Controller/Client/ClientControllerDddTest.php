@@ -50,7 +50,7 @@ final class ClientControllerDddTest extends WebTestCase
         $admin = UserFactory::createOne(['roles' => ['ROLE_CHEF_PROJET']]);
         $this->client->loginUser($admin);
 
-        $this->client->request('POST', '/clients/new-via-ddd', [
+        $this->client->request('POST', '/clients/new', [
             'name' => 'Acme via DDD',
             'service_level' => 'standard',
             'description' => 'Created via DDD use case',
@@ -69,7 +69,7 @@ final class ClientControllerDddTest extends WebTestCase
         $admin = UserFactory::createOne(['roles' => ['ROLE_CHEF_PROJET']]);
         $this->client->loginUser($admin);
 
-        $this->client->request('POST', '/clients/new-via-ddd', [
+        $this->client->request('POST', '/clients/new', [
             'name' => 'A', // Too short — CompanyName VO requires min 2 chars
             'service_level' => 'standard',
         ]);
