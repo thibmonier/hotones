@@ -31,7 +31,17 @@ exclude:
 # Utiliser avec précaution - uniquement pour les faux positifs
 # =============================================================================
 ignore:
-  # Exemple d'ignorage d'une vulnérabilité spécifique
+  # US-088 (sprint-014, 2026-05-07) — Triage Snyk + composer audit + npm audit :
+  # - composer audit : 0 vulnerability advisories (post bump Symfony 8.0.10)
+  # - npm audit : 0 vulnerabilities (post npm update)
+  # - Aucune entrée ignore active — tout fix dispo upstream a été appliqué
+  #
+  # Si Snyk dashboard remonte de nouvelles alertes :
+  # 1. Vérifier composer outdated --direct + npm outdated
+  # 2. Bump si fix upstream disponible (pas de patch custom)
+  # 3. Si pas de fix upstream → ajouter ici avec reason + expires + created
+  #
+  # Exemple d'ignorage d'une vulnérabilité spécifique :
   # 'SNYK-PHP-SYMFONY-12345':
   #   - '*':
   #       reason: 'Pas applicable à notre cas d'usage'
