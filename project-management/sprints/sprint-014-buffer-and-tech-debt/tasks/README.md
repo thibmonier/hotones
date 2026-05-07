@@ -1,16 +1,32 @@
-# Tasks — Sprint 014 — Buffer Activation + Tech Debt
+# Tasks — Sprint 014 — OPS Stabilization (reshuffled 2026-05-07)
 
-## Vue d'ensemble
+## Vue d'ensemble (révisée)
 
-| Story | Titre | Pts | Tâches | Heures |
-|---|---|---:|---:|---:|
-| DDD-PHASE2-CONTRIBUTOR-ACL | Bridge Contributor BC | 4 | 5 | 8 h |
-| DDD-PHASE2-VACATION-ACL | Bridge Vacation BC complet | 4 | 4 | 7 h |
-| ORDER-TRANSLATOR-FLAT-TO-DDD-FIX | Bug protected createdAt | 1 | 2 | 2 h |
-| TEST-COVERAGE-004 | Escalator step 4 (35 → 40 %) | 2 | 3 | 4 h |
-| **Total ferme** | | **11** | **14** | **21 h** |
-| EPIC-002-KICKOFF-WORKSHOP | Atelier scope PO | 1 | 1 | 1 h |
-| EPIC-002-FOUNDATION | Selon scope post-atelier | TBD | TBD | TBD |
+| Story | Titre | Pts | Tâches | Heures | Statut |
+|---|---|---:|---:|---:|---|
+| ORDER-TRANSLATOR-FLAT-TO-DDD-FIX | Bug protected createdAt | 1 | 2 | 2 h | ✅ #168 |
+| TEST-COVERAGE-004 | Escalator step 4 | 2 | 3 | 4 h | ✅ #169 |
+| US-087 CI green | Faire passer GitHub Actions | 5 | 6 | 8,5 h | 🔲 |
+| US-088 Snyk security | Upgrades deps (no custom dev) | 3 | 5 | 5 h | 🔲 |
+| US-089 Deps update routine | Dependabot + cadence | 2 | 3 | 2,5 h | 🔲 |
+| US-090 Render deploy fix | Build + healthcheck | 3 | 5 | 5,5 h | 🔲 |
+| **Total révisé** | | **16** | **24** | **27,5 h** | |
+
+## Reportés sprint-015
+
+| Story | Pts | Raison |
+|---|---:|---|
+| DDD-PHASE2-CONTRIBUTOR-ACL | 4 | Capacité absorbée par OPS US-087..090 |
+| DDD-PHASE2-VACATION-ACL | 4 | Idem |
+| EPIC-002-KICKOFF-WORKSHOP | 1 | Reporté sprint-015 J1 si capacité OPS verte |
+
+## Détails tâches OPS US-087..US-090
+
+Voir `project-management/backlog/user-stories/OPS.md` sections US-087..US-090 :
+- T-087-01..06 : audit + fix CI jobs (8,5 h)
+- T-088-01..05 : Snyk triage + bump (5 h)
+- T-089-01..03 : Dependabot + cadence (2,5 h)
+- T-090-01..05 : Render logs + fix + runbook (5,5 h)
 
 ## Détail par story
 

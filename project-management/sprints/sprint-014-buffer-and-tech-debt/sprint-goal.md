@@ -13,36 +13,45 @@
 
 ## 🎯 Sprint Goal
 
-> « Promouvoir le buffer Vacation/Contributor ACL en commitment ferme,
-> corriger le bug latent OrderFlatToDddTranslator, pousser l'escalator
-> coverage à 40 % (step 4/5), et démarrer EPIC-002 (atelier scope avec PO). »
+> « Stabiliser la chaîne de production : CI green, sécurité Snyk à jour,
+> deps fresh, déploiement Render fonctionnel. Reporter buffer Contributor +
+> Vacation ACL au sprint-015 (capacité absorbée par stories OPS urgentes
+> US-087..US-090). »
 
 ---
 
-## Backlog engagé (11 pts)
+## ⚠️ Reshuffle 2026-05-07
 
-### Sub-epic A — Buffer héritage promotion (8 pts)
+Stories OPS critiques injectées en cours de sprint (PO request) — voir
+backlog OPS.md US-087..US-090 (Must / Should). Les stories Contributor +
+Vacation ACL (8 pts) reportées sprint-015 (capacité absorbée).
 
-| ID | Titre | Pts |
-|---|---|---:|
-| DDD-PHASE2-CONTRIBUTOR-ACL | Bridge Contributor BC (depuis sprint-012 buffer) | 4 |
-| DDD-PHASE2-VACATION-ACL | Bridge Vacation BC déjà DDD partiel (depuis sprint-012 buffer) | 4 |
+État actuel (post-merge PRs #167 + #168 + #169) :
 
-### Sub-epic B — Tech Debt (3 pts)
+| Story | Pts | PR | Statut |
+|---|---:|---|---|
+| ORDER-TRANSLATOR-FLAT-TO-DDD-FIX | 1 | #168 | ✅ mergée |
+| TEST-COVERAGE-004 | 2 | #169 | ✅ mergée |
+| Sub-total fait | **3** | | |
 
-| ID | Titre | Pts |
-|---|---|---:|
-| ORDER-TRANSLATOR-FLAT-TO-DDD-FIX | Corriger bug `$flat->createdAt` protected dans OrderFlatToDddTranslator | 1 |
-| TEST-COVERAGE-004 | Push coverage 35 → 40 % (escalator step 4 sur 5) — Repositories ACL | 2 |
+Reste à livrer sprint-014 :
 
----
+| Story | Pts | Priorité |
+|---|---:|---|
+| US-087 CI green | 5 | Must |
+| US-088 Snyk security upgrades | 3 | Must |
+| US-090 Render deploy fix | 3 | Must |
+| US-089 Composer + npm update routine | 2 | Should |
+| **Sub-total reste** | **13** | |
 
-## Capacité libre (7 pts) — EPIC-002 Kickoff
+**Engagement total révisé : 3 livrés + 13 à faire = 16 pts** (vs 11 initial).
 
-| ID | Titre | Pts |
-|---|---|---:|
-| EPIC-002-KICKOFF-WORKSHOP | Atelier scope avec PO (1 h) — produire MMF + 5 user stories candidates | 1 (process) |
-| EPIC-002-FOUNDATION (à définir post-atelier) | Foundation technique selon scope retenu | TBD (≤ 6) |
+Capacité = 18 pts. Marge = 2 pts (faible).
+
+Reportés sprint-015 :
+- DDD-PHASE2-CONTRIBUTOR-ACL (4 pts)
+- DDD-PHASE2-VACATION-ACL (4 pts)
+- EPIC-002-KICKOFF-WORKSHOP (déplacé sprint-015 ou sprint-014 J9 si possible)
 
 ---
 
