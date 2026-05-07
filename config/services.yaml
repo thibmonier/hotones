@@ -6,6 +6,8 @@
 parameters:
     app.mail.from_email: '%env(MAIL_FROM_ADDRESS)%'
     app.mail.from_name: '%env(MAIL_FROM_NAME)%'
+    # US-094 (sprint-017 EPIC-002) — Slack alerting fallback channel
+    default_slack_channel: '#alerts-prod'
 
 services:
     # default configuration for services in *this* file
@@ -122,6 +124,17 @@ services:
     App\Service\Analytics\DashboardReadService:
         arguments:
             $analyticsCache: '@cache.analytics'
+
+    # Business KPI Service (US-093 sprint-017 EPIC-002)
+    App\Service\Analytics\BusinessKpiService:
+        arguments:
+            $analyticsCache: '@cache.analytics'
+
+    # Slack Alerting Service (US-094 sprint-017 EPIC-002)
+    App\Service\Alerting\SlackAlertingService:
+        arguments:
+            $webhookUrl: '%env(default::SLACK_WEBHOOK_URL)%'
+            $defaultChannel: '%env(default:default_slack_channel:SLACK_ALERTS_CHANNEL)%'
 
 when@test:
     services:
