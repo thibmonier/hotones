@@ -240,7 +240,7 @@ class InvoiceController extends AbstractController
             try {
                 $command = new CreateInvoiceDraftCommand(
                     companyId: $this->companyContext->getCurrentCompany()->getId() ?? throw new InvalidArgumentException('No current company'),
-                    clientId: $invoice->getClient()?->id ?? throw new InvalidArgumentException('Client required'),
+                    clientId: $invoice->getClient()->id ?? throw new InvalidArgumentException('Client required'),
                     orderId: null,
                     projectId: $invoice->getProject()?->getId(),
                     paymentTerms: $invoice->getPaymentTerms(),

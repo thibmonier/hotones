@@ -58,7 +58,7 @@ class ProjectTask implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'string', length: 20)]
     public string $type = self::TYPE_REGULAR {
-        get => $this->type ?? self::TYPE_REGULAR;
+        get => $this->type;
         set {
             $this->type = $value;
         }
@@ -114,7 +114,7 @@ class ProjectTask implements CompanyOwnedInterface
     // Avancement de la tâche (0-100%)
     #[ORM\Column(name: 'progress_percentage', type: 'integer')]
     public int $progressPercentage = 0 {
-        get => $this->progressPercentage ?? 0;
+        get => $this->progressPercentage;
         set {
             $this->progressPercentage = $value;
         }
@@ -159,7 +159,7 @@ class ProjectTask implements CompanyOwnedInterface
     // Statut de la tâche
     #[ORM\Column(type: 'string', length: 20)]
     public string $status = 'not_started' {
-        get => $this->status ?? 'not_started';
+        get => $this->status;
         set {
             $this->status = $value;
         }

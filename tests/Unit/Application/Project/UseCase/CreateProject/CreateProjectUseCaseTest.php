@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use stdClass;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -124,8 +125,7 @@ final class CreateProjectUseCaseTest extends TestCase
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('find')->willReturnCallback(
-            static fn (string $class, mixed $id): ?FlatClient =>
-                FlatClient::class === $class && 42 === $id ? $client : null,
+            static fn (string $class, mixed $id): ?FlatClient => FlatClient::class === $class && 42 === $id ? $client : null,
         );
         $em->method('persist')->willReturnCallback(function (FlatProject $flat): void {
             (new ReflectionProperty(FlatProject::class, 'id'))->setValue($flat, 7);
@@ -133,7 +133,7 @@ final class CreateProjectUseCaseTest extends TestCase
         $em->method('flush');
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+        $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
         $useCase = new CreateProjectUseCase($em, new ProjectDddToFlatTranslator(), $bus);
 
@@ -161,7 +161,7 @@ final class CreateProjectUseCaseTest extends TestCase
         $em->method('flush');
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+        $bus->method('dispatch')->willReturn(new Envelope(new stdClass()));
 
         return new CreateProjectUseCase($em, new ProjectDddToFlatTranslator(), $bus);
     }

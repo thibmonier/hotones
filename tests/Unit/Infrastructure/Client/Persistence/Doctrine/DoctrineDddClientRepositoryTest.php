@@ -139,7 +139,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $ddd = DddClient::create(
             ClientId::fromLegacyInt(999),
-            CompanyName::fromString("Acme"),
+            CompanyName::fromString('Acme'),
         );
 
         $this->expectException(ClientNotFoundException::class);
@@ -185,7 +185,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $ddd = DddClient::create(
             ClientId::generate(),
-            CompanyName::fromString("Acme"),
+            CompanyName::fromString('Acme'),
         );
 
         $this->expectException(RuntimeException::class);
@@ -201,7 +201,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $ddd = DddClient::create(
             ClientId::fromLegacyInt(999),
-            CompanyName::fromString("Acme"),
+            CompanyName::fromString('Acme'),
         );
 
         $this->expectException(ClientNotFoundException::class);

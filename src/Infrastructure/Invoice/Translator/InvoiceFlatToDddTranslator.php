@@ -36,8 +36,8 @@ final class InvoiceFlatToDddTranslator
         $companyId = CompanyId::fromLegacyInt($flat->getCompany()->getId() ?? throw new RuntimeException('Invoice has no company'));
         $clientId = ClientId::fromLegacyInt($flat->getClient()->getId() ?? throw new RuntimeException('Invoice has no client'));
 
-        $orderId = $flat->getOrder() !== null && $flat->getOrder()->getId() !== null
-            ? OrderId::fromLegacyInt($flat->getOrder()->getId())
+        $orderId = $flat->getOrder() !== null && $flat->getOrder()->id !== null
+            ? OrderId::fromLegacyInt($flat->getOrder()->id)
             : null;
         $projectId = $flat->getProject() !== null && $flat->getProject()->getId() !== null
             ? ProjectId::fromLegacyInt($flat->getProject()->getId())

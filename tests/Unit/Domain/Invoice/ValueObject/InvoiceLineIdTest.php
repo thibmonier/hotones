@@ -34,7 +34,7 @@ final class InvoiceLineIdTest extends TestCase
     {
         $uuid = Uuid::v4()->toRfc4122();
         $this->assertTrue(
-            InvoiceLineId::fromString($uuid)->equals(InvoiceLineId::fromString($uuid))
+            InvoiceLineId::fromString($uuid)->equals(InvoiceLineId::fromString($uuid)),
         );
     }
 

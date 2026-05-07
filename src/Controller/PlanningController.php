@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\Vacation\Entity\Vacation;
 use App\Entity\Contributor;
 use App\Entity\EmploymentPeriod;
 use App\Entity\Planning;
 use App\Entity\Timesheet;
-use App\Entity\Vacation;
 use App\Repository\ContributorRepository;
 use App\Security\CompanyContext;
 use App\Service\Planning\TaceAnalyzer;

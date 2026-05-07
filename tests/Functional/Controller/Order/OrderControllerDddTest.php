@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Controller\Order;
 
 use App\Entity\Client;
 use App\Entity\Order;
-use App\Entity\Project;
 use App\Factory\UserFactory;
 use App\Tests\Support\MultiTenantTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
