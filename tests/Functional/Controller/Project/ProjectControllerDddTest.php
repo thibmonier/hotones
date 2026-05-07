@@ -126,7 +126,10 @@ final class ProjectControllerDddTest extends WebTestCase
             'is_internal' => '1',
         ]);
 
-        // Route promoted/removed → 404
-        self::assertResponseStatusCodeSame(404);
+        // Route promoted/removed : Symfony match `/{id}` (GET) → 405 pour POST.
+        self::assertContains(
+            $this->client->getResponse()->getStatusCode(),
+            [404, 405],
+        );
     }
 }

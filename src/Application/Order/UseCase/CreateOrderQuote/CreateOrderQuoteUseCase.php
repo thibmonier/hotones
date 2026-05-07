@@ -28,6 +28,7 @@ final readonly class CreateOrderQuoteUseCase
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private \App\Security\CompanyContext $companyContext,
         private OrderDddToFlatTranslator $dddToFlat,
         private MessageBusInterface $messageBus,
     ) {
@@ -52,6 +53,7 @@ final readonly class CreateOrderQuoteUseCase
         }
 
         $flat = new FlatOrder();
+        $flat->setCompany($this->companyContext->getCurrentCompany());
         // Resolve flat project (Order is attached to Project, not Client directly)
         if ($command->projectId !== null) {
             $flat->project = $this->entityManager->find(FlatProject::class, $command->projectId);
@@ -65,7 +67,11 @@ final readonly class CreateOrderQuoteUseCase
         $persistedId = OrderId::fromLegacyInt($flat->id ?? throw new InvalidArgumentException('Persisted Order has null id'));
 
         foreach ($ddd->pullDomainEvents() as $event) {
-            $this->messageBus->dispatch($event);
+            try {
+                $this->messageBus->dispatch($event);
+            } catch (\Symfony\Component\Messenger\Exception\NoHandlerForMessageException) {
+                // Phase 2: handlers optionnels
+            }
         }
 
         return $persistedId;

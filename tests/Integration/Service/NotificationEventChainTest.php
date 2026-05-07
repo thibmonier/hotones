@@ -48,9 +48,9 @@ final class NotificationEventChainTest extends KernelTestCase
     public function testDispatchedEventPersistsNotificationsForAllRecipients(): void
     {
         // Given: a company + 2 users authenticated in that company
-        $company = CompanyFactory::createOne()->_real();
-        $alice = UserFactory::createOne(['company' => $company, 'email' => 'alice@example.com'])->_real();
-        $bob = UserFactory::createOne(['company' => $company, 'email' => 'bob@example.com'])->_real();
+        $company = CompanyFactory::createOne();
+        $alice = UserFactory::createOne(['company' => $company, 'email' => 'alice@example.com']);
+        $bob = UserFactory::createOne(['company' => $company, 'email' => 'bob@example.com']);
 
         $this->authenticate($alice);
 
@@ -81,8 +81,8 @@ final class NotificationEventChainTest extends KernelTestCase
     public function testServiceFailureDoesNotBreakDispatchChain(): void
     {
         // Given: an event with a recipient whose company is misaligned -> service may raise
-        $company = CompanyFactory::createOne()->_real();
-        $alice = UserFactory::createOne(['company' => $company])->_real();
+        $company = CompanyFactory::createOne();
+        $alice = UserFactory::createOne(['company' => $company]);
 
         $this->authenticate($alice);
 

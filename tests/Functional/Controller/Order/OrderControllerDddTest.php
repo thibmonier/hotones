@@ -132,7 +132,11 @@ final class OrderControllerDddTest extends WebTestCase
             'amount' => '100',
         ]);
 
-        self::assertResponseStatusCodeSame(404);
+        // Route promoted/removed : Symfony match `/{id}` (GET) → 405 pour POST.
+        self::assertContains(
+            $this->client->getResponse()->getStatusCode(),
+            [404, 405],
+        );
     }
 
     private function makeClient(EntityManagerInterface $em): Client

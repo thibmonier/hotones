@@ -253,9 +253,14 @@ class ProjectTask implements CompanyOwnedInterface
     {
         $tasks = [];
 
+        $company = $project->getCompany();
+
         // Tâche AVV
         $avvTask = new self();
         $avvTask->setProject($project);
+        if ($company !== null) {
+            $avvTask->setCompany($company);
+        }
         $avvTask->name = 'AVV - Avant-vente';
         $avvTask->description = 'Temps passé en avant-vente (ne compte pas dans la rentabilité)';
         $avvTask->type = self::TYPE_AVV;
@@ -267,6 +272,9 @@ class ProjectTask implements CompanyOwnedInterface
         // Tâche Non-vendu
         $nonVenduTask = new self();
         $nonVenduTask->setProject($project);
+        if ($company !== null) {
+            $nonVenduTask->setCompany($company);
+        }
         $nonVenduTask->name = 'Non-vendu';
         $nonVenduTask->description = 'Temps passé non-vendu (ne compte pas dans la rentabilité)';
         $nonVenduTask->type = self::TYPE_NON_VENDU;
