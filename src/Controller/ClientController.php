@@ -245,8 +245,12 @@ class ClientController extends AbstractController
      */
     #[Route('/{id}/edit-via-ddd', name: 'client_edit_ddd', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CHEF_PROJET')]
-    public function editViaDdd(int $id, Request $request, UpdateClientUseCase $useCase, DddClientRepositoryInterface $repository): Response
-    {
+    public function editViaDdd(
+        int $id,
+        Request $request,
+        UpdateClientUseCase $useCase,
+        DddClientRepositoryInterface $repository,
+    ): Response {
         if ($request->isMethod('POST')) {
             try {
                 $command = new UpdateClientCommand(

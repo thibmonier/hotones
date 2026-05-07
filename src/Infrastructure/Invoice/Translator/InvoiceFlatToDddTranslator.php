@@ -29,19 +29,27 @@ final class InvoiceFlatToDddTranslator
 {
     public function translate(FlatInvoice $flat): DddInvoice
     {
-        $id = InvoiceId::fromLegacyInt($flat->getId() ?? throw new RuntimeException('Cannot translate unsaved Invoice'));
+        $id = InvoiceId::fromLegacyInt(
+            $flat->getId() ?? throw new RuntimeException('Cannot translate unsaved Invoice'),
+        );
 
         $number = InvoiceNumber::fromString($flat->invoiceNumber);
 
-        $companyId = CompanyId::fromLegacyInt($flat->getCompany()->getId() ?? throw new RuntimeException('Invoice has no company'));
-        $clientId = ClientId::fromLegacyInt($flat->getClient()->getId() ?? throw new RuntimeException('Invoice has no client'));
+        $companyId = CompanyId::fromLegacyInt(
+            $flat->getCompany()->getId() ?? throw new RuntimeException('Invoice has no company'),
+        );
+        $clientId = ClientId::fromLegacyInt(
+            $flat->getClient()->getId() ?? throw new RuntimeException('Invoice has no client'),
+        );
 
-        $orderId = $flat->getOrder() !== null && $flat->getOrder()->id !== null
-            ? OrderId::fromLegacyInt($flat->getOrder()->id)
-            : null;
-        $projectId = $flat->getProject() !== null && $flat->getProject()->getId() !== null
-            ? ProjectId::fromLegacyInt($flat->getProject()->getId())
-            : null;
+        $orderId =
+            $flat->getOrder() !== null && $flat->getOrder()->id !== null
+                ? OrderId::fromLegacyInt($flat->getOrder()->id)
+                : null;
+        $projectId =
+            $flat->getProject() !== null && $flat->getProject()->getId() !== null
+                ? ProjectId::fromLegacyInt($flat->getProject()->getId())
+                : null;
 
         $status = InvoiceStatus::from($flat->status);
 

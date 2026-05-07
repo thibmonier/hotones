@@ -43,14 +43,16 @@ class TimesheetExportService
         $sheet->setCellValue('G1', 'Jours');
         $sheet->setCellValue('H1', 'Notes');
 
-        $sheet->getStyle('A1:H1')->applyFromArray([
-            'font' => ['bold' => true, 'size' => 12],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'E2E8F0'],
-            ],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ]);
+        $sheet
+            ->getStyle('A1:H1')
+            ->applyFromArray([
+                'font' => ['bold' => true, 'size' => 12],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'E2E8F0'],
+                ],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            ]);
 
         $row = 2;
         $totalHours = 0;
@@ -170,20 +172,13 @@ class TimesheetExportService
     /**
      * @return \App\Entity\Timesheet[]
      */
-    private function getTimesheets(
-        Contributor $contributor,
-        DateTime $start,
-        DateTime $end,
-        ?int $projectId,
-    ): array {
+    private function getTimesheets(Contributor $contributor, DateTime $start, DateTime $end, ?int $projectId): array
+    {
         $timesheetRepo = $this->em->getRepository(\App\Entity\Timesheet::class);
         $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $start, $end);
 
         if ($projectId) {
-            $timesheets = array_filter(
-                $timesheets,
-                fn ($t): bool => $t->getProject()->getId() === $projectId,
-            );
+            $timesheets = array_filter($timesheets, fn ($t): bool => $t->getProject()->getId() === $projectId);
         }
 
         return $timesheets;

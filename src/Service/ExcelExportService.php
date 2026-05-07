@@ -200,7 +200,10 @@ class ExcelExportService
 
         // Format numérique pour les colonnes monétaires
         $lastRow = $row - 1;
-        $sheet->getStyle('B2:D'.$lastRow)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet
+            ->getStyle('B2:D'.$lastRow)
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
 
         // Ajuster largeurs
         foreach (range('A', 'D') as $col) {
@@ -283,7 +286,10 @@ class ExcelExportService
 
         // Format numérique
         $lastRow = $row - 1;
-        $sheet->getStyle('B2:B'.$lastRow)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet
+            ->getStyle('B2:B'.$lastRow)
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
 
         // Ajuster largeurs
         $sheet->getColumnDimension('A')->setAutoSize(true);
@@ -297,8 +303,14 @@ class ExcelExportService
     {
         $sheet->setCellValue('A'.$row, $label);
         $sheet->setCellValue('B'.$row, $value);
-        $sheet->getStyle('A'.$row)->getFont()->setBold(false);
-        $sheet->getStyle('B'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet
+            ->getStyle('A'.$row)
+            ->getFont()
+            ->setBold(false);
+        $sheet
+            ->getStyle('B'.$row)
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
     }
 
     /**
@@ -308,7 +320,11 @@ class ExcelExportService
     {
         $sheet->setCellValue('A'.$row, $title);
         $sheet->mergeCells('A'.$row.':B'.$row);
-        $sheet->getStyle('A'.$row)->getFont()->setSize(14)->setBold(true);
+        $sheet
+            ->getStyle('A'.$row)
+            ->getFont()
+            ->setSize(14)
+            ->setBold(true);
         $sheet
             ->getStyle('A'.$row)
             ->applyFromArray([

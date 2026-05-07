@@ -21,7 +21,7 @@ final class ClientDddToFlatTranslatorTest extends TestCase
     private function makeCompany(): Company
     {
         $company = new Company();
-        (new ReflectionProperty(Company::class, 'id'))->setValue($company, 1);
+        new ReflectionProperty(Company::class, 'id')->setValue($company, 1);
 
         return $company;
     }
@@ -47,11 +47,7 @@ final class ClientDddToFlatTranslatorTest extends TestCase
     public function testServiceLevelMappingEnterprise(): void
     {
         $translator = new ClientDddToFlatTranslator();
-        $ddd = DddClient::create(
-            ClientId::fromLegacyInt(1),
-            CompanyName::fromString('XY'),
-            ServiceLevel::ENTERPRISE,
-        );
+        $ddd = DddClient::create(ClientId::fromLegacyInt(1), CompanyName::fromString('XY'), ServiceLevel::ENTERPRISE);
         $flat = new FlatClient();
 
         $translator->applyTo($ddd, $flat, $this->makeCompany());
@@ -62,11 +58,7 @@ final class ClientDddToFlatTranslatorTest extends TestCase
     public function testServiceLevelMappingStandard(): void
     {
         $translator = new ClientDddToFlatTranslator();
-        $ddd = DddClient::create(
-            ClientId::fromLegacyInt(1),
-            CompanyName::fromString('XY'),
-            ServiceLevel::STANDARD,
-        );
+        $ddd = DddClient::create(ClientId::fromLegacyInt(1), CompanyName::fromString('XY'), ServiceLevel::STANDARD);
         $flat = new FlatClient();
 
         $translator->applyTo($ddd, $flat, $this->makeCompany());
@@ -77,10 +69,7 @@ final class ClientDddToFlatTranslatorTest extends TestCase
     public function testNotesArePropagated(): void
     {
         $translator = new ClientDddToFlatTranslator();
-        $ddd = DddClient::create(
-            ClientId::fromLegacyInt(1),
-            CompanyName::fromString('XY'),
-        );
+        $ddd = DddClient::create(ClientId::fromLegacyInt(1), CompanyName::fromString('XY'));
         $ddd->addNotes('Important notes');
 
         $flat = new FlatClient();

@@ -48,9 +48,7 @@ final readonly class RequestVacationHandler
 
         $this->vacationRepository->save($vacation);
 
-        $this->messageBus->dispatch(
-            new VacationNotificationMessage($vacationId->getValue(), 'created'),
-        );
+        $this->messageBus->dispatch(new VacationNotificationMessage($vacationId->getValue(), 'created'));
 
         return $vacationId;
     }

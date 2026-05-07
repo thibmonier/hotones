@@ -72,10 +72,7 @@ class VacationRepositoryTest extends KernelTestCase
         // Pending vacation (excluded)
         $this->createAndSaveVacation($contributor, '2025-01-20', '2025-01-22');
 
-        $count = $this->repository->countApprovedDaysBetween(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-01-31'),
-        );
+        $count = $this->repository->countApprovedDaysBetween(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         // 5 days (Jan 10-14) + 4 days (Jan 28-31) = 9 days
         $this->assertEquals(9.0, $count);
@@ -83,10 +80,7 @@ class VacationRepositoryTest extends KernelTestCase
 
     public function testCountApprovedDaysBetweenWithNoVacations(): void
     {
-        $count = $this->repository->countApprovedDaysBetween(
-            new DateTime('2025-01-01'),
-            new DateTime('2025-01-31'),
-        );
+        $count = $this->repository->countApprovedDaysBetween(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         $this->assertEquals(0.0, $count);
     }
@@ -129,10 +123,7 @@ class VacationRepositoryTest extends KernelTestCase
             VacationId::generate(),
             $this->getTestCompany(),
             $contributor,
-            DateRange::create(
-                new DateTimeImmutable($startDate),
-                new DateTimeImmutable($endDate),
-            ),
+            DateRange::create(new DateTimeImmutable($startDate), new DateTimeImmutable($endDate)),
             VacationType::PAID_LEAVE,
             DailyHours::fullDay(),
         );
@@ -146,8 +137,12 @@ class VacationRepositoryTest extends KernelTestCase
         return $vacation;
     }
 
-    private function createAndSaveVacationWithStatus($contributor, string $startDate, string $endDate, string $status): Vacation
-    {
+    private function createAndSaveVacationWithStatus(
+        $contributor,
+        string $startDate,
+        string $endDate,
+        string $status,
+    ): Vacation {
         $vacation = $this->createVacation($contributor, $startDate, $endDate);
 
         if ($status === 'approved') {

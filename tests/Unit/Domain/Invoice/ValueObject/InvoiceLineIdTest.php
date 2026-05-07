@@ -33,9 +33,7 @@ final class InvoiceLineIdTest extends TestCase
     public function testEqualsTrueForSameValue(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
-        $this->assertTrue(
-            InvoiceLineId::fromString($uuid)->equals(InvoiceLineId::fromString($uuid)),
-        );
+        $this->assertTrue(InvoiceLineId::fromString($uuid)->equals(InvoiceLineId::fromString($uuid)));
     }
 
     public function testEqualsFalseForDifferentValues(): void

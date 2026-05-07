@@ -11,12 +11,6 @@ final class InvalidStatusTransitionException extends DomainException
 {
     public static function create(VacationStatus $from, VacationStatus $to): self
     {
-        return new self(
-            sprintf(
-                'Cannot transition vacation from "%s" to "%s"',
-                $from->value,
-                $to->value,
-            ),
-        );
+        return new self(sprintf('Cannot transition vacation from "%s" to "%s"', $from->value, $to->value));
     }
 }

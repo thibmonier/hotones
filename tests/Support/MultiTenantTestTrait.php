@@ -48,7 +48,9 @@ trait MultiTenantTestTrait
 
         $company = new Company();
         $company->setName($name.' '.$unique);
-        $company->setSlug(strtolower(str_replace(' ', '-', $name)).'-'.substr(str_replace('.', '', $unique), 0, 12));
+        $company->setSlug(
+            strtolower(str_replace(' ', '-', $name)).'-'.substr(str_replace('.', '', $unique), 0, 12),
+        );
         $company->setSubscriptionTier(Company::TIER_PROFESSIONAL);
         $company->setCurrency('EUR');
         $company->setStructureCostCoefficient('1.35');

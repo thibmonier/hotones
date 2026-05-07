@@ -162,7 +162,10 @@ class OrderControllerPreviewTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/pdf');
-        $this->assertStringContainsString('attachment', $this->client->getResponse()->headers->get('Content-Disposition'));
+        $this->assertStringContainsString(
+            'attachment',
+            $this->client->getResponse()->headers->get('Content-Disposition'),
+        );
     }
 
     public function testPdfPreviewReturns422ForEmptyOrder(): void

@@ -100,11 +100,7 @@ final class RunningTimerRepositoryTest extends KernelTestCase
             startedAt: new DateTime('2026-04-30 07:30:00'),
             stoppedAt: new DateTime('2026-04-30 08:00:00'),
         );
-        $active = $this->createTimer(
-            $contributor,
-            $project,
-            startedAt: new DateTime('2026-04-30 09:00:00'),
-        );
+        $active = $this->createTimer($contributor, $project, startedAt: new DateTime('2026-04-30 09:00:00'));
 
         $found = $this->repository->findActiveByContributor($contributor);
 

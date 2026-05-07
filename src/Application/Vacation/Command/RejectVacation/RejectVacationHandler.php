@@ -21,15 +21,11 @@ final readonly class RejectVacationHandler
 
     public function __invoke(RejectVacationCommand $command): void
     {
-        $vacation = $this->vacationRepository->findById(
-            VacationId::fromString($command->vacationId),
-        );
+        $vacation = $this->vacationRepository->findById(VacationId::fromString($command->vacationId));
 
         $vacation->reject($command->rejectionReason);
         $this->vacationRepository->save($vacation);
 
-        $this->messageBus->dispatch(
-            new VacationNotificationMessage($command->vacationId, 'rejected'),
-        );
+        $this->messageBus->dispatch(new VacationNotificationMessage($command->vacationId, 'rejected'));
     }
 }

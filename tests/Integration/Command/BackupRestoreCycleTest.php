@@ -37,19 +37,15 @@ final class BackupRestoreCycleTest extends KernelTestCase
         $this->connection = self::getContainer()->get(Connection::class);
 
         $this->connection->executeStatement('DROP TABLE IF EXISTS backup_restore_cycle_fixture');
-        $this->connection->executeStatement(
-            'CREATE TABLE backup_restore_cycle_fixture (
+        $this->connection->executeStatement('CREATE TABLE backup_restore_cycle_fixture (
                 id INTEGER PRIMARY KEY,
                 label TEXT NOT NULL,
                 amount NUMERIC NOT NULL
-            )',
-        );
-        $this->connection->executeStatement(
-            "INSERT INTO backup_restore_cycle_fixture (id, label, amount) VALUES
+            )');
+        $this->connection->executeStatement("INSERT INTO backup_restore_cycle_fixture (id, label, amount) VALUES
                 (1, 'alpha', 10.5),
                 (2, 'beta with ''quote''', 0),
-                (3, 'gamma', -42.42)",
-        );
+                (3, 'gamma', -42.42)");
 
         $this->dumpPath = sys_get_temp_dir().'/backup-restore-cycle-'.uniqid('', true).'.sql';
     }
@@ -70,7 +66,7 @@ final class BackupRestoreCycleTest extends KernelTestCase
         $application = new Application($kernel);
 
         $dumpCommand = $application->find('app:backup:dump');
-        $dumpExit = (new CommandTester($dumpCommand))->execute([
+        $dumpExit = new CommandTester($dumpCommand)->execute([
             '--output' => $this->dumpPath,
         ]);
         self::assertSame(Command::SUCCESS, $dumpExit);

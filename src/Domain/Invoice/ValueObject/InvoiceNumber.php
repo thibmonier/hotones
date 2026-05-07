@@ -47,13 +47,7 @@ final readonly class InvoiceNumber
             throw new InvalidArgumentException(sprintf('Sequence must be positive, got: %d', $sequence));
         }
 
-        $number = sprintf(
-            '%s%04d%02d%03d',
-            self::PREFIX,
-            $year,
-            $month,
-            $sequence,
-        );
+        $number = sprintf('%s%04d%02d%03d', self::PREFIX, $year, $month, $sequence);
 
         return new self($number);
     }

@@ -44,9 +44,12 @@ final class BackupDumpCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Output file path. Defaults to var/backups/backup-<timestamp>.<ext>.')
-            ->addOption('compress', 'c', InputOption::VALUE_NONE, 'Gzip the dump (mysql/pgsql only).');
+        $this->addOption(
+            'output',
+            'o',
+            InputOption::VALUE_REQUIRED,
+            'Output file path. Defaults to var/backups/backup-<timestamp>.<ext>.',
+        )->addOption('compress', 'c', InputOption::VALUE_NONE, 'Gzip the dump (mysql/pgsql only).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -56,7 +59,9 @@ final class BackupDumpCommand extends Command
         $params = $this->connection->getParams();
         $driver = $this->resolveDriver($params);
 
-        $outputPath = (string) ($input->getOption('output') ?? $this->defaultOutputPath($driver, (bool) $input->getOption('compress')));
+        $outputPath = (string) (
+            $input->getOption('output') ?? $this->defaultOutputPath($driver, (bool) $input->getOption('compress'))
+        );
 
         $dir = dirname($outputPath);
         if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
@@ -77,7 +82,11 @@ final class BackupDumpCommand extends Command
 
         if ($exit === Command::SUCCESS) {
             $size = is_file($outputPath) ? filesize($outputPath) : 0;
-            $io->success(sprintf('Dump created (%s bytes): %s', number_format((float) $size, 0, '.', ' '), $outputPath));
+            $io->success(sprintf(
+                'Dump created (%s bytes): %s',
+                number_format((float) $size, 0, '.', ' '),
+                $outputPath,
+            ));
         }
 
         return $exit;
@@ -88,7 +97,9 @@ final class BackupDumpCommand extends Command
         $driver = $params['driver'] ?? '';
 
         return match ($driver) {
-            'pdo_mysql', 'mysqli' => str_contains((string) ($params['serverVersion'] ?? ''), 'mariadb') ? 'mariadb' : 'mysql',
+            'pdo_mysql', 'mysqli' => str_contains((string) ($params['serverVersion'] ?? ''), 'mariadb')
+                ? 'mariadb'
+                : 'mysql',
             'pdo_pgsql', 'pgsql' => 'pgsql',
             'pdo_sqlite', 'sqlite3' => 'sqlite',
             default => $driver,
@@ -161,17 +172,19 @@ final class BackupDumpCommand extends Command
         $tables = $schemaManager->listTableNames();
 
         foreach ($tables as $table) {
-            $createRow = $this->connection->fetchAssociative(
-                'SELECT sql FROM sqlite_master WHERE type = ? AND name = ?',
-                ['table', $table],
-            );
+            $createRow = $this->connection->fetchAssociative('SELECT sql FROM sqlite_master WHERE type = ? AND name = ?', [
+                'table',
+                $table,
+            ]);
             if ($createRow !== false && isset($createRow['sql'])) {
                 $sql .= $createRow['sql'].";\n";
             }
 
             $rows = $this->connection->fetchAllAssociative('SELECT * FROM '.$platform->quoteSingleIdentifier($table));
             foreach ($rows as $row) {
-                $columns = array_map(static fn ($col) => $platform->quoteSingleIdentifier((string) $col), array_keys($row));
+                $columns = array_map(static fn ($col) => $platform->quoteSingleIdentifier(
+                    (string) $col,
+                ), array_keys($row));
                 $values = array_map(fn ($value) => $this->quoteSqliteValue($value), array_values($row));
                 $sql .= sprintf(
                     "INSERT INTO %s (%s) VALUES (%s);\n",

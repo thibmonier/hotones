@@ -101,11 +101,7 @@ final class TenantFilterRegressionTest extends KernelTestCase
         $this->em->clear();
 
         $allClients = $this->em->getRepository(Client::class)->findAll();
-        $this->assertCount(
-            2,
-            $allClients,
-            'Disabled filter must expose all tenants (superadmin cross-tenant reports)',
-        );
+        $this->assertCount(2, $allClients, 'Disabled filter must expose all tenants (superadmin cross-tenant reports)');
 
         // Re-enable for cleanup discipline.
         $this->em->getFilters()->enable('tenant_filter');

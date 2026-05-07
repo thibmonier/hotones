@@ -40,8 +40,9 @@ class CjmCalculatorService
         $publicHolidays = $this->countPublicHolidaysInYear($year);
 
         // Jours ouvrés = Total - Weekends - Fériés - CP - RTT
-        $workingDays = $totalDays - $weekends - $publicHolidays - $settings->getAnnualPaidLeaveDays()
-                                  - $settings->getAnnualRttDays();
+        $workingDays =
+            $totalDays - $weekends - $publicHolidays - $settings->getAnnualPaidLeaveDays()
+            - $settings->getAnnualRttDays();
 
         return max($workingDays, 1); // Minimum 1 jour
     }

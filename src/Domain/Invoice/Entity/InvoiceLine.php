@@ -60,12 +60,8 @@ final class InvoiceLine
         return new self($id, $description, $quantity, $unitPriceHt, $taxRate, $position);
     }
 
-    public function update(
-        string $description,
-        float $quantity,
-        Money $unitPriceHt,
-        TaxRate $taxRate,
-    ): void {
+    public function update(string $description, float $quantity, Money $unitPriceHt, TaxRate $taxRate): void
+    {
         $this->validateDescription($description);
         $this->validateQuantity($quantity);
 

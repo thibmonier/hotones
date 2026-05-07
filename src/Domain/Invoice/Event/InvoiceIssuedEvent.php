@@ -23,11 +23,8 @@ final readonly class InvoiceIssuedEvent implements DomainEventInterface
         $this->occurredOn = new DateTimeImmutable();
     }
 
-    public static function create(
-        InvoiceId $invoiceId,
-        DateTimeImmutable $issuedAt,
-        DateTimeImmutable $dueDate,
-    ): self {
+    public static function create(InvoiceId $invoiceId, DateTimeImmutable $issuedAt, DateTimeImmutable $dueDate): self
+    {
         return new self($invoiceId, $issuedAt, $dueDate);
     }
 

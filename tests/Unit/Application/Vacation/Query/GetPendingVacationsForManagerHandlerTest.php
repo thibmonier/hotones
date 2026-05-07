@@ -68,7 +68,9 @@ final class GetPendingVacationsForManagerHandlerTest extends TestCase
         $this->contributorRepo->expects(self::once())->method('findOneBy')->with(['user' => 7])->willReturn($manager);
 
         $vacations = [$this->buildVacation('Adrien Test', VacationType::PAID_LEAVE)];
-        $this->vacationRepo->expects(self::once())->method('findPendingForContributors')
+        $this->vacationRepo
+            ->expects(self::once())
+            ->method('findPendingForContributors')
             ->with([$teamMate])
             ->willReturn($vacations);
 

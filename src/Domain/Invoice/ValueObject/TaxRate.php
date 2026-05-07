@@ -15,9 +15,9 @@ use InvalidArgumentException;
 final readonly class TaxRate
 {
     private const int STANDARD_RATE_FR = 2000; // 20.00%
-    private const int REDUCED_RATE_FR = 1000;  // 10.00%
-    private const int SUPER_REDUCED_FR = 550;  // 5.50%
-    private const int ZERO_RATE = 0;           // 0.00%
+    private const int REDUCED_RATE_FR = 1000; // 10.00%
+    private const int SUPER_REDUCED_FR = 550; // 5.50%
+    private const int ZERO_RATE = 0; // 0.00%
 
     private function __construct(
         private int $basisPoints,

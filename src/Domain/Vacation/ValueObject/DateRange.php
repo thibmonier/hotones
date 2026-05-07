@@ -26,10 +26,7 @@ final readonly class DateRange
 
     public static function fromStrings(string $startDate, string $endDate): self
     {
-        return new self(
-            new DateTimeImmutable($startDate),
-            new DateTimeImmutable($endDate),
-        );
+        return new self(new DateTimeImmutable($startDate), new DateTimeImmutable($endDate));
     }
 
     public function getStartDate(): DateTimeImmutable
@@ -75,7 +72,6 @@ final readonly class DateRange
 
     public function equals(self $other): bool
     {
-        return $this->startDate == $other->startDate
-            && $this->endDate == $other->endDate;
+        return $this->startDate == $other->startDate && $this->endDate == $other->endDate;
     }
 }

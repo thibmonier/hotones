@@ -92,10 +92,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
             'low_threshold' => 10000,
         ];
 
-        $this->calculator
-            ->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($config);
+        $this->calculator->expects($this->once())->method('getConfiguration')->willReturn($config);
 
         $this->calculator->method('recalculateAllAutoClients')->willReturn(0);
 
@@ -171,10 +168,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
                 'low_threshold' => 5000,
             ]);
 
-        $this->calculator
-            ->expects($this->once())
-            ->method('recalculateAllAutoClients')
-            ->willReturn(0);
+        $this->calculator->expects($this->once())->method('recalculateAllAutoClients')->willReturn(0);
 
         $this->commandTester->execute([]);
     }

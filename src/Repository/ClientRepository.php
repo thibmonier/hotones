@@ -23,11 +23,7 @@ class ClientRepository extends CompanyAwareRepository
      */
     public function findAllOrderedByName(): array
     {
-        return $this
-            ->createCompanyQueryBuilder('c')
-            ->orderBy('c.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $this->createCompanyQueryBuilder('c')->orderBy('c.name', 'ASC')->getQuery()->getResult();
     }
 
     /**

@@ -90,7 +90,9 @@ class SaasSubscriptionCrudController extends AbstractCrudController
             ->setRequired(true)
             ->setHelp('Prix unitaire (€)')
             ->formatValue(
-                static fn (mixed $value): string => number_format(is_numeric($value) ? (float) $value : 0.0, 2, ',', ' ').' €',
+                static fn (mixed $value): string =>
+                    number_format(is_numeric($value) ? (float) $value : 0.0, 2, ',', ' ').' €'
+                ,
             );
 
         yield ChoiceField::new('currency', 'Devise')->setChoices([

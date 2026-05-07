@@ -21,12 +21,7 @@ final class ProjectTest extends TestCase
 {
     private function makeProject(): Project
     {
-        return Project::create(
-            ProjectId::generate(),
-            'Test Project',
-            ClientId::generate(),
-            ProjectType::FORFAIT,
-        );
+        return Project::create(ProjectId::generate(), 'Test Project', ClientId::generate(), ProjectType::FORFAIT);
     }
 
     public function testCreateInitializesDefaults(): void
@@ -158,10 +153,7 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
 
         $this->expectException(InvalidArgumentException::class);
-        $project->setDates(
-            new DateTimeImmutable('2026-12-31'),
-            new DateTimeImmutable('2026-01-01'),
-        );
+        $project->setDates(new DateTimeImmutable('2026-12-31'), new DateTimeImmutable('2026-01-01'));
     }
 
     public function testSetBudgetAndSoldAmount(): void

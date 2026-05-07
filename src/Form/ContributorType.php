@@ -121,12 +121,8 @@ class ContributorType extends AbstractType
             ->add('user', EntityType::class, [
                 'label' => 'Compte utilisateur associé',
                 'class' => User::class,
-                'choice_label' => fn (User $user): string => $user->getFirstName()
-                    .' '
-                    .$user->getLastName()
-                    .' ('
-                    .$user->getEmail()
-                    .')',
+                'choice_label' => fn (User $user): string =>
+                    $user->getFirstName().' '.$user->getLastName().' ('.$user->getEmail().')',
                 'required' => false,
                 'placeholder' => '-- Aucun compte --',
                 'attr' => ['class' => 'form-select'],

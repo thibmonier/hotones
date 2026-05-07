@@ -337,11 +337,11 @@ class ProjectRiskAnalyzerTest extends TestCase
     {
         // Verify that EM->persist + flush are invoked once each.
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
+        $em
+            ->expects($this->once())
             ->method('persist')
             ->with($this->isInstanceOf(\App\Entity\ProjectHealthScore::class));
-        $em->expects($this->once())
-            ->method('flush');
+        $em->expects($this->once())->method('flush');
 
         $companyContext = $this->createStub(CompanyContext::class);
         $companyContext->method('getCurrentCompany')->willReturn(new \App\Entity\Company());

@@ -11,8 +11,6 @@ final class VacationNotFoundException extends DomainException
 {
     public static function withId(VacationId $id): self
     {
-        return new self(
-            sprintf('Vacation not found with id: %s', $id->getValue()),
-        );
+        return new self(sprintf('Vacation not found with id: %s', $id->getValue()));
     }
 }

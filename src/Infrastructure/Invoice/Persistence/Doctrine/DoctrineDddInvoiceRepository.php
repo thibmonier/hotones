@@ -75,10 +75,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
 
         $flats = $this->flatRepository->findBy(['client' => $clientId->toLegacyInt()]);
 
-        return array_map(
-            fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat),
-            $flats,
-        );
+        return array_map(fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat), $flats);
     }
 
     /**
@@ -92,10 +89,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
 
         $flats = $this->flatRepository->findBy(['company' => $companyId->toLegacyInt()]);
 
-        return array_map(
-            fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat),
-            $flats,
-        );
+        return array_map(fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat), $flats);
     }
 
     /**
@@ -105,10 +99,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
     {
         $flats = $this->flatRepository->findBy(['status' => $status->value]);
 
-        return array_map(
-            fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat),
-            $flats,
-        );
+        return array_map(fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat), $flats);
     }
 
     /**
@@ -126,8 +117,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
             throw new RuntimeException('Saving DDD Invoice with pure UUID id is not yet supported during Phase 2.');
         }
 
-        $flat = $this->flatRepository->find($id->toLegacyInt())
-            ?? throw new InvoiceNotFoundException(sprintf('Cannot update Invoice %s: not found', (string) $id));
+        $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new InvoiceNotFoundException(sprintf('Cannot update Invoice %s: not found', (string) $id));
 
         $this->dddToFlat->applyTo($invoice, $flat);
 
@@ -142,8 +132,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
             throw new RuntimeException('Deleting DDD Invoice with pure UUID id not yet supported');
         }
 
-        $flat = $this->flatRepository->find($id->toLegacyInt())
-            ?? throw new InvoiceNotFoundException(sprintf('Cannot delete Invoice %s: not found', (string) $id));
+        $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new InvoiceNotFoundException(sprintf('Cannot delete Invoice %s: not found', (string) $id));
 
         $this->entityManager->remove($flat);
         $this->entityManager->flush();

@@ -27,7 +27,7 @@ final class OrderVoter extends AbstractTenantAwareVoter
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [self::VIEW, self::EDIT, self::SIGN, self::DELETE], true)
-            && $subject instanceof Order;
+        && $subject instanceof Order;
     }
 
     protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool
@@ -69,10 +69,6 @@ final class OrderVoter extends AbstractTenantAwareVoter
         }
 
         // Only PENDING (à signer) or WON can transition to SIGNED.
-        return in_array(
-            $order->getStatus(),
-            [OrderStatus::PENDING->value, OrderStatus::WON->value],
-            true,
-        );
+        return in_array($order->getStatus(), [OrderStatus::PENDING->value, OrderStatus::WON->value], true);
     }
 }

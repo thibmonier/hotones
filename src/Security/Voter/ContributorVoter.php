@@ -26,7 +26,7 @@ final class ContributorVoter extends AbstractTenantAwareVoter
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [self::VIEW, self::EDIT, self::DEACTIVATE, self::DELETE], true)
-            && $subject instanceof Contributor;
+        && $subject instanceof Contributor;
     }
 
     protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool

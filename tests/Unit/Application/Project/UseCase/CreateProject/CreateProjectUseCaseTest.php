@@ -25,11 +25,7 @@ final class CreateProjectUseCaseTest extends TestCase
     {
         $useCase = $this->makeUseCase(persistedId: 99);
 
-        $id = $useCase->execute(new CreateProjectCommand(
-            name: 'New Project',
-            clientId: null,
-            isInternal: true,
-        ));
+        $id = $useCase->execute(new CreateProjectCommand(name: 'New Project', clientId: null, isInternal: true));
 
         $this->assertTrue($id->isLegacy());
         $this->assertSame(99, $id->toLegacyInt());
@@ -38,7 +34,9 @@ final class CreateProjectUseCaseTest extends TestCase
     public function testProjectTypeForfait(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (
+            &$persistedFlat,
+        ) {
             $persistedFlat = clone $flat;
         });
 
@@ -104,7 +102,9 @@ final class CreateProjectUseCaseTest extends TestCase
     public function testDescriptionApplied(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (
+            &$persistedFlat,
+        ) {
             $persistedFlat = clone $flat;
         });
 
@@ -121,14 +121,16 @@ final class CreateProjectUseCaseTest extends TestCase
     public function testExternalProjectResolvesClient(): void
     {
         $client = new FlatClient();
-        (new ReflectionProperty(FlatClient::class, 'id'))->setValue($client, 42);
+        new ReflectionProperty(FlatClient::class, 'id')->setValue($client, 42);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('find')->willReturnCallback(
-            static fn (string $class, mixed $id): ?FlatClient => FlatClient::class === $class && 42 === $id ? $client : null,
-        );
+        $em->method('find')->willReturnCallback(static fn (string $class, mixed $id): ?FlatClient => FlatClient::class
+            === $class
+            && 42 === $id
+                ? $client
+                : null);
         $em->method('persist')->willReturnCallback(function (FlatProject $flat): void {
-            (new ReflectionProperty(FlatProject::class, 'id'))->setValue($flat, 7);
+            new ReflectionProperty(FlatProject::class, 'id')->setValue($flat, 7);
         });
         $em->method('flush');
 
@@ -137,11 +139,7 @@ final class CreateProjectUseCaseTest extends TestCase
 
         $useCase = new CreateProjectUseCase($em, $this->makeCompanyContext(), new ProjectDddToFlatTranslator(), $bus);
 
-        $id = $useCase->execute(new CreateProjectCommand(
-            name: 'External',
-            clientId: 42,
-            isInternal: false,
-        ));
+        $id = $useCase->execute(new CreateProjectCommand(name: 'External', clientId: 42, isInternal: false));
 
         $this->assertSame(7, $id->toLegacyInt());
     }
@@ -152,8 +150,11 @@ final class CreateProjectUseCaseTest extends TestCase
     private function makeUseCase(int $persistedId, ?callable $persistCapture = null): CreateProjectUseCase
     {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(function (FlatProject $flat) use ($persistedId, $persistCapture): void {
-            (new ReflectionProperty(FlatProject::class, 'id'))->setValue($flat, $persistedId);
+        $em->method('persist')->willReturnCallback(function (FlatProject $flat) use (
+            $persistedId,
+            $persistCapture,
+        ): void {
+            new ReflectionProperty(FlatProject::class, 'id')->setValue($flat, $persistedId);
             if ($persistCapture !== null) {
                 $persistCapture($flat);
             }

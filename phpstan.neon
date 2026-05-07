@@ -47,7 +47,5 @@ parameters:
         # Allow useless casts from PHPDoc (PHPDoc types are not always reliable)
         - identifier: cast.useless
 
-        # Allow nullsafe on left side of ?? in property hooks (defensive code)
-        - identifier: nullsafe.neverNull
-          path: src/Entity/Contributor.php
+        # (Removed 2026-05-07 US-087 : nullsafe.neverNull on Contributor.php no longer triggers)
 

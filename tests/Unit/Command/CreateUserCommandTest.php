@@ -78,10 +78,7 @@ class CreateUserCommandTest extends TestCase
 
         // Mock password hashing
         $hashedPassword = '$2y$13$hashedpassword';
-        $this->passwordHasher
-            ->expects($this->once())
-            ->method('hashPassword')
-            ->willReturn($hashedPassword);
+        $this->passwordHasher->expects($this->once())->method('hashPassword')->willReturn($hashedPassword);
 
         // Track persist and flush calls
         $persistedEntities = [];

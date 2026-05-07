@@ -106,10 +106,7 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
             fn (FlatOrder $flat): bool => !in_array($flat->status, $terminalStates, true),
         );
 
-        return array_map(
-            fn (FlatOrder $flat): DddOrder => $this->flatToDdd->translate($flat),
-            $actives,
-        );
+        return array_map(fn (FlatOrder $flat): DddOrder => $this->flatToDdd->translate($flat), $actives);
     }
 
     /**
@@ -117,10 +114,9 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
      */
     public function findAll(): array
     {
-        return array_map(
-            fn (FlatOrder $flat): DddOrder => $this->flatToDdd->translate($flat),
-            $this->flatRepository->findAll(),
-        );
+        return array_map(fn (FlatOrder $flat): DddOrder => $this->flatToDdd->translate(
+            $flat,
+        ), $this->flatRepository->findAll());
     }
 
     public function save(DddOrder $order): void
@@ -130,8 +126,7 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
             throw new RuntimeException('Saving DDD Order with pure UUID id not yet supported during Phase 2.');
         }
 
-        $flat = $this->flatRepository->find($id->toLegacyInt())
-            ?? throw new OrderNotFoundException(sprintf('Cannot update Order %s: not found', (string) $id));
+        $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new OrderNotFoundException(sprintf('Cannot update Order %s: not found', (string) $id));
 
         $this->dddToFlat->applyTo($order, $flat);
 
@@ -146,8 +141,7 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
             throw new RuntimeException('Deleting DDD Order with pure UUID id not yet supported');
         }
 
-        $flat = $this->flatRepository->find($id->toLegacyInt())
-            ?? throw new OrderNotFoundException(sprintf('Cannot delete Order %s: not found', (string) $id));
+        $flat = $this->flatRepository->find($id->toLegacyInt()) ?? throw new OrderNotFoundException(sprintf('Cannot delete Order %s: not found', (string) $id));
 
         $this->entityManager->remove($flat);
         $this->entityManager->flush();

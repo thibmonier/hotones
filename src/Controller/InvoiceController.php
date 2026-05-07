@@ -239,7 +239,9 @@ class InvoiceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $command = new CreateInvoiceDraftCommand(
-                    companyId: $this->companyContext->getCurrentCompany()->getId() ?? throw new InvalidArgumentException('No current company'),
+                    companyId: $this->companyContext
+                        ->getCurrentCompany()
+                        ->getId() ?? throw new InvalidArgumentException('No current company'),
                     clientId: $invoice->getClient()->id ?? throw new InvalidArgumentException('Client required'),
                     orderId: null,
                     projectId: $invoice->getProject()?->getId(),
@@ -257,11 +259,16 @@ class InvoiceController extends AbstractController
                     $persistedInvoice->setTvaRate($invoice->getTvaRate());
                     $persistedInvoice->setStatus($invoice->getStatus());
                     $persistedInvoice->setInternalNotes($invoice->getInternalNotes());
-                    $persistedInvoice->setInvoiceNumber($invoiceRepository->generateNextInvoiceNumber($persistedInvoice->getIssuedAt()));
+                    $persistedInvoice->setInvoiceNumber(
+                        $invoiceRepository->generateNextInvoiceNumber($persistedInvoice->getIssuedAt()),
+                    );
                     $persistedInvoice->calculateAmounts();
                     $em->flush();
 
-                    $this->addFlash('success', sprintf('Facture %s créée avec succès', $persistedInvoice->getInvoiceNumber()));
+                    $this->addFlash('success', sprintf(
+                        'Facture %s créée avec succès',
+                        $persistedInvoice->getInvoiceNumber(),
+                    ));
 
                     return $this->redirectToRoute('invoice_show', ['id' => $persistedId]);
                 }

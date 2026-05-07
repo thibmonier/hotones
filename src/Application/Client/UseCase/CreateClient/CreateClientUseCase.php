@@ -72,7 +72,9 @@ final readonly class CreateClientUseCase
         $this->entityManager->persist($flat);
         $this->entityManager->flush();
 
-        $persistedId = ClientId::fromLegacyInt($flat->id ?? throw new InvalidArgumentException('Persisted Client has null id'));
+        $persistedId = ClientId::fromLegacyInt(
+            $flat->id ?? throw new InvalidArgumentException('Persisted Client has null id'),
+        );
 
         // Dispatch domain events. Phase 2: handlers are optional — silently
         // skip NoHandlerForMessageException (events queued for future handlers

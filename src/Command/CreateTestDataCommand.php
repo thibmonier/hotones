@@ -663,7 +663,7 @@ Répartition des contributeurs :
         if (str_contains($taskName, 'Analyse') || str_contains($taskName, 'spécification')) {
             return
                 $contributorsByProfile['product owner'][0] ?? $contributorsByProfile['chef de projet'][0]
-                                                           ?? $contributors[0]
+                ?? $contributors[0]
             ;
         }
 

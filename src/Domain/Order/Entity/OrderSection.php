@@ -28,11 +28,8 @@ final class OrderSection
     /** @var array<OrderLine> */
     private array $lines = [];
 
-    private function __construct(
-        OrderSectionId $id,
-        string $title,
-        int $position,
-    ) {
+    private function __construct(OrderSectionId $id, string $title, int $position)
+    {
         $this->validateTitle($title);
 
         $this->id = $id;
@@ -42,11 +39,8 @@ final class OrderSection
         $this->updatedAt = null;
     }
 
-    public static function create(
-        OrderSectionId $id,
-        string $title,
-        int $position,
-    ): self {
+    public static function create(OrderSectionId $id, string $title, int $position): self
+    {
         return new self($id, $title, $position);
     }
 
@@ -61,15 +55,7 @@ final class OrderSection
         float $taxRate,
     ): void {
         $linePosition = count($this->lines) + 1;
-        $line = OrderLine::create(
-            $lineId,
-            $description,
-            $type,
-            $quantity,
-            $unitPriceHt,
-            $taxRate,
-            $linePosition,
-        );
+        $line = OrderLine::create($lineId, $description, $type, $quantity, $unitPriceHt, $taxRate, $linePosition);
 
         $this->lines[] = $line;
         $this->updatedAt = new DateTimeImmutable();

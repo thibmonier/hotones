@@ -197,9 +197,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $entityManager = $this->createStub(EntityManagerInterface::class);
 
         // includeConfirmed=true → service queries both confirmed statuses + pending.
-        $orderRepository->expects($this->exactly(2))
-            ->method('findBy')
-            ->willReturnOnConsecutiveCalls([], []);
+        $orderRepository->expects($this->exactly(2))->method('findBy')->willReturnOnConsecutiveCalls([], []);
 
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result = $service->analyzePipeline([], [], true);

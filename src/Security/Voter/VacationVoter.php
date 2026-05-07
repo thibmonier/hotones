@@ -29,7 +29,7 @@ final class VacationVoter extends AbstractTenantAwareVoter
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [self::VIEW, self::REQUEST, self::APPROVE, self::REJECT, self::CANCEL], true)
-            && $subject instanceof Vacation;
+        && $subject instanceof Vacation;
     }
 
     protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool

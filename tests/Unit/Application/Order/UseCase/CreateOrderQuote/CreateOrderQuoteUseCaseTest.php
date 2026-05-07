@@ -130,14 +130,16 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
     public function testProjectAttached(): void
     {
         $project = new FlatProject();
-        (new ReflectionProperty(FlatProject::class, 'id'))->setValue($project, 33);
+        new ReflectionProperty(FlatProject::class, 'id')->setValue($project, 33);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('find')->willReturnCallback(
-            static fn (string $class, mixed $id): ?FlatProject => FlatProject::class === $class && 33 === $id ? $project : null,
-        );
+        $em->method('find')->willReturnCallback(static fn (string $class, mixed $id): ?FlatProject => FlatProject::class
+            === $class
+            && 33 === $id
+                ? $project
+                : null);
         $em->method('persist')->willReturnCallback(function (FlatOrder $flat): void {
-            (new ReflectionProperty(FlatOrder::class, 'id'))->setValue($flat, 9);
+            new ReflectionProperty(FlatOrder::class, 'id')->setValue($flat, 9);
         });
         $em->method('flush');
 
@@ -163,8 +165,11 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
     private function makeUseCase(int $persistedId, ?callable $persistCapture = null): CreateOrderQuoteUseCase
     {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(function (FlatOrder $flat) use ($persistedId, $persistCapture): void {
-            (new ReflectionProperty(FlatOrder::class, 'id'))->setValue($flat, $persistedId);
+        $em->method('persist')->willReturnCallback(function (FlatOrder $flat) use (
+            $persistedId,
+            $persistCapture,
+        ): void {
+            new ReflectionProperty(FlatOrder::class, 'id')->setValue($flat, $persistedId);
             if ($persistCapture !== null) {
                 $persistCapture($flat);
             }

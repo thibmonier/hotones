@@ -211,38 +211,37 @@ class ContributorRepository extends CompanyAwareRepository
         string $sort = 'name',
         string $dir = 'ASC',
     ): \Doctrine\ORM\QueryBuilder {
-        $qb = $this
-            ->createQueryBuilder('c')
-            ->leftJoin('c.profiles', 'p')
-            ->addSelect('p');
+        $qb = $this->createQueryBuilder('c')->leftJoin('c.profiles', 'p')->addSelect('p');
 
         if ($search) {
-            $qb->andWhere('c.firstName LIKE :search OR c.lastName LIKE :search OR c.email LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere('c.firstName LIKE :search OR c.lastName LIKE :search OR c.email LIKE :search')->setParameter(
+                'search',
+                '%'.$search.'%',
+            );
         }
 
         if ($active !== 'all') {
-            $qb->andWhere('c.active = :active')
-                ->setParameter('active', $active === 'active');
+            $qb->andWhere('c.active = :active')->setParameter('active', $active === 'active');
         }
 
         if ($employmentStatus === 'current') {
             $today = new DateTime();
-            $qb->innerJoin('c.employmentPeriods', 'ep')
+            $qb
+                ->innerJoin('c.employmentPeriods', 'ep')
                 ->andWhere('ep.startDate <= :today')
                 ->andWhere('(ep.endDate IS NULL OR ep.endDate >= :today)')
                 ->setParameter('today', $today);
         } elseif ($employmentStatus === 'inactive_employment') {
             $today = new DateTime();
-            $subQuery = $this->getEntityManager()
+            $subQuery = $this
+                ->getEntityManager()
                 ->createQueryBuilder()
                 ->select('IDENTITY(ep2.contributor)')
                 ->from(\App\Entity\EmploymentPeriod::class, 'ep2')
                 ->where('ep2.startDate <= :today')
                 ->andWhere('(ep2.endDate IS NULL OR ep2.endDate >= :today)')
                 ->getDQL();
-            $qb->andWhere($qb->expr()->notIn('c.id', $subQuery))
-                ->setParameter('today', $today);
+            $qb->andWhere($qb->expr()->notIn('c.id', $subQuery))->setParameter('today', $today);
         }
 
         $map = ['name' => ['c.lastName', 'c.firstName'], 'email' => ['c.email'], 'active' => ['c.active']];

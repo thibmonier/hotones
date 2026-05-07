@@ -33,7 +33,9 @@ class AuthenticationTest extends WebTestCase
         $client = static::createClient();
 
         // Se connecter avec un utilisateur non-admin
-        $userRepository = static::getContainer()->get('doctrine')->getRepository(\App\Entity\User::class);
+        $userRepository = static::getContainer()
+            ->get('doctrine')
+            ->getRepository(\App\Entity\User::class);
         $regularUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$regularUser) {
@@ -68,7 +70,9 @@ class AuthenticationTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $userRepository = static::getContainer()->get('doctrine')->getRepository(\App\Entity\User::class);
+        $userRepository = static::getContainer()
+            ->get('doctrine')
+            ->getRepository(\App\Entity\User::class);
         $user2fa = $userRepository->findOneBy(['totpSecret' => ['$ne' => null]]);
 
         if (!$user2fa) {
@@ -94,7 +98,9 @@ class AuthenticationTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $userRepository = static::getContainer()->get('doctrine')->getRepository(\App\Entity\User::class);
+        $userRepository = static::getContainer()
+            ->get('doctrine')
+            ->getRepository(\App\Entity\User::class);
         $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {

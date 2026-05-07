@@ -11,8 +11,6 @@ final class ClientNotFoundException extends DomainException
 {
     public static function withId(ClientId $id): self
     {
-        return new self(
-            sprintf('Client with ID "%s" was not found', $id->getValue()),
-        );
+        return new self(sprintf('Client with ID "%s" was not found', $id->getValue()));
     }
 }

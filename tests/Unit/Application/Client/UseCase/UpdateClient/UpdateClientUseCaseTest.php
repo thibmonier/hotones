@@ -29,12 +29,15 @@ final class UpdateClientUseCaseTest extends TestCase
 
         $repo = $this->createMock(ClientRepositoryInterface::class);
         $repo->method('findById')->willReturn($existing);
-        $repo->expects($this->once())
+        $repo
+            ->expects($this->once())
             ->method('save')
             ->with($this->callback(function (Client $client): bool {
-                return $client->getName()->getValue() === 'New Name'
+                return
+                    $client->getName()->getValue() === 'New Name'
                     && $client->getServiceLevel() === ServiceLevel::ENTERPRISE
-                    && $client->getNotes() === 'Updated notes';
+                    && $client->getNotes() === 'Updated notes'
+                ;
             }));
 
         $useCase = new UpdateClientUseCase($repo);
@@ -48,30 +51,20 @@ final class UpdateClientUseCaseTest extends TestCase
 
     public function testServiceLevelMappingPremium(): void
     {
-        $existing = Client::create(
-            ClientId::fromLegacyInt(1),
-            CompanyName::fromString('Acme'),
-        );
+        $existing = Client::create(ClientId::fromLegacyInt(1), CompanyName::fromString('Acme'));
 
         $repo = $this->createMock(ClientRepositoryInterface::class);
         $repo->method('findById')->willReturn($existing);
 
         $useCase = new UpdateClientUseCase($repo);
-        $useCase->execute(new UpdateClientCommand(
-            clientId: 1,
-            name: 'Acme',
-            serviceLevel: 'premium',
-        ));
+        $useCase->execute(new UpdateClientCommand(clientId: 1, name: 'Acme', serviceLevel: 'premium'));
 
         $this->assertSame(ServiceLevel::PREMIUM, $existing->getServiceLevel());
     }
 
     public function testInvalidServiceLevelRejected(): void
     {
-        $existing = Client::create(
-            ClientId::fromLegacyInt(1),
-            CompanyName::fromString('Acme'),
-        );
+        $existing = Client::create(ClientId::fromLegacyInt(1), CompanyName::fromString('Acme'));
 
         $repo = $this->createMock(ClientRepositoryInterface::class);
         $repo->method('findById')->willReturn($existing);
@@ -79,10 +72,6 @@ final class UpdateClientUseCaseTest extends TestCase
         $useCase = new UpdateClientUseCase($repo);
 
         $this->expectException(InvalidArgumentException::class);
-        $useCase->execute(new UpdateClientCommand(
-            clientId: 1,
-            name: 'Acme',
-            serviceLevel: 'invalid-level',
-        ));
+        $useCase->execute(new UpdateClientCommand(clientId: 1, name: 'Acme', serviceLevel: 'invalid-level'));
     }
 }

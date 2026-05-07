@@ -54,11 +54,7 @@ class SecureFileUploadServiceTest extends TestCase
         // Given: a valid JPEG file
         $file = $this->createValidUploadedFile('test.jpg', 'image/jpeg', 1024);
 
-        $this->slugger
-            ->expects($this->once())
-            ->method('slug')
-            ->with('test')
-            ->willReturn(new UnicodeString('test'));
+        $this->slugger->expects($this->once())->method('slug')->with('test')->willReturn(new UnicodeString('test'));
 
         $this->filesystem
             ->expects($this->once())
@@ -229,16 +225,9 @@ class SecureFileUploadServiceTest extends TestCase
     public function testDeleteFileWhenFileExistsReturnsTrue(): void
     {
         // Given: a file that exists
-        $this->filesystem
-            ->expects($this->once())
-            ->method('fileExists')
-            ->with('avatars/test-123.jpg')
-            ->willReturn(true);
+        $this->filesystem->expects($this->once())->method('fileExists')->with('avatars/test-123.jpg')->willReturn(true);
 
-        $this->filesystem
-            ->expects($this->once())
-            ->method('delete')
-            ->with('avatars/test-123.jpg');
+        $this->filesystem->expects($this->once())->method('delete')->with('avatars/test-123.jpg');
 
         // When: delete file
         $result = $this->service->deleteFile('test-123.jpg', 'avatars');

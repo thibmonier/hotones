@@ -89,8 +89,8 @@ final class VacationRequestControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', '/mes-conges/nouvelle-demande');
         self::assertResponseIsSuccessful();
 
-        $tomorrow = (new DateTimeImmutable('+1 day'))->format('Y-m-d');
-        $dayAfter = (new DateTimeImmutable('+2 days'))->format('Y-m-d');
+        $tomorrow = new DateTimeImmutable('+1 day')->format('Y-m-d');
+        $dayAfter = new DateTimeImmutable('+2 days')->format('Y-m-d');
         $form = $crawler->selectButton('Soumettre la demande')->form();
         $form['vacation_request[type]'] = 'conges_payes';
         $form['vacation_request[startDate]'] = $tomorrow;

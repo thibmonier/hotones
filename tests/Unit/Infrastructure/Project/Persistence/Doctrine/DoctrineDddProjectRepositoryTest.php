@@ -29,9 +29,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
         $flat = $this->makeFlatProject(42, 'Project Alpha');
 
         $flatRepo = $this->createMock(FlatProjectRepository::class);
-        $flatRepo->method('find')->willReturnCallback(
-            static fn (mixed $id): ?FlatProject => 42 === $id ? $flat : null,
-        );
+        $flatRepo->method('find')->willReturnCallback(static fn (mixed $id): ?FlatProject => 42 === $id ? $flat : null);
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
         $ddd = $repo->findById(ProjectId::fromLegacyInt(42));
@@ -165,13 +163,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
     {
         $repo = $this->makeRepo();
 
-        $ddd = DddProject::create(
-            ProjectId::generate(),
-            'X',
-            ClientId::fromLegacyInt(1),
-            ProjectType::FORFAIT,
-            true,
-        );
+        $ddd = DddProject::create(ProjectId::generate(), 'X', ClientId::fromLegacyInt(1), ProjectType::FORFAIT, true);
 
         $this->expectException(RuntimeException::class);
         $repo->save($ddd);
@@ -223,13 +215,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
     {
         $repo = $this->makeRepo();
 
-        $ddd = DddProject::create(
-            ProjectId::generate(),
-            'X',
-            ClientId::fromLegacyInt(1),
-            ProjectType::FORFAIT,
-            true,
-        );
+        $ddd = DddProject::create(ProjectId::generate(), 'X', ClientId::fromLegacyInt(1), ProjectType::FORFAIT, true);
 
         $this->expectException(RuntimeException::class);
         $repo->delete($ddd);
@@ -238,7 +224,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
     private function makeFlatProject(int $id, string $name): FlatProject
     {
         $flat = new FlatProject();
-        (new ReflectionProperty(FlatProject::class, 'id'))->setValue($flat, $id);
+        new ReflectionProperty(FlatProject::class, 'id')->setValue($flat, $id);
         $flat->name = $name;
         $flat->status = 'active';
         $flat->isInternal = true;

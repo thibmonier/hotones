@@ -33,7 +33,8 @@ final class ExpenseReportVoter extends AbstractTenantAwareVoter
             $attribute,
             [self::VIEW, self::EDIT, self::SUBMIT, self::APPROVE, self::REJECT, self::DELETE],
             true,
-        ) && $subject instanceof ExpenseReport;
+        )
+        && $subject instanceof ExpenseReport;
     }
 
     protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool
@@ -65,13 +66,7 @@ final class ExpenseReportVoter extends AbstractTenantAwareVoter
             return true;
         }
 
-        return $this->userHasAnyRole(
-            $user,
-            'ROLE_MANAGER',
-            'ROLE_COMPTA',
-            'ROLE_ADMIN',
-            'ROLE_SUPERADMIN',
-        );
+        return $this->userHasAnyRole($user, 'ROLE_MANAGER', 'ROLE_COMPTA', 'ROLE_ADMIN', 'ROLE_SUPERADMIN');
     }
 
     private function canEdit(ExpenseReport $report, User $user): bool

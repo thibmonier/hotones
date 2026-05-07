@@ -24,8 +24,11 @@ use Symfony\Component\HttpFoundation\Response;
 #[AllowMockObjectsWithoutExpectations]
 final class TimesheetExportServiceTest extends TestCase
 {
-    private function createContributor(string $firstName = 'Jean', string $lastName = 'Dupont', float $hoursPerDay = 7.0): Contributor
-    {
+    private function createContributor(
+        string $firstName = 'Jean',
+        string $lastName = 'Dupont',
+        float $hoursPerDay = 7.0,
+    ): Contributor {
         $contributor = $this->createStub(Contributor::class);
         $contributor->method('getFirstName')->willReturn($firstName);
         $contributor->method('getLastName')->willReturn($lastName);
@@ -154,7 +157,8 @@ final class TimesheetExportServiceTest extends TestCase
         $expectedResponse = new Response('pdf-bytes', 200, ['Content-Type' => 'application/pdf']);
 
         $pdf = $this->createMock(PdfGeneratorService::class);
-        $pdf->expects($this->once())
+        $pdf
+            ->expects($this->once())
             ->method('createPdfResponse')
             ->with(
                 $this->equalTo('timesheet/export_pdf.html.twig'),
@@ -194,20 +198,12 @@ final class TimesheetExportServiceTest extends TestCase
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repo);
-        $em->expects($this->once())
-            ->method('getReference')
-            ->with(Project::class, 7)
-            ->willReturn($projectRef);
+        $em->expects($this->once())->method('getReference')->with(Project::class, 7)->willReturn($projectRef);
 
         $pdf = $this->createMock(PdfGeneratorService::class);
         $pdf->method('createPdfResponse')->willReturn(new Response('', 200));
 
         $service = new TimesheetExportService($em, $pdf);
-        $service->exportToPdf(
-            $this->createContributor(),
-            new DateTime('2026-05-01'),
-            new DateTime('2026-05-31'),
-            7,
-        );
+        $service->exportToPdf($this->createContributor(), new DateTime('2026-05-01'), new DateTime('2026-05-31'), 7);
     }
 }

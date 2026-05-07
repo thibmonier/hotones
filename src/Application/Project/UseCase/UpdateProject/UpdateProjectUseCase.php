@@ -26,11 +26,7 @@ final readonly class UpdateProjectUseCase
         $id = ProjectId::fromLegacyInt($command->projectId);
         $project = $this->repository->findById($id);
 
-        $project->updateDetails(
-            $command->name,
-            $command->description,
-            $command->reference,
-        );
+        $project->updateDetails($command->name, $command->description, $command->reference);
 
         if ($command->status !== null) {
             $project->changeStatus($this->parseStatus($command->status));

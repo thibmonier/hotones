@@ -27,8 +27,13 @@ class ProjectRepositoryFilterTest extends KernelTestCase
         $this->repository = static::getContainer()->get(ProjectRepository::class);
     }
 
-    private function createProject(string $name, string $status = 'active', string $type = 'forfait', ?DateTime $start = null, ?DateTime $end = null): Project
-    {
+    private function createProject(
+        string $name,
+        string $status = 'active',
+        string $type = 'forfait',
+        ?DateTime $start = null,
+        ?DateTime $end = null,
+    ): Project {
         $project = new Project();
         $project->setName($name);
         $project->setCompany($this->getTestCompany());
@@ -47,12 +52,15 @@ class ProjectRepositoryFilterTest extends KernelTestCase
     public function testFindBetweenDatesFilteredReturnsProjectsInDateRange(): void
     {
         $this->createProject('In Range', 'active', 'forfait', new DateTime('2026-02-01'), new DateTime('2026-04-01'));
-        $this->createProject('Out of Range', 'active', 'forfait', new DateTime('2025-01-01'), new DateTime('2025-03-01'));
-
-        $results = $this->repository->findBetweenDatesFiltered(
-            new DateTime('2026-01-01'),
-            new DateTime('2026-12-31'),
+        $this->createProject(
+            'Out of Range',
+            'active',
+            'forfait',
+            new DateTime('2025-01-01'),
+            new DateTime('2025-03-01'),
         );
+
+        $results = $this->repository->findBetweenDatesFiltered(new DateTime('2026-01-01'), new DateTime('2026-12-31'));
 
         $names = array_map(fn (Project $p) => $p->getName(), $results);
         $this->assertContains('In Range', $names);
@@ -208,10 +216,7 @@ class ProjectRepositoryFilterTest extends KernelTestCase
         $em->persist($otherProject);
         $em->flush();
 
-        $results = $this->repository->findBetweenDatesFiltered(
-            new DateTime('2026-01-01'),
-            new DateTime('2026-12-31'),
-        );
+        $results = $this->repository->findBetweenDatesFiltered(new DateTime('2026-01-01'), new DateTime('2026-12-31'));
 
         $names = array_map(fn (Project $p) => $p->getName(), $results);
         $this->assertContains('My Company Project', $names);

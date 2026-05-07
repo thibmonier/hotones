@@ -31,9 +31,6 @@ final readonly class GetContributorVacationsHandler
 
         $vacations = $this->vacationRepository->findByContributor($contributor);
 
-        return array_map(
-            static fn ($vacation) => VacationDTO::fromEntity($vacation),
-            $vacations,
-        );
+        return array_map(static fn ($vacation) => VacationDTO::fromEntity($vacation), $vacations);
     }
 }

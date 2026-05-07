@@ -65,7 +65,11 @@ final class GetContributorVacationsHandlerTest extends TestCase
             $this->buildVacation('Adrien Test', VacationType::PAID_LEAVE),
             $this->buildVacation('Adrien Test', VacationType::TRAINING),
         ];
-        $this->vacationRepo->expects(self::once())->method('findByContributor')->with($contributor)->willReturn($vacations);
+        $this->vacationRepo
+            ->expects(self::once())
+            ->method('findByContributor')
+            ->with($contributor)
+            ->willReturn($vacations);
 
         $result = ($this->handler)(new GetContributorVacationsQuery(42));
 

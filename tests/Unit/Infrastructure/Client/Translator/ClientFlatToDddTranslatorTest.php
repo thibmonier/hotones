@@ -16,7 +16,7 @@ final class ClientFlatToDddTranslatorTest extends TestCase
     private function makeFlatClient(int $id, string $name, ?string $level = 'standard'): FlatClient
     {
         $flat = new FlatClient();
-        (new ReflectionProperty(FlatClient::class, 'id'))->setValue($flat, $id);
+        new ReflectionProperty(FlatClient::class, 'id')->setValue($flat, $id);
         $flat->name = $name;
         $flat->serviceLevel = $level;
         $flat->description = null;

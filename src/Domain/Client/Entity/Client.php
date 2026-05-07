@@ -32,11 +32,8 @@ final class Client implements AggregateRootInterface
     private DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
-    private function __construct(
-        ClientId $id,
-        CompanyName $name,
-        ServiceLevel $serviceLevel,
-    ) {
+    private function __construct(ClientId $id, CompanyName $name, ServiceLevel $serviceLevel)
+    {
         $this->id = $id;
         $this->name = $name;
         $this->serviceLevel = $serviceLevel;
@@ -60,9 +57,7 @@ final class Client implements AggregateRootInterface
     ): self {
         $client = new self($id, $name, $serviceLevel);
 
-        $client->recordEvent(
-            ClientCreatedEvent::create($id, $name->getValue()),
-        );
+        $client->recordEvent(ClientCreatedEvent::create($id, $name->getValue()));
 
         return $client;
     }

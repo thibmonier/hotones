@@ -42,13 +42,7 @@ final readonly class CreateProjectUseCase
 
         // Build aggregate (placeholder id, replaced after persist)
         $tempId = ProjectId::fromLegacyInt(PHP_INT_MAX);
-        $ddd = Project::create(
-            $tempId,
-            $command->name,
-            $clientId,
-            $projectType,
-            $command->isInternal,
-        );
+        $ddd = Project::create($tempId, $command->name, $clientId, $projectType, $command->isInternal);
         if ($command->description !== null) {
             $ddd->updateDetails($command->name, $command->description, null);
         }
@@ -65,7 +59,9 @@ final readonly class CreateProjectUseCase
         $this->entityManager->persist($flat);
         $this->entityManager->flush();
 
-        $persistedId = ProjectId::fromLegacyInt($flat->id ?? throw new InvalidArgumentException('Persisted Project has null id'));
+        $persistedId = ProjectId::fromLegacyInt(
+            $flat->id ?? throw new InvalidArgumentException('Persisted Project has null id'),
+        );
 
         foreach ($ddd->pullDomainEvents() as $event) {
             try {

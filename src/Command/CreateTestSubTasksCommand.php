@@ -171,8 +171,10 @@ class CreateTestSubTasksCommand extends Command
             // Si possible, choisir une sous-tâche assignée au même contributeur
             $matching = array_values(array_filter(
                 $subTasks,
-                fn (ProjectSubTask $st): bool => $st->getAssignee()
-                    && $st->getAssignee()->getId() === $ts->getContributor()->getId(),
+                fn (ProjectSubTask $st): bool =>
+                    $st->getAssignee()
+                    && $st->getAssignee()->getId() === $ts->getContributor()->getId()
+                ,
             ));
             $chosen = $matching ? $matching[array_rand($matching)] : $subTasks[array_rand($subTasks)];
             $ts->setSubTask($chosen);

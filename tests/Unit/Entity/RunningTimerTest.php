@@ -41,8 +41,7 @@ final class RunningTimerTest extends TestCase
     #[Test]
     public function isActiveIsTrueWhenStoppedAtIsNull(): void
     {
-        $timer = (new RunningTimer())
-            ->setStartedAt(new DateTime('2026-04-30 10:00:00'));
+        $timer = new RunningTimer()->setStartedAt(new DateTime('2026-04-30 10:00:00'));
 
         self::assertTrue($timer->isActive());
     }
@@ -50,7 +49,7 @@ final class RunningTimerTest extends TestCase
     #[Test]
     public function isActiveBecomesFalseOnceStoppedAtIsSet(): void
     {
-        $timer = (new RunningTimer())
+        $timer = new RunningTimer()
             ->setStartedAt(new DateTime('2026-04-30 10:00:00'))
             ->setStoppedAt(new DateTime('2026-04-30 11:30:00'));
 
@@ -89,7 +88,7 @@ final class RunningTimerTest extends TestCase
         $startedAt = new DateTimeImmutable('2026-04-30 09:15:00');
         $stoppedAt = new DateTimeImmutable('2026-04-30 12:00:00');
 
-        $timer = (new RunningTimer())
+        $timer = new RunningTimer()
             ->setCompany($company)
             ->setContributor($contributor)
             ->setProject($project)
@@ -110,7 +109,7 @@ final class RunningTimerTest extends TestCase
     #[Test]
     public function taskAndSubTaskAreOptional(): void
     {
-        $timer = (new RunningTimer())
+        $timer = new RunningTimer()
             ->setStartedAt(new DateTime('2026-04-30 10:00:00'))
             ->setTask(null)
             ->setSubTask(null);
@@ -123,7 +122,7 @@ final class RunningTimerTest extends TestCase
     public function stoppingARunningTimerPreservesStartedAt(): void
     {
         $startedAt = new DateTime('2026-04-30 10:00:00');
-        $timer = (new RunningTimer())->setStartedAt($startedAt);
+        $timer = new RunningTimer()->setStartedAt($startedAt);
 
         $timer->setStoppedAt(new DateTime('2026-04-30 11:00:00'));
 

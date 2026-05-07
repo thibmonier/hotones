@@ -40,7 +40,8 @@ class DoctrineVacationRepository extends ServiceEntityRepository implements Vaca
 
     public function findByIdOrNull(VacationId $id): ?Vacation
     {
-        return $this->createCompanyQueryBuilder('v')
+        return $this
+            ->createCompanyQueryBuilder('v')
             ->andWhere('v.id = :id')
             ->setParameter('id', $id->getValue())
             ->getQuery()
@@ -52,7 +53,8 @@ class DoctrineVacationRepository extends ServiceEntityRepository implements Vaca
      */
     public function findByContributor(Contributor $contributor): array
     {
-        return $this->createCompanyQueryBuilder('v')
+        return $this
+            ->createCompanyQueryBuilder('v')
             ->andWhere('v.contributor = :contributor')
             ->setParameter('contributor', $contributor)
             ->orderBy('v.createdAt', 'DESC')
@@ -71,7 +73,8 @@ class DoctrineVacationRepository extends ServiceEntityRepository implements Vaca
             return [];
         }
 
-        return $this->createCompanyQueryBuilder('v')
+        return $this
+            ->createCompanyQueryBuilder('v')
             ->leftJoin('v.contributor', 'c')
             ->addSelect('c')
             ->andWhere('v.contributor IN (:contributors)')
@@ -85,7 +88,8 @@ class DoctrineVacationRepository extends ServiceEntityRepository implements Vaca
 
     public function countApprovedDaysBetween(DateTimeInterface $startDate, DateTimeInterface $endDate): float
     {
-        $vacations = $this->createCompanyQueryBuilder('v')
+        $vacations = $this
+            ->createCompanyQueryBuilder('v')
             ->andWhere('v.status = :approved')
             ->andWhere('v.dateRange.startDate <= :endDate')
             ->andWhere('v.dateRange.endDate >= :startDate')
@@ -119,7 +123,8 @@ class DoctrineVacationRepository extends ServiceEntityRepository implements Vaca
     {
         $company = $this->companyContext->getCurrentCompany();
 
-        return $this->createQueryBuilder($alias)
+        return $this
+            ->createQueryBuilder($alias)
             ->andWhere("{$alias}.company = :company")
             ->setParameter('company', $company);
     }

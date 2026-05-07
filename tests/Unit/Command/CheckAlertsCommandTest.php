@@ -37,10 +37,7 @@ class CheckAlertsCommandTest extends TestCase
             'payment_alerts' => 0,
         ];
 
-        $this->alertDetectionService
-            ->expects($this->once())
-            ->method('checkAllAlerts')
-            ->willReturn($stats);
+        $this->alertDetectionService->expects($this->once())->method('checkAllAlerts')->willReturn($stats);
 
         $exitCode = $this->commandTester->execute([]);
 

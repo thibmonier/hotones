@@ -31,49 +31,33 @@ final class UpdateProjectUseCaseTest extends TestCase
 
         $repo = $this->createMock(ProjectRepositoryInterface::class);
         $repo->method('findById')->willReturn($existing);
-        $repo->expects($this->once())
+        $repo
+            ->expects($this->once())
             ->method('save')
-            ->with($this->callback(fn (Project $p): bool => $p->getName() === 'New Name'
-                && $p->getDescription() === 'New description'));
+            ->with($this->callback(
+                fn (Project $p): bool => $p->getName() === 'New Name' && $p->getDescription() === 'New description',
+            ));
 
         $useCase = new UpdateProjectUseCase($repo);
-        $useCase->execute(new UpdateProjectCommand(
-            projectId: 42,
-            name: 'New Name',
-            description: 'New description',
-        ));
+        $useCase->execute(new UpdateProjectCommand(projectId: 42, name: 'New Name', description: 'New description'));
     }
 
     public function testStatusTransition(): void
     {
-        $existing = Project::create(
-            ProjectId::fromLegacyInt(1),
-            'X',
-            ClientId::fromLegacyInt(1),
-            ProjectType::FORFAIT,
-        );
+        $existing = Project::create(ProjectId::fromLegacyInt(1), 'X', ClientId::fromLegacyInt(1), ProjectType::FORFAIT);
 
         $repo = $this->createMock(ProjectRepositoryInterface::class);
         $repo->method('findById')->willReturn($existing);
 
         $useCase = new UpdateProjectUseCase($repo);
-        $useCase->execute(new UpdateProjectCommand(
-            projectId: 1,
-            name: 'X',
-            status: 'active',
-        ));
+        $useCase->execute(new UpdateProjectCommand(projectId: 1, name: 'X', status: 'active'));
 
         $this->assertSame(ProjectStatus::ACTIVE, $existing->getStatus());
     }
 
     public function testInvalidStatusRejected(): void
     {
-        $existing = Project::create(
-            ProjectId::fromLegacyInt(1),
-            'X',
-            ClientId::fromLegacyInt(1),
-            ProjectType::FORFAIT,
-        );
+        $existing = Project::create(ProjectId::fromLegacyInt(1), 'X', ClientId::fromLegacyInt(1), ProjectType::FORFAIT);
 
         $repo = $this->createMock(ProjectRepositoryInterface::class);
         $repo->method('findById')->willReturn($existing);
@@ -81,10 +65,6 @@ final class UpdateProjectUseCaseTest extends TestCase
         $useCase = new UpdateProjectUseCase($repo);
 
         $this->expectException(InvalidArgumentException::class);
-        $useCase->execute(new UpdateProjectCommand(
-            projectId: 1,
-            name: 'X',
-            status: 'unknown-status',
-        ));
+        $useCase->execute(new UpdateProjectCommand(projectId: 1, name: 'X', status: 'unknown-status'));
     }
 }

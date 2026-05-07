@@ -95,11 +95,7 @@ abstract class AbstractTenantAwareVoter extends Voter
      * Subclass-specific role + ownership check. Tenant has already been
      * verified at this point.
      */
-    abstract protected function voteOnRoleAndOwnership(
-        string $attribute,
-        mixed $subject,
-        User $user,
-    ): bool;
+    abstract protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool;
 
     protected function userHasAnyRole(User $user, string ...$roles): bool
     {

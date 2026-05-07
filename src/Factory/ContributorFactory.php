@@ -60,7 +60,7 @@ final class ContributorFactory extends PersistentObjectFactory
             // Multi-tenant alignment : si user fourni, hériter de sa company
             // (priorité sur le default qui peut créer une nouvelle company isolée).
             $user = $contributor->getUser();
-            if ($user !== null && $user->getCompany() !== null) {
+            if ($user !== null) {
                 $contributor->setCompany($user->getCompany());
             }
 

@@ -26,7 +26,7 @@ final class InvoiceVoter extends AbstractTenantAwareVoter
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [self::VIEW, self::EDIT, self::CANCEL, self::DELETE], true)
-            && $subject instanceof Invoice;
+        && $subject instanceof Invoice;
     }
 
     protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool
@@ -56,13 +56,7 @@ final class InvoiceVoter extends AbstractTenantAwareVoter
             return $this->userHasAnyRole($user, 'ROLE_SUPERADMIN');
         }
 
-        return $this->userHasAnyRole(
-            $user,
-            'ROLE_ADMIN',
-            'ROLE_MANAGER',
-            'ROLE_COMPTA',
-            'ROLE_SUPERADMIN',
-        );
+        return $this->userHasAnyRole($user, 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COMPTA', 'ROLE_SUPERADMIN');
     }
 
     private function canCancel(Invoice $invoice, User $user): bool
@@ -71,11 +65,7 @@ final class InvoiceVoter extends AbstractTenantAwareVoter
             return false;
         }
 
-        return in_array(
-            $invoice->getStatus(),
-            [Invoice::STATUS_SENT, Invoice::STATUS_OVERDUE],
-            true,
-        );
+        return in_array($invoice->getStatus(), [Invoice::STATUS_SENT, Invoice::STATUS_OVERDUE], true);
     }
 
     private function canDelete(Invoice $invoice, User $user): bool

@@ -99,25 +99,19 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function clearExistingData(int $year): void
     {
         // Supprimer les métriques existantes
-        $this->entityManager
-            ->createQuery('
+        $this->entityManager->createQuery('
             DELETE FROM App\Entity\Analytics\FactProjectMetrics f 
             WHERE f.dimTime IN (
                 SELECT t.id FROM App\Entity\Analytics\DimTime t 
                 WHERE t.year = :year
             )
-        ')
-            ->setParameter('year', $year)
-            ->execute();
+        ')->setParameter('year', $year)->execute();
 
         // Supprimer les dimensions temporelles
-        $this->entityManager
-            ->createQuery('
+        $this->entityManager->createQuery('
             DELETE FROM App\Entity\Analytics\DimTime t 
             WHERE t.year = :year
-        ')
-            ->setParameter('year', $year)
-            ->execute();
+        ')->setParameter('year', $year)->execute();
     }
 
     private function createTimeDimensions(int $year): array

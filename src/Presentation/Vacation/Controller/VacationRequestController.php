@@ -85,7 +85,10 @@ class VacationRequestController extends AbstractController
 
                 ($this->requestVacationHandler)($command);
 
-                $this->addFlash('success', 'Votre demande de conge a ete enregistree avec succes. Elle est en attente de validation.');
+                $this->addFlash(
+                    'success',
+                    'Votre demande de conge a ete enregistree avec succes. Elle est en attente de validation.',
+                );
 
                 return $this->redirectToRoute('vacation_request_index');
             } catch (InvalidArgumentException $e) {

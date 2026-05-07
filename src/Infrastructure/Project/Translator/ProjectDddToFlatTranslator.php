@@ -40,9 +40,7 @@ final class ProjectDddToFlatTranslator
     private function mapStatus(ProjectStatus $status): string
     {
         return match ($status) {
-            ProjectStatus::DRAFT,
-            ProjectStatus::ACTIVE,
-            ProjectStatus::ON_HOLD => 'active',
+            ProjectStatus::DRAFT, ProjectStatus::ACTIVE, ProjectStatus::ON_HOLD => 'active',
             ProjectStatus::COMPLETED => 'completed',
             ProjectStatus::CANCELLED => 'cancelled',
         };

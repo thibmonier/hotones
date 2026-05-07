@@ -19,13 +19,11 @@ final class InvalidInvoiceException extends DomainException
 
     public static function invalidStatusTransition(InvoiceStatus $from, InvoiceStatus $to): self
     {
-        return new self(
-            sprintf(
-                'Cannot transition invoice status from "%s" to "%s".',
-                $from->getLabel(),
-                $to->getLabel(),
-            ),
-        );
+        return new self(sprintf(
+            'Cannot transition invoice status from "%s" to "%s".',
+            $from->getLabel(),
+            $to->getLabel(),
+        ));
     }
 
     public static function cannotModifyFinalizedInvoice(): self

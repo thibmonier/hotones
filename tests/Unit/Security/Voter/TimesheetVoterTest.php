@@ -23,7 +23,7 @@ final class TimesheetVoterTest extends TestCase
     private function makeCompany(int $id = 1): Company
     {
         $company = new Company();
-        (new ReflectionProperty(Company::class, 'id'))->setValue($company, $id);
+        new ReflectionProperty(Company::class, 'id')->setValue($company, $id);
 
         return $company;
     }
@@ -33,7 +33,7 @@ final class TimesheetVoterTest extends TestCase
         $user = new User();
         $user->setCompany($company);
         $user->setRoles($roles);
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }
@@ -51,8 +51,8 @@ final class TimesheetVoterTest extends TestCase
         // Real Timesheet instance with reflection-injected fields. Avoids
         // createPartialMock + the associated PHPUnit notice (TEST-MOCKS-004).
         $timesheet = new Timesheet();
-        (new ReflectionProperty(Timesheet::class, 'company'))->setValue($timesheet, $company);
-        (new ReflectionProperty(Timesheet::class, 'contributor'))->setValue($timesheet, $contributor);
+        new ReflectionProperty(Timesheet::class, 'company')->setValue($timesheet, $company);
+        new ReflectionProperty(Timesheet::class, 'contributor')->setValue($timesheet, $contributor);
 
         return $timesheet;
     }

@@ -19,11 +19,8 @@ final readonly class OrderStatusChangedEvent implements DomainEventInterface
     ) {
     }
 
-    public static function create(
-        OrderId $orderId,
-        OrderStatus $previousStatus,
-        OrderStatus $newStatus,
-    ): self {
+    public static function create(OrderId $orderId, OrderStatus $previousStatus, OrderStatus $newStatus): self
+    {
         return new self($orderId, $previousStatus, $newStatus, new DateTimeImmutable());
     }
 

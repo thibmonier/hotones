@@ -23,8 +23,7 @@ final class ClientVoter extends AbstractTenantAwareVoter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT, self::DELETE], true)
-            && $subject instanceof Client;
+        return in_array($attribute, [self::VIEW, self::EDIT, self::DELETE], true) && $subject instanceof Client;
     }
 
     protected function voteOnRoleAndOwnership(string $attribute, mixed $subject, User $user): bool

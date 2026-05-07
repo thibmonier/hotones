@@ -39,11 +39,7 @@ class ProviderRepository extends CompanyAwareRepository
     #[Override]
     public function findAll(): array
     {
-        return $this
-            ->createCompanyQueryBuilder('p')
-            ->orderBy('p.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $this->createCompanyQueryBuilder('p')->orderBy('p.name', 'ASC')->getQuery()->getResult();
     }
 
     /**

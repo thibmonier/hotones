@@ -31,22 +31,30 @@ enum OrderStatus: string
 
     public function isActive(): bool
     {
-        return in_array($this, [
-            self::DRAFT,
-            self::TO_SIGN,
-            self::WON,
-            self::SIGNED,
-            self::STANDBY,
-        ], true);
+        return in_array(
+            $this,
+            [
+                self::DRAFT,
+                self::TO_SIGN,
+                self::WON,
+                self::SIGNED,
+                self::STANDBY,
+            ],
+            true,
+        );
     }
 
     public function isClosed(): bool
     {
-        return in_array($this, [
-            self::LOST,
-            self::COMPLETED,
-            self::ABANDONED,
-        ], true);
+        return in_array(
+            $this,
+            [
+                self::LOST,
+                self::COMPLETED,
+                self::ABANDONED,
+            ],
+            true,
+        );
     }
 
     public function canTransitionTo(self $newStatus): bool

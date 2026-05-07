@@ -21,7 +21,11 @@ final class NotificationTypeTest extends TestCase
     #[Test]
     public function exposesExactly11NotificationTypes(): void
     {
-        self::assertCount(11, NotificationType::cases(), 'NotificationType enum must expose 11 cases — update tests if a case is added/removed.');
+        self::assertCount(
+            11,
+            NotificationType::cases(),
+            'NotificationType enum must expose 11 cases — update tests if a case is added/removed.',
+        );
     }
 
     /**
@@ -34,12 +38,21 @@ final class NotificationTypeTest extends TestCase
         yield 'quote_lost' => [NotificationType::QUOTE_LOST, 'quote_lost'];
         yield 'project_budget_alert' => [NotificationType::PROJECT_BUDGET_ALERT, 'project_budget_alert'];
         yield 'low_margin_alert' => [NotificationType::LOW_MARGIN_ALERT, 'low_margin_alert'];
-        yield 'contributor_overload_alert' => [NotificationType::CONTRIBUTOR_OVERLOAD_ALERT, 'contributor_overload_alert'];
-        yield 'timesheet_pending_validation' => [NotificationType::TIMESHEET_PENDING_VALIDATION, 'timesheet_pending_validation'];
+        yield 'contributor_overload_alert' => [
+            NotificationType::CONTRIBUTOR_OVERLOAD_ALERT,
+            'contributor_overload_alert',
+        ];
+        yield 'timesheet_pending_validation' => [
+            NotificationType::TIMESHEET_PENDING_VALIDATION,
+            'timesheet_pending_validation',
+        ];
         yield 'payment_due_alert' => [NotificationType::PAYMENT_DUE_ALERT, 'payment_due_alert'];
         yield 'kpi_threshold_exceeded' => [NotificationType::KPI_THRESHOLD_EXCEEDED, 'kpi_threshold_exceeded'];
         yield 'timesheet_missing_weekly' => [NotificationType::TIMESHEET_MISSING_WEEKLY, 'timesheet_missing_weekly'];
-        yield 'vacation_cancelled_by_manager' => [NotificationType::VACATION_CANCELLED_BY_MANAGER, 'vacation_cancelled_by_manager'];
+        yield 'vacation_cancelled_by_manager' => [
+            NotificationType::VACATION_CANCELLED_BY_MANAGER,
+            'vacation_cancelled_by_manager',
+        ];
     }
 
     #[Test]
@@ -75,7 +88,11 @@ final class NotificationTypeTest extends TestCase
         $allowedColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
 
         foreach (NotificationType::cases() as $case) {
-            self::assertContains($case->getColor(), $allowedColors, sprintf('Unexpected color "%s" for %s', $case->getColor(), $case->name));
+            self::assertContains(
+                $case->getColor(),
+                $allowedColors,
+                sprintf('Unexpected color "%s" for %s', $case->getColor(), $case->name),
+            );
         }
     }
 

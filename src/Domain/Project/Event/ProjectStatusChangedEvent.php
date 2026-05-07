@@ -19,11 +19,8 @@ final readonly class ProjectStatusChangedEvent implements DomainEventInterface
     ) {
     }
 
-    public static function create(
-        ProjectId $projectId,
-        ProjectStatus $previousStatus,
-        ProjectStatus $newStatus,
-    ): self {
+    public static function create(ProjectId $projectId, ProjectStatus $previousStatus, ProjectStatus $newStatus): self
+    {
         return new self($projectId, $previousStatus, $newStatus, new DateTimeImmutable());
     }
 
