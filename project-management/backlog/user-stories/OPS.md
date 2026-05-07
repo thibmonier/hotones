@@ -415,3 +415,157 @@ Then cause root identifiée et fixée
 - [ ] T-090-03 [OPS] Fix (config Render + Dockerfile / buildpack si nécessaire) (2 h)
 - [ ] T-090-04 [TEST] Smoke test post-deploy (curl /health + login) (0,5 h)
 - [ ] T-090-05 [DOC] Runbook déploiement Render (`docs/05-deployment/render.md`) (1 h)
+
+---
+
+## EPIC-002 — Observabilité & Performance (US-091..US-095)
+
+> Source : atelier PO sprint-016 J1 (2026-05-07). Cf ADR-0012 stack
+> observabilité (Sentry free tier — option C différer upgrade).
+
+## US-091 — Sentry free tier configuré prod (sampling 5 %)
+
+- **Implements** : EPIC-002 — **Persona** : équipe dev / PO — **Estimate** : 5 pts — **MoSCoW** : Must
+
+### Card
+**As** équipe dev
+**I want** Sentry instrumentation prod (errors + traces) avec sampling agressif
+**So that** détection précoce des bugs sans dépasser quota free tier.
+
+### Acceptance Criteria
+```
+Given push main mergé
+When Render deploy complète
+Then SENTRY_DSN injecté → errors + traces remontent dashboard Sentry
+And traces_sample_rate = 0.05 (5 % transactions)
+And profiles_sample_rate = 0.10 (10 % des transactions échantillonnées profilées)
+And send_default_pii = false (RGPD)
+```
+```
+Given Sentry quota transactions à 80 %
+When alerte Sentry déclenche
+Then mail PO + considération upgrade Team plan ($25/mois)
+```
+
+### Technical Notes
+- `sentry/sentry-symfony ^5.8.3` déjà installé sprint-002
+- `config/packages/sentry.yaml` : ajout sampling rates + send_default_pii
+- `render.yaml` + `render.staging.yaml` : SENTRY_DSN env var sync false
+- DSN dans Render dashboard manual
+
+### Tasks
+- [x] T-091-01 [OPS] sentry.yaml sampling + RGPD config (0,5 h) ✅ PR US-091/US-092
+- [x] T-091-02 [OPS] render.yaml + staging SENTRY_DSN env var (0,5 h) ✅
+- [x] T-091-03 [DOC] ADR-0012 décision stack + sampling strategy (1 h) ✅
+- [ ] T-091-04 [OPS] DSN configuré dans Render dashboard prod + staging (0,5 h)
+- [ ] T-091-05 [TEST] Verification post-deploy : provoquer erreur + vérifier dashboard Sentry (1 h)
+
+---
+
+## US-092 — Smoke test post-deploy GH Action
+
+- **Implements** : EPIC-002 — **Persona** : équipe dev — **Estimate** : 3 pts — **MoSCoW** : Must
+
+### Card
+**As** équipe dev
+**I want** smoke test automatique homepage + /health après chaque merge main
+**So that** détection immédiate des régressions production (cf bug US-090 vécu 4 mois).
+
+### Acceptance Criteria
+```
+Given push main mergé
+When Render deploy complète (~5-10 min)
+Then GH Action `post-deploy-smoke.yml` exécute :
+  - GET / → 200 + body contient "HotOnes"
+  - GET /health → 200 + Content-Type: application/json (pas octet-stream)
+  - body NE CONTIENT PAS '<?php' (régression US-090)
+And workflow échoue si dépassement 5 min wait
+```
+
+### Technical Notes
+- Workflow `.github/workflows/post-deploy-smoke.yml`
+- Trigger : push main + workflow_dispatch
+- PROD_URL = `https://hotones.onrender.com` (statique, pas secret)
+- MAX_WAIT_SECONDS = 300 (5 min) pour cold start free tier (mais starter activé donc cold start nul)
+
+### Tasks
+- [x] T-092-01 [OPS] Workflow post-deploy-smoke.yml (1,5 h) ✅
+- [x] T-092-02 [OPS] Wait /health 200 + smoke / + smoke /health (1,5 h) ✅
+- [ ] T-092-03 [OPS] (sprint-017) Slack webhook si fail
+- [x] T-092-04 [DOC] runbook update : section smoke test post-deploy (0,5 h) ✅
+
+---
+
+## US-093 — Dashboard 7 KPIs business
+
+- **Implements** : EPIC-002 — **Persona** : PO — **Estimate** : 5 pts — **MoSCoW** : Should — **Sprint** : 017
+
+### Card
+**As** PO
+**I want** dashboard prod avec 7 KPIs business pilotables
+**So that** je peux mesurer la traction commerciale + la rentabilité.
+
+### Acceptance Criteria
+```
+Given accès admin
+When je vais sur /admin/business-dashboard
+Then j'observe en temps réel :
+  - DAU (Daily Active Users) + MAU
+  - Projets créés / jour (sur 30j)
+  - Devis signés / mois
+  - Factures émises (count + montant total) / mois
+  - Taux conversion devis → projet (%)
+  - Revenu trail 30 jours
+  - Marge moyenne par projet (€)
+```
+
+### Technical Notes
+- Route `/admin/business-dashboard` protégée ROLE_ADMIN
+- Twig template + Stimulus controller (refresh auto 5 min)
+- Queries Doctrine optimisées (cache Redis 5 min)
+- Pas d'export CSV initial (sprint-018)
+
+### Tasks (à scoper sprint-017)
+- [ ] T-093-01 [BE] DashboardKpiService avec 7 méthodes (4 h)
+- [ ] T-093-02 [BE] Controller `/admin/business-dashboard` + cache (1 h)
+- [ ] T-093-03 [FE-WEB] Twig template + Stimulus auto-refresh (2 h)
+- [ ] T-093-04 [TEST] Tests Unit Service KPI (1,5 h)
+
+---
+
+## US-094 — Alerting Sentry → Slack
+
+- **Implements** : EPIC-002 — **Persona** : équipe dev — **Estimate** : 3 pts — **MoSCoW** : Should — **Sprint** : 017
+
+### Card
+**As** équipe dev
+**I want** alertes Sentry routées vers canal Slack `#alerts-prod`
+**So that** détection < 5 min des erreurs critiques + quota Sentry approche limite.
+
+### Acceptance Criteria
+```
+Given errors 500 prod > 10/heure OU quota Sentry > 80 %
+When Sentry alert rule déclenche
+Then message Slack `#alerts-prod` avec lien vers issue
+```
+
+### Tasks (sprint-017)
+- [ ] T-094-01 [OPS] Slack workspace incoming webhook créé
+- [ ] T-094-02 [OPS] Sentry alert rules (errors / quota / slow transactions)
+- [ ] T-094-03 [DOC] Runbook on-call (escalation + ack)
+
+---
+
+## US-095 — Logging structuré JSON + Sentry Logs
+
+- **Implements** : EPIC-002 — **Persona** : équipe dev — **Estimate** : 3 pts — **MoSCoW** : Could — **Sprint** : 018
+
+### Card
+**As** équipe dev
+**I want** logs Symfony en JSON structuré ingérés par Sentry Logs (free tier)
+**So that** correlation logs ↔ traces ↔ errors unifiée dans Sentry.
+
+### Tasks (sprint-018)
+- [ ] T-095-01 [OPS] Monolog handler JSON formatter + sentry_logs handler
+- [ ] T-095-02 [BE] ContextProcessor : tenant_id + user_id sur tous logs
+- [ ] T-095-03 [TEST] Tests Integration log → Sentry capture

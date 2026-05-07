@@ -1,0 +1,114 @@
+name: Post-Deploy Smoke Test
+
+# US-092 (sprint-016 EPIC-002) — Smoke test minimum sur prod après merge main.
+# Scope option PO atelier : homepage + /health (~30s execution).
+#
+# Trigger :
+#   - push sur main (déclenché à chaque merge)
+#   - workflow_dispatch (manuel)
+#
+# Sécurité : aucun input untrusted utilisé en run:. PROD_URL est statique,
+# secrets pris via secrets.* (pas de github.event.* expansé inline).
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: post-deploy-smoke-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Smoke Test Prod (homepage + /health)
+    runs-on: ubuntu-latest
+
+    env:
+      PROD_URL: https://hotones.onrender.com
+      MAX_WAIT_SECONDS: 300  # 5 min max pour réveiller free tier (cold start)
+
+    steps:
+      - name: Wait for Render deploy completion
+        # Render auto-deploy met ~5-10 min après merge main. On attend que
+        # /health réponde 200 avant de lancer les assertions business.
+        run: |
+          set -euo pipefail
+          echo "Waiting for /health to return 200..."
+
+          start_ts=$(date +%s)
+          while true; do
+            now_ts=$(date +%s)
+            elapsed=$((now_ts - start_ts))
+            if [ "$elapsed" -gt "$MAX_WAIT_SECONDS" ]; then
+              echo "::error::Health endpoint did not return 200 within ${MAX_WAIT_SECONDS}s"
+              exit 1
+            fi
+
+            http_code=$(curl --max-time 30 -sS -o /tmp/health.body -w "%{http_code}" "$PROD_URL/health" || echo "000")
+
+            if [ "$http_code" = "200" ]; then
+              echo "Health endpoint responded 200 after ${elapsed}s"
+              break
+            fi
+
+            echo "  /health returned $http_code (elapsed=${elapsed}s) — retrying in 10s"
+            sleep 10
+          done
+
+      - name: Smoke test 1/2 — Homepage GET /
+        run: |
+          set -euo pipefail
+          http_code=$(curl --max-time 30 -sS -o /tmp/homepage.body -w "%{http_code}" "$PROD_URL/")
+          if [ "$http_code" != "200" ]; then
+            echo "::error::Homepage returned $http_code (expected 200)"
+            head -c 500 /tmp/homepage.body
+            exit 1
+          fi
+
+          # Sanity check : Symfony rendered (HotOnes title in HTML)
+          if ! grep -q "HotOnes" /tmp/homepage.body; then
+            echo "::error::Homepage rendered but does not contain HotOnes title"
+            head -c 500 /tmp/homepage.body
+            exit 1
+          fi
+
+          echo "Homepage OK : 200 + HotOnes title found"
+
+      - name: Smoke test 2/2 — Health JSON GET /health
+        run: |
+          set -euo pipefail
+          http_code=$(curl --max-time 30 -sS -o /tmp/health.body -w "%{http_code}" "$PROD_URL/health")
+          if [ "$http_code" != "200" ]; then
+            echo "::error::/health returned $http_code (expected 200)"
+            cat /tmp/health.body
+            exit 1
+          fi
+
+          # Sanity check : JSON response (US-090 regression check : no raw PHP source)
+          content_type=$(curl --max-time 30 -sS -I "$PROD_URL/health" | grep -i "content-type:" | tr -d '\r')
+          if echo "$content_type" | grep -qi "application/octet-stream"; then
+            echo "::error::/health returns octet-stream (US-090 regression : raw PHP source served)"
+            exit 1
+          fi
+
+          # Body must NOT contain '<?php' literal (raw source leak detection)
+          if grep -q "<?php" /tmp/health.body; then
+            echo "::error::/health body contains literal <?php — Symfony route NOT executing"
+            head -c 200 /tmp/health.body
+            exit 1
+          fi
+
+          echo "Health OK : 200 + no PHP source leak"
+          cat /tmp/health.body
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "Post-deploy smoke test on $PROD_URL"
+          echo "  - /health JSON 200"
+          echo "  - / 200 + HotOnes title"

@@ -49,6 +49,10 @@ services:
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
+      # Sentry observability (US-091 sprint-016 EPIC-002)
+      # Free tier : 5k errors + 10k transactions/mois (sampling 5 %)
+      - key: SENTRY_DSN
+        sync: false  # À définir manuellement dans le dashboard Render
       # Timezone
       - key: TZ
         value: Europe/Paris
