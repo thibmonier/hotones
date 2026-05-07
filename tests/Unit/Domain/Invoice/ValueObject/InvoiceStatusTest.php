@@ -40,5 +40,58 @@ final class InvoiceStatusTest extends TestCase
     {
         $this->assertSame('Brouillon', InvoiceStatus::DRAFT->getLabel());
         $this->assertSame('Payée', InvoiceStatus::PAID->getLabel());
+        $this->assertSame('Envoyée', InvoiceStatus::SENT->getLabel());
+        $this->assertSame('En retard', InvoiceStatus::OVERDUE->getLabel());
+        $this->assertSame('Annulée', InvoiceStatus::CANCELLED->getLabel());
+    }
+
+    public function testIsClosed(): void
+    {
+        $this->assertTrue(InvoiceStatus::PAID->isClosed());
+        $this->assertTrue(InvoiceStatus::CANCELLED->isClosed());
+        $this->assertFalse(InvoiceStatus::DRAFT->isClosed());
+        $this->assertFalse(InvoiceStatus::SENT->isClosed());
+        $this->assertFalse(InvoiceStatus::OVERDUE->isClosed());
+    }
+
+    public function testIsAwaitingPayment(): void
+    {
+        $this->assertTrue(InvoiceStatus::SENT->isAwaitingPayment());
+        $this->assertTrue(InvoiceStatus::OVERDUE->isAwaitingPayment());
+        $this->assertFalse(InvoiceStatus::DRAFT->isAwaitingPayment());
+        $this->assertFalse(InvoiceStatus::PAID->isAwaitingPayment());
+        $this->assertFalse(InvoiceStatus::CANCELLED->isAwaitingPayment());
+    }
+
+    public function testCanTransitionFromDraft(): void
+    {
+        $this->assertTrue(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::SENT));
+        $this->assertTrue(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::CANCELLED));
+        $this->assertFalse(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::PAID));
+        $this->assertFalse(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::OVERDUE));
+    }
+
+    public function testCanTransitionFromSent(): void
+    {
+        $this->assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::PAID));
+        $this->assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::OVERDUE));
+        $this->assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::CANCELLED));
+        $this->assertFalse(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::DRAFT));
+    }
+
+    public function testCanTransitionFromOverdue(): void
+    {
+        $this->assertTrue(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::PAID));
+        $this->assertTrue(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::CANCELLED));
+        $this->assertFalse(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::DRAFT));
+        $this->assertFalse(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::SENT));
+    }
+
+    public function testTerminalStatesCannotTransition(): void
+    {
+        foreach (InvoiceStatus::cases() as $target) {
+            $this->assertFalse(InvoiceStatus::PAID->canTransitionTo($target));
+            $this->assertFalse(InvoiceStatus::CANCELLED->canTransitionTo($target));
+        }
     }
 }
