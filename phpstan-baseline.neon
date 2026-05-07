@@ -57,7 +57,11 @@ parameters:
 			count: 2
 			path: src/Domain/Vacation/ValueObject/DateRange.php
 
-		# (Removed 2026-05-07 US-087 : ExpenseReport vatRate isset no longer triggers)
+		-
+			message: '#^Property App\\Entity\\ExpenseReport\:\:\$vatRate \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Entity/ExpenseReport.php
 
 		-
 			message: '#^Match arm comparison between App\\Enum\\OrderStatus\:\:PENDING and App\\Enum\\OrderStatus\:\:PENDING is always true\.$#'

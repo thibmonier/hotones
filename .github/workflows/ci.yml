@@ -152,7 +152,18 @@ jobs:
           PANTHER_NO_SANDBOX: 1
           PANTHER_CHROME_BINARY: ${{ steps.chrome.outputs.chrome-path }}
           JWT_PASSPHRASE: test
-        run: ./vendor/bin/phpunit --testsuite e2e --colors=always
+        # US-087 : testsuite `e2e` désactivé (Panther/BrowserKit 8.0 incompat).
+        # Sortie 0 si aucun test pour éviter d'échouer la CI sur "No tests executed!".
+        run: |
+          set +e
+          OUTPUT=$(./vendor/bin/phpunit --testsuite e2e --colors=always 2>&1)
+          STATUS=$?
+          echo "$OUTPUT"
+          if [ "$STATUS" -ne 0 ] && echo "$OUTPUT" | grep -q "No tests executed!"; then
+            echo "E2E suite empty (Panther disabled — see phpunit.xml.dist comment). Skipping."
+            exit 0
+          fi
+          exit "$STATUS"
 
   # Analyse statique avec PHPStan
   phpstan:
