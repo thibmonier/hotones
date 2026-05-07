@@ -98,6 +98,49 @@ final class Invoice implements AggregateRootInterface
         return $invoice;
     }
 
+    /**
+     * Reconstitute an aggregate from persisted state — ACL adapter Phase 2.
+     * Does NOT record domain events.
+     *
+     * @param array<string, mixed> $extra
+     */
+    public static function reconstitute(
+        InvoiceId $id,
+        InvoiceNumber $number,
+        CompanyId $companyId,
+        ClientId $clientId,
+        ?OrderId $orderId = null,
+        ?ProjectId $projectId = null,
+        array $extra = [],
+    ): self {
+        $invoice = new self($id, $number, $companyId, $clientId, $orderId, $projectId);
+
+        if (isset($extra['status']) && $extra['status'] instanceof InvoiceStatus) {
+            $invoice->status = $extra['status'];
+        }
+        if (isset($extra['amountHt']) && $extra['amountHt'] instanceof Money) {
+            $invoice->amountHt = $extra['amountHt'];
+        }
+        if (isset($extra['amountTva']) && $extra['amountTva'] instanceof Money) {
+            $invoice->amountTva = $extra['amountTva'];
+        }
+        if (isset($extra['amountTtc']) && $extra['amountTtc'] instanceof Money) {
+            $invoice->amountTtc = $extra['amountTtc'];
+        }
+        $invoice->notes = $extra['notes'] ?? null;
+        $invoice->paymentTerms = $extra['paymentTerms'] ?? null;
+        $invoice->issuedAt = $extra['issuedAt'] ?? null;
+        $invoice->dueDate = $extra['dueDate'] ?? null;
+        $invoice->paidAt = $extra['paidAt'] ?? null;
+
+        if (isset($extra['createdAt']) && $extra['createdAt'] instanceof DateTimeImmutable) {
+            $invoice->createdAt = $extra['createdAt'];
+        }
+        $invoice->updatedAt = $extra['updatedAt'] ?? null;
+
+        return $invoice;
+    }
+
     // Line management
 
     public function addLine(
