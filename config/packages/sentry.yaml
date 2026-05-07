@@ -2,9 +2,25 @@ when@prod:
     sentry:
         dsn: '%env(SENTRY_DSN)%'
         options:
-            # Add request headers, cookies, IP address and the authenticated user
-            # see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
-            # send_default_pii: true
+            # US-091 (sprint-016 EPIC-002) — option C atelier PO :
+            # rester sur free tier Sentry (5k errors + 10k transactions/mois)
+            # via sampling agressif. Upgrade Team plan ($25/mois) seulement
+            # si dépassement réel observé.
+            #
+            # traces_sample_rate : 5 % des transactions instrumentées
+            # → ~10k requests/jour × 0.05 = 500 transactions/jour
+            # → ~15k transactions/mois (légèrement au-dessus quota free,
+            #   acceptable car Sentry drop silencieusement sans bloquer app)
+            traces_sample_rate: 0.05
+
+            # profiles_sample_rate : ratio de transactions échantillonnées
+            # qui auront aussi un profil. 10 % de 5 % = 0,5 % requests profilées.
+            profiles_sample_rate: 0.10
+
+            # send_default_pii : false par défaut (RGPD safe).
+            # Pas activé tant que pas de DPA signé avec Sentry.
+            send_default_pii: false
+
             ignore_exceptions:
                 - 'Symfony\Component\ErrorHandler\Error\FatalError'
                 - 'Symfony\Component\Debug\Exception\FatalErrorException'

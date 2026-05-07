@@ -67,6 +67,10 @@ services:
       - key: STAGING_BANNER
         value: "1"
 
+      # Sentry observability (US-091 sprint-016 EPIC-002)
+      - key: SENTRY_DSN
+        sync: false  # À définir manuellement dans le dashboard Render
+
     # Override du CMD : on utilise le script de boot staging au lieu
     # du start-render.sh prod (qui n'execute pas le wipe + fixtures)
     dockerCommand: /usr/local/bin/start-staging.sh
