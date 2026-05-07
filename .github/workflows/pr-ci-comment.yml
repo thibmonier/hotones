@@ -146,12 +146,17 @@ jobs:
           EXISTING_ID: ${{ steps.existing.outputs.id }}
         run: |
           set -euo pipefail
+          # Both branches use `gh api` directly — the runner has no checkout,
+          # so `gh pr comment` (which calls git internally) would fail with
+          # "fatal: not a git repository".
           if [[ -n "${EXISTING_ID:-}" ]]; then
             gh api --method PATCH \
               "repos/${GITHUB_REPOSITORY}/issues/comments/${EXISTING_ID}" \
               -F body=@/tmp/comment.md > /dev/null
             echo "Updated existing comment ${EXISTING_ID} on PR #${PR_NUMBER}"
           else
-            gh pr comment "${PR_NUMBER}" --body-file /tmp/comment.md
+            gh api --method POST \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              -F body=@/tmp/comment.md > /dev/null
             echo "Posted new comment on PR #${PR_NUMBER}"
           fi
