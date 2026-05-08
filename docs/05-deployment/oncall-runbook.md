@@ -7,7 +7,7 @@
 | Source | Type | Canal Slack |
 |---|---|---|
 | Sentry (errors / performance) | Auto via Sentry → Slack integration | `#alerts-prod` |
-| Smoke test post-deploy | Manuel via failure GH Action | `#alerts-prod` (TODO US-094 OPS step) |
+| Smoke test post-deploy (minimum + extended) | Manuel via failure GH Action | `#alerts-prod` (TODO US-094 OPS step) |
 | Quota Sentry > 80 % | Auto via Sentry alert rule | `#alerts-prod` |
 | App-side custom (batch failures, etc.) | Manuel via `SlackAlertingService` | `#alerts-prod` |
 
@@ -116,6 +116,41 @@ final class MyBatchProcessor
 - Smoke test interne
 
 **No-op si SLACK_WEBHOOK_URL vide** (dev / CI). Logs uniquement.
+
+---
+
+## Smoke test extended (sprint-018)
+
+### Activation OPS
+
+1. **Créer un user dédié smoke** sur prod :
+   - Email `smoke@hotones.local` (no real inbox needed)
+   - Mot de passe fort généré 1Password
+   - Rôle `ROLE_USER` strict (read-only)
+   - **2FA désactivé** (workflow auth simple form_login)
+2. **Configurer GitHub repo secrets** :
+   - `SMOKE_USER_EMAIL` = email user smoke
+   - `SMOKE_USER_PASSWORD` = mot de passe user smoke
+3. **Activer GitHub variable** :
+   - `SMOKE_EXTENDED_ENABLED` = `true` (Settings → Variables → Actions)
+
+### Assertions couvertes
+
+| Step | Endpoint | Vérifie |
+|---|---|---|
+| Login | POST `/login` (form_login + CSRF) | Auth path opérationnel + session cookie |
+| Dashboard business | GET `/admin/dashboard/business` | US-093 regression check (KPI markers présents) |
+| API DDD Contributor | GET `/api/contributors/active` | Phase 3 strangler fig regression check (JSON shape valid) |
+
+### Failure response
+
+Si `smoke-extended` job fail → alert Slack `#alerts-prod` (config OPS US-094).
+Indique typiquement :
+- Login broken (changement firewall config / form fields renamed)
+- Dashboard 500 ou markers KPI manquants (regression dashboard)
+- API DDD endpoint cassé (regression Phase 3)
+
+Niveau 2 escalation si bloque > 1h.
 
 ---
 
