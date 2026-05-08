@@ -1,0 +1,239 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\WorkItem\Entity;
+
+use App\Domain\Contributor\ValueObject\ContributorId;
+use App\Domain\Project\ValueObject\ProjectId;
+use App\Domain\Shared\Interface\AggregateRootInterface;
+use App\Domain\Shared\Trait\RecordsDomainEvents;
+use App\Domain\Shared\ValueObject\Money;
+use App\Domain\WorkItem\Event\WorkItemRecordedEvent;
+use App\Domain\WorkItem\Event\WorkItemRevisedEvent;
+use App\Domain\WorkItem\ValueObject\HourlyRate;
+use App\Domain\WorkItem\ValueObject\WorkedHours;
+use App\Domain\WorkItem\ValueObject\WorkItemId;
+use DateTimeImmutable;
+
+/**
+ * WorkItem aggregate root — heures travaillées par un contributeur sur un
+ * projet (avec optionnellement une tâche), avec rates de coût et facturation
+ * **figés à la création** (snapshot).
+ *
+ * EPIC-003 Phase 1 (sprint-019 US-097).
+ *
+ * Mitige les risks Q3 + Q4 audit :
+ * - `costRate` / `billedRate` non-null par construction (HourlyRate VO)
+ * - rates immuables après création (snapshot moment T) — recalcul historique
+ *   reste cohérent même si CJM/TJM contributor changent ultérieurement
+ *
+ * Phase 1 ne supporte PAS les tâches (`?ProjectTaskId`) ni la suppression —
+ * uniquement record + revise hours (sprint-022 ajoutera linkToTask).
+ *
+ * @see ADR-0013 EPIC-003 scope WorkItem & Profitability
+ * @see docs/02-architecture/epic-003-audit-existing-data.md
+ */
+final class WorkItem implements AggregateRootInterface
+{
+    use RecordsDomainEvents;
+
+    private WorkItemId $id;
+    private ProjectId $projectId;
+    private ContributorId $contributorId;
+    private DateTimeImmutable $workedOn;
+    private WorkedHours $hours;
+    private HourlyRate $costRate;
+    private HourlyRate $billedRate;
+    private ?string $notes;
+    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $updatedAt;
+
+    private function __construct(
+        WorkItemId $id,
+        ProjectId $projectId,
+        ContributorId $contributorId,
+        DateTimeImmutable $workedOn,
+        WorkedHours $hours,
+        HourlyRate $costRate,
+        HourlyRate $billedRate,
+    ) {
+        $this->id = $id;
+        $this->projectId = $projectId;
+        $this->contributorId = $contributorId;
+        $this->workedOn = $workedOn;
+        $this->hours = $hours;
+        $this->costRate = $costRate;
+        $this->billedRate = $billedRate;
+        $this->notes = null;
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = null;
+    }
+
+    public static function create(
+        WorkItemId $id,
+        ProjectId $projectId,
+        ContributorId $contributorId,
+        DateTimeImmutable $workedOn,
+        WorkedHours $hours,
+        HourlyRate $costRate,
+        HourlyRate $billedRate,
+    ): self {
+        $workItem = new self(
+            $id,
+            $projectId,
+            $contributorId,
+            $workedOn,
+            $hours,
+            $costRate,
+            $billedRate,
+        );
+
+        $workItem->recordEvent(
+            WorkItemRecordedEvent::create($id, $projectId, $contributorId, $workedOn),
+        );
+
+        return $workItem;
+    }
+
+    /**
+     * Reconstitute depuis stockage persistant (ACL Phase 2). N'enregistre PAS
+     * d'event domain.
+     *
+     * @param array{notes?: ?string, createdAt?: ?DateTimeImmutable, updatedAt?: ?DateTimeImmutable} $extra
+     */
+    public static function reconstitute(
+        WorkItemId $id,
+        ProjectId $projectId,
+        ContributorId $contributorId,
+        DateTimeImmutable $workedOn,
+        WorkedHours $hours,
+        HourlyRate $costRate,
+        HourlyRate $billedRate,
+        array $extra = [],
+    ): self {
+        $workItem = new self(
+            $id,
+            $projectId,
+            $contributorId,
+            $workedOn,
+            $hours,
+            $costRate,
+            $billedRate,
+        );
+        $workItem->notes = $extra['notes'] ?? null;
+        $workItem->createdAt = $extra['createdAt'] ?? new DateTimeImmutable();
+        $workItem->updatedAt = $extra['updatedAt'] ?? null;
+
+        return $workItem;
+    }
+
+    // Mutations
+
+    /**
+     * Révise le nombre d'heures (correction déclaration).
+     * Rates restent figés (snapshot d'origine).
+     */
+    public function reviseHours(WorkedHours $newHours): void
+    {
+        if ($this->hours->equals($newHours)) {
+            return;
+        }
+
+        $oldHours = $this->hours;
+        $this->hours = $newHours;
+        $this->updatedAt = new DateTimeImmutable();
+
+        $this->recordEvent(WorkItemRevisedEvent::create($this->id, $oldHours, $newHours));
+    }
+
+    public function setNotes(?string $notes): void
+    {
+        $this->notes = $notes;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    // Calculations (pure — pas d'effet de bord, pas d'event)
+
+    public function cost(): Money
+    {
+        return $this->costRate->multiply($this->hours);
+    }
+
+    public function revenue(): Money
+    {
+        return $this->billedRate->multiply($this->hours);
+    }
+
+    public function margin(): Money
+    {
+        return $this->revenue()->subtract($this->cost());
+    }
+
+    /**
+     * Marge en pourcentage. Retourne 0.0 si revenue est nul.
+     */
+    public function marginPercent(): float
+    {
+        if ($this->revenue()->isZero()) {
+            return 0.0;
+        }
+
+        $marginCents = $this->margin()->getAmountCents();
+        $revenueCents = $this->revenue()->getAmountCents();
+
+        return round(($marginCents / $revenueCents) * 100, 2);
+    }
+
+    // Getters
+
+    public function getId(): WorkItemId
+    {
+        return $this->id;
+    }
+
+    public function getProjectId(): ProjectId
+    {
+        return $this->projectId;
+    }
+
+    public function getContributorId(): ContributorId
+    {
+        return $this->contributorId;
+    }
+
+    public function getWorkedOn(): DateTimeImmutable
+    {
+        return $this->workedOn;
+    }
+
+    public function getHours(): WorkedHours
+    {
+        return $this->hours;
+    }
+
+    public function getCostRate(): HourlyRate
+    {
+        return $this->costRate;
+    }
+
+    public function getBilledRate(): HourlyRate
+    {
+        return $this->billedRate;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+}
