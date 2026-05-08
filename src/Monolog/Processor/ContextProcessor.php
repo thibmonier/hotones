@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Monolog\Processor;
 
+use App\EventSubscriber\RequestIdSubscriber;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -36,7 +37,13 @@ class ContextProcessor implements ProcessorInterface
         // Generate or retrieve request ID for log correlation
         if ($request !== null) {
             if ($this->requestId === null) {
-                $this->requestId = $this->generateRequestId();
+                // US-096 : prefer the request_id set by RequestIdSubscriber
+                // (synchro côté response header `X-Request-Id`). Fallback :
+                // genere localement si subscriber pas encore passé (early hooks).
+                $fromSubscriber = $request->attributes->get(RequestIdSubscriber::ATTRIBUTE_NAME);
+                $this->requestId = is_string($fromSubscriber) && $fromSubscriber !== ''
+                    ? $fromSubscriber
+                    : $this->generateRequestId();
             }
 
             $extra = [
