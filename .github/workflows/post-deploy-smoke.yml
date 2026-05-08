@@ -3,12 +3,17 @@ name: Post-Deploy Smoke Test
 # US-092 (sprint-016 EPIC-002) — Smoke test minimum sur prod après merge main.
 # Scope option PO atelier : homepage + /health (~30s execution).
 #
+# SMOKE-PROD-EXTENDED (sprint-018 EPIC-002) — étend le scope : login admin
+# + accès dashboard business (lecture protégée). Skip silencieux si secrets
+# `SMOKE_USER_EMAIL` + `SMOKE_USER_PASSWORD` absents (premier run).
+#
 # Trigger :
 #   - push sur main (déclenché à chaque merge)
 #   - workflow_dispatch (manuel)
 #
 # Sécurité : aucun input untrusted utilisé en run:. PROD_URL est statique,
 # secrets pris via secrets.* (pas de github.event.* expansé inline).
+# Smoke user dédié (no-2FA), permissions read-only minimal (ROLE_USER).
 
 on:
   push:
@@ -112,3 +117,132 @@ jobs:
           echo "Post-deploy smoke test on $PROD_URL"
           echo "  - /health JSON 200"
           echo "  - / 200 + HotOnes title"
+
+  smoke-extended:
+    name: Smoke Extended Prod (login + dashboard + API DDD)
+    needs: smoke
+    runs-on: ubuntu-latest
+
+    # SMOKE-PROD-EXTENDED (sprint-018) — assertions business authentifiées.
+    # Skip silencieux si secrets manquants (premier run avant config OPS).
+    if: ${{ vars.SMOKE_EXTENDED_ENABLED == 'true' }}
+
+    env:
+      PROD_URL: https://hotones.onrender.com
+
+    steps:
+      - name: Login as smoke user (form_login + CSRF)
+        env:
+          SMOKE_USER_EMAIL: ${{ secrets.SMOKE_USER_EMAIL }}
+          SMOKE_USER_PASSWORD: ${{ secrets.SMOKE_USER_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SMOKE_USER_EMAIL:-}" ] || [ -z "${SMOKE_USER_PASSWORD:-}" ]; then
+            echo "::error::Required secrets SMOKE_USER_EMAIL / SMOKE_USER_PASSWORD missing"
+            exit 1
+          fi
+
+          # 1. GET /login → extract CSRF token from hidden input.
+          curl --max-time 30 -c /tmp/cookies.txt -sS "$PROD_URL/login" -o /tmp/login.html
+          csrf=$(grep -oE 'name="_csrf_token"[^>]+value="[^"]+"' /tmp/login.html \
+            | head -n1 | sed -E 's/.*value="([^"]+)".*/\1/')
+
+          if [ -z "$csrf" ]; then
+            echo "::error::Failed to extract CSRF token from login form"
+            head -c 500 /tmp/login.html
+            exit 1
+          fi
+
+          # 2. POST /login (form_login) — follow redirects.
+          http_code=$(curl --max-time 30 -b /tmp/cookies.txt -c /tmp/cookies.txt -sS -L \
+            -o /tmp/post_login.html -w "%{http_code}" \
+            -X POST "$PROD_URL/login" \
+            --data-urlencode "_username=$SMOKE_USER_EMAIL" \
+            --data-urlencode "_password=$SMOKE_USER_PASSWORD" \
+            --data-urlencode "_csrf_token=$csrf")
+
+          if [ "$http_code" != "200" ]; then
+            echo "::error::Login POST returned $http_code (expected 200 after redirect chain)"
+            head -c 500 /tmp/post_login.html
+            exit 1
+          fi
+
+          # 3. Verify redirected to authenticated page (not login error).
+          if grep -qE "Identifiants invalides|Invalid credentials|Login failed" /tmp/post_login.html; then
+            echo "::error::Login failed — invalid credentials response"
+            exit 1
+          fi
+
+          if ! grep -qiE "logout|déconnexion|déconnecter" /tmp/post_login.html; then
+            echo "::error::Login appears to have failed (no logout link in response)"
+            head -c 500 /tmp/post_login.html
+            exit 1
+          fi
+
+          echo "Login OK : authenticated session cookie acquired"
+
+      - name: Smoke business 1/2 — GET /admin/dashboard/business (KPIs)
+        run: |
+          set -euo pipefail
+
+          http_code=$(curl --max-time 30 -b /tmp/cookies.txt -sS \
+            -o /tmp/dashboard.html -w "%{http_code}" \
+            "$PROD_URL/admin/dashboard/business")
+
+          if [ "$http_code" != "200" ]; then
+            echo "::error::Dashboard business returned $http_code (expected 200)"
+            head -c 500 /tmp/dashboard.html
+            exit 1
+          fi
+
+          # Sanity check : KPI markers présents (US-093 dashboard 7 KPIs).
+          if ! grep -qiE "DAU|MAU|projets|devis|factures|revenu|marge" /tmp/dashboard.html; then
+            echo "::error::Dashboard 200 but missing KPI markers (US-093 regression)"
+            head -c 500 /tmp/dashboard.html
+            exit 1
+          fi
+
+          echo "Dashboard business OK : 200 + KPI markers"
+
+      - name: Smoke business 2/2 — GET /api/contributors/active (API DDD)
+        run: |
+          set -euo pipefail
+
+          # Phase 3 strangler fig BC Contributor (sprint-018).
+          response=$(curl --max-time 30 -b /tmp/cookies.txt -sS \
+            -H "Accept: application/json" \
+            -w "%{http_code}" \
+            -o /tmp/contributors.json \
+            "$PROD_URL/api/contributors/active")
+          http_code="$response"
+
+          if [ "$http_code" != "200" ]; then
+            echo "::error::API contributors/active returned $http_code (expected 200)"
+            head -c 500 /tmp/contributors.json
+            exit 1
+          fi
+
+          # Verify JSON shape : `data` array + `meta.count` int.
+          if ! python3 -c "
+          import json, sys
+          d = json.load(open('/tmp/contributors.json'))
+          assert isinstance(d.get('data'), list), 'data must be array'
+          assert isinstance(d.get('meta', {}).get('count'), int), 'meta.count must be int'
+          assert d['meta']['count'] == len(d['data']), 'count must match data length'
+          " 2>/tmp/jsonerr; then
+            echo "::error::API contributors/active : JSON shape invalid"
+            cat /tmp/jsonerr
+            head -c 500 /tmp/contributors.json
+            exit 1
+          fi
+
+          echo "API contributors/active OK : 200 + valid JSON shape"
+
+      - name: Smoke extended summary
+        if: always()
+        run: |
+          echo "Post-deploy smoke EXTENDED on $PROD_URL"
+          echo "  - Login form_login + CSRF OK"
+          echo "  - /admin/dashboard/business 200 + KPI markers"
+          echo "  - /api/contributors/active 200 + JSON shape valid"
