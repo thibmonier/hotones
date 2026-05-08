@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Monolog\Processor;
 
+use App\EventSubscriber\RequestIdSubscriber;
 use App\Monolog\Processor\ContextProcessor;
 use DateTimeImmutable;
 use Monolog\Level;
@@ -144,6 +145,27 @@ final class ContextProcessorTest extends TestCase
 
         self::assertSame('custom_value', $record->extra['custom_key']);
         self::assertArrayHasKey('request_id', $record->extra);
+    }
+
+    public function testReusesRequestIdFromSubscriberWhenAvailable(): void
+    {
+        // US-096 sync : request_id stocké par RequestIdSubscriber dans
+        // Request attributes doit être réutilisé par ContextProcessor (pas
+        // de génération locale).
+        $request = Request::create('/');
+        $request->attributes->set(RequestIdSubscriber::ATTRIBUTE_NAME, 'cf-edge-correlation-42');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+
+        $security = $this->createMock(Security::class);
+        $security->method('getUser')->willReturn(null);
+
+        $processor = new ContextProcessor($stack, $security, 'prod');
+
+        $record = $processor($this->makeRecord());
+
+        self::assertSame('cf-edge-correlation-42', $record->extra['request_id']);
     }
 
     private function makeRecord(): LogRecord

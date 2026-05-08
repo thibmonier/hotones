@@ -93,9 +93,23 @@ $this->logger->info('Order created', ['order' => $orderEntity]);
 
 Pour tracer une requête bout-en-bout :
 
-1. `request_id` injecté auto par `ContextProcessor` dans `extra`
-2. Passer aux jobs Messenger via stamp custom (TODO US-097 si besoin)
-3. Exposer côté response header `X-Request-Id` (TODO US-096)
+1. **`X-Request-Id` request header** (entrant) — pris si fourni par CDN /
+   load balancer (Cloudflare, Render edge), sinon généré localement par
+   `RequestIdSubscriber` (US-096). Format `<YmdHis>-<8 hex>`.
+2. **Stocké dans `Request::attributes->request_id`** — accessible côté code
+   applicatif via `$request->attributes->get('request_id')`.
+3. **Réutilisé par `ContextProcessor`** → `extra.request_id` dans logs JSON
+   identique à celui exposé en réponse.
+4. **`X-Request-Id` response header** (sortant) — frontend peut lire en
+   devtools network ou via JS et le ré-injecter dans requêtes suivantes
+   pour corréler une trace bout-en-bout.
+5. Passer aux jobs Messenger via stamp custom (TODO US-097 si besoin).
+
+### Sécurité
+
+`RequestIdSubscriber` valide le header entrant (whitelist `[A-Za-z0-9._-]+`,
+max 128 chars) pour bloquer header injection (CRLF + Set-Cookie). Si invalide,
+fallback génération locale.
 
 ## Exploitation côté Render
 
@@ -113,5 +127,6 @@ extra.user_email="alice@example.org"
 ## Liens
 
 - US-095 : Logging structuré JSON
+- US-096 : `X-Request-Id` correlation ID frontend (`RequestIdSubscriber`)
 - ADR-0012 : observability stack (Sentry free tier — ces logs complètent Sentry)
 - Runbook on-call : `docs/05-deployment/oncall-runbook.md`
