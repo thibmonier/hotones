@@ -23,6 +23,7 @@ use InvalidArgumentException;
 
 use const PHP_INT_MAX;
 
+use ReflectionProperty;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
@@ -98,7 +99,14 @@ final readonly class CreateInvoiceDraftUseCase
         // The flat layer is responsible for invoice number generation (sequence
         // table). For Phase 2 we let it auto-assign from a TBD service if any,
         // or use the placeholder for now (operations team can adjust post-hoc).
-        if (!isset($flat->invoiceNumber) || $flat->invoiceNumber === '') {
+        //
+        // Bug fix US-INVOICE-DRAFT-UC-INVOICENUMBER-INIT-FIX (sprint-018) :
+        // `isset()` on PHP 8.4 typed property with property hook triggers
+        // "must not be accessed before initialization" error if uninit.
+        // Use ReflectionProperty::isInitialized() pour bypass the property hook
+        // getter et check le backing storage directement.
+        $invoiceNumberInitialized = (new ReflectionProperty($flat, 'invoiceNumber'))->isInitialized($flat);
+        if (!$invoiceNumberInitialized || $flat->invoiceNumber === '') {
             $flat->invoiceNumber = sprintf('F%04d%02d%03d', (int) date('Y'), (int) date('n'), random_int(100, 999));
         }
 
