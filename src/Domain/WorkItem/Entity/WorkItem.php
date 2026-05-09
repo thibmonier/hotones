@@ -6,6 +6,7 @@ namespace App\Domain\WorkItem\Entity;
 
 use App\Domain\Contributor\ValueObject\ContributorId;
 use App\Domain\Project\ValueObject\ProjectId;
+use App\Domain\Project\ValueObject\ProjectTaskId;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Money;
@@ -41,6 +42,7 @@ final class WorkItem implements AggregateRootInterface
     private WorkItemId $id;
     private ProjectId $projectId;
     private ContributorId $contributorId;
+    private ?ProjectTaskId $taskId;
     private DateTimeImmutable $workedOn;
     private WorkedHours $hours;
     private HourlyRate $costRate;
@@ -57,10 +59,12 @@ final class WorkItem implements AggregateRootInterface
         WorkedHours $hours,
         HourlyRate $costRate,
         HourlyRate $billedRate,
+        ?ProjectTaskId $taskId = null,
     ) {
         $this->id = $id;
         $this->projectId = $projectId;
         $this->contributorId = $contributorId;
+        $this->taskId = $taskId;
         $this->workedOn = $workedOn;
         $this->hours = $hours;
         $this->costRate = $costRate;
@@ -70,6 +74,10 @@ final class WorkItem implements AggregateRootInterface
         $this->updatedAt = null;
     }
 
+    /**
+     * `taskId` est nullable (cf ADR-0015 décision Q1 — allocation fictive niveau projet
+     * si task = NULL côté flat Timesheet).
+     */
     public static function create(
         WorkItemId $id,
         ProjectId $projectId,
@@ -78,6 +86,7 @@ final class WorkItem implements AggregateRootInterface
         WorkedHours $hours,
         HourlyRate $costRate,
         HourlyRate $billedRate,
+        ?ProjectTaskId $taskId = null,
     ): self {
         $workItem = new self(
             $id,
@@ -87,6 +96,7 @@ final class WorkItem implements AggregateRootInterface
             $hours,
             $costRate,
             $billedRate,
+            $taskId,
         );
 
         $workItem->recordEvent(
@@ -100,7 +110,7 @@ final class WorkItem implements AggregateRootInterface
      * Reconstitute depuis stockage persistant (ACL Phase 2). N'enregistre PAS
      * d'event domain.
      *
-     * @param array{notes?: ?string, createdAt?: ?DateTimeImmutable, updatedAt?: ?DateTimeImmutable} $extra
+     * @param array{taskId?: ?ProjectTaskId, notes?: ?string, createdAt?: ?DateTimeImmutable, updatedAt?: ?DateTimeImmutable} $extra
      */
     public static function reconstitute(
         WorkItemId $id,
@@ -120,6 +130,7 @@ final class WorkItem implements AggregateRootInterface
             $hours,
             $costRate,
             $billedRate,
+            $extra['taskId'] ?? null,
         );
         $workItem->notes = $extra['notes'] ?? null;
         $workItem->createdAt = $extra['createdAt'] ?? new DateTimeImmutable();
@@ -200,6 +211,11 @@ final class WorkItem implements AggregateRootInterface
     public function getContributorId(): ContributorId
     {
         return $this->contributorId;
+    }
+
+    public function getTaskId(): ?ProjectTaskId
+    {
+        return $this->taskId;
     }
 
     public function getWorkedOn(): DateTimeImmutable
