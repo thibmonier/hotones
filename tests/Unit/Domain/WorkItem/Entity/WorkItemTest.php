@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Domain\WorkItem\Entity;
 
 use App\Domain\Contributor\ValueObject\ContributorId;
 use App\Domain\Project\ValueObject\ProjectId;
+use App\Domain\Project\ValueObject\ProjectTaskId;
 use App\Domain\WorkItem\Entity\WorkItem;
 use App\Domain\WorkItem\Event\WorkItemRecordedEvent;
 use App\Domain\WorkItem\Event\WorkItemRevisedEvent;
@@ -187,6 +188,49 @@ final class WorkItemTest extends TestCase
         // Note : Money n'autorise pas le négatif → subtract throw probably.
         // Si Money supporte négatif, margin = -400. Sinon throw — couvert par
         // testNegativeMarginThrowsWhenMoneyForbidsNegative ci-dessous.
+    }
+
+    public function testCreateWithoutTaskIdDefaultsNull(): void
+    {
+        $workItem = $this->newWorkItem();
+        self::assertNull($workItem->getTaskId(), 'taskId nullable par défaut (ADR-0015 Q1)');
+    }
+
+    public function testCreateWithTaskIdStoresIt(): void
+    {
+        $taskId = ProjectTaskId::fromLegacyInt(33);
+        $workItem = WorkItem::create(
+            WorkItemId::fromLegacyInt(7),
+            ProjectId::fromLegacyInt(11),
+            ContributorId::fromLegacyInt(42),
+            new DateTimeImmutable('2026-04-15'),
+            WorkedHours::fromFloat(7.5),
+            HourlyRate::fromAmount(50.0),
+            HourlyRate::fromAmount(100.0),
+            taskId: $taskId,
+        );
+
+        self::assertNotNull($workItem->getTaskId());
+        self::assertTrue($workItem->getTaskId()->equals($taskId));
+    }
+
+    public function testReconstituteWithTaskIdInExtra(): void
+    {
+        $taskId = ProjectTaskId::fromLegacyInt(33);
+        $workItem = WorkItem::reconstitute(
+            WorkItemId::fromLegacyInt(1),
+            ProjectId::fromLegacyInt(1),
+            ContributorId::fromLegacyInt(1),
+            new DateTimeImmutable(),
+            WorkedHours::fromFloat(8.0),
+            HourlyRate::fromAmount(50.0),
+            HourlyRate::fromAmount(100.0),
+            ['taskId' => $taskId, 'notes' => 'imported'],
+        );
+
+        self::assertNotNull($workItem->getTaskId());
+        self::assertTrue($workItem->getTaskId()->equals($taskId));
+        self::assertSame('imported', $workItem->getNotes());
     }
 
     private function newWorkItem(): WorkItem

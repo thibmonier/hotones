@@ -40,5 +40,17 @@ interface WorkItemRepositoryInterface
         DateTimeImmutable $to,
     ): array;
 
+    /**
+     * Sprint-020 ADR-0015 décision Q2 : invariant journalier nécessite charger
+     * tous les WorkItems d'un contributeur pour une date donnée afin de calculer
+     * `dailyTotal = sum(hours)` avant nouveau record.
+     *
+     * @return array<WorkItem>
+     */
+    public function findByContributorAndDate(
+        ContributorId $contributorId,
+        DateTimeImmutable $date,
+    ): array;
+
     public function save(WorkItem $workItem): void;
 }
