@@ -100,7 +100,7 @@ final class AuditContributorsCjmCommand extends Command
                 'id' => $contributor->getId(),
                 'email' => $contributor->getEmail() ?? '(no email)',
                 'name' => trim(($contributor->getFirstName() ?? '').' '.($contributor->getLastName() ?? '')),
-                'company' => $contributor->getCompany()?->getId() ?? '(no company)',
+                'company' => $contributor->getCompany()->getId(),
                 'cjm' => $missingCjm ? '❌ NULL' : '✅ '.$resolvedCjm,
                 'tjm' => $auditTjm ? ($missingTjm ? '❌ NULL' : '✅ '.$resolvedTjm) : '—',
                 'has_active_period' => $this->hasActivePeriod($contributor, $now) ? 'yes' : 'no',
