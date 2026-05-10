@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{# EPIC-003 Phase 3 (sprint-021 US-102) — UI Twig grille hebdo saisie WorkItem.
+ # ADR-0016 Q1.1 grille jours × projets + Q1.3 step 0.25h + Q2.1 auto-save +
+ # Q2.2 lock display + Q2.4 warning override.
+ #}
+
+{% block title %}Saisie hebdo — {{ week }}{% endblock %}
+
+{% block body %}
+<div
+    class="weekly-timesheet container my-4"
+    data-controller="weekly-timesheet"
+    data-weekly-timesheet-save-url-value="{{ path('weekly_timesheet_save') }}"
+    data-weekly-timesheet-csrf-token-value="{{ csrf_token('weekly_timesheet_save') }}"
+    data-weekly-timesheet-week-value="{{ week }}"
+>
+    <header class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1">Saisie hebdomadaire — semaine {{ week }}</h1>
+            <p class="text-muted small mb-0">
+                Du {{ startOfWeek|date('d/m/Y') }} au {{ endOfWeek|date('d/m/Y') }}
+                {% if isManager %}
+                    <span class="badge bg-info ms-2">Manager — auto-validation</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="btn-group" role="group" aria-label="Navigation semaines">
+            <a class="btn btn-outline-secondary" href="{{ path('weekly_timesheet_index', {week: previousWeek}) }}">← {{ previousWeek }}</a>
+            <a class="btn btn-outline-primary" href="{{ path('weekly_timesheet_index') }}">Semaine courante</a>
+            <a class="btn btn-outline-secondary" href="{{ path('weekly_timesheet_index', {week: nextWeek}) }}">{{ nextWeek }} →</a>
+        </div>
+    </header>
+
+    <div
+        data-weekly-timesheet-target="status"
+        class="alert alert-info d-none"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle weekly-timesheet__grid">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" class="weekly-timesheet__project-col">Projet</th>
+                    {% for day in days %}
+                        <th scope="col" class="text-center{% if day|date('N') in [6, 7] %} table-secondary{% endif %}">
+                            <div class="small text-uppercase">{{ day|date('D')|trans }}</div>
+                            <div class="fw-bold">{{ day|date('d/m') }}</div>
+                        </th>
+                    {% endfor %}
+                    <th scope="col" class="text-center">Total projet</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                    <tr>
+                        <th scope="row" class="weekly-timesheet__project-name">
+                            {{ project.name }}
+                        </th>
+                        {% for day in days %}
+                            {% set cellKey = project.id ~ '-' ~ day|date('Y-m-d') %}
+                            {% set cell = cells[cellKey] | default(null) %}
+                            {% set isLocked = cell ? cell.locked : false %}
+                            <td class="text-center weekly-timesheet__cell{% if isLocked %} weekly-timesheet__cell--locked{% endif %}">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="24"
+                                    step="0.25"
+                                    inputmode="decimal"
+                                    class="form-control form-control-sm text-center"
+                                    value="{{ cell ? cell.hours : '' }}"
+                                    placeholder="0"
+                                    aria-label="Heures {{ project.name }} — {{ day|date('d/m/Y') }}"
+                                    data-weekly-timesheet-target="cell"
+                                    data-project-id="{{ project.id }}"
+                                    data-date="{{ day|date('Y-m-d') }}"
+                                    data-action="change->weekly-timesheet#onCellChange"
+                                    {% if isLocked %}disabled aria-disabled="true"{% endif %}
+                                />
+                                {% if cell and cell.status %}
+                                    <small class="text-muted d-block">
+                                        {% if cell.status == 'draft' %}<span class="badge bg-secondary">brouillon</span>{% endif %}
+                                        {% if cell.status == 'validated' %}<span class="badge bg-primary">validé</span>{% endif %}
+                                        {% if cell.status == 'billed' %}<span class="badge bg-warning text-dark">facturé</span>{% endif %}
+                                        {% if cell.status == 'paid' %}<span class="badge bg-success">payé</span>{% endif %}
+                                    </small>
+                                {% endif %}
+                                {% if isLocked %}
+                                    <small class="text-danger d-block" aria-label="Cellule verrouillée">🔒</small>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td class="text-center fw-bold" data-weekly-timesheet-target="projectTotal" data-project-id="{{ project.id }}">
+                            {% set projectTotal = 0 %}
+                            {% for day in days %}
+                                {% set cellKey = project.id ~ '-' ~ day|date('Y-m-d') %}
+                                {% set cell = cells[cellKey] | default(null) %}
+                                {% if cell %}{% set projectTotal = projectTotal + cell.hours %}{% endif %}
+                            {% endfor %}
+                            {{ projectTotal }}h
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            Aucun projet actif. Contactez votre manager.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <th scope="row">Total jour</th>
+                    {% for day in days %}
+                        <td class="text-center fw-bold" data-weekly-timesheet-target="dayTotal" data-date="{{ day|date('Y-m-d') }}">
+                            {% set dayTotal = 0 %}
+                            {% for project in projects %}
+                                {% set cellKey = project.id ~ '-' ~ day|date('Y-m-d') %}
+                                {% set cell = cells[cellKey] | default(null) %}
+                                {% if cell %}{% set dayTotal = dayTotal + cell.hours %}{% endif %}
+                            {% endfor %}
+                            {{ dayTotal }}h
+                        </td>
+                    {% endfor %}
+                    <td class="text-center fw-bold table-active" data-weekly-timesheet-target="weekTotal">
+                        {# Stimulus controller updates this #}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {# Warning override modal — Q2.4 ADR-0016 #}
+    <div
+        class="modal fade"
+        tabindex="-1"
+        data-weekly-timesheet-target="warningModal"
+        aria-labelledby="warning-modal-title"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="warning-modal-title">⚠️ Dépassement seuil journalier</h5>
+                    <button type="button" class="btn-close" data-action="weekly-timesheet#cancelOverride" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Total journalier après saisie : <strong data-weekly-timesheet-target="warningTotal">—</strong> h</p>
+                    <p>Seuil journalier maximum : <strong data-weekly-timesheet-target="warningMax">—</strong> h</p>
+                    <p class="text-danger">Dépassement : <strong data-weekly-timesheet-target="warningExcess">—</strong> h</p>
+                    <p class="small text-muted">Vous pouvez confirmer la saisie (override loggé pour audit) ou corriger.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-action="weekly-timesheet#cancelOverride">Annuler</button>
+                    <button type="button" class="btn btn-danger" data-action="weekly-timesheet#confirmOverride">Confirmer le dépassement</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
