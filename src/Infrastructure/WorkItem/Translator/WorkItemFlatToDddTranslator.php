@@ -11,6 +11,7 @@ use App\Domain\WorkItem\Entity\WorkItem as DddWorkItem;
 use App\Domain\WorkItem\ValueObject\HourlyRate;
 use App\Domain\WorkItem\ValueObject\WorkedHours;
 use App\Domain\WorkItem\ValueObject\WorkItemId;
+use App\Domain\WorkItem\ValueObject\WorkItemStatus;
 use App\Entity\Timesheet as FlatTimesheet;
 use DateTimeImmutable;
 use RuntimeException;
@@ -77,6 +78,7 @@ final class WorkItemFlatToDddTranslator
             extra: [
                 'taskId' => $taskId,
                 'notes' => $flat->getNotes(),
+                'status' => WorkItemStatus::tryFrom($flat->status) ?? WorkItemStatus::DRAFT,
                 'createdAt' => new DateTimeImmutable(),
                 'updatedAt' => null,
             ],

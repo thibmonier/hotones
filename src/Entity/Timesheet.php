@@ -126,6 +126,21 @@ class Timesheet implements CompanyOwnedInterface
         }
     }
 
+    /**
+     * EPIC-003 Phase 3 (sprint-021 US-101 ADR-0016 Q3.1) — workflow state
+     * machine 4 états (draft/validated/billed/paid).
+     *
+     * Default 'draft' pour rows existantes via migration Version20260510170000.
+     */
+    #[ORM\Column(type: 'string', length: 16, options: ['default' => 'draft'])]
+    #[Groups(['timesheet:read'])]
+    public string $status = 'draft' {
+        get => $this->status;
+        set {
+            $this->status = $value;
+        }
+    }
+
     public function getCompany(): Company
     {
         return $this->company;

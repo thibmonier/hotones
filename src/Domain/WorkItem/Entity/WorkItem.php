@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Domain\WorkItem\Entity;
 
 use App\Domain\Contributor\ValueObject\ContributorId;
+use App\Domain\Invoice\ValueObject\InvoiceId;
 use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Project\ValueObject\ProjectTaskId;
 use App\Domain\Shared\Interface\AggregateRootInterface;
 use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Money;
+use App\Domain\WorkItem\Event\WorkItemBilledEvent;
+use App\Domain\WorkItem\Event\WorkItemPaidEvent;
 use App\Domain\WorkItem\Event\WorkItemRecordedEvent;
 use App\Domain\WorkItem\Event\WorkItemRevisedEvent;
 use App\Domain\WorkItem\Event\WorkItemValidatedEvent;
@@ -191,6 +194,56 @@ final class WorkItem implements AggregateRootInterface
         $this->updatedAt = new DateTimeImmutable();
 
         $this->recordEvent(WorkItemValidatedEvent::create($this->id));
+    }
+
+    /**
+     * Workflow transition bill (validated → billed). Cross-aggregate :
+     * déclenché par listener `BillRelatedWorkItemsOnInvoiceCreated` consume
+     * `InvoiceCreatedEvent` avec workItemIds payload (AT-3.2 ADR-0016).
+     *
+     * Idempotent : pas de re-event si déjà billed.
+     *
+     * @throws WorkItemInvalidTransitionException si état actuel != VALIDATED et != BILLED
+     */
+    public function markAsBilled(InvoiceId $invoiceId): void
+    {
+        if ($this->status === WorkItemStatus::BILLED) {
+            return;
+        }
+
+        if (!$this->status->canTransitionTo(WorkItemStatus::BILLED)) {
+            throw new WorkItemInvalidTransitionException($this->id, $this->status, WorkItemStatus::BILLED);
+        }
+
+        $this->status = WorkItemStatus::BILLED;
+        $this->updatedAt = new DateTimeImmutable();
+
+        $this->recordEvent(WorkItemBilledEvent::create($this->id, $invoiceId));
+    }
+
+    /**
+     * Workflow transition mark_paid (billed → paid). Cross-aggregate :
+     * déclenchement automatique via `InvoicePaidEvent` listener = sprint-022+
+     * (sprint-021 livre la transition Domain).
+     *
+     * Idempotent : pas de re-event si déjà paid.
+     *
+     * @throws WorkItemInvalidTransitionException si état actuel != BILLED et != PAID
+     */
+    public function markAsPaid(InvoiceId $invoiceId): void
+    {
+        if ($this->status === WorkItemStatus::PAID) {
+            return;
+        }
+
+        if (!$this->status->canTransitionTo(WorkItemStatus::PAID)) {
+            throw new WorkItemInvalidTransitionException($this->id, $this->status, WorkItemStatus::PAID);
+        }
+
+        $this->status = WorkItemStatus::PAID;
+        $this->updatedAt = new DateTimeImmutable();
+
+        $this->recordEvent(WorkItemPaidEvent::create($this->id, $invoiceId));
     }
 
     // Calculations (pure — pas d'effet de bord, pas d'event)
