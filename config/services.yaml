@@ -72,6 +72,12 @@ services:
     App\Domain\WorkItem\Repository\WorkItemRepositoryInterface:
         alias: App\Infrastructure\WorkItem\Persistence\Doctrine\DoctrineDddWorkItemRepository
 
+    # WorkItem Domain Service — Domain pure mais nécessite autowire explicite
+    # car src/Domain/ exclu de l'auto-resolution (sprint-021 US-100/US-099)
+    App\Domain\WorkItem\Service\DailyHoursValidator:
+        autowire: true
+        autoconfigure: true
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
