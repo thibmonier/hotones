@@ -12,9 +12,12 @@ use App\Domain\Shared\Trait\RecordsDomainEvents;
 use App\Domain\Shared\ValueObject\Money;
 use App\Domain\WorkItem\Event\WorkItemRecordedEvent;
 use App\Domain\WorkItem\Event\WorkItemRevisedEvent;
+use App\Domain\WorkItem\Event\WorkItemValidatedEvent;
+use App\Domain\WorkItem\Exception\WorkItemInvalidTransitionException;
 use App\Domain\WorkItem\ValueObject\HourlyRate;
 use App\Domain\WorkItem\ValueObject\WorkedHours;
 use App\Domain\WorkItem\ValueObject\WorkItemId;
+use App\Domain\WorkItem\ValueObject\WorkItemStatus;
 use DateTimeImmutable;
 
 /**
@@ -48,6 +51,7 @@ final class WorkItem implements AggregateRootInterface
     private HourlyRate $costRate;
     private HourlyRate $billedRate;
     private ?string $notes;
+    private WorkItemStatus $status;
     private DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
@@ -70,6 +74,7 @@ final class WorkItem implements AggregateRootInterface
         $this->costRate = $costRate;
         $this->billedRate = $billedRate;
         $this->notes = null;
+        $this->status = WorkItemStatus::DRAFT;
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;
     }
@@ -110,7 +115,7 @@ final class WorkItem implements AggregateRootInterface
      * Reconstitute depuis stockage persistant (ACL Phase 2). N'enregistre PAS
      * d'event domain.
      *
-     * @param array{taskId?: ?ProjectTaskId, notes?: ?string, createdAt?: ?DateTimeImmutable, updatedAt?: ?DateTimeImmutable} $extra
+     * @param array{taskId?: ?ProjectTaskId, notes?: ?string, status?: ?WorkItemStatus, createdAt?: ?DateTimeImmutable, updatedAt?: ?DateTimeImmutable} $extra
      */
     public static function reconstitute(
         WorkItemId $id,
@@ -133,6 +138,7 @@ final class WorkItem implements AggregateRootInterface
             $extra['taskId'] ?? null,
         );
         $workItem->notes = $extra['notes'] ?? null;
+        $workItem->status = $extra['status'] ?? WorkItemStatus::DRAFT;
         $workItem->createdAt = $extra['createdAt'] ?? new DateTimeImmutable();
         $workItem->updatedAt = $extra['updatedAt'] ?? null;
 
@@ -162,6 +168,29 @@ final class WorkItem implements AggregateRootInterface
     {
         $this->notes = $notes;
         $this->updatedAt = new DateTimeImmutable();
+    }
+
+    /**
+     * Workflow transition validate (draft → validated).
+     *
+     * Idempotent : pas de re-event si déjà validated.
+     *
+     * @throws WorkItemInvalidTransitionException si état actuel != DRAFT et != VALIDATED
+     */
+    public function markAsValidated(): void
+    {
+        if ($this->status === WorkItemStatus::VALIDATED) {
+            return;
+        }
+
+        if (!$this->status->canTransitionTo(WorkItemStatus::VALIDATED)) {
+            throw new WorkItemInvalidTransitionException($this->id, $this->status, WorkItemStatus::VALIDATED);
+        }
+
+        $this->status = WorkItemStatus::VALIDATED;
+        $this->updatedAt = new DateTimeImmutable();
+
+        $this->recordEvent(WorkItemValidatedEvent::create($this->id));
     }
 
     // Calculations (pure — pas d'effet de bord, pas d'event)
@@ -241,6 +270,11 @@ final class WorkItem implements AggregateRootInterface
     public function getNotes(): ?string
     {
         return $this->notes;
+    }
+
+    public function getStatus(): WorkItemStatus
+    {
+        return $this->status;
     }
 
     public function getCreatedAt(): DateTimeImmutable
