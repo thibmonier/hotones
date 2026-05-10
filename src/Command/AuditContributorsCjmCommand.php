@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
 
 /**
  * Sprint-020 sub-epic D AUDIT-CONTRIBUTORS-CJM (Risk Q3 héritage audit
@@ -57,6 +58,12 @@ final class AuditContributorsCjmCommand extends Command
                 't',
                 InputOption::VALUE_NONE,
                 'Auditer également les TJM manquants (par défaut : CJM uniquement)',
+            )
+            ->addOption(
+                'audit-daily-hours',
+                null,
+                InputOption::VALUE_NONE,
+                'EPIC-003 Phase 3 (sprint-021 AUDIT-DAILY-HOURS) : auditer EmploymentPeriod.weeklyHours / workTimePercentage NULL ou aberrants (invariant journalier ADR-0015 inopérant si manquant)',
             );
     }
 
@@ -65,6 +72,16 @@ final class AuditContributorsCjmCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $includeInactive = (bool) $input->getOption('include-inactive');
         $auditTjm = (bool) $input->getOption('tjm');
+        $auditDailyHours = (bool) $input->getOption('audit-daily-hours');
+
+        // AT-3.4 + AT-3.5 (ADR-0016) : defense-in-depth Postgres-level —
+        // toute écriture rejetée par PG engine même si DB user a privilèges
+        // CRUD. Cost ~1 ligne SQL.
+        $this->enforceReadOnlyTransaction($io);
+
+        if ($auditDailyHours) {
+            return $this->executeDailyHoursAudit($io, $output, $includeInactive);
+        }
 
         $io->title('EPIC-003 — Audit Contributors sans CJM (Risk Q3)');
         $io->note(sprintf(
@@ -221,6 +238,189 @@ final class AuditContributorsCjmCommand extends Command
             }
             $line[] = $row['has_active_period'];
             $table->addRow($line);
+        }
+
+        $table->render();
+    }
+
+    /**
+     * AT-3.4 + AT-3.5 (ADR-0016) : SET TRANSACTION READ ONLY Postgres-level.
+     *
+     * Si DB engine n'est pas Postgres (ex SQLite tests), pattern best-effort
+     * — la commande ne fait que des SELECT donc impact écriture nul.
+     */
+    private function enforceReadOnlyTransaction(SymfonyStyle $io): void
+    {
+        $connection = $this->em->getConnection();
+        $platform = $connection->getDatabasePlatform()::class;
+
+        try {
+            // PostgreSQL : SET TRANSACTION READ ONLY (rejette toute écriture
+            // même si user a privilèges CRUD)
+            if (str_contains(strtolower($platform), 'postgres')) {
+                $connection->executeStatement('SET TRANSACTION READ ONLY');
+                $io->note('AT-3.5 : SET TRANSACTION READ ONLY appliqué (PostgreSQL).');
+
+                return;
+            }
+
+            // MariaDB / MySQL : equivalent
+            if (str_contains(strtolower($platform), 'mariadb') || str_contains(strtolower($platform), 'mysql')) {
+                $connection->executeStatement('SET TRANSACTION READ ONLY');
+                $io->note('AT-3.5 : SET TRANSACTION READ ONLY appliqué (MySQL/MariaDB).');
+
+                return;
+            }
+
+            // SQLite (tests) : pas de SET TRANSACTION READ ONLY natif. Skip.
+            $io->note(sprintf('AT-3.5 : platform %s ne supporte pas SET TRANSACTION READ ONLY — skip (commande SELECT-only intrinsèquement safe).', $platform));
+        } catch (Throwable $e) {
+            // Best-effort : ne pas bloquer audit si la transaction read-only échoue.
+            $io->warning(sprintf('SET TRANSACTION READ ONLY non appliqué : %s', $e->getMessage()));
+        }
+    }
+
+    /**
+     * EPIC-003 Phase 3 (sprint-021 AUDIT-DAILY-HOURS) — audit
+     * EmploymentPeriod.weeklyHours / workTimePercentage NULL ou aberrants.
+     *
+     * Invariant journalier (ADR-0015) :
+     *   dailyMaxHours = (weeklyHours × workTimePercentage / 100) / 5
+     *
+     * Si weeklyHours OU workTimePercentage NULL/0/aberrants → invariant
+     * journalier inopérant → DailyHoursValidator throw
+     * NoActiveEmploymentPeriodException ou calculs faux.
+     *
+     * Bornes valides :
+     * - weeklyHours : strictly > 0, max 80 (Domain VO WeeklyHours)
+     * - workTimePercentage : strictly > 0, max 100 (Domain VO WorkTimePercentage)
+     */
+    private function executeDailyHoursAudit(
+        SymfonyStyle $io,
+        OutputInterface $output,
+        bool $includeInactive,
+    ): int {
+        $io->title('EPIC-003 Phase 3 — Audit EmploymentPeriod weeklyHours / workTimePercentage');
+        $io->note(sprintf(
+            'Scope : %s · ADR-0015 invariant journalier',
+            $includeInactive ? 'tous contributeurs' : 'contributeurs actifs uniquement',
+        ));
+
+        $contributors = $this->loadContributors($includeInactive);
+
+        if ($contributors === []) {
+            $io->warning('Aucun contributeur trouvé dans le scope demandé.');
+
+            return Command::SUCCESS;
+        }
+
+        $io->info(sprintf('Analyse de %d contributeurs…', count($contributors)));
+
+        $issues = [];
+        $now = new DateTimeImmutable('today');
+
+        foreach ($contributors as $contributor) {
+            $period = $this->findActiveEmploymentPeriod($contributor, $now);
+
+            if ($period === null) {
+                $issues[] = [
+                    'id' => $contributor->getId(),
+                    'email' => $contributor->getEmail() ?? '(no email)',
+                    'name' => trim(($contributor->getFirstName() ?? '').' '.($contributor->getLastName() ?? '')),
+                    'weekly_hours' => '❌ aucune période active',
+                    'work_time_percentage' => '—',
+                    'daily_max_hours' => '—',
+                    'severity' => 'CRITICAL',
+                ];
+
+                continue;
+            }
+
+            $issue = $this->checkDailyHoursValidity($contributor, $period);
+            if ($issue !== null) {
+                $issues[] = $issue;
+            }
+        }
+
+        if ($issues === []) {
+            $io->success(sprintf(
+                'OK : tous les %d contributeurs ont weeklyHours + workTimePercentage valides (ADR-0015 invariant journalier opérant).',
+                count($contributors),
+            ));
+
+            return Command::SUCCESS;
+        }
+
+        $this->renderDailyHoursIssuesTable($output, $issues);
+
+        $io->warning(sprintf(
+            '⚠️ %d / %d contributeurs avec EmploymentPeriod weeklyHours/workTimePercentage invalides.',
+            count($issues),
+            count($contributors),
+        ));
+        $io->writeln('Action requise avant déploiement Phase 3 prod (US-099/US-101) :');
+        $io->listing([
+            '1. Corriger weeklyHours/workTimePercentage côté admin (EmploymentPeriod entity)',
+            '2. Re-exécuter --audit-daily-hours pour valider 0 issue',
+            '3. Marquer AUDIT-DAILY-HOURS résolu sprint-021 retro',
+        ]);
+
+        return Command::FAILURE;
+    }
+
+    /**
+     * @return array{id: int|null, email: string, name: string, weekly_hours: string, work_time_percentage: string, daily_max_hours: string, severity: string}|null
+     */
+    private function checkDailyHoursValidity(Contributor $contributor, EmploymentPeriod $period): ?array
+    {
+        $weeklyHoursStr = $period->weeklyHours;
+        $workTimePercentageStr = $period->workTimePercentage;
+
+        $weeklyHours = (float) $weeklyHoursStr;
+        $workTimePercentage = (float) $workTimePercentageStr;
+
+        $weeklyHoursValid = $weeklyHours > 0.0 && $weeklyHours <= 80.0;
+        $percentageValid = $workTimePercentage > 0.0 && $workTimePercentage <= 100.0;
+
+        if ($weeklyHoursValid && $percentageValid) {
+            return null;
+        }
+
+        $dailyMax = $weeklyHoursValid && $percentageValid
+            ? sprintf('%.2fh', ($weeklyHours * ($workTimePercentage / 100.0)) / 5.0)
+            : 'invariant invalide';
+
+        $severity = (!$weeklyHoursValid && !$percentageValid) ? 'CRITICAL' : 'WARN';
+
+        return [
+            'id' => $contributor->getId(),
+            'email' => $contributor->getEmail() ?? '(no email)',
+            'name' => trim($contributor->getFirstName().' '.$contributor->getLastName()),
+            'weekly_hours' => $weeklyHoursValid ? '✅ '.$weeklyHoursStr : '❌ '.($weeklyHoursStr === '' ? 'vide' : $weeklyHoursStr),
+            'work_time_percentage' => $percentageValid ? '✅ '.$workTimePercentageStr : '❌ '.($workTimePercentageStr === '' ? 'vide' : $workTimePercentageStr),
+            'daily_max_hours' => $dailyMax,
+            'severity' => $severity,
+        ];
+    }
+
+    /**
+     * @param list<array{id: int|null, email: string, name: string, weekly_hours: string, work_time_percentage: string, daily_max_hours: string, severity: string}> $issues
+     */
+    private function renderDailyHoursIssuesTable(OutputInterface $output, array $issues): void
+    {
+        $table = new Table($output);
+        $table->setHeaders(['Sev', 'ID', 'Email', 'Nom', 'weeklyHours', 'workTimePercentage', 'dailyMaxHours']);
+
+        foreach ($issues as $row) {
+            $table->addRow([
+                $row['severity'],
+                $row['id'],
+                $row['email'],
+                $row['name'],
+                $row['weekly_hours'],
+                $row['work_time_percentage'],
+                $row['daily_max_hours'],
+            ]);
         }
 
         $table->render();
