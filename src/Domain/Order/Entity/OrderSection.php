@@ -19,22 +19,17 @@ use InvalidArgumentException;
  */
 final class OrderSection
 {
-    private OrderSectionId $id;
     private string $title;
-    private int $position;
-    private DateTimeImmutable $createdAt;
+    private readonly DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
     /** @var array<OrderLine> */
     private array $lines = [];
 
-    private function __construct(OrderSectionId $id, string $title, int $position)
+    private function __construct(private readonly OrderSectionId $id, string $title, private int $position)
     {
         $this->validateTitle($title);
-
-        $this->id = $id;
         $this->title = $title;
-        $this->position = $position;
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;
     }

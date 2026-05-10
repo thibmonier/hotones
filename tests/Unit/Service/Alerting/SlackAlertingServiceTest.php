@@ -70,7 +70,7 @@ final class SlackAlertingServiceTest extends TestCase
 
     public function testSendAlertCatchesNetworkException(): void
     {
-        $client = new MockHttpClient(static function () {
+        $client = new MockHttpClient(static function (): void {
             throw new RuntimeException('network down');
         });
 

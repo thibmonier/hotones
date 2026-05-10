@@ -7,11 +7,13 @@ namespace App\Infrastructure\Vacation\Persistence\Doctrine\Type;
 use App\Domain\Vacation\ValueObject\DailyHours;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Override;
 
 final class DailyHoursType extends Type
 {
     public const string NAME = 'daily_hours';
 
+    #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?DailyHours
     {
         if ($value === null) {
@@ -21,6 +23,7 @@ final class DailyHoursType extends Type
         return DailyHours::fromString((string) $value);
     }
 
+    #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if ($value === null) {

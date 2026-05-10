@@ -44,38 +44,21 @@ use DateTimeImmutable;
 final class WorkItem implements AggregateRootInterface
 {
     use RecordsDomainEvents;
-
-    private WorkItemId $id;
-    private ProjectId $projectId;
-    private ContributorId $contributorId;
-    private ?ProjectTaskId $taskId;
-    private DateTimeImmutable $workedOn;
-    private WorkedHours $hours;
-    private HourlyRate $costRate;
-    private HourlyRate $billedRate;
     private ?string $notes;
     private WorkItemStatus $status;
     private DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
-        WorkItemId $id,
-        ProjectId $projectId,
-        ContributorId $contributorId,
-        DateTimeImmutable $workedOn,
-        WorkedHours $hours,
-        HourlyRate $costRate,
-        HourlyRate $billedRate,
-        ?ProjectTaskId $taskId = null,
+        private WorkItemId $id,
+        private ProjectId $projectId,
+        private ContributorId $contributorId,
+        private DateTimeImmutable $workedOn,
+        private WorkedHours $hours,
+        private HourlyRate $costRate,
+        private HourlyRate $billedRate,
+        private ?ProjectTaskId $taskId = null,
     ) {
-        $this->id = $id;
-        $this->projectId = $projectId;
-        $this->contributorId = $contributorId;
-        $this->taskId = $taskId;
-        $this->workedOn = $workedOn;
-        $this->hours = $hours;
-        $this->costRate = $costRate;
-        $this->billedRate = $billedRate;
         $this->notes = null;
         $this->status = WorkItemStatus::DRAFT;
         $this->createdAt = new DateTimeImmutable();

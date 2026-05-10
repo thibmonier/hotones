@@ -56,7 +56,7 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
     public function testThrowsWhenClientNotFound(): void
     {
         $company = new FlatCompany();
-        (new ReflectionProperty(FlatCompany::class, 'id'))->setValue($company, 1);
+        new ReflectionProperty(FlatCompany::class, 'id')->setValue($company, 1);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('find')->willReturnCallback(
@@ -164,10 +164,10 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
         ?Closure $persistCapture = null,
     ): CreateInvoiceDraftUseCase {
         $company = new FlatCompany();
-        (new ReflectionProperty(FlatCompany::class, 'id'))->setValue($company, 1);
+        new ReflectionProperty(FlatCompany::class, 'id')->setValue($company, 1);
 
         $client = new FlatClient();
-        (new ReflectionProperty(FlatClient::class, 'id'))->setValue($client, 7);
+        new ReflectionProperty(FlatClient::class, 'id')->setValue($client, 7);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('find')->willReturnCallback(
@@ -180,7 +180,7 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
         $em->method('persist')->willReturnCallback(
             function (object $entity) use ($persistedId, $persistCapture): void {
                 if ($entity instanceof FlatInvoice) {
-                    (new ReflectionProperty(FlatInvoice::class, 'id'))->setValue($entity, $persistedId);
+                    new ReflectionProperty(FlatInvoice::class, 'id')->setValue($entity, $persistedId);
                     if ($persistCapture !== null) {
                         $persistCapture($entity);
                     }

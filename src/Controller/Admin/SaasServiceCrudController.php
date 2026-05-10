@@ -63,7 +63,7 @@ class SaasServiceCrudController extends AbstractCrudController
         yield AssociationField::new('provider', 'Fournisseur')
             ->setRequired(false)
             ->setQueryBuilder(
-                fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
+                fn (\Doctrine\ORM\QueryBuilder $qb): \Doctrine\ORM\QueryBuilder => $qb
                     ->andWhere('entity.active = :active')
                     ->setParameter('active', true)
                     ->orderBy('entity.name', 'ASC'),

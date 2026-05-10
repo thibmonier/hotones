@@ -33,7 +33,7 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
         $flat->hours = '7.50';
         $flat->notes = 'old notes';
 
-        (new WorkItemDddToFlatTranslator())->applyTo($ddd, $flat);
+        new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
         self::assertSame('8', $flat->hours);
         self::assertSame('synced notes', $flat->notes);
@@ -47,7 +47,7 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
         $flat = $this->makeFlatTimesheet();
         $flat->notes = 'some legacy note';
 
-        (new WorkItemDddToFlatTranslator())->applyTo($ddd, $flat);
+        new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
         self::assertNull($flat->notes);
     }
@@ -65,7 +65,7 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
         $originalProjectId = $flat->project->getId();
         $originalDate = $flat->date;
 
-        (new WorkItemDddToFlatTranslator())->applyTo($ddd, $flat);
+        new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
         self::assertSame($originalId, $flat->getId());
         self::assertSame($originalContributorId, $flat->contributor->getId());
@@ -82,7 +82,7 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
 
         $ddd->reviseHours(WorkedHours::fromFloat(8.0));
 
-        (new WorkItemDddToFlatTranslator())->applyTo($ddd, $flat);
+        new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
         self::assertSame('8', $flat->hours);
     }
@@ -103,13 +103,13 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
     private function makeFlatTimesheet(): FlatTimesheet
     {
         $project = new FlatProject();
-        (new ReflectionProperty(FlatProject::class, 'id'))->setValue($project, 11);
+        new ReflectionProperty(FlatProject::class, 'id')->setValue($project, 11);
 
         $contributor = new FlatContributor();
-        (new ReflectionProperty(FlatContributor::class, 'id'))->setValue($contributor, 7);
+        new ReflectionProperty(FlatContributor::class, 'id')->setValue($contributor, 7);
 
         $flat = new FlatTimesheet();
-        (new ReflectionProperty(FlatTimesheet::class, 'id'))->setValue($flat, 42);
+        new ReflectionProperty(FlatTimesheet::class, 'id')->setValue($flat, 42);
         $flat->project = $project;
         $flat->contributor = $contributor;
         $flat->date = new DateTimeImmutable('2026-04-15');

@@ -151,7 +151,7 @@ class Technology implements CompanyOwnedInterface
     public function getExperts(): Collection
     {
         return $this->contributorTechnologies->filter(
-            fn (ContributorTechnology $ct) => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
+            fn (ContributorTechnology $ct): bool => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
         );
     }
 

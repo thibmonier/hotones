@@ -105,7 +105,7 @@ final readonly class CreateInvoiceDraftUseCase
         // "must not be accessed before initialization" error if uninit.
         // Use ReflectionProperty::isInitialized() pour bypass the property hook
         // getter et check le backing storage directement.
-        $invoiceNumberInitialized = (new ReflectionProperty($flat, 'invoiceNumber'))->isInitialized($flat);
+        $invoiceNumberInitialized = new ReflectionProperty($flat, 'invoiceNumber')->isInitialized($flat);
         if (!$invoiceNumberInitialized || $flat->invoiceNumber === '') {
             $flat->invoiceNumber = sprintf('F%04d%02d%03d', (int) date('Y'), (int) date('n'), random_int(100, 999));
         }

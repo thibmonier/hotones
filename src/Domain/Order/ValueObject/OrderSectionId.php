@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Order\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
  * Value Object representing an OrderSection identifier.
  */
-final readonly class OrderSectionId
+final readonly class OrderSectionId implements Stringable
 {
     private function __construct(
         private string $value,

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Domain\Order\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
-final readonly class OrderId
+final readonly class OrderId implements Stringable
 {
     private const string LEGACY_PREFIX = 'legacy:';
 

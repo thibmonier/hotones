@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Domain\Client\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 
-final readonly class CompanyName
+final readonly class CompanyName implements Stringable
 {
     private const int MIN_LENGTH = 2;
     private const int MAX_LENGTH = 255;

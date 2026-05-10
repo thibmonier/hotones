@@ -141,7 +141,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         // Verify 1 yearly message
         $yearlyMessages = array_filter($dispatchedDates, fn ($d): bool => $d['granularity'] === 'yearly');
         $this->assertCount(1, $yearlyMessages);
-        $this->assertEquals('2023-01-01', array_values($yearlyMessages)[0]['date']);
+        $this->assertEquals('2023-01-01', array_first($yearlyMessages)['date']);
     }
 
     public function testExecuteWithDateDefaultGranularity(): void

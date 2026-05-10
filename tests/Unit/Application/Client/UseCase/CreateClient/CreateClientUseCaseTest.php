@@ -38,7 +38,7 @@ final class CreateClientUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
             &$persistedFlat,
-        ) {
+        ): void {
             $persistedFlat = clone $flat;
         });
 
@@ -52,7 +52,7 @@ final class CreateClientUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
             &$persistedFlat,
-        ) {
+        ): void {
             $persistedFlat = clone $flat;
         });
 
@@ -66,7 +66,7 @@ final class CreateClientUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
             &$persistedFlat,
-        ) {
+        ): void {
             $persistedFlat = clone $flat;
         });
 
@@ -88,7 +88,7 @@ final class CreateClientUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
             &$persistedFlat,
-        ) {
+        ): void {
             $persistedFlat = clone $flat;
         });
 
@@ -102,7 +102,7 @@ final class CreateClientUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
             &$persistedFlat,
-        ) {
+        ): void {
             $persistedFlat = clone $flat;
         });
 

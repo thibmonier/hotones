@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Override;
 
 /**
  * Abstract Doctrine type for string-based Value Objects.
@@ -33,6 +34,7 @@ abstract class AbstractStringType extends Type
     /**
      * @return T|null
      */
+    #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         if ($value === null || $value === '') {
@@ -45,6 +47,7 @@ abstract class AbstractStringType extends Type
         return $class::fromString($value);
     }
 
+    #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
         if ($value === null) {

@@ -20,7 +20,7 @@ final class EmployeeLevelFactory extends PersistentObjectFactory
     /**
      * Configuration par défaut des 12 niveaux avec fourchettes salariales.
      */
-    private const LEVELS_CONFIG = [
+    private const array LEVELS_CONFIG = [
         1 => [
             'name' => 'Junior 1',
             'salaryMin' => 28000,

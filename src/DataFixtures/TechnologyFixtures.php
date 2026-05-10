@@ -20,7 +20,7 @@ class TechnologyFixtures extends Fixture implements FixtureGroupInterface
     /**
      * Configuration des technologies par catégorie avec couleurs associées.
      */
-    private const TECHNOLOGIES = [
+    private const array TECHNOLOGIES = [
         // Langages de programmation
         ['name' => 'PHP', 'category' => 'language', 'color' => '#777BB4'],
         ['name' => 'JavaScript', 'category' => 'language', 'color' => '#F7DF1E'],

@@ -248,8 +248,10 @@ class ImportTheTribePlanningCommand extends Command
 
         for ($row = 3; $row <= $sheet->getHighestDataRow(); ++$row) {
             $rawName = trim((string) $sheet->getCell('A'.$row)->getValue());
-
-            if ($rawName === '' || in_array($rawName, self::SECTION_HEADERS, true)) {
+            if ($rawName === '') {
+                continue;
+            }
+            if (in_array($rawName, self::SECTION_HEADERS, true)) {
                 continue;
             }
 
@@ -297,8 +299,10 @@ class ImportTheTribePlanningCommand extends Command
         foreach ($weekDates as $colIdx => $weekStart) {
             $coordinate = Coordinate::stringFromColumnIndex($colIdx);
             $cellValue = $sheet->getCell($coordinate.$row)->getValue();
-
-            if ($cellValue === null || trim((string) $cellValue) === '') {
+            if ($cellValue === null) {
+                continue;
+            }
+            if (trim((string) $cellValue) === '') {
                 continue;
             }
 
@@ -450,13 +454,7 @@ class ImportTheTribePlanningCommand extends Command
             return true;
         }
 
-        foreach (self::SKIP_NAMES as $skipName) {
-            if (mb_strtolower($name) === mb_strtolower($skipName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SKIP_NAMES, fn ($skipName): bool => mb_strtolower($name) === mb_strtolower((string) $skipName));
     }
 
     private function resolveContributor(string $rawName): ?Contributor

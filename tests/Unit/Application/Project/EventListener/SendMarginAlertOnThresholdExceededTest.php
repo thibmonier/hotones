@@ -82,9 +82,7 @@ final class SendMarginAlertOnThresholdExceededTest extends TestCase
             ->method('info')
             ->with(
                 self::stringContains('MarginThresholdExceeded'),
-                self::callback(function (array $context): bool {
-                    return ($context['slack_sent'] ?? null) === false;
-                }),
+                self::callback(fn (array $context): bool => ($context['slack_sent'] ?? null) === false),
             );
 
         $listener = new SendMarginAlertOnThresholdExceeded($slack, $logger);

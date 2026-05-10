@@ -40,7 +40,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
     public function testContractTypeForfait(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatOrder $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatOrder $flat) use (&$persistedFlat): void {
             $persistedFlat = clone $flat;
         });
 
@@ -109,7 +109,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
     public function testTitleAndDescriptionApplied(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatOrder $flat) use (&$persistedFlat) {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatOrder $flat) use (&$persistedFlat): void {
             $persistedFlat = clone $flat;
         });
 

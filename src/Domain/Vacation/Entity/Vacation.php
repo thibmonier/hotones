@@ -23,36 +23,21 @@ final class Vacation implements CompanyOwnedInterface
 {
     /** @var list<object> */
     private array $domainEvents = [];
-
-    private VacationId $id;
-    private Company $company;
-    private Contributor $contributor;
-    private DateRange $dateRange;
-    private VacationType $type;
     private VacationStatus $status;
-    private DailyHours $dailyHours;
-    private ?string $reason;
     private ?string $rejectionReason = null;
-    private DateTimeImmutable $createdAt;
+    private readonly DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $approvedAt;
     private ?User $approvedBy;
 
     private function __construct(
-        VacationId $id,
-        Company $company,
-        Contributor $contributor,
-        DateRange $dateRange,
-        VacationType $type,
-        DailyHours $dailyHours,
-        ?string $reason,
+        private readonly VacationId $id,
+        private Company $company,
+        private readonly Contributor $contributor,
+        private readonly DateRange $dateRange,
+        private readonly VacationType $type,
+        private readonly DailyHours $dailyHours,
+        private readonly ?string $reason,
     ) {
-        $this->id = $id;
-        $this->company = $company;
-        $this->contributor = $contributor;
-        $this->dateRange = $dateRange;
-        $this->type = $type;
-        $this->dailyHours = $dailyHours;
-        $this->reason = $reason;
         $this->status = VacationStatus::PENDING;
         $this->createdAt = new DateTimeImmutable();
         $this->approvedAt = null;

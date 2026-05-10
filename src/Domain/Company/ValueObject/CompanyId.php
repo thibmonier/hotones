@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Company\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
  * Value object representing a Company's unique identifier.
  */
-final readonly class CompanyId
+final readonly class CompanyId implements Stringable
 {
     private const string LEGACY_PREFIX = 'legacy:';
 

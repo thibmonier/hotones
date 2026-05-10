@@ -32,13 +32,9 @@ final class UpdateClientUseCaseTest extends TestCase
         $repo
             ->expects($this->once())
             ->method('save')
-            ->with($this->callback(function (Client $client): bool {
-                return
-                    $client->getName()->getValue() === 'New Name'
-                    && $client->getServiceLevel() === ServiceLevel::ENTERPRISE
-                    && $client->getNotes() === 'Updated notes'
-                ;
-            }));
+            ->with($this->callback(fn (Client $client): bool => $client->getName()->getValue() === 'New Name'
+            && $client->getServiceLevel() === ServiceLevel::ENTERPRISE
+            && $client->getNotes() === 'Updated notes'));
 
         $useCase = new UpdateClientUseCase($repo);
         $useCase->execute(new UpdateClientCommand(

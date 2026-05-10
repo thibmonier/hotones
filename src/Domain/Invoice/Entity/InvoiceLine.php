@@ -17,34 +17,25 @@ use InvalidArgumentException;
  */
 final class InvoiceLine
 {
-    private InvoiceLineId $id;
     private string $description;
     private float $quantity;
-    private Money $unitPriceHt;
-    private TaxRate $taxRate;
     private ?string $unit;
-    private int $position;
-    private DateTimeImmutable $createdAt;
+    private readonly DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
-        InvoiceLineId $id,
+        private readonly InvoiceLineId $id,
         string $description,
         float $quantity,
-        Money $unitPriceHt,
-        TaxRate $taxRate,
-        int $position,
+        private Money $unitPriceHt,
+        private TaxRate $taxRate,
+        private int $position,
     ) {
         $this->validateDescription($description);
         $this->validateQuantity($quantity);
-
-        $this->id = $id;
         $this->description = $description;
         $this->quantity = $quantity;
-        $this->unitPriceHt = $unitPriceHt;
-        $this->taxRate = $taxRate;
         $this->unit = null;
-        $this->position = $position;
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;
     }

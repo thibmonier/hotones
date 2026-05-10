@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Override;
 
 /**
  * Abstract base class for UUID-based Value Object Doctrine types.
@@ -30,6 +31,7 @@ abstract class AbstractUuidType extends Type
         return $platform->getGuidTypeDeclarationSQL($column);
     }
 
+    #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         if ($value === null || $value === '') {
@@ -41,6 +43,7 @@ abstract class AbstractUuidType extends Type
         return $class::fromString($value);
     }
 
+    #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
         if ($value === null) {

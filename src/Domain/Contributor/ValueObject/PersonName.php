@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Domain\Contributor\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 
-final readonly class PersonName
+final readonly class PersonName implements Stringable
 {
     private function __construct(
         private string $firstName,

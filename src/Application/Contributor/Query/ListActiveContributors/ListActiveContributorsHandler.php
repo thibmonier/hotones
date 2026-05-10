@@ -29,7 +29,7 @@ final readonly class ListActiveContributorsHandler
         $contributors = $this->contributorRepository->findActive();
 
         return array_map(
-            static fn ($contributor) => ContributorListItemDto::fromAggregate($contributor),
+            ContributorListItemDto::fromAggregate(...),
             $contributors,
         );
     }

@@ -812,7 +812,7 @@ class Project implements CompanyOwnedInterface
      */
     public function getCriticalSkills(): Collection
     {
-        return $this->projectSkills->filter(fn (ProjectSkill $ps) => $ps->getPriority() >= ProjectSkill::PRIORITY_HIGH);
+        return $this->projectSkills->filter(fn (ProjectSkill $ps): bool => $ps->getPriority() >= ProjectSkill::PRIORITY_HIGH);
     }
 
     /**

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Domain\Vacation\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
-final readonly class VacationId
+final readonly class VacationId implements Stringable
 {
     private function __construct(
         private string $value,

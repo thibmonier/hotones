@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Invoice\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 
 /**
  * Invoice number value object.
@@ -15,7 +16,7 @@ use InvalidArgumentException;
  * - MM: Month (2 digits)
  * - NNN: Sequential number (3+ digits, zero-padded)
  */
-final readonly class InvoiceNumber
+final readonly class InvoiceNumber implements Stringable
 {
     private const string PREFIX = 'F';
     private const string PATTERN = '/^F\d{4}\d{2}\d{3,}$/';

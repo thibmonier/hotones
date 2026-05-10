@@ -573,7 +573,7 @@ class Contributor implements CompanyOwnedInterface
      */
     public function getRecentTechnologies(): Collection
     {
-        return $this->contributorTechnologies->filter(fn (ContributorTechnology $ct) => $ct->isRecent());
+        return $this->contributorTechnologies->filter(fn (ContributorTechnology $ct): bool => $ct->isRecent());
     }
 
     /**
@@ -584,7 +584,7 @@ class Contributor implements CompanyOwnedInterface
     public function getExpertTechnologies(): Collection
     {
         return $this->contributorTechnologies->filter(
-            fn (ContributorTechnology $ct) => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
+            fn (ContributorTechnology $ct): bool => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
         );
     }
 

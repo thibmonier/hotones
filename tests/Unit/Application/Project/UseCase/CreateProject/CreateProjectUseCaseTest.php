@@ -36,7 +36,7 @@ final class CreateProjectUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (
             &$persistedFlat,
-        ) {
+        ): void {
             $persistedFlat = clone $flat;
         });
 
@@ -104,7 +104,7 @@ final class CreateProjectUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (
             &$persistedFlat,
-        ) {
+        ): void {
             $persistedFlat = clone $flat;
         });
 

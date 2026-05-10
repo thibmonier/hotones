@@ -149,13 +149,14 @@ class PlanningSkillRepository extends CompanyAwareRepository
             $met = false;
 
             foreach ($contributor->getContributorSkills() as $contributorSkill) {
-                if ($contributorSkill->getSkill()?->getId() === $planningSkill->getSkill()?->getId()) {
-                    if ($contributorSkill->getEffectiveLevel() >= $planningSkill->getRequiredLevel()) {
-                        $met = true;
-
-                        break;
-                    }
+                if ($contributorSkill->getSkill()?->getId() !== $planningSkill->getSkill()?->getId()) {
+                    continue;
                 }
+                if ($contributorSkill->getEffectiveLevel() < $planningSkill->getRequiredLevel()) {
+                    continue;
+                }
+                $met = true;
+                break;
             }
 
             if (!$met) {
@@ -185,13 +186,14 @@ class PlanningSkillRepository extends CompanyAwareRepository
             $total += $weight;
 
             foreach ($contributor->getContributorSkills() as $contributorSkill) {
-                if ($contributorSkill->getSkill()?->getId() === $planningSkill->getSkill()?->getId()) {
-                    if ($contributorSkill->getEffectiveLevel() >= $planningSkill->getRequiredLevel()) {
-                        $met += $weight;
-
-                        break;
-                    }
+                if ($contributorSkill->getSkill()?->getId() !== $planningSkill->getSkill()?->getId()) {
+                    continue;
                 }
+                if ($contributorSkill->getEffectiveLevel() < $planningSkill->getRequiredLevel()) {
+                    continue;
+                }
+                $met += $weight;
+                break;
             }
         }
 

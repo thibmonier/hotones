@@ -79,7 +79,7 @@ final class ApproveVacationHandlerTest extends TestCase
     private function makeUser(int $id): User
     {
         $user = new User();
-        (new ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+        new ReflectionProperty(User::class, 'id')->setValue($user, $id);
 
         return $user;
     }

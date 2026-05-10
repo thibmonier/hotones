@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\EmployeeLevelRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'employee_levels')]
 #[ORM\Index(name: 'idx_employee_level_company', columns: ['company_id'])]
 #[ORM\UniqueConstraint(name: 'unique_level_per_company', columns: ['company_id', 'level'])]
-class EmployeeLevel implements CompanyOwnedInterface
+class EmployeeLevel implements CompanyOwnedInterface, Stringable
 {
     public const CATEGORY_JUNIOR = 'junior';
     public const CATEGORY_EXPERIENCED = 'experienced';

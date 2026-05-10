@@ -24,27 +24,18 @@ use DateTimeImmutable;
 final class Contributor implements AggregateRootInterface
 {
     use RecordsDomainEvents;
-
-    private ContributorId $id;
-    private CompanyId $companyId;
-    private PersonName $name;
     private ?string $email;
-    private ContractStatus $status;
     private ?ContributorId $managerId;
     private DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
-        ContributorId $id,
-        CompanyId $companyId,
-        PersonName $name,
-        ContractStatus $status,
+        private ContributorId $id,
+        private CompanyId $companyId,
+        private PersonName $name,
+        private ContractStatus $status,
     ) {
-        $this->id = $id;
-        $this->companyId = $companyId;
-        $this->name = $name;
         $this->email = null;
-        $this->status = $status;
         $this->managerId = null;
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = null;

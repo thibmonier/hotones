@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Project\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
  * Project identifier value object.
  */
-final readonly class ProjectId
+final readonly class ProjectId implements Stringable
 {
     /** Legacy int-id prefix used during EPIC-001 Phase 2 strangler fig. */
     private const string LEGACY_PREFIX = 'legacy:';

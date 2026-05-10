@@ -6,6 +6,7 @@ namespace App\Infrastructure\Persistence\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Override;
 
 /**
  * Abstract base class for PHP 8.1+ backed enum Doctrine types.
@@ -39,6 +40,7 @@ abstract class AbstractEnumType extends Type
     /**
      * @return T|null
      */
+    #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         if ($value === null || $value === '') {
@@ -50,6 +52,7 @@ abstract class AbstractEnumType extends Type
         return $enumClass::from($value);
     }
 
+    #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
         if ($value === null) {

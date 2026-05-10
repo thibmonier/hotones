@@ -9,7 +9,6 @@ use App\Domain\Contributor\Entity\Contributor as DddContributor;
 use App\Domain\Contributor\Exception\ContributorNotFoundException;
 use App\Domain\Contributor\Repository\ContributorRepositoryInterface;
 use App\Domain\Contributor\ValueObject\ContributorId;
-use App\Entity\Contributor as FlatContributor;
 use App\Infrastructure\Contributor\Translator\ContributorDddToFlatTranslator;
 use App\Infrastructure\Contributor\Translator\ContributorFlatToDddTranslator;
 use App\Repository\ContributorRepository as FlatContributorRepository;
@@ -63,7 +62,7 @@ final readonly class DoctrineDddContributorRepository implements ContributorRepo
         $flats = $this->flatRepository->findBy(['active' => true]);
 
         return array_map(
-            fn (FlatContributor $flat): DddContributor => $this->flatToDdd->translate($flat),
+            $this->flatToDdd->translate(...),
             $flats,
         );
     }
@@ -80,7 +79,7 @@ final readonly class DoctrineDddContributorRepository implements ContributorRepo
         $flats = $this->flatRepository->findBy(['company' => $companyId->toLegacyInt()]);
 
         return array_map(
-            fn (FlatContributor $flat): DddContributor => $this->flatToDdd->translate($flat),
+            $this->flatToDdd->translate(...),
             $flats,
         );
     }
@@ -97,7 +96,7 @@ final readonly class DoctrineDddContributorRepository implements ContributorRepo
         $flats = $this->flatRepository->findBy(['manager' => $managerId->toLegacyInt()]);
 
         return array_map(
-            fn (FlatContributor $flat): DddContributor => $this->flatToDdd->translate($flat),
+            $this->flatToDdd->translate(...),
             $flats,
         );
     }

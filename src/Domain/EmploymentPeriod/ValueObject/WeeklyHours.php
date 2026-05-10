@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Domain\EmploymentPeriod\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 
-final readonly class WeeklyHours
+final readonly class WeeklyHours implements Stringable
 {
     private const float MIN_HOURS = 0.0;
     private const float MAX_HOURS = 80.0;

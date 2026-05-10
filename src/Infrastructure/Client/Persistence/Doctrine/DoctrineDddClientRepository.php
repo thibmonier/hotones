@@ -9,7 +9,6 @@ use App\Domain\Client\Exception\ClientNotFoundException;
 use App\Domain\Client\Repository\ClientRepositoryInterface;
 use App\Domain\Client\ValueObject\ClientId;
 use App\Domain\Shared\ValueObject\Email;
-use App\Entity\Client as FlatClient;
 use App\Infrastructure\Client\Translator\ClientDddToFlatTranslator;
 use App\Infrastructure\Client\Translator\ClientFlatToDddTranslator;
 use App\Repository\ClientRepository as FlatClientRepository;
@@ -84,7 +83,7 @@ final readonly class DoctrineDddClientRepository implements ClientRepositoryInte
     {
         $flatClients = $this->flatRepository->findAllForCurrentCompany(['name' => 'ASC']);
 
-        return array_map(fn (FlatClient $flat): DddClient => $this->flatToDdd->translate($flat), $flatClients);
+        return array_map($this->flatToDdd->translate(...), $flatClients);
     }
 
     /**

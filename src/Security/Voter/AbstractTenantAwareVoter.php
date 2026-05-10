@@ -100,12 +100,7 @@ abstract class AbstractTenantAwareVoter extends Voter
     protected function userHasAnyRole(User $user, string ...$roles): bool
     {
         $userRoles = $user->getRoles();
-        foreach ($roles as $role) {
-            if (in_array($role, $userRoles, true)) {
-                return true;
-            }
-        }
 
-        return false;
+        return array_any($roles, fn ($role): bool => in_array($role, $userRoles, true));
     }
 }

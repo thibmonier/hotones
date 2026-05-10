@@ -148,7 +148,7 @@ final class CompanyVoterTest extends TestCase
     {
         $company = $this->makeCompany(1);
         $user = $this->makeUser(42, $company, ['ROLE_INTERVENANT'], isChefProjet: false, isManager: false);
-        $subject = $this->makeSubject($company, className: 'App\\Entity\\Project');
+        $subject = $this->makeSubject($company, className: \App\Entity\Project::class);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
 
@@ -162,7 +162,7 @@ final class CompanyVoterTest extends TestCase
     {
         $company = $this->makeCompany(1);
         $user = $this->makeUser(42, $company, ['ROLE_MANAGER'], isChefProjet: true, isManager: true);
-        $subject = $this->makeSubject($company, className: 'App\\Entity\\Project');
+        $subject = $this->makeSubject($company, className: \App\Entity\Project::class);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
 
@@ -176,7 +176,7 @@ final class CompanyVoterTest extends TestCase
     {
         $company = $this->makeCompany(1);
         $user = $this->makeUser(42, $company, ['ROLE_CHEF_PROJET'], isChefProjet: true, isManager: false);
-        $subject = $this->makeSubject($company, className: 'App\\Entity\\Order');
+        $subject = $this->makeSubject($company, className: \App\Entity\Order::class);
 
         $this->companyContext->method('getCurrentCompany')->willReturn($company);
 

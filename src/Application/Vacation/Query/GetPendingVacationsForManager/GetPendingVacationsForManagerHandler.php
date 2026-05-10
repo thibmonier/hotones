@@ -33,6 +33,6 @@ final readonly class GetPendingVacationsForManagerHandler
 
         $vacations = $this->vacationRepository->findPendingForContributors($managedContributors->toArray());
 
-        return array_map(static fn ($vacation): VacationDTO => VacationDTO::fromEntity($vacation), $vacations);
+        return array_map(VacationDTO::fromEntity(...), $vacations);
     }
 }

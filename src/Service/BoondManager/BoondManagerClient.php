@@ -18,8 +18,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class BoondManagerClient
 {
-    private const TIMEOUT = 30;
-    private const MAX_RESULTS_PER_PAGE = 100;
+    private const int TIMEOUT = 30;
+    private const int MAX_RESULTS_PER_PAGE = 100;
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
