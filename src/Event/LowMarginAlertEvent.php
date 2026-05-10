@@ -7,6 +7,17 @@ namespace App\Event;
 use App\Entity\Project;
 use App\Enum\NotificationType;
 
+/**
+ * @deprecated Sprint-022 US-105 (AT-3.3 ADR-0016) — use
+ * `App\Domain\Project\Event\MarginThresholdExceededEvent` instead.
+ *
+ * `AlertDetectionService` dispatches both events sprint-022 (coexistence
+ * pour préserver in-app notifications via NotificationSubscriber).
+ *
+ * Removal planned sprint-023+ après refactor `NotificationSubscriber`
+ * pour consume Domain Events directement (translator Domain → Notification
+ * OR new Domain handler crée Notification entity).
+ */
 class LowMarginAlertEvent extends NotificationEvent
 {
     public function __construct(

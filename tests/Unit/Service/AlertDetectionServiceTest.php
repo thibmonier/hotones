@@ -23,6 +23,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Unit tests for AlertDetectionService threshold/dispatch behaviour
@@ -44,6 +46,7 @@ final class AlertDetectionServiceTest extends TestCase
     private StaffingMetricsRepository&Stub $staffingMetricsRepository;
     private ProfitabilityPredictor&Stub $profitabilityPredictor;
     private EventDispatcherInterface&MockObject $eventDispatcher;
+    private MessageBusInterface&MockObject $messageBus;
     private AlertDetectionService $service;
 
     protected function setUp(): void
@@ -55,6 +58,9 @@ final class AlertDetectionServiceTest extends TestCase
         $this->staffingMetricsRepository = $this->createStub(StaffingMetricsRepository::class);
         $this->profitabilityPredictor = $this->createStub(ProfitabilityPredictor::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->messageBus = $this->createMock(MessageBusInterface::class);
+        $this->messageBus->method('dispatch')
+            ->willReturnCallback(static fn (object $e): Envelope => new Envelope($e));
 
         $this->userRepository->method('findByRole')->willReturn([]);
         $this->contributorRepository->method('findActiveContributors')->willReturn([]);
@@ -67,6 +73,7 @@ final class AlertDetectionServiceTest extends TestCase
             $this->staffingMetricsRepository,
             $this->profitabilityPredictor,
             $this->eventDispatcher,
+            $this->messageBus,
         );
     }
 
@@ -190,6 +197,40 @@ final class AlertDetectionServiceTest extends TestCase
         self::assertSame('warning', $captured->getSeverity());
     }
 
+    public function testMarginAlertDualDispatchesDomainAndLegacyEvents(): void
+    {
+        // Sprint-022 US-105 (AT-3.3 ADR-0016) — verify dual dispatch :
+        // legacy LowMarginAlertEvent + nouveau MarginThresholdExceededEvent.
+        $project = $this->makeProject();
+        $this->projectRepository->method('findBy')->willReturn([$project]);
+        $this->orderRepository->method('findBy')->willReturn([]);
+        $this->profitabilityPredictor
+            ->method('predictProfitability')
+            ->willReturn([
+                'canPredict' => true,
+                'predictedMargin' => ['projected' => 5.0],
+            ]);
+
+        $domainEventCaptured = null;
+        $this->messageBus
+            ->expects(self::atLeastOnce())
+            ->method('dispatch')
+            ->willReturnCallback(static function (object $event) use (&$domainEventCaptured): Envelope {
+                if ($event instanceof \App\Domain\Project\Event\MarginThresholdExceededEvent) {
+                    $domainEventCaptured = $event;
+                }
+
+                return new Envelope($event);
+            });
+
+        $stats = $this->service->checkAllAlerts();
+
+        self::assertSame(1, $stats['margin_alerts']);
+        self::assertNotNull($domainEventCaptured);
+        self::assertSame(5.0, $domainEventCaptured->marginPercent);
+        self::assertSame(10.0, $domainEventCaptured->thresholdPercent); // critical
+    }
+
     public function testMarginAlertSkippedAboveWarningThreshold(): void
     {
         $project = $this->makeProject();
@@ -203,6 +244,7 @@ final class AlertDetectionServiceTest extends TestCase
             ]);
 
         $this->eventDispatcher->expects(self::never())->method('dispatch');
+        $this->messageBus->expects(self::never())->method('dispatch');
 
         $stats = $this->service->checkAllAlerts();
         self::assertSame(0, $stats['margin_alerts']);
@@ -273,6 +315,9 @@ final class AlertDetectionServiceTest extends TestCase
         $project->method('getGlobalProgress')->willReturn((string) $globalProgress);
         $project->method('getProjectManager')->willReturn(null);
         $project->method('getKeyAccountManager')->willReturn(null);
+        $project->method('getId')->willReturn(42);
+        $project->method('getName')->willReturn('Test Project');
+        $project->method('getTotalSoldAmount')->willReturn('10000.00');
 
         return $project;
     }

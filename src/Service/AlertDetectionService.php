@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Domain\Project\Event\MarginThresholdExceededEvent;
+use App\Domain\Project\ValueObject\ProjectId;
+use App\Domain\Shared\ValueObject\Money;
 use App\Entity\Project;
 use App\Event\ContributorOverloadAlertEvent;
 use App\Event\LowMarginAlertEvent;
@@ -17,6 +20,7 @@ use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class AlertDetectionService
 {
@@ -28,6 +32,7 @@ class AlertDetectionService
         private readonly StaffingMetricsRepository $staffingMetricsRepository,
         private readonly ProfitabilityPredictor $profitabilityPredictor,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
@@ -116,9 +121,18 @@ class AlertDetectionService
             if ($severity !== null) {
                 $recipients = $this->getMarginAlertRecipients($project);
 
+                // EPIC-003 Phase 3 (sprint-022 US-105 AT-3.3 ADR-0016) :
+                // dual dispatch — legacy LowMarginAlertEvent (NotificationSubscriber
+                // crée notifications in-app) + nouveau Domain Event
+                // MarginThresholdExceededEvent (handler async US-103 envoie Slack
+                // #alerts-prod). Coexistence sprint-022 ; legacy retiré
+                // sprint-023+ après refactor NotificationSubscriber pour consume
+                // Domain Events directement.
                 $this->eventDispatcher->dispatch(
                     new LowMarginAlertEvent($project, $predictedMargin, $severity, $recipients),
                 );
+
+                $this->dispatchDomainMarginEvent($project, $predictedMargin, $severity);
 
                 ++$alertCount;
             }
@@ -330,5 +344,49 @@ class AlertDetectionService
         }
 
         return $result;
+    }
+
+    /**
+     * EPIC-003 Phase 3 (sprint-022 US-105 AT-3.3 ADR-0016) — dispatch nouveau
+     * Domain Event `MarginThresholdExceededEvent` en parallèle de legacy
+     * `LowMarginAlertEvent`.
+     *
+     * Severity mapping :
+     * - 'critical' (margin < 10 %) → threshold 10 %
+     * - 'warning' (margin < 20 %) → threshold 20 %
+     *
+     * Coût + facturé non disponibles dans le contexte legacy `Project` flat
+     * + `ProfitabilityPredictor` (qui calcule via prédiction). Pour le
+     * Domain Event, on utilise budget projet comme proxy facture
+     * (best-effort) et coût calculé inversement depuis margin %.
+     *
+     * Sprint-023+ : refactor `AlertDetectionService` pour utiliser
+     * `CalculateProjectMarginUseCase` (US-104) — élimination calcul double.
+     */
+    private function dispatchDomainMarginEvent(Project $project, float $predictedMargin, string $severity): void
+    {
+        $thresholdPercent = $severity === 'critical' ? 10.0 : 20.0;
+        $projectIdInt = $project->getId();
+        if ($projectIdInt === null) {
+            return;
+        }
+
+        $budgetProxy = (float) $project->getTotalSoldAmount();
+        $factureProxy = Money::fromAmount(max($budgetProxy, 0.01));
+
+        // Coût inverse : si margin = (facture - cout) / facture × 100,
+        // alors cout = facture × (1 - margin/100). Best-effort proxy.
+        $coutProxy = Money::fromAmount(max($budgetProxy * (1.0 - ($predictedMargin / 100.0)), 0.0));
+
+        $event = MarginThresholdExceededEvent::create(
+            projectId: ProjectId::fromLegacyInt($projectIdInt),
+            projectName: $project->getName(),
+            costTotal: $coutProxy,
+            invoicedPaidTotal: $factureProxy,
+            marginPercent: $predictedMargin,
+            thresholdPercent: $thresholdPercent,
+        );
+
+        $this->messageBus->dispatch($event);
     }
 }
