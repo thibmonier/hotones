@@ -182,15 +182,15 @@ final readonly class MarginThresholdExceededEvent implements DomainEventInterfac
 
 ---
 
-## 3. Décisions ouvertes Sprint Planning P2
+## 3. Décisions actées Sprint Planning P2 (2026-05-10)
 
-| ID | Question | Owner |
-|---|---|---|
-| AT-3.1 | EmploymentPeriod : Domain interface + ACL adapter (recommandé) OU Domain entity migration complète Phase 3 ? | Tech Lead |
-| AT-3.2 | `InvoiceCreatedEvent` payload contient WorkItem IDs OU listener query par Project.id ? | Tech Lead |
-| AT-3.3 | `MarginThresholdExceededEvent` co-existence avec legacy `LowMarginAlertEvent` accepté ? | Tech Lead + PO |
-| AT-3.4 | BDD prod read-only access confirmé pour AUDIT-DAILY-HOURS ? | Tech Lead |
-| AT-3.5 | Script audit `--audit-daily-hours` utilise `SET TRANSACTION READ ONLY` (sécurité) ? | Tech Lead |
+| ID | Question | Décision | Impact |
+|---|---|---|---|
+| **AT-3.1** | EmploymentPeriod : Domain interface + ACL adapter OU Domain entity migration complète ? | ✅ **ACL Adapter** | Pattern strangler fig sprint-008-013 réutilisé. US-100 = 2-3 pts (création interface + DTO snapshot + ACL adapter wrapping flat repo). Migration Domain pure sprint-026+ si besoin. |
+| **AT-3.2** | `InvoiceCreatedEvent` payload contient WorkItem IDs OU listener query par Project.id ? | ✅ **WorkItem IDs in payload** | Étendre `InvoiceCreatedEvent` constructor avec `array<WorkItemId> $workItemIds = []`. Caller (Application Layer use case `CreateInvoice`) collecte WorkItems projet AVANT dispatch event. Listener consume payload directement (pas de query DB extra). Backward compatible : default empty array. |
+| **AT-3.3** | `MarginThresholdExceededEvent` co-existence avec legacy `LowMarginAlertEvent` accepté ? | ✅ **Oui** + `LowMarginAlertEvent` marqué `@deprecated` | Co-existence sprint-021 (strangler fig). Legacy event marqué `@deprecated` PHPDoc + plan retrait sprint-022+ après refactor `AlertDetectionService` vers Domain Event. Pas de break consumers actuels. |
+| **AT-3.4** | BDD prod read-only access confirmé pour AUDIT-DAILY-HOURS ? | ✅ **Option C : SET TRANSACTION READ ONLY** | Defense-in-depth Postgres-level via SQL `SET TRANSACTION READ ONLY` au début script. Pas de nouveau DB user (option B reportée sprint-022+ si autres scripts audit ajoutés). Cost ~1 ligne SQL. |
+| **AT-3.5** | Script audit `--audit-daily-hours` utilise `SET TRANSACTION READ ONLY` ? | ✅ **Oui implémenter** | Pattern reproductible scripts audit futurs. Test Integration Docker DB validera qu'écriture lance exception PG. Étendre AUDIT-CONTRIBUTORS-CJM existant sprint-020 #205 avec même pattern (refactor optionnel sprint-022+). |
 
 ---
 
