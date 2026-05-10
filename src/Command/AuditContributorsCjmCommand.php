@@ -395,7 +395,7 @@ final class AuditContributorsCjmCommand extends Command
         return [
             'id' => $contributor->getId(),
             'email' => $contributor->getEmail() ?? '(no email)',
-            'name' => trim(($contributor->getFirstName() ?? '').' '.($contributor->getLastName() ?? '')),
+            'name' => trim($contributor->getFirstName().' '.$contributor->getLastName()),
             'weekly_hours' => $weeklyHoursValid ? '✅ '.$weeklyHoursStr : '❌ '.($weeklyHoursStr === '' ? 'vide' : $weeklyHoursStr),
             'work_time_percentage' => $percentageValid ? '✅ '.$workTimePercentageStr : '❌ '.($workTimePercentageStr === '' ? 'vide' : $workTimePercentageStr),
             'daily_max_hours' => $dailyMax,
