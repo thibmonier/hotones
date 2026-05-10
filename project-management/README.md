@@ -25,7 +25,7 @@ project-management/
 
 1. `/project:add-epic` - Créer un EPIC
 2. `/project:add-story` - Ajouter des User Stories
-3. `/project:move-story US-XXX sprint-N` - Planifier le sprint
+3. `/sprint:transition US-XXX sprint-N` - Planifier le sprint
 4. `/project:add-task` ou `/project:decompose-tasks` - Créer les tâches
 5. `/project:board` - Suivre l'avancement
 6. `/project:move-task` - Mettre à jour les statuts

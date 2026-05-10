@@ -64,6 +64,10 @@ services:
     App\Domain\Contributor\Repository\ContributorRepositoryInterface:
         alias: App\Infrastructure\Contributor\Persistence\Doctrine\DoctrineDddContributorRepository
 
+    # EmploymentPeriod Bounded Context - ACL adapter binding (sprint-021 US-100, AT-3.1 ADR-0016)
+    App\Domain\EmploymentPeriod\Repository\EmploymentPeriodRepositoryInterface:
+        alias: App\Infrastructure\EmploymentPeriod\Persistence\Doctrine\DoctrineEmploymentPeriodAdapter
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 

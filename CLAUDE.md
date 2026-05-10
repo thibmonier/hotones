@@ -14,15 +14,18 @@ Expert en architecture, décomposition technique et facilitation Scrum.
 
 ## Commandes personnalisées
 
-### Génération & Validation
+### Génération & Gestion de Backlog (`/project:`)
 
 | Commande | Description |
 |----------|-------------|
 | `/project:generate-backlog` | Génère le backlog complet |
 | `/project:validate-backlog` | Valide la conformité du backlog (score /100) |
 | `/project:decompose-tasks N` | Décompose le sprint N en tâches |
+| `/project:analyze-backlog` | Analyser le backlog existant |
+| `/project:migrate-backlog` | Migrer un backlog existant |
+| `/project:sync-backlog` | Synchroniser l'index du backlog |
 
-### Gestion des EPICs
+### Gestion des EPICs (`/project:`)
 
 | Commande | Description |
 |----------|-------------|
@@ -30,7 +33,7 @@ Expert en architecture, décomposition technique et facilitation Scrum.
 | `/project:list-epics` | Lister tous les EPICs |
 | `/project:update-epic EPIC-XXX` | Modifier un EPIC |
 
-### Gestion des User Stories
+### Gestion des User Stories (`/project:`)
 
 | Commande | Description |
 |----------|-------------|
@@ -38,8 +41,9 @@ Expert en architecture, décomposition technique et facilitation Scrum.
 | `/project:list-stories` | Lister les User Stories |
 | `/project:move-story US-XXX destination` | Changer statut/sprint |
 | `/project:update-story US-XXX` | Modifier une US |
+| `/project:update-stories` | Mettre à jour plusieurs US |
 
-### Gestion des Tasks
+### Gestion des Tasks (`/project:`)
 
 | Commande | Description |
 |----------|-------------|
@@ -47,12 +51,38 @@ Expert en architecture, décomposition technique et facilitation Scrum.
 | `/project:list-tasks` | Lister les tâches |
 | `/project:move-task TASK-XXX statut` | Changer le statut |
 
-### Visualisation
+### Visualisation & Exécution (`/project:`)
 
 | Commande | Description |
 |----------|-------------|
 | `/project:board` | Afficher le Kanban du sprint |
-| `/project:sprint-status` | Métriques détaillées du sprint |
+| `/project:batch-status` | Statut par lot des éléments |
+| `/project:run-sprint N` | Exécuter un sprint complet |
+| `/project:run-epic EPIC-XXX` | Exécuter un EPIC complet |
+| `/project:run-queue` | Exécuter la file d'attente |
+| `/project:generate-prd` | Générer le PRD |
+| `/project:generate-tech-spec` | Générer la spécification technique |
+
+### Sprint (`/sprint:`)
+
+| Commande | Description |
+|----------|-------------|
+| `/sprint:status` | Métriques détaillées du sprint |
+| `/sprint:transition US-XXX statut` | Changer statut/sprint d'une US |
+| `/sprint:next-story` | Prochaine story prête pour le dev |
+| `/sprint:auto-route` | Routage automatique des stories |
+| `/sprint:dev US-XXX` | Développer une story |
+
+### Quality Gates (`/gate:`)
+
+| Commande | Description |
+|----------|-------------|
+| `/gate:validate-backlog` | Valide la conformité du backlog (score /100) |
+| `/gate:validate-prd` | Valider le PRD |
+| `/gate:validate-techspec` | Valider la spécification technique |
+| `/gate:validate-story US-XXX` | Valider une User Story (DoD) |
+| `/gate:validate-sprint N` | Valider un sprint |
+| `/gate:report` | Rapport de qualité complet |
 
 ## Stack technique
 
@@ -136,7 +166,11 @@ project-management/
 # 3. Planifier le sprint 1
 /project:decompose-tasks 001
 
-# 4. Développer...
+# 4. Obtenir la prochaine story
+/sprint:next-story
+
+# 5. Développer une story
+/sprint:dev US-XXX
 
 # 5. Préparer le sprint suivant
 /project:decompose-tasks 002
