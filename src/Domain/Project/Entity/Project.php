@@ -34,6 +34,15 @@ final class Project implements AggregateRootInterface
     private DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
+    /**
+     * EPIC-003 Phase 3 (sprint-022 US-104 ADR-0016 Q4.x) — snapshot marge
+     * calculée par UC `CalculateProjectMargin`. Transient (non persisté
+     * sprint-022 — migration sprint-023+ si demande PO de persistence).
+     */
+    private ?Money $coutTotal = null;
+    private ?Money $factureTotal = null;
+    private ?DateTimeImmutable $margeCalculatedAt = null;
+
     private function __construct(
         private ProjectId $id,
         private string $name,
@@ -314,5 +323,87 @@ final class Project implements AggregateRootInterface
     public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * EPIC-003 Phase 3 (sprint-022 US-104) — calcule snapshot marge depuis
+     * coût total (sum WorkItem.cost) + facturé payé total (sum Invoice.paid).
+     *
+     * Caller (UC CalculateProjectMargin Application Layer) résout les sums
+     * via repositories puis appelle cette méthode pour figer le snapshot.
+     */
+    public function setMargeSnapshot(Money $coutTotal, Money $factureTotal): void
+    {
+        $this->coutTotal = $coutTotal;
+        $this->factureTotal = $factureTotal;
+        $this->margeCalculatedAt = new DateTimeImmutable();
+    }
+
+    public function getCoutTotal(): ?Money
+    {
+        return $this->coutTotal;
+    }
+
+    public function getFactureTotal(): ?Money
+    {
+        return $this->factureTotal;
+    }
+
+    /**
+     * Marge absolue en centimes : factureTotal - coutTotal (peut être négatif).
+     * Null si snapshot pas calculé.
+     *
+     * Retourne int (centimes) au lieu de Money car Money n'autorise pas
+     * négatif (invariant Money strict positive). Pour affichage UI :
+     * `$marge / 100.0` donne euros (signed).
+     */
+    public function getMargeAbsoluteCents(): ?int
+    {
+        if ($this->factureTotal === null || $this->coutTotal === null) {
+            return null;
+        }
+
+        return $this->factureTotal->getAmountCents() - $this->coutTotal->getAmountCents();
+    }
+
+    /**
+     * Marge en pourcentage : (margeAbsolute / factureTotal) × 100.
+     * Null si factureTotal = 0 OR snapshot pas calculé.
+     */
+    public function getMargePercent(): ?float
+    {
+        if ($this->factureTotal === null || $this->coutTotal === null) {
+            return null;
+        }
+
+        if ($this->factureTotal->isZero()) {
+            return null;
+        }
+
+        $margeCents = $this->getMargeAbsoluteCents();
+        if ($margeCents === null) {
+            return null;
+        }
+
+        return ($margeCents / $this->factureTotal->getAmountCents()) * 100.0;
+    }
+
+    public function getMargeCalculatedAt(): ?DateTimeImmutable
+    {
+        return $this->margeCalculatedAt;
+    }
+
+    /**
+     * Indique si la marge actuelle est sous le seuil donné.
+     * Retourne false si snapshot pas calculé OR factureTotal = 0.
+     */
+    public function hasMargeBelowThreshold(float $thresholdPercent): bool
+    {
+        $marge = $this->getMargePercent();
+        if ($marge === null) {
+            return false;
+        }
+
+        return $marge < $thresholdPercent;
     }
 }
