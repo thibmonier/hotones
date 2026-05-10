@@ -68,6 +68,10 @@ services:
     App\Domain\EmploymentPeriod\Repository\EmploymentPeriodRepositoryInterface:
         alias: App\Infrastructure\EmploymentPeriod\Persistence\Doctrine\DoctrineEmploymentPeriodAdapter
 
+    # WorkItem Bounded Context - Interface binding (sprint-020 #207 EPIC-003 Phase 2 ACL)
+    App\Domain\WorkItem\Repository\WorkItemRepositoryInterface:
+        alias: App\Infrastructure\WorkItem\Persistence\Doctrine\DoctrineDddWorkItemRepository
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 

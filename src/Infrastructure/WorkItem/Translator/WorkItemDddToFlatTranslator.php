@@ -31,5 +31,6 @@ final class WorkItemDddToFlatTranslator
     {
         $flat->setHours((string) $ddd->getHours()->getValue());
         $flat->setNotes($ddd->getNotes());
+        $flat->status = $ddd->getStatus()->value;
     }
 }
