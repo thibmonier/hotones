@@ -243,10 +243,10 @@ Then retourne false (pas de dépassement)
 
 ### Technical Notes
 - ADR-0016 A-4 + ADR-0015 invariant journalier
-- Interface `EmploymentPeriodRepositoryInterface` Domain (à créer ou ACL adapter wrapping flat repo)
+- **AT-3.1 acté** : ACL adapter pattern. Créer `EmploymentPeriodRepositoryInterface` Domain + `EmploymentPeriodSnapshot` DTO Domain + `DoctrineEmploymentPeriodAdapter` Infrastructure wrapping flat `App\Repository\EmploymentPeriodRepository`. Migration Domain pure entity reportée sprint-026+.
 - `DailyHoursWarningException` Domain — non bloquante (Q2.4) mais propagée UC pour UI override
-- Tests Unit pure host PHP (sans Docker)
-- ⚠️ OPS-PREP-J0 sprint-021 PRE-1 : vérifier `EmploymentPeriodRepository` interface Domain existe ou planifier création
+- Tests Unit pure host PHP (sans Docker) — `EmploymentPeriodRepositoryInterface` mockée
+- Tests Integration Docker DB — `DoctrineEmploymentPeriodAdapter` validé contre vraie BDD
 
 ---
 
@@ -304,7 +304,9 @@ And WorkItemPaidEvent dispatché
 - `WorkItemStatus` enum Domain (`DRAFT`, `VALIDATED`, `BILLED`, `PAID`)
 - Symfony Workflow component (déjà bundled framework)
 - Cross-aggregate Application Layer listeners ACL `Invoice` → `WorkItem`
-- ⚠️ OPS-PREP-J0 sprint-021 PRE-1 : vérifier `InvoiceCreatedEvent` + `InvoicePaidEvent` existent (sinon +task spec)
+- **AT-3 vérification** : `InvoiceCreatedEvent` + `InvoicePaidEvent` existent ✅ (`src/Domain/Invoice/Event/`)
+- **AT-3.2 acté** : étendre `InvoiceCreatedEvent` constructor avec `array<WorkItemId> $workItemIds = []` (default empty = backward compat). Application Layer use case `CreateInvoice` collecte WorkItems projet AVANT dispatch event. Listeners `BillRelatedWorkItemsOnInvoiceCreated` consomment payload directement (pas de query DB extra). Migration Doctrine ajoute colonne `status` table `work_item` avec default `'draft'`.
+- Migration Doctrine : ajout colonne `status` table `work_item` (default `'draft'` rows existantes)
 - Tests Integration Docker DB pour transitions valides + invalides
 
 ---
@@ -417,6 +419,8 @@ And tests Unit valident comportement degraded (sans webhook)
 - ADR-0016 A-7
 - Réutilise US-094 `SlackAlertingService` (sprint-017 #189)
 - Configurabilité hiérarchique seuil (Q5.1 D) reportée sprint-022+ (OQ-3 default)
+- **AT-3.3 acté** : nouveau Domain Event `MarginThresholdExceededEvent` (`src/Domain/Project/Event/`) co-existe avec legacy `App\Event\LowMarginAlertEvent`. Legacy event marqué `@deprecated` PHPDoc dès sprint-021 (annotation : « Deprecated since EPIC-003 Phase 3 — use `App\Domain\Project\Event\MarginThresholdExceededEvent`. Removal planned sprint-022+ after `AlertDetectionService` refactor. »). Pas de break consumers actuels.
+- Strangler fig : `AlertDetectionService` legacy continue dispatcher `LowMarginAlertEvent` sprint-021. Refactor sprint-022+ pour dispatcher `MarginThresholdExceededEvent` à la place + suppression legacy event.
 - ⚠️ OPS-PREP-J0 sprint-021 PRE-1 : Slack webhook URL `#alerts-prod` configuré prod J0 ?
   - 🟢 A : webhook configuré → US-103 testable end-to-end prod (✅ go)
   - 🟡 B : webhook non configuré → US-103 livré tests Unit + staging only (livraison partielle)

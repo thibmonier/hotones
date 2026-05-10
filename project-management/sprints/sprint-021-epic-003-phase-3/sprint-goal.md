@@ -140,6 +140,16 @@ complet — ce dernier sprint-022 A-8). Validation PO Sprint Planning P2.
 | OQ-3 | Q5.1 timing : alerte marge configurable sprint-022 (default) OU sprint-021 ? | Sprint-022 |
 | OQ-4 | Q6.4 capacité libre : event + alerting sprint-021 OU UC `CalculateProjectMargin` complet sprint-021 ? | Event + alerting sprint-021 (UC complet sprint-022) |
 
+## ✅ Décisions actées AT-3 (atelier OPS-PREP-J0 J-2 — 2026-05-10)
+
+| AT | Décision | Impact |
+|---|---|---|
+| AT-3.1 | EmploymentPeriod = ACL adapter (Domain interface + DTO snapshot + adapter wrapping flat repo) | US-100 = 2-3 pts |
+| AT-3.2 | `InvoiceCreatedEvent` payload étendu `array<WorkItemId> $workItemIds = []` (backward compat default) | US-101 task : étendre constructor + Application Layer use case `CreateInvoice` collecte IDs |
+| AT-3.3 | `MarginThresholdExceededEvent` co-existe `LowMarginAlertEvent` (legacy `@deprecated` PHPDoc + retrait sprint-022+) | US-103 sans break consumers |
+| AT-3.4 | `SET TRANSACTION READ ONLY` Postgres-level (defense-in-depth) — pas de nouveau DB user | AUDIT-DAILY-HOURS ~1 ligne SQL |
+| AT-3.5 | Pattern READ ONLY appliqué AUDIT-DAILY-HOURS + AUDIT-CONTRIBUTORS-CJM existant (refactor sprint-022+ optionnel) | Tests Integration Docker DB valident écriture rejetée PG |
+
 ---
 
 ## 📊 Indicateurs cibles fin sprint
