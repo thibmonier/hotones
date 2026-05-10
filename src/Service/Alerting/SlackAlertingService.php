@@ -19,7 +19,7 @@ use Throwable;
  *
  * No-op when SLACK_WEBHOOK_URL is empty (dev / CI environment).
  */
-final readonly class SlackAlertingService
+final readonly class SlackAlertingService implements SlackAlertingInterface
 {
     public function __construct(
         private HttpClientInterface $httpClient,

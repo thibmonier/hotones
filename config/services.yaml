@@ -78,6 +78,11 @@ services:
         autowire: true
         autoconfigure: true
 
+    # SlackAlertingInterface binding (sprint-021 US-103) — extracted interface
+    # pour mockabilité tests Application Layer
+    App\Service\Alerting\SlackAlertingInterface:
+        alias: App\Service\Alerting\SlackAlertingService
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
