@@ -167,8 +167,8 @@ final class WeeklyTimesheetController extends AbstractController
      */
     private function buildCommandFromPayload(int $contributorId, array $payload): ?RecordWorkItemCommand
     {
-        $projectId = is_int($payload['projectId'] ?? null) ? (int) $payload['projectId'] : null;
-        $date = is_string($payload['date'] ?? null) ? (string) $payload['date'] : null;
+        $projectId = is_int($payload['projectId'] ?? null) ? $payload['projectId'] : null;
+        $date = is_string($payload['date'] ?? null) ? $payload['date'] : null;
         $hours = is_numeric($payload['hours'] ?? null) ? (float) $payload['hours'] : null;
 
         if ($projectId === null || $date === null || $hours === null) {
@@ -186,7 +186,7 @@ final class WeeklyTimesheetController extends AbstractController
             hours: $hours,
             costRateAmount: $costRate > 0 ? $costRate : 1.0, // dégradé si CJM manquant — Risk Q3 audit
             billedRateAmount: $billedRate > 0 ? $billedRate : 1.0,
-            taskIdLegacy: is_int($payload['taskId'] ?? null) ? (int) $payload['taskId'] : null,
+            taskIdLegacy: is_int($payload['taskId'] ?? null) ? $payload['taskId'] : null,
             comment: isset($payload['comment']) && is_string($payload['comment']) ? $payload['comment'] : null,
             userOverride: (bool) ($payload['userOverride'] ?? false),
             authorIsManager: $this->isGranted('ROLE_MANAGER') || $this->isGranted('ROLE_ADMIN'),
@@ -212,7 +212,7 @@ final class WeeklyTimesheetController extends AbstractController
 
     private function currentIsoWeek(): string
     {
-        return (new DateTimeImmutable())->format('o-\WW');
+        return new DateTimeImmutable()->format('o-\WW');
     }
 
     /**
@@ -227,7 +227,7 @@ final class WeeklyTimesheetController extends AbstractController
         $year = (int) $matches[1];
         $weekNumber = (int) $matches[2];
 
-        $start = (new DateTimeImmutable())->setISODate($year, $weekNumber)->setTime(0, 0, 0);
+        $start = new DateTimeImmutable()->setISODate($year, $weekNumber)->setTime(0, 0, 0);
         $end = $start->modify('+6 days')->setTime(23, 59, 59);
 
         return [$start, $end];

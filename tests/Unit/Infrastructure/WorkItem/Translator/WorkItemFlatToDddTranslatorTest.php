@@ -113,22 +113,22 @@ final class WorkItemFlatToDddTranslatorTest extends TestCase
         string $hours = '7.50',
     ): FlatTimesheet {
         $project = new FlatProject();
-        (new ReflectionProperty(FlatProject::class, 'id'))->setValue($project, $projectId);
+        new ReflectionProperty(FlatProject::class, 'id')->setValue($project, $projectId);
 
         $contributor = new FlatContributor();
-        (new ReflectionProperty(FlatContributor::class, 'id'))->setValue($contributor, $contributorId);
+        new ReflectionProperty(FlatContributor::class, 'id')->setValue($contributor, $contributorId);
         $contributor->cjm = $contributorCjm;
         $contributor->tjm = $contributorTjm;
 
         $task = null;
         if ($taskId !== null) {
             $task = new FlatProjectTask();
-            (new ReflectionProperty(FlatProjectTask::class, 'id'))->setValue($task, $taskId);
+            new ReflectionProperty(FlatProjectTask::class, 'id')->setValue($task, $taskId);
         }
 
         $flat = new FlatTimesheet();
         if ($id !== null) {
-            (new ReflectionProperty(FlatTimesheet::class, 'id'))->setValue($flat, $id);
+            new ReflectionProperty(FlatTimesheet::class, 'id')->setValue($flat, $id);
         }
         $flat->project = $project;
         $flat->contributor = $contributor;

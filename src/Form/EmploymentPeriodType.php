@@ -65,7 +65,7 @@ class EmploymentPeriodType extends AbstractType
             ->add('employeeLevel', EntityType::class, [
                 'label' => 'Niveau',
                 'class' => EmployeeLevel::class,
-                'choice_label' => fn (EmployeeLevel $level) => sprintf(
+                'choice_label' => fn (EmployeeLevel $level): string => sprintf(
                     'Niveau %d - %s (%s)',
                     $level->level,
                     $level->name,
@@ -74,7 +74,7 @@ class EmploymentPeriodType extends AbstractType
                 'required' => false,
                 'placeholder' => '-- Sélectionner un niveau --',
                 'attr' => ['class' => 'form-select'],
-                'query_builder' => fn (EmployeeLevelRepository $repo) => $repo
+                'query_builder' => fn (EmployeeLevelRepository $repo): \Doctrine\ORM\QueryBuilder => $repo
                     ->createQueryBuilder('el')
                     ->andWhere('el.company = :company')
                     ->andWhere('el.active = :active')
@@ -82,7 +82,7 @@ class EmploymentPeriodType extends AbstractType
                     ->setParameter('active', true)
                     ->orderBy('el.level', 'ASC'),
                 'help' => 'Niveau 1-3: Junior, 4-6: Expérimenté, 7-9: Senior, 10-12: Lead',
-                'group_by' => fn (EmployeeLevel $level) => $level->getCategoryLabel(),
+                'group_by' => fn (EmployeeLevel $level): string => $level->getCategoryLabel(),
             ])
             ->add('salary', MoneyType::class, [
                 'label' => 'Salaire mensuel brut',

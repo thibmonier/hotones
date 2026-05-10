@@ -147,7 +147,12 @@ final class BackupRestoreCommand extends Command
         $sql = (string) file_get_contents($file);
         try {
             foreach ($this->splitSqliteStatements($sql) as $statement) {
-                if ($statement === '' || $this->isTransactionControlStatement($statement)) {
+                if ($statement === '') {
+                    // Skip BEGIN/COMMIT/ROLLBACK: the surrounding caller (or DAMA test bundle)
+                    // may already hold an active transaction, and SQLite forbids nesting.
+                    continue;
+                }
+                if ($this->isTransactionControlStatement($statement)) {
                     // Skip BEGIN/COMMIT/ROLLBACK: the surrounding caller (or DAMA test bundle)
                     // may already hold an active transaction, and SQLite forbids nesting.
                     continue;

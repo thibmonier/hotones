@@ -220,7 +220,7 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
         // Calculer le score pour chaque contributeur
         $totalTechnologies = count($technologyIds);
 
-        foreach ($byContributor as $contributorId => $data) {
+        foreach ($byContributor as $data) {
             $matchingCount = count($data['technologies']);
             $totalScore = 0;
 
@@ -240,7 +240,7 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
         }
 
         // Trier par score décroissant
-        usort($contributors, fn ($a, $b) => $b['score'] <=> $a['score']);
+        usort($contributors, fn ($a, $b): int => $b['score'] <=> $a['score']);
 
         return $contributors;
     }

@@ -32,12 +32,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *   `$em->getFilters()->disable('tenant_filter');` then re-enable.
  */
 #[AsEventListener(event: KernelEvents::REQUEST, priority: 8)]
-final class TenantBootstrapListener
+final readonly class TenantBootstrapListener
 {
     public function __construct(
-        private readonly Security $security,
-        private readonly TenantContext $tenantContext,
-        private readonly EntityManagerInterface $em,
+        private Security $security,
+        private TenantContext $tenantContext,
+        private EntityManagerInterface $em,
     ) {
     }
 

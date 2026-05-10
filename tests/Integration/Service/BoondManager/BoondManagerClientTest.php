@@ -29,7 +29,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  */
 final class BoondManagerClientTest extends TestCase
 {
-    private const BASE_URL = 'https://example.boondmanager.com';
+    private const string BASE_URL = 'https://example.boondmanager.com';
 
     public function testConnectionReturnsTrueWhenDictionaryIs200(): void
     {

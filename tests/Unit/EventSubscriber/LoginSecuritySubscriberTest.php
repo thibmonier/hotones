@@ -85,14 +85,10 @@ final class LoginSecuritySubscriberTest extends TestCase
         $this->logger
             ->expects(self::once())
             ->method('warning')
-            ->with('Login attempt failed', self::callback(static function (array $ctx): bool {
-                return
-                    $ctx['username'] === 'jean@test.com'
-                    && $ctx['ip'] === '10.0.0.42'
-                    // 5 max - 1 consumed = 4 remaining on first attempt
-                    && $ctx['remaining_attempts'] === 4
-                ;
-            }));
+            ->with('Login attempt failed', self::callback(static fn (array $ctx): bool => $ctx['username'] === 'jean@test.com'
+            && $ctx['ip'] === '10.0.0.42'
+            // 5 max - 1 consumed = 4 remaining on first attempt
+            && $ctx['remaining_attempts'] === 4));
         $this->logger->expects(self::never())->method('error');
 
         $this->subscriber->onLoginFailure($this->makeFailureEvent());

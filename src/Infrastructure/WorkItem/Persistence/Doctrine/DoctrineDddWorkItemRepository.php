@@ -81,7 +81,7 @@ final readonly class DoctrineDddWorkItemRepository implements WorkItemRepository
             ->findBy(['project' => $project]);
 
         return array_map(
-            fn (FlatTimesheet $t): DddWorkItem => $this->flatToDdd->translate($t),
+            $this->flatToDdd->translate(...),
             $timesheets,
         );
     }
@@ -113,7 +113,7 @@ final readonly class DoctrineDddWorkItemRepository implements WorkItemRepository
         $timesheets = $qb->getQuery()->getResult();
 
         return array_map(
-            fn (FlatTimesheet $t): DddWorkItem => $this->flatToDdd->translate($t),
+            $this->flatToDdd->translate(...),
             $timesheets,
         );
     }
@@ -145,7 +145,7 @@ final readonly class DoctrineDddWorkItemRepository implements WorkItemRepository
             ]);
 
         return array_map(
-            fn (FlatTimesheet $t): DddWorkItem => $this->flatToDdd->translate($t),
+            $this->flatToDdd->translate(...),
             $timesheets,
         );
     }

@@ -354,7 +354,7 @@ class ImportTheTribeStaffingCommand extends Command
             $this->profileCache[mb_strtolower($profile->getName())] = $profile;
         }
 
-        foreach (self::CF_PROFILE_MAP as $type => $profileName) {
+        foreach (self::CF_PROFILE_MAP as $profileName) {
             $key = mb_strtolower($profileName);
             if (isset($this->profileCache[$key])) {
                 $io->writeln(sprintf('  Profil existant: %s', $profileName));
@@ -393,8 +393,10 @@ class ImportTheTribeStaffingCommand extends Command
         for ($row = 3; $row <= $sheet->getHighestRow(); ++$row) {
             $name = trim((string) $sheet->getCell('A'.$row)->getValue());
             $cf = trim((string) $sheet->getCell('C'.$row)->getValue());
-
-            if ($name === '' || $cf === '') {
+            if ($name === '') {
+                continue;
+            }
+            if ($cf === '') {
                 continue;
             }
 
@@ -735,6 +737,6 @@ class ImportTheTribeStaffingCommand extends Command
             return [];
         }
 
-        return array_map('trim', explode(',', $raw));
+        return array_map(trim(...), explode(',', $raw));
     }
 }

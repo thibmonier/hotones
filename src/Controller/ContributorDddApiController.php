@@ -45,7 +45,7 @@ final class ContributorDddApiController extends AbstractController
         $items = ($this->listActiveContributors)(new ListActiveContributorsQuery());
 
         return new JsonResponse([
-            'data' => array_map(static fn ($dto) => $dto->toArray(), $items),
+            'data' => array_map(static fn ($dto): array => $dto->toArray(), $items),
             'meta' => ['count' => count($items)],
         ]);
     }

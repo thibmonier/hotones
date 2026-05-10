@@ -30,10 +30,6 @@ class AiUsageLog implements CompanyOwnedInterface
     #[ORM\Column]
     public private(set) ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Company::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private Company $company;
-
     /**
      * Provider name: anthropic | openai | mistral | google.
      */
@@ -86,9 +82,10 @@ class AiUsageLog implements CompanyOwnedInterface
     #[ORM\Column(type: 'datetime_immutable')]
     public private(set) DateTimeImmutable $occurredAt;
 
-    public function __construct(Company $company)
+    public function __construct(#[ORM\ManyToOne(targetEntity: Company::class)]
+        #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+        private Company $company)
     {
-        $this->company = $company;
         $this->occurredAt = new DateTimeImmutable();
     }
 

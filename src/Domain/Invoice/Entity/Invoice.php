@@ -32,13 +32,6 @@ use InvalidArgumentException;
 final class Invoice implements AggregateRootInterface
 {
     use RecordsDomainEvents;
-
-    private InvoiceId $id;
-    private InvoiceNumber $number;
-    private CompanyId $companyId;
-    private ClientId $clientId;
-    private ?OrderId $orderId;
-    private ?ProjectId $projectId;
     private InvoiceStatus $status;
     private Money $amountHt;
     private Money $amountTva;
@@ -55,19 +48,13 @@ final class Invoice implements AggregateRootInterface
     private array $lines = [];
 
     private function __construct(
-        InvoiceId $id,
-        InvoiceNumber $number,
-        CompanyId $companyId,
-        ClientId $clientId,
-        ?OrderId $orderId,
-        ?ProjectId $projectId,
+        private InvoiceId $id,
+        private InvoiceNumber $number,
+        private CompanyId $companyId,
+        private ClientId $clientId,
+        private ?OrderId $orderId,
+        private ?ProjectId $projectId,
     ) {
-        $this->id = $id;
-        $this->number = $number;
-        $this->companyId = $companyId;
-        $this->clientId = $clientId;
-        $this->orderId = $orderId;
-        $this->projectId = $projectId;
         $this->status = InvoiceStatus::DRAFT;
         $this->amountHt = Money::zero();
         $this->amountTva = Money::zero();

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\WorkItem\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -15,7 +16,7 @@ use Symfony\Component\Uid\Uuid;
  * @see ADR-0008 ACL pattern
  * @see ADR-0013 EPIC-003 scope WorkItem & Profitability
  */
-final readonly class WorkItemId
+final readonly class WorkItemId implements Stringable
 {
     private const string LEGACY_PREFIX = 'legacy:';
 

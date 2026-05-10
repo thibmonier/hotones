@@ -11,7 +11,6 @@ use App\Domain\Project\Repository\ProjectRepositoryInterface;
 use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Project\ValueObject\ProjectStatus;
 use App\Domain\Project\ValueObject\ProjectType;
-use App\Entity\Project as FlatProject;
 use App\Infrastructure\Project\Translator\ProjectDddToFlatTranslator;
 use App\Infrastructure\Project\Translator\ProjectFlatToDddTranslator;
 use App\Repository\ProjectRepository as FlatProjectRepository;
@@ -61,9 +60,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
      */
     public function findAll(): array
     {
-        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate(
-            $flat,
-        ), $this->flatRepository->findAll());
+        return array_map($this->flatToDdd->translate(...), $this->flatRepository->findAll());
     }
 
     public function findByReference(string $reference): ?DddProject
@@ -83,7 +80,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
 
         $flatClients = $this->flatRepository->findBy(['client' => $clientId->toLegacyInt()]);
 
-        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat), $flatClients);
+        return array_map($this->flatToDdd->translate(...), $flatClients);
     }
 
     /**
@@ -99,7 +96,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
 
         $flats = $this->flatRepository->findBy(['status' => $flatStatus]);
 
-        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat), $flats);
+        return array_map($this->flatToDdd->translate(...), $flats);
     }
 
     /**
@@ -126,7 +123,7 @@ final readonly class DoctrineDddProjectRepository implements ProjectRepositoryIn
     {
         $flats = $this->flatRepository->findBy(['client' => null]);
 
-        return array_map(fn (FlatProject $flat): DddProject => $this->flatToDdd->translate($flat), $flats);
+        return array_map($this->flatToDdd->translate(...), $flats);
     }
 
     public function save(DddProject $project): void

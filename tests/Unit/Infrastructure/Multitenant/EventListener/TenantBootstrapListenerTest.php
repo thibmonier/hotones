@@ -55,7 +55,7 @@ final class TenantBootstrapListenerTest extends TestCase
     private function makeEmWithRealFilter(bool $alreadyEnabled = false): array
     {
         $connection = $this->createStub(Connection::class);
-        $connection->method('quote')->willReturnCallback(static fn ($value) => "'".(string) $value."'");
+        $connection->method('quote')->willReturnCallback(static fn ($value): string => "'".$value."'");
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getConnection')->willReturn($connection);
@@ -67,10 +67,8 @@ final class TenantBootstrapListenerTest extends TestCase
 
         $filter = new TenantFilter($em);
 
-        $filterCollection->method('isEnabled')->willReturnCallback(static fn (string $name) => 'tenant_filter' === $name
-            ? $alreadyEnabled
-            : false);
-        $filterCollection->method('getFilter')->willReturnCallback(static fn (string $name) => 'tenant_filter' === $name
+        $filterCollection->method('isEnabled')->willReturnCallback(static fn (string $name): bool => 'tenant_filter' === $name && $alreadyEnabled);
+        $filterCollection->method('getFilter')->willReturnCallback(static fn (string $name): ?\App\Infrastructure\Multitenant\Doctrine\Filter\TenantFilter => 'tenant_filter' === $name
             ? $filter
             : null);
 

@@ -87,13 +87,7 @@ class ProjectSkillRepository extends CompanyAwareRepository
     {
         $criticalSkills = $this->findCriticalByProject($project);
 
-        foreach ($criticalSkills as $projectSkill) {
-            if (!$projectSkill->isMetByContributor($contributor)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($criticalSkills, fn ($projectSkill) => $projectSkill->isMetByContributor($contributor));
     }
 
     /**

@@ -109,10 +109,8 @@ final class RecordWorkItemUseCaseTest extends TestCase
             ->method('warning')
             ->with(
                 self::stringContains('override accepted'),
-                self::callback(function (array $context): bool {
-                    return ($context['daily_total_after_override'] ?? null) === 8.0
-                        && ($context['daily_max_hours'] ?? null) === 7.0;
-                }),
+                self::callback(fn (array $context): bool => ($context['daily_total_after_override'] ?? null) === 8.0
+                    && ($context['daily_max_hours'] ?? null) === 7.0),
             );
 
         $useCase = $this->makeUseCase(

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Domain\EmploymentPeriod\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 
-final readonly class WorkTimePercentage
+final readonly class WorkTimePercentage implements Stringable
 {
     private const float MIN_PERCENT = 0.0;
     private const float MAX_PERCENT = 100.0;

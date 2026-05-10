@@ -200,15 +200,20 @@ class ImportTheTribeProjectsCommand extends Command
 
         for ($row = 3; $row <= $sheet->getHighestDataRow(); ++$row) {
             $contributorName = trim((string) $sheet->getCell('A'.$row)->getValue());
-
-            if ($contributorName === '' || in_array($contributorName, $sectionHeaders, true)) {
+            if ($contributorName === '') {
+                continue;
+            }
+            if (in_array($contributorName, $sectionHeaders, true)) {
                 continue;
             }
 
             for ($col = self::STAFFING_START_COLUMN; $col <= $highestColIdx; ++$col) {
                 $coordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
                 $cellValue = $sheet->getCell($coordinate.$row)->getValue();
-                if ($cellValue === null || trim((string) $cellValue) === '') {
+                if ($cellValue === null) {
+                    continue;
+                }
+                if (trim((string) $cellValue) === '') {
                     continue;
                 }
 
@@ -298,13 +303,7 @@ class ImportTheTribeProjectsCommand extends Command
             return true;
         }
 
-        foreach (self::SKIP_NAMES as $skipName) {
-            if (mb_strtolower($name) === mb_strtolower($skipName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SKIP_NAMES, fn ($skipName): bool => mb_strtolower($name) === mb_strtolower((string) $skipName));
     }
 
     /**

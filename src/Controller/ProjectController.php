@@ -263,7 +263,7 @@ class ProjectController extends AbstractController
         if ($request->isMethod('POST')) {
             try {
                 // Support flat POST fields ET Symfony Form `project[*]` array.
-                $formArray = (array) $request->request->all('project');
+                $formArray = $request->request->all('project');
 
                 $name = trim((string) ($formArray['name'] ?? $request->request->get('name', '')));
                 $clientId = isset($formArray['client'])

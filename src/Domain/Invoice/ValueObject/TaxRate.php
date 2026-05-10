@@ -6,13 +6,14 @@ namespace App\Domain\Invoice\ValueObject;
 
 use App\Domain\Shared\ValueObject\Money;
 use InvalidArgumentException;
+use Stringable;
 
 /**
  * Tax rate value object (TVA).
  *
  * Stores rate as basis points (1% = 100 basis points) for precision.
  */
-final readonly class TaxRate
+final readonly class TaxRate implements Stringable
 {
     private const int STANDARD_RATE_FR = 2000; // 20.00%
     private const int REDUCED_RATE_FR = 1000; // 10.00%

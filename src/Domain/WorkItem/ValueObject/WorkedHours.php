@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\WorkItem\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 
 /**
  * Worked hours value object — décimal positif strict, max 24h/jour.
@@ -15,7 +16,7 @@ use InvalidArgumentException;
  * @see ADR-0013 EPIC-003 scope WorkItem & Profitability
  * @see docs/02-architecture/epic-003-audit-existing-data.md
  */
-final readonly class WorkedHours
+final readonly class WorkedHours implements Stringable
 {
     private const float MAX_HOURS_PER_DAY = 24.0;
     private const int DECIMAL_PRECISION = 2;

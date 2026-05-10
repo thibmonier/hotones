@@ -19,7 +19,7 @@ class EmployeeLevelFixtures extends Fixture implements DependentFixtureInterface
      * Configuration des 12 niveaux avec fourchettes salariales (annuel brut en EUR).
      * Ces valeurs sont des exemples pour le marché français IT en 2025-2026.
      */
-    private const LEVELS_CONFIG = [
+    private const array LEVELS_CONFIG = [
         // Juniors (1-3)
         1 => [
             'name' => 'Junior 1',
@@ -125,7 +125,7 @@ class EmployeeLevelFixtures extends Fixture implements DependentFixtureInterface
         ],
     ];
 
-    private const LEVELS_DESCRIPTIONS = [
+    private const array LEVELS_DESCRIPTIONS = [
         1 => 'Débutant, moins de 2 ans d\'expérience. Travaille sous supervision, apprend les bases.',
         2 => '1-2 ans d\'expérience. Gagne en autonomie sur les tâches simples.',
         3 => '2-3 ans d\'expérience. Autonome sur les tâches courantes, prêt pour des responsabilités.',

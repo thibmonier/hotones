@@ -175,14 +175,14 @@ final class AuditContributorsCjmCommand extends Command
 
         if ($period !== null) {
             $rate = $field === 'cjm' ? $period->cjm : $period->tjm;
-            if ($rate !== null && trim((string) $rate) !== '' && (float) $rate > 0) {
-                return (string) $rate;
+            if ($rate !== null && trim($rate) !== '' && (float) $rate > 0) {
+                return $rate;
             }
         }
 
         $direct = $field === 'cjm' ? $contributor->cjm : $contributor->tjm;
-        if ($direct !== null && trim((string) $direct) !== '' && (float) $direct > 0) {
-            return (string) $direct;
+        if ($direct !== null && trim($direct) !== '' && (float) $direct > 0) {
+            return $direct;
         }
 
         return null;

@@ -87,7 +87,7 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
         };
 
         return array_map(
-            fn (FlatOrder $flat): DddOrder => $this->flatToDdd->translate($flat),
+            $this->flatToDdd->translate(...),
             $this->flatRepository->findBy(['status' => $flatStatus]),
         );
     }
@@ -106,7 +106,7 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
             fn (FlatOrder $flat): bool => !in_array($flat->status, $terminalStates, true),
         );
 
-        return array_map(fn (FlatOrder $flat): DddOrder => $this->flatToDdd->translate($flat), $actives);
+        return array_map($this->flatToDdd->translate(...), $actives);
     }
 
     /**
@@ -114,9 +114,7 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
      */
     public function findAll(): array
     {
-        return array_map(fn (FlatOrder $flat): DddOrder => $this->flatToDdd->translate(
-            $flat,
-        ), $this->flatRepository->findAll());
+        return array_map($this->flatToDdd->translate(...), $this->flatRepository->findAll());
     }
 
     public function save(DddOrder $order): void

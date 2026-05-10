@@ -14,7 +14,7 @@ use Twig\Environment;
 class PdfGeneratorServiceTest extends TestCase
 {
     private PdfGeneratorService $service;
-    private Environment $twig;
+    private \PHPUnit\Framework\MockObject\MockObject $twig;
 
     protected function setUp(): void
     {

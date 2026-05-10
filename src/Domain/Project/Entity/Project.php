@@ -20,14 +20,8 @@ use InvalidArgumentException;
 final class Project implements AggregateRootInterface
 {
     use RecordsDomainEvents;
-
-    private ProjectId $id;
-    private string $name;
     private ?string $description;
-    private ClientId $clientId;
     private ProjectStatus $status;
-    private ProjectType $projectType;
-    private bool $isInternal;
     private ?Money $budget;
     private ?Money $soldAmount;
     private ?string $reference;
@@ -41,17 +35,12 @@ final class Project implements AggregateRootInterface
     private ?DateTimeImmutable $updatedAt;
 
     private function __construct(
-        ProjectId $id,
-        string $name,
-        ClientId $clientId,
-        ProjectType $projectType,
-        bool $isInternal = false,
+        private ProjectId $id,
+        private string $name,
+        private ClientId $clientId,
+        private ProjectType $projectType,
+        private bool $isInternal = false,
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->clientId = $clientId;
-        $this->projectType = $projectType;
-        $this->isInternal = $isInternal;
         $this->status = ProjectStatus::DRAFT;
         $this->description = null;
         $this->budget = null;

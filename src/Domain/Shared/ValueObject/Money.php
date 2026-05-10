@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Domain\Shared\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 
-final readonly class Money
+final readonly class Money implements Stringable
 {
     private const string DEFAULT_CURRENCY = 'EUR';
 

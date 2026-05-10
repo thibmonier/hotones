@@ -162,16 +162,14 @@ final class TimesheetExportServiceTest extends TestCase
             ->method('createPdfResponse')
             ->with(
                 $this->equalTo('timesheet/export_pdf.html.twig'),
-                $this->callback(function (array $context): bool {
-                    return isset(
-                        $context['contributor'],
-                        $context['timesheets'],
-                        $context['totalHours'],
-                        $context['totalDays'],
-                        $context['hoursPerDay'],
-                        $context['projectSummary'],
-                    );
-                }),
+                $this->callback(fn (array $context): bool => isset(
+                    $context['contributor'],
+                    $context['timesheets'],
+                    $context['totalHours'],
+                    $context['totalDays'],
+                    $context['hoursPerDay'],
+                    $context['projectSummary'],
+                )),
                 $this->stringContains('temps_'),
             )
             ->willReturn($expectedResponse);

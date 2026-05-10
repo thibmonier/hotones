@@ -225,7 +225,7 @@ class EmploymentPeriodController extends AbstractController
             if ($period->getSalary()) {
                 $year = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
-                $period->setCjm((string) $calculatedCjm);
+                $period->setCjm($calculatedCjm);
             } else {
                 // Autoriser la saisie manuelle si pas de salaire
                 $cjm = $request->request->get('cjm');
@@ -349,7 +349,7 @@ class EmploymentPeriodController extends AbstractController
             if ($period->getSalary()) {
                 $year = (int) $period->getStartDate()->format('Y');
                 $calculatedCjm = $cjmCalculatorService->calculateCjmFromMonthlySalary($period->getSalary(), $year);
-                $period->setCjm((string) $calculatedCjm);
+                $period->setCjm($calculatedCjm);
             } else {
                 // Autoriser la saisie manuelle si pas de salaire
                 $cjm = $request->request->get('cjm');

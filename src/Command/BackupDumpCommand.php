@@ -182,10 +182,10 @@ final class BackupDumpCommand extends Command
 
             $rows = $this->connection->fetchAllAssociative('SELECT * FROM '.$platform->quoteSingleIdentifier($table));
             foreach ($rows as $row) {
-                $columns = array_map(static fn ($col) => $platform->quoteSingleIdentifier(
+                $columns = array_map(static fn ($col): string => $platform->quoteSingleIdentifier(
                     (string) $col,
                 ), array_keys($row));
-                $values = array_map(fn ($value) => $this->quoteSqliteValue($value), array_values($row));
+                $values = array_map($this->quoteSqliteValue(...), array_values($row));
                 $sql .= sprintf(
                     "INSERT INTO %s (%s) VALUES (%s);\n",
                     $platform->quoteSingleIdentifier($table),
@@ -234,8 +234,8 @@ final class BackupDumpCommand extends Command
         }
 
         $writer = $compress
-            ? static fn (string $chunk) => gzwrite($handle, $chunk)
-            : static fn (string $chunk) => fwrite($handle, $chunk);
+            ? static fn (string $chunk): int|false => gzwrite($handle, $chunk)
+            : static fn (string $chunk): int|false => fwrite($handle, $chunk);
 
         $process->run(static function (string $type, string $buffer) use ($writer, $io): void {
             if ($type === Process::OUT) {

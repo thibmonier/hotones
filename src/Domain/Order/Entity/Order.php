@@ -24,15 +24,9 @@ use InvalidArgumentException;
 final class Order implements AggregateRootInterface
 {
     use RecordsDomainEvents;
-
-    private OrderId $id;
-    private string $reference;
-    private ClientId $clientId;
     private ?string $title;
     private ?string $description;
     private OrderStatus $status;
-    private ContractType $contractType;
-    private Money $amount;
     private ?Money $discount;
     private ?DateTimeImmutable $startDate;
     private ?DateTimeImmutable $endDate;
@@ -45,17 +39,12 @@ final class Order implements AggregateRootInterface
     private array $sections = [];
 
     private function __construct(
-        OrderId $id,
-        string $reference,
-        ClientId $clientId,
-        ContractType $contractType,
-        Money $amount,
+        private OrderId $id,
+        private string $reference,
+        private ClientId $clientId,
+        private ContractType $contractType,
+        private Money $amount,
     ) {
-        $this->id = $id;
-        $this->reference = $reference;
-        $this->clientId = $clientId;
-        $this->contractType = $contractType;
-        $this->amount = $amount;
         $this->status = OrderStatus::DRAFT;
         $this->title = null;
         $this->description = null;

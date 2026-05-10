@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Invoice\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
  * Invoice line identifier value object.
  */
-final readonly class InvoiceLineId
+final readonly class InvoiceLineId implements Stringable
 {
     private function __construct(
         private string $value,

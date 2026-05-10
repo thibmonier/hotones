@@ -174,7 +174,7 @@ final class HealthCheckControllerTest extends TestCase
 
         $itemFactory = function (string $key) use (&$store): CacheItemInterface {
             $item = $this->createStub(CacheItemInterface::class);
-            $item->method('isHit')->willReturnCallback(static fn () => isset($store[$key]));
+            $item->method('isHit')->willReturnCallback(static fn (): bool => isset($store[$key]));
             $item->method('get')->willReturnCallback(static fn () => $store[$key] ?? null);
             $item->method('set')->willReturnCallback(static function ($value) use ($item, $key, &$store) {
                 $store[$key] = $value;

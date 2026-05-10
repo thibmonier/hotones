@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Invoice\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
  * Invoice identifier value object.
  */
-final readonly class InvoiceId
+final readonly class InvoiceId implements Stringable
 {
     private const string LEGACY_PREFIX = 'legacy:';
 

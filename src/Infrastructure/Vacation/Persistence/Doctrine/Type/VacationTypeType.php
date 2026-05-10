@@ -7,11 +7,13 @@ namespace App\Infrastructure\Vacation\Persistence\Doctrine\Type;
 use App\Domain\Vacation\ValueObject\VacationType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Override;
 
 final class VacationTypeType extends Type
 {
     public const string NAME = 'vacation_type';
 
+    #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?VacationType
     {
         if ($value === null) {
@@ -21,6 +23,7 @@ final class VacationTypeType extends Type
         return VacationType::from((string) $value);
     }
 
+    #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if ($value === null) {

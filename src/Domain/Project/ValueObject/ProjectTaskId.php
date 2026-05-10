@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Project\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -17,7 +18,7 @@ use Symfony\Component\Uid\Uuid;
  * @see ADR-0008 ACL pattern
  * @see ADR-0015 EPIC-003 Phase 2 décisions
  */
-final readonly class ProjectTaskId
+final readonly class ProjectTaskId implements Stringable
 {
     private const string LEGACY_PREFIX = 'legacy:';
 

@@ -59,7 +59,7 @@ class SaasSubscriptionCrudController extends AbstractCrudController
         yield AssociationField::new('service', 'Service')
             ->setRequired(true)
             ->setQueryBuilder(
-                fn (\Doctrine\ORM\QueryBuilder $qb) => $qb
+                fn (\Doctrine\ORM\QueryBuilder $qb): \Doctrine\ORM\QueryBuilder => $qb
                     ->leftJoin('entity.provider', 'p')
                     ->andWhere('entity.active = :active')
                     ->setParameter('active', true)

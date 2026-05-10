@@ -803,7 +803,7 @@ class OrderController extends AbstractController
             $filename = sprintf('devis_%s_preview.pdf', $order->getOrderNumber());
 
             return $pdfGenerator->createPdfResponse('order/pdf.html.twig', $data, $filename, inline: true);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return new Response(
                 'Impossible de generer la previsualisation. Veuillez reessayer.',
                 Response::HTTP_INTERNAL_SERVER_ERROR,

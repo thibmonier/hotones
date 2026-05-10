@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Domain\Client\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
-final readonly class ClientId
+final readonly class ClientId implements Stringable
 {
     /** Legacy int-id prefix used during EPIC-001 Phase 2 strangler fig. */
     private const string LEGACY_PREFIX = 'legacy:';

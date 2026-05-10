@@ -29,7 +29,7 @@ final class TenantFilterTest extends TestCase
     private function makeFilter(int $tenantId): TenantFilter
     {
         $connection = $this->createStub(Connection::class);
-        $connection->method('quote')->willReturnCallback(static fn ($value) => "'".(string) $value."'");
+        $connection->method('quote')->willReturnCallback(static fn ($value): string => "'".$value."'");
 
         $filterCollection = $this->createStub(FilterCollection::class);
         $filterCollection->method('setFiltersStateDirty');

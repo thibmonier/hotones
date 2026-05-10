@@ -16,9 +16,6 @@ use DateTimeImmutable;
 final class Client implements AggregateRootInterface
 {
     use RecordsDomainEvents;
-
-    private ClientId $id;
-    private CompanyName $name;
     private ?Email $email;
     private ?string $phone;
     private ?string $address;
@@ -26,17 +23,13 @@ final class Client implements AggregateRootInterface
     private ?string $postalCode;
     private ?string $country;
     private ?string $vatNumber;
-    private ServiceLevel $serviceLevel;
     private bool $isActive;
     private ?string $notes;
     private DateTimeImmutable $createdAt;
     private ?DateTimeImmutable $updatedAt;
 
-    private function __construct(ClientId $id, CompanyName $name, ServiceLevel $serviceLevel)
+    private function __construct(private ClientId $id, private CompanyName $name, private ServiceLevel $serviceLevel)
     {
-        $this->id = $id;
-        $this->name = $name;
-        $this->serviceLevel = $serviceLevel;
         $this->isActive = true;
         $this->email = null;
         $this->phone = null;

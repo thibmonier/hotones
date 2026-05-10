@@ -264,7 +264,7 @@ class ImportTheTribeNotionCommand extends Command
         }
 
         // Lire le header pour construire l'index des colonnes
-        $header = fgetcsv($handle);
+        $header = fgetcsv($handle, escape: '\\');
         if ($header === false) {
             $io->error('Fichier CSV vide ou header invalide');
             fclose($handle);
@@ -275,12 +275,12 @@ class ImportTheTribeNotionCommand extends Command
         $columnIndex = [];
         foreach ($header as $i => $col) {
             // Supprimer le BOM UTF-8 éventuel sur la première colonne
-            $col = preg_replace('/^\x{FEFF}/u', '', trim($col));
-            $columnIndex[trim($col)] = $i;
+            $col = preg_replace('/^\x{FEFF}/u', '', trim((string) $col));
+            $columnIndex[trim((string) $col)] = $i;
         }
 
         $rows = [];
-        while (($data = fgetcsv($handle)) !== false) {
+        while (($data = fgetcsv($handle, escape: '\\')) !== false) {
             $row = [];
             foreach ($columnIndex as $colName => $idx) {
                 $row[$colName] = trim($data[$idx] ?? '');
@@ -380,7 +380,7 @@ class ImportTheTribeNotionCommand extends Command
                 continue;
             }
 
-            $techNames = array_map('trim', explode(',', $rawTechs));
+            $techNames = array_map(trim(...), explode(',', $rawTechs));
             foreach ($techNames as $techName) {
                 if ($techName === '') {
                     continue;

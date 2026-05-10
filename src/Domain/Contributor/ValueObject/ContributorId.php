@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Contributor\ValueObject;
 
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -12,7 +13,7 @@ use Symfony\Component\Uid\Uuid;
  *
  * @see ADR-0008 ACL pattern
  */
-final readonly class ContributorId
+final readonly class ContributorId implements Stringable
 {
     private const string LEGACY_PREFIX = 'legacy:';
 

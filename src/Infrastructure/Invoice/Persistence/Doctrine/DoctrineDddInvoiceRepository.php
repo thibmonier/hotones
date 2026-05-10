@@ -12,7 +12,6 @@ use App\Domain\Invoice\Repository\InvoiceRepositoryInterface;
 use App\Domain\Invoice\ValueObject\InvoiceId;
 use App\Domain\Invoice\ValueObject\InvoiceNumber;
 use App\Domain\Invoice\ValueObject\InvoiceStatus;
-use App\Entity\Invoice as FlatInvoice;
 use App\Infrastructure\Invoice\Translator\InvoiceDddToFlatTranslator;
 use App\Infrastructure\Invoice\Translator\InvoiceFlatToDddTranslator;
 use App\Repository\InvoiceRepository as FlatInvoiceRepository;
@@ -75,7 +74,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
 
         $flats = $this->flatRepository->findBy(['client' => $clientId->toLegacyInt()]);
 
-        return array_map(fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat), $flats);
+        return array_map($this->flatToDdd->translate(...), $flats);
     }
 
     /**
@@ -89,7 +88,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
 
         $flats = $this->flatRepository->findBy(['company' => $companyId->toLegacyInt()]);
 
-        return array_map(fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat), $flats);
+        return array_map($this->flatToDdd->translate(...), $flats);
     }
 
     /**
@@ -99,7 +98,7 @@ final readonly class DoctrineDddInvoiceRepository implements InvoiceRepositoryIn
     {
         $flats = $this->flatRepository->findBy(['status' => $status->value]);
 
-        return array_map(fn (FlatInvoice $flat): DddInvoice => $this->flatToDdd->translate($flat), $flats);
+        return array_map($this->flatToDdd->translate(...), $flats);
     }
 
     /**
