@@ -114,6 +114,18 @@ final class Project implements AggregateRootInterface
         }
         $project->updatedAt = $extra['updatedAt'] ?? null;
 
+        // EPIC-003 Phase 3 (sprint-023 US-107) — restore margin snapshot
+        // persisté via ACL translator
+        if (isset($extra['coutTotal']) && $extra['coutTotal'] instanceof Money) {
+            $project->coutTotal = $extra['coutTotal'];
+        }
+        if (isset($extra['factureTotal']) && $extra['factureTotal'] instanceof Money) {
+            $project->factureTotal = $extra['factureTotal'];
+        }
+        if (isset($extra['margeCalculatedAt']) && $extra['margeCalculatedAt'] instanceof DateTimeImmutable) {
+            $project->margeCalculatedAt = $extra['margeCalculatedAt'];
+        }
+
         return $project;
     }
 
