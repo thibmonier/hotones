@@ -9,6 +9,7 @@ use App\Domain\Project\Entity\Project as DddProject;
 use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Project\ValueObject\ProjectStatus;
 use App\Domain\Project\ValueObject\ProjectType;
+use App\Domain\Shared\ValueObject\Money;
 use App\Entity\Project as FlatProject;
 use DateTimeImmutable;
 
@@ -57,6 +58,10 @@ final class ProjectFlatToDddTranslator
                 'documentationUrl' => null,
                 'notes' => null,
                 'createdAt' => new DateTimeImmutable(),
+                // EPIC-003 Phase 3 (sprint-023 US-107) — margin snapshot persisté
+                'coutTotal' => $flat->coutTotalCents !== null ? Money::fromCents($flat->coutTotalCents) : null,
+                'factureTotal' => $flat->factureTotalCents !== null ? Money::fromCents($flat->factureTotalCents) : null,
+                'margeCalculatedAt' => $flat->margeCalculatedAt,
             ],
         );
     }

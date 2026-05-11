@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Entity\Interface\CompanyOwnedInterface;
 use App\Repository\ProjectRepository;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -277,6 +278,41 @@ class Project implements CompanyOwnedInterface
         get => $this->boondManagerId;
         set {
             $this->boondManagerId = $value;
+        }
+    }
+
+    /**
+     * EPIC-003 Phase 3 (sprint-023 US-107 ADR-0016 Q4.x) — snapshot marge
+     * persistée. Snapshot transient sprint-022 US-104 (Project Domain aggregate
+     * setMargeSnapshot) maintenant persisté en BDD pour requêtes dashboard +
+     * éviter recalcul à chaque consultation.
+     *
+     * Calculé par UC `CalculateProjectMargin` (sprint-022 US-104) :
+     * - coutTotalCents = somme `WorkItem.cost()` (en centimes)
+     * - factureTotalCents = somme `Invoice.amountTtc` paid (en centimes)
+     * - margeCalculatedAt = timestamp last snapshot
+     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    public ?int $coutTotalCents = null {
+        get => $this->coutTotalCents;
+        set {
+            $this->coutTotalCents = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    public ?int $factureTotalCents = null {
+        get => $this->factureTotalCents;
+        set {
+            $this->factureTotalCents = $value;
+        }
+    }
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    public ?DateTimeImmutable $margeCalculatedAt = null {
+        get => $this->margeCalculatedAt;
+        set {
+            $this->margeCalculatedAt = $value;
         }
     }
 

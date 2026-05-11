@@ -26,6 +26,11 @@ final class ProjectDddToFlatTranslator
 
         // Internal projects have null client; otherwise inject the resolved one.
         $flat->client = $client;
+
+        // EPIC-003 Phase 3 (sprint-023 US-107) — persist margin snapshot
+        $flat->coutTotalCents = $ddd->getCoutTotal()?->getAmountCents();
+        $flat->factureTotalCents = $ddd->getFactureTotal()?->getAmountCents();
+        $flat->margeCalculatedAt = $ddd->getMargeCalculatedAt();
     }
 
     /**
