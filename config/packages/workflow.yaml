@@ -1,0 +1,49 @@
+# EPIC-003 Phase 3 (sprint-022 sub-epic F WORKFLOW-YAML — sprint-021 retro
+# S-3 + ADR-0016 Q3.1) — Workflow Symfony state machine WorkItem 4 états.
+#
+# Source : Domain pure state machine (`WorkItemStatus::canTransitionTo` +
+# Aggregate methods `markAsValidated`/`markAsBilled`/`markAsPaid`) livrée
+# sprint-021 US-101. Cette config Symfony Workflow active intégration
+# UI/listeners visuels + workflow dump CLI.
+#
+# Transitions :
+# - validate : draft → validated (US-099 role-based managers Q3.2 ou
+#   manager déclenche manuellement)
+# - bill : validated → billed (US-101 cross-aggregate listener
+#   `BillRelatedWorkItemsOnInvoiceCreated` consume `InvoiceCreatedEvent`
+#   payload workItemIds — AT-3.2)
+# - mark_paid : billed → paid (sprint-021 livre transition Domain ;
+#   listener automatique sprint-023+ après design tracking Invoice ↔
+#   WorkItem persisté)
+#
+# Defense-in-depth : la state machine sert de garde-fou logique. Domain
+# entity `WorkItem` valide aussi via `WorkItemStatus::canTransitionTo()`
+# (idempotent + throws `WorkItemInvalidTransitionException`).
+
+framework:
+    workflows:
+        work_item:
+            type: state_machine
+            audit_trail:
+                enabled: false  # Logging applicatif suffit (US-095 JSON)
+            marking_store:
+                type: method
+                property: status
+            supports:
+                - App\Domain\WorkItem\Entity\WorkItem
+            initial_marking: draft
+            places:
+                - draft
+                - validated
+                - billed
+                - paid
+            transitions:
+                validate:
+                    from: draft
+                    to: validated
+                bill:
+                    from: validated
+                    to: billed
+                mark_paid:
+                    from: billed
+                    to: paid
