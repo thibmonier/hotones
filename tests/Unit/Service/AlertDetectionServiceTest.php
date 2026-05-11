@@ -7,7 +7,6 @@ namespace App\Tests\Unit\Service;
 use App\Entity\Order;
 use App\Entity\OrderPaymentSchedule;
 use App\Entity\Project;
-use App\Event\LowMarginAlertEvent;
 use App\Event\PaymentDueAlertEvent;
 use App\Event\ProjectBudgetAlertEvent;
 use App\Repository\ContributorRepository;
@@ -137,7 +136,7 @@ final class AlertDetectionServiceTest extends TestCase
         self::assertSame(0, $stats['budget_alerts']);
     }
 
-    public function testMarginAlertDispatchedAtCriticalSeverity(): void
+    public function testMarginAlertDispatchedAtCriticalSeverityViaDomainEvent(): void
     {
         $project = $this->makeProject();
         $this->projectRepository->method('findBy')->willReturn([$project]);
@@ -149,25 +148,28 @@ final class AlertDetectionServiceTest extends TestCase
                 'predictedMargin' => ['projected' => 5.0],
             ]);
 
-        $captured = null;
-        $this->eventDispatcher
+        // Sprint-023 US-106 (AT-3.3 strangler fig completion) : legacy
+        // LowMarginAlertEvent supprimé, seul Domain Event dispatched via
+        // messageBus.
+        $domainEventCaptured = null;
+        $this->messageBus
             ->method('dispatch')
-            ->willReturnCallback(static function ($event) use (&$captured) {
-                if ($event instanceof LowMarginAlertEvent) {
-                    $captured = $event;
+            ->willReturnCallback(static function (object $event) use (&$domainEventCaptured): Envelope {
+                if ($event instanceof \App\Domain\Project\Event\MarginThresholdExceededEvent) {
+                    $domainEventCaptured = $event;
                 }
 
-                return $event;
+                return new Envelope($event);
             });
 
         $stats = $this->service->checkAllAlerts();
 
         self::assertSame(1, $stats['margin_alerts']);
-        self::assertNotNull($captured);
-        self::assertSame('critical', $captured->getSeverity());
+        self::assertNotNull($domainEventCaptured);
+        self::assertSame(10.0, $domainEventCaptured->thresholdPercent); // critical = threshold 10
     }
 
-    public function testMarginAlertDispatchedAtWarningSeverity(): void
+    public function testMarginAlertDispatchedAtWarningSeverityViaDomainEvent(): void
     {
         $project = $this->makeProject();
         $this->projectRepository->method('findBy')->willReturn([$project]);
@@ -179,28 +181,30 @@ final class AlertDetectionServiceTest extends TestCase
                 'predictedMargin' => ['projected' => 15.0],
             ]);
 
-        $captured = null;
-        $this->eventDispatcher
+        $domainEventCaptured = null;
+        $this->messageBus
             ->method('dispatch')
-            ->willReturnCallback(static function ($event) use (&$captured) {
-                if ($event instanceof LowMarginAlertEvent) {
-                    $captured = $event;
+            ->willReturnCallback(static function (object $event) use (&$domainEventCaptured): Envelope {
+                if ($event instanceof \App\Domain\Project\Event\MarginThresholdExceededEvent) {
+                    $domainEventCaptured = $event;
                 }
 
-                return $event;
+                return new Envelope($event);
             });
 
         $stats = $this->service->checkAllAlerts();
 
         self::assertSame(1, $stats['margin_alerts']);
-        self::assertNotNull($captured);
-        self::assertSame('warning', $captured->getSeverity());
+        self::assertNotNull($domainEventCaptured);
+        self::assertSame(20.0, $domainEventCaptured->thresholdPercent); // warning = threshold 20
     }
 
-    public function testMarginAlertDualDispatchesDomainAndLegacyEvents(): void
+    public function testMarginAlertNoLegacyEventDispatched(): void
     {
-        // Sprint-022 US-105 (AT-3.3 ADR-0016) — verify dual dispatch :
-        // legacy LowMarginAlertEvent + nouveau MarginThresholdExceededEvent.
+        // Sprint-023 US-106 strangler fig completion : legacy
+        // LowMarginAlertEvent supprimé. eventDispatcher ne reçoit PLUS
+        // d'événement margin (autres alertes Budget/Workload/Payment
+        // continuent via eventDispatcher).
         $project = $this->makeProject();
         $this->projectRepository->method('findBy')->willReturn([$project]);
         $this->orderRepository->method('findBy')->willReturn([]);
