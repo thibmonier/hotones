@@ -1,0 +1,543 @@
+metadata:
+  sprint_id: "sprint-011"
+  name: "DDD Phase 3 Completion + E2E Tests"
+  start_date: "2026-05-06"
+  end_date: "TBD"
+  goal: "Compléter Phase 3 EPIC-001 par la migration des controllers Project + Order + Client edit/delete vers les use cases DDD, ajouter test E2E sur la route DDD livrée sprint-010, et activer le buffer DDD-PHASE1-INVOICE."
+  capacity_points: 22
+  capacity_projected_points: 22
+  committed_points: 17
+  velocity_target: "17-22"
+  last_sync: "2026-05-06T18:00:00Z"
+  current_day: 1
+
+# History of completed sprints, kept for traceability and velocity tracking.
+sprint_history:
+  sprint-001:
+    name: "Walking Skeleton"
+    points_planned: 21
+    points_delivered: 21
+    velocity: 21
+
+  sprint-002:
+    name: "Tests Consolidation"
+    points_planned: 34
+    points_delivered: 34
+    velocity: 34
+
+  sprint-003:
+    name: "Stabilization"
+    points_planned: 30
+    points_delivered: 30
+    velocity: 30
+
+  sprint-004:
+    name: "Quality Foundation"
+    points_planned: 30
+    points_delivered: 30
+    velocity: 30
+
+  sprint-005:
+    name: "Test Stabilization & Tech-Debt"
+    points_planned: 26
+    points_delivered: 26
+    velocity: 26
+    closed_at: "2026-05-04"
+    review: "project-management/sprints/sprint-005-test-stabilization/sprint-review.md"
+    retro: "project-management/sprints/sprint-005-test-stabilization/sprint-retro.md"
+
+  sprint-006:
+    name: "Test Debt Cleanup & Workflow Hygiene"
+    points_planned: 22
+    points_delivered: 19
+    velocity: 19
+    closed_at: "2026-05-05"
+    notes: "TEST-MOCKS-002 audit + cleanup + PR template gating + pre-commit auto-generes guards. PRs #100-#105."
+
+  sprint-007:
+    name: "Security Hardening + DDD Foundation"
+    points_planned: 32
+    points_delivered: 32
+    velocity: 32
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-007-security-hardening-ddd/sprint-review.md"
+    retro: "project-management/sprints/sprint-007-security-hardening-ddd/sprint-retro.md"
+    notes: "Mode agentic accéléré 2j. EPIC-001 Phase 0 ✅. SEC-MULTITENANT-001/002/003 + SEC-VOTERS-001/002 + DDD-PHASE0-001/002 + TEST-MOCKS-003. 10 PRs (#114-#123). 3 gap-analysis Critical résolus (C1+C2+D1)."
+
+  sprint-008:
+    name: "DDD Phase 1 + Tech Debt + PRD/DB"
+    points_planned: 17
+    points_delivered: 17
+    velocity: 17
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-008-ddd-phase1-and-tech-debt/sprint-review.md"
+    retro: "project-management/sprints/sprint-008-ddd-phase1-and-tech-debt/sprint-retro.md"
+    notes: "EPIC-001 Phase 1 ✅ 100% (3 BCs additifs Client+Project+Order). 8 PRs (#126-#133). 4 ADRs (0004/0005/0006/0007)."
+
+  sprint-009:
+    name: "DDD Phase 2 Strangler Fig + Critical Fixes"
+    points_planned: 15
+    points_delivered: 14
+    velocity: 14
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-009-strangler-fig-and-fixes/sprint-review.md"
+    retro: "project-management/sprints/sprint-009-strangler-fig-and-fixes/sprint-retro.md"
+    notes: "EPIC-001 Phase 2 amorcée (Client BC ACL + use cases). PHPUnit Notices 251→0. INVESTIGATE-CAT-C déférée sprint-010. 6 PRs (#136-#141). 2 ADRs (0008 ACL pattern)."
+
+  sprint-010:
+    name: "DDD Phase 2 Completion + Phase 3 Start"
+    points_planned: 17
+    points_delivered: 17
+    velocity: 17
+    closed_at: "2026-05-06"
+    review: "project-management/sprints/sprint-010-ddd-phase2-completion/sprint-review.md"
+    retro: "project-management/sprints/sprint-010-ddd-phase2-completion/sprint-retro.md"
+    notes: "EPIC-001 Phase 2 ✅ 100% (3/3 BCs ACL Client+Project+Order). Phase 3 amorcée (1er controller migré). 5 PRs (#144-#148). ADR-0009 controller migration pattern."
+
+stories:
+
+  # =========================================================================
+  # Sprint-002 — Tests Consolidation (closed, 34/34 pts)
+  # =========================================================================
+
+  TEST-001:
+    title: "Tests Notifications (NotificationService + Subscriber)"
+    epic: "TECH"
+    points: 5
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: []
+
+  TEST-002:
+    title: "Tests Auth/2FA (SecurityController + TwoFactor + LoginSecuritySubscriber)"
+    epic: "TECH"
+    points: 5
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: []
+
+  TEST-003:
+    title: "Tests RunningTimer + Timer start/stop"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: []
+
+  TEST-004:
+    title: "Tests Multi-tenant (CompanyVoter + CompanyContext)"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: []
+
+  US-066:
+    title: "Demande conges"
+    epic: "EPIC-009"
+    points: 5
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: ["TEST-002", "TEST-004"]
+
+  US-067:
+    title: "Validation manager conges"
+    epic: "EPIC-009"
+    points: 5
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: ["US-066"]
+    pr: 45
+
+  US-068:
+    title: "Rejet avec motif"
+    epic: "EPIC-009"
+    points: 3
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: ["US-067"]
+    pr: 43
+
+  US-069:
+    title: "Annulation demande"
+    epic: "EPIC-009"
+    points: 3
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: ["US-066"]
+    pr: 43
+
+  OPS-001:
+    title: "Coverage CI + baseline (PHPUnit + Sonar)"
+    epic: "TECH"
+    points: 2
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-002"
+    blocked_by: []
+    pr: 30
+    completed_at: "2026-04-23"
+
+  # =========================================================================
+  # Sprint-003 — Stabilization (closed, 30/30 pts)
+  # =========================================================================
+
+  OPS-002:
+    title: "Restaurer pipeline SonarQube + Quality Gate strict"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 53
+
+  OPS-003:
+    title: "ADR + fix conflit formatage Mago vs PHP-CS-Fixer"
+    epic: "TECH"
+    points: 2
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 50
+
+  OPS-004:
+    title: "Monitoring CI sur main (issue auto si rouge >24h)"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 48
+
+  OPS-005:
+    title: "Hooks pre-commit / pre-push fallback sans Docker"
+    epic: "TECH"
+    points: 2
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 49
+
+  OPS-006:
+    title: "Politique PR <400 lignes diff dans CONTRIBUTING.md"
+    epic: "TECH"
+    points: 1
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 47
+
+  TECH-DEBT-001:
+    title: "Notifier intervenant lors d'une annulation manager (US-069)"
+    epic: "EPIC-009"
+    points: 3
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: ["US-069"]
+    pr: 52
+
+  TECH-DEBT-002:
+    title: "Audit + cleanup CI checks (Mago/PHPCS/PHPUnit) sur PR existantes"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: ["OPS-003"]
+    pr: 54
+
+  US-070:
+    title: "Provision env staging (Render/Docker) avec migrations + fixtures"
+    epic: "EPIC-OPS"
+    points: 5
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 56
+
+  US-071:
+    title: "Email transactionnel Vacation (intervenant + manager)"
+    epic: "EPIC-009"
+    points: 3
+    priority: "Could"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: ["TECH-DEBT-001"]
+    pr: 57
+
+  TEST-005:
+    title: "Elever coverage baseline 9.4% -> 25% (Application + Domain Vacation + Notification)"
+    epic: "TECH"
+    points: 5
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: ["OPS-001"]
+    pr: 55
+
+  DEPS-001:
+    title: "endroid/qr-code v5 -> v7 (config breaking)"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 59
+    notes: "Livre J1 sprint-003 (avance sprint-004)"
+
+  DEPS-002:
+    title: "Symfony patches + roave/security-advisories audit"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 60
+
+  DEPS-003:
+    title: "composer audit + npm audit clean"
+    epic: "TECH"
+    points: 2
+    priority: "Should"
+    status: "done"
+    sprint: "sprint-003"
+    blocked_by: []
+    pr: 60
+
+  # =========================================================================
+  # Sprint-004 — Quality Foundation (in review, 9 PRs open + 1 merged)
+  # =========================================================================
+
+  TEST-006:
+    title: "Backup / Restore SQL strategy + tests integration"
+    epic: "TECH"
+    points: 5
+    priority: "Must"
+    status: "done"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 70
+    notes: "MERGED 2026-05-01"
+
+  TEST-007:
+    title: "Tests AlertDetectionService + CheckAlertsMessageHandler"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 72
+
+  TEST-008:
+    title: "Healthcheck endpoint failure paths (Doctrine connectivity)"
+    epic: "TECH"
+    points: 2
+    priority: "Must"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 71
+
+  TEST-009:
+    title: "BoondManagerClient + HubSpotClient integration tests (MockHttpClient)"
+    epic: "TECH"
+    points: 5
+    priority: "Should"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 79
+
+  TEST-DEPRECATIONS-001:
+    title: "Silence 8 PHPUnit deprecations + 229 notices + 1 PHP warning"
+    epic: "TECH"
+    points: 2
+    priority: "Should"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 74
+
+  OPS-007:
+    title: "Stacked PR merge procedure (CONTRIBUTING + bin/stacked-pr helper)"
+    epic: "TECH"
+    points: 2
+    priority: "Must"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 73
+
+  OPS-008:
+    title: "Auto-comment on PRs when critical workflow goes red"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: ["OPS-004"]
+    pr: 75
+
+  OPS-009:
+    title: "Automated staging smoke test post-deploy"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: ["US-070"]
+    pr: 76
+
+  OPS-010:
+    title: "Review + merge cascade des 4 majors PRs ouverts"
+    epic: "TECH"
+    points: 2
+    priority: "Must"
+    status: "deferred"
+    sprint: "sprint-004"
+    blocked_by: []
+    notes: "Scope ambigu, decision dans REFACTOR-002 sprint-005"
+
+  DEPS-004:
+    title: "Symfony AI bundle 0.1 -> 0.8"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 77
+
+  REFACTOR-001:
+    title: "VacationFunctionalTrait + register Presentation routes"
+    epic: "TECH"
+    points: 2
+    priority: "Could"
+    status: "in-review"
+    sprint: "sprint-004"
+    blocked_by: []
+    pr: 78
+
+  # =========================================================================
+  # Sprint-005 — Test Stabilization & Tech-Debt (active)
+  # =========================================================================
+
+  TEST-VACATION-FUNCTIONAL-001:
+    title: "Fix 11 broken Vacation functional tests (session/CSRF) + route count smoke guard"
+    epic: "EPIC-009"
+    points: 5
+    priority: "Must"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: ["REFACTOR-001"]
+    notes: "Retro sprint-004 action #2"
+
+  OPS-011:
+    title: "Pre-push baseline (74 pre-existing failures eliminated or @group skip-pre-push)"
+    epic: "TECH"
+    points: 3
+    priority: "Must"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: ["TEST-VACATION-FUNCTIONAL-001"]
+    notes: "Retro sprint-004 action #3"
+
+  TEST-MOCKS-001:
+    title: "Convert createMock -> createStub + remove AllowMockObjectsWithoutExpectations sweep"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: ["TEST-DEPRECATIONS-001"]
+
+  TEST-CONNECTORS-CONTRACT-001:
+    title: "Sandbox contract tests Boond + HubSpot (weekly cron + auto-issue)"
+    epic: "TECH"
+    points: 5
+    priority: "Should"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: ["TEST-009"]
+
+  TEST-WORKLOAD-001:
+    title: "Cover AlertDetectionService::checkWorkloadAlerts (extract WorkloadCalculator)"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: ["TEST-007"]
+
+  OPS-012:
+    title: "gitignore config/reference.php + regenerate phpstan-baseline from scratch"
+    epic: "TECH"
+    points: 2
+    priority: "Should"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: []
+    notes: "Retro sprint-004 action #1"
+
+  TEST-E2E-STAGING-001:
+    title: "Extend staging smoke with business assertions (login JWT + read + write)"
+    epic: "TECH"
+    points: 3
+    priority: "Should"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: ["OPS-009"]
+
+  OPS-013:
+    title: "Cap concurrent open PRs to 4 (CONTRIBUTING.md section)"
+    epic: "TECH"
+    points: 1
+    priority: "Could"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: []
+    notes: "Retro sprint-004 action #4"
+
+  REFACTOR-002:
+    title: "Decide or drop OPS-010 (review cascade) ambiguity"
+    epic: "TECH"
+    points: 1
+    priority: "Could"
+    status: "ready-for-dev"
+    sprint: "sprint-005"
+    blocked_by: []
+
+# Sprint-005 capacity vs engagement
+sprint_005_summary:
+  capacity: 32
+  engaged: 26
+  margin: 6
+  margin_reason: "Absorber les 9 PRs sprint-004 ouvertes en review en parallele"
+
+  by_priority:
+    Must: 8
+    Should: 16
+    Could: 2
+
+  by_type:
+    test: 19
+    ops: 6
+    refactor: 1

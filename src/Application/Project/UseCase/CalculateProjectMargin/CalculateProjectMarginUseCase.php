@@ -101,7 +101,7 @@ final readonly class CalculateProjectMarginUseCase
      * hiérarchique seuil :
      * 1. flat Project.margin_threshold_percent (override le plus prioritaire)
      * 2. flat Client.margin_threshold_percent (override secondaire)
-     * 3. $defaultPercent (fallback handler/command)
+     * 3. $defaultPercent (fallback handler/command).
      *
      * Lecture via flat entity (Client ↔ Project pas Domain pure sprint-023).
      */
