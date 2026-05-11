@@ -30,17 +30,28 @@
 
 ## Sprint Actuel
 
-**sprint-023 — EPIC-003 Phase 3 Finition + Coverage Step 12**
+**sprint-024 — EPIC-003 Phase 4 Kickoff (KPIs business) — kickoff pending**
 
 | Champ | Valeur |
 |---|---|
-| Période | 2026-05-12 → 2026-05-26 (10 jours ouvrés) |
-| Capacité | 12 pts ferme + 1-2 pts libre |
-| Goal | Refactor `NotificationSubscriber` Domain Events + persistence margin snapshot + configurabilité seuil + BUFFER Integration sprint-021 + Coverage 68 → 70 % |
-| Stories livrées | US-106 (3 pts) ✅, US-107 (3 pts) ✅, US-108 (2 pts) ✅, coverage-012 (2 pts) ✅, integration-21 BUFFER (2 pts) ✅ |
-| Progression | ~12 pts livrés (engagement atteint) |
+| Période | 2026-05-27 → 2026-06-10 (10 jours ouvrés) |
+| Capacité | 12 pts ferme + 1-2 pts libre (4ᵉ confirmation recalibrage durable) |
+| Goal | KPIs business (DSO + temps facturation + adoption marge). Décision PO PRE-5 Render redeploy 6ᵉ sprint consécutif holdover (trigger atteint). |
+| Stories engagées (provisoire) | US-110/111/112/113 + OPS-PRE5-DECISION |
+| Statut | kickoff_pending — Sprint Planning P1 à 2026-05-27 |
 
-Voir : `project-management/sprints/sprint-023-epic-003-phase-3-finition/sprint-goal.md`
+Voir : `project-management/sprints/sprint-024-epic-003-phase-4-kickoff/sprint-goal.md`
+
+### Sprint Précédent — sprint-023 ✅ CLOSED 2026-05-11
+
+| Champ | Valeur |
+|---|---|
+| Engagement | 12 pts ferme |
+| Livré | **12 pts (100 %)** |
+| Stories | US-106 + US-107 + US-108 + COVERAGE-012 + INTEGRATION-21-SUITE |
+| Highlights | Strangler fig EPIC-003 Phase 3 complet (LowMarginAlertEvent supprimé), persistence margin snapshot, configurabilité hiérarchique seuil, 3ᵉ sprint consécutif 0 holdover OPS, coverage 70 % atteint, 0 commit `--no-verify` |
+
+Voir : `project-management/sprints/sprint-023-epic-003-phase-3-finition/sprint-review.md` + `sprint-retro.md`
 
 ---
 
@@ -64,7 +75,8 @@ Voir : `project-management/sprints/sprint-023-epic-003-phase-3-finition/sprint-g
 | sprint-020 | EPIC-003 Phase 2 ACL | TBD | TBD | TBD |
 | sprint-021 | EPIC-003 Phase 3 RecordWorkItem | TBD | TBD | TBD |
 | sprint-022 | EPIC-003 Phase 3 Completion | 12 | 13 (108 %) | 13 |
-| sprint-023 | EPIC-003 Phase 3 Finition (en cours) | 12 | ~12 | — |
+| sprint-023 | EPIC-003 Phase 3 Finition ✅ closed 2026-05-11 | 12 | 12 (100 %) | 12 |
+| sprint-024 | EPIC-003 Phase 4 Kickoff (kickoff pending) | TBD | — | — |
 
 > Détail vélocité : `.bmad/sprint-status.yaml` (rebuild en cours, voir
 > backup `.bmad/sprint-status.yaml.backup-2026-05-11-sprint011`).
