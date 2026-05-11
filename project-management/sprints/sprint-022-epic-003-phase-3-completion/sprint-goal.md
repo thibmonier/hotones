@@ -61,11 +61,11 @@ exception). Sprint-021 retro action A-1 actée.
 |---|---|---:|---|
 | TEST-COVERAGE-011 | Push coverage 65 → 68 % via Domain Notification + Settings BCs Aggregate extensions | 2 | Sprint-020/021 retro héritage step 11 |
 
-### Sub-epic D — Sub-epic B OPS holdover finalisation (1 pt — selon AT-3 décision)
+### Sub-epic D — Sub-epic B OPS holdover finalisation — **OUT BACKLOG** (ADR-0017)
 
 | ID | Titre | Pts | Notes |
 |---|---:|---:|---|
-| OPS-SUB-EPIC-B | Si AT-3 atelier J0 = A : Slack webhook prod + Sentry alert rules + SMOKE-PROD config | 1 | Si B Out backlog → réallocation 1 pt autre |
+| ~~OPS-SUB-EPIC-B~~ | **OUT BACKLOG** — décision AT-3 = B (atelier OPS-PREP-J0 J-2 sprint-022). 4ᵉ holdover consécutif = signal arrêt runbook §3. Replan sprint dédié OPS quand owner aligné + 4 credentials simultanés confirmés. Voir ADR-0017. | 0 | 1 pt réalloué capacité libre |
 
 ### Sub-epic E — BUFFER tests Integration sprint-021 (1-2 pts)
 
