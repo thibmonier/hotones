@@ -9,7 +9,6 @@ use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Shared\ValueObject\Money;
 use App\Entity\Project;
 use App\Event\ContributorOverloadAlertEvent;
-use App\Event\LowMarginAlertEvent;
 use App\Event\PaymentDueAlertEvent;
 use App\Event\ProjectBudgetAlertEvent;
 use App\Repository\ContributorRepository;
@@ -119,19 +118,17 @@ class AlertDetectionService
             }
 
             if ($severity !== null) {
-                $recipients = $this->getMarginAlertRecipients($project);
-
-                // EPIC-003 Phase 3 (sprint-022 US-105 AT-3.3 ADR-0016) :
-                // dual dispatch — legacy LowMarginAlertEvent (NotificationSubscriber
-                // crée notifications in-app) + nouveau Domain Event
-                // MarginThresholdExceededEvent (handler async US-103 envoie Slack
-                // #alerts-prod). Coexistence sprint-022 ; legacy retiré
-                // sprint-023+ après refactor NotificationSubscriber pour consume
-                // Domain Events directement.
-                $this->eventDispatcher->dispatch(
-                    new LowMarginAlertEvent($project, $predictedMargin, $severity, $recipients),
-                );
-
+                // EPIC-003 Phase 3 (sprint-023 US-106 AT-3.3 ADR-0016 strangler
+                // fig completion) : suppression dual dispatch sprint-022 US-105.
+                // Seul Domain Event `MarginThresholdExceededEvent` dispatched.
+                //
+                // Handlers async consume :
+                // - `CreateInAppNotificationOnMarginThresholdExceeded` crée
+                //   notifications in-app via NotificationService (substitute
+                //   legacy NotificationSubscriber path qui consommait
+                //   `LowMarginAlertEvent`)
+                // - `SendMarginAlertOnThresholdExceeded` envoie Slack
+                //   `#alerts-prod` (US-103 sprint-021)
                 $this->dispatchDomainMarginEvent($project, $predictedMargin, $severity);
 
                 ++$alertCount;
@@ -277,15 +274,6 @@ class AlertDetectionService
         }
 
         return $this->uniqueUsers($recipients);
-    }
-
-    /**
-     * Get recipients for margin alerts.
-     */
-    private function getMarginAlertRecipients(Project $project): array
-    {
-        // Same as budget alerts
-        return $this->getBudgetAlertRecipients($project);
     }
 
     /**
