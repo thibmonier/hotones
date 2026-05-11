@@ -316,6 +316,22 @@ class Project implements CompanyOwnedInterface
         }
     }
 
+    /**
+     * EPIC-003 Phase 3 (sprint-023 US-108 ADR-0016 Q5.1 D) — override seuil
+     * marge par projet (priorité plus haute que Client.marginThresholdPercent).
+     * Null = hérite Client OU default global env var MARGIN_ALERT_THRESHOLD.
+     *
+     * Resolution hiérarchique UC CalculateProjectMargin :
+     * Project.marginThresholdPercent → Client.marginThresholdPercent → default
+     */
+    #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)]
+    public ?string $marginThresholdPercent = null {
+        get => $this->marginThresholdPercent;
+        set {
+            $this->marginThresholdPercent = $value;
+        }
+    }
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();

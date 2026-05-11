@@ -10,6 +10,7 @@ use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Shared\ValueObject\Money;
 use App\Domain\WorkItem\Repository\WorkItemRepositoryInterface;
 use App\Entity\Invoice as FlatInvoice;
+use App\Entity\Project as FlatProject;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -64,15 +65,24 @@ final readonly class CalculateProjectMarginUseCase
         $project->setMargeSnapshot($coutTotal, $factureTotal);
         $this->projectRepository->save($project);
 
+        // EPIC-003 Phase 3 (sprint-023 US-108 ADR-0016 Q5.1 D) — resolution
+        // hiérarchique seuil marge : Project override → Client override →
+        // default command (handler env var OR hardcoded 10 %).
+        $resolvedThreshold = $this->resolveThresholdPercent(
+            $command->projectIdLegacy,
+            $command->thresholdPercent,
+        );
+
         $this->logger->info('Project margin calculated', [
             'project_id' => $command->projectIdLegacy,
             'cout_total_eur' => $coutTotal->getAmount(),
             'facture_total_eur' => $factureTotal->getAmount(),
             'marge_percent' => $project->getMargePercent(),
-            'threshold_percent' => $command->thresholdPercent,
+            'threshold_percent' => $resolvedThreshold,
+            'threshold_source' => $resolvedThreshold === $command->thresholdPercent ? 'default' : 'override',
         ]);
 
-        if ($project->hasMargeBelowThreshold($command->thresholdPercent)) {
+        if ($project->hasMargeBelowThreshold($resolvedThreshold)) {
             $marge = $project->getMargePercent() ?? 0.0;
             $event = MarginThresholdExceededEvent::create(
                 projectId: $projectId,
@@ -80,10 +90,37 @@ final readonly class CalculateProjectMarginUseCase
                 costTotal: $coutTotal,
                 invoicedPaidTotal: $factureTotal,
                 marginPercent: $marge,
-                thresholdPercent: $command->thresholdPercent,
+                thresholdPercent: $resolvedThreshold,
             );
             $this->eventBus->dispatch($event);
         }
+    }
+
+    /**
+     * EPIC-003 Phase 3 (sprint-023 US-108 ADR-0016 Q5.1 D) — resolution
+     * hiérarchique seuil :
+     * 1. flat Project.margin_threshold_percent (override le plus prioritaire)
+     * 2. flat Client.margin_threshold_percent (override secondaire)
+     * 3. $defaultPercent (fallback handler/command)
+     *
+     * Lecture via flat entity (Client ↔ Project pas Domain pure sprint-023).
+     */
+    private function resolveThresholdPercent(string $projectIdLegacy, float $defaultPercent): float
+    {
+        $flat = $this->entityManager->find(FlatProject::class, (int) $projectIdLegacy);
+
+        if ($flat instanceof FlatProject) {
+            if ($flat->marginThresholdPercent !== null) {
+                return (float) $flat->marginThresholdPercent;
+            }
+
+            $client = $flat->client;
+            if ($client !== null && $client->marginThresholdPercent !== null) {
+                return (float) $client->marginThresholdPercent;
+            }
+        }
+
+        return $defaultPercent;
     }
 
     private function calculateCoutTotal(ProjectId $projectId): Money
