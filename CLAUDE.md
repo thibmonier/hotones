@@ -19,7 +19,6 @@ Expert en architecture, décomposition technique et facilitation Scrum.
 | Commande | Description |
 |----------|-------------|
 | `/project:generate-backlog` | Génère le backlog complet |
-| `/project:validate-backlog` | Valide la conformité du backlog (score /100) |
 | `/project:decompose-tasks N` | Décompose le sprint N en tâches |
 | `/project:analyze-backlog` | Analyser le backlog existant |
 | `/project:migrate-backlog` | Migrer un backlog existant |
@@ -39,7 +38,6 @@ Expert en architecture, décomposition technique et facilitation Scrum.
 |----------|-------------|
 | `/project:add-story EPIC-XXX "Nom"` | Créer une User Story |
 | `/project:list-stories` | Lister les User Stories |
-| `/project:move-story US-XXX destination` | Changer statut/sprint |
 | `/project:update-story US-XXX` | Modifier une US |
 | `/project:update-stories` | Mettre à jour plusieurs US |
 
@@ -161,7 +159,7 @@ project-management/
 /project:generate-backlog
 
 # 2. Valider la conformité
-/project:validate-backlog
+/gate:validate-backlog
 
 # 3. Planifier le sprint 1
 /project:decompose-tasks 001
@@ -172,7 +170,10 @@ project-management/
 # 5. Développer une story
 /sprint:dev US-XXX
 
-# 5. Préparer le sprint suivant
+# 6. Suivre le sprint
+/sprint:status
+
+# 7. Préparer le sprint suivant
 /project:decompose-tasks 002
 ```
 
