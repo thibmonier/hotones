@@ -115,7 +115,7 @@ Candidats (PO décision P1) :
 
 | Issue | Sprint affecté | Action sprint-024 |
 |---|---|---|
-| **Render image stale 2026-01-12** : `/health` raw octet-stream | 6ᵉ sprint → **clôture Option A** | ✅ ADR-0018 redeploy + smoke (T-PRE5-03) |
+| ~~Render image stale 2026-01-12~~ : `/health` raw octet-stream | 6ᵉ sprint → **clôturé 2026-05-12** | ✅ ADR-0018 redeploy + smoke `/health` JSON valide |
 | **Sub-epic B OPS** ADR-0017 Out Backlog | Replan dédié | Hors sprint-024. Re-évaluation sprint-025+ owner + 4 credentials |
 | **Mago lint** 626 errors stable | Sprint-024 Sub-epic D candidate | Cleanup batch initial 100-150 errors |
 | **Deptrac VacationRepository violation** | Sprint-024 Sub-epic D candidate | Audit + Domain pure migration |

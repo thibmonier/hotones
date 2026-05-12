@@ -278,14 +278,18 @@ current_sprint:
       epic: "OPS"
       points: 1
       priority: "Must"
-      status: "ready-for-dev"
+      status: "done"
       sprint: "sprint-024"
       adr: "ADR-0018"
+      closed_at: "2026-05-12T07:36:00Z"
       notes: |
         Décision actée user 2026-05-11 = Option A redeploy. Trigger
-        réversibilité ADR-0017 satisfait (PO + Tech Lead disponibles J0 +
-        credentials confirmés). T-PRE5-01 ✅ atelier, T-PRE5-02 ✅ ADR-0018.
-        T-PRE5-03 redeploy + smoke à exécuter.
+        réversibilité ADR-0017 satisfait. T-PRE5-01 ✅ atelier, T-PRE5-02 ✅
+        ADR-0018, T-PRE5-03 ✅ redeploy + smoke 2026-05-12 07:36 UTC.
+        /health JSON valide (status: healthy, checks BDD + cache healthy).
+        Image stale 2026-01-12 → fresh 2026-05-12. 6 sprints holdover
+        clôturés. Métrique runbook OPS-PREP-J0 §6 « holdover récurrent
+        même story » = 6 → 0.
 
   pre_requis:
     PRE-1:
@@ -514,3 +518,11 @@ migration_log:
     artifacts:
       - "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/atelier-ops-prep-j0.md"
       - "docs/02-architecture/adr/0018-render-redeploy-option-a.md"
+  - date: "2026-05-12"
+    action: "OPS-PRE5-DECISION clôturée — Render redeploy + smoke OK"
+    detail: |
+      Redeploy Render dashboard exécuté 2026-05-12. Smoke GET /health JSON
+      valide (status: healthy, checks BDD + cache healthy). Image stale
+      2026-01-12 → fresh 2026-05-12. Métrique runbook OPS-PREP-J0 §6
+      « holdover récurrent même story » = 6 → 0. Story OPS-PRE5-DECISION
+      done, 1 pt livré.

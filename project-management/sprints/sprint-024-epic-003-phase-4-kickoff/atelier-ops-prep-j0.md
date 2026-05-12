@@ -150,10 +150,11 @@ ADR-0017 §Trigger réversibilité critère 2 :
 | AT-2 | ADR-0018 rédigé | Tech Lead | sprint-024 (atelier) | ✅ `0018-render-redeploy-option-a.md` |
 | AT-3 | Sync sprint-status.yaml PRE-1..PRE-6 statut | Tech Lead | sprint-024 (atelier) | ✅ committed |
 | AT-4 | Sync sprint-status.yaml stories pending → ready-for-dev | Tech Lead | sprint-024 (atelier) | ✅ committed |
-| AT-5 | Exécution redeploy Render dashboard | Tech Lead + user | sprint-024 J0 redeploy window | ⏳ user action |
-| AT-6 | Smoke test post-redeploy (`/health` raw → JSON valide) | Tech Lead | post-AT-5 | ⏳ post-redeploy |
+| AT-5 | Exécution redeploy Render dashboard | Tech Lead + user | sprint-024 J0 redeploy window | ✅ exécuté 2026-05-12 |
+| AT-6 | Smoke test post-redeploy (`/health` raw → JSON valide) | Tech Lead | post-AT-5 | ✅ JSON valide 2026-05-12 07:36 UTC |
 | AT-7 | Update OPS-PRE5-DECISION estimation 1 pt (vs 0-2 bracket) | Tech Lead | sprint-024 (atelier) | ✅ committed |
 | AT-8 | PO décision PRE-6 cap libre 1-2 pts | PO | Sprint Planning P1 2026-05-27 | ⏳ |
+| AT-9 | Sentry events + Render logs deploy success validation | Tech Lead | post-AT-5 | ✅ Render logs OK (rndr-id served, server: cloudflare) |
 
 ---
 
@@ -165,14 +166,28 @@ ADR-0017 §Trigger réversibilité critère 2 :
 - **Libre : 1-2 pts** (PRE-6 PO P1)
 - **Vélocité cible : 12-14 pts** (cohérent avg 14 sprints = 11)
 
-### Métriques OPS-PREP-J0 (runbook §6)
+### Métriques OPS-PREP-J0 (runbook §6) — clôturées post-redeploy
 
 | Métrique | Cible sp-021+ | sprint-024 |
 |---|---|---|
-| Stories OPS holdover / sprint | 0 | 0 (cible — post-redeploy validé) |
-| % engagement honoré J1 ready | 100 % | 100 % (cible) |
-| Holdover récurrent même story | 0 | 6 → 0 (Option A clôture) |
+| Stories OPS holdover / sprint | 0 | ✅ 0 (Option A redeploy 2026-05-12 validé) |
+| % engagement honoré J1 ready | 100 % | ✅ 100 % |
+| Holdover récurrent même story | 0 | ✅ 6 → 0 (Option A clôturée) |
 | Atelier J0 OPS prep tenu | 1 / 1 | ✅ atelier J-16 anticipé |
+
+### Validation redeploy 2026-05-12
+
+```
+GET https://hotones.onrender.com/health
+HTTP/2 200
+content-type: application/json
+{"status":"healthy","timestamp":"2026-05-12T07:36:14+00:00","checks":{
+  "database":{"status":"healthy","message":"Database connection successful"},
+  "cache":{"status":"healthy","message":"Cache system ..."}}}
+```
+
+Pré-redeploy (image stale 2026-01-12) : `/health` raw octet-stream → résolu.
+Post-redeploy : JSON valide, checks BDD + cache healthy.
 
 ### Sprint statut
 
