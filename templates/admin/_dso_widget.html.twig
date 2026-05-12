@@ -1,0 +1,59 @@
+{# US-110 T-110-04 — DSO widget (Days Sales Outstanding) #}
+{# Renders 30/90/365 rolling windows + trend + warning threshold flag. #}
+
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        ⏱️ DSO — Days Sales Outstanding
+                        <small class="text-muted">délai moyen de paiement</small>
+                    </h5>
+                    {% if dso.warningTriggered %}
+                        <span class="badge bg-warning text-dark"
+                              title="DSO 30j ({{ dso.dso30Days|number_format(1, ',', ' ') }} j) dépasse le seuil {{ dso.warningThresholdDays|number_format(0, ',', ' ') }} j">
+                            ⚠ Seuil dépassé (&gt; {{ dso.warningThresholdDays|number_format(0, ',', ' ') }} j)
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100 {{ dso.warningTriggered ? 'border-warning' : '' }}">
+                            <div class="text-muted small">30 jours rolling</div>
+                            <div class="fs-2 fw-bold">
+                                {{ dso.dso30Days|number_format(1, ',', ' ') }} j
+                                <span class="fs-5 text-muted" title="{{ dso.trend30.label }}">
+                                    {{ dso.trend30.symbol }}
+                                </span>
+                            </div>
+                            <small class="text-muted">vs période précédente</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">90 jours rolling</div>
+                            <div class="fs-2 fw-bold">{{ dso.dso90Days|number_format(1, ',', ' ') }} j</div>
+                            <small class="text-muted">moyenne pondérée</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">365 jours rolling</div>
+                            <div class="fs-2 fw-bold">{{ dso.dso365Days|number_format(1, ',', ' ') }} j</div>
+                            <small class="text-muted">tendance annuelle</small>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-muted small mt-3 mb-0">
+                    Formule : Σ(date_paiement − date_émission) × montant_payé / Σ(montant_payé).
+                    Factures impayées exclues. Cache 1 h (invalidé sur paiement).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
