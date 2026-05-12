@@ -13,9 +13,9 @@ metadata:
   capacity_free_points: 2
   committed_points: null
   velocity_target: "12-14"
-  status: "kickoff_pending"
-  last_sync: "2026-05-11T12:00:00Z"
-  current_day: "J-1"
+  status: "ready"
+  last_sync: "2026-05-11T14:30:00Z"
+  current_day: "J-16 pre-kickoff (atelier OPS-PREP-J0 anticipé)"
   rebuild_from_scratch: true
   rebuild_note: |
     Yaml rebuild 2026-05-11. Backup yaml legacy sprint-011 conservée :
@@ -209,12 +209,25 @@ sprint_history:
 
 current_sprint:
   id: "sprint-024"
-  status: "kickoff_pending"
+  status: "ready"
   capacity_breakdown:
     firm: 12
     free: 2
     velocity_avg_14_sprints: 11
+  committed_points: 12
+  committed_breakdown:
+    US-110: 3
+    US-111: 3
+    US-112: 2
+    US-113: 3
+    OPS-PRE5-DECISION: 1
   predecessor: "sprint-023 (closed 2026-05-11, 12/12 pts)"
+  atelier_ops_prep_j0:
+    date: "2026-05-11"
+    advance_days: 16
+    decision_pre4: "Option A redeploy (ADR-0018)"
+    reversibility_adr_0017: "satisfait"
+    artifact: "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/atelier-ops-prep-j0.md"
 
   stories:
     US-110:
@@ -223,9 +236,9 @@ current_sprint:
       phase: "Phase 4 KPIs business"
       points: 3
       priority: "Must"
-      status: "pending"
+      status: "in-progress"
       sprint: "sprint-024"
-      notes: "ADR-0013 KPI #1. Délai paiement moyen factures émises."
+      notes: "ADR-0013 KPI #1. T-110-01 Domain Service DsoCalculator + VO ✅ done (PR #240, commit 33e5d071). 5 tasks restantes."
 
     US-111:
       title: "KPI temps de facturation (lead time devis signé → facture émise)"
@@ -233,9 +246,9 @@ current_sprint:
       phase: "Phase 4"
       points: 3
       priority: "Must"
-      status: "pending"
+      status: "ready-for-dev"
       sprint: "sprint-024"
-      notes: "ADR-0013 KPI #2."
+      notes: "ADR-0013 KPI #2. Gherkin specs PR #237."
 
     US-112:
       title: "KPI % projets adoption marge temps réel"
@@ -243,9 +256,9 @@ current_sprint:
       phase: "Phase 4"
       points: 2
       priority: "Should"
-      status: "pending"
+      status: "ready-for-dev"
       sprint: "sprint-024"
-      notes: "ADR-0013 KPI #3 — adoption MVP."
+      notes: "ADR-0013 KPI #3 — adoption MVP. Gherkin specs PR #237."
 
     US-113:
       title: "Migration historique WorkItem.cost legacy → DDD aggregate"
@@ -253,50 +266,62 @@ current_sprint:
       phase: "Phase 4"
       points: 3
       priority: "Should"
-      status: "pending"
+      status: "ready-for-dev"
       sprint: "sprint-024"
-      notes: "AUDIT-WORKITEM-DATA Phase 1 conclusions."
+      notes: |
+        AUDIT-WORKITEM-DATA Phase 1 conclusions. Atelier OPS-PREP-J0:
+        risk daily Q3 données prod DDL + Q4 plan rollback. Backup prod J-1
+        obligatoire. Trigger abandon ADR-0013 cas 3 si drift > 5 %.
 
     OPS-PRE5-DECISION:
-      title: "ADR-0018 Render redeploy ou ADR Out Backlog (pattern ADR-0017)"
+      title: "ADR-0018 Render redeploy Option A (réversibilité ADR-0017)"
       epic: "OPS"
-      points: 2
+      points: 1
       priority: "Must"
-      status: "pending"
+      status: "ready-for-dev"
       sprint: "sprint-024"
-      notes: "6ᵉ sprint consécutif holdover. Trigger réversibilité runbook §3 atteint."
+      adr: "ADR-0018"
+      notes: |
+        Décision actée user 2026-05-11 = Option A redeploy. Trigger
+        réversibilité ADR-0017 satisfait (PO + Tech Lead disponibles J0 +
+        credentials confirmés). T-PRE5-01 ✅ atelier, T-PRE5-02 ✅ ADR-0018.
+        T-PRE5-03 redeploy + smoke à exécuter.
 
   pre_requis:
     PRE-1:
       action: "Atelier OPS-PREP-J0 J-2 sprint-024 (runbook §2 + matrix §3)"
       owner: "PO + Tech Lead"
       deadline: "Sprint-024 J-2 (2026-05-26)"
-      status: "héritage A-1"
+      status: "✅ conduit J-16 anticipé 2026-05-11"
+      artifact: "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/atelier-ops-prep-j0.md"
     PRE-2:
       action: "Mesurer coverage actuel post sprint-023 (70 % vérifié)"
       owner: "Tech Lead"
       deadline: "Sprint-024 J-1"
-      status: "héritage A-2"
+      status: "✅ 70 % vérifié CI report sp-023 closure"
+      note: "Clover local 22.62 % stale — CI report source de vérité"
     PRE-3:
       action: "Décision PO scope sprint-024 (Phase 4 / Mago cleanup / OPS replan)"
       owner: "PO"
       deadline: "Sprint-024 Planning P1"
-      status: "héritage A-3"
+      status: "✅ Phase 4 KPIs (US-110..US-112) + Migration (US-113) + OPS-PRE5 = 12 pts ferme"
     PRE-4:
       action: "Décision PO PRE-5 Render redeploy (6ᵉ sprint → action obligatoire)"
       owner: "PO + user"
       deadline: "Sprint-024 J-2"
-      status: "trigger atteint - OBLIGATOIRE"
+      status: "✅ Option A redeploy actée user 2026-05-11"
+      adr: "ADR-0018"
+      reversibility_trigger: "ADR-0017 §Trigger 2 satisfait (PO + Tech Lead J0 + credentials confirmés)"
     PRE-5:
       action: "Stories sprint-024 spécifiées 3C + Gherkin (US-110..US-113)"
       owner: "PO"
       deadline: "Sprint-024 J0 fin"
-      status: "pending"
+      status: "✅ Gherkin specs PR #237 — yaml sync post atelier"
     PRE-6:
       action: "Pré-allocation explicite cap libre 1-2 pts (vs slot reserved vide)"
       owner: "PO"
       deadline: "Sprint-024 P1"
-      status: "héritage ST-1 sprint-023"
+      status: "🟡 à décider P1 2026-05-27 — candidats : Mago lint batch (2 pts) / VacationRepository audit (1 pt) / TEST-COVERAGE-013 (1 pt)"
 
 # =========================================================================
 # Sprint-023 closure — archived for traceability
@@ -420,7 +445,7 @@ epics:
     completion: "~92%"
     stories_delivered: ["US-097", "US-098", "US-099", "US-100", "US-101", "US-102", "US-103", "US-104", "US-105", "US-106", "US-107", "US-108"]
     stories_planned_phase4: ["US-110", "US-111", "US-112", "US-113"]
-    adrs: ["ADR-0013", "ADR-0015", "ADR-0016", "ADR-0017"]
+    adrs: ["ADR-0013", "ADR-0015", "ADR-0016", "ADR-0017", "ADR-0018"]
     mvp_delivered: "sprint-022 (US-103 + US-104)"
     phase3_completion: "sprint-023 (strangler fig complet, persistence margin, configurabilité hiérarchique)"
 
@@ -480,3 +505,12 @@ migration_log:
     action: "Sprint-024 kickoff stub"
     detail: "EPIC-003 Phase 4 KPIs business. PRE-4 Render redeploy obligatoire (6ᵉ sprint trigger)."
     path: "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/sprint-goal.md"
+  - date: "2026-05-11"
+    action: "Sprint-024 atelier OPS-PREP-J0 conduit J-16 anticipé"
+    detail: |
+      Décision PRE-4 = Option A redeploy Render (ADR-0018). Trigger réversibilité
+      ADR-0017 satisfait. Stories status pending → ready-for-dev. Sprint
+      status kickoff_pending → ready. Committed 12 pts ferme.
+    artifacts:
+      - "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/atelier-ops-prep-j0.md"
+      - "docs/02-architecture/adr/0018-render-redeploy-option-a.md"

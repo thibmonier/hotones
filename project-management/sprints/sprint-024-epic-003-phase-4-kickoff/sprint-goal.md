@@ -7,8 +7,8 @@
 | Fin | 2026-06-10 (clôture cible) |
 | Durée | 10 jours ouvrés |
 | Capacité | **12 pts ferme + 1-2 pts libre** (4ᵉ confirmation recalibrage durable) |
-| Engagement ferme | **TBD** (Sprint Planning P1) |
-| Statut backlog | **Provisoire** — atelier OPS-PREP-J0 J-2 |
+| Engagement ferme | **12 pts** (US-110 3 + US-111 3 + US-112 2 + US-113 3 + OPS-PRE5 1) — atelier OPS-PREP-J0 J-16 anticipé |
+| Statut backlog | **✅ ready** — atelier OPS-PREP-J0 conduit 2026-05-11 (`atelier-ops-prep-j0.md`) |
 
 ---
 
@@ -26,12 +26,12 @@
 
 | ID | Action | Owner | Deadline | Statut |
 |---|---|---|---|---|
-| PRE-1 | Atelier OPS-PREP-J0 J-2 sprint-024 (runbook §2 + matrix §3) | PO + Tech Lead | Sprint-024 J-2 | ⏳ A-1 héritage |
-| PRE-2 | Mesurer coverage actuel post sprint-023 (CI report → 70 % vérifié) | Tech Lead | Sprint-024 J-1 | ⏳ A-2 héritage |
-| PRE-3 | Décision PO scope sprint-024 (Phase 4 KPIs / Mago cleanup / OPS replan) | PO | Sprint-024 Planning P1 | ⏳ A-3 héritage |
-| PRE-4 | Décision PO PRE-5 Render redeploy (6ᵉ sprint → action obligatoire) | PO + user | Sprint-024 J-2 | ❌ trigger atteint |
-| PRE-5 | Stories sprint-024 spécifiées 3C + Gherkin (US-110..US-113 si Phase 4) | PO | Sprint-024 J0 fin | ⏳ |
-| PRE-6 | Pré-allocation explicite cap libre 1-2 pts (vs slot reserved) | PO | Sprint-024 P1 | ⏳ héritage ST-1 |
+| PRE-1 | Atelier OPS-PREP-J0 J-2 sprint-024 (runbook §2 + matrix §3) | PO + Tech Lead | Sprint-024 J-2 | ✅ conduit J-16 anticipé 2026-05-11 |
+| PRE-2 | Mesurer coverage actuel post sprint-023 (CI report → 70 % vérifié) | Tech Lead | Sprint-024 J-1 | ✅ 70 % CI report sp-023 closure |
+| PRE-3 | Décision PO scope sprint-024 (Phase 4 KPIs / Mago cleanup / OPS replan) | PO | Sprint-024 Planning P1 | ✅ Phase 4 + Migration + OPS-PRE5 = 12 pts |
+| PRE-4 | Décision PO PRE-5 Render redeploy (6ᵉ sprint → action obligatoire) | PO + user | Sprint-024 J-2 | ✅ Option A redeploy (ADR-0018) |
+| PRE-5 | Stories sprint-024 spécifiées 3C + Gherkin (US-110..US-113 si Phase 4) | PO | Sprint-024 J0 fin | ✅ Gherkin PR #237 |
+| PRE-6 | Pré-allocation explicite cap libre 1-2 pts (vs slot reserved) | PO | Sprint-024 P1 | 🟡 candidats Mago lint / VacationRepository / TEST-COVERAGE-013 |
 
 ---
 
@@ -51,11 +51,11 @@
 |---|---|---:|---|
 | US-113 | Migration historique `WorkItem.cost` legacy → DDD aggregate | 3 | AUDIT-WORKITEM-DATA Phase 1 conclusions. Data quality > 95 %. |
 
-### Sub-epic C — Décision PRE-5 Render redeploy (0-2 pts selon décision PO)
+### Sub-epic C — Décision PRE-5 Render redeploy (1 pt — Option A actée)
 
 | ID | Titre | Pts | Notes |
 |---|---|---:|---|
-| OPS-PRE5-DECISION | ADR-0018 Render redeploy ou ADR Out Backlog (pattern ADR-0017) | 0-2 | 6ᵉ sprint consécutif holdover. Trigger réversibilité runbook §3. |
+| OPS-PRE5-DECISION | ADR-0018 Render redeploy Option A | 1 | Décision actée user 2026-05-11. Trigger réversibilité ADR-0017 satisfait (PO + Tech Lead J0 + credentials). T-PRE5-01 ✅ atelier, T-PRE5-02 ✅ ADR-0018, T-PRE5-03 redeploy + smoke à exécuter. |
 
 ### Sub-epic D — Cap libre 1-2 pts pré-allouée explicite
 
@@ -100,14 +100,14 @@ Candidats (PO décision P1) :
 
 | ID | Action | Statut sprint-024 |
 |---|---|---|
-| A-1 | Atelier OPS-PREP-J0 J-2 sprint-024 | ⏳ PRE-1 |
-| A-2 | Mesurer coverage actuel post sprint-023 | ⏳ PRE-2 |
-| A-3 | Décision PO scope sprint-024 | ⏳ PRE-3 |
-| A-4 | Décision PO PRE-5 Render redeploy | ⏳ PRE-4 OBLIGATOIRE |
-| A-5 | Stories spécifiées 3C + Gherkin (US-110..US-113) | ⏳ PRE-5 |
-| A-6 | Maintenir baseline 12 pts ferme (4ᵉ confirmation) | ⏳ acté kickoff |
-| A-7 | Pré-allocation cap libre 1-2 pts explicite | ⏳ PRE-6 |
-| A-8 | Audit ciblé VacationRepository Deptrac violation | ⏳ Sub-epic D candidate |
+| A-1 | Atelier OPS-PREP-J0 J-2 sprint-024 | ✅ conduit J-16 (atelier-ops-prep-j0.md) |
+| A-2 | Mesurer coverage actuel post sprint-023 | ✅ 70 % CI report |
+| A-3 | Décision PO scope sprint-024 | ✅ Phase 4 + Migration + OPS-PRE5 = 12 pts |
+| A-4 | Décision PO PRE-5 Render redeploy | ✅ Option A actée (ADR-0018) |
+| A-5 | Stories spécifiées 3C + Gherkin (US-110..US-113) | ✅ PR #237 |
+| A-6 | Maintenir baseline 12 pts ferme (4ᵉ confirmation) | ✅ 12 pts committed |
+| A-7 | Pré-allocation cap libre 1-2 pts explicite | 🟡 candidats P1 |
+| A-8 | Audit ciblé VacationRepository Deptrac violation | 🟡 Sub-epic D candidate |
 
 ---
 
@@ -115,7 +115,7 @@ Candidats (PO décision P1) :
 
 | Issue | Sprint affecté | Action sprint-024 |
 |---|---|---|
-| **Render image stale 2026-01-12** : `/health` raw octet-stream | **6ᵉ sprint consécutif** | **Décision PO obligatoire PRE-4 + Sub-epic C** |
+| **Render image stale 2026-01-12** : `/health` raw octet-stream | 6ᵉ sprint → **clôture Option A** | ✅ ADR-0018 redeploy + smoke (T-PRE5-03) |
 | **Sub-epic B OPS** ADR-0017 Out Backlog | Replan dédié | Hors sprint-024. Re-évaluation sprint-025+ owner + 4 credentials |
 | **Mago lint** 626 errors stable | Sprint-024 Sub-epic D candidate | Cleanup batch initial 100-150 errors |
 | **Deptrac VacationRepository violation** | Sprint-024 Sub-epic D candidate | Audit + Domain pure migration |
