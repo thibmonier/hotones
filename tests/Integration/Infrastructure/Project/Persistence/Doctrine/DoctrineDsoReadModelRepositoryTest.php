@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Infrastructure\Project\Persistence\Doctrine;
 
-use App\Domain\Project\Repository\DsoReadModelRepositoryInterface;
 use App\Domain\Project\Service\DsoCalculator;
 use App\Domain\Project\Service\InvoicePaymentRecord;
 use App\Entity\Invoice;
 use App\Factory\ClientFactory;
 use App\Factory\InvoiceFactory;
+use App\Infrastructure\Project\Persistence\Doctrine\DoctrineDsoReadModelRepository;
 use App\Tests\Support\MultiTenantTestTrait;
 use DateTimeImmutable;
 use InvalidArgumentException;
@@ -29,14 +29,16 @@ final class DoctrineDsoReadModelRepositoryTest extends KernelTestCase
     use MultiTenantTestTrait;
     use ResetDatabase;
 
-    private DsoReadModelRepositoryInterface $repository;
+    private DoctrineDsoReadModelRepository $repository;
     private DateTimeImmutable $now;
 
     protected function setUp(): void
     {
         self::bootKernel();
         $this->setUpMultiTenant();
-        $this->repository = static::getContainer()->get(DsoReadModelRepositoryInterface::class);
+        // Test the Doctrine adapter directly (bypasses CachingDsoReadModelRepository
+        // decorator) so we exercise DQL/projection logic in isolation.
+        $this->repository = static::getContainer()->get(DoctrineDsoReadModelRepository::class);
         $this->now = new DateTimeImmutable('2026-05-12T00:00:00+00:00');
     }
 

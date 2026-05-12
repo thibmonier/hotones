@@ -52,11 +52,22 @@ services:
     App\Domain\Project\Repository\ProjectRepositoryInterface:
         alias: App\Infrastructure\Project\Persistence\Doctrine\DoctrineDddProjectRepository
 
-    # DSO Read-Model Repository (EPIC-003 Phase 4 sprint-024 US-110 T-110-02)
-    # public: true tant que pas de consumer downstream (T-110-03+ Subscriber + Application Query)
+    # DSO Read-Model Repository (EPIC-003 Phase 4 sprint-024 US-110)
+    # T-110-02 Doctrine adapter + T-110-03 caching decorator (cache.kpi 1h TTL)
+    # public: true tant que pas de consumer downstream (T-110-04 Widget + Slack)
     App\Domain\Project\Repository\DsoReadModelRepositoryInterface:
-        alias: App\Infrastructure\Project\Persistence\Doctrine\DoctrineDsoReadModelRepository
+        alias: App\Infrastructure\Project\Persistence\Doctrine\CachingDsoReadModelRepository
         public: true
+
+    App\Infrastructure\Project\Persistence\Doctrine\CachingDsoReadModelRepository:
+        arguments:
+            $inner: '@App\Infrastructure\Project\Persistence\Doctrine\DoctrineDsoReadModelRepository'
+            $kpiCache: '@cache.kpi'
+
+    # T-110-03 Subscriber InvoicePaidEvent → invalide cache.kpi pool
+    App\Application\Project\EventListener\InvalidateDsoCacheOnInvoicePaid:
+        arguments:
+            $kpiCache: '@cache.kpi'
 
     # Order Bounded Context - Interface bindings (EPIC-001 Phase 2/3)
     App\Domain\Order\Repository\OrderRepositoryInterface:

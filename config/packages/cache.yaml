@@ -26,3 +26,10 @@ framework:
             cache.rate_limiter:
                 adapter: cache.adapter.redis
                 default_lifetime: 3600  # 1 hour
+
+            # Cache for business KPIs (US-110 DSO, US-111 billing lead time,
+            # US-112 margin adoption). EPIC-003 Phase 4 sprint-024.
+            # Invalidated by domain event listeners (e.g., InvoicePaidEvent).
+            cache.kpi:
+                adapter: cache.adapter.redis
+                default_lifetime: 3600  # 1 hour
