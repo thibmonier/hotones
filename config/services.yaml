@@ -92,6 +92,11 @@ services:
         alias: App\Infrastructure\Project\Persistence\Doctrine\DoctrineMarginAdoptionReadModelRepository
         public: true
 
+    # T-112-04 Margin adoption red threshold checker (Slack persistent 7j)
+    App\Application\Project\Alerting\CheckMarginAdoptionRedThresholdHandler:
+        arguments:
+            $kpiCache: '@cache.kpi'
+
     # Order Bounded Context - Interface bindings (EPIC-001 Phase 2/3)
     App\Domain\Order\Repository\OrderRepositoryInterface:
         alias: App\Infrastructure\Order\Persistence\Doctrine\DoctrineDddOrderRepository
