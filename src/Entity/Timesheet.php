@@ -141,6 +141,41 @@ class Timesheet implements CompanyOwnedInterface
         }
     }
 
+    /**
+     * US-113 T-113-01 — legacy WorkItem.cost migration tracking.
+     * Timestamp last migration run (idempotence guard).
+     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    public ?DateTimeInterface $migratedAt = null {
+        get => $this->migratedAt;
+        set {
+            $this->migratedAt = $value;
+        }
+    }
+
+    /**
+     * US-113 T-113-01 — flag set if recalculated cost differs from snapshot > 1 cent.
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    public bool $legacyCostDrift = false {
+        get => $this->legacyCostDrift;
+        set {
+            $this->legacyCostDrift = $value;
+        }
+    }
+
+    /**
+     * US-113 T-113-01 — snapshot of cost (in cents) at migration time.
+     * Used for drift detection vs current recalc and rollback safety.
+     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    public ?int $legacyCostCents = null {
+        get => $this->legacyCostCents;
+        set {
+            $this->legacyCostCents = $value;
+        }
+    }
+
     public function getCompany(): Company
     {
         return $this->company;
