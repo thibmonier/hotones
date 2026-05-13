@@ -1,21 +1,25 @@
 metadata:
-  sprint_id: "sprint-024"
-  name: "EPIC-003 Phase 4 Kickoff (KPIs business)"
-  start_date: "2026-05-27"
-  end_date: "2026-06-10"
+  sprint_id: "sprint-025"
+  name: "Sprint 025 — Scope à définir Planning P1"
+  start_date: "2026-06-10"
+  end_date: "2026-06-24"
   goal: |
-    EPIC-003 Phase 4 kickoff : KPIs business (DSO + temps facturation +
-    adoption marge temps réel). Démarrage US-110..US-112. Décision PO
-    PRE-5 Render redeploy (6ᵉ sprint consécutif holdover → trigger
-    réversibilité ADR-0017 pattern). Pré-allocation explicite cap libre
-    (vs slot reserved vide sprint-023 retro ST-1).
+    À définir Sprint Planning P1 2026-05-27. Candidats sub-epics :
+      - EPIC-003 Phase 5 (post-MVP KPIs business) — extensions DSO/lead time
+        ou nouveau KPI revenue forecast (pattern KpiCalculator réutilisé sp-024)
+      - Dette technique : Mago lint cleanup batch (sp-022 retro #3, sp-023 retro A-6),
+        VacationRepository Deptrac violation audit (sp-023 retro L-4),
+        TEST-COVERAGE-013 push 70 → 72 %
+      - T-113-07 dry-run prod user-tracked (sp-024 retro A-5 — High priority)
+      - PRE-6 cap libre 1-2 pts (sp-024 retro A-2)
+      - 7 actions héritées sp-024 retro (A-1..A-7)
   capacity_points: 12
   capacity_free_points: 2
   committed_points: null
   velocity_target: "12-14"
-  status: "ready"
-  last_sync: "2026-05-11T14:30:00Z"
-  current_day: "J-16 pre-kickoff (atelier OPS-PREP-J0 anticipé)"
+  status: "kickoff_pending"
+  last_sync: "2026-05-13T10:00:00Z"
+  current_day: "J-14 pre-kickoff"
   rebuild_from_scratch: true
   rebuild_note: |
     Yaml rebuild 2026-05-11. Backup yaml legacy sprint-011 conservée :
@@ -203,42 +207,174 @@ sprint_history:
       BUFFER Integration sprint-021 100 % soldé (4/4). Coverage 70 %.
       3ᵉ sprint consécutif 0 holdover OPS.
 
+  sprint-024:
+    name: "EPIC-003 Phase 4 KPIs business + Migration WorkItem.cost legacy"
+    points_planned: 12
+    points_delivered: 12
+    velocity: 12
+    engagement_ratio: 1.00
+    closed_at: "2026-05-13"
+    review: "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/sprint-review.md"
+    retro: "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/sprint-retro.md"
+    notes: |
+      100 % engagement ferme (4ᵉ confirmation baseline 12 pts). EPIC-003
+      Phase 4 KPIs business complets (DSO + lead time + adoption marge).
+      Migration WorkItem.cost legacy avec runbook prod + dry-run safety.
+      4ᵉ sprint consécutif 0 holdover OPS + 0 commit --no-verify.
+      Trigger réversibilité ADR-0017 validé → ADR-0018 redeploy Render.
+      Pattern KpiCalculator établi 4× consécutivement (réutilisable sp-025+).
+      ROI estimation parfaite : 42.5 h estimé = 42.5 h livré.
+      Exec accélérée agentic J-16 anticipé (3 jours J0..J+1 compactés).
+
 # =========================================================================
-# Current Sprint — sprint-024 (kickoff pending)
+# Current Sprint — sprint-025 (kickoff pending)
 # =========================================================================
 
 current_sprint:
+  id: "sprint-025"
+  status: "kickoff_pending"
+  capacity_breakdown:
+    firm: 12
+    free: 2
+    velocity_avg_15_sprints: 11.07
+  committed_points: null
+  committed_breakdown: null
+  predecessor: "sprint-024 (closed 2026-05-13, 12/12 pts)"
+  notes: |
+    Scope à définir Sprint Planning P1 2026-05-27. Pattern KpiCalculator
+    établi sp-024 (4× consécutifs) réutilisable pour nouveaux KPIs.
+
+  inherited_actions_sp_024_retro:
+    A-1:
+      action: "Activer enablePullRequestAutoMerge repo settings"
+      owner: "Tech Lead"
+      priority: "High"
+      deadline: "Sprint-025 J-2"
+    A-2:
+      action: "PRE-6 cap libre — assignement story concrète J0 (vs slot reserved vide)"
+      owner: "PO"
+      priority: "High"
+      deadline: "Sprint-025 Planning P1"
+    A-3:
+      action: "Doc procédure rebase stack PR adjacent dans CONTRIBUTING.md"
+      owner: "Tech Lead"
+      priority: "Medium"
+      deadline: "Sprint-025 doc-only"
+    A-4:
+      action: "Helper DateTime::mutableFromImmutable() dans Tests Support"
+      owner: "Tech Lead"
+      priority: "Medium"
+      deadline: "Sprint-025 refactor 30 min"
+    A-5:
+      action: "T-113-07 dry-run prod user-tracked (post-merge sp-024 closure)"
+      owner: "user + Tech Lead"
+      priority: "High"
+      deadline: "Sprint-025 J0 maintenance window"
+    A-6:
+      action: "Doc cache.kpi pool partagé design notes (ADR ou cache.yaml comment)"
+      owner: "Tech Lead"
+      priority: "Low"
+      deadline: "Sprint-025 doc-only"
+    A-7:
+      action: "Décision Slack channel dédié #kpi-alerts-prod"
+      owner: "PO + Tech Lead"
+      priority: "Low"
+      deadline: "Sprint-025 atelier OPS-PREP"
+
+  sub_epic_d_candidates_carry_over:
+    - id: "MAGO-LINT-BATCH-001"
+      title: "Mago lint cleanup batch initial (100-150 errors)"
+      points: 2
+      source: "sprint-022 retro top-5 #3, sprint-023 retro A-6, sprint-024 hérité"
+    - id: "VACATION-REPO-AUDIT"
+      title: "Audit VacationRepository Deptrac violation"
+      points: 1
+      source: "sprint-023 retro L-4, sprint-024 hérité"
+    - id: "TEST-COVERAGE-013"
+      title: "Coverage anticipation 70 → 72 %"
+      points: 1
+      source: "PRE-2 héritage sp-024"
+
+  pre_requis:
+    PRE-1:
+      action: "Atelier OPS-PREP-J0 J-2 sprint-025 (runbook §2 + matrix §3)"
+      owner: "PO + Tech Lead"
+      deadline: "Sprint-025 J-2 (2026-06-08)"
+      status: "pending"
+      note: |
+        Atelier sp-024 a couvert sp-024 + déjà conduit anticipé. Sp-025
+        requiert atelier dédié uniquement si nouvelles stories OPS-tagged.
+        Si scope = continuation Phase 4/dette tech sans nouvelles credentials
+        → atelier minimal.
+    PRE-2:
+      action: "Mesurer coverage actuel post sprint-024"
+      owner: "Tech Lead"
+      deadline: "Sprint-025 J-1"
+      status: "pending"
+      note: "Cible 72 % (TEST-COVERAGE-013 candidate cap libre)"
+    PRE-3:
+      action: "Décision PO scope sprint-025"
+      owner: "PO"
+      deadline: "Sprint-025 Planning P1 (2026-06-09 ou 2026-05-27)"
+      status: "pending"
+      candidates: ["EPIC-003 Phase 5", "Dette tech (Mago/VacationRepo/Coverage)", "Nouveau KPI (revenue forecast)"]
+    PRE-4:
+      action: "Stories sprint-025 spécifiées 3C + Gherkin"
+      owner: "PO"
+      deadline: "Sprint-025 J0 fin"
+      status: "pending"
+      depends_on: "PRE-3 scope décidé"
+    PRE-5:
+      action: "Cap libre 1-2 pts pré-allocation explicite (A-2 héritage)"
+      owner: "PO"
+      deadline: "Sprint-025 Planning P1"
+      status: "pending"
+      note: "3ᵉ sprint consécutif TBD (sp-023 ST-1 → sp-024 PRE-6 → sp-025) — A-2 priorité High"
+
+# =========================================================================
+# Sprint-024 closure — archived for traceability
+# =========================================================================
+
+sprint_024_closure:
   id: "sprint-024"
-  status: "ready"
+  status: "closed"
+  closed_at: "2026-05-13"
   capacity_breakdown:
     firm: 12
     free: 2
     velocity_avg_14_sprints: 11
-  committed_points: 12
-  committed_breakdown:
-    US-110: 3
-    US-111: 3
-    US-112: 2
-    US-113: 3
-    OPS-PRE5-DECISION: 1
-  predecessor: "sprint-023 (closed 2026-05-11, 12/12 pts)"
-  atelier_ops_prep_j0:
-    date: "2026-05-11"
-    advance_days: 16
-    decision_pre4: "Option A redeploy (ADR-0018)"
-    reversibility_adr_0017: "satisfait"
-    artifact: "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/atelier-ops-prep-j0.md"
+  delivered_summary:
+    points_delivered: 12
+    engagement_ferme: 12
+    ratio: 1.00
+    note: |
+      4ᵉ confirmation baseline 12 pts ferme. ROI estimation parfaite
+      (42.5 h estimé = 42.5 h livré). 28 PRs mergées (#236 → #267).
+      ~5500 lignes de code + ~120 cas de tests.
 
   stories:
+    OPS-PRE5-DECISION:
+      title: "ADR-0018 Render redeploy Option A"
+      epic: "OPS"
+      points: 1
+      priority: "Must"
+      status: "done"
+      sprint: "sprint-024"
+      pr: "#241"
+      closed_at: "2026-05-12T07:36:00Z"
+      adr: "ADR-0018"
+      notes: "Smoke /health JSON valide post-redeploy. 6 sprints holdover clôturés (réversibilité ADR-0017)."
+
     US-110:
       title: "KPI DSO (Days Sales Outstanding) calcul + exposition dashboard EPIC-002"
       epic: "EPIC-003"
       phase: "Phase 4 KPIs business"
       points: 3
       priority: "Must"
-      status: "in-progress"
+      status: "done"
       sprint: "sprint-024"
-      notes: "ADR-0013 KPI #1. T-110-01 Domain Service DsoCalculator + VO ✅ done (PR #240, commit 33e5d071). 5 tasks restantes."
+      prs: ["#240", "#242", "#243", "#244", "#245", "#246"]
+      tasks_done: "6/6"
 
     US-111:
       title: "KPI temps de facturation (lead time devis signé → facture émise)"
@@ -246,9 +382,11 @@ current_sprint:
       phase: "Phase 4"
       points: 3
       priority: "Must"
-      status: "ready-for-dev"
+      status: "done"
       sprint: "sprint-024"
-      notes: "ADR-0013 KPI #2. Gherkin specs PR #237."
+      prs: ["#247", "#248", "#249", "#250", "#253", "#254", "#255"]
+      tasks_done: "6/6"
+      notes: "PR #253 hotfix conflits merge post-merge stack séquentiel."
 
     US-112:
       title: "KPI % projets adoption marge temps réel"
@@ -256,9 +394,10 @@ current_sprint:
       phase: "Phase 4"
       points: 2
       priority: "Should"
-      status: "ready-for-dev"
+      status: "done"
       sprint: "sprint-024"
-      notes: "ADR-0013 KPI #3 — adoption MVP. Gherkin specs PR #237."
+      prs: ["#256", "#257", "#258", "#259", "#260"]
+      tasks_done: "5/5"
 
     US-113:
       title: "Migration historique WorkItem.cost legacy → DDD aggregate"
@@ -266,154 +405,35 @@ current_sprint:
       phase: "Phase 4"
       points: 3
       priority: "Should"
-      status: "ready-for-dev"
+      status: "done"
       sprint: "sprint-024"
-      notes: |
-        AUDIT-WORKITEM-DATA Phase 1 conclusions. Atelier OPS-PREP-J0:
-        risk daily Q3 données prod DDL + Q4 plan rollback. Backup prod J-1
-        obligatoire. Trigger abandon ADR-0013 cas 3 si drift > 5 %.
-
-    OPS-PRE5-DECISION:
-      title: "ADR-0018 Render redeploy Option A (réversibilité ADR-0017)"
-      epic: "OPS"
-      points: 1
-      priority: "Must"
-      status: "ready-for-dev"
-      sprint: "sprint-024"
-      adr: "ADR-0018"
-      notes: |
-        Décision actée user 2026-05-11 = Option A redeploy. Trigger
-        réversibilité ADR-0017 satisfait (PO + Tech Lead disponibles J0 +
-        credentials confirmés). T-PRE5-01 ✅ atelier, T-PRE5-02 ✅ ADR-0018.
-        T-PRE5-03 redeploy + smoke à exécuter.
-
-  pre_requis:
-    PRE-1:
-      action: "Atelier OPS-PREP-J0 J-2 sprint-024 (runbook §2 + matrix §3)"
-      owner: "PO + Tech Lead"
-      deadline: "Sprint-024 J-2 (2026-05-26)"
-      status: "✅ conduit J-16 anticipé 2026-05-11"
-      artifact: "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/atelier-ops-prep-j0.md"
-    PRE-2:
-      action: "Mesurer coverage actuel post sprint-023 (70 % vérifié)"
-      owner: "Tech Lead"
-      deadline: "Sprint-024 J-1"
-      status: "✅ 70 % vérifié CI report sp-023 closure"
-      note: "Clover local 22.62 % stale — CI report source de vérité"
-    PRE-3:
-      action: "Décision PO scope sprint-024 (Phase 4 / Mago cleanup / OPS replan)"
-      owner: "PO"
-      deadline: "Sprint-024 Planning P1"
-      status: "✅ Phase 4 KPIs (US-110..US-112) + Migration (US-113) + OPS-PRE5 = 12 pts ferme"
-    PRE-4:
-      action: "Décision PO PRE-5 Render redeploy (6ᵉ sprint → action obligatoire)"
-      owner: "PO + user"
-      deadline: "Sprint-024 J-2"
-      status: "✅ Option A redeploy actée user 2026-05-11"
-      adr: "ADR-0018"
-      reversibility_trigger: "ADR-0017 §Trigger 2 satisfait (PO + Tech Lead J0 + credentials confirmés)"
-    PRE-5:
-      action: "Stories sprint-024 spécifiées 3C + Gherkin (US-110..US-113)"
-      owner: "PO"
-      deadline: "Sprint-024 J0 fin"
-      status: "✅ Gherkin specs PR #237 — yaml sync post atelier"
-    PRE-6:
-      action: "Pré-allocation explicite cap libre 1-2 pts (vs slot reserved vide)"
-      owner: "PO"
-      deadline: "Sprint-024 P1"
-      status: "🟡 à décider P1 2026-05-27 — candidats : Mago lint batch (2 pts) / VacationRepository audit (1 pt) / TEST-COVERAGE-013 (1 pt)"
-
-# =========================================================================
-# Sprint-023 closure — archived for traceability
-# =========================================================================
-
-sprint_023_closure:
-  id: "sprint-023"
-  status: "closed"
-  closed_at: "2026-05-11"
-  capacity_breakdown:
-    firm: 12
-    free: 2
-    velocity_avg_13_sprints: 11
-
-  stories:
-    US-106:
-      title: "Refactor NotificationSubscriber Domain Events + LowMarginAlertEvent removal"
-      epic: "EPIC-003"
-      phase: "Phase 3.3 strangler completion"
-      points: 3
-      priority: "Must"
-      status: "done"
-      sprint: "sprint-023"
-      pr: "#231"
-      commit: "ade9f839"
-      blocked_by: ["US-105"]
-
-    US-107:
-      title: "Persistence margin snapshot Project"
-      epic: "EPIC-003"
-      phase: "Phase 3.3"
-      points: 3
-      priority: "Must"
-      status: "done"
-      sprint: "sprint-023"
-      commit: "358b2107"
-      blocked_by: ["US-103"]
-      notes: "Project.margin persisted + invalidation event-driven (perf p95)."
-
-    US-108:
-      title: "Configurabilité hiérarchique seuil marge Q5.1 D"
-      epic: "EPIC-003"
-      phase: "Phase 3.3"
-      points: 2
-      priority: "Must"
-      status: "done"
-      sprint: "sprint-023"
-      commit: "1d23762a"
-      blocked_by: ["US-104"]
-      branch: "feat/us-108-hierarchical-margin-threshold-stacked"
-
-    COVERAGE-012:
-      title: "Step 12 push 68 → 70 % via Order + Invoice BCs Events/Exceptions/Entity"
-      epic: "TECH"
-      points: 2
-      priority: "Should"
-      status: "done"
-      sprint: "sprint-023"
-      pr: "#233"
-      commit: "31db7c1b"
-
-    INTEGRATION-21-SUITE:
-      title: "BUFFER Integration sprint-021 — WeeklyTimesheetController Functional + Workflow E2E"
-      epic: "TECH"
-      points: 2
-      priority: "Should"
-      status: "done"
-      sprint: "sprint-023"
-      pr: "#232"
-      commit: "74f8a880"
-
-    US-109:
-      title: "Reserved Phase 3 finition / Phase 4 kickoff"
-      epic: "EPIC-003"
-      points: null
-      priority: "Could"
-      status: "pending"
-      sprint: "sprint-023"
-      notes: "Slot capacité libre. Décision PO sprint-023 J-2."
-
-  delivered_summary:
-    points_delivered: 12
-    engagement_ferme: 12
-    ratio: 1.00
-    note: "Engagement ferme atteint 100 %. Capacité libre 1-2 pts non utilisée (US-109 reserved slot vide — sprint-023 retro ST-1)."
+      prs: ["#261", "#262", "#263", "#264", "#265", "#266"]
+      tasks_done: "6/7"
+      note: "T-113-07 dry-run prod user-tracked hors sprint (sp-024 retro A-5)."
 
   pre_requis_closure:
-    PRE-1: { action: "Atelier OPS-PREP-J0 J-2 sprint-023", status: "✅ appliqué (héritage A-1)" }
-    PRE-2: { action: "Mesurer coverage post sprint-022", status: "✅ 68 % → 70 % atteint (step 12)" }
-    PRE-3: { action: "Décision PO scope sprint-023", status: "✅ US-106/107/108 + BUFFER + COVERAGE-012" }
-    PRE-4: { action: "Stories specs 3C + Gherkin", status: "✅ US-106..US-108" }
-    PRE-5: { action: "Render prod redeploy", status: "❌ 6ᵉ sprint consécutif holdover - trigger atteint sprint-024" }
+    PRE-1: { action: "Atelier OPS-PREP-J0", status: "✅ conduit J-16 anticipé 2026-05-11" }
+    PRE-2: { action: "Coverage post sp-023", status: "✅ 70 % CI report" }
+    PRE-3: { action: "Décision PO scope sp-024", status: "✅ Phase 4 + Migration + OPS-PRE5 = 12 pts" }
+    PRE-4: { action: "Décision PRE-5 Render redeploy", status: "✅ Option A actée (ADR-0018)" }
+    PRE-5: { action: "Stories specs 3C + Gherkin", status: "✅ PR #237" }
+    PRE-6: { action: "Pré-allocation cap libre 1-2 pts", status: "❌ non décidé — héritage A-2 sp-025" }
+
+  retro_actions:
+    inherited_to_sp_025: 7
+    summary: |
+      A-1 High Activer enablePullRequestAutoMerge repo
+      A-2 High PRE-6 cap libre assignement story J0 (3ᵉ sprint consécutif TBD)
+      A-3 Medium Doc procédure rebase stack PR CONTRIBUTING.md
+      A-4 Medium Helper DateTime::mutableFromImmutable() Tests Support
+      A-5 High T-113-07 dry-run prod user-tracked
+      A-6 Low Doc cache.kpi pool partagé design notes
+      A-7 Low Décision Slack channel #kpi-alerts-prod
+
+# =========================================================================
+# Note: sprint-023 closure archived in `sprint_history.sprint-023` ci-dessus.
+# Sprint-024 closure détaillé dans bloc `sprint_024_closure:` plus haut.
+# =========================================================================
 
 # =========================================================================
 # EPIC roll-up
@@ -437,17 +457,18 @@ epics:
 
   EPIC-003:
     name: "WorkItem & Profitability"
-    status: "in_progress"
-    phase: "Phase 4 kickoff (sprint-024)"
+    status: "done"
+    phase: "Phase 4 complete (sprint-024 done)"
     sprints: ["sprint-019", "sprint-020", "sprint-021", "sprint-022", "sprint-023", "sprint-024"]
-    sprints_completed: 5
+    sprints_completed: 6
     sprints_estimated: 6
-    completion: "~92%"
-    stories_delivered: ["US-097", "US-098", "US-099", "US-100", "US-101", "US-102", "US-103", "US-104", "US-105", "US-106", "US-107", "US-108"]
-    stories_planned_phase4: ["US-110", "US-111", "US-112", "US-113"]
+    completion: "100%"
+    stories_delivered: ["US-097", "US-098", "US-099", "US-100", "US-101", "US-102", "US-103", "US-104", "US-105", "US-106", "US-107", "US-108", "US-110", "US-111", "US-112", "US-113"]
     adrs: ["ADR-0013", "ADR-0015", "ADR-0016", "ADR-0017", "ADR-0018"]
     mvp_delivered: "sprint-022 (US-103 + US-104)"
     phase3_completion: "sprint-023 (strangler fig complet, persistence margin, configurabilité hiérarchique)"
+    phase4_completion: "sprint-024 (KPIs business DSO+lead time+adoption marge + Migration WorkItem.cost legacy + ADR-0018 Render redeploy)"
+    pattern_kpi_calculator_established: "4× consécutifs (DSO + Billing lead time + Margin adoption + WorkItem migrator) — réplicable sprints futurs"
 
 # =========================================================================
 # Backlog roll-up
@@ -514,3 +535,27 @@ migration_log:
     artifacts:
       - "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/atelier-ops-prep-j0.md"
       - "docs/02-architecture/adr/0018-render-redeploy-option-a.md"
+  - date: "2026-05-13"
+    action: "Sprint-024 closure"
+    detail: |
+      12/12 pts delivered (100 %). EPIC-003 Phase 4 complete (KPIs business +
+      Migration WorkItem.cost legacy). 28 PRs merged (#236 → #266). Pattern
+      KpiCalculator établi 4× consécutifs. 4ᵉ sprint 0 holdover OPS. 4ᵉ
+      confirmation baseline 12 pts ferme. Trigger réversibilité ADR-0017
+      satisfait → ADR-0018 redeploy Render Option A.
+    artifacts:
+      - "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/sprint-review.md"
+      - "project-management/sprints/sprint-024-epic-003-phase-4-kickoff/sprint-retro.md"
+      - "docs/runbooks/workitem-cost-migration.md"
+  - date: "2026-05-13"
+    action: "T-113 Doctrine migration cols ajoutées timesheets"
+    detail: "ADD COLUMN migrated_at, legacy_cost_drift, legacy_cost_cents (idempotent ADD COLUMN IF NOT EXISTS)."
+    path: "migrations/Version20260513090000.php"
+  - date: "2026-05-13"
+    action: "Sprint-025 kickoff stub"
+    detail: |
+      EPIC-003 closé sprint-024. Sprint-025 scope candidates : EPIC-003 Phase 5
+      (post-MVP extensions), Sub-epic D dette tech (Mago lint batch /
+      VacationRepo audit Deptrac / TEST-COVERAGE-013), PRE-6 cap libre 1-2 pts
+      à décider Sprint Planning P1. 7 actions héritées retro sp-024 (A-1..A-7).
+    path: "project-management/sprints/sprint-025/ (TBD)"
