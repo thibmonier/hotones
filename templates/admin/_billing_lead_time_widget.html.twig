@@ -1,0 +1,67 @@
+{# US-111 T-111-04 — Billing lead time widget (devis signé → facture émise) #}
+{# Renders 30/90/365 rolling windows percentiles + top 3 slow clients + threshold warning. #}
+
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        📑 Temps de facturation
+                        <small class="text-muted">devis signé → facture émise (médiane / p75 / p95)</small>
+                    </h5>
+                    {% if billing_lead_time.warningTriggered %}
+                        <span class="badge bg-warning text-dark"
+                              title="Médiane 30j ({{ billing_lead_time.stats30.p50.days|number_format(1, ',', ' ') }} j) dépasse le seuil {{ billing_lead_time.warningThresholdDays|number_format(0, ',', ' ') }} j">
+                            ⚠ Seuil dépassé (&gt; {{ billing_lead_time.warningThresholdDays|number_format(0, ',', ' ') }} j)
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3">
+                    {% for window, stats in {
+                        '30 jours rolling': billing_lead_time.stats30,
+                        '90 jours rolling': billing_lead_time.stats90,
+                        '365 jours rolling': billing_lead_time.stats365,
+                    } %}
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 h-100 {{ loop.index == 1 and billing_lead_time.warningTriggered ? 'border-warning' : '' }}">
+                                <div class="text-muted small">{{ window }}</div>
+                                <div class="fs-2 fw-bold">
+                                    {{ stats.p50.days|number_format(1, ',', ' ') }} j
+                                    <span class="fs-6 text-muted">médiane</span>
+                                </div>
+                                <small class="text-muted">
+                                    p75 : {{ stats.p75.days|number_format(1, ',', ' ') }} j
+                                    · p95 : {{ stats.p95.days|number_format(1, ',', ' ') }} j
+                                    · n = {{ stats.count }}
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if billing_lead_time.topSlowClients|length > 0 %}
+                    <hr class="my-3">
+                    <h6 class="text-muted text-uppercase small">Top 3 clients lents (30 j)</h6>
+                    <ol class="list-unstyled mb-0">
+                        {% for client in billing_lead_time.topSlowClients %}
+                            <li class="d-flex justify-content-between border-bottom py-2">
+                                <span>
+                                    <strong>{{ loop.index }}.</strong> {{ client.clientName }}
+                                    <small class="text-muted">({{ client.sampleCount }} facture{{ client.sampleCount > 1 ? 's' : '' }})</small>
+                                </span>
+                                <span class="fw-bold">{{ client.averageLeadTimeDays|number_format(1, ',', ' ') }} j</span>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
+
+                <p class="text-muted small mt-3 mb-0">
+                    Formule : lead_time = date_facture_émise − date_devis_signé.
+                    Devis sans facture exclus. Cache 1 h (invalidé sur création de facture).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
