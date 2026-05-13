@@ -8,6 +8,7 @@ use App\Domain\WorkItem\Migration\LegacyTimesheetReadModelRepositoryInterface;
 use App\Domain\WorkItem\Migration\LegacyTimesheetRecord;
 use App\Entity\Timesheet;
 use App\Security\CompanyContext;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -93,7 +94,8 @@ final readonly class DoctrineLegacyTimesheetReadModelRepository implements Legac
         }
 
         $timesheet->legacyCostDrift = $drift;
-        $timesheet->migratedAt = $now;
+        // Doctrine DateTimeType strict mutable — convert depuis DateTimeImmutable.
+        $timesheet->migratedAt = DateTime::createFromImmutable($now);
 
         $this->entityManager->flush();
     }
