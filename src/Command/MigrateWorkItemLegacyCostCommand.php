@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Application\WorkItem\Migration\DriftReportCsvExporter;
 use App\Domain\WorkItem\Migration\HourlyRateProviderInterface;
 use App\Domain\WorkItem\Migration\LegacyTimesheetReadModelRepositoryInterface;
 use App\Domain\WorkItem\Migration\MigrationDriftDetail;
@@ -47,6 +48,8 @@ final class MigrateWorkItemLegacyCostCommand extends Command
         private readonly LegacyTimesheetReadModelRepositoryInterface $repository,
         private readonly HourlyRateProviderInterface $hourlyRateProvider,
         private readonly WorkItemMigrator $migrator,
+        private readonly DriftReportCsvExporter $driftExporter,
+        private readonly string $projectDir,
     ) {
         parent::__construct();
     }
@@ -62,7 +65,14 @@ final class MigrateWorkItemLegacyCostCommand extends Command
                 'Items par batch (default 100)',
                 (string) self::DEFAULT_BATCH_SIZE,
             )
-            ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Limite globale items processés', '0');
+            ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Limite globale items processés', '0')
+            ->addOption(
+                'csv-report',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Export CSV drifts (path absolu OU "auto" pour var/migration/workitem-cost-drift-{date}.csv)',
+                'auto',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -121,8 +131,34 @@ final class MigrateWorkItemLegacyCostCommand extends Command
         $io->progressFinish();
 
         $this->reportSummary($io, $aggregated, $dryRun);
+        $this->exportDriftsIfRequested($io, $aggregated, $input, $now);
 
         return $aggregated->shouldTriggerAbandonCase3() ? Command::FAILURE : Command::SUCCESS;
+    }
+
+    private function exportDriftsIfRequested(
+        SymfonyStyle $io,
+        WorkItemMigrationResult $result,
+        InputInterface $input,
+        DateTimeImmutable $now,
+    ): void {
+        $csvOption = $input->getOption('csv-report');
+        if ($csvOption === null || $csvOption === '' || $csvOption === false) {
+            return;
+        }
+
+        if ($result->driftCount() === 0) {
+            $io->writeln('<comment>Pas de drift : aucun export CSV.</comment>');
+
+            return;
+        }
+
+        $path = $csvOption === 'auto'
+            ? DriftReportCsvExporter::defaultPath($this->projectDir, $now)
+            : (string) $csvOption;
+
+        $exportedPath = $this->driftExporter->export($result, $path);
+        $io->writeln(sprintf('<info>Drift report CSV exporté : %s</info>', $exportedPath));
     }
 
     private function mergeResults(WorkItemMigrationResult $a, WorkItemMigrationResult $b): WorkItemMigrationResult
