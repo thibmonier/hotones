@@ -14,12 +14,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * US-093 (sprint-017 EPIC-002) — Dashboard 7 KPIs business pilotage PO.
+ * US-110 (sprint-024 EPIC-003 Phase 4) — KPI DSO ajouté (T-110-04).
  * US-111 (sprint-024 EPIC-003 Phase 4) — KPI billing lead time ajouté (T-111-04).
  *
- * Cache : BusinessKpiService 5 min (cache.analytics) + billing lead time 1 h (cache.kpi).
- * US-110 (sprint-024 EPIC-003 Phase 4) — KPI DSO ajouté (T-110-04).
- *
- * Cache : BusinessKpiService 5 min (cache.analytics) + DSO 1h (cache.kpi).
+ * Cache : BusinessKpiService 5 min (cache.analytics) + DSO/billing lead time 1 h (cache.kpi).
  * Refresh auto Stimulus sur la vue Twig.
  */
 #[Route('/admin/business-dashboard')]
