@@ -12,6 +12,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
+ * Functional tests for `/admin/business-dashboard` — US-111 T-111-04 billing lead time widget.
  * Functional tests for `/admin/business-dashboard` — US-110 T-110-04 DSO widget.
  */
 #[Group('skip-pre-push')]
@@ -29,7 +30,7 @@ final class BusinessDashboardControllerTest extends WebTestCase
         self::assertResponseRedirects();
     }
 
-    public function testRendersDashboardWithDsoWidgetWhenAdminAuthenticated(): void
+    public function testRendersDashboardWithBillingLeadTimeWidgetWhenAdminAuthenticated(): void
     {
         $client = static::createClient();
         $this->setUpMultiTenant();
@@ -44,6 +45,29 @@ final class BusinessDashboardControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Dashboard Business');
+        self::assertSelectorTextContains('h5', 'Temps de facturation');
+        self::assertSelectorTextContains('body', '30 jours rolling');
+        self::assertSelectorTextContains('body', '90 jours rolling');
+        self::assertSelectorTextContains('body', '365 jours rolling');
+        self::assertSelectorTextContains('body', 'médiane');
+    }
+  
+    public function testRendersDashboardWithBillingLeadTimeWidgetWhenAdminAuthenticated(): void
+    {  
+        $client = static::createClient();
+        $this->setUpMultiTenant();
+
+        $admin = UserFactory::createOne([
+            'company' => $this->getTestCompany(),
+            'roles' => ['ROLE_ADMIN'],
+        ]);
+        $client->loginUser($admin);
+
+        $client->request('GET', '/admin/business-dashboard');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Dashboard Business');
+      
         self::assertSelectorTextContains('h5', 'DSO');
         // Three rolling windows rendered
         self::assertSelectorTextContains('body', '30 jours rolling');
