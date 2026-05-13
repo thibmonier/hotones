@@ -114,6 +114,8 @@ services:
 
     # Billing Lead Time Domain Service (sprint-024 US-111 T-111-01) — Domain pure, autowire explicite
     App\Domain\Project\Service\BillingLeadTimeCalculator:
+    # DSO Domain Service (sprint-024 US-110 T-110-01) — Domain pure, autowire explicite
+    App\Domain\Project\Service\DsoCalculator:
         autowire: true
         autoconfigure: true
 
