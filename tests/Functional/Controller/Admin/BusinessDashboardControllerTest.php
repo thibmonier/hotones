@@ -1,0 +1,69 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Functional\Controller\Admin;
+
+use App\Factory\UserFactory;
+use App\Tests\Support\MultiTenantTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
+
+/**
+ * Functional tests for `/admin/business-dashboard` — US-110 T-110-04 DSO widget.
+ */
+#[Group('skip-pre-push')]
+final class BusinessDashboardControllerTest extends WebTestCase
+{
+    use Factories;
+    use MultiTenantTestTrait;
+    use ResetDatabase;
+
+    public function testRedirectsAnonymousToLogin(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/admin/business-dashboard');
+
+        self::assertResponseRedirects();
+    }
+
+    public function testRendersDashboardWithDsoWidgetWhenAdminAuthenticated(): void
+    {
+        $client = static::createClient();
+        $this->setUpMultiTenant();
+
+        $admin = UserFactory::createOne([
+            'company' => $this->getTestCompany(),
+            'roles' => ['ROLE_ADMIN'],
+        ]);
+        $client->loginUser($admin);
+
+        $client->request('GET', '/admin/business-dashboard');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Dashboard Business');
+        self::assertSelectorTextContains('h5', 'DSO');
+        // Three rolling windows rendered
+        self::assertSelectorTextContains('body', '30 jours rolling');
+        self::assertSelectorTextContains('body', '90 jours rolling');
+        self::assertSelectorTextContains('body', '365 jours rolling');
+    }
+
+    public function testForbidsNonAdminUser(): void
+    {
+        $client = static::createClient();
+        $this->setUpMultiTenant();
+
+        $user = UserFactory::createOne([
+            'company' => $this->getTestCompany(),
+            'roles' => ['ROLE_USER'],
+        ]);
+        $client->loginUser($user);
+
+        $client->request('GET', '/admin/business-dashboard');
+
+        self::assertResponseStatusCodeSame(403);
+    }
+}

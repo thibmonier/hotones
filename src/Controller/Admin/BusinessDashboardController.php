@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
+use App\Application\Project\Query\DsoKpi\ComputeDsoKpiHandler;
 use App\Service\Analytics\BusinessKpiService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,9 +13,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * US-093 (sprint-017 EPIC-002) — Dashboard 7 KPIs business pilotage PO.
+ * US-110 (sprint-024 EPIC-003 Phase 4) — KPI DSO ajouté (T-110-04).
  *
- * Cache 5 min via `BusinessKpiService::computeAll()`. Refresh auto Stimulus
- * sur la vue Twig.
+ * Cache : BusinessKpiService 5 min (cache.analytics) + DSO 1h (cache.kpi).
+ * Refresh auto Stimulus sur la vue Twig.
  */
 #[Route('/admin/business-dashboard')]
 #[IsGranted('ROLE_ADMIN')]
@@ -22,16 +24,16 @@ final class BusinessDashboardController extends AbstractController
 {
     public function __construct(
         private readonly BusinessKpiService $kpiService,
+        private readonly ComputeDsoKpiHandler $computeDsoKpi,
     ) {
     }
 
     #[Route('', name: 'admin_business_dashboard', methods: ['GET'])]
     public function index(): Response
     {
-        $kpis = $this->kpiService->computeAll();
-
         return $this->render('admin/business_dashboard.html.twig', [
-            'kpis' => $kpis,
+            'kpis' => $this->kpiService->computeAll(),
+            'dso' => ($this->computeDsoKpi)(),
         ]);
     }
 }

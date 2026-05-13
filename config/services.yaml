@@ -112,6 +112,11 @@ services:
         autowire: true
         autoconfigure: true
 
+    # DSO Domain Service (sprint-024 US-110 T-110-01) — Domain pure, autowire explicite
+    App\Domain\Project\Service\DsoCalculator:
+        autowire: true
+        autoconfigure: true
+
     # SlackAlertingInterface binding (sprint-021 US-103) — extracted interface
     # pour mockabilité tests Application Layer
     App\Service\Alerting\SlackAlertingInterface:
