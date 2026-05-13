@@ -16,6 +16,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  *
  * - US-110 T-110-04 DSO widget
  * - US-111 T-111-04 billing lead time widget
+ * - US-112 T-112-03 margin adoption widget
  */
 #[Group('skip-pre-push')]
 final class BusinessDashboardControllerTest extends WebTestCase
@@ -73,6 +74,24 @@ final class BusinessDashboardControllerTest extends WebTestCase
         self::assertSelectorTextContains('body', '30 jours rolling');
         self::assertSelectorTextContains('body', '90 jours rolling');
         self::assertSelectorTextContains('body', '365 jours rolling');
+    }
+
+    public function testRendersDashboardWithMarginAdoptionWidgetWhenAdminAuthenticated(): void
+    {
+        $client = static::createClient();
+        $this->setUpMultiTenant();
+
+        $admin = UserFactory::createOne([
+            'company' => $this->getTestCompany(),
+            'roles' => ['ROLE_ADMIN'],
+        ]);
+        $client->loginUser($admin);
+
+        $client->request('GET', '/admin/business-dashboard');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Adoption marge');
+        self::assertSelectorTextContains('body', 'Indicateur trigger abandon ADR-0013');
     }
 
     public function testForbidsNonAdminUser(): void
