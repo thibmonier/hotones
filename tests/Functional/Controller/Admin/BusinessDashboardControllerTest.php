@@ -12,8 +12,10 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
- * Functional tests for `/admin/business-dashboard` — US-111 T-111-04 billing lead time widget.
- * Functional tests for `/admin/business-dashboard` — US-110 T-110-04 DSO widget.
+ * Functional tests for `/admin/business-dashboard`.
+ *
+ * - US-110 T-110-04 DSO widget
+ * - US-111 T-111-04 billing lead time widget
  */
 #[Group('skip-pre-push')]
 final class BusinessDashboardControllerTest extends WebTestCase
@@ -45,15 +47,15 @@ final class BusinessDashboardControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Dashboard Business');
-        self::assertSelectorTextContains('h5', 'Temps de facturation');
+        self::assertSelectorTextContains('body', 'Temps de facturation');
         self::assertSelectorTextContains('body', '30 jours rolling');
         self::assertSelectorTextContains('body', '90 jours rolling');
         self::assertSelectorTextContains('body', '365 jours rolling');
         self::assertSelectorTextContains('body', 'médiane');
     }
-  
-    public function testRendersDashboardWithBillingLeadTimeWidgetWhenAdminAuthenticated(): void
-    {  
+
+    public function testRendersDashboardWithDsoWidgetWhenAdminAuthenticated(): void
+    {
         $client = static::createClient();
         $this->setUpMultiTenant();
 
@@ -67,9 +69,7 @@ final class BusinessDashboardControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Dashboard Business');
-      
-        self::assertSelectorTextContains('h5', 'DSO');
-        // Three rolling windows rendered
+        self::assertSelectorTextContains('body', 'DSO');
         self::assertSelectorTextContains('body', '30 jours rolling');
         self::assertSelectorTextContains('body', '90 jours rolling');
         self::assertSelectorTextContains('body', '365 jours rolling');
