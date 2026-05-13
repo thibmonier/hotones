@@ -97,6 +97,17 @@ services:
         arguments:
             $kpiCache: '@cache.kpi'
 
+    # WorkItem Migration (EPIC-003 Phase 4 sprint-024 US-113 T-113-02 + T-113-03)
+    App\Domain\WorkItem\Migration\HourlyRateProviderInterface:
+        alias: App\Infrastructure\WorkItem\Migration\DoctrineHourlyRateProvider
+
+    App\Domain\WorkItem\Migration\LegacyTimesheetReadModelRepositoryInterface:
+        alias: App\Infrastructure\WorkItem\Migration\DoctrineLegacyTimesheetReadModelRepository
+
+    App\Domain\WorkItem\Migration\WorkItemMigrator:
+        autowire: true
+        autoconfigure: true
+
     # Order Bounded Context - Interface bindings (EPIC-001 Phase 2/3)
     App\Domain\Order\Repository\OrderRepositoryInterface:
         alias: App\Infrastructure\Order\Persistence\Doctrine\DoctrineDddOrderRepository
