@@ -69,11 +69,22 @@ services:
         arguments:
             $kpiCache: '@cache.kpi'
 
-    # Billing Lead Time Read-Model Repository (EPIC-003 Phase 4 sprint-024 US-111 T-111-02)
+    # Billing Lead Time Read-Model Repository (EPIC-003 Phase 4 sprint-024 US-111)
+    # T-111-02 Doctrine adapter + T-111-03 caching decorator (cache.kpi 1h TTL)
     # public: true tant que pas de consumer downstream (T-111-04 Widget Twig)
     App\Domain\Project\Repository\BillingLeadTimeReadModelRepositoryInterface:
-        alias: App\Infrastructure\Project\Persistence\Doctrine\DoctrineBillingLeadTimeReadModelRepository
+        alias: App\Infrastructure\Project\Persistence\Doctrine\CachingBillingLeadTimeReadModelRepository
         public: true
+
+    App\Infrastructure\Project\Persistence\Doctrine\CachingBillingLeadTimeReadModelRepository:
+        arguments:
+            $inner: '@App\Infrastructure\Project\Persistence\Doctrine\DoctrineBillingLeadTimeReadModelRepository'
+            $kpiCache: '@cache.kpi'
+
+    # T-111-03 Subscriber InvoiceCreatedEvent → invalide cache.kpi pool
+    App\Application\Project\EventListener\InvalidateBillingLeadTimeCacheOnInvoiceCreated:
+        arguments:
+            $kpiCache: '@cache.kpi'
 
     # Order Bounded Context - Interface bindings (EPIC-001 Phase 2/3)
     App\Domain\Order\Repository\OrderRepositoryInterface:
