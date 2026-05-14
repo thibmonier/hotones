@@ -41,7 +41,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
         $client = static::createClient();
         $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         ContributorFactory::createOne(['user' => $user, 'company' => $user->getCompany()]);
-        $client->loginUser($user->_real());
+        $client->loginUser($user);
 
         $client->request('GET', '/timesheet/week');
 
@@ -54,7 +54,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
         $client = static::createClient();
         $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         ContributorFactory::createOne(['user' => $user, 'company' => $user->getCompany()]);
-        $client->loginUser($user->_real());
+        $client->loginUser($user);
 
         $client->request('GET', '/timesheet/week/2026-W19');
 
@@ -66,7 +66,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
         $client = static::createClient();
         $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         ContributorFactory::createOne(['user' => $user, 'company' => $user->getCompany()]);
-        $client->loginUser($user->_real());
+        $client->loginUser($user);
 
         // Route requirements regex \d{4}-W\d{2} — "not-a-week" ne matche pas
         $client->request('GET', '/timesheet/week/not-a-week');
@@ -80,7 +80,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
         $client = static::createClient();
         $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         ContributorFactory::createOne(['user' => $user, 'company' => $user->getCompany()]);
-        $client->loginUser($user->_real());
+        $client->loginUser($user);
 
         $client->request('GET', '/timesheet/week/save');
 
@@ -93,7 +93,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
         $client = static::createClient();
         $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         ContributorFactory::createOne(['user' => $user, 'company' => $user->getCompany()]);
-        $client->loginUser($user->_real());
+        $client->loginUser($user);
 
         $client->request(
             'POST',
@@ -110,7 +110,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
         $client = static::createClient();
         $user = UserFactory::createOne(['roles' => ['ROLE_INTERVENANT']]);
         ContributorFactory::createOne(['user' => $user, 'company' => $user->getCompany()]);
-        $client->loginUser($user->_real());
+        $client->loginUser($user);
 
         $client->request(
             'POST',
