@@ -11,6 +11,7 @@ use App\Domain\WorkItem\Repository\WorkItemRepositoryInterface;
 use App\Domain\WorkItem\ValueObject\WorkItemStatus;
 use App\Entity\Contributor;
 use App\Entity\Project;
+use App\Repository\ContributorRepository;
 use App\Repository\ProjectRepository;
 use App\Security\CompanyContext;
 use DateTimeImmutable;
@@ -48,6 +49,7 @@ final class WeeklyTimesheetController extends AbstractController
         private readonly RecordWorkItemUseCase $recordWorkItemUseCase,
         private readonly WorkItemRepositoryInterface $workItemRepository,
         private readonly ProjectRepository $projectRepository,
+        private readonly ContributorRepository $contributorRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly CompanyContext $companyContext,
     ) {
@@ -154,12 +156,14 @@ final class WeeklyTimesheetController extends AbstractController
 
     private function getContributor(): Contributor
     {
-        $user = $this->getUser();
-        if (!$user instanceof Contributor) {
+        // Security provider resolves App\Entity\User — the Contributor is a
+        // distinct entity linked via Contributor.user, resolved here.
+        $contributor = $this->contributorRepository->findByUser($this->getUser());
+        if ($contributor === null) {
             throw $this->createAccessDeniedException('User is not a Contributor');
         }
 
-        return $user;
+        return $contributor;
     }
 
     /**

@@ -37,7 +37,7 @@ jobs:
             --branch main \
             --status failure \
             --limit 50 \
-            --json databaseId,name,workflowName,event,conclusion,createdAt,updatedAt,htmlUrl \
+            --json databaseId,name,workflowName,event,conclusion,createdAt,updatedAt,url \
             | jq --arg since "$since" '
               [ .[]
                 | select(.event == "push" or .event == "schedule")
@@ -65,7 +65,7 @@ jobs:
             | jq -r '.[0].number // empty')"
 
           first_run="$(jq -r '.[0]' /tmp/stale-runs.json)"
-          run_url="$(echo "$first_run" | jq -r '.htmlUrl')"
+          run_url="$(echo "$first_run" | jq -r '.url')"
           run_workflow="$(echo "$first_run" | jq -r '.workflowName')"
           run_updated="$(echo "$first_run" | jq -r '.updatedAt')"
           stale_count="${{ steps.detect.outputs.stale_count }}"
@@ -117,15 +117,15 @@ jobs:
             --branch main \
             --workflow CI \
             --limit 1 \
-            --json conclusion,status,htmlUrl \
+            --json conclusion,status,url \
             | jq -r '.[0].conclusion // empty')"
 
           latest_url="$(gh run list \
             --branch main \
             --workflow CI \
             --limit 1 \
-            --json conclusion,status,htmlUrl \
-            | jq -r '.[0].htmlUrl // empty')"
+            --json conclusion,status,url \
+            | jq -r '.[0].url // empty')"
 
           echo "conclusion=$latest_conclusion" >> "$GITHUB_OUTPUT"
           echo "url=$latest_url" >> "$GITHUB_OUTPUT"

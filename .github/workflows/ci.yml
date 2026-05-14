@@ -113,6 +113,15 @@ jobs:
           {}
           JSON
 
+      - name: Install importmap vendor assets
+        # US-110/111/112 (sprint-024) : le layout admin `base.html.twig`
+        # rend `importmap('app')` qui exige `assets/vendor/@hotwired/*`.
+        # `assets/vendor/` est gitignored → vendoring obligatoire en CI
+        # sinon les Functional tests admin renvoient 500 (asset missing).
+        env:
+          APP_ENV: test
+        run: php bin/console importmap:install
+
       - name: Run PHPUnit
         env:
           APP_ENV: test

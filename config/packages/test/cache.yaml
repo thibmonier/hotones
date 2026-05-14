@@ -12,3 +12,9 @@ framework:
             # Cache for rate limiter (in-memory for tests)
             cache.rate_limiter:
                 adapter: cache.adapter.array
+
+            # Cache for business KPIs — US-110/111/112 (in-memory for tests).
+            # Array adapter keeps get()/hasItem() consistent in-process and
+            # AlertState streak persisted across CheckMarginAdoption calls.
+            cache.kpi:
+                adapter: cache.adapter.array
