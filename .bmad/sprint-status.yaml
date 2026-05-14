@@ -237,12 +237,91 @@ current_sprint:
     firm: 12
     free: 2
     velocity_avg_15_sprints: 11.07
-  committed_points: null
-  committed_breakdown: null
+  committed_points: 12
+  committed_breakdown:
+    US-114: 3
+    US-115: 3
+    US-116: 2
+    MAGO-LINT-BATCH-001: 2
+    VACATION-REPO-AUDIT: 1
+    TEST-COVERAGE-013: 1
   predecessor: "sprint-024 (closed 2026-05-13, 12/12 pts)"
   notes: |
-    Scope à définir Sprint Planning P1 2026-05-27. Pattern KpiCalculator
-    établi sp-024 (4× consécutifs) réutilisable pour nouveaux KPIs.
+    Scope décidé (PRE-3 ✅) : EPIC-003 Phase 5 KPIs business (8 pts) +
+    Sub-epic D dette technique (4 pts). Décomposition prête : 23 tâches
+    ~43h (project-management/sprints/sprint-025/tasks/). Pattern
+    KpiCalculator sp-024 réutilisé US-114/115. Formalisation Planning P1.
+
+  stories:
+    US-114:
+      title: "KPI Revenue forecast (prévision CA glissante)"
+      epic: "EPIC-003"
+      phase: "Phase 5"
+      points: 3
+      priority: "Must"
+      status: "ready-for-dev"
+      sprint: "sprint-025"
+      tasks: 6
+      notes: "Pattern KpiCalculator 6-task. Source Order pipeline + exclusion Invoice."
+    US-115:
+      title: "KPI Taux de conversion devis → commande"
+      epic: "EPIC-003"
+      phase: "Phase 5"
+      points: 3
+      priority: "Must"
+      status: "ready-for-dev"
+      sprint: "sprint-025"
+      tasks: 6
+      notes: "Pattern KpiCalculator 6-task + tendance. Source Order statut/createdAt."
+    US-116:
+      title: "Extension widgets DSO/lead time (drill-down + export CSV)"
+      epic: "EPIC-003"
+      phase: "Phase 5"
+      points: 2
+      priority: "Should"
+      status: "ready-for-dev"
+      sprint: "sprint-025"
+      tasks: 4
+      notes: "Extension UI, pas de nouveau calculateur. Réutilise read-models US-110/111 + DriftReportCsvExporter US-113."
+    MAGO-LINT-BATCH-001:
+      title: "Mago lint cleanup batch initial (100-150 erreurs)"
+      epic: "TECH"
+      sub_epic: "D"
+      points: 2
+      priority: "Must"
+      status: "ready-for-dev"
+      sprint: "sprint-025"
+      tasks: 3
+      notes: "Carry-over sp-022/023/024. 626 erreurs Mago stable → batch initial + baseline résiduel."
+    VACATION-REPO-AUDIT:
+      title: "Audit Deptrac VacationRepository (CompanyContext hors Repository layer)"
+      epic: "TECH"
+      sub_epic: "D"
+      points: 1
+      priority: "Should"
+      status: "ready-for-dev"
+      sprint: "sprint-025"
+      tasks: 2
+      notes: "Carry-over sp-023 retro L-4. Même pattern que violation ContributorRepository détectée sp-024 PR #270."
+    TEST-COVERAGE-013:
+      title: "Coverage anticipation 70 → 72 %"
+      epic: "TECH"
+      sub_epic: "D"
+      points: 1
+      priority: "Should"
+      status: "ready-for-dev"
+      sprint: "sprint-025"
+      tasks: 2
+      notes: "PRE-2 héritage sp-024. Cible CI globale 72 %."
+    US-117:
+      title: "KPI Marge moyenne portefeuille"
+      epic: "EPIC-003"
+      phase: "Phase 5"
+      points: 3
+      priority: "Could"
+      status: "backlog"
+      sprint: "sprint-026+"
+      notes: "Reporté — overflow capacité sprint-025. Spec créée. Candidat sprint-026."
 
   inherited_actions_sp_024_retro:
     A-1:
@@ -315,15 +394,15 @@ current_sprint:
     PRE-3:
       action: "Décision PO scope sprint-025"
       owner: "PO"
-      deadline: "Sprint-025 Planning P1 (2026-06-09 ou 2026-05-27)"
-      status: "pending"
-      candidates: ["EPIC-003 Phase 5", "Dette tech (Mago/VacationRepo/Coverage)", "Nouveau KPI (revenue forecast)"]
+      deadline: "Sprint-025 Planning P1 (2026-06-09)"
+      status: "✅ done"
+      decision: "EPIC-003 Phase 5 KPIs business (US-114/115/116 = 8 pts) + Sub-epic D dette technique (MAGO/VACREPO/COVERAGE = 4 pts) = 12 pts ferme"
     PRE-4:
       action: "Stories sprint-025 spécifiées 3C + Gherkin"
       owner: "PO"
       deadline: "Sprint-025 J0 fin"
-      status: "pending"
-      depends_on: "PRE-3 scope décidé"
+      status: "✅ done"
+      detail: "US-114/115/116 (sprint-025) + US-117 (backlog Phase 5) créées dans backlog/user-stories/. Décomposition 23 tâches dans sprint-025/tasks/."
     PRE-5:
       action: "Cap libre 1-2 pts pré-allocation explicite (A-2 héritage)"
       owner: "PO"
