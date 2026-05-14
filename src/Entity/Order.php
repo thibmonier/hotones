@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     new ORM\Index(name: 'idx_order_status', columns: ['status']),
     new ORM\Index(name: 'idx_order_created_at', columns: ['created_at']),
     new ORM\Index(name: 'idx_order_validated_at', columns: ['validated_at']),
+    new ORM\Index(name: 'idx_order_valid_until', columns: ['valid_until']),
     new ORM\Index(name: 'idx_order_company', columns: ['company_id']),
 ])]
 #[ApiResource(
