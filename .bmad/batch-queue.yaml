@@ -11,8 +11,8 @@ queue:
     title: "KPI Marge moyenne portefeuille"
     points: 3
     priority: 1
-    status: "in_progress"
-    tasks_done: ["T-117-01", "T-117-02", "T-117-03", "T-117-04", "T-117-05"]
+    status: "completed"
+    tasks_done: ["T-117-01", "T-117-02", "T-117-03", "T-117-04", "T-117-05", "T-117-06"]
     depends_on: []
     nature: "feature"
     epic: "EPIC-003 Phase 5"
@@ -88,14 +88,15 @@ queue:
     branch: "ops/t-113-07-dry-run-prod"
 
 checkpoints:
-  last_completed: null
-  last_task_completed: "T-117-05"
-  current_story: "US-117"
-  next_story: "US-117"
-  next_task: "T-117-06"
-  timestamp: "2026-05-15T19:00:00Z"
-  stories_completed: 0
+  last_completed: "US-117"
+  last_task_completed: "T-117-06"
+  current_story: null
+  next_story: "US-119"
+  next_task: null
+  timestamp: "2026-05-15T19:30:00Z"
+  stories_completed: 1
   stories_failed: 0
-  tasks_completed: 5
+  tasks_completed: 6
   tasks_total: 19
   branch_current: "feat/us-117-portfolio-margin"
+  branch_completed: "feat/us-117-portfolio-margin"
