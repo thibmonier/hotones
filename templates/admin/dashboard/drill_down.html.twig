@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ kpi_label }} — Drill-down par client{% endblock %}
+
+{% block body %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="{{ path('admin_business_dashboard') }}" class="btn btn-sm btn-outline-secondary mb-2">
+                ← Retour dashboard
+            </a>
+            <h1 class="mb-1">{{ kpi_label }} — Drill-down par client</h1>
+            <small class="text-muted">
+                Fenêtre rolling {{ window }} jours · {{ aggregates|length }} client{{ aggregates|length > 1 ? 's' : '' }}
+            </small>
+        </div>
+        <div class="text-end">
+            <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Fenêtre rolling">
+                {% for w in [30, 90, 365] %}
+                    <a href="{{ path('admin_business_dashboard_drill_down', {kpi: kpi, window: w}) }}"
+                       class="btn {{ w == window ? 'btn-primary' : 'btn-outline-primary' }}">
+                        {{ w }} j
+                    </a>
+                {% endfor %}
+            </div>
+            <br>
+            <a href="{{ path('admin_business_dashboard_drill_down_export', {kpi: kpi, window: window}) }}"
+               class="btn btn-sm btn-success">
+                ⬇ Export CSV
+            </a>
+        </div>
+    </div>
+
+    {% if aggregates is empty %}
+        <div class="alert alert-info">
+            Aucune donnée disponible sur la fenêtre {{ window }} jours.
+            Essayez une fenêtre plus large (90 ou 365 jours).
+        </div>
+    {% else %}
+        <div class="card shadow-sm">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Client</th>
+                        <th class="text-end">Valeur moyenne ({{ value_unit }})</th>
+                        <th class="text-end">Échantillon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agg in aggregates %}
+                        {% set value = kpi == 'dso' ? agg.dsoAverageDays : agg.leadTimeAverageDays %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td><strong>{{ agg.clientName }}</strong></td>
+                            <td class="text-end">{{ value|number_format(1, ',', ' ') }} j</td>
+                            <td class="text-end">
+                                <span class="badge bg-secondary">{{ agg.sampleCount }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p class="text-muted small mt-3">
+            Tri par valeur décroissante (clients lents en tête).
+            Multi-tenant (société courante uniquement). Cache 1 h.
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

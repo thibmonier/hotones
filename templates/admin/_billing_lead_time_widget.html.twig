@@ -61,6 +61,11 @@
                     Formule : lead_time = date_facture_émise − date_devis_signé.
                     Devis sans facture exclus. Cache 1 h (invalidé sur création de facture).
                 </p>
+
+                <a href="{{ path('admin_business_dashboard_drill_down', {kpi: 'lead-time', window: 30}) }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    📊 Drill-down par client →
+                </a>
             </div>
         </div>
     </div>
