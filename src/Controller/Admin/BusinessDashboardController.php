@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Application\Project\Query\BillingLeadTimeKpi\ComputeBillingLeadTimeKpiHandler;
 use App\Application\Project\Query\DsoKpi\ComputeDsoKpiHandler;
 use App\Application\Project\Query\MarginAdoptionKpi\ComputeMarginAdoptionKpiHandler;
+use App\Application\Project\Query\RevenueForecastKpi\ComputeRevenueForecastKpiHandler;
 use App\Service\Analytics\BusinessKpiService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,6 +33,7 @@ final class BusinessDashboardController extends AbstractController
         private readonly ComputeBillingLeadTimeKpiHandler $computeBillingLeadTimeKpi,
         private readonly ComputeDsoKpiHandler $computeDsoKpi,
         private readonly ComputeMarginAdoptionKpiHandler $computeMarginAdoptionKpi,
+        private readonly ComputeRevenueForecastKpiHandler $computeRevenueForecastKpi,
     ) {
     }
 
@@ -43,6 +45,7 @@ final class BusinessDashboardController extends AbstractController
             'billing_lead_time' => ($this->computeBillingLeadTimeKpi)(),
             'dso' => ($this->computeDsoKpi)(),
             'margin_adoption' => ($this->computeMarginAdoptionKpi)(),
+            'revenue_forecast' => ($this->computeRevenueForecastKpi)(),
         ]);
     }
 }
