@@ -33,7 +33,9 @@ final readonly class SendRevenueForecastRedAlertOnOrderStatusChanged
 
     public function __invoke(OrderStatusChangedEvent $event): void
     {
-        $forecast = ($this->computeRevenueForecastKpi)();
+        // Ancre temporelle = timestamp de l'événement → cohérence entre
+        // dispatch et calcul forecast (testable avec event fabriqué).
+        $forecast = ($this->computeRevenueForecastKpi)($event->getOccurredOn());
 
         // Seuil rouge plancher : alerte si forecast > 0 ET < seuil
         // (forecast = 0 sur pipeline vide n'est pas un signal exploitable).
